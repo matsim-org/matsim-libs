@@ -23,9 +23,8 @@ package org.matsim.contrib.locationchoice;
 import static org.junit.Assert.*;
 
 import jakarta.inject.Provider;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -77,12 +76,12 @@ public class LocationChoiceIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-
 	/**
 	 * This is, as far as I can see, testing the {@link LocationChoicePlanStrategy}.  It will use the algo from the config, which is "random".  It is thus not using the frozen
 	 * epsilon approach.  kai, mar'19
 	 */
-	@Test public void testLocationChoice() {
+	@Test
+	void testLocationChoice() {
 
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
 

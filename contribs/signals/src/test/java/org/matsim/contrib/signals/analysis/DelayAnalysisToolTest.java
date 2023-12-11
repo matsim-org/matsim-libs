@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -67,7 +67,7 @@ public class DelayAnalysisToolTest {
 	private static final int NUMBER_OF_PERSONS = 5;
 
 	@Test
-	public void testGetTotalDelayOnePerson(){
+	void testGetTotalDelayOnePerson(){
 		Scenario scenario = prepareTest(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -95,7 +95,7 @@ public class DelayAnalysisToolTest {
 	}
 
 	@Test
-	public void testGetTotalDelaySeveralPerson(){
+	void testGetTotalDelaySeveralPerson(){
 		Scenario scenario = prepareTest(NUMBER_OF_PERSONS);
 
 		EventsManager events = EventsUtils.createEventsManager();

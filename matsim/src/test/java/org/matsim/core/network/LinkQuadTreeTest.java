@@ -22,7 +22,7 @@
  package org.matsim.core.network;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
+ /**
  * @author mrieser / senozon
  */
 public class LinkQuadTreeTest {
 
-	@Test
-	public void testGetNearest() {
+	 @Test
+	 void testGetNearest() {
 		
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -68,8 +68,8 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(c, qt.getNearest(1205, 1101));
 	}
 
-	@Test
-	public void testGetNearest_longNear_smallFarAway() {
+	 @Test
+	 void testGetNearest_longNear_smallFarAway() {
 		
 		/*
 		 * Test the following constellation:
@@ -98,9 +98,9 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(b, qt.getNearest(300, 210)); // outside of segment (1)-(2), thus (3)-(4) is closer 
 		Assert.assertEquals(a, qt.getNearest(400, 210)); // distance to (1) is smaller than to (3)-(4) 
 	}
-	
-	@Test
-	public void testPut_zeroLengthLink() {
+
+	 @Test
+	 void testPut_zeroLengthLink() {
 		/*
 		 * Test the following constellation:
 		 * 
@@ -144,8 +144,8 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(l13, qt.getNearest(100, 800));
 	}
 
-	@Test
-	public void testPut_zeroLengthLink_negativeCoords() {
+	 @Test
+	 void testPut_zeroLengthLink_negativeCoords() {
 		/* Same as test above, but with negative coords
 		 */
 
@@ -169,8 +169,8 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(l13, qt.getNearest(-100, -800));
 	}
 
-	@Test
-	public void testRemove() {
+	 @Test
+	 void testRemove() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);
@@ -189,11 +189,11 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(l23, qt.getNearest(100, 800));
 	}
 
-	/**
-	 * Test for MATSIM-687: links not stored in top-node are not removed
-	 */
-	@Test
-	public void testRemove_inSubNode() {
+	 /**
+	  * Test for MATSIM-687: links not stored in top-node are not removed
+	  */
+	 @Test
+	 void testRemove_inSubNode() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);

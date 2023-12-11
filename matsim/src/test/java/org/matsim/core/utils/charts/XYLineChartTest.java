@@ -29,8 +29,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -48,7 +48,8 @@ public class XYLineChartTest {
 	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
 	 * @throws IOException possible exception when reading the image for validation
 	 */
-	@Test public void testXYLineChartDemo() throws IOException {
+	@Test
+	void testXYLineChartDemo() throws IOException {
 		String imageFilename = utils.getOutputDirectory() + "xylinechart.png";
 		Demo demo = new Demo();
 		demo.createXYLineChart(imageFilename);

@@ -20,7 +20,7 @@
 package org.matsim.core.config.groups;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class CountsConfigGroupTest {
 
 	@Test
-	public void testWriteCountsInterval() {
+	void testWriteCountsInterval() {
 		CountsConfigGroup cg = new CountsConfigGroup();
 		// test initial value
 		Assert.assertEquals(10, cg.getWriteCountsInterval());
@@ -44,13 +44,13 @@ public class CountsConfigGroupTest {
 	}
 
 	@Test
-	public void testGetParams_writeCountsInterval() {
+	void testGetParams_writeCountsInterval() {
 		CountsConfigGroup cg = new CountsConfigGroup();
 		Assert.assertNotNull(cg.getParams().get("writeCountsInterval"));
 	}
-	
+
 	@Test
-	public void testWriteAverageOverIterations() {
+	void testWriteAverageOverIterations() {
 		CountsConfigGroup cg = new CountsConfigGroup();
 		// test initial value
 		Assert.assertEquals(5, cg.getAverageCountsOverIterations());
@@ -64,9 +64,9 @@ public class CountsConfigGroupTest {
 		Assert.assertEquals(2, cg.getAverageCountsOverIterations());
 		Assert.assertEquals("2", cg.getValue("averageCountsOverIterations"));
 	}
-	
+
 	@Test
-	public void testGetParams_averageCountsOverIterations() {
+	void testGetParams_averageCountsOverIterations() {
 		CountsConfigGroup cg = new CountsConfigGroup();
 		Assert.assertNotNull(cg.getParams().get("averageCountsOverIterations"));
 	}

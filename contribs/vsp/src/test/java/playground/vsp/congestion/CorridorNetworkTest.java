@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -65,7 +65,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 public class CorridorNetworkTest {
 
 	@Test
-	public void v3Test(){
+	void v3Test(){
 		CorridorNetworkAndPlans inputs = new CorridorNetworkAndPlans();
 		Scenario sc = inputs.getDesiredScenario();
 		
@@ -112,7 +112,7 @@ public class CorridorNetworkTest {
 	}
 
 	@Test
-	public void v4Test(){
+	void v4Test(){
 		CorridorNetworkAndPlans inputs = new CorridorNetworkAndPlans();
 		Scenario sc = inputs.getDesiredScenario();
 

@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MultimodalNetworkCleanerTest {
 
 	@Test
-	public void testRun_singleMode() {
+	void testRun_singleMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
@@ -62,7 +61,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleMode_separateLink() {
+	void testRun_singleMode_separateLink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
@@ -106,7 +105,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleInexistantMode() {
+	void testRun_singleInexistantMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 
@@ -126,7 +125,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleMode_singleSink() {
+	void testRun_singleMode_singleSink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
@@ -179,7 +178,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleMode_singleSinkIntegrated() {
+	void testRun_singleMode_singleSinkIntegrated() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		network.getLinks().get(f.linkIds[1]).setAllowedModes(f.modesCW); // integrate the sinks into the existing network
@@ -221,7 +220,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleMode_doubleSink() {
+	void testRun_singleMode_doubleSink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
@@ -278,7 +277,7 @@ public class MultimodalNetworkCleanerTest {
 
 
 	@Test
-	public void testRun_singleMode_singleSource() {
+	void testRun_singleMode_singleSource() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
@@ -331,7 +330,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRemoveNodesWithoutLinks() {
+	void testRemoveNodesWithoutLinks() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		network.addNode(network.getFactory().createNode(f.nodeIds[10], new Coord((double) 300, (double) 300)));
@@ -351,7 +350,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleMode_doubleSource() {
+	void testRun_singleMode_doubleSource() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
@@ -407,7 +406,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_multipleModes() {
+	void testRun_multipleModes() {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
 
@@ -431,7 +430,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_multipleModes_doubleSink() {
+	void testRun_multipleModes_doubleSink() {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
 
@@ -465,7 +464,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_multipleModes_doubleSource() {
+	void testRun_multipleModes_doubleSource() {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
 
@@ -499,7 +498,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_emptyModes() {
+	void testRun_emptyModes() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 
@@ -520,7 +519,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_unknownMode() {
+	void testRun_unknownMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 
@@ -541,7 +540,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleLinkNetwork() {
+	void testRun_singleLinkNetwork() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
@@ -566,7 +565,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_singleModeWithConnectivity() {
+	void testRun_singleModeWithConnectivity() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		Assert.assertEquals(6, network.getNodes().size());
@@ -577,7 +576,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_withConnectivity_connectedSource() {
+	void testRun_withConnectivity_connectedSource() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
@@ -597,7 +596,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_withConnectivity_connectedSink() {
+	void testRun_withConnectivity_connectedSink() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
@@ -617,7 +616,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_withConnectivity_unconnectedSource() {
+	void testRun_withConnectivity_unconnectedSource() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
@@ -638,7 +637,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_withConnectivity_unconnectedSink() {
+	void testRun_withConnectivity_unconnectedSink() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
@@ -659,7 +658,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
-	public void testRun_withConnectivity_unconnectedLink() {
+	void testRun_withConnectivity_unconnectedLink() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();

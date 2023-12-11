@@ -22,7 +22,7 @@
  package org.matsim.core.controler;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -30,13 +30,13 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-/**
+ /**
  * @author mrieser / senozon
  */
 public class ControlerListenerManagerImplTest {
 
-	@Test
-	public void testAddControlerListener_ClassHierarchy() {
+	 @Test
+	 void testAddControlerListener_ClassHierarchy() {
 		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
@@ -72,8 +72,8 @@ public class ControlerListenerManagerImplTest {
 		Assert.assertEquals(1, ecl.nOfShutdowns);
 	}
 
-	@Test
-	public void testAddCoreControlerListener_ClassHierarchy() {
+	 @Test
+	 void testAddCoreControlerListener_ClassHierarchy() {
 		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();

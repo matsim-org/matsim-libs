@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.fare;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -42,7 +42,7 @@ public class DrtFareHandlerTest {
 	 * Test method for {@link DrtFareHandler}.
 	 */
 	@Test
-	public void testDrtFareHandler() {
+	void testDrtFareHandler() {
 		String mode = "mode_0";
 		DrtFareParams fareParams = new DrtFareParams();
 		fareParams.baseFare = 1;

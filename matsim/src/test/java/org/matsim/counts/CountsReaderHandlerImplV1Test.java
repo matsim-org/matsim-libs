@@ -22,8 +22,8 @@ package org.matsim.counts;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestUtils;
@@ -34,7 +34,8 @@ public class CountsReaderHandlerImplV1Test {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testSECounts() {
+	@Test
+	void testSECounts() {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
@@ -45,7 +46,8 @@ public class CountsReaderHandlerImplV1Test {
 		assertEquals("Counts attribute setting failed", 2000, counts.getYear());
 	}
 
-	@Test public void testSECount() {
+	@Test
+	void testSECount() {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
@@ -56,7 +58,8 @@ public class CountsReaderHandlerImplV1Test {
 		assertEquals("Count attribute setting failed", "testNr", counts.getCount(Id.create(1, Link.class)).getCsLabel());
 	}
 
-	@Test public void testSEVolume() {
+	@Test
+	void testSEVolume() {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);

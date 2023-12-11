@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +42,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 public class DynamicGroupIdentifierTest {
 
 	@Test
-	public void testNGroupsNoJointPlansNoSocialNet() {
+	void testNGroupsNoJointPlansNoSocialNet() {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 
@@ -62,7 +62,7 @@ public class DynamicGroupIdentifierTest {
 	}
 
 	@Test
-	public void testNGroupsNoJointPlansCompleteSocialNet() {
+	void testNGroupsNoJointPlansCompleteSocialNet() {
 		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
@@ -92,7 +92,7 @@ public class DynamicGroupIdentifierTest {
 	}
 
 	@Test
-	public void testNGroupsWithJointPlansNoSocialNet() {
+	void testNGroupsWithJointPlansNoSocialNet() {
 		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
@@ -139,7 +139,7 @@ public class DynamicGroupIdentifierTest {
 	}
 
 	@Test
-	public void testNGroupsWithJointPlansCompleteSocialNet() {
+	void testNGroupsWithJointPlansCompleteSocialNet() {
 		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 

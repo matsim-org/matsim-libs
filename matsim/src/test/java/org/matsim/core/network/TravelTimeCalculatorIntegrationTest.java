@@ -22,8 +22,8 @@ package org.matsim.core.network;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +47,8 @@ public class TravelTimeCalculatorIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testTravelTimeCalculatorArray() {
+	@Test
+	void testTravelTimeCalculatorArray() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
 			Config config = utils.loadConfig((String)null);
 
@@ -88,7 +89,8 @@ public class TravelTimeCalculatorIntegrationTest {
         }
 	}
 
-	@Test public void testTravelTimeCalculatorHashMap() {
+	@Test
+	void testTravelTimeCalculatorHashMap() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
 			Config config = utils.loadConfig((String)null);
 

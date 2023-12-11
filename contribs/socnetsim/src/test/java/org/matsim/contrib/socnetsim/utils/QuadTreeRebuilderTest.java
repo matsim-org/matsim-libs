@@ -1,13 +1,13 @@
 package org.matsim.contrib.socnetsim.utils;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class QuadTreeRebuilderTest {
 	@Test
-	public void testGrowingQuadTree() {
+	void testGrowingQuadTree() {
 		final QuadTreeRebuilder<Object> rebuilder = new QuadTreeRebuilder<>();
 
 		Assert.assertEquals(

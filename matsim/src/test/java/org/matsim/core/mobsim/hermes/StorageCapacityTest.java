@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,7 +64,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-	public void testStorageCapacity() {
+	void testStorageCapacity() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -113,7 +113,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-	public void testStorageCapacityDownscaling() {
+	void testStorageCapacityDownscaling() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -165,8 +165,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-
-	public void testStorageCapacityWithDifferentPCUs() {
+	void testStorageCapacityWithDifferentPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -230,8 +229,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-
-	public void testStorageCapacityWithVaryingPCUs() {
+	void testStorageCapacityWithVaryingPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkModes(Set.of(TransportMode.car, TransportMode.truck));

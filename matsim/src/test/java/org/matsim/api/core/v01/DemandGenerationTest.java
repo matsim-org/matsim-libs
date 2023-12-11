@@ -25,8 +25,8 @@ import java.io.File;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -68,7 +68,8 @@ public class DemandGenerationTest {
 		this.sc = null;
 	}
 
-	@Test public void testDemandGeneration(){
+	@Test
+	void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
 

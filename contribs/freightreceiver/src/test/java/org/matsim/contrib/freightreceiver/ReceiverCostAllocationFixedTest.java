@@ -1,13 +1,13 @@
 package org.matsim.contrib.freightreceiver;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ReceiverCostAllocationFixedTest {
 
 	@Test
-	public void getScore() {
+	void getScore() {
 		Assert.assertEquals("Wrong cost.", -20.0, new ReceiverCostAllocationFixed(20.0).getScore(null, null), MatsimTestUtils.EPSILON);
 	}
 }

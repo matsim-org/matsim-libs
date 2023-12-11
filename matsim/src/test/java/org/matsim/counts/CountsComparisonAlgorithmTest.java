@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -35,7 +35,8 @@ public class CountsComparisonAlgorithmTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testCompare() {
+	@Test
+	void testCompare() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
@@ -52,7 +53,8 @@ public class CountsComparisonAlgorithmTest {
 		}//while
 	}
 
-	@Test public void testDistanceFilter() {
+	@Test
+	void testDistanceFilter() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

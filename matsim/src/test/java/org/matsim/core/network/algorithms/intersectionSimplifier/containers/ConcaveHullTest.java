@@ -20,8 +20,8 @@
 package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -35,7 +35,7 @@ public class ConcaveHullTest {
 
 	/** Test whether duplicate input points are removed. **/
 	@Test
-	public void testConstructor(){
+	void testConstructor(){
 		GeometryCollection gcIncorrect = setupWithDuplicates();
 		ConcaveHull ch1 = new ConcaveHull(gcIncorrect, 2);
 		Assert.assertEquals("Duplicates not removed.", 8, ch1.getInputPoints());

@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -93,19 +93,23 @@ public abstract class AbstractNetworkWriterReaderTest {
 	 */
 	protected abstract void readNetwork(final Scenario scenario, final InputStream stream);
 
-	@Test public void testAllowedModes_multipleModes() {
+	@Test
+	void testAllowedModes_multipleModes() {
 		doTestAllowedModes(createHashSet("bus", "train"), utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testAllowedModes_singleMode() {
+	@Test
+	void testAllowedModes_singleMode() {
 		doTestAllowedModes(createHashSet("miv"), utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testAllowedModes_noMode() {
+	@Test
+	void testAllowedModes_noMode() {
 		doTestAllowedModes(new HashSet<String>(), utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_withoutElevation(){
+	@Test
+	void testNodes_withoutElevation(){
 		List<Node> nodes = new ArrayList<>(2);
 		Node n1 = NetworkUtils.createNode(
 				Id.create("1", Node.class),
@@ -118,7 +122,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_withElevation(){
+	@Test
+	void testNodes_withElevation(){
 		List<Node> nodes = new ArrayList<>(2);
 		Node n1 = NetworkUtils.createNode(
 				Id.create("1", Node.class),
@@ -131,7 +136,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_withAndWithoutElevation(){
+	@Test
+	void testNodes_withAndWithoutElevation(){
 		List<Node> nodes = new ArrayList<>(2);
 		Node n1 = NetworkUtils.createNode(
 				Id.create("1", Node.class),
@@ -144,7 +150,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_IdSpecialCharacters() {
+	@Test
+	void testNodes_IdSpecialCharacters() {
 		Network network1 = NetworkUtils.createNetwork();
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
@@ -162,7 +169,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		Assert.assertNotSame(nodeB1, nodeB2);
 	}
 
-	@Test public void testLinks_IdSpecialCharacters() {
+	@Test
+	void testLinks_IdSpecialCharacters() {
 		Network network1 = NetworkUtils.createNetwork();
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
@@ -190,7 +198,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 //		Assert.assertEquals(NetworkUtils.getOrigId(linkB1), NetworkUtils.getOrigId(linkB2)); // origId is not supported anymore in v2
 	}
 
-	@Test public void testNetwork_NameSpecialCharacters() {
+	@Test
+	void testNetwork_NameSpecialCharacters() {
 		Network network1 = NetworkUtils.createNetwork();
 		network1.setName("Special & characters < are > in \" this ' name.");
 		NetworkFactory nf = network1.getFactory();

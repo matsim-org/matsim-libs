@@ -21,8 +21,8 @@
 package org.matsim.contrib.signals.builder;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -53,7 +53,7 @@ public class TravelTimeFourWaysTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testTrafficLightIntersection4arms() {
+	void testTrafficLightIntersection4arms() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
@@ -62,7 +62,7 @@ public class TravelTimeFourWaysTest {
 	}
 
 	@Test
-	public void testTrafficLightIntersection4armsWithUTurn() {
+	void testTrafficLightIntersection4armsWithUTurn() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans_uturn.xml.gz");
 		ScenarioUtils.loadScenario(scenario);

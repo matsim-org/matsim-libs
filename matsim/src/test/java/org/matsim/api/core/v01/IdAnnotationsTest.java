@@ -3,7 +3,7 @@ package org.matsim.api.core.v01;
 import java.util.Objects;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.IdAnnotations.JsonId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -19,7 +19,7 @@ public class IdAnnotationsTest {
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
-	public void testRecordJsonIds() throws JsonProcessingException {
+	void testRecordJsonIds() throws JsonProcessingException {
 		Id<Person> personId = Id.createPersonId("person");
 		RecordWithIds recordWithIds1 = new RecordWithIds(
 				personId,
@@ -35,7 +35,7 @@ public class IdAnnotationsTest {
 	}
 
 	@Test
-	public void testRecordJsonIdsWithNull() throws JsonProcessingException {
+	void testRecordJsonIdsWithNull() throws JsonProcessingException {
 		Id<Person> personId = null;
 		RecordWithIds recordWithIds1 = new RecordWithIds(personId, null, null);
 
@@ -48,7 +48,7 @@ public class IdAnnotationsTest {
 	}
 
 	@Test
-	public void testClassJsonIds() throws JsonProcessingException {
+	void testClassJsonIds() throws JsonProcessingException {
 		Id<Person> personId = Id.createPersonId("person");
 		ClassWithIds classWithIds1 = new ClassWithIds(
 				personId,
@@ -64,7 +64,7 @@ public class IdAnnotationsTest {
 	}
 
 	@Test
-	public void testClassJsonIdsWithNull() throws JsonProcessingException {
+	void testClassJsonIdsWithNull() throws JsonProcessingException {
 		Id<Person> personId = null;
 		ClassWithIds classWithIds1 = new ClassWithIds(personId, null, null);
 

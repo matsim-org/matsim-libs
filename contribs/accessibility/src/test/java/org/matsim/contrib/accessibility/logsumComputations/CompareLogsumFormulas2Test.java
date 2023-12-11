@@ -23,8 +23,8 @@
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -37,8 +37,8 @@ public class CompareLogsumFormulas2Test {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-
-	@Test public void testLogsumFormulas(){
+	@Test
+	void testLogsumFormulas(){
 
 		double walkTravelTime2Network = 2.; // 2min
 		double travelTimeOnNetwork = 6.;	// 6min

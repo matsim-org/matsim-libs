@@ -21,8 +21,8 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.Initializer;
@@ -48,7 +48,8 @@ public class RandomLocationMutatorTest  {
 	/*
 	 * TODO: Construct scenario with knowledge to compare plans before and after loc. choice
 	 */
-	@Test public void testHandlePlan() {
+	@Test
+	void testHandlePlan() {
 		RandomLocationMutator randomlocationmutator = this.initialize();
 		randomlocationmutator.run(scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan());
 	}

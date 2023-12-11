@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -52,7 +52,7 @@ public class RunTaxiPTIntermodalExampleIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIntermodalExample() throws MalformedURLException {
+	void testIntermodalExample() throws MalformedURLException {
 		URL configUrl = new File(utils.getClassInputDirectory() + "config.xml").toURI().toURL();
 		new RunTaxiPTIntermodalExample().run(configUrl, false);
 

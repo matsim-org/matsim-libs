@@ -23,8 +23,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -34,12 +34,14 @@ public class TestEventLog {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testGetTravelTime(){
+	@Test
+	void testGetTravelTime(){
 		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(utils.getPackageInputDirectory() + "deq_events.txt");
 		assertEquals(3599.0, Math.floor(EventLog.getTravelTime(deqSimLog,1)), MatsimTestUtils.EPSILON);
 	}
 
-	@Test public void testGetAverageTravelTime(){
+	@Test
+	void testGetAverageTravelTime(){
 		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(utils.getPackageInputDirectory() + "deq_events.txt");
 		assertEquals(EventLog.getTravelTime(deqSimLog,1), EventLog.getSumTravelTime(deqSimLog), MatsimTestUtils.EPSILON);
 	}

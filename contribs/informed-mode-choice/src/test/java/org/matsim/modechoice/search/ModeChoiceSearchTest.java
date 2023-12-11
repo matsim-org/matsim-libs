@@ -1,7 +1,7 @@
 package org.matsim.modechoice.search;
 
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +9,7 @@ public class ModeChoiceSearchTest {
 
 
 	@Test
-	public void order() {
+	void order() {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
 
@@ -43,7 +43,7 @@ public class ModeChoiceSearchTest {
 
 
 	@Test
-	public void negative() {
+	void negative() {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
 
@@ -68,7 +68,7 @@ public class ModeChoiceSearchTest {
 
 
 	@Test
-	public void nullValues() {
+	void nullValues() {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
 

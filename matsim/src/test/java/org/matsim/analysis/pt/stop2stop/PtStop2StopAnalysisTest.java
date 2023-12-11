@@ -20,7 +20,7 @@
 package org.matsim.analysis.pt.stop2stop;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,11 +50,11 @@ import java.util.stream.Collectors;
 
 public class PtStop2StopAnalysisTest {
 
-    /**
-     * Test method for {@link PtStop2StopAnalysis}.
-     */
-    @Test
-    public void testPtStop2StopAnalysisSingle() {
+	/**
+	* Test method for {@link PtStop2StopAnalysis}.
+	*/
+	@Test
+	void testPtStop2StopAnalysisSingle() {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -173,8 +173,8 @@ public class PtStop2StopAnalysisTest {
 
 //    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    @Test
-    public void testPtStop2StopAnalysisMulti() {
+	@Test
+	void testPtStop2StopAnalysisMulti() {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
 

@@ -1,7 +1,7 @@
 package org.matsim.core.population.io;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 public class ParallelPopulationReaderTest {
 
 	@Test
-	public void testParallelPopulationReaderV4_escalateException() {
+	void testParallelPopulationReaderV4_escalateException() {
 		String xml = """
 			<?xml version="1.0" ?>
 			<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
@@ -42,7 +42,7 @@ public class ParallelPopulationReaderTest {
 	}
 
 	@Test
-	public void testParallelPopulationReaderV6_escalateException() {
+	void testParallelPopulationReaderV6_escalateException() {
 		String xml = """
 			<?xml version="1.0" encoding="utf-8"?>
 			<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">

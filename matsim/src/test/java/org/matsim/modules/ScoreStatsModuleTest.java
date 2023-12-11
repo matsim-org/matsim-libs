@@ -29,8 +29,8 @@ import java.util.Map;
 import jakarta.inject.Inject;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -71,7 +71,7 @@ public class ScoreStatsModuleTest {
 	}
 
 	@Test
-	public void testScoreStats() {
+	void testScoreStats() {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);

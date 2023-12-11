@@ -25,8 +25,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,7 +55,8 @@ public class PersonIntersectAreaFilterTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testFilter() throws Exception {
+	@Test
+	void testFilter() throws Exception {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		Network network = NetworkUtils.createNetwork();

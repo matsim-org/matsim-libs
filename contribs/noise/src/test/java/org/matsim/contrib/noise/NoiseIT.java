@@ -30,8 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -77,7 +77,7 @@ public class NoiseIT {
 
 	// Tests the NoisSpatialInfo functionality separately for each function
 	@Test
-	public final void test1(){
+	final void test1(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
@@ -150,7 +150,7 @@ public class NoiseIT {
 	// tests the noise emissions, immissions, considered agent units, damages (receiver points), damages (per link), damages (per vehicle) based on the generated *.csv output
 	// tests the noise events applying the average cost allocation approach
 	@Test
-	public final void test2a(){
+	final void test2a(){
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
@@ -158,8 +158,9 @@ public class NoiseIT {
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		runTest2a( config ) ;
 	}
+
 	@Test
-	public final void test2aWAccessEgress(){
+	final void test2aWAccessEgress(){
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
@@ -948,7 +949,7 @@ public class NoiseIT {
 
 	// same test as before, but using the marginal cost approach
 	@Test
-	public final void test2b(){
+	final void test2b(){
 
 		String runDirectory = null;
 		int lastIteration = -1;
@@ -1047,7 +1048,7 @@ public class NoiseIT {
 
 	// same test as 2a, but using the actual speed level
 	@Test
-	public final void test2c(){
+	final void test2c(){
 
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
@@ -1174,7 +1175,7 @@ public class NoiseIT {
 
 	// tests the static methods within class "noiseEquations"
 	@Test
-	public final void test3(){
+	final void test3(){
 
 		double p = 0;
 		double pInPercent = 0;
@@ -1369,7 +1370,7 @@ public class NoiseIT {
 
 	// tests the static methods within class "noiseEquations"
 	@Test
-	public final void test4(){
+	final void test4(){
 
 		double vCar = 0.0496757749985181;
 		double vHGV = 0.0478758773550055;
@@ -1417,7 +1418,7 @@ public class NoiseIT {
 
 	// tests the static methods within class "noiseEquations" - other speed levels
 	@Test
-	public final void test5(){
+	final void test5(){
 
 		double vCar = 30;
 		double vHGV = 30;

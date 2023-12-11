@@ -2,8 +2,8 @@ package org.matsim.counts;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.SplittableRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CountsV2Test {
 
@@ -30,7 +31,7 @@ public class CountsV2Test {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_general_handling() throws IOException {
+	void test_general_handling() throws IOException {
 
 		Counts<Link> counts = new Counts<>();
 		counts.setName("test");
@@ -49,7 +50,7 @@ public class CountsV2Test {
 	}
 
 	@Test
-	public void test_reader_writer() throws IOException {
+	void test_reader_writer() throws IOException {
 
 		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
@@ -88,21 +89,24 @@ public class CountsV2Test {
 	}
 
 
-	@Test(expected = IllegalArgumentException.class)
-	public void test_illegal() {
+	@Test
+	void test_illegal() {
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		Counts<Link> dummyCounts = new Counts<>();
+			Counts<Link> dummyCounts = new Counts<>();
 
-		MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
-		Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
+			MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
+			Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
 
-		volume.setAtHour(-1, 500);
+			volume.setAtHour(-1, 500);
+
+		});
 
 	}
 
 
 	@Test
-	public void aggregate() {
+	void aggregate() {
 
 		Counts<Link> counts = new Counts<>();
 

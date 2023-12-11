@@ -22,18 +22,18 @@
  package org.matsim.utils.objectattributes.attributable;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-/**
+ /**
  * @author thibautd
  */
 public class AttributesTest {
-	@Test
-	public void testInsertion() {
+	 @Test
+	 void testInsertion() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
@@ -61,8 +61,8 @@ public class AttributesTest {
 				attributes.getAttribute( "1 the begin" ) );
 	}
 
-	@Test
-	public void testReplacement() {
+	 @Test
+	 void testReplacement() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
@@ -84,8 +84,8 @@ public class AttributesTest {
 				attributes.getAttribute( "the answer" ) );
 	}
 
-	@Test
-	public void testRemoval() {
+	 @Test
+	 void testRemoval() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
@@ -106,8 +106,8 @@ public class AttributesTest {
 				attributes.getAttribute( "rain is nice" ) );
 	}
 
-	@Test
-	public void testGetAsMap() {
+	 @Test
+	 void testGetAsMap() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );

@@ -22,8 +22,8 @@ package org.matsim.contrib.minibus.replanning;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -39,7 +39,7 @@ public class TimeProviderTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-    public final void testGetRandomTimeInIntervalOneTimeSlot() {
+	final void testGetRandomTimeInIntervalOneTimeSlot() {
 
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
 
@@ -56,7 +56,7 @@ public class TimeProviderTest {
 	}
 
 	@Test
-    public final void testGetRandomTimeInIntervalOneSameStartEndTime() {
+	final void testGetRandomTimeInIntervalOneSameStartEndTime() {
 
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
 
@@ -73,7 +73,7 @@ public class TimeProviderTest {
 	}
 
 	@Test
-    public final void testGetRandomTimeInIntervalDifferentStartEndTime() {
+	final void testGetRandomTimeInIntervalDifferentStartEndTime() {
 
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
 

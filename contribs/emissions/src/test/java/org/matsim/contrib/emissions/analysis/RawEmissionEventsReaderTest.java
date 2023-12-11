@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions.analysis;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.TestUtils;
@@ -19,8 +19,8 @@ public class RawEmissionEventsReaderTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void handleNonEventNode() {
+	@Test
+	void handleNonEventNode() {
 
         // read in an xml file which doesn't have events. It will parse the whole file but will not handle any of the
         // parsed nodes
@@ -33,8 +33,8 @@ public class RawEmissionEventsReaderTest {
         // this test passes if the in the callback 'fail()' is not reached.
     }
 
-    @Test
-    public void handleNonEmissionEvent() {
+	@Test
+	void handleNonEmissionEvent() {
 
         // read in events file wihtout emission events. Those events should be ignored
         var eventsUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "output_events.xml.gz");
@@ -46,8 +46,8 @@ public class RawEmissionEventsReaderTest {
         // this test passes if the in the callback 'fail()' is not reached.
     }
 
-    @Test
-    public void handleColdEmissionEvent() {
+	@Test
+	void handleColdEmissionEvent() {
 
         final double expectedValue = 10;
         final int expectedTime = 1;
@@ -71,8 +71,8 @@ public class RawEmissionEventsReaderTest {
         assertEquals(expectedEventsCount, counter.get());
     }
 
-    @Test
-    public void handleWarmEmissionEvent() {
+	@Test
+	void handleWarmEmissionEvent() {
 
         final double expectedValue = 10;
         final int expectedTime = 1;

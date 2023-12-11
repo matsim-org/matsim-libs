@@ -26,7 +26,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 public class QSimIntegrationTest {
 
 	@Test
-	public void test_twoStopsOnFirstLink() throws SAXException, ParserConfigurationException, IOException {
+	void test_twoStopsOnFirstLink() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 				"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -121,7 +121,7 @@ public class QSimIntegrationTest {
 	}
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
+	void test_multipleStopsOnFirstLink_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -184,7 +184,7 @@ public class QSimIntegrationTest {
 	}
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtFirstStop() throws SAXException, ParserConfigurationException, IOException {
+	void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtFirstStop() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 				"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -269,7 +269,7 @@ public class QSimIntegrationTest {
 	}
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtSecondStop() throws SAXException, ParserConfigurationException, IOException {
+	void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtSecondStop() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -366,7 +366,7 @@ public class QSimIntegrationTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void test_circularEmptyRoute_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
+	void test_circularEmptyRoute_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +

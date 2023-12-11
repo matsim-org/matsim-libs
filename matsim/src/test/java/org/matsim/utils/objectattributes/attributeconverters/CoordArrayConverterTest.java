@@ -21,14 +21,13 @@
 package org.matsim.utils.objectattributes.attributeconverters;
 
 import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
 public class CoordArrayConverterTest {
 
-    @Test
-    public void testFromToString() {
+	@Test
+	void testFromToString() {
         final CoordArrayConverter converter = new CoordArrayConverter();
         String a = "[(223380.4988791829;6758072.4280857295),(223404.67545027257;6758049.17275259),(223417.0127605943;6758038.021038004),(223450.67625251273;6757924.791645723),(223456.13332351885;6757906.359813054)]";
         Coord[] coords = converter.convert(a);

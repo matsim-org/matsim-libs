@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +52,7 @@ public class ReflectiveConfigGroupTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDumpAndRead() {
+	void testDumpAndRead() {
 		MyModule dumpedModule = new MyModule();
 		dumpedModule.setDoubleField(1000);
 		dumpedModule.setIdField(Id.create(123, Link.class));
@@ -76,13 +76,13 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadNulls() {
+	void testDumpAndReadNulls() {
 		MyModule dumpedModule = new MyModule();
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
 
 	@Test
-	public void testDumpAndReadEmptyCollections() {
+	void testDumpAndReadEmptyCollections() {
 		MyModule dumpedModule = new MyModule();
 		dumpedModule.listField = List.of();
 		dumpedModule.setField = ImmutableSet.of();
@@ -92,7 +92,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadCollectionsWithExactlyOneEmptyString() {
+	void testDumpAndReadCollectionsWithExactlyOneEmptyString() {
 		MyModule dumpedModule = new MyModule();
 
 		//fail on list
@@ -109,7 +109,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadCollectionsIncludingEmptyString() {
+	void testDumpAndReadCollectionsIncludingEmptyString() {
 		MyModule dumpedModule = new MyModule();
 
 		//fail on list
@@ -141,7 +141,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testReadCollectionsIncludingEmptyString() {
+	void testReadCollectionsIncludingEmptyString() {
 		String fileName = utils.getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
 		final Config readConfig = ConfigUtils.loadConfig(fileName);
 		final MyModule readModule = new MyModule();
@@ -152,7 +152,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testComments() {
+	void testComments() {
 		var expectedComments = new HashMap<>();
 		expectedComments.put("floatField", "float");
 		expectedComments.put("longField", "long");
@@ -173,7 +173,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingOrphanSetter() {
+	void testFailOnConstructingOrphanSetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("setterWithoutGetter")
 			public void setStuff(String s) {
@@ -182,7 +182,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingOrphanGetter() {
+	void testFailOnConstructingOrphanGetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringGetter("setterWithoutGetter")
 			public Coord getStuff() {
@@ -192,7 +192,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingInvalidSetter() {
+	void testFailOnConstructingInvalidSetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			// no arg: no good
 			@StringSetter("field")
@@ -221,7 +221,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingInvalidGetter() {
+	void testFailOnConstructingInvalidGetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public Object setStuff(String s) {
@@ -249,7 +249,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingSeveralGetters() {
+	void testFailOnConstructingSeveralGetters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -268,7 +268,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingSeveralSetters() {
+	void testFailOnConstructingSeveralSetters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -286,7 +286,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingSeveralParameters() {
+	void testFailOnConstructingSeveralParameters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter
 			double field;
@@ -297,7 +297,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnMixingGettersSettersWithParameters() {
+	void testFailOnMixingGettersSettersWithParameters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public void setStuff(double s) {
@@ -314,7 +314,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailUnsupportedType_StringCollections() {
+	void testFailUnsupportedType_StringCollections() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
 			private Collection<String> stuff;
@@ -322,7 +322,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailUnsupportedType_NonStringList() {
+	void testFailUnsupportedType_NonStringList() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
 			private List<Double> stuff;
@@ -330,7 +330,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailUnsupportedType_StringHashSet() {
+	void testFailUnsupportedType_StringHashSet() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
 			private HashSet<String> stuff;
@@ -338,7 +338,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testPreferCustomCommentToAutoGeneratedEnumComment() {
+	void testPreferCustomCommentToAutoGeneratedEnumComment() {
 		var config = new ReflectiveConfigGroup("name") {
 			@Comment("my comment")
 			@Parameter("field")
@@ -348,7 +348,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testBehaviorWhenAcceptingUnknownParameters() {
+	void testBehaviorWhenAcceptingUnknownParameters() {
 		final ConfigGroup testee = new ReflectiveConfigGroup("name", true) {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -367,7 +367,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testBehaviorWhenRejectingUnknownParameters() {
+	void testBehaviorWhenRejectingUnknownParameters() {
 		final ConfigGroup testee = new ReflectiveConfigGroup("name", false) {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -388,7 +388,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testExceptionRedirection() {
+	void testExceptionRedirection() {
 		final RuntimeException expectedException = new RuntimeException();
 		final ConfigGroup m = new ReflectiveConfigGroup("name") {
 			@StringSetter("field")

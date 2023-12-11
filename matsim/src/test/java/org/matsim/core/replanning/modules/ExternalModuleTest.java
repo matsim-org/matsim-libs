@@ -24,8 +24,8 @@ package org.matsim.core.replanning.modules;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -71,8 +71,8 @@ public class ExternalModuleTest {
 //        prepareForSim.run();
     }
 
-    @Test
-    public void testNoOpExternalModule() {
+	@Test
+	void testNoOpExternalModule() {
         ExternalModule testee = new ExternalModule(new ExternalModule.ExeRunnerDelegate() {
             @Override
             public boolean invoke() {
@@ -85,8 +85,8 @@ public class ExternalModuleTest {
         Assert.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
     }
 
-    @Test
-    public void testPlanEmptyingExternalModule() {
+	@Test
+	void testPlanEmptyingExternalModule() {
         ExternalModule testee = new ExternalModule(new ExternalModule.ExeRunnerDelegate() {
             @Override
             public boolean invoke() {

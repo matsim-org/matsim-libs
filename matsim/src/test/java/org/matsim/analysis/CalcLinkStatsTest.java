@@ -22,8 +22,8 @@ package org.matsim.analysis;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +50,7 @@ public class CalcLinkStatsTest {
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testAddData() {
+	void testAddData() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();
@@ -131,7 +131,7 @@ public class CalcLinkStatsTest {
 	 * @author ikaddoura
 	 */
 	@Test
-	public void testAddDataObservedTravelTime() {
+	void testAddDataObservedTravelTime() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();
@@ -215,7 +215,7 @@ public class CalcLinkStatsTest {
 	}
 
 	@Test
-	public void testWriteRead() {
+	void testWriteRead() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();

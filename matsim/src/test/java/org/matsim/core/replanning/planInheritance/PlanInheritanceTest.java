@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -24,7 +25,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 
-
 public class PlanInheritanceTest {
 	/**
 	 * @author alex94263
@@ -33,8 +33,8 @@ public class PlanInheritanceTest {
 		@RegisterExtension
 		public MatsimTestUtils util = new MatsimTestUtils();
 
-		@Test
-		public void testPlanInheritanceEnabled() throws IOException {
+	@Test
+	void testPlanInheritanceEnabled() throws IOException {
 			String outputDirectory = util.getOutputDirectory();
 
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -91,8 +91,8 @@ public class PlanInheritanceTest {
 
 		}
 
-		@Test
-		public void testPlanInheritanceDisabled() throws IOException {
+	@Test
+	void testPlanInheritanceDisabled() throws IOException {
 			String outputDirectory = util.getOutputDirectory();
 
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");

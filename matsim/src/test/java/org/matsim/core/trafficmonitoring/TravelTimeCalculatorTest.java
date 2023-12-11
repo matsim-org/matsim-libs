@@ -33,8 +33,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -76,7 +76,8 @@ public class TravelTimeCalculatorTest {
 
 	private final static Logger log = LogManager.getLogger(TravelTimeCalculatorTest.class);
 
-	@Test public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
+	@Test
+	final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -91,7 +92,8 @@ public class TravelTimeCalculatorTest {
 				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-	@Test public final void testTravelTimeCalculator_Array_Optimistic_LinearInterpolation() throws IOException {
+	@Test
+	final void testTravelTimeCalculator_Array_Optimistic_LinearInterpolation() throws IOException {
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -189,7 +191,8 @@ public class TravelTimeCalculatorTest {
 	 *
 	 * @author mrieser, tthunig
 	 */
-	@Test public void testLongTravelTimeInEmptySlot() {
+	@Test
+	void testLongTravelTimeInEmptySlot() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -226,7 +229,8 @@ public class TravelTimeCalculatorTest {
 	 *
 	 * @author tthunig
 	 */
-	@Test public void testLongTravelTimeInEmptySlotWithDoubleTimeBins() {
+	@Test
+	void testLongTravelTimeInEmptySlotWithDoubleTimeBins() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -280,7 +284,8 @@ public class TravelTimeCalculatorTest {
 	 *
 	 * @author tthunig
 	 */
-	@Test public void testInterpolatedTravelTimes() {
+	@Test
+	void testInterpolatedTravelTimes() {
 		Config config = ConfigUtils.createConfig();
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 		int timeBinSize = 15*60;
@@ -327,7 +332,8 @@ public class TravelTimeCalculatorTest {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	@Test public void testReadFromFile_LargeScenarioCase() throws SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testReadFromFile_LargeScenarioCase() throws SAXException, ParserConfigurationException, IOException {
 		/* Assume, you have a big events file from a huge scenario and you want to do data-mining...
 		 * Then you likely want to calculate link travel times. This requires the network, but NOT
 		 * the population. Thus, using "new Events(new EventsBuilderImpl(scenario))" is not appropriate
@@ -360,7 +366,8 @@ public class TravelTimeCalculatorTest {
 	/**
 	 * @author mrieser / senozon
 	 */
-	@Test public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
+	@Test
+	void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
 		Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -388,7 +395,8 @@ public class TravelTimeCalculatorTest {
 	/**
 	 * @author mrieser / senozon
 	 */
-	@Test public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
+	@Test
+	void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -418,7 +426,8 @@ public class TravelTimeCalculatorTest {
 	 * Expect that all link travel times are ignored.
 	 * @author cdobler
 	 */
-	@Test public void testGetLinkTravelTime_NoAnalyzedModes() {
+	@Test
+	void testGetLinkTravelTime_NoAnalyzedModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -454,7 +463,8 @@ public class TravelTimeCalculatorTest {
 	 * Expect that walk legs are ignored.
 	 * @author cdobler
 	 */
-	@Test public void testGetLinkTravelTime_CarAnalyzedModes() {
+	@Test
+	void testGetLinkTravelTime_CarAnalyzedModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -495,7 +505,8 @@ public class TravelTimeCalculatorTest {
 	 * Expect that still all modes are counted.
 	 * @author cdobler
 	 */
-	@Test public void testGetLinkTravelTime_NoFilterModes() {
+	@Test
+	void testGetLinkTravelTime_NoFilterModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -536,7 +547,8 @@ public class TravelTimeCalculatorTest {
 	 * Expect that the default value (=car) will be used for the modes to be counted.
 	 * @author cdobler
 	 */
-	@Test public void testGetLinkTravelTime_FilterDefaultModes() {
+	@Test
+	void testGetLinkTravelTime_FilterDefaultModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);

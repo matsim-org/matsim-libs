@@ -34,8 +34,8 @@ import jakarta.inject.Provider;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -131,9 +131,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 * V3
 	 *
 	 */
-    @Ignore("Temporarily ignoring")//TODO for Amit
-    @Test
-	public final void testFlowAndStorageCongestion_3agents(){
+	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Test
+	final void testFlowAndStorageCongestion_3agents(){
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
@@ -178,7 +178,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 *
 	 */
 	@Test
-	public final void testFlowAndStorageCongestion_3agents_V9() {
+	final void testFlowAndStorageCongestion_3agents_V9() {
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
@@ -219,7 +219,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 *
 	 */
 	@Test
-	public final void testFlowAndStorageCongestion_3agents_V8() {
+	final void testFlowAndStorageCongestion_3agents_V8() {
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
@@ -259,9 +259,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 * V10
 	 *
 	 */
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Ignore("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testFlowAndStorageCongestion_3agents_V10() {
+	final void testFlowAndStorageCongestion_3agents_V10() {
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
@@ -309,9 +309,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	// in both iterations the "toll" and the "tollOldValue" should be the same
 	//
 	// 3 iterations are necessary to check the equality of the "toll" and the "tollOldValue"
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Ignore("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testRouting(){
+	final void testRouting(){
 
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3QsimTest/configTestRouting.xml";
 
@@ -449,9 +449,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 }
 
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Ignore("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testInsertingWaitingVehicles_01(){
+	final void testInsertingWaitingVehicles_01(){
 
 		Scenario sc = loadScenario4();
 		setPopulation4(sc);
@@ -508,9 +508,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = true
 	// to compare
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Ignore("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testInsertingWaitingVehicles_02(){
+	final void testInsertingWaitingVehicles_02(){
 
 		Scenario sc = loadScenario5();
 		setPopulation5(sc);
@@ -569,9 +569,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
 	// agent 2 is already on link 2 when agent 3 ends his activity,
 	// therefore agent 3 has to wait until agent 2 has left the link
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Ignore("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testInsertingWaitingVehicles_03(){
+	final void testInsertingWaitingVehicles_03(){
 
 		Scenario sc = loadScenario4();
 		setPopulation6(sc);
@@ -627,9 +627,9 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 	}
 
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Ignore("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testStuckTimePeriod(){
+	final void testStuckTimePeriod(){
 
 		Scenario sc = loadScenario1b();
 		setPopulation1(sc);

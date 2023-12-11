@@ -24,20 +24,20 @@
 import java.io.ByteArrayInputStream;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
+ /**
  * @author mrieser / Senozon AG
  */
 public class MatsimFacilitiesReaderTest {
 
-	@Test
-	public void testReadLinkId() {
+	 @Test
+	 void testReadLinkId() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 "<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
 "<facilities name=\"test facilities for triangle network\">\n" +
@@ -84,8 +84,8 @@ public class MatsimFacilitiesReaderTest {
 		Assert.assertNull(fac20.getLinkId());
 	}
 
-	@Test
-	public void testRead3DCoord() {
+	 @Test
+	 void testRead3DCoord() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 	"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v2.dtd\">\n" +
 	"<facilities name=\"test facilities for triangle network\">\n" +

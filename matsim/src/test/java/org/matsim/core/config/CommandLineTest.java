@@ -1,8 +1,10 @@
 package org.matsim.core.config;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.NoSuchElementException;
@@ -12,7 +14,7 @@ public class CommandLineTest{
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void testStandardUsage() {
+	void testStandardUsage() {
 
 		String outDir = utils.getOutputDirectory() ;
 		final String configFilename = outDir + "/config.xml";
@@ -29,25 +31,28 @@ public class CommandLineTest{
 
 	}
 
-	@Test( expected = NoSuchElementException.class )
-	public void testTypo() {
+	@Test
+	void testTypo() {
+		assertThrows(NoSuchElementException.class, () -> {
 
-		final String configFilename = utils.getOutputDirectory() + "/config.xml";
+			final String configFilename = utils.getOutputDirectory() + "/config.xml";
 
-		// write some config:
-		ConfigUtils.writeConfig( ConfigUtils.createConfig(), configFilename );
+			// write some config:
+			ConfigUtils.writeConfig(ConfigUtils.createConfig(), configFilename);
 
-		String [] args = {configFilename, "--something=abc"} ;
+			String [] args = {configFilename, "--something=abc"} ;
 
-		Config config = ConfigUtils.loadConfig( args ) ;
-		CommandLine cmd = ConfigUtils.getCommandLine( args );
+			Config config = ConfigUtils.loadConfig(args) ;
+			CommandLine cmd = ConfigUtils.getCommandLine(args);
 
-		Assert.assertEquals( "abc", cmd.getOption( "someting" ).get() );
+			Assert.assertEquals("abc", cmd.getOption("someting").get());
+
+		});
 
 	}
 
 	@Test
-	public void testAdditionalConfigGroup() {
+	void testAdditionalConfigGroup() {
 
 		final String configFilename = utils.getOutputDirectory() + "/config.xml";
 
@@ -67,7 +72,7 @@ public class CommandLineTest{
 	}
 
 	@Test
-	public void testSetParameterInAllParameterSets() {
+	void testSetParameterInAllParameterSets() {
 
 		final String configFilename = utils.getOutputDirectory() + "/config.xml";
 
@@ -94,24 +99,26 @@ public class CommandLineTest{
 		}
 	}
 
-	@Test( expected = RuntimeException.class )
-	public void testNotYetExistingAdditionalConfigGroup() {
-		final String configFilename = utils.getOutputDirectory() + "/config.xml";
-		{
-			// write some config:
-			final Config config = ConfigUtils.createConfig() ;
-			ConfigUtils.writeConfig( config, configFilename );
-		}
-		{
-			String[] args = {configFilename, "--config:mockConfigGroup.abc=28"};
-			Config config = ConfigUtils.loadConfig( args );
-			// (fails in the above line because CommandLine can not deal with the additional config group when it does not know about it
+	@Test
+	void testNotYetExistingAdditionalConfigGroup() {
+		assertThrows(RuntimeException.class, () -> {
+			final String configFilename = utils.getOutputDirectory() + "/config.xml";
+			{
+				// write some config:
+				final Config config = ConfigUtils.createConfig() ;
+				ConfigUtils.writeConfig(config, configFilename);
+			}
+			{
+				String[] args = {configFilename, "--config:mockConfigGroup.abc=28"};
+				Config config = ConfigUtils.loadConfig(args);
+				// (fails in the above line because CommandLine can not deal with the additional config group when it does not know about it
 
-		}
+			}
+		});
 	}
 
 	@Test
-	public void testFixNotYetExistingAdditionalConfigGroup() {
+	void testFixNotYetExistingAdditionalConfigGroup() {
 		final String configFilename = utils.getOutputDirectory() + "/config.xml";
 		{
 			// write some config:

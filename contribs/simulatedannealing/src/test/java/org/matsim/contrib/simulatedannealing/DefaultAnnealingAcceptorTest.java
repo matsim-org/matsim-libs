@@ -10,7 +10,7 @@ package org.matsim.contrib.simulatedannealing;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
@@ -23,7 +23,7 @@ public class DefaultAnnealingAcceptorTest {
 	private final SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
 
 	@Test
-	public void testAcceptor() {
+	void testAcceptor() {
 
 		MutableInt iteration = new MutableInt(0);
 		IterationCounter iterationCounter = iteration::getValue;

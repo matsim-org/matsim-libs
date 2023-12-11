@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -101,7 +101,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	 * V3
 	 */
 	@Test
-	public final void testFlowCongestion_3agents_V3(){
+	final void testFlowCongestion_3agents_V3(){
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
@@ -140,7 +140,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	 * V7
 	 */
 	@Test
-	public final void testFlowCongestion_3agents_V7(){
+	final void testFlowCongestion_3agents_V7(){
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
@@ -191,7 +191,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	 * V8
 	 */
 	@Test
-	public final void testFlowCongestion_3agents_V8(){
+	final void testFlowCongestion_3agents_V8(){
 
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);

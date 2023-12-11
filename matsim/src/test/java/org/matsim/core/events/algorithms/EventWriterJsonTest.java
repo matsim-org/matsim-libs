@@ -1,7 +1,7 @@
 package org.matsim.core.events.algorithms;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -26,7 +26,7 @@ public class EventWriterJsonTest {
 	 * values are correctly encoded when written to a file.
 	 */
 	@Test
-	public void testSpecialCharacters() {
+	void testSpecialCharacters() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		EventWriterJson writer = new EventWriterJson(baos);
 
@@ -55,7 +55,7 @@ public class EventWriterJsonTest {
 	}
 
 	@Test
-	public void testNullAttribute() {
+	void testNullAttribute() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		EventWriterJson writer = new EventWriterJson(baos);
 

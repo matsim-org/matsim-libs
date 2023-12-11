@@ -31,8 +31,8 @@ import org.junit.Assert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Coord;
@@ -89,7 +89,7 @@ public class PtMatrixTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testPtMatrixStops() throws IOException{
+	void testPtMatrixStops() throws IOException{
 		log.info("Start testing the pt matrix with information about the pt stops.");
 		long start = System.currentTimeMillis();
 
@@ -192,7 +192,7 @@ public class PtMatrixTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testPtMatrixTimesAndDistances() throws IOException{
+	void testPtMatrixTimesAndDistances() throws IOException{
 		log.info("Start testing the pt matrix with information about the pt stops, pt travel times and distances.");
 		long start = System.currentTimeMillis();
 

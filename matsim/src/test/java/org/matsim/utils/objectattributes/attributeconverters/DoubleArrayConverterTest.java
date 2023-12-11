@@ -22,16 +22,16 @@
  package org.matsim.utils.objectattributes.attributeconverters;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-/**
+ /**
  * @author jbischoff
  */
 public class DoubleArrayConverterTest {
 
 
-    @Test
-    public void testFromToString() {
+	 @Test
+	 void testFromToString() {
         final DoubleArrayConverter converter = new DoubleArrayConverter();
         String a = "-0.1,0,0.0005,17.3,5.2E22";
         double[] array = converter.convert(a);

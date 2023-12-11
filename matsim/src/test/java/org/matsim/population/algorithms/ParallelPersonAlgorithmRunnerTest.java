@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -49,7 +49,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testNumberOfThreads() {
+	void testNumberOfThreads() {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
@@ -67,7 +67,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testNofPersons() {
+	void testNofPersons() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
@@ -91,7 +91,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 	}
 
 	@Test
-	public void testCrashingAlgorithm() {
+	void testCrashingAlgorithm() {
 		try {
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population population = scenario.getPopulation();

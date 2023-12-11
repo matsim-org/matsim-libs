@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.dashboards;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -45,7 +45,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void drtDefaults() {
+	void drtDefaults() {
 		run();
 
 		// TODO: add test headers!?

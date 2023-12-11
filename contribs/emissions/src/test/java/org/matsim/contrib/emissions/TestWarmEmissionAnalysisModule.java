@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -127,9 +127,8 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 
-
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6(){
 		//-- set up tables, event handler, parameters, module
 		setUp();
 
@@ -166,7 +165,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions1(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions1(){
 		//-- set up tables, event handler, parameters, module
 		setUp();
 
@@ -198,7 +197,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions2(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions2(){
 		//-- set up tables, event handler, parameters, module
 		setUp();
 
@@ -223,7 +222,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions3(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions3(){
 		//-- set up tables, event handler, parameters, module
 		setUp();
 
@@ -247,7 +246,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions4(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions4(){
 		//-- set up tables, event handler, parameters, module
 		setUp();
 		//  vehicle information string is 'null'
@@ -270,7 +269,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 	@Test
-	public void testCounters7(){
+	void testCounters7(){
 		setUp();
 		emissionsModule.reset();
 

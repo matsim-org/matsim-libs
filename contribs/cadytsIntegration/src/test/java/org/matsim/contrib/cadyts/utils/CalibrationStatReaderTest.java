@@ -22,8 +22,8 @@ package org.matsim.contrib.cadyts.utils;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
@@ -34,7 +34,7 @@ public class CalibrationStatReaderTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReader() throws IOException {
+	void testReader() throws IOException {
 		TabularFileParser tabularFileParser = new TabularFileParser();
 		String calibStatFile = this.utils.getInputDirectory() + "calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();

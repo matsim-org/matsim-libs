@@ -21,6 +21,8 @@
 
 package org.matsim.freight.carriers.utils;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -30,8 +32,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -164,8 +166,9 @@ public class CarrierControlerUtilsTest {
 	}
 
 
-	@Test //Should only have Services
-	public void numberOfInitalServicesIsCorrect() {
+	//Should only have Services
+	@Test
+	void numberOfInitalServicesIsCorrect() {
 		Assert.assertEquals(2, carrierWServices.getServices().size());
 
 		int demandServices = 0;
@@ -177,8 +180,9 @@ public class CarrierControlerUtilsTest {
 		Assert.assertEquals(0, carrierWServices.getShipments().size());
 	}
 
-	@Test //Should only have Shipments
-	public void numberOfInitialShipmentsIsCorrect() {
+	//Should only have Shipments
+	@Test
+	void numberOfInitialShipmentsIsCorrect() {
 		Assert.assertEquals(0, carrierWShipments.getServices().size());
 
 		Assert.assertEquals(2, carrierWShipments.getShipments().size());
@@ -190,7 +194,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void numberOfShipmentsFromCopiedShipmentsIsCorrect() {
+	void numberOfShipmentsFromCopiedShipmentsIsCorrect() {
 		Assert.assertEquals(0, carrierWShipmentsOnlyFromCarrierWShipments.getServices().size());
 
 		Assert.assertEquals(2, carrierWShipmentsOnlyFromCarrierWShipments.getShipments().size());
@@ -202,7 +206,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void numberOfShipmentsFromConvertedServicesIsCorrect() {
+	void numberOfShipmentsFromConvertedServicesIsCorrect() {
 		Assert.assertEquals(0, carrierWShipmentsOnlyFromCarrierWServices.getServices().size());
 
 		Assert.assertEquals(2, carrierWShipmentsOnlyFromCarrierWServices.getShipments().size());
@@ -214,7 +218,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void fleetAvailableAfterConvertingIsCorrect() {
+	void fleetAvailableAfterConvertingIsCorrect() {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes().size());
 		for ( VehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes()){
@@ -240,7 +244,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void copiingOfShipmentsIsDoneCorrectly() {
+	void copiingOfShipmentsIsDoneCorrectly() {
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
@@ -279,7 +283,7 @@ public class CarrierControlerUtilsTest {
 
 
 	@Test
-	public void convertionOfServicesIsDoneCorrectly() {
+	void convertionOfServicesIsDoneCorrectly() {
 		boolean foundSercice1 = false;
 		boolean foundService2 = false;
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
@@ -314,22 +318,24 @@ public class CarrierControlerUtilsTest {
 		Assert.assertTrue("Not found converted Service2 after converting", foundService2);
 	}
 
-	/* Note: This test can be removed / modified when jsprit works properly with a combined Service and Shipment VRP.
+	/*Note: This test can be removed / modified when jsprit works properly with a combined Service and Shipment VRP.
 	* Currently the capacity of the vehicle seems to be "ignored" in a way that the load within the tour is larger than the capacity;
 	* Maybe it is because of the misunderstanding, that a Service is modeled as "Pickup" and not as thought before as "Delivery". KMT sep18
 	*/
-	@Test(expected=UnsupportedOperationException.class)
-	public void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
-		Carrier carrierMixedWServicesAndShipments = CarriersUtils.createCarrier(Id.create("CarrierMixed", Carrier.class ) );
-		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
-		CarriersUtils.addService(carrierMixedWServicesAndShipments, service1);
-		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
-		CarriersUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
+	@Test
+	void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
+		assertThrows(UnsupportedOperationException.class, () -> {
+			Carrier carrierMixedWServicesAndShipments = CarriersUtils.createCarrier(Id.create("CarrierMixed", Carrier.class));
+			CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+			CarriersUtils.addService(carrierMixedWServicesAndShipments, service1);
+			CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
+			CarriersUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
 
-        Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
+			Network network = NetworkUtils.createNetwork();
+			new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 
-		MatsimJspritFactory.createRoutingProblemBuilder(carrierMixedWServicesAndShipments, network);
+			MatsimJspritFactory.createRoutingProblemBuilder(carrierMixedWServicesAndShipments, network);
+		});
 	}
 
 	private static CarrierShipment createMatsimShipment(String id, String from, String to, int size) {
@@ -361,7 +367,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void testAddVehicleTypeSkill(){
+	void testAddVehicleTypeSkill(){
 		VehiclesFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getVehicles().getFactory();
 		VehicleType type = factory.createVehicleType(Id.create("test", VehicleType.class));
 		Assert.assertFalse("Should not have skill.", CarriersUtils.hasSkill(type, "testSkill"));
@@ -376,7 +382,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void testAddShipmentSkill(){
+	void testAddShipmentSkill(){
 		CarrierShipment shipment = CarrierShipment.Builder.newInstance(
 				Id.create("testShipment", CarrierShipment.class), Id.createLinkId("1"), Id.createLinkId("2"), 1)
 				.build();
@@ -392,7 +398,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void testAddServiceSkill(){
+	void testAddServiceSkill(){
 		CarrierService service = CarrierService.Builder.newInstance(
 				Id.create("testShipment", CarrierService.class), Id.createLinkId("2"))
 				.build();
@@ -408,7 +414,7 @@ public class CarrierControlerUtilsTest {
 	}
 
 	@Test
-	public void testRunJsprit_allInformationGiven(){
+	void testRunJsprit_allInformationGiven(){
 		Config config = prepareConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
@@ -436,28 +442,30 @@ public class CarrierControlerUtilsTest {
 	/**
 	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
 	 */
-	@Test(expected = java.util.concurrent.ExecutionException.class)
-	public void testRunJsprit_NoOfJspritIterationsMissing() throws ExecutionException, InterruptedException {
-		Config config = prepareConfig();
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+	@Test
+	void testRunJsprit_NoOfJspritIterationsMissing() throws ExecutionException, InterruptedException {
+		assertThrows(java.util.concurrent.ExecutionException.class, () -> {
+			Config config = prepareConfig();
+			config.controller().setOutputDirectory(utils.getOutputDirectory());
+			Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+			CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
-		//remove all attributes --> remove the NumberOfJspritIterations attribute to trigger exception
-		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		for (Carrier carrier : carriers.getCarriers().values()) {
-			carrier.getAttributes().clear();
-		}
+			//remove all attributes --> remove the NumberOfJspritIterations attribute to trigger exception
+			Carriers carriers = CarriersUtils.getCarriers(scenario);
+			for (Carrier carrier : carriers.getCarriers().values()) {
+				carrier.getAttributes().clear();
+			}
 
-		CarriersUtils.runJsprit(scenario);
+			CarriersUtils.runJsprit(scenario);
+		});
 	}
 
 	/**
 	 * Don't crash even if there is no algortihm file specified.
 	 */
 	@Test
-	public void testRunJsprit_NoAlgortihmFileGiven(){
+	void testRunJsprit_NoAlgortihmFileGiven(){
 		Config config = prepareConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);

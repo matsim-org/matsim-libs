@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -90,8 +90,8 @@ public class SwissRailRaptorModuleTest {
         System.setProperty("matsim.preferLocalDtds", "true");
     }
 
-    @Test
-    public void testInitialization() {
+	@Test
+	void testInitialization() {
         Config config = ConfigUtils.createConfig();
         config.controller().setLastIteration(0);
         config.controller().setOutputDirectory(this.utils.getOutputDirectory());
@@ -117,8 +117,8 @@ public class SwissRailRaptorModuleTest {
         Assert.assertTrue(module instanceof SwissRailRaptorRoutingModule);
     }
 
-    @Test
-    public void testIntermodalIntegration() {
+	@Test
+	void testIntermodalIntegration() {
         IntermodalFixture f = new IntermodalFixture();
 
         // add a single agent traveling with (intermodal) pt from A to B
@@ -247,11 +247,11 @@ public class SwissRailRaptorModuleTest {
 
     }
 
-    /**
-     * Test update of SwissRailRaptorData after TransitScheduleChangedEvent
-     */
-    @Test
-    public void testTransitScheduleUpdate() {
+	/**
+	* Test update of SwissRailRaptorData after TransitScheduleChangedEvent
+	*/
+	@Test
+	void testTransitScheduleUpdate() {
         Fixture f = new Fixture();
         f.init();
         f.addVehicles();
@@ -339,11 +339,11 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());
     }
 
-    /**
-     * Test individual scoring parameters for agents
-     */
-    @Test
-    public void testRaptorParametersForPerson() {
+	/**
+	* Test individual scoring parameters for agents
+	*/
+	@Test
+	void testRaptorParametersForPerson() {
         SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
         srrConfig.setScoringParameters(ch.sbb.matsim.config.SwissRailRaptorConfigGroup.ScoringParameters.Individual);
 

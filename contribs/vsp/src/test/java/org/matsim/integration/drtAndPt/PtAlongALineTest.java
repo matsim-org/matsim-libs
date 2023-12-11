@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,7 +53,7 @@ public class PtAlongALineTest {
 
 	@Ignore
 	@Test
-	public void testPtAlongALine() {
+	void testPtAlongALine() {
 
 		Config config = createConfig(utils.getOutputDirectory());
 
@@ -70,7 +70,7 @@ public class PtAlongALineTest {
 	 */
 	@Ignore
 	@Test
-	public void testPtAlongALineWithRaptorAndBike() {
+	void testPtAlongALineWithRaptorAndBike() {
 
 		Config config = createConfig(utils.getOutputDirectory());
 
@@ -93,7 +93,7 @@ public class PtAlongALineTest {
 	 */
 	@Ignore
 	@Test
-	public void testDrtAlongALine() {
+	void testDrtAlongALine() {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -204,7 +204,7 @@ public class PtAlongALineTest {
 
 	@Ignore
 	@Test
-	public void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
+	void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);

@@ -1,8 +1,8 @@
 package playground.vsp.openberlinscenario.cemdap.input;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.testcases.MatsimTestUtils;
@@ -23,7 +23,7 @@ public class SynPopCreatorTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void TestGenerateDemand() {
+	void TestGenerateDemand() {
 
 		// Input and output files
 		String commuterFileOutgoingTest = utils.getInputDirectory() + "Teil1BR2009Ga_Test_kurz.txt";

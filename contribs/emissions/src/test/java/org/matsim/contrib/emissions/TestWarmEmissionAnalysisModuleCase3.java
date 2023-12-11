@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -116,7 +116,7 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	 * for two cases:  "avg speed = free flow speed" & "avg speed = stop go speed" the average values are used to calculate the PM warm emissions
 	 */
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent3(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent3(){
 
 		//-- set up tables, event handler, parameters, module
 		WarmEmissionAnalysisModule emissionsModule = setUp();
@@ -155,7 +155,7 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	 * for two cases:  "current speed equals free flow speed" & "current speed equals stop go speed" the counters are tested
 	*/
 	@Test
-	public void testCounters4(){
+	void testCounters4(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 

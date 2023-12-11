@@ -6,8 +6,8 @@ import com.google.inject.multibindings.Multibinder;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -78,7 +78,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void minmax() {
+	void minmax() {
 
 		Person person = create();
 
@@ -115,7 +115,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void subset() {
+	void subset() {
 
 		Person person = create();
 

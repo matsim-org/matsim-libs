@@ -22,7 +22,7 @@ package org.matsim.core.controler;
 import java.util.*;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +72,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PrepareForSimImplTest {
 
 	@Test
-	public void testSingleLegTripRoutingMode() {
+	void testSingleLegTripRoutingMode() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -135,7 +135,7 @@ public class PrepareForSimImplTest {
 	}
 
 	@Test
-	public void testSingleFallbackModeLegTrip() {
+	void testSingleFallbackModeLegTrip() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -200,7 +200,7 @@ public class PrepareForSimImplTest {
 	}
 
 	@Test
-	public void testCorrectTripsRemainUnchanged() {
+	void testCorrectTripsRemainUnchanged() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -366,7 +366,7 @@ public class PrepareForSimImplTest {
 	}
 
 	@Test
-	public void testRoutingModeConsistency() {
+	void testRoutingModeConsistency() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -449,7 +449,7 @@ public class PrepareForSimImplTest {
 	}
 
 	@Test
-	public void testOutdatedHelperModesReplacement() {
+	void testOutdatedHelperModesReplacement() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
@@ -672,7 +672,7 @@ public class PrepareForSimImplTest {
 	}
 
 	@Test
-	public void testOutdatedFallbackAndHelperModesReplacement() {
+	void testOutdatedFallbackAndHelperModesReplacement() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
@@ -763,7 +763,7 @@ public class PrepareForSimImplTest {
 	}
 
 	@Test
-	public void vehicleTypes() {
+	void vehicleTypes() {
 
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

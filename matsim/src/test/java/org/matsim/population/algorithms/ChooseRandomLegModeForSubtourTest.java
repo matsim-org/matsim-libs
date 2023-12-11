@@ -30,8 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
@@ -119,7 +119,7 @@ public class ChooseRandomLegModeForSubtourTest {
 
 
 	@Test
-	public void testHandleEmptyPlan() {
+	void testHandleEmptyPlan() {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() , new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(),
 				SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -129,7 +129,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 	@Test
-	public void testHandlePlanWithoutLeg() {
+	void testHandlePlanWithoutLeg() {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(),
 				SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -141,7 +141,7 @@ public class ChooseRandomLegModeForSubtourTest {
 
 
 	@Test
-	public void testSubTourMutationNetworkBased() {
+	void testSubTourMutationNetworkBased() {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
@@ -152,7 +152,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 	@Test
-	public void testSubTourMutationFacilitiesBased() {
+	void testSubTourMutationFacilitiesBased() {
 		Config config = utils.loadConfig(CONFIGFILE);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
@@ -163,7 +163,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 	@Test
-	public void testCarDoesntTeleportFromHome() {
+	void testCarDoesntTeleportFromHome() {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
@@ -173,7 +173,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 	@Test
-	public void testSingleTripSubtourHandling() {
+	void testSingleTripSubtourHandling() {
 		String[] modes = new String[] {"car", "pt", "walk"};
 
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -258,7 +258,7 @@ public class ChooseRandomLegModeForSubtourTest {
 
 
 	@Test
-	public void testUnclosedSubtour() {
+	void testUnclosedSubtour() {
 
 		String[] modes = new String[] {"car", "pt", "walk"};
 

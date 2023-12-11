@@ -23,8 +23,8 @@ package org.matsim.core.replanning.strategies;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -56,7 +56,8 @@ public class TimeAllocationMutatorModuleTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testSimplifiedMutation() {
+	@Test
+	void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
 		runSimplifiedMutationRangeTest(new MutateActivityTimeAllocation( 750, affectingDuration, MatsimRandom.getLocalInstance(),24*3600,false,1), 750);
@@ -150,7 +151,7 @@ public class TimeAllocationMutatorModuleTest {
 
 
 	@Test
-	public void testRun() {
+	void testRun() {
 		// setup population with one person
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -188,7 +189,7 @@ public class TimeAllocationMutatorModuleTest {
 	}
 
 	@Test
-	public void testRunLatestEndTime() {
+	void testRunLatestEndTime() {
 		// setup population with one person
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -243,8 +244,9 @@ public class TimeAllocationMutatorModuleTest {
 			}
 		}
 	}
+
 	@Test
-	public void testLegTimesAreSetCorrectly() {
+	void testLegTimesAreSetCorrectly() {
 		// setup population with one person
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);

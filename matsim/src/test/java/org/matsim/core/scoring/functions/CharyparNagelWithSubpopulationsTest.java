@@ -19,7 +19,7 @@
 package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -41,7 +41,7 @@ import org.matsim.core.scoring.ScoringFunction;
  */
 public class CharyparNagelWithSubpopulationsTest {
 	@Test
-	public void testLegsScoredDifferently() {
+	void testLegsScoredDifferently() {
 		final Scenario sc = createTestScenario();
 
 		final CharyparNagelScoringFunctionFactory functionFactory = new CharyparNagelScoringFunctionFactory( sc );
@@ -77,7 +77,7 @@ public class CharyparNagelWithSubpopulationsTest {
 	}
 
 	@Test
-	public void testActivitiesScoredDifferently() {
+	void testActivitiesScoredDifferently() {
 		final Scenario sc = createTestScenario();
 
 		final CharyparNagelScoringFunctionFactory functionFactory = new CharyparNagelScoringFunctionFactory( sc );

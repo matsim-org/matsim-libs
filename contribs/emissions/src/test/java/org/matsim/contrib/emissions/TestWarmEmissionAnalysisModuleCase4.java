@@ -23,7 +23,7 @@ package org.matsim.contrib.emissions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -124,7 +124,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	 * average values are used
 	 */
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent4() {
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent4() {
 
 		//-- set up tables, event handler, parameters, module
 		WarmEmissionAnalysisModule emissionsModule = setUp();
@@ -162,7 +162,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	 * average values are used
 	 */
 	@Test
-	public void testCounters2(){
+	void testCounters2(){
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// ff und sg not part of the detailed table -> use average table

@@ -20,10 +20,9 @@
 
 package playground.vsp.zzArchive.bvwpOld;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
-
 
 
 public class BvwpTest {
@@ -32,7 +31,8 @@ public class BvwpTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testOne() {
+	@Test
+	void testOne() {
 
 		Values economicValues = EconomicValues.createEconomicValuesForTest1();
 

@@ -22,13 +22,13 @@ package org.matsim.api.core.v01;
 
 import static org.junit.Assert.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CoordTest {
 
 	@Test
-	public void testCoord2D() {
+	void testCoord2D() {
 		@SuppressWarnings("unused")
 		Coord c;
 		try{
@@ -39,7 +39,7 @@ public class CoordTest {
 	}
 
 	@Test
-	public void testCoord3D() {
+	void testCoord3D() {
 		@SuppressWarnings("unused")
 		Coord c;
 		try{
@@ -60,7 +60,7 @@ public class CoordTest {
 	}
 
 	@Test
-	public void testGetX() {
+	void testGetX() {
 		// 2D
 		Coord c2 = new Coord(0.0, 1.0);
 		assertEquals("Wrong x-value.", 0.0, c2.getX(), MatsimTestUtils.EPSILON);
@@ -71,7 +71,7 @@ public class CoordTest {
 	}
 
 	@Test
-	public void testGetY() {
+	void testGetY() {
 		// 2D
 		Coord c2 = new Coord(0.0, 1.0);
 		assertEquals("Wrong y-value.", 1.0, c2.getY(), MatsimTestUtils.EPSILON);
@@ -82,7 +82,7 @@ public class CoordTest {
 	}
 
 	@Test
-	public void testGetZ() {
+	void testGetZ() {
 		// 2D
 		Coord c2 = new Coord(0.0, 1.0);
 		try{
@@ -99,7 +99,7 @@ public class CoordTest {
 	}
 
 	@Test
-	public void testEqualsObject() {
+	void testEqualsObject() {
 		Double dummy = 0.0;
 		
 		Coord c2a = new Coord(0.0, 1.0);
@@ -122,7 +122,7 @@ public class CoordTest {
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		Coord c2 = new Coord(0.0, 1.0);
 		assertTrue(c2.toString().equalsIgnoreCase("[x=0.0 | y=1.0]"));
 		

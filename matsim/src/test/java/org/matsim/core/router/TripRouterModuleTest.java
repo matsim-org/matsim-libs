@@ -23,8 +23,8 @@
 package org.matsim.core.router;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -41,8 +41,8 @@ public class TripRouterModuleTest {
     @RegisterExtension
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-    @Test
-    public void testRouterCreation() {
+	@Test
+	void testRouterCreation() {
         for (ControllerConfigGroup.RoutingAlgorithmType routingAlgorithmType : ControllerConfigGroup.RoutingAlgorithmType.values()) {
             Config config = ConfigUtils.createConfig();
             config.controller().setRoutingAlgorithmType(routingAlgorithmType);

@@ -24,8 +24,8 @@ package org.matsim.contrib.signals.controller.sylvia;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -103,7 +103,7 @@ public class SylviaIT {
 	 * priority over the second.
 	 */
 	@Test
-	public void testDemandABPrioA() {
+	void testDemandABPrioA() {
 		double[] noPersons = { 3600, 3600 };
 		SignalAnalysisTool signalAnalyzer = runScenario(noPersons, 0);
 
@@ -141,7 +141,7 @@ public class SylviaIT {
 	 * priority over the second.
 	 */
 	@Test
-	public void testDemandABPrioB() {
+	void testDemandABPrioB() {
 		double[] noPersons = { 3600, 3600 };
 		// change the priority (i.e. order in the plan) by using an offset of 5 seconds
 		SignalAnalysisTool signalAnalyzer = runScenario(noPersons, 5);
@@ -169,7 +169,7 @@ public class SylviaIT {
 	 * test sylvia with demand crossing only in east-west direction
 	 */
 	@Test
-	public void testDemandA() {
+	void testDemandA() {
 		double[] noPersons = { 3600, 0 };
 		SignalAnalysisTool signalAnalyzer = runScenario(noPersons, 0);
 

@@ -22,8 +22,8 @@ package org.matsim.pt.transitSchedule;
 
 import static org.junit.Assert.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -53,7 +53,8 @@ public class TransitStopFacilityTest {
 		return new TransitStopFacilityImpl(id, coord, isBlockingLane);
 	}
 
-	@Test public void testInitialization() {
+	@Test
+	void testInitialization() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -63,7 +64,8 @@ public class TransitStopFacilityTest {
 		assertFalse(stop.getIsBlockingLane());
 	}
 
-	@Test public void testBlockingStop() {
+	@Test
+	void testBlockingStop() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -72,7 +74,8 @@ public class TransitStopFacilityTest {
 		assertTrue(stop.getIsBlockingLane());
 	}
 
-	@Test public void testLink() {
+	@Test
+	void testLink() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -84,7 +87,8 @@ public class TransitStopFacilityTest {
 		assertNull(stop.getLinkId());
 	}
 
-	@Test public void testName() {
+	@Test
+	void testName() {
 		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
 		Coord coord = new Coord((double) 10, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);

@@ -24,8 +24,8 @@ package org.matsim.codeexamples.fixedTimeSignals;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -40,7 +40,7 @@ public class CreateIntergreensExampleTest {
 	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testIntergreenExample(){
+	void testIntergreenExample(){
 		try {
 			String[] args = {testUtils.getOutputDirectory()};
 			CreateIntergreensExample.main(args);

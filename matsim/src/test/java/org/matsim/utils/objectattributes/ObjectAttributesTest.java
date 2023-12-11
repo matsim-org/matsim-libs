@@ -20,7 +20,7 @@
 package org.matsim.utils.objectattributes;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class ObjectAttributesTest {
 
 	@Test
-	public void testPutGet() {
+	void testPutGet() {
 		ObjectAttributes linkAttributes = new ObjectAttributes();
 		Assert.assertNull(linkAttributes.getAttribute("1", "osm:roadtype"));
 		Assert.assertNull(linkAttributes.putAttribute("1", "osm:roadtype", "trunk"));

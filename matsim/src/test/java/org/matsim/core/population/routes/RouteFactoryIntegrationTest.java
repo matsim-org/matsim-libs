@@ -21,8 +21,8 @@
 package org.matsim.core.population.routes;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -50,7 +50,7 @@ public class RouteFactoryIntegrationTest {
 	 * Tests that the plans-reader and ReRoute-strategy module use the specified RouteFactory.
 	 */
 	@Test
-	public void testRouteFactoryIntegration() {
+	void testRouteFactoryIntegration() {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile("plans2.xml");
 		Collection<StrategySettings> settings = config.replanning().getStrategySettings();

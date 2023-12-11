@@ -20,7 +20,7 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +72,7 @@ import java.util.List;
  */
 public class SwissRailRaptorInVehicleCostTest {
 
-	/* fastRoute takes 14min30sec. (==> 870 sec)
+	/*fastRoute takes 14min30sec. (==> 870 sec)
 	 * slowRoute takes 20min30sec (==> 1230 sec) and departs 1 min later.
 	 * slowRoute arrives 7 minutes later ==> 420 sec
 	 *
@@ -82,19 +82,19 @@ public class SwissRailRaptorInVehicleCostTest {
 	 */
 
 	@Test
-	public void testBaseline_defaultInVehicleCostCalculator_uses_fastRoute() {
+	void testBaseline_defaultInVehicleCostCalculator_uses_fastRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new DefaultRaptorInVehicleCostCalculator(), f.fastLineId);
 	}
 
 	@Test
-	public void testBaseline_capacityDependentInVehicleCost_indifferent_uses_fastRoute() {
+	void testBaseline_capacityDependentInVehicleCost_indifferent_uses_fastRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 1.8), f.fastLineId);
 	}
 
 	@Test
-	public void test_capacityDependentInVehicleCost_prefersLowOccupancy_uses_slowRoute() {
+	void test_capacityDependentInVehicleCost_prefersLowOccupancy_uses_slowRoute() {
 		Fixture f = new Fixture();
 
 		// from the note above:
@@ -114,13 +114,13 @@ public class SwissRailRaptorInVehicleCostTest {
 	}
 
 	@Test
-	public void test_capacityDependentInVehicleCost_minorHighOccupancyAvoidance_uses_fastRoute() {
+	void test_capacityDependentInVehicleCost_minorHighOccupancyAvoidance_uses_fastRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 1.2), f.fastLineId);
 	}
 
 	@Test
-	public void test_capacityDependentInVehicleCost_majorHighOccupancyAvoidance_uses_slowRoute() {
+	void test_capacityDependentInVehicleCost_majorHighOccupancyAvoidance_uses_slowRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 2.0), f.slowLineId);
 	}

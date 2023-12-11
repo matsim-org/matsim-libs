@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -27,7 +27,7 @@ public class TransportPlanningMainModeIdentifierTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControlerListener() {
 
 		modeHierarchy.add(TransportMode.non_network_walk);
 		modeHierarchy.add("undefined");

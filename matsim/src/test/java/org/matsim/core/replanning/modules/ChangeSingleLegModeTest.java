@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +43,7 @@ import org.matsim.core.population.PopulationUtils;
 public class ChangeSingleLegModeTest {
 
 	@Test
-	public void testDefaultModes() {
+	void testDefaultModes() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 
@@ -53,7 +53,7 @@ public class ChangeSingleLegModeTest {
 	}
 
 	@Test
-	public void testWithConfig() {
+	void testWithConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
@@ -62,16 +62,16 @@ public class ChangeSingleLegModeTest {
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes, 20);
 	}
-	
+
 	@Test
-	public void testWithConstructor() {
+	void testWithConstructor() {
 		final ChangeSingleLegMode module = new ChangeSingleLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes, 20);
 	}
 
 	@Test
-	public void testWithConfig_withoutIgnoreCarAvailability() {
+	void testWithConfig_withoutIgnoreCarAvailability() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");

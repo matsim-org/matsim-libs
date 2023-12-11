@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +44,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class NetworkExpandNodeTest {
 
 	@Test
-	public void testExpandNode() {
+	void testExpandNode() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -153,7 +152,7 @@ public class NetworkExpandNodeTest {
 	}
 
 	@Test
-	public void testExpandNode_sameCoordinateLinks() {
+	void testExpandNode_sameCoordinateLinks() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		Coord c = f.scenario.getNetwork().getNodes().get(Id.create("3", Node.class)).getCoord();
@@ -265,7 +264,7 @@ public class NetworkExpandNodeTest {
 	}
 
 	@Test
-	public void testExpandNode_specificModes() {
+	void testExpandNode_specificModes() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -388,7 +387,7 @@ public class NetworkExpandNodeTest {
 	}
 
 	@Test
-	public void testTurnsAreSameAsSingleNode_IncludeUTurns() {
+	void testTurnsAreSameAsSingleNode_IncludeUTurns() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -426,7 +425,7 @@ public class NetworkExpandNodeTest {
 	}
 
 	@Test
-	public void testTurnsAreSameAsSingleNode_IgnoreUTurns() {
+	void testTurnsAreSameAsSingleNode_IgnoreUTurns() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -463,9 +462,9 @@ public class NetworkExpandNodeTest {
 		
 		Assert.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
 	}
-	
+
 	@Test
-	public void testTurnInfo_equals() {
+	void testTurnInfo_equals() {
 		Set<String> modes1 = new HashSet<String>();
 		Set<String> modes2 = new HashSet<String>();
 		modes2.add(TransportMode.car);

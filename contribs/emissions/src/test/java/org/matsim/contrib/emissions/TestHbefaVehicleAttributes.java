@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /*
@@ -41,7 +41,7 @@ public class TestHbefaVehicleAttributes {
 	private HbefaVehicleAttributes differentValues;
 
 	@Test
-	public final void testEqualsForCompleteAttributes(){
+	final void testEqualsForCompleteAttributes(){
 
 		//two equal objects - no default values
 		normal = new HbefaVehicleAttributes();
@@ -60,7 +60,7 @@ public class TestHbefaVehicleAttributes {
 	}
 
 	@Test
-	public final void testEqualsForCompleteAttributes_emConcept(){
+	final void testEqualsForCompleteAttributes_emConcept(){
 
 		//two unequal but complete objects
 		normal = new HbefaVehicleAttributes();
@@ -79,7 +79,7 @@ public class TestHbefaVehicleAttributes {
 	}
 
 	@Test
-	public final void testEqualsForCompleteAttributes_sizeClass(){
+	final void testEqualsForCompleteAttributes_sizeClass(){
 
 		//two unequal but complete objects
 		normal = new HbefaVehicleAttributes();
@@ -98,7 +98,7 @@ public class TestHbefaVehicleAttributes {
 	}
 
 	@Test
-	public final void testEqualsForCompleteAttributes_technologies(){
+	final void testEqualsForCompleteAttributes_technologies(){
 
 		//two unequal but complete objects
 		normal = new HbefaVehicleAttributes();
@@ -121,7 +121,7 @@ public class TestHbefaVehicleAttributes {
 	// thus, the equals method should not throw nullpointer exceptions but return false or respectively true
 
 	@Test
-	public final void testEqualsForIncompleteAttributes_emConcept(){
+	final void testEqualsForIncompleteAttributes_emConcept(){
 		//generate a complete key and set its parameters
 		normal = new HbefaVehicleAttributes();
 		setToNormal(normal);
@@ -142,7 +142,7 @@ public class TestHbefaVehicleAttributes {
 
 
 	@Test
-	public final void testEqualsForIncompleteAttributes_technology() {
+	final void testEqualsForIncompleteAttributes_technology() {
 
 		// generate a complete key and set its parameters
 		normal = new HbefaVehicleAttributes();
@@ -166,7 +166,7 @@ public class TestHbefaVehicleAttributes {
 	}
 
 	@Test
-	public final void testEqualsForIncompleteAttributes_sizeClass(){
+	final void testEqualsForIncompleteAttributes_sizeClass(){
 
 		//generate a complete key and set its parameters
 		normal = new HbefaVehicleAttributes();

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanBuilder;
@@ -20,7 +20,7 @@ import org.matsim.facilities.ActivityFacility;
 
 public class VehicleTourConstraintTest {
 	@Test
-	public void testWithHome() {
+	void testWithHome() {
 		// PREPARATION
 		HomeFinder homeFinder = (List<DiscreteModeChoiceTrip> trips) -> Id.create("A", ActivityFacility.class);
 		Collection<String> availableModes = Arrays.asList("car", "walk");
@@ -69,7 +69,7 @@ public class VehicleTourConstraintTest {
 	}
 
 	@Test
-	public void testWithoutHome() {
+	void testWithoutHome() {
 		// PREPARATION
 		HomeFinder homeFinder = (List<DiscreteModeChoiceTrip> trips) -> null;
 		Collection<String> availableModes = Arrays.asList("car", "walk");
@@ -107,7 +107,7 @@ public class VehicleTourConstraintTest {
 	}
 
 	@Test
-	public void testTour() {
+	void testTour() {
 		// PREPARATION
 		HomeFinder homeFinder = (List<DiscreteModeChoiceTrip> trips) -> Id.create("A", ActivityFacility.class);
 		Collection<String> availableModes = Arrays.asList("car", "walk");

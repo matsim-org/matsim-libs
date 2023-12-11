@@ -22,7 +22,7 @@
  package org.matsim.utils.objectattributes;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Month;
 import java.util.Arrays;
@@ -33,13 +33,13 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-/**
+ /**
  * @author thibautd
  */
 public class ObjectAttributesConverterTest {
 
-	@Test
-	public void testEnumToString() {
+	 @Test
+	 void testEnumToString() {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		// cannot use an enum type defined here, because test classes are not on classpath for classes outside of test...
 		// And is thus unavailable to the ObjectAttributesConverter
@@ -48,15 +48,15 @@ public class ObjectAttributesConverterTest {
 		Assert.assertEquals("unexpected string converted from enum value", "JANUARY", converted);
 	}
 
-	@Test
-	public void testStringToEnum() {
+	 @Test
+	 void testStringToEnum() {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
 		Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
 	}
 
-	@Test
-	public void testHashMap() {
+	 @Test
+	 void testHashMap() {
 
 		var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
 		final var converter = new ObjectAttributesConverter();
@@ -67,8 +67,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testEmptyHashMap() {
+	 @Test
+	 void testEmptyHashMap() {
 
 		var expectedString = "{}";
 		final var converter = new ObjectAttributesConverter();
@@ -79,8 +79,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testCollection() {
+	 @Test
+	 void testCollection() {
 
 		var expectedString = "[\"a\",\"b\"]";
 		final var converter = new ObjectAttributesConverter();
@@ -91,8 +91,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testEmptyCollection() {
+	 @Test
+	 void testEmptyCollection() {
 
 		var expectedString = "[]";
 		final var converter = new ObjectAttributesConverter();
@@ -103,8 +103,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testUnsupported() {
+	 @Test
+	 void testUnsupported() {
 
 		final var converter = new ObjectAttributesConverter();
 		var serialized = converter.convertToString(new UnsupportedType());

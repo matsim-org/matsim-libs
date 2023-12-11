@@ -20,7 +20,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -98,8 +98,8 @@ public class IsTheRightCustomerScoredTest {
     }
 
 
-    @Test
-    public void testIfTheRightPersonIsScoredForReceivingAJob() {
+	@Test
+	void testIfTheRightPersonIsScoredForReceivingAJob() {
         Plan partyPizzaPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("customerOrderingForParty")).getSelectedPlan();
         Plan lonelyPizzaPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("customerOrderingJustForItself")).getSelectedPlan();
         Plan nonCustomerPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("nonCustomer")).getSelectedPlan();

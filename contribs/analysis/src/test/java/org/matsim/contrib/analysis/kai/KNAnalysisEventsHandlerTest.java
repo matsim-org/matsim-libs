@@ -26,8 +26,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -107,9 +107,9 @@ public class KNAnalysisEventsHandlerTest {
 		this.network = null;
 	}
 
-    @Test
-    @Ignore
-	public void testNoEvents() {
+	@Test
+	@Ignore
+	void testNoEvents() {
 
 		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
@@ -121,9 +121,9 @@ public class KNAnalysisEventsHandlerTest {
 		this.runTest(testee);
 	}
 
-    @Test
-    @Ignore
-	public void testAveraging() {
+	@Test
+	@Ignore
+	void testAveraging() {
 		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14
 
 		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);

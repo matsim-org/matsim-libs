@@ -28,8 +28,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -106,7 +106,8 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testInit() {
+	@Test
+	void testInit() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertNotNull(f.qlink1);
 		assertEquals(1.0, f.qlink1.getSimulatedFlowCapacityPerTimeStep(), MatsimTestUtils.EPSILON);
@@ -120,7 +121,8 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testAdd() {
+	@Test
+	void testAdd() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
@@ -151,7 +153,8 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testGetVehicle_Driving() {
+	@Test
+	void testGetVehicle_Driving() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -216,7 +219,8 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testGetVehicle_Parking() {
+	@Test
+	void testGetVehicle_Parking() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -253,7 +257,8 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testGetVehicle_Departing() {
+	@Test
+	void testGetVehicle_Departing() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -317,7 +322,8 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testBuffer() {
+	@Test
+	void testBuffer() {
 		Config conf = utils.loadConfig((String)null);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -440,7 +446,8 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testStorageSpaceDifferentVehicleSizes() {
+	@Test
+	void testStorageSpaceDifferentVehicleSizes() {
 
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -541,7 +548,8 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testStuckEvents() {
+	@Test
+	void testStuckEvents() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);

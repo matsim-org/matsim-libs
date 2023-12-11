@@ -23,8 +23,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -67,9 +67,10 @@ public class TinyMultimodalAccessibilityTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
+	// non-deterministic presumably because of multi-threading.  kai, sep'19
 	@Test
-	@Ignore // non-deterministic presumably because of multi-threading.  kai, sep'19
-	public void testWithBoundingBox() {
+	@Ignore
+	void testWithBoundingBox() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file

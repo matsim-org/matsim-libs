@@ -29,8 +29,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -78,7 +78,7 @@ public class AccessibilityIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testRunAccessibilityExample() {
+	void testRunAccessibilityExample() {
 		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
 
 		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
@@ -119,7 +119,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithBoundingBoxConfigFile() {
+	void testWithBoundingBoxConfigFile() {
 		Config config = ConfigUtils.loadConfig(utils.getInputDirectory() + "config.xml");
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
@@ -159,7 +159,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithBoundingBox() {
+	void testWithBoundingBox() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file
@@ -197,7 +197,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithBoundingBoxUsingOpportunityWeights() {
+	void testWithBoundingBoxUsingOpportunityWeights() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file
@@ -237,7 +237,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithExtentDeterminedByNetwork() {
+	void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
 
 		config.routing().setRoutingRandomness(0.);
@@ -264,7 +264,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithExtentDeterminedShapeFile() {
+	void testWithExtentDeterminedShapeFile() {
 		Config config = createTestConfig() ;
 
 		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
@@ -304,7 +304,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithPredefinedMeasuringPoints() {
+	void testWithPredefinedMeasuringPoints() {
 		Config config = createTestConfig() ;
 
 		File f = new File(this.utils.getInputDirectory() + "measuringPoints.xml");
@@ -352,7 +352,7 @@ public class AccessibilityIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testWithFile(){
+	void testWithFile(){
 		/*TODO Complete - JWJ, Dec'16 */
 		Config config = createTestConfig();
 

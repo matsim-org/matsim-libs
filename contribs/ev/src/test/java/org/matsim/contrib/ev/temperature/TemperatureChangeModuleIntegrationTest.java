@@ -22,8 +22,8 @@ package org.matsim.contrib.ev.temperature;
 import jakarta.inject.Inject;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -45,7 +45,7 @@ public class TemperatureChangeModuleIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTemperatureChangeModule() {
+	void testTemperatureChangeModule() {
 
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new TemperatureChangeConfigGroup());

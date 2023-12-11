@@ -25,8 +25,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -51,7 +51,7 @@ public class TransitScheduleWriterTest {
 	 * @throws ParserConfigurationException
 	 */
 	@Test
-	public void testDefaultV2() throws IOException, SAXException, ParserConfigurationException {
+	void testDefaultV2() throws IOException, SAXException, ParserConfigurationException {
 		String filename = this.utils.getOutputDirectory() + "schedule.xml";
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -69,7 +69,7 @@ public class TransitScheduleWriterTest {
 	}
 
 	@Test
-	public void testTransitLineName() {
+	void testTransitLineName() {
 		String filename = this.utils.getOutputDirectory() + "schedule.xml";
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();

@@ -25,8 +25,8 @@ import static org.junit.Assert.*;
 import java.util.Set;
 import java.util.Stack;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,7 +49,8 @@ public class NetworkReaderMatsimV1Test {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testAllowedModes_singleMode() {
+	@Test
+	void testAllowedModes_singleMode() {
 		Link link = prepareTestAllowedModes("car");
 		Set<String> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 1, modes.size());
@@ -65,7 +66,8 @@ public class NetworkReaderMatsimV1Test {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testAllowedModes_emptyMode() {
+	@Test
+	void testAllowedModes_emptyMode() {
 		Link link = prepareTestAllowedModes("");
 		Set<String> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.size());
@@ -74,7 +76,8 @@ public class NetworkReaderMatsimV1Test {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testAllowedModes_multipleModes() {
+	@Test
+	void testAllowedModes_multipleModes() {
 		Link link = prepareTestAllowedModes("car,bus");
 		Set<String> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 2, modes.size());

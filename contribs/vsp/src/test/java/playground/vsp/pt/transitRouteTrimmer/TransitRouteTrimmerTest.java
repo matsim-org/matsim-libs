@@ -23,7 +23,7 @@ package playground.vsp.pt.transitRouteTrimmer;
 import javafx.util.Pair;
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -89,16 +89,16 @@ public class TransitRouteTrimmerTest {
     }
 
 
-    /*
+	/*
     Part 1: these tests check whether the three route types are actually configured as described above
      */
 
-    /**
-     * In the allIn scenario, the transitRoute in question should have all stops within zone.
-     */
-    @Ignore
-    @Test
-    public void test_AllIn() {
+	/**
+	* In the allIn scenario, the transitRoute in question should have all stops within zone.
+	*/
+	@Ignore
+	@Test
+	void test_AllIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -122,13 +122,13 @@ public class TransitRouteTrimmerTest {
         assertEquals("All stops should be inside the zone", stopsTotal, stopsInZoneCnt);
     }
 
-    /**
-     * In the halfIn scenario, the transitRoute in question begins outside of the zone and
-     * ends within the zone.
-     */
-    @Ignore
-    @Test
-    public void test_HalfIn() {
+	/**
+	* In the halfIn scenario, the transitRoute in question begins outside of the zone and
+	* ends within the zone.
+	*/
+	@Ignore
+	@Test
+	void test_HalfIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -150,13 +150,13 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * In the MiddleIn scenario, the transitRoute in question begins outside of the zone then dips
-     * into the zone, and finally leaves the zone once again
-     */
-    @Ignore
-    @Test
-    public void test_MiddleIn() {
+	/**
+	* In the MiddleIn scenario, the transitRoute in question begins outside of the zone then dips
+	* into the zone, and finally leaves the zone once again
+	*/
+	@Ignore
+	@Test
+	void test_MiddleIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -178,19 +178,19 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /*
+	/*
     Part 2: These tests check functionality of all four trimming methods. For each trimming
     method, all three route types are checked.
      */
 
-    /**
-     * trimming method: DeleteRoutesEntirelyInsideZone.
-     * route scenario: AllIn
-     * The testRoute should be deleted since all stops are within the zone.
-     */
-    @Ignore
-    @Test
-    public void testDeleteRoutesEntirelyInsideZone_AllIn() {
+	/**
+	* trimming method: DeleteRoutesEntirelyInsideZone.
+	* route scenario: AllIn
+	* The testRoute should be deleted since all stops are within the zone.
+	*/
+	@Ignore
+	@Test
+	void testDeleteRoutesEntirelyInsideZone_AllIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -218,15 +218,15 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * trimming method: DeleteRoutesEntirelyInsideZone.
-     * route scenario: HalfIn
-     * The testRoute should be retained and left unmodified,
-     * since some stops are outside the zone.
-     */
-    @Ignore
-    @Test
-    public void testDeleteRoutesEntirelyInsideZone_HalfIn() {
+	/**
+	* trimming method: DeleteRoutesEntirelyInsideZone.
+	* route scenario: HalfIn
+	* The testRoute should be retained and left unmodified,
+	* since some stops are outside the zone.
+	*/
+	@Ignore
+	@Test
+	void testDeleteRoutesEntirelyInsideZone_HalfIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -266,15 +266,15 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * trimming method: DeleteRoutesEntirelyInsideZone.
-     * route scenario: MiddleIn
-     * The testRoute should be retained and left unmodified,
-     * since some stops are outside the zone.
-     */
-    @Ignore
-    @Test
-    public void testDeleteRoutesEntirelyInsideZone_MiddleIn() {
+	/**
+	* trimming method: DeleteRoutesEntirelyInsideZone.
+	* route scenario: MiddleIn
+	* The testRoute should be retained and left unmodified,
+	* since some stops are outside the zone.
+	*/
+	@Ignore
+	@Test
+	void testDeleteRoutesEntirelyInsideZone_MiddleIn() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
@@ -314,14 +314,14 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * trimming method: TrimEnds.
-     * route scenario: AllIn
-     * The testRoute should be deleted since all stops are within the zone.
-     */
-    @Ignore
-    @Test
-    public void testTrimEnds_AllIn() {
+	/**
+	* trimming method: TrimEnds.
+	* route scenario: AllIn
+	* The testRoute should be deleted since all stops are within the zone.
+	*/
+	@Ignore
+	@Test
+	void testTrimEnds_AllIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -349,14 +349,14 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * trimming method: TrimEnds.
-     * route scenario: HalfIn
-     * The second half of the route is outside the zone and should be trimmed
-     */
-    @Ignore
-    @Test
-    public void testTrimEnds_HalfIn() {
+	/**
+	* trimming method: TrimEnds.
+	* route scenario: HalfIn
+	* The second half of the route is outside the zone and should be trimmed
+	*/
+	@Ignore
+	@Test
+	void testTrimEnds_HalfIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -406,14 +406,14 @@ public class TransitRouteTrimmerTest {
                 vehiclesInVehiclesNew.containsAll(vehiclesUsedInTransitSchedule));
     }
 
-    /**
-     * trimming method: TrimEnds.
-     * route scenario: MiddleIn
-     * Since the ends are both outside of zone, route should not be modified
-     */
-    @Ignore
-    @Test
-    public void testTrimEnds_MiddleIn() {
+	/**
+	* trimming method: TrimEnds.
+	* route scenario: MiddleIn
+	* Since the ends are both outside of zone, route should not be modified
+	*/
+	@Ignore
+	@Test
+	void testTrimEnds_MiddleIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -454,14 +454,14 @@ public class TransitRouteTrimmerTest {
     }
 
 
-    /**
-     * trimming method: SkipStops.
-     * route scenario: AllIn
-     * New route should be empty
-     */
-    @Ignore
-    @Test
-    public void testSkipStops_AllIn() {
+	/**
+	* trimming method: SkipStops.
+	* route scenario: AllIn
+	* New route should be empty
+	*/
+	@Ignore
+	@Test
+	void testSkipStops_AllIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -486,14 +486,14 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * trimming method: SkipStops.
-     * route scenario: HalfIn
-     * Stops outside zone should be skipped
-     */
-    @Ignore
-    @Test
-    public void testSkipStops_HalfIn() {
+	/**
+	* trimming method: SkipStops.
+	* route scenario: HalfIn
+	* Stops outside zone should be skipped
+	*/
+	@Ignore
+	@Test
+	void testSkipStops_HalfIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -538,14 +538,14 @@ public class TransitRouteTrimmerTest {
     }
 
 
-    /**
-     * trimming method: SkipStops.
-     * route scenario: MiddleIn
-     * New route should have less stops than old route, but same amount of links
-     */
-    @Ignore
-    @Test
-    public void testSkipStops_MiddleIn() {
+	/**
+	* trimming method: SkipStops.
+	* route scenario: MiddleIn
+	* New route should have less stops than old route, but same amount of links
+	*/
+	@Ignore
+	@Test
+	void testSkipStops_MiddleIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -588,14 +588,14 @@ public class TransitRouteTrimmerTest {
                 vehiclesInVehiclesNew.containsAll(vehiclesUsedInTransitSchedule));
     }
 
-    /**
-     * trimming method: SplitRoutes.
-     * route scenario: AllIn
-     * route will be deleted
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_AllIn() {
+	/**
+	* trimming method: SplitRoutes.
+	* route scenario: AllIn
+	* route will be deleted
+	*/
+	@Ignore
+	@Test
+	void testSplitRoutes_AllIn() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
@@ -623,14 +623,14 @@ public class TransitRouteTrimmerTest {
                 vehiclesInVehiclesNew.containsAll(vehiclesUsedInTransitSchedule));
     }
 
-    /**
-     * trimming method: SplitRoutes.
-     * route scenario: HalfIn
-     * New route should have less stops than old route
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_HalfIn() {
+	/**
+	* trimming method: SplitRoutes.
+	* route scenario: HalfIn
+	* New route should have less stops than old route
+	*/
+	@Ignore
+	@Test
+	void testSplitRoutes_HalfIn() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
@@ -674,14 +674,14 @@ public class TransitRouteTrimmerTest {
                 vehiclesInVehiclesNew.containsAll(vehiclesUsedInTransitSchedule));
     }
 
-    /**
-     * trimming method: SplitRoutes.
-     * route scenario: MiddleIn
-     * Two routes should be created, each with only one stop within zone
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_MiddleIn() {
+	/**
+	* trimming method: SplitRoutes.
+	* route scenario: MiddleIn
+	* Two routes should be created, each with only one stop within zone
+	*/
+	@Ignore
+	@Test
+	void testSplitRoutes_MiddleIn() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
@@ -732,22 +732,22 @@ public class TransitRouteTrimmerTest {
     }
 
 
-        /*
-        Part 3: tests hub functionality for SplitRoutes trimming method (using route type "middleIn")
-        Hubs allow route to extend into zone to reach a import transit stop (like a major transfer point)
-         */
+	/*
+    Part 3: tests hub functionality for SplitRoutes trimming method (using route type "middleIn")
+    Hubs allow route to extend into zone to reach a import transit stop (like a major transfer point)
+    */
 
 
-    /**
-     * Test Hub functionality
-     * trimming method: SplitRoutes.
-     * route scenario: MiddleIn
-     * tests reach of hubs. Left hub should be included in route 1, while right hub should not be
-     * included in route 2, due to lacking reach
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_MiddleIn_Hub_ValidateReach() {
+	/**
+	 * Test Hub functionality
+	 * trimming method: SplitRoutes.
+	 * route scenario: MiddleIn
+	 * tests reach of hubs. Left hub should be included in route 1, while right hub should not be
+	 * included in route 2, due to lacking reach
+	 */
+	@Ignore
+	@Test
+	void testSplitRoutes_MiddleIn_Hub_ValidateReach() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
@@ -808,16 +808,16 @@ public class TransitRouteTrimmerTest {
                 vehiclesInVehiclesNew.containsAll(vehiclesUsedInTransitSchedule));
     }
 
-    /**
-     * Test Hub functionality
-     * trimming method: SplitRoutes.
-     * route scenario: MiddleIn
-     * tests parameter to include first nearest hub, even if reach is insufficient.
-     * Right hub should be included, even though reach is too low.
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_MiddleIn_Hub_IncludeFirstHubInZone() {
+	/**
+	* Test Hub functionality
+	* trimming method: SplitRoutes.
+	* route scenario: MiddleIn
+	* tests parameter to include first nearest hub, even if reach is insufficient.
+	* Right hub should be included, even though reach is too low.
+	*/
+	@Ignore
+	@Test
+	void testSplitRoutes_MiddleIn_Hub_IncludeFirstHubInZone() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -886,15 +886,15 @@ public class TransitRouteTrimmerTest {
                 vehiclesInVehiclesNew.containsAll(vehiclesUsedInTransitSchedule));
     }
 
-    /**
-     * Test Hub functionality
-     * trimming method: SplitRoutes.
-     * route scenario: MiddleIn
-     * if multiple hubs are within reach of route, the route should go to further one
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_MiddleIn_Hub_MultipleHubs() {
+	/**
+	* Test Hub functionality
+	* trimming method: SplitRoutes.
+	* route scenario: MiddleIn
+	* if multiple hubs are within reach of route, the route should go to further one
+	*/
+	@Ignore
+	@Test
+	void testSplitRoutes_MiddleIn_Hub_MultipleHubs() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
@@ -954,16 +954,16 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    /**
-     * Test Hub functionality
-     * trimming method: SplitRoutes.
-     * route scenario: MiddleIn
-     * if two new routes overlap (because they both reach to same hub)
-     * then they should be combined into one route
-     */
-    @Ignore
-    @Test
-    public void testSplitRoutes_MiddleIn_Hub_OverlapRoutes() {
+	/**
+	* Test Hub functionality
+	* trimming method: SplitRoutes.
+	* route scenario: MiddleIn
+	* if two new routes overlap (because they both reach to same hub)
+	* then they should be combined into one route
+	*/
+	@Ignore
+	@Test
+	void testSplitRoutes_MiddleIn_Hub_OverlapRoutes() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
@@ -1006,20 +1006,20 @@ public class TransitRouteTrimmerTest {
 
     }
 
-        /*
-        Part 4: Tests individual user-defined parameters
-         */
-
-    /**
-     * Test parameter allowableStopsWithinZone
-     * trimming method: SplitRoutes.
-     * route scenario: MiddleIn
-     * route should not be split, since the parameter allowableStopsWithinZone is equal to the number
-     * of stops within zone
+	/*
+    Part 4: Tests individual user-defined parameters
      */
-    @Ignore
-    @Test
-    public void testSplitRoutes_MiddleIn_AllowableStopsWithin() {
+
+	/**
+	 * Test parameter allowableStopsWithinZone
+	 * trimming method: SplitRoutes.
+	 * route scenario: MiddleIn
+	 * route should not be split, since the parameter allowableStopsWithinZone is equal to the number
+	 * of stops within zone
+	 */
+	@Ignore
+	@Test
+	void testSplitRoutes_MiddleIn_AllowableStopsWithin() {
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -1059,9 +1059,9 @@ public class TransitRouteTrimmerTest {
 
     }
 
-    @Ignore
-    @Test
-    public void testDeparturesAndOffsetsAndDescription() {
+	@Ignore
+	@Test
+	void testDeparturesAndOffsetsAndDescription() {
 
         Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);

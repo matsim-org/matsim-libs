@@ -22,8 +22,8 @@
  package org.matsim.core.network.io;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,7 +40,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+ /**
  * @author thibautd
  */
 public class NetworkReprojectionIOTest {
@@ -54,8 +54,8 @@ public class NetworkReprojectionIOTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testInput() {
+	 @Test
+	 void testInput() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -81,8 +81,8 @@ public class NetworkReprojectionIOTest {
 		}
 	}
 
-	@Test
-	public void testOutput() {
+	 @Test
+	 void testOutput() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -109,8 +109,8 @@ public class NetworkReprojectionIOTest {
 		}
 	}
 
-	@Test
-	public void testWithControlerAndAttributes() {
+	 @Test
+	 void testWithControlerAndAttributes() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -163,8 +163,8 @@ public class NetworkReprojectionIOTest {
 		}
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();

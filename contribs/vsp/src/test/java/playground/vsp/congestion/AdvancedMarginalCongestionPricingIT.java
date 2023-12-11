@@ -29,8 +29,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -76,7 +76,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test normal activities
 	@Test
-	public final void test0a(){
+	final void test0a(){
 
 		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("work");
@@ -141,7 +141,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test overnight activities with first and last activity of the same type
 	@Test
-	public final void test0b(){
+	final void test0b(){
 
 		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("overnightActivity");
@@ -189,7 +189,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test overnight activities with first and last activity of different types
 	@Test
-	public final void test0c(){
+	final void test0c(){
 
 		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 
@@ -236,7 +236,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test if the delayed arrival at a normal activity (not the first or last activity) results in the right monetary amount
 	@Test
-	public final void test1(){
+	final void test1(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
 
@@ -318,7 +318,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test if a delayed arrival at the last activity results in the right monetary amount
 	@Test
-	public final void test2(){
+	final void test2(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
@@ -404,7 +404,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test if the right number of money events are thrown
 	@Test
-	public final void test3(){
+	final void test3(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
@@ -472,7 +472,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 	// test if the right number of money events are thrown
 	@Test
-	public final void test4(){
+	final void test4(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 

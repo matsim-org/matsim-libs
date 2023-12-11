@@ -25,11 +25,10 @@ import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-
+import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.model.Signal;
@@ -66,8 +65,8 @@ public class SignalSystemsData20ReaderWriterTest {
 
   private Id<Link> linkId4 = Id.create("4", Link.class);
 
-  @Test
-  public void testParser() throws IOException, JAXBException, SAXException, ParserConfigurationException {
+	@Test
+	void testParser() throws IOException, JAXBException, SAXException, ParserConfigurationException {
   	SignalSystemsData lss = new SignalSystemsDataImpl();
   	SignalSystemsReader20 reader = new SignalSystemsReader20(lss);
   	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
@@ -75,8 +74,8 @@ public class SignalSystemsData20ReaderWriterTest {
   	checkContent(lss);
   }
 
-  @Test
-  public void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
   	String testoutput = this.testUtils.getOutputDirectory()  + "testLssOutput.xml";
   	log.debug("reading file...");
   	//read the test file

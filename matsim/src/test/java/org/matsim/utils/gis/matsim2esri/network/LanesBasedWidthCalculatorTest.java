@@ -20,7 +20,7 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkUtils;
 public class LanesBasedWidthCalculatorTest {
 
 	@Test
-	public void testGetWidth_laneWidthNaN() {
+	void testGetWidth_laneWidthNaN() {
 		Network net = NetworkUtils.createNetwork();
         Node n1 = net.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = net.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));

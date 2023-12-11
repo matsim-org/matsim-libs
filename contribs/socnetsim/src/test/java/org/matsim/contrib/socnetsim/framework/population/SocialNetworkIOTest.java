@@ -25,8 +25,8 @@ import java.util.Random;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -43,12 +43,12 @@ public class SocialNetworkIOTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReinputReflective() {
+	void testReinputReflective() {
 		testReinput( true );
 	}
 
 	@Test
-	public void testReinputNonReflective() {
+	void testReinputNonReflective() {
 		testReinput( false );
 	}
 

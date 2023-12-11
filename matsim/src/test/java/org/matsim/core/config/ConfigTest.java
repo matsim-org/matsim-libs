@@ -22,7 +22,7 @@ package org.matsim.core.config;
 import java.io.ByteArrayInputStream;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser / senozon
@@ -30,7 +30,7 @@ import org.junit.Test;
 public class ConfigTest {
 
 	@Test
-	public void testAddModule_beforeLoading() {
+	void testAddModule_beforeLoading() {
 		Config config = new Config();
 		ConfigTestGroup group = new ConfigTestGroup();
 
@@ -54,7 +54,7 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void testAddModule_afterLoading() {
+	void testAddModule_afterLoading() {
 		Config config = new Config();
 		ConfigTestGroup group = new ConfigTestGroup();
 

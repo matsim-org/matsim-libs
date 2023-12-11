@@ -22,7 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -104,7 +104,7 @@ public class TestColdEmissionAnalysisModule {
 	 * all of them should throw exceptions
 	 */
 	@Test
-	public void calculateColdEmissionsAndThrowEventTest_Exceptions() {
+	void calculateColdEmissionsAndThrowEventTest_Exceptions() {
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 		List<Id<VehicleType>> testCasesExceptions = new ArrayList<>();
@@ -135,7 +135,7 @@ public class TestColdEmissionAnalysisModule {
 	}
 
 	@Test
-	public void calculateColdEmissionsAndThrowEventTest_minimalVehicleInformation() {
+	void calculateColdEmissionsAndThrowEventTest_minimalVehicleInformation() {
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 		excep = false;

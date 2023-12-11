@@ -1,8 +1,8 @@
 package org.matsim.contrib.emissions.events;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.VspHbefaRoadTypeMapping;
@@ -38,8 +38,8 @@ public class VehicleLeavesTrafficEventTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public final void testRareEventsFromBerlinScenario (){
+	@Test
+	final void testRareEventsFromBerlinScenario(){
 
 		final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
 		final String resultingEvents = utils.getOutputDirectory() + emissionEventsFileName;

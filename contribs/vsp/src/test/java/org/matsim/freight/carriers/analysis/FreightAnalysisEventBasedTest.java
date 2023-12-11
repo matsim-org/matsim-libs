@@ -21,8 +21,8 @@
 
 package org.matsim.freight.carriers.analysis;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class FreightAnalysisEventBasedTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void runFreightAnalysisEventBasedTest() throws IOException {
+	void runFreightAnalysisEventBasedTest() throws IOException {
 
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(testUtils.getClassInputDirectory(), testUtils.getOutputDirectory(),null);
 		analysisEventBased.runAnalysis();

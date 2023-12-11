@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,7 +55,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 	//TODO: test that vehicles added where they should be
 
 	@Test
-	public void testFailsIfOnlySomeRoutesHaveAVehicle() throws Exception {
+	void testFailsIfOnlySomeRoutesHaveAVehicle() throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 
@@ -123,12 +123,12 @@ public class PopulationAgentSourceWithVehiclesTest {
 	}
 
 	@Test
-	public void testNoFailIfAllHaveVehicles() throws Exception {
+	void testNoFailIfAllHaveVehicles() throws Exception {
 		testNoFail( true );
 	}
 
 	@Test
-	public void testNoFailIfNoneHaveVehicles() throws Exception {
+	void testNoFailIfNoneHaveVehicles() throws Exception {
 		testNoFail( false );
 	}
 

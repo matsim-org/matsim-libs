@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -71,7 +71,7 @@ public class InsertionRemovalIterativeActionTest {
 	}
 
 	@Test
-	public void testNonIterativeRemoval() throws Exception {
+	void testNonIterativeRemoval() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
@@ -114,7 +114,7 @@ public class InsertionRemovalIterativeActionTest {
 	}
 
 	@Test
-	public void testIterativeRemoval() throws Exception {
+	void testIterativeRemoval() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
@@ -157,7 +157,7 @@ public class InsertionRemovalIterativeActionTest {
 	}
 
 	@Test
-	public void testNonIterativeInsertion() throws Exception {
+	void testNonIterativeInsertion() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
@@ -216,7 +216,7 @@ public class InsertionRemovalIterativeActionTest {
 	}
 
 	@Test
-	public void testIterativeInsertion() throws Exception {
+	void testIterativeInsertion() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),

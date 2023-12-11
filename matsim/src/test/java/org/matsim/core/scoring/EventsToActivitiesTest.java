@@ -20,7 +20,7 @@
 package org.matsim.core.scoring;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -33,7 +33,7 @@ import org.matsim.facilities.ActivityFacility;
 public class EventsToActivitiesTest {
 
 	@Test
-	public void testCreatesActivty() {
+	void testCreatesActivty() {
 		EventsToActivities testee = new EventsToActivities();
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.addActivityHandler(ah);
@@ -50,7 +50,7 @@ public class EventsToActivitiesTest {
 	}
 
 	@Test
-	public void testCreateNightActivity() {
+	void testCreateNightActivity() {
 		EventsToActivities testee = new EventsToActivities();
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.addActivityHandler(ah);
@@ -70,9 +70,9 @@ public class EventsToActivitiesTest {
 		Assert.assertEquals( 123., ah.handledActivity.getActivity().getCoord().getX(), 0. );
 		Assert.assertEquals( 4.56, ah.handledActivity.getActivity().getCoord().getY(), 0. );
 	}
-	
+
 	@Test
-	public void testDontCreateNightActivityIfNoneIsBeingPerformedWhenSimulationEnds() {
+	void testDontCreateNightActivityIfNoneIsBeingPerformedWhenSimulationEnds() {
 		EventsToActivities testee = new EventsToActivities();
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.addActivityHandler(ah);

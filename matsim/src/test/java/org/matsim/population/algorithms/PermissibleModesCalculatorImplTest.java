@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -101,7 +101,7 @@ public class PermissibleModesCalculatorImplTest {
 	}
 
 	@Test
-	public void testWhenConsideringCarAvailability() throws Exception {
+	void testWhenConsideringCarAvailability() throws Exception {
 		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
 		final List<String> modesWithoutCar = Arrays.asList("rail", "plane");
 		Config config = ConfigUtils.createConfig();
@@ -120,7 +120,7 @@ public class PermissibleModesCalculatorImplTest {
 	}
 
 	@Test
-	public void testWhenNotConsideringCarAvailability() throws Exception {
+	void testWhenNotConsideringCarAvailability() throws Exception {
 		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
 		Config config = ConfigUtils.createConfig();
 		config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));

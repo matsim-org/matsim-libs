@@ -22,7 +22,7 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Coord;
 public class CH1903LV03PlustofromCH1903LV03Test {
 
 	@Test
-	public void testCH1903LV03PlustoCH1903LV03() {
+	void testCH1903LV03PlustoCH1903LV03() {
 		CH1903LV03PlustoCH1903LV03 converter = new CH1903LV03PlustoCH1903LV03();
 		Coord n = converter.transform(new Coord((double) 2700000, (double) 1100000));
 		Assert.assertEquals(700000, n.getX(), 0.0);
@@ -39,7 +39,7 @@ public class CH1903LV03PlustofromCH1903LV03Test {
 	}
 
 	@Test
-	public void testCH1903LV03toCH1903LV03Plus() {
+	void testCH1903LV03toCH1903LV03Plus() {
 		CH1903LV03toCH1903LV03Plus converter = new CH1903LV03toCH1903LV03Plus();
 		Coord n = converter.transform(new Coord((double) 700000, (double) 100000));
 		Assert.assertEquals(2700000, n.getX(), 0.0);

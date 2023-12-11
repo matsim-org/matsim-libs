@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -86,7 +86,7 @@ public class GroupPlansTest {
 	}
 
 	@Test
-	public void testGetters() throws Exception {
+	void testGetters() throws Exception {
 		final List<Plan> indivPlans = new ArrayList<Plan>();
 		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
 
@@ -133,7 +133,7 @@ public class GroupPlansTest {
 	}
 
 	@Test
-	public void testCopyLooksValid() throws Exception {
+	void testCopyLooksValid() throws Exception {
 		for (GroupPlans plans : testPlans) {
 			GroupPlans copy = GroupPlans.copyPlans( factory , plans );
 
@@ -150,7 +150,7 @@ public class GroupPlansTest {
 	}
 
 	@Test
-	public void testCopyIsNotSame() throws Exception {
+	void testCopyIsNotSame() throws Exception {
 		for (GroupPlans plans : testPlans) {
 			GroupPlans copy = GroupPlans.copyPlans( factory , plans );
 

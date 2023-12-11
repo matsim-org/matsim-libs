@@ -27,8 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -63,15 +63,15 @@ public class SignalControlData20ReaderWriterTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testReader() throws JAXBException, SAXException, ParserConfigurationException, IOException{
+	void testReader() throws JAXBException, SAXException, ParserConfigurationException, IOException{
 		SignalControlData controlData = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(controlData);
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(controlData);
 	}
 
-  @Test
-  public void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
   	String testoutput = this.testUtils.getOutputDirectory()  + "testSignalControlOutput.xml";
   	log.debug("reading file...");
   	//read the test file

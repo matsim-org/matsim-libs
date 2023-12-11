@@ -26,8 +26,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -38,7 +38,7 @@ public class RunAvExampleIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testAvFlowExample() throws MalformedURLException {
+	void testAvFlowExample() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
 		new RunAvExample().run(configUrl, false);
 	}

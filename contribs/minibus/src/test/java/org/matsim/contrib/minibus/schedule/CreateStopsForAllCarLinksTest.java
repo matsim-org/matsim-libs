@@ -20,8 +20,8 @@
 package org.matsim.contrib.minibus.schedule;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,7 +39,7 @@ public class CreateStopsForAllCarLinksTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-    public final void testCreateStopsForAllCarLinks() {
+	final void testCreateStopsForAllCarLinks() {
 
 		Network net = PScenarioHelper.createTestNetwork().getNetwork();
 		PConfigGroup pC = new PConfigGroup();

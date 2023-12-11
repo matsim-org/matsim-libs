@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -40,8 +41,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkSimplifierPass2WayTest {
 
-    @Test
-    public void testSimplifying(){
+	@Test
+	void testSimplifying(){
         List<Network> networks = buildNetworks();
 
         int counter = 0;

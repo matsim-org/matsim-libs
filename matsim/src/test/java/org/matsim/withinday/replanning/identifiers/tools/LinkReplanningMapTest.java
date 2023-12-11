@@ -23,9 +23,8 @@ package org.matsim.withinday.replanning.identifiers.tools;
 import static org.junit.Assert.assertEquals;
 
 import jakarta.inject.Inject;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -49,8 +48,8 @@ public class LinkReplanningMapTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-
-	@Test public void testScenarioRun() {
+	@Test
+	void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");

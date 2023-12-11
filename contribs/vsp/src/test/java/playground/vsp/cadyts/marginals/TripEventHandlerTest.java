@@ -1,7 +1,7 @@
 package playground.vsp.cadyts.marginals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,7 +40,7 @@ public class TripEventHandlerTest {
 	 * @throws MalformedURLException another stupid api
 	 */
 	@Test
-	public void test() throws MalformedURLException {
+	void test() throws MalformedURLException {
 
 		// url is such a weird api
 		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "0.config.xml").toURL();

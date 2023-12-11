@@ -19,8 +19,8 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -108,7 +108,7 @@ public class VehicleSourceTest {
 	private Link link3;
 
 	@Test
-	public void main() {
+	void main() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		createNetwork();

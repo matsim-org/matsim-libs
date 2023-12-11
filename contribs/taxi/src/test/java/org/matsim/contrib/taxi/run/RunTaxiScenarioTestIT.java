@@ -21,8 +21,8 @@ package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,12 +36,12 @@ public class RunTaxiScenarioTestIT {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunMielecLowDemandLowSupply() {
+	void testRunMielecLowDemandLowSupply() {
 		runMielec("plans_taxi_1.0.xml.gz", "taxis-25.xml");
 	}
 
 	@Test
-	public void testRunMielecHighDemandLowSupply() {
+	void testRunMielecHighDemandLowSupply() {
 		runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
 	}
 

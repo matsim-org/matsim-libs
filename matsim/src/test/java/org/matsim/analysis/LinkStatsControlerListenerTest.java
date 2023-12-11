@@ -21,8 +21,8 @@ package org.matsim.analysis;
 
 import com.google.inject.*;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +61,7 @@ public class LinkStatsControlerListenerTest {
 	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testlinksOutputCSV() throws IOException {
+	void testlinksOutputCSV() throws IOException {
 		String outputDirectory = util.getOutputDirectory();
 
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -82,7 +82,7 @@ public class LinkStatsControlerListenerTest {
 	}
 
 	@Test
-	public void testUseVolumesOfIteration() {
+	void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(util.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -309,7 +309,7 @@ public class LinkStatsControlerListenerTest {
 	}
 
 	@Test
-	public void test_writeLinkStatsInterval() {
+	void test_writeLinkStatsInterval() {
 		Config config = this.util.loadConfig((String) null);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 
@@ -346,7 +346,7 @@ public class LinkStatsControlerListenerTest {
 	}
 
 	@Test
-	public void testReset_CorrectlyExecuted() throws IOException {
+	void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.loadConfig((String) null);
 		config.controller().setMobsim("dummy");
 		config.controller().setFirstIteration(0);

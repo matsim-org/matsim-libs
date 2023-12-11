@@ -28,8 +28,8 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -48,7 +48,7 @@ public class IntegrationIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testJsprit() throws ExecutionException, InterruptedException {
+	void testJsprit() throws ExecutionException, InterruptedException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
 		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";

@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
@@ -58,7 +58,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 
 	@Ignore
 	@Test
-	public final void testDefaultPControler() {
+	final void testDefaultPControler() {
 
 		Config config1 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 
@@ -117,7 +117,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 
 	@Ignore
 	@Test
-	public final void testSubsidyPControler() {
+	final void testSubsidyPControler() {
 
 		Config config2 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 

@@ -20,8 +20,9 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.List;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -65,7 +66,7 @@ public class HermesRoundaboutTest {
 
 
 	@Test
-	public void testRoundaboutBehavior(){
+	void testRoundaboutBehavior(){
 		ScenarioImporter.flush();
 		final Config config = createConfig();
 		config.controller().setMobsim("hermes");

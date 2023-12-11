@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -102,13 +102,13 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 	}
 
 	@Test
-	@Ignore( "TODO" )
-	public void testVehiclesAreAllocatedAtTheTourLevel() throws Exception {
+	@Ignore("TODO")
+	void testVehiclesAreAllocatedAtTheTourLevel() throws Exception {
 		throw new UnsupportedOperationException( "TODO" );
 	}
 
 	@Test
-	public void testCannotFindBetterAllocationRandomly() throws Exception {
+	void testCannotFindBetterAllocationRandomly() throws Exception {
 		Set<String> stages = new HashSet<>();// formerly EmptyStageActivityTypes.INSTANCE;
 
 		for ( int i = 0; i < 5; i++ ) {

@@ -22,8 +22,8 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.freight.carriers.*;
@@ -42,7 +42,7 @@ public class CarrierPlanReaderV1Test {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testCarrierPlanReaderDoesSomething() {
+	void testCarrierPlanReaderDoesSomething() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
@@ -56,7 +56,7 @@ public class CarrierPlanReaderV1Test {
 	}
 
 	@Test
-	public void testReaderReadsCorrectly() {
+	void testReaderReadsCorrectly() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
@@ -81,7 +81,7 @@ public class CarrierPlanReaderV1Test {
 	}
 
 	@Test
-	public void testReaderReadsScoreAndSelectedPlanCorrectly() {
+	void testReaderReadsScoreAndSelectedPlanCorrectly() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
@@ -98,7 +98,7 @@ public class CarrierPlanReaderV1Test {
 	}
 
 	@Test
-	public void testReaderReadsUnScoredAndUnselectedPlanCorrectly() {
+	void testReaderReadsUnScoredAndUnselectedPlanCorrectly() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );

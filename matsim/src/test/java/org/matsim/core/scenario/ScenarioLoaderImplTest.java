@@ -21,8 +21,8 @@ package org.matsim.core.scenario;
 
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -49,7 +49,7 @@ public class ScenarioLoaderImplTest {
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testLoadScenario_loadTransitData() {
+	void testLoadScenario_loadTransitData() {
 		// test the create/load sequence:
 		{
 			ScenarioBuilder builder = new ScenarioBuilder(ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
@@ -71,7 +71,7 @@ public class ScenarioLoaderImplTest {
 	}
 
 	@Test
-	public void testLoadScenario_loadPersonAttributes_nowDeprecated() {
+	void testLoadScenario_loadPersonAttributes_nowDeprecated() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
 		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
 		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
@@ -83,7 +83,7 @@ public class ScenarioLoaderImplTest {
 	}
 
 	@Test
-	public void testLoadScenario_loadPersonAttributes() {
+	void testLoadScenario_loadPersonAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
 		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
 		boolean caughtException=false ;
@@ -99,7 +99,7 @@ public class ScenarioLoaderImplTest {
 
 
 	@Test
-	public void testLoadScenario_loadFacilitiesAttributes() {
+	void testLoadScenario_loadFacilitiesAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "facilityAttributesConfig.xml"));
 		config.facilities().setInsistingOnUsingDeprecatedFacilitiesAttributeFile(true);
 		config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
@@ -113,7 +113,7 @@ public class ScenarioLoaderImplTest {
 	}
 
 	@Test
-	public void testLoadScenario_loadHouseholdAttributes() {
+	void testLoadScenario_loadHouseholdAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "householdAttributesConfig.xml"));
 		config.households().addParam("inputHouseholdAttributesFile", "householdAttributes.xml");
 		config.households().setInsistingOnUsingDeprecatedHouseholdsAttributeFile(true);

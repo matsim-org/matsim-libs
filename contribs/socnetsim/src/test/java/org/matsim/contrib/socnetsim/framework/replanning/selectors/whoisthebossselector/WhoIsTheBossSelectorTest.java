@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -55,7 +55,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
 public class WhoIsTheBossSelectorTest {
 
 	@Test
-	public void testOnePlanSelectedForEachAgent() throws Exception {
+	void testOnePlanSelectedForEachAgent() throws Exception {
 		final WhoIsTheBossSelector testee =
 			new WhoIsTheBossSelector(
 					new Random( 9087 ),
@@ -120,8 +120,8 @@ public class WhoIsTheBossSelectorTest {
 	}
 
 	@Test
-	@Ignore( "TODO" )
-	public void testBestPlanIsSelectedIfPossible() throws Exception {
+	@Ignore("TODO")
+	void testBestPlanIsSelectedIfPossible() throws Exception {
 		throw new UnsupportedOperationException( "TODO" );
 	}
 

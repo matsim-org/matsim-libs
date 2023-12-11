@@ -19,8 +19,8 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
@@ -38,7 +38,7 @@ public class PlansDumpingIT {
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testPlansDump_Interval() {
+	void testPlansDump_Interval() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(3);
@@ -62,7 +62,7 @@ public class PlansDumpingIT {
 	}
 
 	@Test
-	public void testPlansDump_Never() {
+	void testPlansDump_Never() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
@@ -86,7 +86,7 @@ public class PlansDumpingIT {
 	}
 
 	@Test
-	public void testPlansDump_Always() {
+	void testPlansDump_Always() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(1);

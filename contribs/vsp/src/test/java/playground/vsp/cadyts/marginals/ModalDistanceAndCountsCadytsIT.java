@@ -1,7 +1,6 @@
 package playground.vsp.cadyts.marginals;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
@@ -254,7 +253,7 @@ public class ModalDistanceAndCountsCadytsIT {
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
 	@Test
-	public void test() {
+	void test() {
 
 		Config config = createConfig();
 		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();

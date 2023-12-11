@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -109,9 +109,9 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 	public ChooseRandomLegModeForSubtourDiffModesTest( double proba ) {
 		this.probaForRandomSingleTripMode = proba ;
 	}
-	
+
 	@Test
-	public void testMutatedTrips() {
+	void testMutatedTrips() {
 		Config config = ConfigUtils.createConfig();
 		config.subtourModeChoice().setModes(MODES);
 		config.subtourModeChoice().setConsiderCarAvailability(false);

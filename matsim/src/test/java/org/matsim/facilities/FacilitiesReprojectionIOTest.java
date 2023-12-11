@@ -22,8 +22,8 @@
  package org.matsim.facilities;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+ /**
  * @author thibautd
  */
 public class FacilitiesReprojectionIOTest {
@@ -53,8 +53,8 @@ public class FacilitiesReprojectionIOTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testReprojectionAtImport() {
+	 @Test
+	 void testReprojectionAtImport() {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -64,8 +64,8 @@ public class FacilitiesReprojectionIOTest {
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}
 
-	@Test
-	public void testReprojectionAtExport() {
+	 @Test
+	 void testReprojectionAtExport() {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
@@ -78,8 +78,8 @@ public class FacilitiesReprojectionIOTest {
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}
 
-	@Test
-	public void testWithControlerAndObjectAttributes() {
+	 @Test
+	 void testWithControlerAndObjectAttributes() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.
@@ -140,8 +140,8 @@ public class FacilitiesReprojectionIOTest {
 		}
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.

@@ -23,8 +23,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesAnalysis;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesWriter;
 import org.matsim.analysis.linkpaxvolumes.VehicleStatsPerVehicleType;
@@ -55,12 +55,12 @@ public class LinkPaxVolumesAnalysisTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    /**
-     * Test method for {@link LinkPaxVolumesAnalysis}.
-     */
+	/**
+	* Test method for {@link LinkPaxVolumesAnalysis}.
+	*/
 
-    @Test
-    public void testLinkPaxVolumes() {
+	@Test
+	void testLinkPaxVolumes() {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
 

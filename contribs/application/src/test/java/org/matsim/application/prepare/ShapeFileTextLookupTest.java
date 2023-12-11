@@ -1,8 +1,8 @@
 package org.matsim.application.prepare;
 
 import org.junit.Assume;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
@@ -17,8 +17,8 @@ public class ShapeFileTextLookupTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void main() {
+	@Test
+	void main() {
 
         Path input = Path.of(utils.getClassInputDirectory(), "verkehrszellen.csv");
         Path output = Path.of(utils.getOutputDirectory(), "output.csv");

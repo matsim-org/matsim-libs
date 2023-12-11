@@ -22,8 +22,8 @@ package org.matsim.api.core.v01;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -43,7 +43,8 @@ public class NetworkCreationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testCreateNetwork() {
+	@Test
+	void testCreateNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);

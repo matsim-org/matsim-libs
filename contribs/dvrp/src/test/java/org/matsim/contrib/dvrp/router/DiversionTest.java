@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -75,7 +75,6 @@ public class DiversionTest {
 	static public final String MODE = "testmode";
 	static public final int DIVERSION_FREQUENCY = 10;
 
-	@Test
 	/**
 	 * This is a relatively complex test to the the diversion behaviour. The
 	 * experiment is constructed as folows: We have one DVRP vehicle which moves
@@ -120,7 +119,8 @@ public class DiversionTest {
 	 * current one.</li>
 	 * </ul>
 	 */
-	public void testRepeatedSameDestinationDiversions() {
+	@Test
+	void testRepeatedSameDestinationDiversions() {
 		Config config = ConfigUtils.createConfig();
 
 		{
@@ -423,7 +423,6 @@ public class DiversionTest {
 		private List<Double> taskEndTimes = new LinkedList<>();
 	}
 
-	@Test
 	/**
 	 * This test is similar as the one above. However, there is another catch when
 	 * diverting, which is not covered on top. In fact, following the QSim and
@@ -447,7 +446,8 @@ public class DiversionTest {
 	 * get a reduced arrival time estimate by one second.
 	 *
 	 */
-	public void testRepeatedDiversionToDifferentDestinationRightBeforeLastLink() {
+	@Test
+	void testRepeatedDiversionToDifferentDestinationRightBeforeLastLink() {
 		Config config = ConfigUtils.createConfig();
 
 		{

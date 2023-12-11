@@ -1,8 +1,8 @@
 package org.matsim.application.prepare.counts;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +36,7 @@ public class CreateCountsFromBAStDataTest {
 	String shpCrs = "EPSG:3857";
 
 	@Test
-	public void testCreateCountsFromBAStData() {
+	void testCreateCountsFromBAStData() {
 
 		String version = "normal-";
 		String out = utils.getOutputDirectory() + version + countsOutput;
@@ -74,7 +74,7 @@ public class CreateCountsFromBAStDataTest {
 	}
 
 	@Test
-	public void testWithIgnoredStations() {
+	void testWithIgnoredStations() {
 
 		String version = "with-ignored-";
 		String out1 = utils.getOutputDirectory() + version + countsOutput;
@@ -123,7 +123,7 @@ public class CreateCountsFromBAStDataTest {
 	}
 
 	@Test
-	public void testManualMatchedCounts() {
+	void testManualMatchedCounts() {
 
 		String out = utils.getOutputDirectory() + "manual-matched-" + countsOutput;
 
@@ -164,7 +164,7 @@ public class CreateCountsFromBAStDataTest {
 	}
 
 	@Test
-	public void testManualMatchingWithWrongInput() {
+	void testManualMatchingWithWrongInput() {
 
 		String out = utils.getOutputDirectory() + "manual-matched-" + countsOutput;
 

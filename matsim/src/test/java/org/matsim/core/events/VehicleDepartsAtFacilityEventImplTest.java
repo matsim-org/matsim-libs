@@ -22,8 +22,8 @@ package org.matsim.core.events;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.utils.misc.Time;
@@ -37,7 +37,8 @@ public class VehicleDepartsAtFacilityEventImplTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteReadXml() {
+	@Test
+	void testWriteReadXml() {
 		VehicleDepartsAtFacilityEvent event = new VehicleDepartsAtFacilityEvent(Time.parseTime("10:55:00"), Id.create(5, Vehicle.class), Id.create(11, TransitStopFacility.class), -1.2);
 		VehicleDepartsAtFacilityEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event);
 		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), MatsimTestUtils.EPSILON);

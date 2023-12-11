@@ -1,7 +1,7 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
@@ -11,7 +11,7 @@ import java.io.ByteArrayInputStream;
 public class StreamingActivityFacilitiesTest {
 
 	@Test
-	public void testFacilityIsComplete() {
+	void testFacilityIsComplete() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 				"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
 				"<facilities name=\"test facilities for triangle network\">\n" +

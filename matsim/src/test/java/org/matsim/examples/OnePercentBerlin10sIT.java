@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -50,7 +50,8 @@ public class OnePercentBerlin10sIT {
 
 	private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
 
-	@Test public void testOnePercent10sQSim() {
+	@Test
+	void testOnePercent10sQSim() {
 		Config config = utils.loadConfig((String)null);
 		// input files are in the main directory in the resource path!
 		String netFileName = "test/scenarios/berlin/network.xml";
@@ -96,7 +97,8 @@ public class OnePercentBerlin10sIT {
 
 	}
 
-	@Test public void testOnePercent10sQSimTryEndTimeThenDuration() {
+	@Test
+	void testOnePercent10sQSimTryEndTimeThenDuration() {
 		Config config = utils.loadConfig((String)null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";

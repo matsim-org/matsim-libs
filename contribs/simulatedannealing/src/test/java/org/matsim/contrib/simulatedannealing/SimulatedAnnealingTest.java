@@ -17,7 +17,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contrib.simulatedannealing.acceptor.Acceptor;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
 import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
@@ -37,7 +37,7 @@ public class SimulatedAnnealingTest {
 	private final Random r = new Random(42);
 
 	@Test
-	public void testSimulatedAnnealing() {
+	void testSimulatedAnnealing() {
 		MatsimRandom.reset();
 
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);

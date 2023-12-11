@@ -21,7 +21,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -70,7 +70,7 @@ import java.util.List;
 public class SwissRailRaptorCapacitiesTest {
 
 	@Test
-	public void testUseSlowerAlternative() {
+	void testUseSlowerAlternative() {
 		Fixture f = new Fixture();
 
 		// default case

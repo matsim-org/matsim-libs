@@ -1,8 +1,8 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,9 +58,9 @@ public class TestPositionEmissionModule {
     @RegisterExtension
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Test
-    @Ignore
-    public void simpleTest() {
+	@Test
+	@Ignore
+	void simpleTest() {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
@@ -81,8 +81,8 @@ public class TestPositionEmissionModule {
         controler.run();
     }
 
-    @Test
-    public void compareToOtherModule_singleVehicleSingleLink() {
+	@Test
+	void compareToOtherModule_singleVehicleSingleLink() {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);

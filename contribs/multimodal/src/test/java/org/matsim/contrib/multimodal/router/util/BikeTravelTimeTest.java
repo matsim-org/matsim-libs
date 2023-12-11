@@ -28,8 +28,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,8 @@ public class BikeTravelTimeTest {
 
 	private static final Logger log = LogManager.getLogger(BikeTravelTimeTest.class);
 
-	@Test public void testLinkTravelTimeCalculation() {
+	@Test
+	void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
@@ -185,7 +186,8 @@ public class BikeTravelTimeTest {
 		log.info(sb.toString());
 	}
 
-	@Test public void testThreadLocals() {
+	@Test
+	void testThreadLocals() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

@@ -21,8 +21,8 @@
 package org.matsim.contrib.freightreceiver;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freightreceiver.run.chessboard.ReceiverChessboardScenario;
 import org.matsim.testcases.MatsimTestUtils;
@@ -36,7 +36,7 @@ public class ReceiversWriterTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testV1() {
+	void testV1() {
 		Scenario sc = ReceiverChessboardScenario.createChessboardScenario(1L, 5, utils.getOutputDirectory(), false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
@@ -53,7 +53,7 @@ public class ReceiversWriterTest {
 	}
 
 	@Test
-	public void testV2() {
+	void testV2() {
 		Scenario sc = ReceiverChessboardScenario.createChessboardScenario(1L, 5,  utils.getOutputDirectory(), false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));

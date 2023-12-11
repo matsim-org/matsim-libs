@@ -26,8 +26,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -48,7 +48,8 @@ public class PersonMoneyEventIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteReadXxml() {
+	@Test
+	void testWriteReadXxml() {
 		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "motorwayOperator");
 		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "motorwayOperator");
 
@@ -100,7 +101,8 @@ public class PersonMoneyEventIntegrationTest {
 	 * This test checks that old event files can still be parsed.
 	 * @throws IOException
 	 */
-	@Test public void testWriteReadXml_oldName() throws IOException {
+	@Test
+	void testWriteReadXml_oldName() throws IOException {
 
 		// write some events to file
 

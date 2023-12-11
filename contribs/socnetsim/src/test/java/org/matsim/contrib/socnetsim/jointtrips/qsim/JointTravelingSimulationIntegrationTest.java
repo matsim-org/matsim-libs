@@ -23,8 +23,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -110,7 +110,7 @@ public class JointTravelingSimulationIntegrationTest {
 	private static final String DESTINATION_ACT = "stress";
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
+	void testAgentsArriveTogetherWithoutDummies() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -118,7 +118,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummies() throws Exception {
+	void testAgentsArriveTogetherWithDummies() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -126,7 +126,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummiesAndDoAtPu() throws Exception {
+	void testAgentsArriveTogetherWithDummiesAndDoAtPu() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -134,7 +134,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPu() throws Exception {
+	void testAgentsArriveTogetherWithoutDummiesAndDoAtPu() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -142,7 +142,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummiesAndDoAtPuFullCycle() throws Exception {
+	void testAgentsArriveTogetherWithDummiesAndDoAtPuFullCycle() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -150,7 +150,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPuFullCycle() throws Exception {
+	void testAgentsArriveTogetherWithoutDummiesAndDoAtPuFullCycle() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -158,7 +158,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummiesAndEverythingAtOrigin() throws Exception {
+	void testAgentsArriveTogetherWithDummiesAndEverythingAtOrigin() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -166,7 +166,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummiesAndEverythingAtOrigin() throws Exception {
+	void testAgentsArriveTogetherWithoutDummiesAndEverythingAtOrigin() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -276,22 +276,22 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehicle() {
+	void testNumberOfEnterLeaveVehicle() {
 		testNumberOfEnterLeaveVehicle( RouteType.normal );
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehicleEverythingAtOrigin() {
+	void testNumberOfEnterLeaveVehicleEverythingAtOrigin() {
 		testNumberOfEnterLeaveVehicle( RouteType.everythingAtOrigin );
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehiclePuAtDo() {
+	void testNumberOfEnterLeaveVehiclePuAtDo() {
 		testNumberOfEnterLeaveVehicle( RouteType.puAtDo );
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehiclePuAtDoFullCycle() {
+	void testNumberOfEnterLeaveVehiclePuAtDoFullCycle() {
 		testNumberOfEnterLeaveVehicle( RouteType.puAtDoFullCycle );
 	}
 

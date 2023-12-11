@@ -18,9 +18,8 @@
  * *********************************************************************** */
 
 package playground.vsp.cadyts.marginals;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,13 +60,13 @@ public class ModalDistanceCadytsSingleDistanceIT {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    /**
-     * This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
-     * One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
-     * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
-     */
-    @Test
-    public void test() {
+	/**
+	* This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
+	* One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
+	* is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
+	*/
+	@Test
+	void test() {
 
         Config config = createConfig();
         CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();

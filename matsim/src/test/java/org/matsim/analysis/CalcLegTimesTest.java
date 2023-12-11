@@ -26,8 +26,8 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -102,7 +102,8 @@ public class CalcLegTimesTest {
 		this.network = null;
 	}
 
-	@Test public void testNoEvents() throws IOException {
+	@Test
+	void testNoEvents() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -114,7 +115,8 @@ public class CalcLegTimesTest {
 		this.runTest(testee);
 	}
 
-	@Test public void testAveraging() throws IOException {
+	@Test
+	void testAveraging() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 

@@ -22,8 +22,8 @@ package org.matsim.contrib.accessibility.run;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +46,7 @@ public class NetworkUtilTest {
 
 
 	@Test
-	public void testNetworkUtil() {
+	void testNetworkUtil() {
 		/* create a sample network:
 		 *
 		 *               (e)          (f)

@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +47,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class FacilitiesFromPopulationTest {
 
 	@Test
-	public void testRun_onePerLink_assignLinks() {
+	void testRun_onePerLink_assignLinks() {
 		Fixture f = new Fixture();
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
@@ -74,7 +74,7 @@ public class FacilitiesFromPopulationTest {
 	}
 
 	@Test
-	public void testRun_onePerLink_assignLinks_openingTimes() {
+	void testRun_onePerLink_assignLinks_openingTimes() {
 		Fixture f = new Fixture();
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
@@ -110,7 +110,7 @@ public class FacilitiesFromPopulationTest {
 	}
 
 	@Test
-	public void testRun_multiple_assignLinks() {
+	void testRun_multiple_assignLinks() {
 		Fixture f = new Fixture();
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());

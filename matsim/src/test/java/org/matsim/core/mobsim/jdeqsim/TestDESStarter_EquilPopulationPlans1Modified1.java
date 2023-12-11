@@ -21,7 +21,7 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,10 +31,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestDESStarter_EquilPopulationPlans1Modified1 extends AbstractJDEQSimTest {
+ public class TestDESStarter_EquilPopulationPlans1Modified1 extends AbstractJDEQSimTest {
 
-	@Test
-	public void test_EquilPopulationPlans1Modified1_TestHandlerDetailedEventChecker() {
+	 @Test
+	 void test_EquilPopulationPlans1Modified1_TestHandlerDetailedEventChecker() {
 		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.plans().setInputFile("plans1.xml");
 		MatsimRandom.reset(config.global().getRandomSeed());

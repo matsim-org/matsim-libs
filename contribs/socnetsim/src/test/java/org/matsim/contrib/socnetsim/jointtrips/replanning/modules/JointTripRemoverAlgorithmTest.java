@@ -36,7 +36,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -935,7 +935,7 @@ public class JointTripRemoverAlgorithmTest {
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testRemoval() throws Exception {
+	void testRemoval() throws Exception {
 		// TODO: test driver and passenger removal separately
 		for ( Fixture f : fixtures ) {
 			log.info( "testing removal on fixture "+f.name );

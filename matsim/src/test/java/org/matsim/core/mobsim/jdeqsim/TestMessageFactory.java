@@ -23,8 +23,8 @@
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
@@ -33,13 +33,14 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class TestMessageFactory {
+ public class TestMessageFactory {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	// check if gc turned on
-	@Test public void testMessageFactory1(){
+	 // check if gc turned on
+	 @Test
+	 void testMessageFactory1(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
 		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
@@ -57,8 +58,9 @@ public class TestMessageFactory {
 		assertEquals(0, MessageFactory.getEndLegMessageQueue().size());
 	}
 
-	// check when gc turned off
-	@Test public void testMessageFactory2(){
+	 // check when gc turned off
+	 @Test
+	 void testMessageFactory2(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
@@ -76,8 +78,9 @@ public class TestMessageFactory {
 		assertEquals(1, MessageFactory.getEndLegMessageQueue().size());
 	}
 
-	// check check use of Message factory
-	@Test public void testMessageFactory3(){
+	 // check check use of Message factory
+	 @Test
+	 void testMessageFactory3(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
@@ -102,8 +105,9 @@ public class TestMessageFactory {
 		assertEquals(0, MessageFactory.getEndLegMessageQueue().size());
 	}
 
-	// check initialization using constructer
-	@Test public void testMessageFactory5(){
+	 // check initialization using constructer
+	 @Test
+	 void testMessageFactory5(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
@@ -127,8 +131,9 @@ public class TestMessageFactory {
 		assertEquals(true,MessageFactory.getDeadlockPreventionMessage(scheduler, vehicle).vehicle==vehicle);
 	}
 
-	// check initialization using rest
-	@Test public void testMessageFactory6(){
+	 // check initialization using rest
+	 @Test
+	 void testMessageFactory6(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler(new MessageQueue());

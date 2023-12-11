@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
@@ -90,7 +90,7 @@ public class NodeTransitionTest {
 	}
 
 	@Test
-	public void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution() {
+	void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution() {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -158,7 +158,7 @@ public class NodeTransitionTest {
 	}
 
 	@Test
-	public void testMergeSituationWithMoveVehByVehRandomDistribution() {
+	void testMergeSituationWithMoveVehByVehRandomDistribution() {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -233,7 +233,7 @@ public class NodeTransitionTest {
 	}
 
 	@Test
-	public void testMergeSituationWithMoveVehByVehDeterministicPriorities() {
+	void testMergeSituationWithMoveVehByVehDeterministicPriorities() {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		// note: the deterministic node transition is only implemented for the case when the node is blocked as soon as one outgoing link is full
@@ -302,7 +302,7 @@ public class NodeTransitionTest {
 	}
 
 	@Test
-	public void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution() {
+	void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -383,7 +383,7 @@ public class NodeTransitionTest {
 	}
 
 	@Test
-	public void testBlockedNodeSituationWithMoveVehByVehRandomDistribution() {
+	void testBlockedNodeSituationWithMoveVehByVehRandomDistribution() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -465,7 +465,7 @@ public class NodeTransitionTest {
 	}
 
 	@Test
-	public void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities() {
+	void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -554,7 +554,7 @@ public class NodeTransitionTest {
 	 * 3. both streams are independently (because blockNode=false).
 	 */
 	@Test
-	public void testNodeTransitionWithTimeStepSizeSmallerOne() {
+	void testNodeTransitionWithTimeStepSizeSmallerOne() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setTimeStepSize(0.5);

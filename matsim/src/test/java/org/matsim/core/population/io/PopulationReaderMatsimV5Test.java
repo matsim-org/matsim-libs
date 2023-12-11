@@ -27,7 +27,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
 public class PopulationReaderMatsimV5Test {
 
 	@Test
-	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -136,7 +136,7 @@ public class PopulationReaderMatsimV5Test {
 	}
 
 	@Test
-	public void testReadRoute_sameLinkRoute() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute_sameLinkRoute() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -172,7 +172,7 @@ public class PopulationReaderMatsimV5Test {
 	}
 
 	@Test
-	public void testReadRoute_consequentLinks() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute_consequentLinks() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -215,7 +215,7 @@ public class PopulationReaderMatsimV5Test {
 	 * @author mrieser
 	 */
 	@Test
-	public void testReadRouteWithoutActivityLinks() {
+	void testReadRouteWithoutActivityLinks() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -246,7 +246,7 @@ public class PopulationReaderMatsimV5Test {
 	}
 
 	@Test
-	public void testReadingOldRoutesWithoutType() {
+	void testReadingOldRoutesWithoutType() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -301,12 +301,12 @@ public class PopulationReaderMatsimV5Test {
 		Assert.assertTrue(route3 instanceof TransitPassengerRoute);
 	}
 
-	
+
 	/**
 	 * @author mrieser
 	 */
 	@Test
-	public void testReadActivity() {
+	void testReadActivity() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -333,7 +333,7 @@ public class PopulationReaderMatsimV5Test {
 	}
 
 	@Test
-	public void testRepeatingLegs() {
+	void testRepeatingLegs() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -363,7 +363,7 @@ public class PopulationReaderMatsimV5Test {
 	}
 
 	@Test
-	public void testRepeatingActs() {
+	void testRepeatingActs() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -391,7 +391,7 @@ public class PopulationReaderMatsimV5Test {
 	}
 
 	@Test
-	public void testVehicleIdInRoute() {
+	void testVehicleIdInRoute() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();

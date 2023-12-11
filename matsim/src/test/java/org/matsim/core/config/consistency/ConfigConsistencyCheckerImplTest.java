@@ -21,7 +21,7 @@ package org.matsim.core.config.consistency;
 
 import org.apache.logging.log4j.Level;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +38,7 @@ import java.util.Set;
 public class ConfigConsistencyCheckerImplTest {
 
 	@Test
-	public void testCheckPlanCalcScore_DefaultsOk() {
+	void testCheckPlanCalcScore_DefaultsOk() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -54,7 +54,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_Traveling() {
+	void testCheckPlanCalcScore_Traveling() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -72,7 +72,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_TravelingPt() {
+	void testCheckPlanCalcScore_TravelingPt() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -90,7 +90,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_TravelingBike() {
+	void testCheckPlanCalcScore_TravelingBike() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -108,7 +108,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_TravelingWalk() {
+	void testCheckPlanCalcScore_TravelingWalk() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -126,7 +126,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_PtInteractionActivity() {
+	void testCheckPlanCalcScore_PtInteractionActivity() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -154,7 +154,7 @@ public class ConfigConsistencyCheckerImplTest {
 
 
 	@Test
-	public void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
+	void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
 		{
 			Config config = ConfigUtils.createConfig();
 

@@ -25,8 +25,8 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -51,7 +51,7 @@ public class NetworkBasedTransportCostsTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
+	void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -85,7 +85,7 @@ public class NetworkBasedTransportCostsTest {
 	}
 
 	@Test
-	public void test_whenVehicleTypeNotKnow_throwException(){
+	void test_whenVehicleTypeNotKnow_throwException(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -113,7 +113,7 @@ public class NetworkBasedTransportCostsTest {
 	}
 
 	@Test
-	public void test_whenAddingTwoVehicleTypesViaConstructor_itMustAccountForThat(){
+	void test_whenAddingTwoVehicleTypesViaConstructor_itMustAccountForThat(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);

@@ -1,6 +1,6 @@
 package org.matsim.contrib.bicycle;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -11,31 +11,31 @@ import static org.junit.Assert.*;
 public class BicycleUtilityUtilsTest {
 
 	@Test
-	public void getGradientNoFromZ() {
+	void getGradientNoFromZ() {
 		var link = createLink(new Coord(0, 0), new Coord(100, 0, 100));
 		assertEquals(0., BicycleUtils.getGradient(link ), 0.00001 );
 	}
 
 	@Test
-	public void getGradientNoToZ() {
+	void getGradientNoToZ() {
 		var link = createLink(new Coord(0, 0, 100), new Coord(100, 0));
 		assertEquals(0., BicycleUtils.getGradient(link ), 0.00001 );
 	}
 
 	@Test
-	public void getGradientFlat() {
+	void getGradientFlat() {
 		var link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 100));
 		assertEquals(0., BicycleUtils.getGradient(link ), 0.00001 );
 	}
 
 	@Test
-	public void getGradientUphill() {
+	void getGradientUphill() {
 		var link = createLink(new Coord(0, 0, 0), new Coord(100, 0, 100));
 		assertEquals(1., BicycleUtils.getGradient(link ), 0.00001 );
 	}
 
 	@Test
-	public void getGradientDownhill() {
+	void getGradientDownhill() {
 		var link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 0));
 		assertEquals(0., BicycleUtils.getGradient(link ), 0.00001 );
 	}

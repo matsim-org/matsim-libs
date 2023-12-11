@@ -23,8 +23,8 @@ package org.matsim.freight.carriers.controler;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -86,7 +86,7 @@ public class EquilWithCarrierWithPersonsIT {
 	}
 
 	@Test
-	public void testScoringInMeters(){
+	void testScoringInMeters(){
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

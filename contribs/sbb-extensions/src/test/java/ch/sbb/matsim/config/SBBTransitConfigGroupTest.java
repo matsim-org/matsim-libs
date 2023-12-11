@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collections;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -35,8 +35,8 @@ import org.matsim.core.config.ConfigWriter;
  */
 public class SBBTransitConfigGroupTest {
 
-    @Test
-    public void testConfigIO() {
+	@Test
+	void testConfigIO() {
         System.setProperty("matsim.preferLocalDtds", "true");
 
         SBBTransitConfigGroup ptConfig1 = new SBBTransitConfigGroup();

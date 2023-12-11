@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -70,7 +70,7 @@ public class DrtRoutingModuleTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testCottbusClosestAccessEgressStopFinder() {
+	void testCottbusClosestAccessEgressStopFinder() {
 		Scenario scenario = createTestScenario();
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		final double networkTravelSpeed = 0.83333;
@@ -226,7 +226,7 @@ public class DrtRoutingModuleTest {
 	}
 
 	@Test
-	public void testRouteDescriptionHandling() {
+	void testRouteDescriptionHandling() {
 		String oldRouteFormat = "600 400";
 		String newRouteFormat = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
 

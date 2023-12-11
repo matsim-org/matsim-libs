@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,8 @@ public class TimeInterpretationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testIgnoreDelays() {
+	@Test
+	void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
@@ -72,7 +73,8 @@ public class TimeInterpretationTest {
 	}
 
 
-	@Test public void testShiftActivityEndTime() {
+	@Test
+	void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 

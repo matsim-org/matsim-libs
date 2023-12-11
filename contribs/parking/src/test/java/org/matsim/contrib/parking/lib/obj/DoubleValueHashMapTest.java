@@ -2,12 +2,13 @@ package org.matsim.contrib.parking.lib.obj;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 
 public class DoubleValueHashMapTest {
 
-	@Test public void testBasic(){
+	@Test
+	void testBasic(){
 		DoubleValueHashMap<Integer> dhm=new DoubleValueHashMap<Integer>();
 
 		dhm.put(0, 5.2);

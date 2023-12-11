@@ -22,7 +22,7 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -35,7 +35,7 @@ public class WGS84toCH1903LV03PlusTest {
 	 * http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/switzerland.parsysrelated1.24280.downloadList.87003.DownloadFile.tmp/ch1903wgs84de.pdf
 	 */
 	@Test
-	public void testTransform() {
+	void testTransform() {
 		double xx = 8.0 + 43.0/60 + 49.79/3600;
 		double yy = 46.0 + 02.0/60 + 38.87/3600;
 		double epsilon = 1e-2;

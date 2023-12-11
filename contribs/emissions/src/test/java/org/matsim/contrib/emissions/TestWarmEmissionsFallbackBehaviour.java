@@ -21,8 +21,10 @@
 
 package org.matsim.contrib.emissions;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -67,7 +69,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * -> should calculate value
 	 */
 	@Test
-	public void testWarmDetailedValueOnlyDetailed() {
+	void testWarmDetailedValueOnlyDetailed() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
@@ -85,12 +87,14 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 *
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testWarm_DetailedElseAbort_ShouldAbort1() {
-		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+	@Test
+	void testWarm_DetailedElseAbort_ShouldAbort1() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
+		});
 	}
 
 	/**
@@ -101,15 +105,17 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 *
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testWarm_DetailedElseAbort_ShouldAbort2() {
-		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+	@Test
+	void testWarm_DetailedElseAbort_ShouldAbort2() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+		});
 	}
 
-	
+
 // ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------	
 	/**
 	 * vehicles information is complete
@@ -119,7 +125,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * ---> should calculate value from detailed value
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
+	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
@@ -138,7 +144,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * ---> should calculate value from technology average
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
+	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
@@ -156,12 +162,14 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 *
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testWarm_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
-		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+	@Test
+	void testWarm_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+		});
 	}
 
 // ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------	
@@ -173,7 +181,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * ---> should calculate value from detailed value
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
+	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
@@ -192,7 +200,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * ---> should calculate value from technology average
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
+	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
@@ -212,7 +220,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * ---> should calculate value from average table
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
+	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s

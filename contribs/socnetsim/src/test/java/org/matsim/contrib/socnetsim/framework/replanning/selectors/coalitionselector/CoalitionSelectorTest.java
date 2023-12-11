@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -215,7 +215,7 @@ public class CoalitionSelectorTest {
 	// Tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testSelectedPlans() {
+	void testSelectedPlans() {
 		final Fixture fixture = fixtureFactory.create();
 		final CoalitionSelector selector = new CoalitionSelector();
 

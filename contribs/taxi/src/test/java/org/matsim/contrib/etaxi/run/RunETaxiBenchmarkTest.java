@@ -22,8 +22,8 @@ package org.matsim.contrib.etaxi.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -38,7 +38,7 @@ public class RunETaxiBenchmarkTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRuleBased() {
+	void testRuleBased() {
 		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml").toString();
 		String[] args = { configPath, "--config:controler.outputDirectory", utils.getOutputDirectory() };
 		// the config file suppresses most writing of output.  Presumably, since it is to be run as a benchmark.  One can override it here, but it is again overwritten later.  So

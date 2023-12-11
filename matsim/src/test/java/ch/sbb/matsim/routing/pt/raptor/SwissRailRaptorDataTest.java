@@ -20,7 +20,7 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -29,8 +29,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class SwissRailRaptorDataTest {
 
-    @Test
-    public void testTransfersFromSchedule() {
+	@Test
+	void testTransfersFromSchedule() {
         Fixture f = new Fixture();
         f.init();
 

@@ -1,7 +1,7 @@
 package org.matsim.core.router.speedy;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
@@ -11,7 +11,7 @@ import java.util.Random;
 public class DAryMinHeapTest {
 
 	@Test
-	public void testPoll() {
+	void testPoll() {
 		double cost[] = new double[10];
 		DAryMinHeap pq = new DAryMinHeap(20, 3);
 
@@ -52,7 +52,7 @@ public class DAryMinHeapTest {
 	}
 
 	@Test
-	public void testDecreaseKey() {
+	void testDecreaseKey() {
 		DAryMinHeap pq = new DAryMinHeap(20, 4);
 
 		pq.insert(2, 4);
@@ -68,7 +68,7 @@ public class DAryMinHeapTest {
 	}
 
 	@Test
-	public void stresstest() {
+	void stresstest() {
 		int cnt = 2000;
 		double[] cost = new double[cnt];
 		Random r = new Random(20190210L);

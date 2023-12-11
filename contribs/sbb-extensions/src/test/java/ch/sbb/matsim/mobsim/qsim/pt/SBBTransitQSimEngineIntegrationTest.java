@@ -25,8 +25,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -42,8 +42,8 @@ public class SBBTransitQSimEngineIntegrationTest {
     private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineIntegrationTest.class);
     @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void testIntegration() {
+	@Test
+	void testIntegration() {
         TestFixture f = new TestFixture();
 
         f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
@@ -67,8 +67,8 @@ public class SBBTransitQSimEngineIntegrationTest {
         Assert.assertFalse(components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME));
     }
 
-    @Test
-    public void testIntegration_misconfiguration() {
+	@Test
+	void testIntegration_misconfiguration() {
         TestFixture f = new TestFixture();
 
         Set<String> mainModes = new HashSet<>();

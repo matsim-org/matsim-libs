@@ -22,8 +22,8 @@ package org.matsim.examples.simple;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -64,7 +64,7 @@ public class PtScoringTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_PtScoringLineswitch() {
+	void test_PtScoringLineswitch() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring() ;
 
@@ -215,8 +215,9 @@ public class PtScoringTest {
 		}
 
 	}
+
 	@Test
-	public void test_PtScoringLineswitchAndPtConstant() {
+	void test_PtScoringLineswitchAndPtConstant() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring() ;
 
@@ -370,8 +371,9 @@ public class PtScoringTest {
 		}
 
 	}
+
 	@Test
-	public void test_PtScoring_Wait() {
+	void test_PtScoring_Wait() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring();
 
@@ -457,7 +459,7 @@ public class PtScoringTest {
 	}
 
 	@Test
-	public void test_PtScoring() {
+	void test_PtScoring() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring() ;
 

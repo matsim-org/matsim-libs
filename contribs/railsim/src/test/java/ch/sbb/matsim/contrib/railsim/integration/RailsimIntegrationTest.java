@@ -23,8 +23,8 @@ import ch.sbb.matsim.contrib.railsim.RailsimModule;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -62,12 +62,12 @@ public class RailsimIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMicroSimpleBiDirectionalTrack() {
+	void testMicroSimpleBiDirectionalTrack() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
 	}
 
 	@Test
-	public void testMesoUniDirectionalVaryingCapacities() {
+	void testMesoUniDirectionalVaryingCapacities() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoUniDirectionalVaryingCapacities"));
 
 		// print events of train1 for debugging
@@ -174,33 +174,33 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void testMicroTrackOppositeTraffic() {
+	void testMicroTrackOppositeTraffic() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
 	}
 
 	@Test
-	public void testMicroTrackOppositeTrafficMany() {
+	void testMicroTrackOppositeTrafficMany() {
 		// multiple trains, one slow train
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTrafficMany"));
 	}
 
 	@Test
-	public void testMesoTwoSources() {
+	void testMesoTwoSources() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
 	}
 
 	@Test
-	public void testMesoTwoSourcesComplex() {
+	void testMesoTwoSourcesComplex() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
 	}
 
 	@Test
-	public void testScenarioMesoGenfBernAllTrains() {
+	void testScenarioMesoGenfBernAllTrains() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
 	}
 
 	@Test
-	public void testScenarioMesoGenfBernOneTrain() {
+	void testScenarioMesoGenfBernOneTrain() {
 
 		// Remove vehicles except the first one
 		Consumer<Scenario> filter = scenario -> {
@@ -228,58 +228,58 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void testMicroThreeUniDirectionalTracks() {
+	void testMicroThreeUniDirectionalTracks() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
 	}
 
 	@Test
-	public void testMicroTrainFollowingConstantSpeed() {
+	void testMicroTrainFollowingConstantSpeed() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
 	}
 
 	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
 	@Test
-	public void testMicroTrainFollowingVaryingSpeed() {
+	void testMicroTrainFollowingVaryingSpeed() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
 	}
 
 	@Test
-	public void testMicroStationSameLink() {
+	void testMicroStationSameLink() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
 	}
 
 	@Test
-	public void testMicroStationDifferentLink() {
+	void testMicroStationDifferentLink() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationDifferentLink"));
 	}
 
 	@Test
-	public void testMicroJunctionCross() {
+	void testMicroJunctionCross() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
 	}
 
 	@Test
-	public void testMicroJunctionY() {
+	void testMicroJunctionY() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionY"));
 	}
 
 	@Test
-	public void testMesoStationCapacityOne() {
+	void testMesoStationCapacityOne() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityOne"));
 	}
 
 	@Test
-	public void testMesoStationCapacityTwo() {
+	void testMesoStationCapacityTwo() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
 	}
 
 	@Test
-	public void testMesoStations() {
+	void testMesoStations() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStations"));
 	}
 
 	@Test
-	public void testMicroSimpleUniDirectionalTrack() {
+	void testMicroSimpleUniDirectionalTrack() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleUniDirectionalTrack"));
 
 		for (Event event : collector.getEvents()) {
@@ -296,7 +296,7 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void testMicroStationRerouting() {
+	void testMicroStationRerouting() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"));
 		collector.getEvents().forEach(System.out::println);
 		// Checks end times
@@ -309,7 +309,7 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void testMicroStationReroutingConcurrent() {
+	void testMicroStationReroutingConcurrent() {
 		Consumer<Scenario> filter = scenario -> {
 
 			TransitScheduleFactory f = scenario.getTransitSchedule().getFactory();
@@ -335,7 +335,7 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void testScenarioKelheim() {
+	void testScenarioKelheim() {
 
 		URL base = ExamplesUtils.getTestScenarioURL("kelheim");
 
@@ -373,7 +373,7 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void testScenarioMicroMesoCombination() {
+	void testScenarioMicroMesoCombination() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
 	}
 

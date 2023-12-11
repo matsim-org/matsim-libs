@@ -23,8 +23,8 @@
 package org.matsim.contrib.decongestion;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +62,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0a() {
+	final void test0a() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -151,7 +151,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0amodified() {
+	final void test0amodified() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -211,7 +211,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0b() {
+	final void test0b() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -299,7 +299,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0bmodified() {
+	final void test0bmodified() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -359,7 +359,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0c() {
+	final void test0c() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -440,7 +440,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test1() {
+	final void test1() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -501,7 +501,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test2() {
+	final void test2() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 

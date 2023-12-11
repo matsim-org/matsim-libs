@@ -25,7 +25,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -75,7 +77,7 @@ public class MultiModalControlerListenerTest {
 
 	@SuppressWarnings("static-method")
 	@Test
-	public void testSimpleScenario() {
+	void testSimpleScenario() {
 		log.info("Run test single threaded...");
 		runSimpleScenario(1);
 
@@ -185,23 +187,23 @@ public class MultiModalControlerListenerTest {
 		Assert.assertEquals(8, linkModeChecker.linkLeftCount);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_singleThreaded() {
+	void testBerlinScenario_singleThreaded() {
 		log.info("Run test single threaded...");
 		runBerlinScenario(1);
 	}
 
 	@Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_multiThreaded_2() {
+	void testBerlinScenario_multiThreaded_2() {
 		log.info("Run test multi threaded with 2 threads...");
 		runBerlinScenario(2);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_multiThreaded_4() {
+	void testBerlinScenario_multiThreaded_4() {
 		log.info("Run test multi threaded with 4 threads...");
 		runBerlinScenario(4);
 	}

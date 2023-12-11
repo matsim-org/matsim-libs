@@ -20,7 +20,7 @@
 package org.matsim.core.config.groups;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class LinkStatsConfigGroupTest {
 
 	@Test
-	public void testWriteLinkStatsInterval() {
+	void testWriteLinkStatsInterval() {
 		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
 		// test initial value
 		Assert.assertEquals(50, cg.getWriteLinkStatsInterval());
@@ -44,13 +44,13 @@ public class LinkStatsConfigGroupTest {
 	}
 
 	@Test
-	public void testGetParams_writeLinkStatsInterval() {
+	void testGetParams_writeLinkStatsInterval() {
 		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
 		Assert.assertNotNull(cg.getParams().get("writeLinkStatsInterval"));
 	}
-	
+
 	@Test
-	public void testWriteAverageOverIterations() {
+	void testWriteAverageOverIterations() {
 		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
 		// test initial value
 		Assert.assertEquals(5, cg.getAverageLinkStatsOverIterations());
@@ -64,9 +64,9 @@ public class LinkStatsConfigGroupTest {
 		Assert.assertEquals(2, cg.getAverageLinkStatsOverIterations());
 		Assert.assertEquals("2", cg.getValue("averageLinkStatsOverIterations"));
 	}
-	
+
 	@Test
-	public void testGetParams_averageLinkStatsOverIterations() {
+	void testGetParams_averageLinkStatsOverIterations() {
 		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
 		Assert.assertNotNull(cg.getParams().get("averageLinkStatsOverIterations"));
 	}

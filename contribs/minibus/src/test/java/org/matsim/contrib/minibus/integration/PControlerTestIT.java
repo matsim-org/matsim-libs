@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
@@ -53,7 +53,7 @@ public class PControlerTestIT implements TabularFileHandler{
 
 
 	@Test
-	public final void testPControler() {
+	final void testPControler() {
 
 		final String scenarioName = "corr_s1_0";
 		final int numberOfIterations = 10;

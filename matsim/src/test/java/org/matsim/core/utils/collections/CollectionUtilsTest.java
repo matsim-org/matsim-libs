@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -38,7 +38,7 @@ public class CollectionUtilsTest {
 	private final static Logger log = LogManager.getLogger(CollectionUtilsTest.class);
 
 	@Test
-	public void testSetToString() {
+	void testSetToString() {
 		Set<String> set = new LinkedHashSet<String>();
 		set.add("Aaa");
 		set.add("Bbb");
@@ -48,13 +48,13 @@ public class CollectionUtilsTest {
 	}
 
 	@Test
-	public void testArrayToString() {
+	void testArrayToString() {
 		String[] array = new String[] {"Aaa", "Bbb", "Ddd", "Ccc"};
 		Assert.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.arrayToString(array));
 	}
 
 	@Test
-	public void testStringToSet() {
+	void testStringToSet() {
 		String[] testStrings = new String[] {
 				"Aaa,Bbb,Ddd,Ccc",
 				",Aaa,Bbb,Ddd,Ccc",
@@ -79,13 +79,13 @@ public class CollectionUtilsTest {
 	}
 
 	@Test
-	public void testNullStringToSet() {
+	void testNullStringToSet() {
 		Set<String> set = CollectionUtils.stringToSet(null);
 		Assert.assertEquals(0, set.size());
 	}
 
 	@Test
-	public void testStringToArray() {
+	void testStringToArray() {
 		String[] testStrings = new String[] {
 				"Aaa,Bbb,Ddd,Ccc",
 				",Aaa,Bbb,Ddd,Ccc",
@@ -108,13 +108,13 @@ public class CollectionUtilsTest {
 	}
 
 	@Test
-	public void testNullStringToArray() {
+	void testNullStringToArray() {
 		String[] array = CollectionUtils.stringToArray(null);
 		Assert.assertEquals(0, array.length);
 	}
 
 	@Test
-	public void testIdSetToString() {
+	void testIdSetToString() {
 		Set<Id<Link>> set = new LinkedHashSet<Id<Link>>();
 		set.add(Id.create("Aaa", Link.class));
 		set.add(Id.create("Bbb", Link.class));

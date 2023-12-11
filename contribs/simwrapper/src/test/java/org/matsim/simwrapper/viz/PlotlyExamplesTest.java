@@ -2,8 +2,8 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
@@ -38,7 +38,7 @@ public class PlotlyExamplesTest {
 	}
 
 	@Test
-	public void pie() throws IOException {
+	void pie() throws IOException {
 
 		String[] modes = {"car", "bike", "pt", "ride", "walk"};
 		double[] shares = {0.2, 0.15, 0.25, 0.1, 0.3};
@@ -52,7 +52,7 @@ public class PlotlyExamplesTest {
 
 
 	@Test
-	public void timeSeries() throws IOException {
+	void timeSeries() throws IOException {
 		Table bush = Table.read().csv(new File(utils.getClassInputDirectory(), "bush.csv"));
 
 		Figure figure = TimeSeriesPlot.create("George W. Bush approval ratings", bush, "date", "approval", "who");
@@ -63,7 +63,7 @@ public class PlotlyExamplesTest {
 	}
 
 	@Test
-	public void hist() throws IOException {
+	void hist() throws IOException {
 
 		Table test = Table.create(
 				StringColumn.create("type").append("apples").append("apples").append("apples").append("oranges").append("bananas"),
@@ -81,7 +81,7 @@ public class PlotlyExamplesTest {
 	}
 
 	@Test
-	public void heatmap() throws IOException {
+	void heatmap() throws IOException {
 
 		Table table = Table.read().csv(new File(utils.getClassInputDirectory(), "bush.csv"));
 
@@ -99,7 +99,7 @@ public class PlotlyExamplesTest {
 	}
 
 	@Test
-	public void scatter() throws IOException {
+	void scatter() throws IOException {
 
 		final double[] x = {1, 2, 3, 4, 5, 6};
 		final double[] y = {0, 1, 6, 14, 25, 39};

@@ -21,8 +21,8 @@ package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
@@ -124,7 +124,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testPersonWithNegativeIncome(){
+	void testPersonWithNegativeIncome(){
 		Id<Person> id = Id.createPersonId("negativeIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		//person's attribute says it has negative income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
@@ -132,7 +132,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testPersonWithNoIncome(){
+	void testPersonWithNoIncome(){
 		Id<Person> id = Id.createPersonId("zeroIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		//person's attribute says it has 0 income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
@@ -140,7 +140,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testPersonWithLowIncomeLowCarAsc(){
+	void testPersonWithLowIncomeLowCarAsc(){
 		Id<Person> id = Id.createPersonId("lowIncomeLowCarAsc");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 0.5d, 0.5d);
@@ -149,7 +149,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testPersonWithHighIncomeLowCarAsc(){
+	void testPersonWithHighIncomeLowCarAsc(){
 		Id<Person> id = Id.createPersonId("highIncomeLowCarAsc");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1.5d, 0.5d);
@@ -158,7 +158,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testPersonWithMediumIncomeHighCarAsc(){
+	void testPersonWithMediumIncomeHighCarAsc(){
 		Id<Person> id = Id.createPersonId("mediumIncomeHighCarAsc");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d, 0.5d);
@@ -168,7 +168,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testMoneyScore(){
+	void testMoneyScore(){
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncomeLowCarAsc")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
@@ -183,7 +183,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 	}
 
 	@Test
-	public void testPersonSpecificAscScoring(){
+	void testPersonSpecificAscScoring(){
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncomeLowCarAsc")));
 		CharyparNagelLegScoring legScoringRichCarLeg = new CharyparNagelLegScoring(paramsRich, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
 		Leg carLegZeroDistanceTenSeconds = createLeg(TransportMode.car,  0.0d, 10.0d );

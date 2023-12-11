@@ -22,8 +22,8 @@
  package org.matsim.core.network.io;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -34,19 +34,19 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class NetworkAttributeConversionTest {
+ public class NetworkAttributeConversionTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDefaults() {
+	 @Test
+	 void testDefaults() {
 		final String path = utils.getOutputDirectory()+"/network.xml";
 
 		testWriteAndReread(w -> w.write(path), w -> w.readFile(path));
 	}
 
-	@Test
-	public void testV2() {
+	 @Test
+	 void testV2() {
 		final String path = utils.getOutputDirectory()+"/network.xml";
 
 		testWriteAndReread(w -> w.writeFileV2(path), w -> w.readFile(path));

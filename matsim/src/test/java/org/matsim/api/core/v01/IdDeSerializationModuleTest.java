@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.network.Link;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +26,7 @@ public class IdDeSerializationModuleTest {
 	}
 
 	@Test
-	public void testMapKey() {
+	void testMapKey() {
 
 		// create map with Id<T> as keys
 		Map<Id<Link>, String> map0 = new LinkedHashMap<>();
@@ -65,7 +65,7 @@ public class IdDeSerializationModuleTest {
 	}
 
 	@Test
-	public void testMapValue() {
+	void testMapValue() {
 
 		// create map with Id<T> as values
 		Map<String, Id<Link>> map0 = new LinkedHashMap<>();

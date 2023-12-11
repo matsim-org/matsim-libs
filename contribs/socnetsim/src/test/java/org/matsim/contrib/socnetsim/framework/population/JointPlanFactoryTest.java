@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +35,7 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class JointPlanFactoryTest {
 	@Test
-	public void testAddAtIndividualLevel() throws Exception {
+	void testAddAtIndividualLevel() throws Exception {
 		final Id<Person> id1 = Id.createPersonId( 1 );
 		final Person person1 = PopulationUtils.getFactory().createPerson(id1);
 
@@ -64,7 +64,7 @@ public class JointPlanFactoryTest {
 	}
 
 	@Test
-	public void testDoNotAddAtIndividualLevel() throws Exception {
+	void testDoNotAddAtIndividualLevel() throws Exception {
 		final Id id1 = Id.createPersonId( 1 );
 		final Person person1 = PopulationUtils.getFactory().createPerson((Id<Person>) id1);
 

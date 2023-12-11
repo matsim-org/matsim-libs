@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 import static org.matsim.contrib.emissions.Pollutant.CO;
@@ -61,7 +61,7 @@ public class TestHbefaColdEmissionFactorKey {
 
 
 	@Test
-	public final void testEqualsForCompleteKeys() {
+	final void testEqualsForCompleteKeys() {
 
 		setUp();
 
@@ -113,7 +113,7 @@ public class TestHbefaColdEmissionFactorKey {
 	//exception: if the vehicleAttributes are set to 'average' by default
 
 	@Test
-	public final void testEqualsForIncompleteKeys_vehicleCategory(){
+	final void testEqualsForIncompleteKeys_vehicleCategory(){
 		setUp();
 
 		//normal HbefaColdEmissionFactorKey
@@ -132,7 +132,7 @@ public class TestHbefaColdEmissionFactorKey {
 	}
 
 	@Test
-	public final void testEqualsForIncompleteKeys_pollutant(){
+	final void testEqualsForIncompleteKeys_pollutant(){
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal'
 		// and set some parameters
@@ -151,7 +151,7 @@ public class TestHbefaColdEmissionFactorKey {
 	}
 
 	@Test
-	public final void testEqualsForIncompleteKeys_parkingTime() {
+	final void testEqualsForIncompleteKeys_parkingTime() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal'
 		// and set some parameters
@@ -170,7 +170,7 @@ public class TestHbefaColdEmissionFactorKey {
 	}
 
 	@Test
-	public final void testEqualsForIncompleteKeys_distance() {
+	final void testEqualsForIncompleteKeys_distance() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal'
 		// and set some parameters
@@ -189,7 +189,7 @@ public class TestHbefaColdEmissionFactorKey {
 	}
 
 	@Test
-	public final void testEqualsForIncompleteKeys_emptyKey() {
+	final void testEqualsForIncompleteKeys_emptyKey() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal'
 		// and set some parameters
@@ -204,7 +204,7 @@ public class TestHbefaColdEmissionFactorKey {
 	}
 
 	@Test
-	public final void testEqualsForIncompleteKeys_VehicleAttributes(){
+	final void testEqualsForIncompleteKeys_VehicleAttributes(){
 
 		//if no vehicle attributes are set manually they are set to 'average' by default
 		// thus, the equals method should not throw nullpointer exceptions but return false or respectively true

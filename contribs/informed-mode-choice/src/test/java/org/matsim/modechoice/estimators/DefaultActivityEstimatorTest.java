@@ -1,7 +1,7 @@
 package org.matsim.modechoice.estimators;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.TripStructureUtils;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DefaultActivityEstimatorTest extends ScenarioTest {
 
 	@Test
-	public void person() {
+	void person() {
 
 
 		ScoringParametersForPerson p = injector.getInstance(ScoringParametersForPerson.class);

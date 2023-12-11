@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +39,7 @@ import java.util.Map;
 public class FreightCarriersConfigGroupTest {
 
 	@Test
-	public void test_allParametersAreWrittenToXml() {
+	void test_allParametersAreWrittenToXml() {
 		FreightCarriersConfigGroup freight = new FreightCarriersConfigGroup();
 		Map<String, String> params = freight.getParams();
 
@@ -51,7 +51,7 @@ public class FreightCarriersConfigGroupTest {
 	}
 
 	@Test
-	public void test_configXmlCanBeParsed() {
+	void test_configXmlCanBeParsed() {
 		FreightCarriersConfigGroup freight = new FreightCarriersConfigGroup();
 		Config config = ConfigUtils.createConfig(freight);
 

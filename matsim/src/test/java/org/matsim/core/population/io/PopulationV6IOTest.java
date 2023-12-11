@@ -22,8 +22,8 @@
  package org.matsim.core.population.io;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,15 +54,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/**
+ /**
  * @author thibautd
  */
 public class PopulationV6IOTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testCoord3dIO() {
+	 @Test
+	 void testCoord3dIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -95,8 +95,8 @@ public class PopulationV6IOTest {
 				MatsimTestUtils.EPSILON );
 	}
 
-	@Test
-	public void testEmptyPersonAttributesIO() {
+	 @Test
+	 void testEmptyPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -110,8 +110,8 @@ public class PopulationV6IOTest {
 		new PopulationReader( readScenario ).readFile( file );
 	}
 
-	@Test
-	public void testPersonAttributesIO() {
+	 @Test
+	 void testPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -145,8 +145,8 @@ public class PopulationV6IOTest {
 				VehicleUtils.getVehicleIds(readPerson) );
 	}
 
-	@Test
-	public void testActivityAttributesIO() {
+	 @Test
+	 void testActivityAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -178,8 +178,8 @@ public class PopulationV6IOTest {
 				readAct.getAttributes().getAttribute( "length" ) );
 	}
 
-	@Test
-	public void testLegAttributesIO() {
+	 @Test
+	 void testLegAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -212,8 +212,8 @@ public class PopulationV6IOTest {
 		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
 	}
 
-	@Test
-	public void testLegAttributesLegacyIO() {
+	 @Test
+	 void testLegAttributesLegacyIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -246,8 +246,8 @@ public class PopulationV6IOTest {
 		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
 	}
 
-	@Test
-	public void testPlanAttributesIO() {
+	 @Test
+	 void testPlanAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -275,8 +275,8 @@ public class PopulationV6IOTest {
 				readPlan.getAttributes().getAttribute( "beauty" ) );
 	}
 
-	@Test
-	public void testPopulationAttributesIO() {
+	 @Test
+	 void testPopulationAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		population.getAttributes().putAttribute( "type" , "candidates" );
@@ -297,9 +297,9 @@ public class PopulationV6IOTest {
 				readScenario.getPopulation().getAttributes().getAttribute( "type" ) );
 	}
 
-	// see MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
-	@Test
-	public void testRouteIO() {
+	 // see MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
+	 @Test
+	 void testRouteIO() {
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory pf = population.getFactory();
 
@@ -332,9 +332,9 @@ public class PopulationV6IOTest {
 		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 
-	// inspired from MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
-	@Test
-	public void testSpecialCharactersIO() {
+	 // inspired from MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
+	 @Test
+	 void testSpecialCharactersIO() {
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory pf = population.getFactory();
 
@@ -379,8 +379,8 @@ public class PopulationV6IOTest {
 		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 
-	@Test
-	public void testSingleActivityLocationInfoIO() {
+	 @Test
+	 void testSingleActivityLocationInfoIO() {
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory pf = population.getFactory();
 
@@ -432,8 +432,8 @@ public class PopulationV6IOTest {
 		Assert.assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
 	}
 
-	@Test
-	public void testPopulationCoordinateTransformationIO() {
+	 @Test
+	 void testPopulationCoordinateTransformationIO() {
 		String outputDirectory = utils.getOutputDirectory();
 
 		// Create a population with CRS EPSG:25832

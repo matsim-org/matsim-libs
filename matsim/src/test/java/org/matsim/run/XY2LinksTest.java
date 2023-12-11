@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -58,7 +58,8 @@ public class XY2LinksTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testMain() throws Exception {
+	@Test
+	void testMain() throws Exception {
 		Config config = utils.loadConfig((String)null);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
 		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";

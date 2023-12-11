@@ -1,7 +1,7 @@
 package org.matsim.core.utils.collections;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class IntArrayMapTest {
 
 	@Test
-	public void testPutGetRemoveSize() {
+	void testPutGetRemoveSize() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		Assert.assertEquals(0, map.size());
@@ -55,7 +55,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterable() {
+	void testValuesIterable() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		map.put(1, "one");
@@ -82,7 +82,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testForEach() {
+	void testForEach() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		map.put(1, "one");
@@ -108,7 +108,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testContainsKey() {
+	void testContainsKey() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		map.put(1, "one");
@@ -132,7 +132,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testContainsValue() {
+	void testContainsValue() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		map.put(1, "one");
@@ -149,7 +149,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testPutAll_ArrayMap() {
+	void testPutAll_ArrayMap() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		IntArrayMap<String> map2 = new IntArrayMap<>();
@@ -170,7 +170,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testPutAll_GenericMap() {
+	void testPutAll_GenericMap() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		Map<Integer, String> map2 = new HashMap<>();
@@ -191,7 +191,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		map.put(1, "one");
@@ -213,7 +213,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testValues() {
+	void testValues() {
 		IntArrayMap<String> map = new IntArrayMap<>();
 
 		map.put(1, "one");
@@ -247,7 +247,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testKeySet() {
+	void testKeySet() {
 		int key1 = 1;
 		int key2 = 2;
 		int key3 = 3;
@@ -288,7 +288,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testEntrySet() {
+	void testEntrySet() {
 		int key1 = 1;
 		int key2 = 2;
 		int key4 = 4;
@@ -342,7 +342,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterator_iterate() {
+	void testValuesIterator_iterate() {
 		int key1 = 1;
 		int key2 = 2;
 		int key4 = 4;
@@ -381,7 +381,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterator_remove() {
+	void testValuesIterator_remove() {
 		int key1 = 1;
 		int key2 = 2;
 		int key4 = 4;
@@ -417,7 +417,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testKeySetIterator_iterate() {
+	void testKeySetIterator_iterate() {
 		int key1 = 1;
 		int key2 = 2;
 		int key4 = 4;
@@ -456,7 +456,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testKeySetIterator_remove() {
+	void testKeySetIterator_remove() {
 		int key1 = 1;
 		int key2 = 2;
 		int key4 = 4;
@@ -492,7 +492,7 @@ public class IntArrayMapTest {
 	}
 
 	@Test
-	public void testKeySetToArray() {
+	void testKeySetToArray() {
 		int key1 = 1;
 		int key2 = 2;
 		int key4 = 4;

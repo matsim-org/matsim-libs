@@ -23,8 +23,8 @@ package org.matsim.integration.replanning;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -74,7 +74,8 @@ public class ChangeTripModeIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testStrategyManagerConfigLoaderIntegration() {
+	@Test
+	void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = utils.loadConfig((String)null);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);

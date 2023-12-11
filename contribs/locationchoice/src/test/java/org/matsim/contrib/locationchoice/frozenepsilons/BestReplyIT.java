@@ -1,7 +1,7 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -18,7 +18,7 @@ public class BestReplyIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunControler() {
+	void testRunControler() {
 		// load chessboard scenario config:
         Config config = utils.loadConfig(
         		IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),

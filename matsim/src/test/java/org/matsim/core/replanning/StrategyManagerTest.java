@@ -21,7 +21,7 @@
 package org.matsim.core.replanning;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -40,6 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StrategyManagerTest {
 
@@ -51,7 +52,7 @@ public class StrategyManagerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testChangeRequests() {
+	void testChangeRequests() {
 		MatsimRandom.reset(4711);
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -126,12 +127,14 @@ public class StrategyManagerTest {
 		assertEquals(498, strategy4.getCounter());
 	}
 
-	@Test( expected=IllegalStateException.class )
-	public void testAddTwiceStrategy() {
-		final StrategyManager manager = new StrategyManager();
-		final PlanStrategy s = new PlanStrategyImpl.Builder( new RandomPlanSelector() ).build();
-		manager.addStrategy( s , null , 1 );
-		manager.addStrategy( s , null , 10 );
+	@Test
+	void testAddTwiceStrategy() {
+		assertThrows(IllegalStateException.class, () -> {
+			final StrategyManager manager = new StrategyManager();
+			final PlanStrategy s = new PlanStrategyImpl.Builder( new RandomPlanSelector() ).build();
+			manager.addStrategy(s, null, 1);
+			manager.addStrategy(s, null, 10);
+		});
 	}
 
 	/**
@@ -141,7 +144,7 @@ public class StrategyManagerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testRemoveStrategy() {
+	void testRemoveStrategy() {
 		MatsimRandom.reset(4711);
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -200,7 +203,7 @@ public class StrategyManagerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testOptimisticBehavior() {
+	void testOptimisticBehavior() {
 
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
@@ -250,7 +253,7 @@ public class StrategyManagerTest {
 	}
 
 	@Test
-	public void testSetPlanSelectorForRemoval() {
+	void testSetPlanSelectorForRemoval() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		manager.addStrategy( new PlanStrategyImpl(new RandomPlanSelector()), null, 1.0 );
@@ -288,7 +291,7 @@ public class StrategyManagerTest {
 	}
 
 	@Test
-	public void testGetStrategies() {
+	void testGetStrategies() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
@@ -306,9 +309,9 @@ public class StrategyManagerTest {
 		Assert.assertEquals(str2, strategies.get(1));
 		Assert.assertEquals(str3, strategies.get(2));
 	}
-	
+
 	@Test
-	public void testGetWeights() {
+	void testGetWeights() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
@@ -326,9 +329,9 @@ public class StrategyManagerTest {
 		Assert.assertEquals(2.0, weights.get(1), 1e-8);
 		Assert.assertEquals(0.5, weights.get(2), 1e-8);
 	}
-	
+
 	@Test
-	public void testGetWeights_ChangeRequests() {
+	void testGetWeights_ChangeRequests() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());

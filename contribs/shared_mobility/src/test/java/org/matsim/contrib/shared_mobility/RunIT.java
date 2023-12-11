@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
@@ -38,7 +38,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunIT {
 
 	@Test
-	public final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
+	final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 

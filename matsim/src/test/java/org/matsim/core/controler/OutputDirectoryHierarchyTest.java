@@ -19,8 +19,8 @@
 package org.matsim.core.controler;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -38,7 +38,7 @@ public class OutputDirectoryHierarchyTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testFailureIfDirectoryExists() {
+	void testFailureIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
 		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
@@ -74,7 +74,7 @@ public class OutputDirectoryHierarchyTest {
 	}
 
 	@Test
-	public void testOverrideIfDirectoryExists() {
+	void testOverrideIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
 		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
@@ -109,7 +109,7 @@ public class OutputDirectoryHierarchyTest {
 	}
 
 	@Test
-	public void testDeleteIfDirectoryExists() {
+	void testDeleteIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
 		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 

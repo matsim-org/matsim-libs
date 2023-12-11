@@ -27,7 +27,7 @@ import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,7 +47,7 @@ public class LinkImplTest {
 
 
 	@Test
-	public void testCalcDistance() {
+	void testCalcDistance() {
 		/* create a sample network:
 		 *
 		 *        (3)---3---(4)
@@ -180,7 +180,7 @@ public class LinkImplTest {
 	}
 
 	@Test
-	public void testSetAttributes() {
+	void testSetAttributes() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		network.setCapacityPeriod(3600.0);
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
@@ -200,7 +200,7 @@ public class LinkImplTest {
 	 *
 	 */
 	@Test
-	public void testAllowedModes() {
+	void testAllowedModes() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -233,7 +233,7 @@ public class LinkImplTest {
 
 
 	@Test
-	public void testHashSetCache_get_unmodifiable() {
+	void testHashSetCache_get_unmodifiable() {
 		Set<String> s1 = new TreeSet<String>();
 		s1.add("A");
 		s1.add("B");
@@ -258,14 +258,14 @@ public class LinkImplTest {
 
 
 	@Test
-	public void testHashSetCache_get_null() {
+	void testHashSetCache_get_null() {
 		Set<String> s = HashSetCache.get((Set<String>) null);
 		Assert.assertNull(s);
 	}
 
 
 	@Test
-	public void testHashSetCache_get_emptySet() {
+	void testHashSetCache_get_emptySet() {
 		Set<String> s = HashSetCache.get(new TreeSet<String>());
 		Assert.assertNotNull(s);
 		Assert.assertEquals(0, s.size());
@@ -273,7 +273,7 @@ public class LinkImplTest {
 
 
 	@Test
-	public void testHashSetCache_get() {
+	void testHashSetCache_get() {
 		Set<String> s1 = new TreeSet<String>();
 		s1.add("A");
 		s1.add("B");
@@ -312,7 +312,7 @@ public class LinkImplTest {
 
 
 	@Test
-	public void testHashSetCache_get_identicalObjects() {
+	void testHashSetCache_get_identicalObjects() {
 		Set<String> s1 = new TreeSet<String>();
 		s1.add("A");
 		s1.add("B");

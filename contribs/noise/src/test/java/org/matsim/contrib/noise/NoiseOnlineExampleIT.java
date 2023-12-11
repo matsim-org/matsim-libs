@@ -26,8 +26,8 @@ import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,7 +58,7 @@ public class NoiseOnlineExampleIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void test0(){
+	final void test0(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
@@ -80,7 +80,7 @@ public class NoiseOnlineExampleIT {
 	}
 
 	@Test
-	public final void testOnTheFlyAggregationTerms() {
+	final void testOnTheFlyAggregationTerms() {
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controller().setLastIteration(1);
@@ -180,7 +180,7 @@ public class NoiseOnlineExampleIT {
 	}
 
 	@Test
-	public final void testNoiseListener(){
+	final void testNoiseListener(){
 
 		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "config.xml", new NoiseConfigGroup() );
 		config.controller().setLastIteration(1);

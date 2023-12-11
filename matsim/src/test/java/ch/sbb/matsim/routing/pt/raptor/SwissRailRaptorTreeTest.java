@@ -21,7 +21,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorCore.TravelInfo;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.misc.Time;
@@ -38,8 +38,8 @@ import java.util.Map;
  */
 public class SwissRailRaptorTreeTest {
 
-    @Test
-    public void testSingleStop_dep0740atN_optimized() {
+	@Test
+	void testSingleStop_dep0740atN_optimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -83,8 +83,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 23, "23", 0, "07:40:00", "07:40:00"); // our start location
     }
 
-    @Test
-    public void testSingleStop_dep0740atN_unoptimized() {
+	@Test
+	void testSingleStop_dep0740atN_unoptimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -126,8 +126,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 23, "23", 0, "07:40:00", "07:40:00"); // our start location
     }
 
-    @Test
-    public void testSingleStop_dep0750atN_optimized() {
+	@Test
+	void testSingleStop_dep0750atN_optimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -172,8 +172,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 23, "23", 0, "07:50:00", "07:50:00"); // our start location
     }
 
-    @Test
-    public void testSingleStop_dep0750atN_unoptimized() {
+	@Test
+	void testSingleStop_dep0750atN_unoptimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -216,8 +216,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 23, "23", 0, "07:50:00", "07:50:00"); // our start location
     }
 
-    @Test
-    public void testMultipleStops_optimized() {
+	@Test
+	void testMultipleStops_optimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -265,8 +265,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 23, "15", 1, "07:43:00", "08:11:00"); // from H, transfer at G, 7:48/7:51 green
     }
 
-    @Test
-    public void testMultipleStops_unoptimized() {
+	@Test
+	void testMultipleStops_unoptimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -312,8 +312,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 23, "15", 1, "07:43:00", "08:11:00"); // from H, transfer at G, 7:48/7:51 green
     }
 
-    @Test
-    public void testSingleStop_costs_dep0740atN_optimized() {
+	@Test
+	void testSingleStop_costs_dep0740atN_optimized() {
         Fixture f = new Fixture();
         f.init();
 
@@ -345,8 +345,8 @@ public class SwissRailRaptorTreeTest {
         Assert.assertTrue("waiting cost should differ", info0740.waitingCost < info0739.waitingCost);
     }
 
-    @Test
-    public void testSingleStop_raptorroute_dep0740atN_optimized() {
+	@Test
+	void testSingleStop_raptorroute_dep0740atN_optimized() {
         Fixture f = new Fixture();
         f.init();
 

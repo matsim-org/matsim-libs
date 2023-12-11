@@ -43,8 +43,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -125,23 +125,23 @@ public class CreateAutomatedFDTest {
 	}
 
 	@Test
-	public void fdsCarTruck(){
+	void fdsCarTruck(){
 		this.travelModes = new String [] {"car","truck"};
 		run(false);
 	}
 
 	@Test
-	public void fdsCarBike(){
+	void fdsCarBike(){
 		run(false);
 	}
 
 	@Test
-	public void fdsCarBikeFastCapacityUpdate(){
+	void fdsCarBikeFastCapacityUpdate(){
 		run(true);
 	}
 
 	@Test
-	public void fdsCarOnly(){
+	void fdsCarOnly(){
 		this.travelModes = new String [] {"car"};
 		run(false);
 	}

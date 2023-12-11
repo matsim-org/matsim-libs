@@ -1,8 +1,8 @@
 package org.matsim.application.prepare.pt;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -16,7 +16,7 @@ public class CreateTransitScheduleFromGtfsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void run() {
+	void run() {
 
 		String input = utils.getClassInputDirectory();
 		String output = utils.getOutputDirectory();

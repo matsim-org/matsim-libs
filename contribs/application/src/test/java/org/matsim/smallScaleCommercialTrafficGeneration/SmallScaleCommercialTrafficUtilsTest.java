@@ -20,8 +20,8 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +50,7 @@ public class SmallScaleCommercialTrafficUtilsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void findZoneOfLinksTest() throws IOException, URISyntaxException {
+	void findZoneOfLinksTest() throws IOException, URISyntaxException {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");

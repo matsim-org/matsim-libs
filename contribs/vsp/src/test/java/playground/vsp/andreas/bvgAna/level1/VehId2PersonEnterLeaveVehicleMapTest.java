@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -17,7 +17,7 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 	TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> leave = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 
 	@Test
-	public void testVehId2PersonEnterLeaveVehicleMap() {
+	void testVehId2PersonEnterLeaveVehicleMap() {
 
 //	    assign Ids to routes, vehicles and agents to be used in Test
 

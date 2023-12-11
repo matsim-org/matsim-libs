@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -48,7 +48,7 @@ public class RandomJointLocationChoiceTest {
 	// tests of individual critical methods
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testBarycenterCalculation() {
+	void testBarycenterCalculation() {
 		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final List<Activity> activities = new ArrayList<Activity>();
 
@@ -108,7 +108,7 @@ public class RandomJointLocationChoiceTest {
 	}
 
 	@Test
-	public void testFacilityRetrieval() {
+	void testFacilityRetrieval() {
 		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final List<Activity> activities = new ArrayList<Activity>();
 

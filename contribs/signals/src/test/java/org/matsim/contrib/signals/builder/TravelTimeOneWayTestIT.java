@@ -24,8 +24,8 @@ import java.util.Collections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -70,22 +70,22 @@ public class TravelTimeOneWayTestIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testSignalOutflow_withLanes() {
+	void testSignalOutflow_withLanes() {
 		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(true));
 	}
 
 	@Test
-	public void testSignalOutflow_woLanes() {
+	void testSignalOutflow_woLanes() {
 		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(false));
 	}
 
 	@Test
-	public void testAllGreenSignalVsNoSignal_withLanes() {
+	void testAllGreenSignalVsNoSignal_withLanes() {
 		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(true));
 	}
 
 	@Test
-	public void testAllGreenSignalVsNoSignal_woLanes() {
+	void testAllGreenSignalVsNoSignal_woLanes() {
 		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(false));
 	}
 

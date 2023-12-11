@@ -27,7 +27,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -45,7 +45,7 @@ public class TourModeUnifierAlgorithmTest {
 	private static final Logger log = LogManager.getLogger( TourModeUnifierAlgorithmTest.class );
 
 	@Test
-	public void testPlanWithOneSingleTour() throws Exception {
+	void testPlanWithOneSingleTour() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink1 = Id.create( "anchor1" , Link.class );
@@ -138,7 +138,7 @@ public class TourModeUnifierAlgorithmTest {
 	}
 
 	@Test
-	public void testPlanWithTwoToursOnOpenTour() throws Exception {
+	void testPlanWithTwoToursOnOpenTour() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> entranceLink = Id.create( "entrance" , Link.class );
@@ -238,7 +238,7 @@ public class TourModeUnifierAlgorithmTest {
 	}
 
 	@Test
-	public void testPlanWithTwoHomeBasedTours() throws Exception {
+	void testPlanWithTwoHomeBasedTours() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink = Id.create( "anchor" , Link.class );

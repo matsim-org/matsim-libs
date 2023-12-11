@@ -23,7 +23,7 @@
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -37,10 +37,10 @@ import org.matsim.core.utils.io.IOUtils;
 
 import static org.junit.Assert.assertTrue;
 
-public class NonCarLegTest extends AbstractJDEQSimTest {
+ public class NonCarLegTest extends AbstractJDEQSimTest {
 
-	@Test
-	public void test_EmptyCarRoute() {
+	 @Test
+	 void test_EmptyCarRoute() {
 		Config config = utils.loadConfig(IOUtils.extendUrl(utils.packageInputResourcePath(), "config2.xml"));
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);

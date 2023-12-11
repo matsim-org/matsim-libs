@@ -26,8 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -124,7 +123,7 @@ public class TestQuadTree {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		TestQuadTree tc = new TestQuadTree();
 		tc.determineNearestPtStation();
 	}

@@ -22,7 +22,7 @@
  package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,13 +46,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.List;
 
-/**
+ /**
  * @author mrieser / Simunto GmbH
  */
 public class NetworkChangeEventsEngineTest {
 
-	@Test
-	public void testActivation_inactive() {
+	 @Test
+	 void testActivation_inactive() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -86,8 +86,8 @@ public class NetworkChangeEventsEngineTest {
 		}
 	}
 
-	@Test
-	public void testActivation_timedepOnly_freespeed() {
+	 @Test
+	 void testActivation_timedepOnly_freespeed() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -122,8 +122,8 @@ public class NetworkChangeEventsEngineTest {
 		Assert.assertEquals("it should be 50 now.", 50, link1.getFreespeed(40), 0);
 	}
 
-	@Test
-	public void testActivation_timedepOnly_capacity() {
+	 @Test
+	 void testActivation_timedepOnly_capacity() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);

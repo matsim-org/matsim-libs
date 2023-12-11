@@ -10,7 +10,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -38,7 +38,7 @@ public class ShiftEfficiencyTest {
 	 * Test method for {@link ShiftEfficiencyTracker}.
 	 */
 	@Test
-	public void testDrtShiftEfficiency() {
+	void testDrtShiftEfficiency() {
 
 		EventsManager events = new EventsManagerImpl();
 		ShiftEfficiencyTracker shiftEfficiencyTracker = new ShiftEfficiencyTracker();

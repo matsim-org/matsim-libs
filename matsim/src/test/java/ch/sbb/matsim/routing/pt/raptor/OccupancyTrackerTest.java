@@ -21,7 +21,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -54,7 +54,7 @@ import java.util.Collections;
 public class OccupancyTrackerTest {
 
 	@Test
-	public void testGetNextDeparture() {
+	void testGetNextDeparture() {
 		Fixture f = new Fixture();
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -131,7 +131,7 @@ public class OccupancyTrackerTest {
 	}
 
 	@Test
-	public void testGetDepartureData() {
+	void testGetDepartureData() {
 		Fixture f = new Fixture();
 
 		EventsManager events = EventsUtils.createEventsManager();

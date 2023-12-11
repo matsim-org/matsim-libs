@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -38,7 +38,7 @@ import playground.vsp.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMapData;
 public class AgentId2PtTripTravelTimeMapDataTest {
 
 	@Test
-	public void testAgentId2PtTripTravelTimeMapData() {
+	void testAgentId2PtTripTravelTimeMapData() {
 		
 		Set<Id<Person>> idSet = new TreeSet<>();
   	for (int ii=0; ii<15; ii++){

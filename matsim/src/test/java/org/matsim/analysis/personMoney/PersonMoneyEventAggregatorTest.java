@@ -23,8 +23,8 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -46,7 +46,7 @@ public class PersonMoneyEventAggregatorTest {
 	 * Test method for {@link org.matsim.analysis.personMoney.PersonMoneyEventsCollector}.
 	 */
 	@Test
-	public void testPersonMoneyEventCollector() {
+	void testPersonMoneyEventCollector() {
 
 
 		Id<Person> passenger1 = Id.createPersonId("passenger1");

@@ -23,7 +23,7 @@ package org.matsim.core.replanning;
 import java.util.Random;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +42,7 @@ public class StrategyManagerSubpopulationsTest {
 	private static final String POP_NAME_2 = "buveurs_de_vin";
 
 	@Test
-	public void testStrategiesAreExecutedOnlyForGivenSubpopulation() {
+	void testStrategiesAreExecutedOnlyForGivenSubpopulation() {
 		final StrategyManager manager = new StrategyManager();
 
 		final Random r = new Random(123);

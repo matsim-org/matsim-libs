@@ -22,8 +22,8 @@ package org.matsim.core.replanning;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -38,7 +38,8 @@ public class PlanStrategyTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetNumberOfStrategyModules() {
+	@Test
+	void testGetNumberOfStrategyModules() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		assertEquals(0, strategy.getNumberOfStrategyModules());
 		strategy.addStrategyModule(new DummyStrategyModule());

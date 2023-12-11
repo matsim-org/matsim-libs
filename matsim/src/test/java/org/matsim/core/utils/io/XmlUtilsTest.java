@@ -20,7 +20,7 @@
 package org.matsim.core.utils.io;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class XmlUtilsTest {
 
 	@Test
-	public void testEncodeAttributeValue() {
+	void testEncodeAttributeValue() {
 		Assert.assertEquals("hello world!", XmlUtils.encodeAttributeValue("hello world!"));
 		Assert.assertEquals("you &amp; me", XmlUtils.encodeAttributeValue("you & me"));
 		Assert.assertEquals("you &amp; me &amp; her", XmlUtils.encodeAttributeValue("you & me & her"));
@@ -39,7 +39,7 @@ public class XmlUtilsTest {
 	}
 
 	@Test
-	public void testEncodedContent() {
+	void testEncodedContent() {
 		Assert.assertEquals("hello world!", XmlUtils.encodeContent("hello world!"));
 		Assert.assertEquals("you &amp; me", XmlUtils.encodeContent("you & me"));
 		Assert.assertEquals("you &amp; me &amp; her", XmlUtils.encodeContent("you & me & her"));

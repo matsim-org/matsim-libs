@@ -22,7 +22,7 @@
  package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,13 +33,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-/**
+ /**
  * @author mrieser
  */
 public class FacilitiesWriterTest {
 
-    @Test
-    public void testWriteLinkId() {
+	 @Test
+	 void testWriteLinkId() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -83,8 +83,8 @@ public class FacilitiesWriterTest {
         Assert.assertEquals("pepsiCo", fac3b.getAttributes().getAttribute("owner"));
     }
 
-    @Test
-    public void testWrite3DCoord() {
+	 @Test
+	 void testWrite3DCoord() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -121,9 +121,9 @@ public class FacilitiesWriterTest {
         Assert.assertFalse(fac3b.getCoord().hasZ());
     }
 
-    @Test
-    // the better fix for https://github.com/matsim-org/matsim/pull/505
-    public void testFacilityDescription() {
+	 // the better fix for https://github.com/matsim-org/matsim/pull/505
+	 @Test
+	 void testFacilityDescription() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -156,9 +156,9 @@ public class FacilitiesWriterTest {
         Assert.assertEquals(desc, desc2);
     }
 
-    @Test
-    // inspired by https://github.com/matsim-org/matsim/pull/505
-    public void testFacilitiesName() {
+	 // inspired by https://github.com/matsim-org/matsim/pull/505
+	 @Test
+	 void testFacilitiesName() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();

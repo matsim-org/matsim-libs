@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -63,9 +63,9 @@ public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		factory = scenario.getTransitSchedule().getFactory();
 	}
-	
+
 	@Test
-	public void testRectangularLine() {
+	void testRectangularLine() {
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		ArrayList<TransitRouteStop> stops = new ArrayList<>();
 		

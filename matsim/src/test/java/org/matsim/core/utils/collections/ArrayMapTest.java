@@ -1,7 +1,7 @@
 package org.matsim.core.utils.collections;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class ArrayMapTest {
 
 	@Test
-	public void testPutGetRemoveSize() {
+	void testPutGetRemoveSize() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		Assert.assertEquals(0, map.size());
@@ -55,7 +55,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterable() {
+	void testValuesIterable() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		map.put("1", "one");
@@ -82,7 +82,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testForEach() {
+	void testForEach() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		map.put("1", "one");
@@ -108,7 +108,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testContainsKey() {
+	void testContainsKey() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		map.put("1", "one");
@@ -132,7 +132,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testContainsValue() {
+	void testContainsValue() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		map.put("1", "one");
@@ -149,7 +149,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testPutAll_ArrayMap() {
+	void testPutAll_ArrayMap() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		ArrayMap<String, String> map2 = new ArrayMap<>();
@@ -170,7 +170,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testPutAll_GenericMap() {
+	void testPutAll_GenericMap() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		Map<String, String> map2 = new HashMap<>();
@@ -191,7 +191,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		map.put("1", "one");
@@ -213,7 +213,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testValues() {
+	void testValues() {
 		ArrayMap<String, String> map = new ArrayMap<>();
 
 		map.put("1", "one");
@@ -247,7 +247,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testKeySet() {
+	void testKeySet() {
 		String key1 = "1";
 		String key2 = "2";
 		String key3 = "3";
@@ -288,7 +288,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testEntrySet() {
+	void testEntrySet() {
 		String key1 = "1";
 		String key2 = "2";
 		String key4 = "4";
@@ -342,7 +342,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterator_iterate() {
+	void testValuesIterator_iterate() {
 		String key1 = "1";
 		String key2 = "2";
 		String key4 = "4";
@@ -381,7 +381,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterator_remove() {
+	void testValuesIterator_remove() {
 		String key1 = "1";
 		String key2 = "2";
 		String key4 = "4";
@@ -416,7 +416,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testKeySetIterator_iterate() {
+	void testKeySetIterator_iterate() {
 		String key1 = "1";
 		String key2 = "2";
 		String key4 = "4";
@@ -455,7 +455,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testKeySetIterator_remove() {
+	void testKeySetIterator_remove() {
 		String key1 = "1";
 		String key2 = "2";
 		String key4 = "4";
@@ -490,7 +490,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testKeySetToArray() {
+	void testKeySetToArray() {
 		String key1 = "1";
 		String key2 = "2";
 		String key4 = "4";
@@ -512,7 +512,7 @@ public class ArrayMapTest {
 	}
 
 	@Test
-	public void testCopyConstructor() {
+	void testCopyConstructor() {
 		Map<String, String> map0 = new HashMap<>();
 		map0.put("1", "one");
 		map0.put("2", "two");

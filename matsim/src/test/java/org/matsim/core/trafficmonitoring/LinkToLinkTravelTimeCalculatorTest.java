@@ -22,8 +22,8 @@ package org.matsim.core.trafficmonitoring;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -47,7 +47,8 @@ public class LinkToLinkTravelTimeCalculatorTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testLongTravelTimeInEmptySlot() {
+	@Test
+	void testLongTravelTimeInEmptySlot() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(utils.loadConfig((String)null));
     scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		Network network = (Network) scenario.getNetwork();

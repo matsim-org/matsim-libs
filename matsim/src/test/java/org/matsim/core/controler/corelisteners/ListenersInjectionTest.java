@@ -20,8 +20,8 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,27 +46,27 @@ public class ListenersInjectionTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDumpDataAtEndIsSingleton() {
+	void testDumpDataAtEndIsSingleton() {
 		testIsSingleton( DumpDataAtEnd.class );
 	}
 
 	@Test
-	public void testEvensHandlingIsSingleton() {
+	void testEvensHandlingIsSingleton() {
 		testIsSingleton( EventsHandling.class );
 	}
 
 	@Test
-	public void testPlansDumpingIsSingleton() {
+	void testPlansDumpingIsSingleton() {
 		testIsSingleton( PlansDumping.class );
 	}
 
 	@Test
-	public void testPlansReplanningIsSingleton() {
+	void testPlansReplanningIsSingleton() {
 		testIsSingleton( PlansReplanning.class );
 	}
 
 	@Test
-	public void testPlansScoringIsSingleton() {
+	void testPlansScoringIsSingleton() {
 		testIsSingleton( PlansScoring.class );
 	}
 

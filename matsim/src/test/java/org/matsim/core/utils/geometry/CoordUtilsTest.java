@@ -24,14 +24,14 @@ import static org.junit.Assert.*;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CoordUtilsTest {
 
 	@Test
-	public void testCreateCoord2D() {
+	void testCreateCoord2D() {
 		Coord c1 = new Coord(0.0, 1.0);
 		Coord c2 = CoordUtils.createCoord(0.0, 1.0);
 		Coord c3 = CoordUtils.createCoord(0.0, 2.0);
@@ -40,7 +40,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testCreateCoord3D() {
+	void testCreateCoord3D() {
 		Coord c1 = new Coord(0.0, 1.0, 2.0);
 		Coord c2 = CoordUtils.createCoord(0.0, 1.0, 2.0);
 		Coord c3 = CoordUtils.createCoord(0.0, 2.0, 2.0);
@@ -49,7 +49,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testPlus() {
+	void testPlus() {
 		Coord c2a = CoordUtils.createCoord(1.0, 1.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
 		Coord c2c = CoordUtils.createCoord(3.0, 3.0);
@@ -80,7 +80,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testMinus() {
+	void testMinus() {
 		Coord c2a = CoordUtils.createCoord(1.0, 1.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
 		Coord c2c = CoordUtils.createCoord(3.0, 3.0);
@@ -111,7 +111,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testScalarMult() {
+	void testScalarMult() {
 		// 2D
 		Coord c2a = CoordUtils.createCoord(1.0, 1.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
@@ -124,7 +124,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testGetCenter() {
+	void testGetCenter() {
 		// 2D
 		Coord c2a = CoordUtils.createCoord(0.0, 0.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
@@ -139,7 +139,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testLength() {
+	void testLength() {
 		// 2D
 		Coord c2 = CoordUtils.createCoord(2.0, 2.0);
 		assertEquals(Math.sqrt(8.0), CoordUtils.length(c2), MatsimTestUtils.EPSILON);
@@ -149,7 +149,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	public void testRotateToRight() {
+	void testRotateToRight() {
 		Coord coord1 = new Coord(3., 2.);
 
 		Coord result = CoordUtils.rotateToRight( coord1 ) ;
@@ -171,12 +171,12 @@ public class CoordUtilsTest {
 
 	@Test
 	@Ignore
-	public void testGetCenterWOffset() {
+	void testGetCenterWOffset() {
 		fail("Not yet implemented");
 	}
 
 	@Test
-	public void testCalcEuclideanDistance() {
+	void testCalcEuclideanDistance() {
 		// 2D
 		Coord c2a = CoordUtils.createCoord(0.0, 0.0);
 		Coord c2b = CoordUtils.createCoord(1.0, 0.0);
@@ -200,10 +200,10 @@ public class CoordUtilsTest {
 		// Mixed 2D and 3D
 		assertEquals(Math.sqrt(2.0), CoordUtils.calcEuclideanDistance(c2a, c3e), MatsimTestUtils.EPSILON);
 	}
-	
-	
+
+
 	@Test
-	public void testCalcProjectedDistance() {
+	void testCalcProjectedDistance() {
 		// 2D
 		Coord c2a = CoordUtils.createCoord(0.0, 0.0);
 		Coord c2b = CoordUtils.createCoord(1.0, 1.0);
@@ -217,11 +217,10 @@ public class CoordUtilsTest {
 		// Mixed 2D and 3D
 		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c2a, c3b), MatsimTestUtils.EPSILON);
 	}
-	
-	
+
 
 	@Test
-	public void testDistancePointLinesegment() {
+	void testDistancePointLinesegment() {
 		/* First: 2D */
 		
 		/*   * (0,1) c1
@@ -268,9 +267,9 @@ public class CoordUtilsTest {
 		dist = CoordUtils.distancePointLinesegment(c2, c3, c1);
 		assertEquals(CoordUtils.calcEuclideanDistance(c3, c1), dist, MatsimTestUtils.EPSILON);
 	}
-	
+
 	@Test
-	public void testOrthogonalProjectionOnLineSegment(){
+	void testOrthogonalProjectionOnLineSegment(){
 		/* First: 2D */
 		Coord point = CoordUtils.createCoord(2.0, 0.0);
 		Coord lineFrom = CoordUtils.createCoord(0.0, 0.0);

@@ -1,7 +1,7 @@
 package org.matsim.core.config;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 public class ConfigReaderMatsimV2Test {
 
 	@Test
-	public void testModuleNameAlias() {
+	void testModuleNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -37,7 +37,7 @@ public class ConfigReaderMatsimV2Test {
 	}
 
 	@Test
-	public void testModuleNameAlias_noOldModules() {
+	void testModuleNameAlias_noOldModules() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -59,7 +59,7 @@ public class ConfigReaderMatsimV2Test {
 	}
 
 	@Test
-	public void testParamNameAlias() {
+	void testParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -81,7 +81,7 @@ public class ConfigReaderMatsimV2Test {
 	}
 
 	@Test
-	public void testModuleAndParamNameAlias() {
+	void testModuleAndParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -107,7 +107,7 @@ public class ConfigReaderMatsimV2Test {
 	 * Test that a parameter can be renamed inside a renamed module.
 	 */
 	@Test
-	public void testConditionalParamNameAliasWithModuleRenaming() {
+	void testConditionalParamNameAliasWithModuleRenaming() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -141,7 +141,7 @@ public class ConfigReaderMatsimV2Test {
 	 * different parameter names depending on in which module they are in.
 	 */
 	@Test
-	public void testConditionalParamNameAlias() {
+	void testConditionalParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -171,7 +171,7 @@ public class ConfigReaderMatsimV2Test {
 	 * Test that an alias only matches if its path also matches.
 	 */
 	@Test
-	public void testConditionalParamNameAlias2() {
+	void testConditionalParamNameAlias2() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -200,7 +200,7 @@ public class ConfigReaderMatsimV2Test {
 	 * Test that an alias only matches if its path also matches.
 	 */
 	@Test
-	public void testConditionalParamNameAlias3() {
+	void testConditionalParamNameAlias3() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -225,7 +225,7 @@ public class ConfigReaderMatsimV2Test {
 	 * Test that an alias only matches if its path also matches.
 	 */
 	@Test
-	public void testConditionalParamNameAlias4() {
+	void testConditionalParamNameAlias4() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -251,7 +251,7 @@ public class ConfigReaderMatsimV2Test {
 	 * Test that an alias also matches in nested parameter sets.
 	 */
 	@Test
-	public void testAliasWithParamSets() {
+	void testAliasWithParamSets() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 

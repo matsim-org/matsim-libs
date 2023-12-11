@@ -7,8 +7,8 @@ import de.topobyte.osm4j.core.model.impl.RelationMember;
 import de.topobyte.osm4j.core.model.impl.Tag;
 
 import org.junit.After;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -40,7 +40,7 @@ public class OsmSignalsParserTest {
 	}
 
 	@Test
-	public void parse_singleLinkWithCrossing() {
+	void parse_singleLinkWithCrossing() {
 
 		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
 		Utils.OsmData data = Utils.createSingleLink();
@@ -74,7 +74,7 @@ public class OsmSignalsParserTest {
 	}
 
 	@Test
-	public void parse_singleLinkWithTrafficSignals() {
+	void parse_singleLinkWithTrafficSignals() {
 
 		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
 		Utils.OsmData data = Utils.createSingleLink();
@@ -108,7 +108,7 @@ public class OsmSignalsParserTest {
 	}
 
 	@Test
-	public void parse_singleLinkWithNonHighwayNode() {
+	void parse_singleLinkWithNonHighwayNode() {
 
 		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
 		Utils.OsmData data = Utils.createSingleLink();
@@ -138,7 +138,7 @@ public class OsmSignalsParserTest {
 	}
 
 	@Test
-	public void parse_singleLinkWithNodeNotReferencedByWay() {
+	void parse_singleLinkWithNodeNotReferencedByWay() {
 
 		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
 		Utils.OsmData data = Utils.createSingleLink();
@@ -158,7 +158,7 @@ public class OsmSignalsParserTest {
 	}
 
 	@Test
-	public void parse_intersectingWaysWithProhibitiveRestriction() {
+	void parse_intersectingWaysWithProhibitiveRestriction() {
 
 		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
 		Utils.OsmData data = Utils.createTwoIntersectingLinksWithDifferentLevels();
@@ -185,7 +185,7 @@ public class OsmSignalsParserTest {
 	}
 
 	@Test
-	public void parse_intersectingWaysWithImperativeRestriction() {
+	void parse_intersectingWaysWithImperativeRestriction() {
 
 		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
 		Utils.OsmData data = Utils.createTwoIntersectingLinksWithDifferentLevels();

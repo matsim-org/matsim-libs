@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -15,12 +15,11 @@ import playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandle
 
 public class AgentId2EnterLeaveVehicleEventHandlerTest {
 
-    /**
-     * Test method for {@link playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler#AgentId2EnterLeaveVehicleEventHandler(java.util.Set)}.
-     */
-    @Test
-    
-    public void testAgentId2EnterLeaveVehicleEventHandler() {
+	/**
+	* Test method for {@link playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler#AgentId2EnterLeaveVehicleEventHandler(java.util.Set)}.
+	*/
+	@Test
+	void testAgentId2EnterLeaveVehicleEventHandler() {
     	       
     	Set<Id<Person>> idSet = new TreeSet<>();
     	for (int ii=0; ii<9; ii++){

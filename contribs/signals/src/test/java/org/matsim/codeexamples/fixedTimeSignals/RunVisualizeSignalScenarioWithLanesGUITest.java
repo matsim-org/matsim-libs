@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests otfvis for signals with/ without lanes.
@@ -25,15 +25,15 @@ public class RunVisualizeSignalScenarioWithLanesGUITest {
 			Assert.fail("something went wrong") ;
 		}
 	}
-	
+
 	@Test
-	public void testSignalExampleVisualizationWithLanes(){
+	void testSignalExampleVisualizationWithLanes(){
 		String[] startOtfvis = {"false"};
 		main(startOtfvis);
 	}
-	
+
 	@Test
-	public void testSignalExampleVisualizationWoLanes(){
+	void testSignalExampleVisualizationWoLanes(){
 		try {
 			VisualizeSignalScenario.run(false);
 		} catch (Exception ee) {

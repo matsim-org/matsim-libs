@@ -28,8 +28,8 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -178,7 +178,7 @@ public class CarrierControlerUtilsIT {
 
 
 	@Test
-	public void numberOfToursIsCorrect() {
+	void numberOfToursIsCorrect() {
 		Assert.assertEquals(2, carrierWServices.getSelectedPlan().getScheduledTours().size());
 		Assert.assertEquals(1, carrierWShipments.getSelectedPlan().getScheduledTours().size());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours().size());
@@ -190,7 +190,7 @@ public class CarrierControlerUtilsIT {
 	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
-	public void toursInitialCarrierWServicesIsCorrect() {
+	void toursInitialCarrierWServicesIsCorrect() {
 		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
@@ -212,7 +212,7 @@ public class CarrierControlerUtilsIT {
 	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
-	public void toursInitialCarrierWShipmentsIsCorrect() {
+	void toursInitialCarrierWShipmentsIsCorrect() {
 		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 
 //		double tourDurationSum = 0;
@@ -236,7 +236,7 @@ public class CarrierControlerUtilsIT {
 	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
-	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
+	void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
 		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 
 //		double tourDurationSum = 0;
@@ -262,7 +262,7 @@ public class CarrierControlerUtilsIT {
 	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
-	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
+	void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
 		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 
 //		double tourDurationSum = 0;

@@ -1,13 +1,13 @@
 package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.DefaultCommercialServiceScore;
 
 public class DefaultCommercialServiceScoreTest {
 
-    @Test
-    public void calcScore() {
+	@Test
+	void calcScore() {
         DefaultCommercialServiceScore serviceScore = new DefaultCommercialServiceScore(6, -6, 1800);
 
         Assert.assertEquals(serviceScore.calcScore(0), 6., 0.001);

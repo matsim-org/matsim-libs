@@ -27,8 +27,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -56,7 +56,7 @@ public class PtTutorialIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void ensure_tutorial_runs() throws MalformedURLException {
+	void ensure_tutorial_runs() throws MalformedURLException {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		config.controller().setLastIteration(1);
 

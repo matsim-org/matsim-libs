@@ -25,8 +25,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Locale;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
@@ -38,7 +38,8 @@ public class CountsTableWriterTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testTableCreation() {
+	@Test
+	void testTableCreation() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

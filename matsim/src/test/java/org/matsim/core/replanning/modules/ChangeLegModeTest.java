@@ -21,7 +21,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +43,7 @@ import java.util.Map;
 public class ChangeLegModeTest {
 
 	@Test
-	public void testDefaultModes() {
+	void testDefaultModes() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 
@@ -53,7 +53,7 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void testWithConfig() {
+	void testWithConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
@@ -64,7 +64,7 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void test_behavior_allowSwitchFromListedModesOnly() {
+	void test_behavior_allowSwitchFromListedModesOnly() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
@@ -76,7 +76,7 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void test_behavior_fromAllModesToSpecifiedModes() {
+	void test_behavior_fromAllModesToSpecifiedModes() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
@@ -88,14 +88,14 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void testWithConstructor() {
+	void testWithConstructor() {
 		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true, false);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
 
 	@Test
-	public void testWithConfig_withoutIgnoreCarAvailability() {
+	void testWithConfig_withoutIgnoreCarAvailability() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");

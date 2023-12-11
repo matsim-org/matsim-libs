@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -78,7 +78,7 @@ public class TransitDriverTest {
 	public MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testInitializationNetworkRoute() {
+	void testInitializationNetworkRoute() {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -165,7 +165,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testInitializationDeparture() {
+	void testInitializationDeparture() {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -194,7 +194,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testInitializationStops() {
+	void testInitializationStops() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -246,7 +246,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testHandleStop_EnterPassengers() {
+	void testHandleStop_EnterPassengers() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -351,7 +351,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testHandleStop_ExitPassengers() {
+	void testHandleStop_ExitPassengers() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -418,7 +418,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testHandleStop_CorrectIdentification() {
+	void testHandleStop_CorrectIdentification() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -461,7 +461,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testHandleStop_AwaitDepartureTime() {
+	void testHandleStop_AwaitDepartureTime() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -520,7 +520,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testExceptionWhenNotEmptyAfterLastStop() {
+	void testExceptionWhenNotEmptyAfterLastStop() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -581,7 +581,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testExceptionWhenNotAllStopsServed() {
+	void testExceptionWhenNotAllStopsServed() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));

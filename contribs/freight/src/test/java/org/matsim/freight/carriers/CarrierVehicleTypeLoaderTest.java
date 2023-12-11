@@ -23,8 +23,8 @@ package org.matsim.freight.carriers;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,7 +48,7 @@ public class CarrierVehicleTypeLoaderTest {
 	}
 
 	@Test
-	public void test_whenLoadingTypes_allAssignmentsInLightVehicleAreCorrectly(){
+	void test_whenLoadingTypes_allAssignmentsInLightVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarriersUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("lightVehicle"));
@@ -67,7 +67,7 @@ public class CarrierVehicleTypeLoaderTest {
 	}
 
 	@Test
-	public void test_whenLoadingTypes_allAssignmentsInMediumVehicleAreCorrectly(){
+	void test_whenLoadingTypes_allAssignmentsInMediumVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarriersUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("mediumVehicle"));

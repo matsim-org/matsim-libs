@@ -20,7 +20,7 @@
 package org.matsim.core.population.io;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CompressedRoutesIntegrationTest {
 
 	@Test
-	public void testReadingPlansV4parallel() {
+	void testReadingPlansV4parallel() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType("CompressedNetworkRoute");
 		Scenario s = ScenarioUtils.createScenario(config);

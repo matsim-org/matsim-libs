@@ -20,7 +20,7 @@
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,7 +37,7 @@ import java.util.Random;
  */
 public class ActivitySequenceMutatorAlgorithmTest {
 	@Test
-	public void testTwoActivities() throws Exception {
+	void testTwoActivities() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
@@ -69,7 +69,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 	}
 
 	@Test
-	public void testOneActivities() throws Exception {
+	void testOneActivities() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
@@ -95,7 +95,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 	}
 
 	@Test
-	public void testZeroActivities() throws Exception {
+	void testZeroActivities() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
@@ -115,7 +115,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 	}
 
 	@Test
-	public void testStage() throws Exception {
+	void testStage() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );

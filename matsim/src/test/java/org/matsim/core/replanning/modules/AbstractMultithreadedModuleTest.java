@@ -23,7 +23,7 @@ package org.matsim.core.replanning.modules;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -37,7 +37,7 @@ public class AbstractMultithreadedModuleTest {
 	private final static Logger log = LogManager.getLogger(AbstractMultithreadedModuleTest.class);
 
 	@Test
-	public void testGetNumOfThreads() {
+	void testGetNumOfThreads() {
 		Config config = new Config();
 		config.addCoreModules();
 		config.global().setNumberOfThreads(3);
@@ -46,7 +46,7 @@ public class AbstractMultithreadedModuleTest {
 	}
 
 	@Test
-	public void testCrashingThread() {
+	void testCrashingThread() {
 		try {
 			DummyCrashingModule testee = new DummyCrashingModule(2);
 			testee.prepareReplanning(null);

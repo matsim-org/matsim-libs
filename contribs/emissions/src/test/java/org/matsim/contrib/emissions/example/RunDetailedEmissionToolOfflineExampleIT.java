@@ -19,8 +19,8 @@
 package org.matsim.contrib.emissions.example;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaVehicleDescriptionSource;
@@ -45,7 +45,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
-	public final void testDetailed_vehTypeV1() {
+	final void testDetailed_vehTypeV1() {
 		boolean gotAnException = false ;
 		try {
 			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
@@ -70,7 +70,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
-	public final void testDetailed_vehTypeV2() {
+	final void testDetailed_vehTypeV2() {
 		boolean gotAnException = false ;
 		try {
 			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
@@ -94,7 +94,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
-	public final void testDetailed_vehTypeV2_HBEFA4() {
+	final void testDetailed_vehTypeV2_HBEFA4() {
 		boolean gotAnException = false ;
 		try {
 			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
@@ -126,7 +126,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	 * */
 
 	@Test
-	public final void testDetailed_vehTypeV1_FallbackToAverage() {
+	final void testDetailed_vehTypeV1_FallbackToAverage() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
@@ -147,7 +147,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	}
 
 	@Test
-	public final void testDetailed_vehTypeV2_FallbackToAverage() {
+	final void testDetailed_vehTypeV2_FallbackToAverage() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
@@ -167,7 +167,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	}
 
 	@Test
-	public final void testDetailed_vehTypeV2_HBEFA4_FallbackToAverage() {
+	final void testDetailed_vehTypeV2_HBEFA4_FallbackToAverage() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");

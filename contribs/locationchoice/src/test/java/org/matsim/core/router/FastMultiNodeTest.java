@@ -21,7 +21,7 @@
 package org.matsim.core.router;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +50,7 @@ import java.util.List;
 public class FastMultiNodeTest {
 
 	@Test
-	public void testFastMultiNodeDijkstra_OneToOne() {
+	void testFastMultiNodeDijkstra_OneToOne() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness( 0. );
@@ -108,7 +108,7 @@ public class FastMultiNodeTest {
 	}
 
 	@Test
-	public void testFastMultiNodeDijkstra_OneToMany() {
+	void testFastMultiNodeDijkstra_OneToMany() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness( 0. );
@@ -199,7 +199,7 @@ public class FastMultiNodeTest {
 	}
 
 	@Test
-	public void testFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
+	void testFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness( 0. );

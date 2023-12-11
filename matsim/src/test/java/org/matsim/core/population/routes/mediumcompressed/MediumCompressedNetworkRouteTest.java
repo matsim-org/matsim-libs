@@ -21,7 +21,7 @@
 package org.matsim.core.population.routes.mediumcompressed;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -54,7 +54,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 * different in this case where we do not actually store the links.
 	 */
 	@Test
-	public void testGetLinks_setLinks() {
+	void testGetLinks_setLinks() {
 		Network network = createTestNetwork();
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link22 = network.getLinks().get(Id.create("22", Link.class));
@@ -75,7 +75,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_onlySubsequentLinks() {
+	void testGetLinks_onlySubsequentLinks() {
 		Network network = createTestNetwork();
 		Link link0 = network.getLinks().get(Id.create("0", Link.class));
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
@@ -100,7 +100,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 * hang when a route object is not correctly initialized.
 	 */
 	@Test
-	public void testGetLinkIds_incompleteInitialization() {
+	void testGetLinkIds_incompleteInitialization() {
 		Network network = createTestNetwork();
 		Link link0 = network.getLinks().get(Id.create("0", Link.class));
 		Link link4 = network.getLinks().get(Id.create("4", Link.class));
@@ -113,7 +113,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testClone() {
+	void testClone() {
 		Network network = NetworkUtils.createNetwork();
         NetworkFactory builder = network.getFactory();
 
@@ -159,7 +159,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_alternative() {
+	void testGetLinks_setLinks_alternative() {
 		Network network = createTestNetwork();
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link22 = network.getLinks().get(Id.create("22", Link.class));
@@ -180,7 +180,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_endLoopLink() {
+	void testGetLinks_setLinks_endLoopLink() {
 		Network network = createTestNetwork();
 
 		final Node node5 = network.getNodes().get(Id.create("5", Node.class));
@@ -206,7 +206,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_containsLargeLoop() {
+	void testGetLinks_setLinks_containsLargeLoop() {
 		Network network = createTestNetwork();
 
 		final Node node13 = network.getNodes().get(Id.create("13", Node.class));
@@ -234,7 +234,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_containsLargeLoop_alternative() {
+	void testGetLinks_setLinks_containsLargeLoop_alternative() {
 		Network network = createTestNetwork();
 
 		network.removeLink(Id.create("4", Link.class));
@@ -272,7 +272,7 @@ public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_isLargeLoop() {
+	void testGetLinks_setLinks_isLargeLoop() {
 		Network network = createTestNetwork();
 
 		final Node node14 = network.getNodes().get(Id.create("14", Node.class));

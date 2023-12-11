@@ -21,7 +21,7 @@ package org.matsim.contrib.parking.parkingcost.eventhandling;
 
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,7 @@ import org.matsim.vehicles.Vehicle;
 public class ParkingCostVehicleTrackerTest {
 
 	@Test
-	public void testParkingCostEvents() {
+	void testParkingCostEvents() {
 		Fixture f = new Fixture();
 
 		f.events.addHandler(new EventsLogger());

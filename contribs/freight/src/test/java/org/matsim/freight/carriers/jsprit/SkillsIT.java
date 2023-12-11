@@ -27,8 +27,8 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +46,7 @@ public class SkillsIT {
 	private final Id<Link> carrierLocation = Id.createLinkId("i(1,0)");
 
 	@Test
-	public void testJspritWithDifferentSkillsRequired() {
+	void testJspritWithDifferentSkillsRequired() {
 		/* First test with different skills. */
 		Scenario scenario = setupTestScenario();
 		addShipmentsRequiringDifferentSkills(scenario);
@@ -62,7 +62,7 @@ public class SkillsIT {
 	}
 
 	@Test
-	public void testJspritWithSameSkillsRequired(){
+	void testJspritWithSameSkillsRequired(){
 		/* Test with same skills. */
 		Scenario scenario = setupTestScenario();
 		addShipmentsRequiringSameSkills(scenario);

@@ -28,7 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -202,7 +202,7 @@ public class JointTripRouterFactoryTest {
 	}
 
 	@Test
-	public void testPassengerRoute() throws Exception {
+	void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
@@ -239,7 +239,7 @@ public class JointTripRouterFactoryTest {
 	}
 
 	@Test
-	public void testDriverRoute() throws Exception {
+	void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );

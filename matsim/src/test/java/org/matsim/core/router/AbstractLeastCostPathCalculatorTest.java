@@ -26,8 +26,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -54,7 +54,8 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 
 	private static final String MODE_RESTRICTION_NOT_SUPPORTED = "Router algo does not support mode restrictions. ";
 
-	@Test public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
 		Config config = utils.loadConfig((String)null);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
@@ -76,7 +77,8 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 		assertEquals(network.getLinks().get(Id.create("22", Link.class)), path.links.get(2));
 	}
 
-	@Test public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");

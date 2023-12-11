@@ -22,7 +22,7 @@
  package org.matsim.core.scoring;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,13 +44,13 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
+ /**
  * @author mrieser / Simunto GmbH
  */
 public class ScoringFunctionsForPopulationTest {
 
-	@Test
-	public void testTripScoring() {
+	 @Test
+	 void testTripScoring() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
@@ -103,8 +103,8 @@ public class ScoringFunctionsForPopulationTest {
 		Assert.assertEquals("transit_walk", ((Leg) rs.lastTrip.getTripElements().get(4)).getMode());
 	}
 
-	@Test
-	public void testPersonScoreEventScoring() {
+	 @Test
+	 void testPersonScoreEventScoring() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();

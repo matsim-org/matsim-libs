@@ -21,14 +21,14 @@
 
  package org.matsim.core.utils.geometry.geotools;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+ /**
  *
  * @author laemmel
  *
@@ -39,7 +39,8 @@ public class MGCTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testCoord2CoordinateAndViceVersa(){
+	 @Test
+	 void testCoord2CoordinateAndViceVersa(){
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
@@ -52,7 +53,8 @@ public class MGCTest {
 		org.junit.Assert.assertEquals(y,y1,delta);
 	}
 
-	@Test public void testCoord2PointAndViceVersa(){
+	 @Test
+	 void testCoord2PointAndViceVersa(){
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
@@ -66,7 +68,8 @@ public class MGCTest {
 
 	}
 
-	@Test public void testGetUTMEPSGCodeForWGS84Coordinate() {
+	 @Test
+	 void testGetUTMEPSGCodeForWGS84Coordinate() {
 		{
 			//Hamburg - should be UTM 32 North --> EPSG:32632
 			double lat = 53.562021;
@@ -111,7 +114,8 @@ public class MGCTest {
 		}
 	}
 
-	@Test public void testGetCRS(){
+	 @Test
+	 void testGetCRS(){
 		// CH1903_LV03 Id
 		org.junit.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
 

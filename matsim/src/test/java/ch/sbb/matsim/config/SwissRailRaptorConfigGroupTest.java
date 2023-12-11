@@ -27,7 +27,7 @@ import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -49,8 +49,8 @@ public class SwissRailRaptorConfigGroupTest {
         System.setProperty("matsim.preferLocalDtds", "true");
     }
 
-    @Test
-    public void testConfigIO_general() {
+	@Test
+	void testConfigIO_general() {
         SwissRailRaptorConfigGroup config1 = new SwissRailRaptorConfigGroup();
 
         { // prepare config1
@@ -69,8 +69,8 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertEquals(0.0031 * 3600, config2.getTransferPenaltyCostPerTravelTimeHour(), 0.0);
     }
 
-    @Test
-    public void testConfigIO_rangeQuery() {
+	@Test
+	void testConfigIO_rangeQuery() {
         SwissRailRaptorConfigGroup config1 = new SwissRailRaptorConfigGroup();
 
         { // prepare config1
@@ -108,8 +108,8 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertEquals(15*60, range2.getMaxLaterDeparture());
     }
 
-    @Test
-    public void testConfigIO_routeSelector() {
+	@Test
+	void testConfigIO_routeSelector() {
         SwissRailRaptorConfigGroup config1 = new SwissRailRaptorConfigGroup();
 
         { // prepare config1
@@ -150,8 +150,8 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertEquals(1.2, selector2.getBetaTravelTime(), 0.0);
     }
 
-    @Test
-    public void testConfigIO_intermodalAccessEgress() {
+	@Test
+	void testConfigIO_intermodalAccessEgress() {
         SwissRailRaptorConfigGroup config1 = new SwissRailRaptorConfigGroup();
 
         { // prepare config1
@@ -215,8 +215,8 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertEquals("hub", paramSet2.getStopFilterValue());
     }
 
-    @Test
-    public void testConfigIO_modeMappings() {
+	@Test
+	void testConfigIO_modeMappings() {
         SwissRailRaptorConfigGroup config1 = new SwissRailRaptorConfigGroup();
 
         { // prepare config1

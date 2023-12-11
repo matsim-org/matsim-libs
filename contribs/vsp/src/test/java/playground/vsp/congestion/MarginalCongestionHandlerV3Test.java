@@ -31,8 +31,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -64,7 +64,7 @@ public class MarginalCongestionHandlerV3Test {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void testCongestionExample(){
+	final void testCongestionExample(){
 
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3Test/config.xml";
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();

@@ -22,8 +22,8 @@ package org.matsim.core.events;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -43,7 +43,8 @@ public class BasicEventsHandlerTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testLinkEnterEventHandler() {
+	@Test
+	void testLinkEnterEventHandler() {
 		EventsManager events = EventsUtils.createEventsManager();
 		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);

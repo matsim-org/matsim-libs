@@ -22,8 +22,8 @@ package org.matsim.households;
 
 import static org.junit.Assert.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -36,7 +36,8 @@ public class HouseholdImplTest {
 	/**
 	 * Test that households with the same {@link Id} are not accepted.
 	 */
-	@Test public void testAddHousehold_DuplicateId(){
+	@Test
+	void testAddHousehold_DuplicateId(){
 		HouseholdsImpl hhs = new HouseholdsImpl();
 		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
 		Household hh2 = new HouseholdImpl(Id.create("1", Household.class));
@@ -56,7 +57,8 @@ public class HouseholdImplTest {
 	/**
 	 * Test that households are accumulated if streaming is off.
 	 */
-	@Test public void testAddHousehold_NoStreaming(){
+	@Test
+	void testAddHousehold_NoStreaming(){
 		HouseholdsImpl hhs = new HouseholdsImpl();
 		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
 		Household hh2 = new HouseholdImpl(Id.create("2", Household.class));

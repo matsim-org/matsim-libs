@@ -22,7 +22,10 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -382,7 +385,7 @@ public class RandomSelectorsTest {
 	}
 
 	@Test
-	public void testDeterminism() throws Exception {
+	void testDeterminism() throws Exception {
 		final int seed = 1264;
 
 		final Counter count = new Counter( "selection # " );
@@ -412,7 +415,7 @@ public class RandomSelectorsTest {
 	}
 
 	@Test
-	public void testNoFailuresWithVariousSeeds() throws Exception {
+	void testNoFailuresWithVariousSeeds() throws Exception {
 		final RandomGroupLevelSelector selector = new RandomGroupLevelSelector(
 				new Random( 123 ),
 				new EmptyIncompatiblePlansIdentifierFactory());

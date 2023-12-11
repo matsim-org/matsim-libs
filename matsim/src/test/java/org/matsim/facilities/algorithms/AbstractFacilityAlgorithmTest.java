@@ -22,8 +22,8 @@ package org.matsim.facilities.algorithms;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -36,7 +36,8 @@ public class AbstractFacilityAlgorithmTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testRunAlgorithms() {
+	@Test
+	void testRunAlgorithms() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		// create 2 facilities
 		facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord(1.0, 1.0));

@@ -20,8 +20,7 @@
 package org.matsim.pt.router;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -34,7 +33,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
 public class TransitRouterConfigTest {
 
 	@Test
-	public void testConstructor() {
+	void testConstructor() {
 		ScoringConfigGroup planScoring = new ScoringConfigGroup();
 		RoutingConfigGroup planRouting = new RoutingConfigGroup();
 		TransitRouterConfigGroup transitRouting = new TransitRouterConfigGroup();

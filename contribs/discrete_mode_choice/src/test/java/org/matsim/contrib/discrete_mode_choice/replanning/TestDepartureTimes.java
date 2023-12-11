@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -49,7 +49,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class TestDepartureTimes {
 	@Test
-	public void testTripBasedModelDepartureTimes() throws NoFeasibleChoiceException {
+	void testTripBasedModelDepartureTimes() throws NoFeasibleChoiceException {
 		TripBasedModel model = createTripBasedModel();
 
 		// Case 1: Only activity end times, and trips fall well between the end times
@@ -130,7 +130,7 @@ public class TestDepartureTimes {
 	}
 
 	@Test
-	public void testPushDepartureTimeToNextTour() throws NoFeasibleChoiceException {
+	void testPushDepartureTimeToNextTour() throws NoFeasibleChoiceException {
 		TourBasedModel model = createTourBasedModel();
 
 		Plan plan = new PlanBuilder() //
@@ -150,7 +150,7 @@ public class TestDepartureTimes {
 	}
 
 	@Test
-	public void testAccumulateAndPushDepartureTimeToNextTour() throws NoFeasibleChoiceException {
+	void testAccumulateAndPushDepartureTimeToNextTour() throws NoFeasibleChoiceException {
 		TourBasedModel model = createTourBasedModel();
 
 		Plan plan = new PlanBuilder() //

@@ -25,8 +25,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -38,7 +38,7 @@ public class ObjectAttributesXmlReaderTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testParse_customConverter() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_customConverter() throws SAXException, ParserConfigurationException, IOException {
 		String tupleClass = MyTuple.class.getCanonicalName();
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 		"<objectAttributes>\n" +
@@ -66,7 +66,7 @@ public class ObjectAttributesXmlReaderTest {
 	}
 
 	@Test
-	public void testParse_missingConverter() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_missingConverter() throws SAXException, ParserConfigurationException, IOException {
 		String tupleClass = MyTuple.class.getCanonicalName();
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 		"<objectAttributes>\n" +
@@ -97,7 +97,7 @@ public class ObjectAttributesXmlReaderTest {
 	}
 
 	@Test
-	public void testParse_withDtd() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_withDtd() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getPackageInputDirectory() + "objectattributes_withDtd_v1.xml";
 		ObjectAttributes oa = new ObjectAttributes();
 		new ObjectAttributesXmlReader(oa).readFile(filename);
@@ -116,7 +116,7 @@ public class ObjectAttributesXmlReaderTest {
 	}
 
 	@Test
-	public void testParse_withoutDtd() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_withoutDtd() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getPackageInputDirectory() + "objectattributes_withoutDtd_v1.xml";
 		ObjectAttributes oa = new ObjectAttributes();
 		new ObjectAttributesXmlReader(oa).readFile(filename);

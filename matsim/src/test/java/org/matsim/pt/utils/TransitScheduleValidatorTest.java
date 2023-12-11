@@ -23,7 +23,7 @@ package org.matsim.pt.utils;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,7 +42,7 @@ import java.util.List;
 public class TransitScheduleValidatorTest {
 
 	@Test
-	public void testPtTutorial() {
+	void testPtTutorial() {
 		Scenario scenario = ScenarioUtils.loadScenario(
 				ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(
@@ -51,7 +51,7 @@ public class TransitScheduleValidatorTest {
 	}
 
 	@Test
-	public void testPtTutorialWithError() {
+	void testPtTutorialWithError() {
 		Scenario scenario = ScenarioUtils.loadScenario(
 				ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitLine transitLine = scenario.getTransitSchedule()
@@ -74,7 +74,7 @@ public class TransitScheduleValidatorTest {
 	}
 
 	@Test
-	public void testValidator_Transfers_implausibleTime() {
+	void testValidator_Transfers_implausibleTime() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory factory = schedule.getFactory();
@@ -97,7 +97,7 @@ public class TransitScheduleValidatorTest {
 	}
 
 	@Test
-	public void testValidator_Transfers_missingStop() {
+	void testValidator_Transfers_missingStop() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory factory = schedule.getFactory();

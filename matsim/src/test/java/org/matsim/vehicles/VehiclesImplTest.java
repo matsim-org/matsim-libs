@@ -20,7 +20,7 @@
 package org.matsim.vehicles;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 public class VehiclesImplTest {
 
 	@Test
-	public void testAddVehicle() {
+	void testAddVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType testType = vehicles.getFactory().createVehicleType(Id.create("test", VehicleType.class));
@@ -59,7 +59,7 @@ public class VehiclesImplTest {
 
 
 	@Test
-	public void testGetVehicles(){
+	void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType testType = vehicles.getFactory().createVehicleType(Id.create("test", VehicleType.class));
@@ -78,7 +78,7 @@ public class VehiclesImplTest {
 
 
 	@Test
-	public void testGetVehicleTypes(){
+	void testGetVehicleTypes(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
@@ -92,7 +92,7 @@ public class VehiclesImplTest {
 	}
 
 	@Test
-	public void testAddVehicleType(){
+	void testAddVehicleType(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
@@ -108,7 +108,7 @@ public class VehiclesImplTest {
 	}
 
 	@Test
-	public void testRemoveVehicle() {
+	void testRemoveVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		vehicles.addVehicleType(t1);
@@ -123,7 +123,7 @@ public class VehiclesImplTest {
 	}
 
 	@Test
-	public void testRemoveVehicleType() {
+	void testRemoveVehicleType() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		vehicles.addVehicleType(t1);

@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -41,7 +41,7 @@ public class DemandReaderFromCSVTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testLinkForPerson() throws IOException {
+	void testLinkForPerson() throws IOException {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(
 				"https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
@@ -67,7 +67,7 @@ public class DemandReaderFromCSVTest {
 	}
 
 	@Test
-	public void demandCreation() throws IOException {
+	void demandCreation() throws IOException {
 		// read inputs
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(
@@ -239,7 +239,7 @@ public class DemandReaderFromCSVTest {
 	}
 
 	@Test
-	public void csvDemandReader() throws IOException {
+	void csvDemandReader() throws IOException {
 
 		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);

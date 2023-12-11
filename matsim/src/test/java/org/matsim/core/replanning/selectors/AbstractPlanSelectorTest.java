@@ -23,8 +23,8 @@ package org.matsim.core.replanning.selectors;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -57,7 +57,8 @@ public abstract class AbstractPlanSelectorTest {
 	 *
 	 *  @author mrieser
 	 */
-	@Test public void testUndefinedScore() {
+	@Test
+	void testUndefinedScore() {
 		Person person;
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
@@ -98,7 +99,8 @@ public abstract class AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testNoPlans() {
+	@Test
+	void testNoPlans() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		assertNull(getPlanSelector().selectPlan(person));
 	}
@@ -109,7 +111,8 @@ public abstract class AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testNegativeScore() {
+	@Test
+	void testNegativeScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
 		// test with only one plan...
@@ -147,7 +150,8 @@ public abstract class AbstractPlanSelectorTest {
 	 * Test how a plan selector reacts when a plan has a score of zero (0.0).
 	 * This test only ensures that a plan is returned and no Exception occurred when selecting a plan.
 	 */
-	@Test public void testZeroScore() {
+	@Test
+	void testZeroScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));

@@ -1,7 +1,7 @@
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -16,7 +16,7 @@ public class GoogleMapRouteValidatorTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReadJson() throws IOException {
+	void testReadJson() throws IOException {
 		GoogleMapRouteValidator googleMapRouteValidator = getDummyValidator();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(utils.getClassInputDirectory() + "route.json")));
 		Optional<Tuple<Double, Double>> result = googleMapRouteValidator.readFromJson(reader);

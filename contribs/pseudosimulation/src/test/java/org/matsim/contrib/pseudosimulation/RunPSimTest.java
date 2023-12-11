@@ -5,8 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.population.Population;
@@ -44,7 +44,7 @@ public class RunPSimTest {
 	 * Run 1 normal qsim iteration, a couple of psim iterations and a final 2nd qsim iteration.
 	 */
 	@Test
-	public void testA() {
+	void testA() {
 		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
@@ -115,7 +115,7 @@ public class RunPSimTest {
 	 * in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
 	@Test
-	public void testB() {
+	void testB() {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);

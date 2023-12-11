@@ -3,8 +3,8 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -34,7 +34,7 @@ public class TerminationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testSimulationEndsOnInterval() {
+	void testSimulationEndsOnInterval() {
 		prepareExperiment(2, 4, ControllerConfigGroup.CleanIterations.keep).run();
 
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
@@ -46,7 +46,7 @@ public class TerminationTest {
 	}
 
 	@Test
-	public void testOnlyRunIterationZero() {
+	void testOnlyRunIterationZero() {
 		prepareExperiment(2, 0, ControllerConfigGroup.CleanIterations.keep).run();
 
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.0/0.events.xml.gz").exists());
@@ -58,7 +58,7 @@ public class TerminationTest {
 	}
 
 	@Test
-	public void testSimulationEndsOffInterval() {
+	void testSimulationEndsOffInterval() {
 		// This is the case when the TerminationCriterion decides that the simulation is
 		// done, but it does not fall at the same time as the output interval.
 
@@ -74,7 +74,7 @@ public class TerminationTest {
 	}
 
 	@Test
-	public void testSimulationEndDeleteIters() {
+	void testSimulationEndDeleteIters() {
 		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.delete).run();
 		Assert.assertFalse(new File(utils.getOutputDirectory(), "/ITERS").exists());
 	}
@@ -91,7 +91,7 @@ public class TerminationTest {
 	}
 
 	@Test
-	public void testMultipleLastIterations() {
+	void testMultipleLastIterations() {
 		/**
 		 * This test covers the case where the termination criterion decides that the
 		 * coming iteration may be the last, but then, after analysis and after the data
@@ -125,7 +125,7 @@ public class TerminationTest {
 	}
 
 	@Test
-	public void testCustomConverenceCriterion() {
+	void testCustomConverenceCriterion() {
 		/**
 		 * In this test, we set all legs to walk and let agents change them to car. We
 		 * stop the simulation once there are more car legs than walk legs.

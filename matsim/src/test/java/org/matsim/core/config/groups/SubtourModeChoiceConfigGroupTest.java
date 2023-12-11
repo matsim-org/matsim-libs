@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author thibautd
@@ -32,7 +32,7 @@ import org.junit.Test;
 public class SubtourModeChoiceConfigGroupTest {
 
 	@Test
-	public void testModes() throws Exception {
+	void testModes() throws Exception {
 		SubtourModeChoiceConfigGroup group = new SubtourModeChoiceConfigGroup();
 		final String msg = "Wrong values for modes";
 		final String msgString = "Wrong string representation";
@@ -78,7 +78,7 @@ public class SubtourModeChoiceConfigGroupTest {
 	}
 
 	@Test
-	public void testChainBasedModes() throws Exception {
+	void testChainBasedModes() throws Exception {
 		SubtourModeChoiceConfigGroup group = new SubtourModeChoiceConfigGroup();
 		final String msg = "Wrong values for chain based modes";
 		final String msgString = "Wrong string representation";
@@ -124,7 +124,7 @@ public class SubtourModeChoiceConfigGroupTest {
 	}
 
 	@Test
-	public void testCarAvail() throws Exception {
+	void testCarAvail() throws Exception {
 		SubtourModeChoiceConfigGroup group = new SubtourModeChoiceConfigGroup();
 
 		assertFalse(

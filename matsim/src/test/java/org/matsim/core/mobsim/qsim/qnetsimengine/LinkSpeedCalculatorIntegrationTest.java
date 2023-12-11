@@ -23,8 +23,8 @@ import java.util.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +61,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
-	public void testIntegration_Default() {
+	void testIntegration_Default() {
 		Fixture f = new Fixture();
 		EventsCollector collector = new EventsCollector();
 		f.events.addHandler(collector);
@@ -90,7 +90,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 	@SuppressWarnings("static-method")
 	@Test
-	public void testIntegration_Slow() {
+	void testIntegration_Slow() {
 		Fixture f = new Fixture();
 
 		final Scenario scenario = f.scenario ;
@@ -142,7 +142,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 	@SuppressWarnings("static-method")
 	@Test
-	public void testIntegration_Fast() {
+	void testIntegration_Fast() {
 		Fixture f = new Fixture();
 
 		final Scenario scenario = f.scenario ;

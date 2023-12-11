@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -67,7 +67,7 @@ public class MarginalCongestionPricingTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void implV4Test(){
+	final void implV4Test(){
 
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();

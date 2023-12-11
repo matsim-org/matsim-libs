@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -47,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
 public class TravelTimeTest {
 
 	@Test
-	public void testEquilOneAgent() {
+	void testEquilOneAgent() {
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 
 		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
@@ -77,13 +77,13 @@ public class TravelTimeTest {
 		Assert.assertEquals(358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
-	@Test
 	/**
 	 * This test shows that the Netsim always rounds up link travel times.
 	 * Please note that a computed link travel time of 400.0s is treated the same,
 	 * i.e. it is rounded up to 401s.
 	 */
-	public void testEquilOneAgentTravelTimeRounding() {
+	@Test
+	void testEquilOneAgentTravelTimeRounding() {
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 
 		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
@@ -173,7 +173,7 @@ public class TravelTimeTest {
 	}
 
 	@Test
-	public void testEquilTwoAgents() {
+	void testEquilTwoAgents() {
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 
 		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");

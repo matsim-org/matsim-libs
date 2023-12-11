@@ -19,8 +19,8 @@
 package org.matsim.contrib.emissions.example;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaVehicleDescriptionSource;
@@ -42,7 +42,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void testAverage_vehTypeV1() {
+	final void testAverage_vehTypeV1() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_average.xml");
@@ -63,7 +63,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 	}
 
 	@Test
-	public final void testAverage_vehTypeV2() {
+	final void testAverage_vehTypeV2() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
@@ -90,7 +90,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 	 * where this is used, has no way to know which file format was originally read.  See some discussion there.  :-(
 	 */
 	@Test
-	public final void testAverage_vehTypeV2b() {
+	final void testAverage_vehTypeV2b() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
@@ -112,7 +112,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 	}
 
 	@Test
-	public final void testAverage_vehTypeV2_HBEFA4() {
+	final void testAverage_vehTypeV2_HBEFA4() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");

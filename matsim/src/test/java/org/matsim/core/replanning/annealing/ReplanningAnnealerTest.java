@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -191,8 +191,8 @@ public class ReplanningAnnealerTest {
         this.scenario = ScenarioUtils.createScenario(this.config);
     }
 
-    @Test
-    public void testLinearAnneal() throws IOException {
+	@Test
+	void testLinearAnneal() throws IOException {
         this.saConfigVar.setAnnealType("linear");
         this.saConfigVar.setEndValue(0.0);
         this.saConfigVar.setStartValue(0.5);
@@ -208,8 +208,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testMsaAnneal() throws IOException {
+	@Test
+	void testMsaAnneal() throws IOException {
         this.saConfigVar.setAnnealType("msa");
         this.saConfigVar.setShapeFactor(1.0);
         this.saConfigVar.setStartValue(0.5);
@@ -225,8 +225,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testGeometricAnneal() throws IOException {
+	@Test
+	void testGeometricAnneal() throws IOException {
         this.saConfigVar.setAnnealType("geometric");
         this.saConfigVar.setShapeFactor(0.9);
         this.saConfigVar.setStartValue(0.5);
@@ -242,8 +242,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testExponentialAnneal() throws IOException {
+	@Test
+	void testExponentialAnneal() throws IOException {
         this.saConfigVar.setAnnealType("exponential");
         this.saConfigVar.setHalfLife(0.5);
         this.saConfigVar.setStartValue(0.5);
@@ -259,8 +259,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testSigmoidAnneal() throws IOException {
+	@Test
+	void testSigmoidAnneal() throws IOException {
         this.saConfigVar.setAnnealType("sigmoid");
         this.saConfigVar.setHalfLife(0.5);
         this.saConfigVar.setShapeFactor(1.0);
@@ -277,8 +277,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testParameterAnneal() throws IOException {
+	@Test
+	void testParameterAnneal() throws IOException {
         this.saConfigVar.setAnnealType("linear");
         this.saConfigVar.setAnnealParameter("BrainExpBeta");
         this.saConfigVar.setEndValue(0.0);
@@ -291,8 +291,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
     }
 
-    @Test
-    public void testTwoParameterAnneal() throws IOException {
+	@Test
+	void testTwoParameterAnneal() throws IOException {
         this.saConfigVar.setAnnealType("msa");
         this.saConfigVar.setShapeFactor(1.0);
         this.saConfigVar.setStartValue(0.5);
@@ -316,8 +316,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testInnovationSwitchoffAnneal() throws IOException {
+	@Test
+	void testInnovationSwitchoffAnneal() throws IOException {
         this.config.replanning().setFractionOfIterationsToDisableInnovation(0.5);
         this.saConfigVar.setAnnealType("msa");
         this.saConfigVar.setShapeFactor(1.0);
@@ -334,8 +334,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testFreezeEarlyAnneal() throws IOException {
+	@Test
+	void testFreezeEarlyAnneal() throws IOException {
         this.saConfigVar.setAnnealType("msa");
         this.saConfigVar.setShapeFactor(1.0);
         this.saConfigVar.setEndValue(0.1);
@@ -352,8 +352,8 @@ public class ReplanningAnnealerTest {
         Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
-    @Test
-    public void testSubpopulationAnneal() throws IOException {
+	@Test
+	void testSubpopulationAnneal() throws IOException {
         String targetSubpop = "subpop";
         this.saConfigVar.setAnnealType("linear");
         this.saConfigVar.setEndValue(0.0);

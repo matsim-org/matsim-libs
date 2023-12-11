@@ -20,7 +20,7 @@
 package org.matsim.pt.transitSchedule;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -39,7 +39,7 @@ public class MinimalTransferTimesImplTest {
 	private Id<TransitStopFacility> stopId5 = Id.create(5, TransitStopFacility.class);
 
 	@Test
-	public void testSetGet() {
+	void testSetGet() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
 		mtt.set(this.stopId1, this.stopId2, 180.0);
@@ -56,7 +56,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testGetWithDefault() {
+	void testGetWithDefault() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		double defaultSeconds = 60.0;
 		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
@@ -71,7 +71,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
 		mtt.set(this.stopId1, this.stopId2, 180.0);
@@ -89,7 +89,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testNotBidirection() {
+	void testNotBidirection() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId1, this.stopId3, 240.0);
@@ -105,7 +105,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testNotTransitive() {
+	void testNotTransitive() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId2, this.stopId3, 240.0);
@@ -120,7 +120,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testIterator_empty() {
+	void testIterator_empty() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 
 		MinimalTransferTimes.MinimalTransferTimesIterator iter = mtt.iterator();
@@ -154,7 +154,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testIterator() {
+	void testIterator() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 
 		MinimalTransferTimes.MinimalTransferTimesIterator iter = mtt.iterator();
@@ -223,7 +223,7 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
-	public void testIterator_withRemove() {
+	void testIterator_withRemove() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		mtt.set(this.stopId1, this.stopId2, 180);
 		mtt.set(this.stopId2, this.stopId3, 240);

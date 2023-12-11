@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
@@ -48,7 +48,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1FallbackToAverage {
 	 *
 	 * */
 	@Test
-	public final void testDetailed_vehTypeV1_FallbackToAverage() {
+	final void testDetailed_vehTypeV1_FallbackToAverage() {
 		try {
 			//			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			var scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv1" );

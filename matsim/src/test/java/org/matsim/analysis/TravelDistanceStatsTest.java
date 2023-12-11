@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,7 +55,7 @@ public class TravelDistanceStatsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTravelDistanceStats() {
+	void testTravelDistanceStats() {
 
 		final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 

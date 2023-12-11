@@ -23,8 +23,8 @@
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -47,7 +47,8 @@ public class CompareLogsumFormulasTest {
 	 *						  cjk3
 	 */
 
-	@Test public void testLogsumFormulas(){
+	@Test
+	void testLogsumFormulas(){
 		double betaWalkTT = -2.;
 		double betaWalkTD = -1.;
 

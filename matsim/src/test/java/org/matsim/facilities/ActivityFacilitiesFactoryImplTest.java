@@ -20,7 +20,7 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 public class ActivityFacilitiesFactoryImplTest {
 
 	@Test
-	public void testCreateActivityFacility() {
+	void testCreateActivityFacility() {
 		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
 		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new Coord((double) 5, (double) 11));
 
@@ -40,7 +40,7 @@ public class ActivityFacilitiesFactoryImplTest {
 	}
 
 	@Test
-	public void testCreateActivityOption() {
+	void testCreateActivityOption() {
 		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
 		ActivityOption option = factory.createActivityOption("leisure");
 

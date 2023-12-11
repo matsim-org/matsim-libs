@@ -26,8 +26,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -73,7 +73,7 @@ public class MultiModalPTCombinationTest {
 	 * probably no longer very useful, there is no more special walk mode for pt agents - gl-nov'19
 	 */
 	@Test
-	public void testMultiModalPtCombination() {
+	void testMultiModalPtCombination() {
 
 		Fixture f = new Fixture();
 		f.init();

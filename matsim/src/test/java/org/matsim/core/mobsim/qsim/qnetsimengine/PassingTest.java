@@ -21,8 +21,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.*;
 import jakarta.inject.Inject;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -71,7 +71,7 @@ public class PassingTest {
 	 * tt_car = 50 sec; tt_bike = 200 sec
 	 */
 	@Test
-	public void test4PassingInFreeFlowState(){
+	void test4PassingInFreeFlowState(){
 
 		SimpleNetwork net = new SimpleNetwork();
 

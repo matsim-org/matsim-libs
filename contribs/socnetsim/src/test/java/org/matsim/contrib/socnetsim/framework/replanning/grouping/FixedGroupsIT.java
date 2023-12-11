@@ -22,8 +22,8 @@ package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -50,7 +50,7 @@ public class FixedGroupsIT {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIterationOrderIsDeterministic() throws Exception {
+	void testIterationOrderIsDeterministic() throws Exception {
 		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile().getParentFile()+"/config.xml";
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 

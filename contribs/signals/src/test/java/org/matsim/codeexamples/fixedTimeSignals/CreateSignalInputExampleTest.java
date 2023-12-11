@@ -26,8 +26,8 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,7 +43,7 @@ public class CreateSignalInputExampleTest {
 	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testCreateSignalInputExample(){
+	void testCreateSignalInputExample(){
 		try {
 			(new CreateSignalInputExample()).run(testUtils.getOutputDirectory());
 		} catch (IOException e) {

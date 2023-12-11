@@ -20,8 +20,8 @@
 package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -44,9 +44,9 @@ public class PersonScoringParametersFromPersonAttributesIT {
     @RegisterExtension
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testSetAttributeAndRunEquil(){
+	@SuppressWarnings("unchecked")
+	@Test
+	void testSetAttributeAndRunEquil(){
         Config config = testUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.controller().setOutputDirectory(testUtils.getOutputDirectory());
         config.controller().setLastIteration(0);

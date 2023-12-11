@@ -1,8 +1,8 @@
 package org.matsim.analysis;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -34,8 +34,8 @@ public class ModeChoiceCoverageControlerListenerTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 
-    @Test
-    public void testChangePlanModes() {
+	@Test
+	void testChangePlanModes() {
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
@@ -92,8 +92,8 @@ public class ModeChoiceCoverageControlerListenerTest {
                 (Double) 1.0, modeChoiceCoverageHistory.get(1).get(TransportMode.bike).get(2));
     }
 
-    @Test
-    public void testTwoAgents() {
+	@Test
+	void testTwoAgents() {
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
         TransportPlanningMainModeIdentifier transportId = new TransportPlanningMainModeIdentifier();
@@ -162,8 +162,8 @@ public class ModeChoiceCoverageControlerListenerTest {
                 (Double) 0.75, modeChoiceCoverageHistory.get(1).get(TransportMode.bike).get(2));
     }
 
-    @Test
-    public void testDifferentLevels() {
+	@Test
+	void testDifferentLevels() {
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         ScoringConfigGroup scoreConfig = new ScoringConfigGroup();

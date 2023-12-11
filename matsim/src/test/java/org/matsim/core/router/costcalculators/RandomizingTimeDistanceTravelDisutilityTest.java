@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,7 +57,7 @@ import org.matsim.facilities.Facility;
 public class RandomizingTimeDistanceTravelDisutilityTest {
 
 	@Test
-	public void testRoutesForDifferentSigmas() {
+	void testRoutesForDifferentSigmas() {
 
 		{
 			Set<String> routes = new HashSet<>();

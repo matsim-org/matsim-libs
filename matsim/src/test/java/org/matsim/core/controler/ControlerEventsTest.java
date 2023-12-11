@@ -28,8 +28,8 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -60,7 +60,8 @@ public class ControlerEventsTest {
 		this.calledStartupListener = null;
 	}
 
-	@Test public void testCoreListenerExecutionOrder() {
+	@Test
+	void testCoreListenerExecutionOrder() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
@@ -77,7 +78,8 @@ public class ControlerEventsTest {
 		assertEquals(1, this.calledStartupListener.get(2).intValue());
 	}
 
-	@Test public void testEvents() {
+	@Test
+	void testEvents() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);

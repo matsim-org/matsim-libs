@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,7 +63,7 @@ public class FlowCapacityTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testFlowCapacityDriving() {
+	void testFlowCapacityDriving() {
 		Fixture f = new Fixture();
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
@@ -133,7 +133,7 @@ public class FlowCapacityTest {
 	 */
 
 	@Test
-	public void testFlowCapacityDrivingFlowCapacityFactors() {
+	void testFlowCapacityDrivingFlowCapacityFactors() {
 		Fixture f = new Fixture();
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 1200; i++) {
@@ -190,7 +190,7 @@ public class FlowCapacityTest {
 	 */
 
 	@Test
-	public void testFlowCapacityDrivingFlowEfficiencyFactors() {
+	void testFlowCapacityDrivingFlowEfficiencyFactors() {
 		Fixture f = new Fixture();
 		ScenarioImporter.flush();
 
@@ -255,7 +255,7 @@ public class FlowCapacityTest {
 	 */
 
 	@Test
-	public void testFlowCapacityDrivingFlowEfficiencyFactorsWithDownscaling() {
+	void testFlowCapacityDrivingFlowEfficiencyFactorsWithDownscaling() {
 		Fixture f = new Fixture();
 		ScenarioImporter.flush();
 
@@ -319,7 +319,7 @@ public class FlowCapacityTest {
 	 */
 
 	@Test
-	public void testFlowCapacityEfficiencyFactorWithLowValueAndDownscaling() {
+	void testFlowCapacityEfficiencyFactorWithLowValueAndDownscaling() {
 		Fixture f = new Fixture();
 		ScenarioImporter.flush();
 
@@ -384,7 +384,7 @@ public class FlowCapacityTest {
 	 * @author michaz
 	 */
 	@Test
-	public void testFlowCapacityDrivingFraction() {
+	void testFlowCapacityDrivingFraction() {
 		Fixture f = new Fixture();
 		ScenarioImporter.flush();
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds

@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
@@ -49,7 +49,7 @@ public class TransferFinalSocToNextIterTest {
 	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	@Test
-	public void test() {
+	void test() {
 		//adapt scenario
 		scenario.getConfig().controller().setLastIteration(LAST_ITERATION);
 		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");

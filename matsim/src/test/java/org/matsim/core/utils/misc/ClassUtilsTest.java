@@ -22,7 +22,7 @@ package org.matsim.core.utils.misc;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -30,14 +30,14 @@ import org.junit.Test;
 public class ClassUtilsTest {
 
 	@Test
-	public void testInterfaceNoInheritance() {
+	void testInterfaceNoInheritance() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(A.class);
 		Assert.assertEquals(1, set.size());
 		Assert.assertTrue(set.contains(A.class));
 	}
 
 	@Test
-	public void testClassNoInheritance() {
+	void testClassNoInheritance() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(Z.class);
 		Assert.assertEquals(2, set.size());
 		Assert.assertTrue(set.contains(Z.class));
@@ -45,7 +45,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testInterfaceSingleInheritance() {
+	void testInterfaceSingleInheritance() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(B.class);
 		Assert.assertEquals(2, set.size());
 		Assert.assertTrue(set.contains(A.class));
@@ -53,7 +53,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testClassSingleInheritance() {
+	void testClassSingleInheritance() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(Y.class);
 		Assert.assertEquals(3, set.size());
 		Assert.assertTrue(set.contains(Z.class));
@@ -62,7 +62,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testInterfaceMultipleInheritance_SingleLevel() {
+	void testInterfaceMultipleInheritance_SingleLevel() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(AB.class);
 		Assert.assertEquals(3, set.size());
 		Assert.assertTrue(set.contains(A.class));
@@ -71,7 +71,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testInterfaceMultipleInheritance_MultipleLevel() {
+	void testInterfaceMultipleInheritance_MultipleLevel() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(C.class);
 		Assert.assertEquals(3, set.size());
 		Assert.assertTrue(set.contains(A.class));
@@ -80,7 +80,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testClassMultipleInheritance_MultipleLevel() {
+	void testClassMultipleInheritance_MultipleLevel() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(X.class);
 		Assert.assertEquals(4, set.size());
 		Assert.assertTrue(set.contains(Z.class));
@@ -90,7 +90,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testSingleInterfaceImplementation() {
+	void testSingleInterfaceImplementation() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(Aimpl.class);
 		Assert.assertEquals(3, set.size());
 		Assert.assertTrue(set.contains(Aimpl.class));
@@ -99,7 +99,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testSingleInterfaceImplementation_MultipleLevel() {
+	void testSingleInterfaceImplementation_MultipleLevel() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(Bimpl.class);
 		Assert.assertEquals(4, set.size());
 		Assert.assertTrue(set.contains(Bimpl.class));
@@ -109,7 +109,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testMultipleInterfaceImplementation() {
+	void testMultipleInterfaceImplementation() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(ABimpl.class);
 		Assert.assertEquals(4, set.size());
 		Assert.assertTrue(set.contains(ABimpl.class));
@@ -119,7 +119,7 @@ public class ClassUtilsTest {
 	}
 
 	@Test
-	public void testComplexClass() {
+	void testComplexClass() {
 		Set<Class<?>> set = ClassUtils.getAllTypes(Dimpl.class);
 		Assert.assertEquals(5, set.size());
 		Assert.assertTrue(set.contains(Dimpl.class));

@@ -4,8 +4,8 @@
 package org.matsim.analysis;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +32,7 @@ public class VolumesAnalyzerTest {
 	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void performTest() {
+	void performTest() {
 
 		final Id<Link> link1 = Id.create(10723, Link.class);
 		final Id<Link> link2 = Id.create(123160, Link.class);

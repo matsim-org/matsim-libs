@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,7 +41,7 @@ public class PersonStuckPrebookingTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void baselineTest() {
+	void baselineTest() {
 		/*
 		 * Agent personA is performing three drt legs during the day. Agent personB does
 		 * exactly the same in parallel, both prebook their requests.
@@ -72,7 +72,7 @@ public class PersonStuckPrebookingTest {
 	}
 
 	@Test
-	public void cancelTest() {
+	void cancelTest() {
 		/*
 		 * Agent personA is performing three drt legs during the day. Agent personB does
 		 * exactly the same in parallel, both prebook there requests.

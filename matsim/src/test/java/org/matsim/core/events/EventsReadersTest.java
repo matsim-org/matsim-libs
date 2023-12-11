@@ -26,8 +26,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -143,7 +143,8 @@ public class EventsReadersTest {
 
 	}
 
-	@Test public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
+	@Test
+	final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
@@ -154,7 +155,8 @@ public class EventsReadersTest {
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
 
-	@Test public final void testAutoFormatReaderXml() {
+	@Test
+	final void testAutoFormatReaderXml() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);

@@ -22,8 +22,8 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -32,8 +32,8 @@ public class RunPassengerAlongWithCarriersIT {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-    @Test
-    public void runChessboard() {
+	@Test
+	void runChessboard() {
         try{
         	RunPassengerAlongWithCarriers abc = new RunPassengerAlongWithCarriers();
             // ---

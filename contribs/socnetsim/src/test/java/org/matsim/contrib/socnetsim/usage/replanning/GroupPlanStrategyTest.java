@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -56,7 +56,7 @@ public class GroupPlanStrategyTest {
 	private static final int N_INITIALLY_INDIV_PLANS = 8;
 
 	@Test
-	public void testNewPlanIsSelected() throws Exception {
+	void testNewPlanIsSelected() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -88,7 +88,7 @@ public class GroupPlanStrategyTest {
 	}
 
 	@Test
-	public void testNumberOfPlans() throws Exception {
+	void testNumberOfPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -106,7 +106,7 @@ public class GroupPlanStrategyTest {
 	}
 
 	@Test
-	public void testNumberOfSelectedJointPlans() throws Exception {
+	void testNumberOfSelectedJointPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -140,7 +140,7 @@ public class GroupPlanStrategyTest {
 	}
 
 	@Test
-	public void testNumberOfNonSelectedJointPlans() throws Exception {
+	void testNumberOfNonSelectedJointPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(

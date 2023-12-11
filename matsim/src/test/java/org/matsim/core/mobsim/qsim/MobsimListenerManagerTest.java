@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 public class MobsimListenerManagerTest {
 
 	@Test
-	public void testAddQueueSimulationListener() {
+	void testAddQueueSimulationListener() {
 		MobsimListenerManager manager = new MobsimListenerManager(null);
 		TestSimListener simpleListener = new TestSimListener();
 		TestSubSimListener subListener = new TestSubSimListener();
@@ -48,7 +48,7 @@ public class MobsimListenerManagerTest {
 	}
 
 	@Test
-	public void testRemoveQueueSimulationListener() {
+	void testRemoveQueueSimulationListener() {
 		MobsimListenerManager manager = new MobsimListenerManager(null);
 		TestSimListener simpleListener = new TestSimListener();
 		TestSubSimListener subListener = new TestSubSimListener();

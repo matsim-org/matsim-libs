@@ -17,17 +17,16 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.freightreceiver;
-
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.junit.Assert;
-import org.junit.Test;
 
 
 public class ReceiverPlanTest {
 
 
 	@Test
-	public void testBuilderTwo() {
+	void testBuilderTwo() {
 		Receiver receiver = ReceiverUtils.newInstance( Id.create( "1", Receiver.class ) );
 		ReceiverPlan.Builder builder = ReceiverPlan.Builder.newInstance(receiver, true);
 		ReceiverPlan plan = builder.build();

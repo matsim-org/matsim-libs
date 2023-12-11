@@ -2,7 +2,9 @@ package playground.vsp.openberlinscenario.planmodification;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -57,8 +59,8 @@ public class PlanFileModifierTest {
         modifiedPopulationCase2 = readPopulationFromFile(outputPlansFile2);
     }
 
-    @Test
-    public void testSelectionProbability() {
+	@Test
+	void testSelectionProbability() {
 
         LOG.info("OriginalPopulationCase1 size: " + originalPopulationCase.getPersons().size());
         LOG.info("ModifiedPopulationCase1 size: " + modifiedPopulationCase1.getPersons().size());
@@ -70,8 +72,8 @@ public class PlanFileModifierTest {
                 MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void testEveryPersonCopiedExistsInOriginal() {
+	@Test
+	void testEveryPersonCopiedExistsInOriginal() {
 
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
             Person original = originalPopulationCase.getPersons().get(copy.getId());
@@ -80,8 +82,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testOnlyTransferSelectedPlan() {
+	@Test
+	void testOnlyTransferSelectedPlan() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             Person original = originalPopulationCase.getPersons().get(copy.getId());
@@ -90,8 +92,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testNotOnlyTransferSelectedPlan() {
+	@Test
+	void testNotOnlyTransferSelectedPlan() {
         //also tests if all plans were copied correctly
 
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
@@ -107,8 +109,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testConsiderHomeStayingAgents() {
+	@Test
+	void testConsiderHomeStayingAgents() {
 
         boolean atLeastOneHomeStayingPerson = false;
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
@@ -118,8 +120,8 @@ public class PlanFileModifierTest {
         Assert.assertTrue("No home staying person found", atLeastOneHomeStayingPerson);
     }
 
-    @Test
-    public void testNotConsiderHomeStayingAgents() {
+	@Test
+	void testNotConsiderHomeStayingAgents() {
 
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
             Assert.assertTrue("No home staying agents allowed",
@@ -127,8 +129,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testIncludeStayHomePlans() {
+	@Test
+	void testIncludeStayHomePlans() {
 
         boolean atLeastOneHomeStayingPlan = false;
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
@@ -139,8 +141,8 @@ public class PlanFileModifierTest {
         Assert.assertTrue("No home staying plan found", atLeastOneHomeStayingPlan);
     }
 
-    @Test
-    public void testNotIncludeStayHomePlans() {
+	@Test
+	void testNotIncludeStayHomePlans() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             for (Plan plan : copy.getPlans())
@@ -150,8 +152,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testOnlyConsiderPeopleAlwaysGoingByCar() {
+	@Test
+	void testOnlyConsiderPeopleAlwaysGoingByCar() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             for (Plan plan : copy.getPlans())
@@ -164,8 +166,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testNotOnlyConsiderPeopleAlwaysGoingByCar() {
+	@Test
+	void testNotOnlyConsiderPeopleAlwaysGoingByCar() {
 
         boolean otherModeThanCarConsidered = false;
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
@@ -179,8 +181,8 @@ public class PlanFileModifierTest {
         Assert.assertTrue("There should be other modes than car", otherModeThanCarConsidered);
     }
 
-    @Test
-    public void testRemoveLinksAndRoutes() {
+	@Test
+	void testRemoveLinksAndRoutes() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             for (Plan plan : copy.getPlans())
@@ -193,8 +195,8 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testNotRemoveLinksAndRoutes() {
+	@Test
+	void testNotRemoveLinksAndRoutes() {
 
         boolean routeFound = false;
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {

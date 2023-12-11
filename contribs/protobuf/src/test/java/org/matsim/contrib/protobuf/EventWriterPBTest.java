@@ -3,8 +3,8 @@ package org.matsim.contrib.protobuf;
 import com.google.protobuf.Descriptors;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -30,8 +30,8 @@ public class EventWriterPBTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void writer() throws IOException {
+	@Test
+	void writer() throws IOException {
 
 //        File file = tmp.newFile("output.pb");
         File file = new File( utils.getOutputDirectory() + "events.pb" );
@@ -85,8 +85,8 @@ public class EventWriterPBTest {
 
     }
 
-    @Test
-    public void convertEvent() {
+	@Test
+	void convertEvent() {
 
         // test few sample events
         GenericEvent event = new GenericEvent("test", 10.0);
@@ -107,8 +107,8 @@ public class EventWriterPBTest {
                 .has(new Condition<>(e -> e.getPersonId().getId().equals("15") && e.getLinkId().getId().equals("20"), "Ids correct"));
     }
 
-    @Test
-    public void convertId() {
+	@Test
+	void convertId() {
 
         Id<Vehicle> id = Id.createVehicleId(123);
 

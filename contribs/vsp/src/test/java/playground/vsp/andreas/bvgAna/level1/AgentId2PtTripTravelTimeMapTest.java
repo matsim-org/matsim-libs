@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -30,8 +30,7 @@ public class AgentId2PtTripTravelTimeMapTest {
 	 * Test method for {@link playground.vsp.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap#AgentId2PtTripTravelTimeMap(java.util.Set)}.
 	 */
 	@Test
-
-	public void testAgentId2PtTripTravelTimeMap() {
+	void testAgentId2PtTripTravelTimeMap() {
 
 
 		Set<Id<Person>> idSet = new TreeSet<>();

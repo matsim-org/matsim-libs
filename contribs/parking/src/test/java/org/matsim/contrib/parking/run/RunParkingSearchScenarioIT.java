@@ -20,8 +20,8 @@
 package org.matsim.contrib.parking.run;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -43,7 +43,7 @@ public class RunParkingSearchScenarioIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunParkingBenesonStrategy() {
+	void testRunParkingBenesonStrategy() {
 		try {
 			String configFile = "./src/main/resources/parkingsearch/config.xml";
 			Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
@@ -62,7 +62,7 @@ public class RunParkingSearchScenarioIT {
 	}
 
 	@Test
-	public void testRunParkingRandomStrategy() {
+	void testRunParkingRandomStrategy() {
 		String configFile = "./src/main/resources/parkingsearch/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
 		config.controller().setLastIteration(0);
@@ -80,7 +80,7 @@ public class RunParkingSearchScenarioIT {
 	}
 
 	@Test
-	public void testRunParkingDistanceMemoryStrategy() {
+	void testRunParkingDistanceMemoryStrategy() {
 		try {
 			String configFile = "./src/main/resources/parkingsearch/config.xml";
 			Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
@@ -118,7 +118,7 @@ public class RunParkingSearchScenarioIT {
 	}
 
 	@Test
-	public void testRunParkingNearestParkingSpotStrategy() {
+	void testRunParkingNearestParkingSpotStrategy() {
 		try {
 			String configFile = "./src/main/resources/parkingsearch/config.xml";
 			Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());

@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -91,7 +91,8 @@ public class CharyparNagelOpenTimesScoringFunctionTest {
 		this.facilities = null;
 	}
 
-	@Test public void testGetOpeningInterval() {
+	@Test
+	void testGetOpeningInterval() {
 		Activity act =  (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
 
 		FacilityOpeningIntervalCalculator testee =

@@ -23,7 +23,7 @@ package org.matsim.core.replanning.selectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -47,7 +47,8 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testBestPlan() {
+	@Test
+	void testBestPlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan;
 		PersonUtils.createAndAddPlan(person, false);

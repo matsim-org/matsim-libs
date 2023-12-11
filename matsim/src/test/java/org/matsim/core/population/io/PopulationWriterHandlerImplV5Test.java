@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -55,7 +55,7 @@ public class PopulationWriterHandlerImplV5Test {
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void test_writeNetworkRoute_sameStartEndLink() {
+	void test_writeNetworkRoute_sameStartEndLink() {
 		doTestWriteNetworkRoute("1", "", "1", "1");
 
 		// round trip
@@ -63,12 +63,12 @@ public class PopulationWriterHandlerImplV5Test {
 	}
 
 	@Test
-	public void test_writeNetworkRoute_consequentLinks() {
+	void test_writeNetworkRoute_consequentLinks() {
 		doTestWriteNetworkRoute("1", "", "2", "1 2");
 	}
 
 	@Test
-	public void test_writeNetworkRoute_regularCase() {
+	void test_writeNetworkRoute_regularCase() {
 		doTestWriteNetworkRoute("1", "2", "3", "1 2 3");
 		doTestWriteNetworkRoute("1", "2 3", "4", "1 2 3 4");
 	}
@@ -117,7 +117,7 @@ public class PopulationWriterHandlerImplV5Test {
 	}
 
 	@Test
-	public void testWriteGenericRouteRoute() {
+	void testWriteGenericRouteRoute() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig((String) null));
 		String startLinkId = "1";
 		String endLinkId = "4";

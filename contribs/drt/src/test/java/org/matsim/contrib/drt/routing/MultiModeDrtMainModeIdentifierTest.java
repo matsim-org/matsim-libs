@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -21,7 +21,7 @@ import org.matsim.core.router.TripRouter;
 public class MultiModeDrtMainModeIdentifierTest {
 
 	@Test
-	public void test() {
+	void test() {
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		String drtMode = "drt";
 		drtConfigGroup.mode = drtMode;

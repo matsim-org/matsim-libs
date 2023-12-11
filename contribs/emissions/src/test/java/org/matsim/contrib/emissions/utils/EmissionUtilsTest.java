@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions.utils;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +43,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.matsim.contrib.emissions.Pollutant.*;
 
 
@@ -80,7 +81,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSumUpEmissions() {
+	final void testSumUpEmissions() {
 		// test the method EmissionUtils.sumUpEmissions for a complete list of pollutants
 		// missing data is not tested here
 
@@ -135,7 +136,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSumUpEmissionsPerId() {
+	final void testSumUpEmissionsPerId() {
 		Map<Id<Person>, Map<Pollutant, Double>> warmEmissions = new HashMap<>();
 		Map<Id<Person>, Map<Pollutant, Double>> coldEmissions = new HashMap<>();
 
@@ -256,17 +257,20 @@ public class EmissionUtilsTest {
 
 	}
 
-	@Test(expected = NullPointerException.class)
-	public final void testGetTotalEmissions_nullInput() {
+	@Test
+	final void testGetTotalEmissions_nullInput() {
+		assertThrows(NullPointerException.class, () -> {
 
-		@SuppressWarnings("ConstantConditions")
-		SortedMap<Pollutant, Double> totalEmissions = EmissionUtils.getTotalEmissions(null);
-		Assert.fail("Expected NullPointerException, got none.");
+			@SuppressWarnings("ConstantConditions")
+			SortedMap<Pollutant, Double> totalEmissions = EmissionUtils.getTotalEmissions(null);
+			Assert.fail("Expected NullPointerException, got none.");
+
+		});
 
 	}
 
 	@Test
-	public final void testGetTotalEmissions_emptyList() {
+	final void testGetTotalEmissions_emptyList() {
 		//test an empty list as input
 
 		SortedMap<Pollutant, Double> totalEmissions;
@@ -278,7 +282,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testGetTotalEmissions_completeData() {
+	final void testGetTotalEmissions_completeData() {
 		//test getTotalEmissions for complete data
 		Set<Pollutant> pollsFromEU = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2));
 
@@ -356,9 +360,9 @@ public class EmissionUtilsTest {
 		Assert.assertEquals("this list should be as long as number of pollutants", totalEmissions.keySet().size(), pollsFromEU.size());
 
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_completeData(){
+	final void testSetNonCalculatedEmissionsForPopulation_completeData(){
 		//test setNonCalculatedEmissionsForPopulation for three persons with complete lists of emissions
 		//check values
 
@@ -465,9 +469,9 @@ public class EmissionUtilsTest {
 		Assert.assertEquals("SO value for person 2 is not correct", sov2, finalMap.get(idp2).get( SO2 ), MatsimTestUtils.EPSILON );
 
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_missingMap() {
+	final void testSetNonCalculatedEmissionsForPopulation_missingMap() {
 
 		setUpForNonCaculatedEmissions();
 
@@ -512,7 +516,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_missingPerson() {
+	final void testSetNonCalculatedEmissionsForPopulation_missingPerson() {
 
 		setUpForNonCaculatedEmissions();
 
@@ -544,9 +548,9 @@ public class EmissionUtilsTest {
 		Assert.assertEquals(message, pop.getPersons().keySet().size(), finalMap.keySet().size());
 
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_nullEmissions(){
+	final void testSetNonCalculatedEmissionsForPopulation_nullEmissions(){
 		//test setNonCalculatedEmissionsForPopulation with 'null'
 		// throw nullpointer exception
 		setUpForNonCaculatedEmissions();
@@ -566,9 +570,9 @@ public class EmissionUtilsTest {
 		}
 		Assert.assertTrue(nullPointerEx);
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_emptyPopulation(){
+	final void testSetNonCalculatedEmissionsForPopulation_emptyPopulation(){
 		// test setNonCalculatedEmissionsForPopulation with an empty population
 		// empty list should be returned
 		setUpForNonCaculatedEmissions();
@@ -599,7 +603,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_emptyEmissionMap() {
+	final void testSetNonCalculatedEmissionsForPopulation_emptyEmissionMap() {
 		//test setNonCalculatedEmissionsForPopulation with an empty emission map
 		setUpForNonCaculatedEmissions();
 
@@ -643,7 +647,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSetNonCalculatedEmissionsForNetwork() {
+	final void testSetNonCalculatedEmissionsForNetwork() {
 		//test setNonCalculatedEmissionsForNetwork
 		// network consists of four nodes 1,2,3,4
 		// and six links 12, 13, 14, 23, 24, 34

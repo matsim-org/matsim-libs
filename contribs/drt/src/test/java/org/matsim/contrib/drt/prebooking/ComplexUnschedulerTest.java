@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -55,7 +55,7 @@ import org.mockito.Mockito;
  */
 public class ComplexUnschedulerTest {
 	@Test
-	public void testDirectDropoffAfterPickup() {
+	void testDirectDropoffAfterPickup() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -115,7 +115,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testStandardSituation() {
+	void testStandardSituation() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -179,7 +179,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testRemoveAtEnd() {
+	void testRemoveAtEnd() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -244,7 +244,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testRemoveAtBeginningWithWaitSecond() {
+	void testRemoveAtBeginningWithWaitSecond() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -310,7 +310,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testRemoveAtBeginningWithWaitFirst() {
+	void testRemoveAtBeginningWithWaitFirst() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -374,7 +374,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testRemoveAtBeginningWithDriveDiversion() {
+	void testRemoveAtBeginningWithDriveDiversion() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -451,7 +451,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testRemoveAllStartWithWait() {
+	void testRemoveAllStartWithWait() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 
@@ -484,7 +484,7 @@ public class ComplexUnschedulerTest {
 	}
 
 	@Test
-	public void testRemoveAllStartWithDrive() {
+	void testRemoveAllStartWithDrive() {
 		Fixture fixture = new Fixture();
 		Schedule schedule = fixture.schedule;
 

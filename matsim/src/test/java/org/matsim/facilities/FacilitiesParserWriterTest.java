@@ -21,8 +21,8 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +45,7 @@ public class FacilitiesParserWriterTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testParserWriter1() {
+	void testParserWriter1() {
 		Config config = ConfigUtils.createConfig();
 		TriangleScenario.setUpScenarioConfig(config);
 
@@ -62,7 +62,7 @@ public class FacilitiesParserWriterTest {
 	}
 
 	@Test
-	public void testWriteReadV2_withActivities() {
+	void testWriteReadV2_withActivities() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 
@@ -103,7 +103,7 @@ public class FacilitiesParserWriterTest {
 	}
 
 	@Test
-	public void testWriteReadV2_withAttributes() {
+	void testWriteReadV2_withAttributes() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 
@@ -140,7 +140,7 @@ public class FacilitiesParserWriterTest {
 	}
 
 	@Test
-	public void testWriteReadV2_withActivitiesAndAttributes() { // MATSIM-859
+	void testWriteReadV2_withActivitiesAndAttributes() { // MATSIM-859
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 

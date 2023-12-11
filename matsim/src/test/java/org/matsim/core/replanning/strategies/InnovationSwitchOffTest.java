@@ -24,10 +24,10 @@ package org.matsim.core.replanning.strategies;
 
 import com.google.inject.*;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -62,7 +62,7 @@ public class InnovationSwitchOffTest {
 	 * Integration test for testing if switching off of innovative strategies works.
 	 */
 	@Test
-	public void testInnovationSwitchOff() {
+	void testInnovationSwitchOff() {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("equil"));
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 

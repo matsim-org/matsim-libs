@@ -1,8 +1,8 @@
 package org.matsim.contrib.accessibility.grid;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.SpatialGrid;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -17,7 +17,8 @@ public class SpatialGridTest {
 	private double cellSize = 10.;
 
 
-	@Test public void testSpatialGrid() {
+	@Test
+	void testSpatialGrid() {
 
 		// get network
 		Network network = CreateTestNetwork.createTestNetwork();

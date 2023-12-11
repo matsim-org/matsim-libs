@@ -24,8 +24,8 @@ package org.matsim.freight.carriers.jsprit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -76,7 +76,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 *
 	 */
 	@Test
-	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
+	final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
@@ -150,7 +150,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 *
 	 */
 	@Test
-	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
+	final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -226,7 +226,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 */
 
 	@Test
-	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
+	final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -307,7 +307,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 */
 
 	@Test
-	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
+	final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);

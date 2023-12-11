@@ -2,7 +2,7 @@ package playground.vsp.andreas.bvgAna.level1;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -15,8 +15,9 @@ import org.matsim.vehicles.Vehicle;
 
 public class StopId2LineId2PulkTest {
 
-	@Test @Ignore
-	public void testStopId2LineId2Pulk() {
+	@Test
+	@Ignore
+	void testStopId2LineId2Pulk() {
 
 //	    assign Ids to routes, vehicles and agents to be used in Test
 

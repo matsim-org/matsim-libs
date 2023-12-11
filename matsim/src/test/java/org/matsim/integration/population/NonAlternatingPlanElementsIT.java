@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,7 +63,7 @@ public class NonAlternatingPlanElementsIT {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_Controler_QSim_Routechoice_acts() {
+	void test_Controler_QSim_Routechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setMobsim("qsim");
 		config.controller().setLastIteration(10);
@@ -95,7 +95,7 @@ public class NonAlternatingPlanElementsIT {
 	}
 
 	@Test
-	public void test_Controler_QSim_Routechoice_legs() {
+	void test_Controler_QSim_Routechoice_legs() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setMobsim("qsim");
 		config.controller().setLastIteration(10);

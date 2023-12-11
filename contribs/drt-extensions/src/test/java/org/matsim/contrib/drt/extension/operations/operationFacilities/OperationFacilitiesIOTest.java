@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,8 +16,8 @@ public class OperationFacilitiesIOTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void test() {
+	@Test
+	void test() {
 
     	OperationFacilitiesSpecification operationFacilities = new OperationFacilitiesSpecificationImpl();
 

@@ -22,7 +22,7 @@
 package org.matsim.contrib.emissions.events;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
@@ -55,7 +55,7 @@ public class TestColdEmissionEventImpl {
 	private final Set<Pollutant> coldPollutants = new HashSet<>(Arrays.asList(CO, FC, HC, NMHC, NOx, NO2,PM));
 
 	@Test
-	public final void testGetAttributesForCompleteEmissionMaps(){
+	final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 
 		//create a normal event impl
@@ -91,9 +91,9 @@ public class TestColdEmissionEventImpl {
 		coldEmissionsMap.put(PM, pm);
 
 	}
-	
+
 	@Test
-	public final void testGetAttributesForIncompleteMaps(){
+	final void testGetAttributesForIncompleteMaps(){
 		//the getAttributesMethod should
 		// - return null if the emission map is empty
 		// - throw NullPointerExceptions if the emission values are not set

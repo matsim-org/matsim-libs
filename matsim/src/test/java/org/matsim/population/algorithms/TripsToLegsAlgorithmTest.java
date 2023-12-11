@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -62,7 +62,7 @@ public class TripsToLegsAlgorithmTest {
 	private static final String DUMMY_2 = "dummy_2 interaction";
 
 	@Test
-	public void testMonoLegPlan() throws Exception {
+	void testMonoLegPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -93,7 +93,7 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	@Test
-	public void testMultiLegPlan() throws Exception {
+	void testMultiLegPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -134,7 +134,7 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	@Test
-	public void testDummyActsPlan() throws Exception {
+	void testDummyActsPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -182,7 +182,7 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	@Test
-	public void testPtPlan() throws Exception {
+	void testPtPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 

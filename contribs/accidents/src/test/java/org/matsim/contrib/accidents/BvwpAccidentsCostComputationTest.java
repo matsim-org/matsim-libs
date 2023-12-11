@@ -3,7 +3,7 @@ package org.matsim.contrib.accidents;
 import java.util.ArrayList;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
-;
+
 
 /**
  * @author ikaddoura, mmayobre
@@ -20,9 +20,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  */
 public class BvwpAccidentsCostComputationTest {
-		
+
 	@Test
-	public void test1() {
+	void test1() {
 		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory = network.getFactory();
 		
@@ -42,9 +42,9 @@ public class BvwpAccidentsCostComputationTest {
 		double costs = AccidentCostComputationBVWP.computeAccidentCosts(4820, link1, list);
 		Assert.assertEquals("wrong cost", 1772.13863066011, costs, MatsimTestUtils.EPSILON);
 	}
-	
+
 	@Test
-	public void test2() {
+	void test2() {
 		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory = network.getFactory();
 		
@@ -64,9 +64,9 @@ public class BvwpAccidentsCostComputationTest {
 		double costs = AccidentCostComputationBVWP.computeAccidentCosts(1000, link1, list);
 		Assert.assertEquals("wrong cost", 23.165, costs, MatsimTestUtils.EPSILON);
 	}
-	
+
 	@Test
-	public void test3() {
+	void test3() {
 		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory = network.getFactory();
 		

@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class VehicleWriteReadTest{
@@ -28,7 +28,7 @@ public class VehicleWriteReadTest{
 	}
 
 	@Test
-	public void v1_isWrittenCorrect () throws FileNotFoundException, IOException {
+	void v1_isWrittenCorrect() throws FileNotFoundException, IOException {
 		//----- V1 --------
 		//read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
@@ -46,7 +46,7 @@ public class VehicleWriteReadTest{
 	}
 
 	@Test
-	public void v2_isWrittenCorrect () throws FileNotFoundException, IOException {
+	void v2_isWrittenCorrect() throws FileNotFoundException, IOException {
 		//----- V2 --------
 		//read it
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();

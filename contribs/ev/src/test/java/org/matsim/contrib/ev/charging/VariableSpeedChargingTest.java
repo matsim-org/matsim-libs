@@ -22,7 +22,7 @@ package org.matsim.contrib.ev.charging;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 public class VariableSpeedChargingTest {
 
 	@Test
-	public void testCalcEnergyCharge() {
+	void testCalcEnergyCharge() {
 		//fast charger (2 c)
 		assertCalcChargingPower(100, 0, 200, 75);
 		assertCalcChargingPower(100, 5, 200, 100);

@@ -5,8 +5,8 @@ import com.google.inject.Injector;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -110,7 +110,7 @@ public class PtTripFareEstimatorTest {
 	}
 
 	@Test
-	public void fare() {
+	void fare() {
 
 		List<MinMaxEstimate> est = estimateAgent(TestScenario.Agents.get(1));
 		System.out.println(est);
@@ -123,7 +123,7 @@ public class PtTripFareEstimatorTest {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 
 		for (Id<Person> agent : TestScenario.Agents) {
 			List<MinMaxEstimate> est = estimateAgent(agent);
@@ -135,7 +135,7 @@ public class PtTripFareEstimatorTest {
 	}
 
 	@Test
-	public void planEstimate() {
+	void planEstimate() {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(2));
 		Plan plan = person.getSelectedPlan();

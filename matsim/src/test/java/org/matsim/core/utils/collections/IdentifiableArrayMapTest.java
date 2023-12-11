@@ -28,7 +28,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
@@ -38,16 +38,16 @@ import org.matsim.api.core.v01.Identifiable;
 public class IdentifiableArrayMapTest {
 
 	private final static Logger log = LogManager.getLogger(IdentifiableArrayMapTest.class);
-	
+
 	@Test
-	public void testConstructor() {
+	void testConstructor() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Assert.assertEquals(0, map.size());
 		Assert.assertTrue(map.isEmpty());
 	}
-	
+
 	@Test
-	public void testPutGet() {
+	void testPutGet() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -72,9 +72,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertEquals(to2, map.get(id2));
 		Assert.assertEquals(to1, map.get(id1));
 	}
-	
+
 	@Test
-	public void testPutGet_identifiablePut() {
+	void testPutGet_identifiablePut() {
 		IdentifiableArrayMap<TO, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -98,9 +98,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertEquals(to2, map.get(id2));
 		Assert.assertEquals(to1, map.get(id1));
 	}
-	
+
 	@Test
-	public void testPut_multiple() {
+	void testPut_multiple() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -131,9 +131,9 @@ public class IdentifiableArrayMapTest {
 		map.put(id1, to1);
 		Assert.assertEquals(3, map.size());
 	}
-	
+
 	@Test
-	public void testGet_equalKeys() {
+	void testGet_equalKeys() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id2a = Id.create(2, TO.class);
 		Id<TO> id2b = Id.create(2, TO.class);
@@ -147,7 +147,7 @@ public class IdentifiableArrayMapTest {
 	}
 
 	@Test
-	public void testPut_Overwrite() {
+	void testPut_Overwrite() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2a = Id.create(2, TO.class);
@@ -173,9 +173,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertEquals(to2b, map.get(id2b));
 		Assert.assertEquals(to2b, map.get(id2a));
 	}
-	
+
 	@Test
-	public void testContainsKey() {
+	void testContainsKey() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -209,9 +209,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(map.containsKey(id2b));
 		Assert.assertTrue(map.containsKey(id3));
 	}
-	
+
 	@Test
-	public void testContainsValue() {
+	void testContainsValue() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -240,9 +240,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(map.containsValue(to2));
 		Assert.assertTrue(map.containsValue(to3));
 	}
-	
+
 	@Test
-	public void testRemove_middle() {
+	void testRemove_middle() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -263,9 +263,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertFalse(map.containsValue(to2));
 		Assert.assertTrue(map.containsValue(to3));
 	}
-	
+
 	@Test
-	public void testRemove_start() {
+	void testRemove_start() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -286,9 +286,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(map.containsValue(to2));
 		Assert.assertTrue(map.containsValue(to3));
 	}
-	
+
 	@Test
-	public void testRemove_end() {
+	void testRemove_end() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -309,9 +309,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(map.containsValue(to2));
 		Assert.assertFalse(map.containsValue(to3));
 	}
-	
+
 	@Test
-	public void testClear() {
+	void testClear() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -334,9 +334,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertFalse(map.containsValue(to2));
 		Assert.assertNull(map.get(id2));
 	}
-	
+
 	@Test
-	public void testValues() {
+	void testValues() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -357,9 +357,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(values.contains(to2));
 		Assert.assertTrue(values.contains(to3));
 	}
-	
+
 	@Test
-	public void testKeySet() {
+	void testKeySet() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -380,9 +380,9 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(keys.contains(id2));
 		Assert.assertTrue(keys.contains(id3));
 	}
-	
+
 	@Test
-	public void testEntrySet() {
+	void testEntrySet() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -400,9 +400,9 @@ public class IdentifiableArrayMapTest {
 		
 		Assert.assertEquals(3, entries.size());
 	}
-	
+
 	@Test
-	public void testValuesIterator() {
+	void testValuesIterator() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -435,7 +435,7 @@ public class IdentifiableArrayMapTest {
 	}
 
 	@Test
-	public void testValuesToArray() {
+	void testValuesToArray() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		Id<TO> id2 = Id.create(2, TO.class);
@@ -469,7 +469,7 @@ public class IdentifiableArrayMapTest {
 	}
 
 	@Test
-	public void testValuesIterator_SingleDiretor() {
+	void testValuesIterator_SingleDiretor() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
 		Id<TO> id1 = Id.create(1, TO.class);
 		

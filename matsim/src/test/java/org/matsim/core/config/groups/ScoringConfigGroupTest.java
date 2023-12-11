@@ -29,8 +29,8 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -41,7 +41,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ScoringConfigGroupTest {
+ public class ScoringConfigGroupTest {
 	private static final Logger log =
 		LogManager.getLogger(ScoringConfigGroupTest.class);
 
@@ -78,8 +78,8 @@ public class ScoringConfigGroupTest {
 		}
 	}
 
-	@Test
-	public void testFullyHierarchicalVersion() {
+	 @Test
+	 void testFullyHierarchicalVersion() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
 		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, true ) ;
@@ -106,8 +106,9 @@ public class ScoringConfigGroupTest {
 		}
 		log.warn( "" );
 	}
-	@Test
-	public void testVersionWoScoringparams() {
+
+	 @Test
+	 void testVersionWoScoringparams() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
 		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, false ) ;
@@ -135,8 +136,8 @@ public class ScoringConfigGroupTest {
 		log.warn( "" );
 	}
 
-	@Test
-	public void testAddActivityParams() {
+	 @Test
+	 void testAddActivityParams() {
 		ScoringConfigGroup c = new ScoringConfigGroup();
         int originalSize = c.getActivityParams().size();
 		Assert.assertNull(c.getActivityParams("type1"));
@@ -148,8 +149,8 @@ public class ScoringConfigGroupTest {
         Assert.assertEquals(originalSize + 1, c.getActivityParams().size());
 	}
 
-	@Test
-	public void testIODifferentVersions() {
+	 @Test
+	 void testIODifferentVersions() {
 		final ScoringConfigGroup initialGroup = createTestConfigGroup();
 
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";

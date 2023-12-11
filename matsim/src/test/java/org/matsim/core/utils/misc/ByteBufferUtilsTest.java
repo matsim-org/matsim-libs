@@ -26,8 +26,8 @@ import static org.junit.Assert.assertFalse;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -43,7 +43,8 @@ public class ByteBufferUtilsTest {
 	 * Tests {@link ByteBufferUtils#putString(java.nio.ByteBuffer, String)} and
 	 * {@link ByteBufferUtils#getString(java.nio.ByteBuffer)}.
 	 */
-	@Test public void testPutGetString() {
+	@Test
+	void testPutGetString() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		buffer.putInt(5);
 		ByteBufferUtils.putString(buffer, "foo bar");
@@ -65,7 +66,8 @@ public class ByteBufferUtilsTest {
 	 * Tests {@link ByteBufferUtils#putObject(java.nio.ByteBuffer, Serializable)} and
 	 * {@link ByteBufferUtils#getObject(java.nio.ByteBuffer)}.
 	 */
-	@Test public void testPutGetObject() {
+	@Test
+	void testPutGetObject() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		buffer.putInt(5);
 		ByteBufferUtils.putObject(buffer, "foo bar");

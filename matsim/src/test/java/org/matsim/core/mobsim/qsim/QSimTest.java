@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -144,7 +144,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSingleAgent() {
+	void testSingleAgent() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -184,7 +184,7 @@ public class QSimTest {
 	 * @author Kai Nagel
 	 */
 	@Test
-	public void testSingleAgentWithEndOnLeg() {
+	void testSingleAgentWithEndOnLeg() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -250,7 +250,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testTwoAgent() {
+	void testTwoAgent() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
@@ -291,7 +291,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testTeleportationSingleAgent() {
+	void testTeleportationSingleAgent() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -338,7 +338,7 @@ public class QSimTest {
 	 * @author cdobler
 	 */
 	@Test
-	public void testSingleAgentImmediateDeparture() {
+	void testSingleAgentImmediateDeparture() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -383,7 +383,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSingleAgent_EmptyRoute() {
+	void testSingleAgent_EmptyRoute() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link1
@@ -456,7 +456,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSingleAgent_LastLinkIsLoop() {
+	void testSingleAgent_LastLinkIsLoop() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
 
@@ -526,7 +526,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testAgentWithoutLeg() {
+	void testAgentWithoutLeg() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -553,7 +553,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testAgentWithoutLegWithEndtime() {
+	void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -581,7 +581,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testAgentWithLastActWithEndtime() {
+	void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -616,7 +616,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testFlowCapacityDriving() {
+	void testFlowCapacityDriving() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
@@ -681,7 +681,7 @@ public class QSimTest {
 	 * @author michaz
 	 */
 	@Test
-	public void testFlowCapacityDrivingFraction() {
+	void testFlowCapacityDrivingFraction() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
@@ -736,7 +736,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testFlowCapacityStarting() {
+	void testFlowCapacityStarting() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
@@ -791,7 +791,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testFlowCapacityMixed() {
+	void testFlowCapacityMixed() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
@@ -859,7 +859,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testVehicleTeleportationTrue() {
+	void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -914,7 +914,7 @@ public class QSimTest {
 	 * @author michaz
 	 */
 	@Test
-	public void testWaitingForCar() {
+	void testWaitingForCar() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
@@ -1009,7 +1009,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testVehicleTeleportationFalse() {
+	void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -1062,7 +1062,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testAssignedVehicles() {
+	void testAssignedVehicles() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -1118,7 +1118,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testCircleAsRoute() {
+	void testCircleAsRoute() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
@@ -1176,7 +1176,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testRouteWithEndLinkTwice() {
+	void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
@@ -1237,7 +1237,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testConsistentRoutes_WrongRoute() {
+	void testConsistentRoutes_WrongRoute() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -1253,7 +1253,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testConsistentRoutes_WrongStartLink() {
+	void testConsistentRoutes_WrongStartLink() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -1269,7 +1269,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testConsistentRoutes_WrongEndLink() {
+	void testConsistentRoutes_WrongEndLink() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -1286,7 +1286,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testConsistentRoutes_ImpossibleRoute() {
+	void testConsistentRoutes_ImpossibleRoute() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -1302,7 +1302,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testConsistentRoutes_MissingRoute() {
+	void testConsistentRoutes_MissingRoute() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -1371,7 +1371,7 @@ public class QSimTest {
 	}
 
 	@Test
-	public void testStartAndEndTime() {
+	void testStartAndEndTime() {
 
 		final Config config = ConfigUtils.createConfig();
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -1437,7 +1437,7 @@ public class QSimTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testCleanupSim_EarlyEnd() {
+	void testCleanupSim_EarlyEnd() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
@@ -1535,7 +1535,7 @@ public class QSimTest {
 	 * @author ikaddoura based on mrieser
 	 */
 	@Test
-	public void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior() {
+	void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG);
@@ -1595,7 +1595,7 @@ public class QSimTest {
 	 * @author ikaddoura based on mrieser
 	 */
 	@Test
-	public void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior() {
+	void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG);
@@ -1655,7 +1655,7 @@ public class QSimTest {
 	 * @author tschlenther based on ikaddoura based on mrieser
 	 */
 	@Test
-	public void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane() {
+	void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE);

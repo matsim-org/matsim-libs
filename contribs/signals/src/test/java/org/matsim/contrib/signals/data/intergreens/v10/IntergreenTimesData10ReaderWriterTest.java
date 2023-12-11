@@ -27,8 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -56,7 +56,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 	private Id<SignalSystem> systemId42 = Id.create("42", SignalSystem.class);
 
 	@Test
-	public void testParser() throws IOException, JAXBException, SAXException,
+	void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		IntergreenTimesData atd = new IntergreenTimesDataImpl();
 		IntergreenTimesReader10 reader = new IntergreenTimesReader10(atd);
@@ -66,7 +66,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 	}
 
 	@Test
-	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
 		String testoutput = this.testUtils.getOutputDirectory() + "testAtdOutput.xml";
 		log.debug("reading file...");

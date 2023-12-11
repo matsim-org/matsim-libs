@@ -22,7 +22,7 @@ package org.matsim.core.scoring;
 import java.util.Collections;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +61,7 @@ import org.matsim.vehicles.Vehicle;
 public class EventsToLegsTest {
 
 	@Test
-	public void testCreatesLeg() {
+	void testCreatesLeg() {
 		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
@@ -73,7 +73,7 @@ public class EventsToLegsTest {
 	}
 
 	@Test
-	public void testCreatesLegWithRoute() {
+	void testCreatesLegWithRoute() {
 		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
@@ -93,7 +93,7 @@ public class EventsToLegsTest {
 	}
 
 	@Test
-	public void testCreatesLegWithRoute_jointTrip() {
+	void testCreatesLegWithRoute_jointTrip() {
 		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
@@ -135,7 +135,7 @@ public class EventsToLegsTest {
 	}
 
 	@Test
-	public void testCreatesLegWithRoute_withoutEnteringTraffic() {
+	void testCreatesLegWithRoute_withoutEnteringTraffic() {
 		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
@@ -153,7 +153,7 @@ public class EventsToLegsTest {
 	}
 
 	@Test
-	public void testCreatesLegWithRoute_withLeavingTrafficOnTheSameLink() {
+	void testCreatesLegWithRoute_withLeavingTrafficOnTheSameLink() {
 		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
@@ -173,9 +173,9 @@ public class EventsToLegsTest {
 		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
 				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
-	
+
 	@Test
-	public void testCreatesTransitPassengerRoute() {
+	void testCreatesTransitPassengerRoute() {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);

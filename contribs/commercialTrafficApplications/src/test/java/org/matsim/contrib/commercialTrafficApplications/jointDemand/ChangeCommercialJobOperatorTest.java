@@ -1,7 +1,7 @@
 package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -17,8 +17,8 @@ import java.util.Map;
 
 public class ChangeCommercialJobOperatorTest {
 
-    @Test
-    public void getPlanAlgoInstance() {
+	@Test
+	void getPlanAlgoInstance() {
 
 
         Carriers carriers = TestScenarioGeneration.generateCarriers();

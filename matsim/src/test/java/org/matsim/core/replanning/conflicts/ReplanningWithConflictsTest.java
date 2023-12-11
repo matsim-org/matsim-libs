@@ -2,8 +2,8 @@ package org.matsim.core.replanning.conflicts;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
@@ -42,7 +42,7 @@ public class ReplanningWithConflictsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testModeRestriction() {
+	void testModeRestriction() {
 		/*
 		 * This is the possibly simplest use of the the conflict resolution logic. We
 		 * have 100 agents and two modes, one is "unrestricted", the other one is

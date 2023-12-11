@@ -30,8 +30,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -63,7 +63,7 @@ public class SignalGroups20ReaderWriterTest {
 
 
 	@Test
-	public void testParser() throws IOException, JAXBException, SAXException,
+	void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		SignalGroupsData sgd = new SignalGroupsDataImpl();
 		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd);
@@ -73,7 +73,7 @@ public class SignalGroups20ReaderWriterTest {
 	}
 
 	@Test
-	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
 		String testoutput = this.testUtils.getOutputDirectory() + "testSgOutput.xml";
 		log.debug("reading file...");

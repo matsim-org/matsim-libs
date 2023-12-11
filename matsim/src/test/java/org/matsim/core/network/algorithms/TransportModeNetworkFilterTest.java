@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +49,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class TransportModeNetworkFilterTest {
 
 	@Test
-	public void testFilter_SingleMode() {
+	void testFilter_SingleMode() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
@@ -142,7 +141,7 @@ public class TransportModeNetworkFilterTest {
 	}
 
 	@Test
-	public void testFilter_MultipleModes() {
+	void testFilter_MultipleModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
@@ -223,7 +222,7 @@ public class TransportModeNetworkFilterTest {
 	}
 
 	@Test
-	public void testFilter_NoModes() {
+	void testFilter_NoModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
@@ -234,7 +233,7 @@ public class TransportModeNetworkFilterTest {
 	}
 
 	@Test
-	public void testFilter_AdditionalModes() {
+	void testFilter_AdditionalModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
@@ -262,7 +261,7 @@ public class TransportModeNetworkFilterTest {
 	}
 
 	@Test
-	public void testFilter_NoCommonModes() {
+	void testFilter_NoCommonModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
@@ -271,7 +270,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
 	}
-	
+
 	/**
 	 * Tests the algorithm for the case the network contains direct loops, i.e.
 	 * links with the same from and to node.
@@ -284,7 +283,7 @@ public class TransportModeNetworkFilterTest {
 	 * scenario from scratch.
 	 */
 	@Test
-	public void testFilter_SingleMode_loop() {
+	void testFilter_SingleMode_loop() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		final NetworkFactory factory = network.getFactory();
@@ -303,12 +302,12 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals("wrong number of links", 1, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(Id.create(1, Link.class)));
 	}
-	
+
 	/**
 	 * Tests that tiem-varying information is converted
 	 */
 	@Test
-	public void testFilter_timeVariant() {
+	void testFilter_timeVariant() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		

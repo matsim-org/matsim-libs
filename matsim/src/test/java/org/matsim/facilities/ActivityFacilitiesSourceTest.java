@@ -20,8 +20,8 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
@@ -80,7 +80,7 @@ public class ActivityFacilitiesSourceTest {
 	}
 
 	@Test
-	public void test(){
+	void test(){
 		String outDir = utils.getOutputDirectory() ;
 		String testOutDir = outDir + "/" + facilitiesSource.toString() + "_facilitiesWithCoordOnly_" + String.valueOf(facilitiesWithCoordOnly) + "/";
 		new File(testOutDir).mkdirs();

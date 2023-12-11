@@ -27,8 +27,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -62,7 +62,7 @@ public class CountsControlerListenerTest {
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testUseVolumesOfIteration() {
+	void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controller(), config.counts(), null, null, null);
@@ -249,7 +249,7 @@ public class CountsControlerListenerTest {
 	}
 
 	@Test
-	public void test_writeCountsInterval() {
+	void test_writeCountsInterval() {
 		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		CountsConfigGroup cConfig = config.counts();
 
@@ -285,7 +285,7 @@ public class CountsControlerListenerTest {
 	}
 
 	@Test
-	public void testReset_CorrectlyExecuted() throws IOException {
+	void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 
@@ -326,7 +326,7 @@ public class CountsControlerListenerTest {
 	}
 
 	@Test
-	public void testFilterAnalyzedModes() throws IOException {
+	void testFilterAnalyzedModes() throws IOException {
 		Config config = util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 

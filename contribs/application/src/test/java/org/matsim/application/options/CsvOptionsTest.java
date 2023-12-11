@@ -2,8 +2,8 @@ package org.matsim.application.options;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 
@@ -19,7 +19,7 @@ public class CsvOptionsTest {
 	public Path f;
 
 	@Test
-	public void output() throws IOException {
+	void output() throws IOException {
 
 		CsvOptions csv = new CsvOptions(CSVFormat.Predefined.TDF);
 

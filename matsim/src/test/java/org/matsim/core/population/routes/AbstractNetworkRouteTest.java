@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +50,7 @@ public abstract class AbstractNetworkRouteTest {
 	abstract protected NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network);
 
 	@Test
-	public void testSetLinkIds() {
+	void testSetLinkIds() {
 		Network network = createTestNetwork();
 		List<Id<Link>> links = NetworkUtils.getLinkIds("-22 2 3 24 14");
 		final Id<Link> link11 = Id.create(11, Link.class);
@@ -68,7 +68,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testSetLinks_linksNull() {
+	void testSetLinks_linksNull() {
 		Network network = createTestNetwork();
 		Id<Link> link1 = Id.create("1", Link.class);
 		Id<Link> link4 = Id.create("4", Link.class);
@@ -88,7 +88,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testSetLinks_AllNull() {
+	void testSetLinks_AllNull() {
 		Network network = createTestNetwork();
 		Id<Link> link1 = Id.create("1", Link.class);
 		Id<Link> link4 = Id.create("4", Link.class);
@@ -107,7 +107,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetDistance() {
+	void testGetDistance() {
 		Network network = createTestNetwork();
 		Id<Link> link1 = Id.create("1", Link.class);
 		Id<Link> link4 = Id.create("4", Link.class);
@@ -119,7 +119,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinkIds() {
+	void testGetLinkIds() {
 		Network network = createTestNetwork();
 		Id<Link> link1 = Id.create("1", Link.class);
 		Id<Link> link4 = Id.create("4", Link.class);
@@ -135,7 +135,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute() {
+	void testGetSubRoute() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id3 = Id.create("3", Link.class);
@@ -156,7 +156,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_fromStart() {
+	void testGetSubRoute_fromStart() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id1 = Id.create("1", Link.class);
@@ -180,7 +180,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_toEnd() {
+	void testGetSubRoute_toEnd() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id3 = Id.create("3", Link.class);
@@ -200,7 +200,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_startOnly() {
+	void testGetSubRoute_startOnly() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
@@ -215,7 +215,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_endOnly() {
+	void testGetSubRoute_endOnly() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
@@ -230,7 +230,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_wrongStart() {
+	void testGetSubRoute_wrongStart() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id1 = Id.create("1", Link.class);
@@ -247,7 +247,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_wrongEnd() {
+	void testGetSubRoute_wrongEnd() {
 		Network network = createTestNetwork();
 		Id<Link> id1 = Id.create("1", Link.class);
 		Id<Link> id14 = Id.create("14", Link.class);
@@ -264,7 +264,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_sameLinks() {
+	void testGetSubRoute_sameLinks() {
 		Network network = createTestNetwork();
 		Id<Link> id1 = Id.create("1", Link.class);
 		Id<Link> id12 = Id.create("12", Link.class);
@@ -280,7 +280,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_sameLinks_emptyRoute1() {
+	void testGetSubRoute_sameLinks_emptyRoute1() {
 		Network network = createTestNetwork();
 		Id<Link> id1 = Id.create("1", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id1, id1, network);
@@ -294,7 +294,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_sameLinks_emptyRoute2() {
+	void testGetSubRoute_sameLinks_emptyRoute2() {
 		Network network = createTestNetwork();
 		Id<Link> id1 = Id.create("1", Link.class);
 		Id<Link> id2 = Id.create("2", Link.class);
@@ -315,7 +315,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_fullRoute() {
+	void testGetSubRoute_fullRoute() {
 		Network network = createTestNetwork();
 		Id<Link> id0 = Id.create("0", Link.class);
 		Id<Link> id4 = Id.create("4", Link.class);
@@ -335,7 +335,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_circleInRoute() {
+	void testGetSubRoute_circleInRoute() {
 		Network network = createTestNetwork();
 		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id11 = Id.create("11", Link.class);
@@ -358,7 +358,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_startInCircle() {
+	void testGetSubRoute_startInCircle() {
 		Network network = createTestNetwork();
 		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id11 = Id.create("11", Link.class);
@@ -378,7 +378,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_startInCircle_CircleInEnd() {
+	void testGetSubRoute_startInCircle_CircleInEnd() {
 		Network network = createTestNetwork();
 		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id11 = Id.create("11", Link.class);
@@ -397,7 +397,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetSubRoute_CircleAtStart() {
+	void testGetSubRoute_CircleAtStart() {
 		Network network = createTestNetwork();
 		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id13 = Id.create("13", Link.class);
@@ -414,7 +414,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testStartAndEndOnSameLinks_setLinks() {
+	void testStartAndEndOnSameLinks_setLinks() {
 		Network network = createTestNetwork();
 		Id<Link> link = Id.create("3", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link, link, network);
@@ -423,7 +423,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testStartAndEndOnSubsequentLinks_setLinks() {
+	void testStartAndEndOnSubsequentLinks_setLinks() {
 		Network network = createTestNetwork();
 		final Id<Link> link13 = Id.create("13", Link.class);
 		final Id<Link> link14 = Id.create("14", Link.class);
@@ -433,7 +433,7 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testVehicleId() {
+	void testVehicleId() {
 		Network network = createTestNetwork();
 		Id<Link> link0 = Id.create("0", Link.class);
 		Id<Link> link15 = Id.create("15", Link.class);

@@ -22,7 +22,7 @@
  package org.matsim.core.population;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,13 +31,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
+ /**
  * @author thibautd
  */
 public class PopulationUtilsTest {
 
-	@Test
-	public void testPlanAttributesCopy() {
+	 @Test
+	 void testPlanAttributesCopy() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));

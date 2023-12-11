@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -64,12 +64,14 @@ public class VehicleReaderV2Test {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	@Test public void test_NumberOfVehicleTypeisReadCorrectly() {
+	@Test
+	void test_NumberOfVehicleTypeisReadCorrectly() {
 		assertNotNull(vehicleTypes);
 		assertEquals(3, vehicleTypes.size());
 	}
 
-	@Test public void test_VehicleAttributesReadCorrectly(){
+	@Test
+	void test_VehicleAttributesReadCorrectly(){
 		assertNotNull(vehicleTypes);
 		/* First vehicle has an attribute. */
 		Vehicle v1 = vehicles.get(Id.createVehicleId("23"));
@@ -91,7 +93,8 @@ public class VehicleReaderV2Test {
 	}
 
 
-	@Test public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
+	@Test
+	void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		VehicleType vehTypeNormalCar = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehTypeNormalCar);
 		assertEquals(9.5, vehTypeNormalCar.getLength(), MatsimTestUtils.EPSILON);
@@ -131,7 +134,8 @@ public class VehicleReaderV2Test {
 		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar));
 	}
 
-	@Test public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
+	@Test
+	void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
 		assertEquals(7.5, vehTypeDefaultCar.getLength(), MatsimTestUtils.EPSILON);
@@ -147,7 +151,8 @@ public class VehicleReaderV2Test {
 		assertEquals(2, vehTypeDefaultCar.getAttributes().getAttribute("Attribute2"));
 	}
 
-	@Test public void test_VehicleTypeValuesAreReadCorrectly_smallTruck() {
+	@Test
+	void test_VehicleTypeValuesAreReadCorrectly_smallTruck() {
 		VehicleType vehTypeSmallTruck = vehicleTypes.get(Id.create("smallTruck", VehicleType.class));
 		assertNotNull(vehTypeSmallTruck);
 		assertEquals("This is a small truck", vehTypeSmallTruck.getDescription());
@@ -169,12 +174,14 @@ public class VehicleReaderV2Test {
 		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation()), MatsimTestUtils.EPSILON);
 	}
 
-	@Test public void test_NumberOfVehiclesIsReadCorrectly() {
+	@Test
+	void test_NumberOfVehiclesIsReadCorrectly() {
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
 	}
 
-	@Test public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
+	@Test
+	void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
 		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());

@@ -22,8 +22,8 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -39,7 +39,7 @@ public class RunChessboardIT {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void runChessboard() {
+	void runChessboard() {
 		String [] args = { IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ).toString()
 				, "--config:controler.outputDirectory", utils.getOutputDirectory()
 				, "--config:controler.lastIteration", "1"

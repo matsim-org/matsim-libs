@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetsim.jointtrips;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -802,7 +802,7 @@ public class JointTravelUtilsTest {
 	}
 
 	@Test
-	public void testExtractJointTrips() throws Exception {
+	void testExtractJointTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
 			JointTravelStructure struct = JointTravelUtils.analyseJointTravel(f.plan);
 
@@ -816,7 +816,7 @@ public class JointTravelUtilsTest {
 	}
 
 	@Test
-	public void testParseDriverTrips() throws Exception {
+	void testParseDriverTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
 			List<DriverTrip> trips = JointTravelUtils.parseDriverTrips(f.plan);
 

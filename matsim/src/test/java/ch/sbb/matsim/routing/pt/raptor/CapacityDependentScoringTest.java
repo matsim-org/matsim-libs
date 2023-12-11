@@ -20,7 +20,7 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -81,7 +81,7 @@ import java.util.List;
 public class CapacityDependentScoringTest {
 
 	@Test
-	public void testScoring() {
+	void testScoring() {
 		double normalScore = calcScore(new Fixture(), false);
 		double capDepScore = calcScore(new Fixture(), true);
 

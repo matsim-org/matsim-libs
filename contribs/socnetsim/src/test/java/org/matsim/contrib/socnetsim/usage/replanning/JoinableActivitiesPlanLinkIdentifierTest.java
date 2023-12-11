@@ -20,7 +20,7 @@
 package org.matsim.contrib.socnetsim.usage.replanning;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -44,7 +44,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 				ConfigUtils.createConfig() ).getPopulation().getFactory();
 
 	@Test
-	public void testOpenPlansSamePlaceSameType() {
+	void testOpenPlansSamePlaceSameType() {
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
 
@@ -58,7 +58,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testOpenPlansSamePlaceDifferentType() {
+	void testOpenPlansSamePlaceDifferentType() {
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
 
@@ -76,7 +76,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testOpenPlansDifferentPlaceSameType() {
+	void testOpenPlansDifferentPlaceSameType() {
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
 		final Id<ActivityFacility> facility2 = Id.create( "fa2" , ActivityFacility.class );
@@ -95,7 +95,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testOpenPlansSamePlaceSameWrongType() {
+	void testOpenPlansSamePlaceSameWrongType() {
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
 
@@ -127,7 +127,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testSingleTourOverlaping() {
+	void testSingleTourOverlaping() {
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
 
@@ -158,7 +158,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testSingleTourPlansNonOverlaping() {
+	void testSingleTourPlansNonOverlaping() {
 		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
@@ -190,7 +190,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testSingleTourPlansZeroDurationAct() {
+	void testSingleTourPlansZeroDurationAct() {
 		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
@@ -222,7 +222,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testSingleTourPlansZeroDurationBegin() {
+	void testSingleTourPlansZeroDurationBegin() {
 		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
@@ -254,7 +254,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testSingleTourPlansZeroDurationEnd() {
+	void testSingleTourPlansZeroDurationEnd() {
 		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
@@ -286,7 +286,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testDoubleTourPlansZeroDurationEnd() {
+	void testDoubleTourPlansZeroDurationEnd() {
 		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
@@ -323,7 +323,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testSingleTourPlansInconsistentDurationAct() {
+	void testSingleTourPlansInconsistentDurationAct() {
 		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );

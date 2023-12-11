@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -22,8 +22,9 @@ import org.matsim.examples.ExamplesUtils;
 
 public class CadytsCarWithPtScenarioIT {
 
-    @Test @Ignore
-    public void testCadytsWithPtVehicles() {
+	@Test
+	@Ignore
+	void testCadytsWithPtVehicles() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml"));
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         config.controller().setLastIteration(0);

@@ -11,8 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -96,7 +96,7 @@ public class PtAlongALine2Test {
 	// !! otfvis does not run within parameterized test :-( !!
 
 	@Test
-	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
+	void testPtAlongALineWithRaptorAndDrtServiceArea() {
 		// Towards some understanding of what is going on here:
 		// * In many situations, a good solution is that drt drives to some transit stop, and from there directly to the destination.  The swiss rail
 		// raptor will return a cost "infinity" of such a solution, in which case the calling method falls back onto transit_walk.
@@ -570,7 +570,7 @@ public class PtAlongALine2Test {
 	}
 
 	@Test
-	public void intermodalAccessEgressPicksWrongVariant() {
+	void intermodalAccessEgressPicksWrongVariant() {
 		// outdated comment:
 		// this test fails because it picks a
 		//    drt-nonNetworkWalk-nonNetworkWalk-drt
@@ -745,9 +745,10 @@ public class PtAlongALine2Test {
 		controler.run();
 	}
 
+	// this test is failing because raptor treats "walk" in a special way.  kai, jul'19
 	@Test
-	@Ignore // this test is failing because raptor treats "walk" in a special way.  kai, jul'19
-	public void networkWalkDoesNotWorkWithRaptor() {
+	@Ignore
+	void networkWalkDoesNotWorkWithRaptor() {
 		// test fails with null pointer exception
 
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());

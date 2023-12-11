@@ -1,6 +1,6 @@
 package org.matsim.contrib.discrete_mode_choice.components.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ScheduleWaitingTimeEstimatorTest {
 	@Test
-	public void testValidSingleCase() throws IOException {
+	void testValidSingleCase() throws IOException {
 		TransitSchedule schedule = createSchedule();
 
 		ScheduleWaitingTimeEstimator estimator = new ScheduleWaitingTimeEstimator(schedule);
@@ -53,9 +53,9 @@ public class ScheduleWaitingTimeEstimatorTest {
 		waitingTime = estimator.estimateWaitingTime(elements);
 		assertEquals(995.0, waitingTime, 1e-6);
 	}
-	
+
 	@Test
-	public void testValidMultiCase() throws IOException {
+	void testValidMultiCase() throws IOException {
 		TransitSchedule schedule = createSchedule();
 
 		ScheduleWaitingTimeEstimator estimator = new ScheduleWaitingTimeEstimator(schedule);
@@ -72,10 +72,10 @@ public class ScheduleWaitingTimeEstimatorTest {
 		waitingTime = estimator.estimateWaitingTime(elements);
 		assertEquals(20.0 + 995.0, waitingTime, 1e-6);
 	}
-	
+
 
 	@Test
-	public void testInvalidCase() throws IOException {
+	void testInvalidCase() throws IOException {
 		TransitSchedule schedule = createSchedule();
 
 		ScheduleWaitingTimeEstimator estimator = new ScheduleWaitingTimeEstimator(schedule);

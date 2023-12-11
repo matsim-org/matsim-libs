@@ -19,12 +19,14 @@
 
 package org.matsim.core.controler;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -43,7 +45,7 @@ public class ControlerMobsimIntegrationTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunMobsim_customMobsim() {
+	void testRunMobsim_customMobsim() {
 		Config cfg = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		cfg.controller().setLastIteration(0);
 		cfg.controller().setMobsim("counting");
@@ -70,17 +72,19 @@ public class ControlerMobsimIntegrationTest {
 		Assert.assertEquals(1, mf.callCount);
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testRunMobsim_missingMobsimFactory() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		cfg.controller().setLastIteration(0);
-		cfg.controller().setMobsim("counting");
-		cfg.controller().setWritePlansInterval(0);
-		Controler c = new Controler(cfg);
-        c.getConfig().controller().setCreateGraphs(false);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setWriteEventsInterval(0);
-		c.run();
+	@Test
+	void testRunMobsim_missingMobsimFactory() {
+		assertThrows(RuntimeException.class, () -> {
+			Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+			cfg.controller().setLastIteration(0);
+			cfg.controller().setMobsim("counting");
+			cfg.controller().setWritePlansInterval(0);
+			Controler c = new Controler(cfg);
+			c.getConfig().controller().setCreateGraphs(false);
+			c.getConfig().controller().setDumpDataAtEnd(false);
+			c.getConfig().controller().setWriteEventsInterval(0);
+			c.run();
+		});
 	}
 
 	private static class CountingMobsimFactory implements MobsimFactory {

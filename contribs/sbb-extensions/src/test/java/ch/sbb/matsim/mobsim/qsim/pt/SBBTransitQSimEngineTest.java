@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -69,8 +69,8 @@ public class SBBTransitQSimEngineTest {
         Assert.assertEquals(time, event.getTime(), 1e-7);
     }
 
-    @Test
-    public void testDriver() {
+	@Test
+	void testDriver() {
         TestFixture f = new TestFixture();
 
         EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
@@ -117,8 +117,8 @@ public class SBBTransitQSimEngineTest {
         driver.depart(f, routeDepTime + depOffset);
     }
 
-    @Test
-    public void testEvents_withoutPassengers_withoutLinks() {
+	@Test
+	void testEvents_withoutPassengers_withoutLinks() {
         TestFixture f = new TestFixture();
 
         EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
@@ -159,11 +159,11 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(14));
     }
 
-    /**
-     * This test also checks that the passenger boarding/leaving times are correctly taken into account
-     */
-    @Test
-    public void testEvents_withPassengers_withoutLinks() {
+	/**
+	* This test also checks that the passenger boarding/leaving times are correctly taken into account
+	*/
+	@Test
+	void testEvents_withPassengers_withoutLinks() {
         TestFixture f = new TestFixture();
         f.addSingleTransitDemand();
 
@@ -214,8 +214,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(21)); // driver
     }
 
-    @Test
-    public void testEvents_withThreePassengers_withoutLinks() {
+	@Test
+	void testEvents_withThreePassengers_withoutLinks() {
         TestFixture f = new TestFixture();
         f.addTripleTransitDemand();
 
@@ -280,8 +280,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(35)); // driver
     }
 
-    @Test
-    public void testEvents_withoutPassengers_withLinks() {
+	@Test
+	void testEvents_withoutPassengers_withLinks() {
         TestFixture f = new TestFixture();
         f.sbbConfig.setCreateLinkEventsInterval(1);
 
@@ -331,8 +331,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(22));
     }
 
-    @Test
-    public void testEvents_withoutPassengers_withLinks_Sesselbahn() {
+	@Test
+	void testEvents_withoutPassengers_withLinks_Sesselbahn() {
         TestFixture f = new TestFixture();
         f.addSesselbahn(true, false);
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -373,13 +373,13 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 35120, allEvents.get(12));
     }
 
-    /**
-     * during development, I had a case where the traveltime-offset between two stops was 0 seconds. This resulted in the 2nd stop being immediately handled, and only after that the
-     * linkLeave/linkEnter-Events were generated. As the 2nd stop happened to be the last one, the driver already left the vehicle, which then resulted in an exception in some event handler trying to
-     * figure out the driver of the vehicle driving around. This tests reproduces this situation in order to check that the code can correctly cope with such a situation.
-     */
-    @Test
-    public void testEvents_withoutPassengers_withLinks_SesselbahnMalformed() {
+	/**
+	* during development, I had a case where the traveltime-offset between two stops was 0 seconds. This resulted in the 2nd stop being immediately handled, and only after that the
+	* linkLeave/linkEnter-Events were generated. As the 2nd stop happened to be the last one, the driver already left the vehicle, which then resulted in an exception in some event handler trying to
+	* figure out the driver of the vehicle driving around. This tests reproduces this situation in order to check that the code can correctly cope with such a situation.
+	*/
+	@Test
+	void testEvents_withoutPassengers_withLinks_SesselbahnMalformed() {
         TestFixture f = new TestFixture();
         f.addSesselbahn(true, true);
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -420,12 +420,12 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 35000, allEvents.get(12));
     }
 
-    /**
-     * During first tests, some events were out-of-order in time, leading to an exception, due to the first stop on a route having a departure offset > 0. This tests reproduces this situation in order
-     * to check that the code can correctly cope with such a situation.
-     */
-    @Test
-    public void testEvents_withoutPassengers_withLinks_DelayedFirstDeparture() {
+	/**
+	* During first tests, some events were out-of-order in time, leading to an exception, due to the first stop on a route having a departure offset > 0. This tests reproduces this situation in order
+	* to check that the code can correctly cope with such a situation.
+	*/
+	@Test
+	void testEvents_withoutPassengers_withLinks_DelayedFirstDeparture() {
         TestFixture f = new TestFixture();
         f.delayDepartureAtFirstStop();
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -476,11 +476,11 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(22));
     }
 
-    /**
-     * During tests, the travel time between two stops was not correctly calculated when the two stops were connected with a single direct link, and each of the stops is on a zero-length loop link.
-     */
-    @Test
-    public void testEvents_withoutPassengers_withLinks_FromToLoopLink() {
+	/**
+	* During tests, the travel time between two stops was not correctly calculated when the two stops were connected with a single direct link, and each of the stops is on a zero-length loop link.
+	*/
+	@Test
+	void testEvents_withoutPassengers_withLinks_FromToLoopLink() {
         TestFixture f = new TestFixture();
         f.addLoopyRoute(true);
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -531,8 +531,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30570, allEvents.get(22));
     }
 
-    @Test
-    public void testMisconfiguration() {
+	@Test
+	void testMisconfiguration() {
         TestFixture f = new TestFixture();
         f.config.transit().setTransitModes(CollectionUtils.stringToSet("pt,train,bus"));
         f.sbbConfig.setDeterministicServiceModes(CollectionUtils.stringToSet("train,tram,ship"));
@@ -557,8 +557,8 @@ public class SBBTransitQSimEngineTest {
 
     }
 
-    @Test
-    public void testCreateEventsInterval() {
+	@Test
+	void testCreateEventsInterval() {
         TestFixture f = new TestFixture();
         f.sbbConfig.setCreateLinkEventsInterval(3);
 

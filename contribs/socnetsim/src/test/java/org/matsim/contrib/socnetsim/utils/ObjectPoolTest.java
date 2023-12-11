@@ -19,16 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.utils;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author thibautd
  */
 public class ObjectPoolTest {
 	@Test
-	public void testInstanceIsPooled() throws Exception {
+	void testInstanceIsPooled() throws Exception {
 		final ObjectPool<String> pool = new ObjectPool<String>();
 
 		final String instance1 = new String( "jojo" );

@@ -21,8 +21,8 @@ package org.matsim.core.events;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -36,7 +36,8 @@ public class GenericEventTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteReadXml() {
+	@Test
+	void testWriteReadXml() {
 		final String TYPE = "GenericEvent";
 		final String KEY1 = "k1";
 		final String VALUE1 = "v1";

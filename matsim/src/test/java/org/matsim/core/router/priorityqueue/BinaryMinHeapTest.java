@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author cdobler
@@ -38,9 +38,9 @@ public class BinaryMinHeapTest {
 	protected static final Logger log = LogManager.getLogger(BinaryMinHeapTest.class);
 	
 	private int maxElements = 10;
-	
+
 	@Test
-	public void testAdd() {
+	void testAdd() {
 		testAdd(createMinHeap(true));
 		testAdd(createMinHeap(false));
 		testAdd(createWrappedMinHeap(true));
@@ -65,7 +65,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testAdd_Null() {
+	void testAdd_Null() {
 		testAdd_Null(createMinHeap(true));
 		testAdd_Null(createMinHeap(false));
 		testAdd_Null(createWrappedMinHeap(true));
@@ -85,7 +85,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testPoll() {
+	void testPoll() {
 		testPoll(createMinHeap(true));
 		testPoll(createMinHeap(false));
 		testPoll(createWrappedMinHeap(true));
@@ -119,9 +119,9 @@ public class BinaryMinHeapTest {
 		Assert.assertEquals(0, pq.size());
 		Assert.assertNull(pq.poll());
 	}
-	
+
 	@Test
-	public void testPoll2() {
+	void testPoll2() {
 		testPoll2(createMinHeap(true));
 		testPoll2(createMinHeap(false));
 		testPoll2(createWrappedMinHeap(true));
@@ -158,7 +158,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testIterator() {
+	void testIterator() {
 		testIterator(createMinHeap(true));
 		testIterator(createMinHeap(false));
 		testIterator(createWrappedMinHeap(true));
@@ -182,7 +182,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testIterator_ConcurrentModification_add() {
+	void testIterator_ConcurrentModification_add() {
 		testIterator_ConcurrentModification_add(createMinHeap(true));
 		testIterator_ConcurrentModification_add(createMinHeap(false));
 		testIterator_ConcurrentModification_add(createWrappedMinHeap(true));
@@ -216,7 +216,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testIterator_ConcurrentModification_poll() {
+	void testIterator_ConcurrentModification_poll() {
 		testIterator_ConcurrentModification_poll(createMinHeap(true));
 		testIterator_ConcurrentModification_poll(createMinHeap(false));
 		testIterator_ConcurrentModification_poll(createWrappedMinHeap(true));
@@ -249,7 +249,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testIterator_ConcurrentModification_remove() {
+	void testIterator_ConcurrentModification_remove() {
 		testIterator_ConcurrentModification_remove(createMinHeap(true));
 		testIterator_ConcurrentModification_remove(createMinHeap(false));
 		testIterator_ConcurrentModification_remove(createWrappedMinHeap(true));
@@ -285,7 +285,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testIterator_RemoveUnsupported() {
+	void testIterator_RemoveUnsupported() {
 		testIterator_RemoveUnsupported(createMinHeap(true));
 		testIterator_RemoveUnsupported(createMinHeap(false));
 		testIterator_RemoveUnsupported(createWrappedMinHeap(true));
@@ -312,7 +312,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		testRemove(createMinHeap(true));
 		testRemove(createMinHeap(false));
 		testRemove(createWrappedMinHeap(true));
@@ -365,7 +365,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testRemoveAndAdd_LowerPriority() {
+	void testRemoveAndAdd_LowerPriority() {
 		testRemoveAndAdd_LowerPriority(createMinHeap(true));
 		testRemoveAndAdd_LowerPriority(createMinHeap(false));
 		testRemoveAndAdd_LowerPriority(createWrappedMinHeap(true));
@@ -393,9 +393,9 @@ public class BinaryMinHeapTest {
 		Assert.assertNull(pq.poll());
 	}
 
-	@Test
 	// increase priority -> decrease key since it is a min-heap
-	public void testIncreasePriority() {
+	@Test
+	void testIncreasePriority() {
 		testIncreasePriority(createMinHeap(true));
 		testIncreasePriority(createMinHeap(false));
 		testIncreasePriority(createWrappedMinHeap(true));
@@ -447,9 +447,9 @@ public class BinaryMinHeapTest {
 		assertEqualsHE(entry0, pq.poll());
 		Assert.assertNull(pq.poll());
 	}
-	
+
 	@Test
-	public void testRemoveAndAdd_HigherPriority() {
+	void testRemoveAndAdd_HigherPriority() {
 		testRemoveAndAdd_HigherPriority(createMinHeap(true));
 		testRemoveAndAdd_HigherPriority(createMinHeap(false));
 		testRemoveAndAdd_HigherPriority(createWrappedMinHeap(true));
@@ -478,7 +478,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testEqualCosts() {
+	void testEqualCosts() {
 		testEqualCosts(createMinHeap(true));
 		testEqualCosts(createMinHeap(false));
 		testEqualCosts(createWrappedMinHeap(true));
@@ -520,7 +520,7 @@ public class BinaryMinHeapTest {
 	}
 
 	@Test
-	public void testEqualCosts2() {
+	void testEqualCosts2() {
 		testEqualCosts2(createMinHeap(true));
 		testEqualCosts2(createMinHeap(false));
 		testEqualCosts2(createWrappedMinHeap(true));
@@ -579,9 +579,9 @@ public class BinaryMinHeapTest {
 		assertEqualsHE(entry9, pq.poll());
 		Assert.assertNull(pq.poll());
 	}
-	
+
 	@Test
-	public void testExceedCapacity() {
+	void testExceedCapacity() {
 		testExceedCapacity(createMinHeap(true));
 		testExceedCapacity(createMinHeap(false));
 		testExceedCapacity(createWrappedMinHeap(true));
@@ -620,9 +620,9 @@ public class BinaryMinHeapTest {
 			log.info("catched expected exception. ", e);
 		}
 	}
-	
+
 	@Test
-	public void testOddOrder() {
+	void testOddOrder() {
 		testOddOrder(createMinHeap(true));
 		testOddOrder(createMinHeap(false));
 		testOddOrder(createWrappedMinHeap(true));

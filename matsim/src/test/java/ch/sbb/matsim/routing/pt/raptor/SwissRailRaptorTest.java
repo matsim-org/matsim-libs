@@ -22,7 +22,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.Builder;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,8 +85,8 @@ public class SwissRailRaptorTest {
         return raptor;
     }
 
-    @Test
-    public void testSingleLine() {
+	@Test
+	void testSingleLine() {
         Fixture f = new Fixture();
         f.init();
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
@@ -117,8 +117,8 @@ public class SwissRailRaptorTest {
         assertEquals(15434, Math.ceil(distance), MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void testSingleLine_linkIds() {
+	@Test
+	void testSingleLine_linkIds() {
         Fixture f = new Fixture();
         f.init();
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
@@ -149,8 +149,8 @@ public class SwissRailRaptorTest {
         assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void testWalkDurations() {
+	@Test
+	void testWalkDurations() {
         Fixture f = new Fixture();
         f.init();
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
@@ -171,7 +171,7 @@ public class SwissRailRaptorTest {
 
 
 	@Test
-	public void testStationAccessEgressTimes() {
+	void testStationAccessEgressTimes() {
 		Fixture f = new Fixture();
 		f.init();
 		RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
@@ -191,8 +191,8 @@ public class SwissRailRaptorTest {
 		assertEquals(Math.ceil(expectedEgressWalkTime), ((Leg)legs.get(2)).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 	}
 
-    @Test
-    public void testWalkDurations_range() {
+	@Test
+	void testWalkDurations_range() {
         Fixture f = new Fixture();
         f.init();
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
@@ -213,15 +213,15 @@ public class SwissRailRaptorTest {
     }
 
 
-    /**
-     * The fromFacility and toFacility are both closest to TransitStopFacility I. The expectation is that the Swiss Rail
-     * Raptor will return null (TripRouter / FallbackRouter will create a transit_walk between the fromFacility and
-     * toFacility) instead of routing the agent to make a major detour by walking the triangle from the fromFacility to
-     * the transitStopFacility and then to the toFacility, without once using pt.
-     */
+	/**
+	* The fromFacility and toFacility are both closest to TransitStopFacility I. The expectation is that the Swiss Rail
+	* Raptor will return null (TripRouter / FallbackRouter will create a transit_walk between the fromFacility and
+	* toFacility) instead of routing the agent to make a major detour by walking the triangle from the fromFacility to
+	* the transitStopFacility and then to the toFacility, without once using pt.
+	*/
 
-    @Test
-    public void testFromToSameStop() {
+	@Test
+	void testFromToSameStop() {
         Fixture f = new Fixture();
         f.init();
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
@@ -233,11 +233,10 @@ public class SwissRailRaptorTest {
     }
 
 
-
-    // now the pt router should always try to return a pt route no matter whether a direct walk would be faster
-    // adjusted the test - gl aug'19
-    @Test
-    public void testDirectWalkCheaper() {
+	// now the pt router should always try to return a pt route no matter whether a direct walk would be faster
+	// adjusted the test - gl aug'19
+	@Test
+	void testDirectWalkCheaper() {
         Fixture f = new Fixture();
         f.init();
 		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(f.config,SwissRailRaptorConfigGroup.class);
@@ -257,8 +256,8 @@ public class SwissRailRaptorTest {
         assertEquals(expectedTravelTime, actualTravelTime, MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void testDirectWalkFactor() {
+	@Test
+	void testDirectWalkFactor() {
         Fixture f = new Fixture();
         f.init();
         f.config.transitRouter().setDirectWalkFactor(100.0);
@@ -287,8 +286,8 @@ public class SwissRailRaptorTest {
         assertEquals((5002-3000)*1.3, ((Leg)legs.get(2)).getRoute().getDistance(), 0.0);
     }
 
-    @Test
-    public void testSingleLine_DifferentWaitingTime() {
+	@Test
+	void testSingleLine_DifferentWaitingTime() {
         Fixture f = new Fixture();
         f.init();
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
@@ -308,8 +307,8 @@ public class SwissRailRaptorTest {
         }
     }
 
-    @Test
-    public void testLineChange() {
+	@Test
+	void testLineChange() {
         Fixture f = new Fixture();
         f.init();
         ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class).setTransferWalkMargin(0);
@@ -345,8 +344,8 @@ public class SwissRailRaptorTest {
         assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void testFasterAlternative() {
+	@Test
+	void testFasterAlternative() {
         /* idea: travel from A to G
          * One could just take the blue line and travel from A to G (dep *:46, arrival *:28),
          * or one could first travel from A to C (dep *:46, arr *:58), and then take the red line
@@ -387,8 +386,8 @@ public class SwissRailRaptorTest {
     }
 
 
-    @Test
-    public void testTransferWeights() {
+	@Test
+	void testTransferWeights() {
         /* idea: travel from C to F
          * If starting at the right time, one could take the red line to G and travel back with blue to F.
          * If one doesn't want to switch lines, one could take the blue line from C to F directly.
@@ -425,8 +424,8 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, ((Leg)legs.get(2)).getMode());
     }
 
-    @Test
-    public void testTransferTime() {
+	@Test
+	void testTransferTime() {
         /* idea: travel from C to F
          * If starting at the right time, one could take the red line to G and travel back with blue to F.
          * If one doesn't want to switch lines, one could take the blue line from C to F directly.
@@ -462,8 +461,8 @@ public class SwissRailRaptorTest {
     }
 
 
-    @Test
-    public void testAfterMidnight() {
+	@Test
+	void testAfterMidnight() {
         // in contrast to the default PT router, SwissRailRaptor will not automatically
         // repeat the schedule after 24 hours, so any agent departing late will have to walk if there
         // is no late service in the schedule.
@@ -477,8 +476,8 @@ public class SwissRailRaptorTest {
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
-    @Test
-    public void testCoordFarAway() {
+	@Test
+	void testCoordFarAway() {
         Fixture f = new Fixture();
         f.init();
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
@@ -497,12 +496,12 @@ public class SwissRailRaptorTest {
         assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
     }
 
-    /**
-     * Tests that if only a single transfer-/walk-link is found, the router correctly only returns
-     * null (TripRouter/FallbackRouter will create a walk leg from start to end).
-     */
-    @Test
-    public void testSingleWalkOnly() {
+	/**
+	* Tests that if only a single transfer-/walk-link is found, the router correctly only returns
+	* null (TripRouter/FallbackRouter will create a walk leg from start to end).
+	*/
+	@Test
+	void testSingleWalkOnly() {
         WalkFixture f = new WalkFixture();
         f.scenario.getConfig().transitRouter().setSearchRadius(0.8 * CoordUtils.calcEuclideanDistance(f.coord2, f.coord4));
         f.scenario.getConfig().transitRouter().setExtensionRadius(0.0);
@@ -513,14 +512,14 @@ public class SwissRailRaptorTest {
     }
 
 
-    /**
-     * Tests that if only exactly two transfer-/walk-link are found, the router correctly only returns
-     * null (which will be replaced by the TripRouter and FallbackRouter with one walk leg from start
-     * to end). Differs from {@link #testSingleWalkOnly()} in that it tests for the correct internal
-     * working when more than one walk links are returned.
-     */
-    @Test
-    public void testDoubleWalkOnly() {
+	/**
+	* Tests that if only exactly two transfer-/walk-link are found, the router correctly only returns
+	* null (which will be replaced by the TripRouter and FallbackRouter with one walk leg from start
+	* to end). Differs from {@link #testSingleWalkOnly()} in that it tests for the correct internal
+	* working when more than one walk links are returned.
+	*/
+	@Test
+	void testDoubleWalkOnly() {
         WalkFixture f = new WalkFixture();
         f.scenario.getConfig().transitRouter().setSearchRadius(0.8 * CoordUtils.calcEuclideanDistance(f.coord2, f.coord4));
         f.scenario.getConfig().transitRouter().setExtensionRadius(0.0);
@@ -531,9 +530,9 @@ public class SwissRailRaptorTest {
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testLongTransferTime_withTransitRouterWrapper() {
+	@SuppressWarnings("unchecked")
+	@Test
+	void testLongTransferTime_withTransitRouterWrapper() {
         // 5 minutes additional transfer time
         {
             TransferFixture f = new TransferFixture(5 * 60.0);
@@ -649,8 +648,8 @@ public class SwissRailRaptorTest {
         return duration;
     }
 
-    @Test
-    public void testNightBus() {
+	@Test
+	void testNightBus() {
         // test a special case where a direct connection only runs at a late time, when typically
         // no other services run anymore.
         NightBusFixture f = new NightBusFixture();
@@ -684,8 +683,8 @@ public class SwissRailRaptorTest {
         assertEquals(f.lineId3, ptRoute.getLineId());
     }
 
-    @Test
-    public void testCircularLine() {
+	@Test
+	void testCircularLine() {
         Fixture f = new Fixture();
         f.init();
 
@@ -713,8 +712,8 @@ public class SwissRailRaptorTest {
         Assert.assertEquals(Id.create(20, TransitStopFacility.class), ((TransitPassengerRoute) ((Leg)legs.get(3)).getRoute()).getEgressStopId());
     }
 
-    @Test
-    public void testRangeQuery() {
+	@Test
+	void testRangeQuery() {
         Fixture f = new Fixture();
         f.init();
         SwissRailRaptor raptor = createTransitRouter(f.schedule, f.config, f.network);
@@ -746,12 +745,12 @@ public class SwissRailRaptorTest {
         Assert.assertEquals("wrong cost", expectedCost, route.getTotalCosts(), 1e-5);
     }
 
-    /** test for https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/1
-     *
-     * If there are StopFacilities in the transit schedule, that are not part of any route, the Router crashes with a NPE in SwissRailRaptorData at line 213, because toRouteStopIndices == null.
-     */
-    @Test
-    public void testUnusedTransitStop() {
+	/** test for https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/1
+	*
+	* If there are StopFacilities in the transit schedule, that are not part of any route, the Router crashes with a NPE in SwissRailRaptorData at line 213, because toRouteStopIndices == null.
+	*/
+	@Test
+	void testUnusedTransitStop() {
         Fixture f = new Fixture();
         f.init();
 
@@ -777,8 +776,8 @@ public class SwissRailRaptorTest {
         Assert.assertEquals(3, legs.size());
     }
 
-    @Test
-    public void testTravelTimeDependentTransferCosts() {
+	@Test
+	void testTravelTimeDependentTransferCosts() {
         TravelTimeDependentTransferFixture f = new TravelTimeDependentTransferFixture();
 
         { // test default 0 + 0 * tt
@@ -862,8 +861,8 @@ public class SwissRailRaptorTest {
         }
     }
 
-    @Test
-    public void testCustomTransferCostCalculator() {
+	@Test
+	void testCustomTransferCostCalculator() {
         TransferFixture f = new TransferFixture(60.0);
 
         int[] transferCount = new int[] { 0 };
@@ -912,8 +911,8 @@ public class SwissRailRaptorTest {
         return config;
     }
 
-    @Test
-    public void testModeMapping() {
+	@Test
+	void testModeMapping() {
         Fixture f = new Fixture();
         f.init();
         for (TransitRoute route : f.blueLine.getRoutes().values()) {
@@ -951,8 +950,8 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, ((Leg)legs.get(4)).getMode());
     }
 
-    @Test
-    public void testModeMappingCosts() {
+	@Test
+	void testModeMappingCosts() {
         Fixture f = new Fixture();
         f.init();
 
@@ -1045,13 +1044,13 @@ public class SwissRailRaptorTest {
         }
     }
 
-    /**
-     * Tests what happens if there is a transit service available, but the agent's departure time (11 AM) is after the last transit
-     * departure time (9:46 AM). The expectation is that the router returns null and TripRouter/FallbackRouter will create a direct
-     * walk leg to get from the fromFacility to the toFacility.
-     */
-    @Test
-    public void testDepartureAfterLastBus(){
+	/**
+	* Tests what happens if there is a transit service available, but the agent's departure time (11 AM) is after the last transit
+	* departure time (9:46 AM). The expectation is that the router returns null and TripRouter/FallbackRouter will create a direct
+	* walk leg to get from the fromFacility to the toFacility.
+	*/
+	@Test
+	void testDepartureAfterLastBus(){
         Fixture f = new Fixture();
         f.init();
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);

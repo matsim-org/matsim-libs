@@ -19,7 +19,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,7 +60,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 	 * whereas cars should leave at a gap of one second.
 	 */
 	@Test
-	public void test4LinkEnterTimeOfCarAndBike () {
+	void test4LinkEnterTimeOfCarAndBike() {
 
 		Id<Vehicle> firstAgent = Id.createVehicleId(1);
 		Id<Vehicle> secondAgent = Id.createVehicleId(2);

@@ -22,7 +22,7 @@ package org.matsim.core.router;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ import org.matsim.facilities.Facility;
 public class NetworkRoutingModuleTest {
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 		Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
@@ -77,7 +77,7 @@ public class NetworkRoutingModuleTest {
 	}
 
 	@Test
-	public void testRouteLegWithDistance() {
+	void testRouteLegWithDistance() {
 		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));

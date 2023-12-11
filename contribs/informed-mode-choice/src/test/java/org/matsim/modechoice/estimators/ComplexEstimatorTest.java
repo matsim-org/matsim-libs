@@ -1,7 +1,7 @@
 package org.matsim.modechoice.estimators;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -17,7 +17,7 @@ public class ComplexEstimatorTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void bindings() {
+	void bindings() {
 
 		Config config = TestScenario.loadConfig(utils);
 

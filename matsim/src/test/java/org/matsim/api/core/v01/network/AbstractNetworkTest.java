@@ -22,7 +22,7 @@ package org.matsim.api.core.v01.network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
@@ -38,7 +38,7 @@ public abstract class AbstractNetworkTest {
 	public abstract Network getEmptyTestNetwork();
 
 	@Test
-	public void removeLink() {
+	void removeLink() {
 		Fixture f = new Fixture(getEmptyTestNetwork());
 
 		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
@@ -63,7 +63,7 @@ public abstract class AbstractNetworkTest {
 	}
 
 	@Test
-	public void removeNode() {
+	void removeNode() {
 		Fixture f = new Fixture(getEmptyTestNetwork());
 
 		Assert.assertEquals(8, f.network.getNodes().size());

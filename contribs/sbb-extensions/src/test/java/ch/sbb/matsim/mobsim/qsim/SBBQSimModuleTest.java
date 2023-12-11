@@ -26,8 +26,8 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -51,9 +51,9 @@ public class SBBQSimModuleTest {
         System.setProperty("matsim.preferLocalDtds", "true");
     }
 
-    // https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
-    @Test
-    public void testIntegration() {
+	// https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
+	@Test
+	void testIntegration() {
         String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
                 "<config>\n" +

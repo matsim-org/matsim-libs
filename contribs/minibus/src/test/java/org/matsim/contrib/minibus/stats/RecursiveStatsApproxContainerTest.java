@@ -20,8 +20,8 @@
 package org.matsim.contrib.minibus.stats;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.minibus.stats.RecursiveStatsApproxContainer;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -30,7 +30,7 @@ public class RecursiveStatsApproxContainerTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void testRecursiveStatsContainer() {
+	final void testRecursiveStatsContainer() {
 
 		RecursiveStatsApproxContainer stats = new RecursiveStatsApproxContainer(0.1, 3);
 

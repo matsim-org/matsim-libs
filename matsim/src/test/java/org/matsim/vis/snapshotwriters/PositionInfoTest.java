@@ -22,8 +22,8 @@ package org.matsim.vis.snapshotwriters;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +46,8 @@ public class PositionInfoTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testDistanceOnLink_shortLink() {
+	@Test
+	void testDistanceOnLink_shortLink() {
 
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
@@ -82,7 +83,8 @@ public class PositionInfoTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testDistanceOnLink_longLink() {
+	@Test
+	void testDistanceOnLink_longLink() {
 
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));

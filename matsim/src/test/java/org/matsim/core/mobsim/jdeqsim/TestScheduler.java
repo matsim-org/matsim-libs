@@ -22,16 +22,16 @@
  package org.matsim.core.mobsim.jdeqsim;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage1;
 import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;
 
-public class TestScheduler {
+ public class TestScheduler {
 
-	// the time at the end of the simulation is equal to the time of the last message processed
-	@Test
-	public void testSchedule1(){
+	 // the time at the end of the simulation is equal to the time of the last message processed
+	 @Test
+	 void testSchedule1(){
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		SimUnit sm1=new DummySimUnit(scheduler);
 		Message m1=new DummyMessage();
@@ -40,10 +40,10 @@ public class TestScheduler {
 		Assert.assertEquals(9000.0, scheduler.getSimTime(), 0.0);
 	}
 
-	// a message is scheduled and unscheduled before starting the simulation
-	// this causes the simulation to stop immediatly (because no messages in queue)
-	@Test
-	public void testUnschedule(){
+	 // a message is scheduled and unscheduled before starting the simulation
+	 // this causes the simulation to stop immediatly (because no messages in queue)
+	 @Test
+	 void testUnschedule(){
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		SimUnit sm1=new DummySimUnit(scheduler);
 		Message m1=new DummyMessage();
@@ -53,10 +53,10 @@ public class TestScheduler {
 		Assert.assertEquals(0.0, scheduler.getSimTime(), 0.0);
 	}
 
-	// We shedule two messages, but the first message deletes upon handling the message the second message.
-	// This results in that the simulation stops not at time 10, but immediatly at time 1.
-	@Test
-	public void testUnschedule2(){
+	 // We shedule two messages, but the first message deletes upon handling the message the second message.
+	 // This results in that the simulation stops not at time 10, but immediatly at time 1.
+	 @Test
+	 void testUnschedule2(){
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		SimUnit sm1=new DummySimUnit(scheduler);
 		Message m1=new DummyMessage();

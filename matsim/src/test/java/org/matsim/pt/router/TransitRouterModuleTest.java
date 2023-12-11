@@ -3,8 +3,8 @@ package org.matsim.pt.router;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor;
 import com.google.inject.Injector;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -19,7 +19,7 @@ public class TransitRouterModuleTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTransitRoutingAlgorithm_DependencyInjection_Raptor() {
+	void testTransitRoutingAlgorithm_DependencyInjection_Raptor() {
 		Fixture f = new Fixture();
 		f.config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.SwissRailRaptor);
 		f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());

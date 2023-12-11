@@ -4,8 +4,8 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 
 import org.junit.After;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
@@ -34,7 +34,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_singleLink() {
+	void parse_singleLink() {
 
 		Utils.OsmData singleLink = Utils.createSingleLink();
 		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parser_single-link.pbf");
@@ -66,7 +66,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_twoIntersectingWays() {
+	void parse_twoIntersectingWays() {
 
 		Utils.OsmData twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parser_two-intersecting-ways.pbf");
@@ -92,7 +92,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_intersectingLinksOneDoesNotMatchFilter() {
+	void parse_intersectingLinksOneDoesNotMatchFilter() {
 
 		Utils.OsmData twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 
@@ -121,7 +121,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_singleLink_withTransformation() {
+	void parse_singleLink_withTransformation() {
 
 		final CoordinateTransformation atlantis = new AtlantisToWGS84();
 

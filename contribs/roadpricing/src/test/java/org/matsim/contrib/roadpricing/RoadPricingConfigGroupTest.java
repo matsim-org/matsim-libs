@@ -1,8 +1,8 @@
 package org.matsim.contrib.roadpricing;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -12,13 +12,13 @@ public class RoadPricingConfigGroupTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void getTollLinksFile() {
+	void getTollLinksFile() {
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
 		Assert.assertNull("Default roadpricing file is not set.", cg.getTollLinksFile());
 	}
 
 	@Test
-	public void setTollLinksFile() {
+	void setTollLinksFile() {
 		String file = "./test.xml.gz";
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
 		cg.setTollLinksFile(file);
@@ -26,7 +26,7 @@ public class RoadPricingConfigGroupTest {
 	}
 
 	@Test
-	public void getEnforcementProbability() {
+	void getEnforcementProbability() {
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
 		Assert.assertEquals("Default probability should be 1.0", 1.0, cg.getEnforcementProbability(), MatsimTestUtils.EPSILON);
 
@@ -36,7 +36,7 @@ public class RoadPricingConfigGroupTest {
 	}
 
 	@Test
-	public void setEnforcementProbability() {
+	void setEnforcementProbability() {
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
 		try{
 			cg.setEnforcementProbability(1.2);

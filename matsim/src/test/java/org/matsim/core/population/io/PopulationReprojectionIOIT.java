@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+ /**
  * @author thibautd
  */
 public class PopulationReprojectionIOIT {
@@ -69,8 +69,8 @@ public class PopulationReprojectionIOIT {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testInput_V4() {
+	 @Test
+	 void testInput_V4() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V4 format
@@ -84,8 +84,8 @@ public class PopulationReprojectionIOIT {
 		testConversionAtInput(testFile);
 	}
 
-	@Test
-	public void testInput_V5() {
+	 @Test
+	 void testInput_V5() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V5 format
@@ -99,8 +99,8 @@ public class PopulationReprojectionIOIT {
 		testConversionAtInput(testFile);
 	}
 
-	@Test
-	public void testOutput_V4() {
+	 @Test
+	 void testOutput_V4() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
@@ -125,8 +125,8 @@ public class PopulationReprojectionIOIT {
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
 	}
 
-	@Test
-	public void testOutput_V5() {
+	 @Test
+	 void testOutput_V5() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
@@ -149,8 +149,8 @@ public class PopulationReprojectionIOIT {
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
 	}
 
-	@Test
-	public void testWithControlerAndAttributes() {
+	 @Test
+	 void testWithControlerAndAttributes() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.
@@ -265,8 +265,8 @@ public class PopulationReprojectionIOIT {
 		}
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.

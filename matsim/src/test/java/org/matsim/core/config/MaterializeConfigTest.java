@@ -3,8 +3,8 @@ package org.matsim.core.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class MaterializeConfigTest {
@@ -14,7 +14,7 @@ public class MaterializeConfigTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void testMaterializeAfterReadParameterSets() {
+	final void testMaterializeAfterReadParameterSets() {
 		{
 			// generate a test config that sets two values away from their defaults, and
 			// write it to file:

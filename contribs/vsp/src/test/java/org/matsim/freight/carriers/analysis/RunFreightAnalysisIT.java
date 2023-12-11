@@ -21,7 +21,9 @@
 
 package org.matsim.freight.carriers.analysis;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -51,7 +53,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void compareResults() {
+	void compareResults() {
 		//some generale stats
 		checkFile("carrierStats.tsv");
 		checkFile("freightVehicleStats.tsv");
@@ -74,7 +76,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void runVehicleTrackerTest(){
+	void runVehicleTrackerTest(){
 		final String inputPath = testUtils.getClassInputDirectory();
 		File networkFile = new File(inputPath + "/output_network.xml.gz");
 		File carrierFile = new File(inputPath + "/output_carriers.xml");
@@ -204,7 +206,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void runServiceTrackerTest(){
+	void runServiceTrackerTest(){
 
 		final String inputPath = testUtils.getClassInputDirectory();
 		File networkFile = new File(inputPath + "/output_network.xml.gz");

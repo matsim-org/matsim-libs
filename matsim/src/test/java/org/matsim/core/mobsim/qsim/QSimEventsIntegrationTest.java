@@ -22,9 +22,9 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,7 +41,7 @@ public class QSimEventsIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void netsimEngineHandlesExceptionCorrectly() {
+	void netsimEngineHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -58,7 +58,7 @@ public class QSimEventsIntegrationTest {
 	}
 
 	@Test
-	public void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
+	void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.eventsManager().setNumberOfThreads(1);
 		config.eventsManager().setSynchronizeOnSimSteps(true);
@@ -73,7 +73,7 @@ public class QSimEventsIntegrationTest {
 	}
 
 	@Test
-	public void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
+	void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.eventsManager().setNumberOfThreads(1);
 		config.eventsManager().setSynchronizeOnSimSteps(false);

@@ -23,8 +23,8 @@ package org.matsim.contrib.signals.data.conflicts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -44,7 +44,7 @@ public class SignalConflictDataReaderWriterTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testReaderAndWriter() {
+	void testReaderAndWriter() {
 		LOG.info("create conflict data");
 		ConflictData conflictData = createConflictDataForTestCase();
 

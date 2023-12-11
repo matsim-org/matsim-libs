@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,7 +64,7 @@ public class TestForEmergenceTime {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void emergenceTimeTest_v4(){
+	final void emergenceTimeTest_v4(){
 
 		String [] congestionPricingImpl = {"v4"};
 

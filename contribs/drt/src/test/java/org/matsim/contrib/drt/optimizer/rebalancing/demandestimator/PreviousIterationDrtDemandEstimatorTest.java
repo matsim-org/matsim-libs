@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,7 +51,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	private final DrtZonalSystem zonalSystem = new DrtZonalSystem(List.of(zone1, zone2));
 
 	@Test
-	public void noDepartures() {
+	void noDepartures() {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		//no events in previous iterations
@@ -66,7 +66,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	}
 
 	@Test
-	public void drtDepartures() {
+	void drtDepartures() {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		//time bin 0-1800
@@ -101,7 +101,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	}
 
 	@Test
-	public void nonDrtDepartures() {
+	void nonDrtDepartures() {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		estimator.handleEvent(departureEvent(100, link1, "mode X"));
@@ -113,7 +113,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	}
 
 	@Test
-	public void currentCountsAreCopiedToPreviousAfterReset() {
+	void currentCountsAreCopiedToPreviousAfterReset() {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
@@ -129,7 +129,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	}
 
 	@Test
-	public void timeBinsAreRespected() {
+	void timeBinsAreRespected() {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
@@ -147,7 +147,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	}
 
 	@Test
-	public void noTimeLimitIsImposed() {
+	void noTimeLimitIsImposed() {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		estimator.handleEvent(departureEvent(10000000, link1, TransportMode.drt));

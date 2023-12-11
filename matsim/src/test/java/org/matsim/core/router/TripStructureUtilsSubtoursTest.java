@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -749,45 +749,45 @@ public class TripStructureUtilsSubtoursTest {
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testOneSubtour() {
+	void testOneSubtour() {
 		performTest( createMonoSubtourFixture( useFacilitiesAsAnchorPoint ) );
 	}
 
 	@Test
-	public void testTwoNestedSubtours() {
+	void testTwoNestedSubtours() {
 		performTest( createTwoNestedSubtours(useFacilitiesAsAnchorPoint) );
 	}
 
 	@Test
-	public void testTwoChildren() {
+	void testTwoChildren() {
 		performTest( createTwoChildren(useFacilitiesAsAnchorPoint) );
 	}
 
 	@Test
-	public void testComplexSubtours() {
+	void testComplexSubtours() {
 		performTest( createComplexSubtours(useFacilitiesAsAnchorPoint) );
 	}
 
 	@Test
-	public void testOpenPlan() {
+	void testOpenPlan() {
 		performTest( createOpenPlan(useFacilitiesAsAnchorPoint) );
 	}
 
 	@Test
-	public void testLoops() {
+	void testLoops() {
 		performTest( createPlanWithLoops(useFacilitiesAsAnchorPoint) );
 	}
 
 	@Test
-	public void testTwoIndependentTours() {
+	void testTwoIndependentTours() {
 		performTest( createTwoIndependentTours(useFacilitiesAsAnchorPoint) );
 	}
 
 	@Test
-	public void testTripFromSomewhereElse() { performTest( createSingleTourComingFromSomewhereElse(useFacilitiesAsAnchorPoint));}
+	void testTripFromSomewhereElse() { performTest( createSingleTourComingFromSomewhereElse(useFacilitiesAsAnchorPoint));}
 
 	@Test
-	public void testTripToSomewhereElse() { performTest( createSingleTourGoingToSomewhereElse(useFacilitiesAsAnchorPoint));}
+	void testTripToSomewhereElse() { performTest( createSingleTourGoingToSomewhereElse(useFacilitiesAsAnchorPoint));}
 
 	private static void performTest(final Fixture fixture) {
 		final Collection<Subtour> subtours =
@@ -809,7 +809,7 @@ public class TripStructureUtilsSubtoursTest {
 	}
 
 	@Test
-	public void testInconsistentPlan() throws Exception {
+	void testInconsistentPlan() throws Exception {
 		final Fixture fixture = createInconsistentTrips( useFacilitiesAsAnchorPoint );
 		boolean hadException = false;
 		try {
@@ -826,7 +826,7 @@ public class TripStructureUtilsSubtoursTest {
 	}
 
 	@Test
-	public void testGetTripsWithoutSubSubtours() throws Exception {
+	void testGetTripsWithoutSubSubtours() throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
 			final int nTrips = TripStructureUtils.getTrips( f.plan ).size();
 			final Collection<Subtour> subtours =
@@ -846,7 +846,7 @@ public class TripStructureUtilsSubtoursTest {
 	}
 
 	@Test
-	public void testFatherhood() throws Exception {
+	void testFatherhood() throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
 			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan );
 

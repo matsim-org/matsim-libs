@@ -22,8 +22,8 @@ package org.matsim.contrib.taxi.optimizer.zonal;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
@@ -34,7 +34,7 @@ public class ZonalTaxiOptimizerIT {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testZonal_dse() {
+	void testZonal_dse() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
 		rbParams.nearestRequestsLimit = 99999;
@@ -54,7 +54,7 @@ public class ZonalTaxiOptimizerIT {
 	}
 
 	@Test
-	public void testZonal_minWaitTime() {
+	void testZonal_minWaitTime() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		rbParams.goal = Goal.MIN_WAIT_TIME;
 		rbParams.nearestRequestsLimit = 10;

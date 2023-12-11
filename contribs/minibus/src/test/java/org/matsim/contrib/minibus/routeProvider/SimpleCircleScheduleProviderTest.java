@@ -22,8 +22,8 @@ package org.matsim.contrib.minibus.routeProvider;
 import java.util.ArrayList;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +45,7 @@ public class SimpleCircleScheduleProviderTest {
 @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-    public final void testCreateTransitLine() {
+	final void testCreateTransitLine() {
 
 		Scenario scenario = PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();
@@ -104,7 +104,7 @@ public class SimpleCircleScheduleProviderTest {
 	}
 
 	@Test
-    public final void testGetRandomTransitStop() {
+	final void testGetRandomTransitStop() {
 
 		MutableScenario scenario = (MutableScenario) PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();
@@ -120,7 +120,7 @@ public class SimpleCircleScheduleProviderTest {
 	}
 
 	@Test
-    public final void testCreateEmptyLine() {
+	final void testCreateEmptyLine() {
 
 		MutableScenario scenario = (MutableScenario) PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();

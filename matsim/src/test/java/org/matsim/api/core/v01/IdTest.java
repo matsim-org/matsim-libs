@@ -23,18 +23,18 @@
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.collections.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IdTest {
+ public class IdTest {
 
 	private final static Logger LOG = LogManager.getLogger(IdTest.class);
 
-	@Test
-	public void testConstructor() {
+	 @Test
+	 void testConstructor() {
 		Id<TLink> linkId1 = Id.create("1", TLink.class);
 		Id<TLink> linkId2 = Id.create("2", TLink.class);
 		
@@ -42,22 +42,22 @@ public class IdTest {
 		Assert.assertEquals("2", linkId2.toString());
 	}
 
-	@Test
-	public void testIdConstructor() {
+	 @Test
+	 void testIdConstructor() {
 		Id<TNode> nodeId1 = Id.create("1", TNode.class);
 		Id<TLink> linkId1 = Id.create(nodeId1, TLink.class);
 		
 		Assert.assertEquals("1", linkId1.toString());
 	}
-	
-	@Test
-	public void testIdConstructor_Null() {
+
+	 @Test
+	 void testIdConstructor_Null() {
 		Id<TLink> linkId1 = Id.create((Id) null, TLink.class);
 		Assert.assertNull(linkId1);
 	}
-	
-	@Test
-	public void testObjectIdentity_cache() {
+
+	 @Test
+	 void testObjectIdentity_cache() {
 		Id<TLink> linkId1 = Id.create("1", TLink.class);
 		Id<TLink> linkId2 = Id.create("2", TLink.class);
 		Id<TLink> linkId1again = Id.create("1", TLink.class);
@@ -65,17 +65,17 @@ public class IdTest {
 		Assert.assertTrue(linkId1 == linkId1again);
 		Assert.assertFalse(linkId1 == linkId2);
 	}
-	
-	@Test
-	public void testObjectIdentity_types() {
+
+	 @Test
+	 void testObjectIdentity_types() {
 		Id<TLink> linkId1 = Id.create("1", TLink.class);
 		Id<TNode> nodeId1 = Id.create("1", TNode.class);
 		
 		Assert.assertFalse((Id) linkId1 == (Id) nodeId1);
 	}
-	
-	@Test
-	public void testCompareTo() {
+
+	 @Test
+	 void testCompareTo() {
 		Id<TLink> linkId1 = Id.create("1", TLink.class);
 		Id<TLink> linkId2 = Id.create("2", TLink.class);
 		Id<TLink> linkId1again = Id.create("1", TLink.class);
@@ -94,8 +94,8 @@ public class IdTest {
 //		} // FIXME temporarily deactivated
 	}
 
-	@Test
-	public void testResetCaches() {
+	 @Test
+	 void testResetCaches() {
 		Id.create("1", TLink.class);
 		Id.create("2", TLink.class);
 		int count = Id.getNumberOfIds(TLink.class);
@@ -108,8 +108,8 @@ public class IdTest {
 		Assert.assertEquals(3, Id.getNumberOfIds(TLink.class));
 	}
 
-	@Test
-	public void testResetCaches_onlyFromJUnit() throws InterruptedException {
+	 @Test
+	 void testResetCaches_onlyFromJUnit() throws InterruptedException {
 		Id.create("1", TLink.class);
 		int countBefore = Id.getNumberOfIds(TLink.class);
 		Assert.assertTrue(countBefore > 0);

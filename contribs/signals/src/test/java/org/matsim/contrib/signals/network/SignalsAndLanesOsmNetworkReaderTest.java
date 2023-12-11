@@ -14,8 +14,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
@@ -176,10 +176,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
     }
 
 
-
 //    @SuppressWarnings("ConstantConditions")
-    @Test
-    public void singleJunction(){
+	@Test
+	void singleJunction(){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -242,8 +241,8 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         Assert.assertEquals("Assert number of Signals", 8, signals);
     }
 
-    @Test
-    public void singleJunctionWithBoundingBox(){
+	@Test
+	void singleJunctionWithBoundingBox(){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -308,8 +307,8 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         Assert.assertEquals("Assert number of Signals", 8, signals);
     }
 
-    @Test
-    public void singleJunctionBadBoundingBox(){
+	@Test
+	void singleJunctionBadBoundingBox(){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -367,8 +366,8 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         }
     }
 
-    @Test
-    public void berlinSnippet(){
+	@Test
+	void berlinSnippet(){
         Path inputfile = Paths.get(matsimTestUtils.getClassInputDirectory());
         inputfile = Paths.get(inputfile.toString(),"berlinSnippet.osm.gz");
 

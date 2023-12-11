@@ -22,8 +22,8 @@ package org.matsim.core.population.io;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +49,8 @@ public class PopulationWriterHandlerImplV4Test {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteGenericRoute() {
+	@Test
+	void testWriteGenericRoute() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");

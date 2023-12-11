@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 public class TransitScheduleIOTest {
 
 	@Test
-	public void testWriteRead_V2() {
+	void testWriteRead_V2() {
 		TransitScheduleFactory f = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = new TransitScheduleImpl(f);
 		{ // prepare data

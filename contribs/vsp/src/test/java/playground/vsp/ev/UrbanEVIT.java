@@ -2,8 +2,8 @@ package playground.vsp.ev;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -18,7 +18,8 @@ import java.net.URL;
 public class UrbanEVIT {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test public void run() {
+	@Test
+	void run() {
 
 		try {
 //			final URL baseUrl = ExamplesUtils.getTestScenarioURL( "equil" );

@@ -26,8 +26,8 @@ import java.util.SortedMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
@@ -51,7 +51,7 @@ public class FixResponsiveSignalResultsIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testOneCrossingExample() {
+	void testOneCrossingExample() {
 		LOG.info("Fix the results from the simple one-crossing-example in RunSimpleResponsiveSignalExample.");
 		RunSimpleResponsiveSignalExample responsiveSignal = new RunSimpleResponsiveSignalExample();
 		responsiveSignal.run();

@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +43,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 public class TripRouterTest {
 	@Test
-	public void testTripInsertion() {
+	void testTripInsertion() {
 		Plan plan = PopulationUtils.createPlan();
 		PopulationUtils.createAndAddActivity(plan, "-4");
 		PopulationUtils.createAndAddLeg( plan, "-3" );
@@ -87,7 +87,7 @@ public class TripRouterTest {
 	}
 
 	@Test
-	public void testTripInsertionIfActivitiesImplementEquals() {
+	void testTripInsertionIfActivitiesImplementEquals() {
 		Plan plan = PopulationUtils.createPlan();
 		plan.addActivity( new EqualsActivity( "-4" , Id.create( 1, Link.class ) ) );
 		PopulationUtils.createAndAddLeg( plan, "-3" );
@@ -133,7 +133,7 @@ public class TripRouterTest {
 	}
 
 	@Test
-	public void testReturnedOldTrip() throws Exception {
+	void testReturnedOldTrip() throws Exception {
 		List<PlanElement> expected = new ArrayList<PlanElement>();
 
 		Plan plan = PopulationUtils.createPlan();

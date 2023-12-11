@@ -3,8 +3,8 @@ package playground.vsp.flowEfficiency;
 import com.google.inject.Provides;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -66,7 +66,7 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 	private FlowEfficiencyHandler handler;
 
 	@Test
-	public void testThatDrtAVMoveFaster(){
+	void testThatDrtAVMoveFaster(){
 
 		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
 		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));

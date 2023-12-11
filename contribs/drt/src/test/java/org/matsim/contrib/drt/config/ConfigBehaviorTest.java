@@ -3,8 +3,8 @@ package org.matsim.contrib.drt.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -19,8 +19,8 @@ public class ConfigBehaviorTest{
         @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
-        @Test
-        public final void testMaterializeAfterReadParameterSets() {
+	@Test
+	final void testMaterializeAfterReadParameterSets() {
                 {
                         // generate a test config that sets two values away from their defaults, and write it to file:
                         Config config = ConfigUtils.createConfig();
@@ -60,8 +60,8 @@ public class ConfigBehaviorTest{
                 }
         }
 
-        @Test
-        public final void testMaterializeAfterReadStandardParams() {
+	@Test
+	final void testMaterializeAfterReadStandardParams() {
                 {
                         // generate a test config that sets two values away from their defaults, and write it to file:
                         Config config = ConfigUtils.createConfig();

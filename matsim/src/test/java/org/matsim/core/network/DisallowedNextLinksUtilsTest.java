@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -14,12 +14,12 @@ public class DisallowedNextLinksUtilsTest {
 	Network n = DisallowedNextLinksTest.createNetwork();
 
 	@Test
-	public void testNoDisallowedNextLinks() {
+	void testNoDisallowedNextLinks() {
 		Assert.assertTrue(DisallowedNextLinksUtils.isValid(n));
 	}
 
 	@Test
-	public void testIsNotValid1() {
+	void testIsNotValid1() {
 		Map<Id<Link>, ? extends Link> links = n.getLinks();
 		Link l1 = links.get(Id.createLinkId("1"));
 		Link l3 = links.get(Id.createLinkId("3"));
@@ -32,7 +32,7 @@ public class DisallowedNextLinksUtilsTest {
 	}
 
 	@Test
-	public void testIsNotValid2() {
+	void testIsNotValid2() {
 		Map<Id<Link>, ? extends Link> links = n.getLinks();
 		Link l1 = links.get(Id.createLinkId("1"));
 		Link l3 = links.get(Id.createLinkId("3"));
@@ -45,7 +45,7 @@ public class DisallowedNextLinksUtilsTest {
 	}
 
 	@Test
-	public void testIsValid() {
+	void testIsValid() {
 		Map<Id<Link>, ? extends Link> links = n.getLinks();
 		Link l1 = links.get(Id.createLinkId("1"));
 		Link l3 = links.get(Id.createLinkId("3"));

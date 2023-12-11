@@ -20,9 +20,8 @@
 package org.matsim.contrib.signals.oneagent;
 
 import org.junit.Assert;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -59,7 +58,7 @@ public class ControlerTest {
 	 * the signal should be red in sec [0,99] and green in [100,2000]
 	 */
 	@Test
-	public void testModifySignalControlDataOnsetOffset() {
+	void testModifySignalControlDataOnsetOffset() {
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);

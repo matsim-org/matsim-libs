@@ -22,8 +22,8 @@ package org.matsim.core.events;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +42,8 @@ public class PersonEntersVehicleEventTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testReadWriteXml() {
+	@Test
+	void testReadWriteXml() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("testVehType", VehicleType.class ) );
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(80, Vehicle.class ), vehicleType );

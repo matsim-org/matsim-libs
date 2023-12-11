@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,7 +50,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetRandomUnscoredPlan() {
+	@Test
+	void testGetRandomUnscoredPlan() {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
 		Plan[] plans = new Plan[10];
@@ -97,7 +98,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testRemoveUnselectedPlans() {
+	@Test
+	void testRemoveUnselectedPlans() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.createAndAddPlan(person, false);
 		PersonUtils.createAndAddPlan(person, false);
@@ -112,7 +114,8 @@ public class PersonImplTest {
 		assertEquals("remaining plan should be selPlan.", selPlan, person.getPlans().get(0));
 	}
 
-	@Test public void testRemovePlan() {
+	@Test
+	void testRemovePlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(5, Person.class));
 		Plan p1 = PersonUtils.createAndAddPlan(person, false);
 		Plan p2 = PersonUtils.createAndAddPlan(person, true);
@@ -137,7 +140,8 @@ public class PersonImplTest {
 		assertEquals("wrong number of plans.", 0, person.getPlans().size());
 	}
 
-	@Test public void testSetSelectedPlan() {
+	@Test
+	void testSetSelectedPlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(11, Person.class));
 		Plan p1 = PersonUtils.createAndAddPlan(person, false);
 		assertEquals(p1, person.getSelectedPlan());
@@ -159,7 +163,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan() {
+	@Test
+	void testGetBestPlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		p1.setScore(90.0);
@@ -174,7 +179,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan_multipleBest() {
+	@Test
+	void testGetBestPlan_multipleBest() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		p1.setScore(11.0);
@@ -192,7 +198,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan_oneWithoutScore() {
+	@Test
+	void testGetBestPlan_oneWithoutScore() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		Plan p2 = PopulationUtils.createPlan();
@@ -206,7 +213,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan_allWithoutScore() {
+	@Test
+	void testGetBestPlan_allWithoutScore() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		Plan p2 = PopulationUtils.createPlan();

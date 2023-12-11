@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +72,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 	private Id<Link> link23 = Id.createLinkId("link_2_3");
 
 	@Test
-	public final void testTTviaMobSimAfterSimStepListener() {
+	final void testTTviaMobSimAfterSimStepListener() {
 
 		String outputDirectory = testUtils.getOutputDirectory() + "output_TTviaMobsimAfterSimStepListener/";
 

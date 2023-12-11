@@ -21,8 +21,8 @@
 package org.matsim.core.scoring;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -51,7 +51,8 @@ public class EventsToScoreTest {
 	/**
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
-	@Test public void testAddMoney() {
+	@Test
+	void testAddMoney() {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -67,7 +68,8 @@ public class EventsToScoreTest {
 		Assert.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
 	}
 
-	@Test public void testMsaAveraging() {
+	@Test
+	void testMsaAveraging() {
 		Config config = ConfigUtils.createConfig() ;
 
 		config.controller().setFirstIteration(10);

@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -24,7 +24,7 @@ import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 
 public class TestSiouxFalls {
 	@Test
-	public void testSiouxFallsWithSubtourModeChoiceReplacement() {
+	void testSiouxFallsWithSubtourModeChoiceReplacement() {
 		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));

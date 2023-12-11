@@ -20,8 +20,8 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -47,7 +47,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMainRunAndResults() {
+	void testMainRunAndResults() {
 		String inputDataDirectory = utils.getPackageInputDirectory() + "config_demand.xml";
 		String output = utils.getOutputDirectory();
 		String sample = "0.1";

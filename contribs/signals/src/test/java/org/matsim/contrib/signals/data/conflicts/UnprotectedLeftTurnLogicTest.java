@@ -21,8 +21,8 @@
 package org.matsim.contrib.signals.data.conflicts;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
@@ -45,7 +45,7 @@ public class UnprotectedLeftTurnLogicTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testSingleIntersectionScenarioWithLeftTurns() {
+	void testSingleIntersectionScenarioWithLeftTurns() {
 		// run scenarios from files
 		AnalyzeSingleIntersectionLeftTurnDelays restrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS);
 		AnalyzeSingleIntersectionLeftTurnDelays unrestrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);

@@ -23,8 +23,8 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -53,8 +53,8 @@ public class SamplerTest {
         this.context.init();
     }
 
-    @Test
-    public void testSampler() {
+	@Test
+	void testSampler() {
         DestinationSampler sampler = new DestinationSampler(
                 context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ) ;
         assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(1, Person.class))));

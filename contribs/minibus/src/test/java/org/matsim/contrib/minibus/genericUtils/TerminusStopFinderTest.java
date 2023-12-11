@@ -20,8 +20,7 @@
 package org.matsim.contrib.minibus.genericUtils;
 
 import java.util.ArrayList;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,9 +41,9 @@ public class TerminusStopFinderTest {
 	
 	TransitSchedule schedule;
 	TransitScheduleFactory stopFactory;
-	
+
 	@Test
-	public void testFindSecondTerminusStop() {
+	void testFindSecondTerminusStop() {
 		/* 
 		 * straight line
 		 * 

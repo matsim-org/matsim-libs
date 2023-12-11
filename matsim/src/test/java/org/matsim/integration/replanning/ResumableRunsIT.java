@@ -21,8 +21,8 @@
 package org.matsim.integration.replanning;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -56,7 +56,7 @@ public class ResumableRunsIT {
 	 * re-planning, which both could depend on random numbers.
 	 */
 	@Test
-	public void testResumableRuns() throws MalformedURLException {
+	void testResumableRuns() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(11);
 		config.controller().setWriteEventsInterval(1);

@@ -20,7 +20,7 @@
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -31,7 +31,7 @@ public class HullConverterTest {
 
 	public void testConvert() {
 
-	}	
+	}
 
 	/**
 	 * 	   4           3
@@ -44,7 +44,7 @@ public class HullConverterTest {
 	 *     1           2
 	 */
 	@Test
-	public void testConvertString(){
+	void testConvertString(){
 		/* Must pass a Geometry. */
 		Object o = new Integer(0);
 		HullConverter hc = new HullConverter();
@@ -81,8 +81,8 @@ public class HullConverterTest {
 		String polygonString = "(0.0;0.0),(5.0;0.0),(5.0;5.0),(0.0;5.0),(0.0;0.0)"; 
 		Assert.assertTrue("Wrong string for polygon.", polygonString.equalsIgnoreCase(s));
 	}
-	
-	
+
+
 	/**
 	 *   (5,0)-------(5,5)
 	 *     |           |
@@ -92,7 +92,7 @@ public class HullConverterTest {
 	 *   (0,0)-------(5,0)
 	 */
 	@Test
-	public void testConstructor(){
+	void testConstructor(){
 		HullConverter hc = new HullConverter();
 		GeometryFactory gf = new GeometryFactory();
 		Coordinate[] ca = new Coordinate[5];

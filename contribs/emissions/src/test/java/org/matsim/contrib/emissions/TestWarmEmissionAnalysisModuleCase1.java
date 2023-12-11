@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -133,12 +133,12 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 	}
 
-	
+
 	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
 	//the CO2_TOTAL warm Emissions are compared to a given value --> computed by using detailed Petrol and traffic state freeflow
 	//the "Sum" of all emissions is tested
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
 		//-- set up tables, event handler, parameters, module
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = setUp();
 		// case 1 - data in both tables -> use detailed
@@ -160,15 +160,15 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		emissionEventManager.reset();
 		warmEmissions.clear();
 	}
-	
-	
+
+
 	/*
 	* this test method creates a mock link and mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
 	* the counters for all possible combinations of avg, stop go and free flow speed are tested
 	* for the cases: > s&g speed, <ff speed ; the different ComputationMethods are tested as well
 	 */
 	@Test
-	public void testCounters1(){
+	void testCounters1(){
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = setUp();
 
 		/*
@@ -262,7 +262,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	 */
 
 	@Test
-	public void testCounters5(){
+	void testCounters5(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 
@@ -308,9 +308,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	}
 
 
-
 	@Test
-	public void testCounters1fractional(){
+	void testCounters1fractional(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 		emissionsModule.getEcg().setEmissionsComputationMethod(StopAndGoFraction );
@@ -396,7 +395,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 
 	@Test
-	public void testCounters6(){
+	void testCounters6(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 		emissionsModule.getEcg().setEmissionsComputationMethod(StopAndGoFraction );
@@ -433,7 +432,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	}
 
 	@Test
-	public void testCounters8(){
+	void testCounters8(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 

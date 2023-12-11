@@ -24,8 +24,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +61,7 @@ public class VehicleHandlerTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testVehicleHandler() {
+	void testVehicleHandler() {
 		// This is a test where there is a link with a certain parking capacity. As soon
 		// as
 		// it is reached the link is blocking, until a vehicle is leaving the link

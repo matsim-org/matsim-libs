@@ -23,8 +23,8 @@ package org.matsim.utils.gis.matsim2esri.network;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -41,7 +41,8 @@ public class Network2ESRIShapeTest   {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test public void testPolygonCapacityShape() {
+	@Test
+	void testPolygonCapacityShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
@@ -63,7 +64,8 @@ public class Network2ESRIShapeTest   {
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	@Test public void testPolygonLanesShape() {
+	@Test
+	void testPolygonLanesShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
@@ -85,7 +87,8 @@ public class Network2ESRIShapeTest   {
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	@Test public void testPolygonFreespeedShape() {
+	@Test
+	void testPolygonFreespeedShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
@@ -107,7 +110,8 @@ public class Network2ESRIShapeTest   {
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	@Test public void testLineStringShape() {
+	@Test
+	void testLineStringShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = utils.getOutputDirectory() + "./network.shp";
 
@@ -129,7 +133,8 @@ public class Network2ESRIShapeTest   {
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	@Test public void testNodesShape() {
+	@Test
+	void testNodesShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = utils.getOutputDirectory() + "./network.shp";
 

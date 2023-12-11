@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -47,21 +47,21 @@ public class ExtensiveInsertionProviderTest {
 	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
 	@Test
-	public void getInsertions_noInsertionsGenerated() {
+	void getInsertions_noInsertionsGenerated() {
 		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(new DefaultStopTimeCalculator(120), null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
 
 	@Test
-	public void getInsertions_twoAtEndInsertionsGenerated_zeroNearestInsertionsAtEndLimit() {
+	void getInsertions_twoAtEndInsertionsGenerated_zeroNearestInsertionsAtEndLimit() {
 		//the infeasible solution gets discarded in the first stage
 		//the feasible solution gets discarded in the second stage (KNearestInsertionsAtEndFilter)
 		getInsertions_twoInsertionsGenerated(0);
 	}
 
 	@Test
-	public void getInsertions_twoAtEndInsertionsGenerated_tenNearestInsertionsAtEndLimit() {
+	void getInsertions_twoAtEndInsertionsGenerated_tenNearestInsertionsAtEndLimit() {
 		//the infeasible solution gets discarded in the first stage
 		//the feasible solution is NOT discarded in the second stage (KNearestInsertionsAtEndFilter)
 		getInsertions_twoInsertionsGenerated(10);

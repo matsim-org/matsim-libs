@@ -21,8 +21,8 @@ package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -53,7 +53,7 @@ public class TrafficVolumeGenerationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
+	void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -183,7 +183,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
+	void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -386,7 +386,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testAddingExistingScenarios() throws Exception {
+	void testAddingExistingScenarios() throws Exception {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
@@ -452,7 +452,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testAddingExistingScenariosWithSample() throws Exception {
+	void testAddingExistingScenariosWithSample() throws Exception {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
@@ -503,7 +503,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
+	void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
@@ -663,7 +663,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
+	void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
@@ -754,9 +754,8 @@ public class TrafficVolumeGenerationTest {
 	}
 
 
-
 	@Test
-	public void testTrafficVolumeKeyGeneration() {
+	void testTrafficVolumeKeyGeneration() {
 		String zone = "zone1";
 		String mode = "modeA";
 

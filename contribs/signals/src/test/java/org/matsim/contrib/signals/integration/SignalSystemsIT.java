@@ -20,8 +20,8 @@
 package org.matsim.contrib.signals.integration;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -52,7 +52,7 @@ public class SignalSystemsIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testSignalSystems() {
+	void testSignalSystems() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
@@ -148,7 +148,7 @@ public class SignalSystemsIT {
 	}
 
 	@Test
-	public void testSignalSystemsWTryEndTimeThenDuration() {
+	void testSignalSystemsWTryEndTimeThenDuration() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		// tryEndTimeThenDuration currently is the default
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);

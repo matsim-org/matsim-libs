@@ -24,8 +24,8 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.*;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -89,7 +89,7 @@ public class FlowStorageSpillbackTest {
 	private Id<Link> linkId4 = Id.create("link4", Link.class);
 
 	@Test
-	public final void testFlowCongestion(){
+	final void testFlowCongestion(){
 
 		Scenario sc = loadScenario();
 		setPopulation(sc);

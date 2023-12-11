@@ -23,7 +23,7 @@ package org.matsim.core.network.filter;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -88,7 +88,7 @@ public class NetworkFilterManagerTest {
 	}
 
 	@Test
-	public void filterTest() {
+	void filterTest() {
 		NetworkFilterManager networkFilterManager = new NetworkFilterManager(filterNetwork, new NetworkConfigGroup());
 		networkFilterManager.addNodeFilter(new NetworkNodeFilter() {
 			@Override

@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +45,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test simple network
 	 */
 
-	@Test public void testSimplifyEmptyNetwork(){
+	@Test
+	void testSimplifyEmptyNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -84,7 +85,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test pt link
 	 */
 
-	@Test public void testSimplifyPTNetwork(){
+	@Test
+	void testSimplifyPTNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -127,7 +129,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test links with count stations
 	 */
 
-	@Test public void testSimplifyCountsNetwork(){
+	@Test
+	void testSimplifyCountsNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -172,7 +175,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test PT and Counts at once
 	 */
 
-	@Test public void testSimplifyPTCountsNetwork(){
+	@Test
+	void testSimplifyPTCountsNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -220,7 +224,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test additional links marked as blocked
 	 */
 
-	@Test public void testSimplifyElseNetwork(){
+	@Test
+	void testSimplifyElseNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -272,7 +277,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test all at once
 	 */
 
-	@Test public void testSimplifyAllNetwork(){
+	@Test
+	void testSimplifyAllNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 

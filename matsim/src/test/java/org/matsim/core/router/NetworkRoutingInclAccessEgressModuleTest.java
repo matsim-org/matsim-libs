@@ -1,7 +1,7 @@
 package org.matsim.core.router;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NetworkRoutingInclAccessEgressModuleTest {
 
@@ -177,8 +178,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
                 .collect(Collectors.toList());
     }
 
-    @Test
-    public void calcRoute_modeVehiclesFromVehiclesData_differentTypesTakeDifferentRoutes() {
+	@Test
+	void calcRoute_modeVehiclesFromVehiclesData_differentTypesTakeDifferentRoutes() {
 
         Config config = createConfig();
 
@@ -230,10 +231,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     }
 
 
-
-
-    @Test
-    public void calcRoute_defaultVehicle_defaultVehicleIsAssigned() {
+	@Test
+	void calcRoute_defaultVehicle_defaultVehicleIsAssigned() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
@@ -258,8 +257,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     }
 
 
-    @Test
-    public void useAccessEgressTimeFromLinkAttributes() {
+	@Test
+	void useAccessEgressTimeFromLinkAttributes() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
@@ -279,8 +278,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
 
-    @Test
-    public void useAccessEgressTimeFromConstantAndWalkTime() {
+	@Test
+	void useAccessEgressTimeFromConstantAndWalkTime() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
@@ -302,8 +301,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
 
-    @Test
-    public void routingModeInEvents() {
+	@Test
+	void routingModeInEvents() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
@@ -344,37 +343,41 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.isTrue(routingModes.contains("car"));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void failifNoAccessTimeSet() {
+	@Test
+	void failifNoAccessTimeSet() {
+		assertThrows(RuntimeException.class, () -> {
 
-        Config config = createConfig();
-        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink);
-        Scenario scenario = createScenario(config);
-        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
-        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
-        scenario.getPopulation().addPerson(person);
-        Controler controler = createControler(scenario);
-        controler.run();
-    }
+			Config config = createConfig();
+			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+			config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink);
+			Scenario scenario = createScenario(config);
+			NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)), TransportMode.car, 75);
+			Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+			scenario.getPopulation().addPerson(person);
+			Controler controler = createControler(scenario);
+			controler.run();
+		});
+	}
 
 
-    @Test(expected = RuntimeException.class)
-    public void failifNoEgressTimeSet() {
+	@Test
+	void failifNoEgressTimeSet() {
+		assertThrows(RuntimeException.class, () -> {
 
-        Config config = createConfig();
-        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.routing().setAccessEgressType(AccessEgressType.walkConstantTimeToLink);
-        Scenario scenario = createScenario(config);
-        NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
-        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
-        scenario.getPopulation().addPerson(person);
-        Controler controler = createControler(scenario);
-        controler.run();
-    }
+			Config config = createConfig();
+			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+			config.routing().setAccessEgressType(AccessEgressType.walkConstantTimeToLink);
+			Scenario scenario = createScenario(config);
+			NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)), TransportMode.car, 180);
+			Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+			scenario.getPopulation().addPerson(person);
+			Controler controler = createControler(scenario);
+			controler.run();
+		});
+	}
 
-    @Test
-    public void calcAccessTimeFromDistanceToLink() {
+	@Test
+	void calcAccessTimeFromDistanceToLink() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
@@ -398,8 +401,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(0.0,legs.get(2).getTravelTime().seconds());
     }
 
-    @Test
-    public void noBushwackingLegs() {
+	@Test
+	void noBushwackingLegs() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);

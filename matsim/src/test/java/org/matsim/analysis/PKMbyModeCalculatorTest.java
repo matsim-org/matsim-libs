@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +44,7 @@ public class PKMbyModeCalculatorTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testPKMbyModeCalculator() {
+	void testPKMbyModeCalculator() {
 
 		final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 		Plans plans = new Plans();

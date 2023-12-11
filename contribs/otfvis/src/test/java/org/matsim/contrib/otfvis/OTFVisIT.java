@@ -24,8 +24,8 @@
 package org.matsim.contrib.otfvis;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -52,7 +52,7 @@ public class OTFVisIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testConvert() {
+	void testConvert() {
 		String networkFilename = "test/scenarios/equil/network.xml";
 		String eventsFilename = "test/scenarios/equil/events.xml";
 		String mviFilename = testUtils.getOutputDirectory()+"/events.mvi";
@@ -65,7 +65,7 @@ public class OTFVisIT {
 	}
 
 	@Test
-	public void testOTFVisSnapshotWriterOnQSim() {
+	void testOTFVisSnapshotWriterOnQSim() {
 		final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(2);
 		config.controller().setWriteEventsInterval(0);

@@ -33,8 +33,8 @@ import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -114,7 +114,7 @@ public class EditTripsTest {
 	 * Case 1.1.1
 	 */
 	@Test
-	public void testAgentStaysAtStop() {
+	void testAgentStaysAtStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -148,13 +148,12 @@ public class EditTripsTest {
 	}
 
 
-
 	/**
 	 * Case 1.1.2 Looks awkward in otfvis, because after replanning there suddenly
 	 * are 2 testAgents at different places, but events are fine :-/
 	 */
 	@Test
-	public void testAgentLeavesStop() {
+	void testAgentLeavesStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
@@ -187,7 +186,7 @@ public class EditTripsTest {
 	 * Case 1.2.1
 	 */
 	@Test
-	public void testAgentStaysInVehicle() {
+	void testAgentStaysInVehicle() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -224,7 +223,7 @@ public class EditTripsTest {
 	 * Case 1.2.2
 	 */
 	@Test
-	public void testAgentLeavesVehicleAtNextStop() {
+	void testAgentLeavesVehicleAtNextStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -268,7 +267,7 @@ public class EditTripsTest {
 	 * This is due to the utility params for walk, pt_wait and pt being equal/indifferent.
 	 */
 	@Test
-	public void testAgentIsAtTeleportLegAndLeavesStop() {
+	void testAgentIsAtTeleportLegAndLeavesStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
@@ -306,7 +305,7 @@ public class EditTripsTest {
 	 * pt_wait and pt. Strangely only works with walk being significantly worse, does not work with small differences.
 	 */
 	@Test
-	public void testAgentIsAtTeleportLegAndWaitsAtStop_walkUnattractive() {
+	void testAgentIsAtTeleportLegAndWaitsAtStop_walkUnattractive() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -346,7 +345,7 @@ public class EditTripsTest {
 	 * Case 2.2
 	 */
 	@Test
-	public void testAgentIsAtTeleportLegAndWaitsAtStop() {
+	void testAgentIsAtTeleportLegAndWaitsAtStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
@@ -383,7 +382,7 @@ public class EditTripsTest {
 	 * Simulates 900 agents so this case should include every possible state of an agent. Current and future trips are replanned.
 	 */
 	@Test
-	public void testOneAgentEveryFourSeconds() {
+	void testOneAgentEveryFourSeconds() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -25,7 +25,7 @@ import org.matsim.vehicles.Vehicle;
 public class LinkSensorTest {
 
 	@Test
-	public void testGetAvgVehiclesPerSecondAfterBucketCollection() {
+	void testGetAvgVehiclesPerSecondAfterBucketCollection() {
 		//test if average is working for constant flow
 		LinkSensor sensor = new LinkSensor(null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -38,9 +38,9 @@ public class LinkSensorTest {
 				assertEquals(1.0/3.0, sensor.getAvgVehiclesPerSecond(time), 0.04);
 		}
 	}
-	
+
 	@Test
-	public void testGetAvgVehiclesPerSecondDuringBucketCollection() {
+	void testGetAvgVehiclesPerSecondDuringBucketCollection() {
 		//test if average is working for constant flow
 		LinkSensor sensor = new LinkSensor(null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -53,9 +53,9 @@ public class LinkSensorTest {
 				assertEquals(1.0/3.0, sensor.getAvgVehiclesPerSecond(time), 0.04);
 		}
 	}
-	
+
 	@Test
-	public void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucket() {
+	void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucket() {
 		//test if average is working for constant flow
 		LinkSensor sensor = new LinkSensor(null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -74,9 +74,9 @@ public class LinkSensorTest {
 				assertEquals((1.0/3.0), sensor.getAvgVehiclesPerSecond(time), 0.02);
 		}
 	}
-	
+
 	@Test
-	public void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucketWhileHavingNotEnoughBuckets() {
+	void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucketWhileHavingNotEnoughBuckets() {
 		//test if average is working for constant flow
 		LinkSensor sensor = new LinkSensor(null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -99,9 +99,9 @@ public class LinkSensorTest {
 				assertEquals((1.0/3.0), sensor.getAvgVehiclesPerSecond(time), 0.02);
 		}
 	}
-	
+
 	@Test
-	public void testClassicBehaviour() {
+	void testClassicBehaviour() {
 		LinkSensor sensor = new LinkSensor(null);
 		sensor.registerAverageVehiclesPerSecondToMonitor();
 		for (int time = 0; time <= 3600; time++) {
@@ -147,10 +147,10 @@ public class LinkSensorTest {
 		l.setFreespeed(6.0);
 		return sc;
 	}
-	
-	
+
+
 	@Test
-	public void testSensorNumberOfCarsMonitoring(){
+	void testSensorNumberOfCarsMonitoring(){
 		Scenario sc = this.createScenario();
 		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
 		LinkSensor sensor = new LinkSensor(link);
@@ -200,9 +200,9 @@ public class LinkSensorTest {
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 	}
-	
+
 	@Test
-	public void testSensorDistanceMonitoring(){
+	void testSensorDistanceMonitoring(){
 		Scenario sc = this.createScenario();
 		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
 		LinkSensor sensor = new LinkSensor(link);

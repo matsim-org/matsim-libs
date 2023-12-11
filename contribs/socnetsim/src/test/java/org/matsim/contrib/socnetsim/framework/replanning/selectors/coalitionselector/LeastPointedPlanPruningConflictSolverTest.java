@@ -22,8 +22,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,7 +37,7 @@ import org.matsim.core.population.PopulationUtils;
 public class LeastPointedPlanPruningConflictSolverTest {
 
 	@Test
-	public void testPruneSmallestJointPlan() {
+	void testPruneSmallestJointPlan() {
 		final JointPlans jointPlans = new JointPlans();
 		final Map<Id<Person>, Plan> smallJp = new HashMap< >();
 		final Map<Id<Person>, Plan> bigJp = new HashMap< >();

@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -41,7 +41,7 @@ public class ShapeFileReaderTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testPlusInFilename() throws IOException {
+	void testPlusInFilename() throws IOException {
 		String filename = "src/test/resources/" + utils.getInputDirectory() + "test+test.shp";
 		FeatureSource fs = ShapeFileReader.readDataFile(filename);
 		Assert.assertEquals(3, fs.getFeatures().size());

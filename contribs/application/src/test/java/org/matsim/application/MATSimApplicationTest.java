@@ -2,8 +2,8 @@ package org.matsim.application;
 
 import org.junit.Assume;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.application.options.SampleOptions;
 import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
@@ -32,7 +32,7 @@ public class MATSimApplicationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void help() {
+	void help() {
 
 		int ret = MATSimApplication.execute(TestScenario.class, "--help");
 
@@ -40,7 +40,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void config() {
+	void config() {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
 				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4", "--config:plans.inputCRS", "EPSG:1234");
@@ -54,7 +54,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void yaml() {
+	void yaml() {
 
 		Path yml = Path.of(utils.getClassInputDirectory(), "specs.yml");
 
@@ -76,7 +76,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void sample() {
+	void sample() {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
 				"--10pct");
@@ -92,7 +92,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void population() throws MalformedURLException {
+	void population() throws MalformedURLException {
 
 		Path input = Path.of(utils.getClassInputDirectory());
 		Path output = Path.of(utils.getOutputDirectory());
@@ -128,7 +128,7 @@ public class MATSimApplicationTest {
 
 	@Test
 	@Ignore("Class is deprecated")
-	public void freight() {
+	void freight() {
 
 		Path input = Path.of("..", "..", "..", "..",
 				"shared-svn", "komodnext", "data", "freight", "original_data").toAbsolutePath().normalize();
@@ -161,7 +161,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void run() {
+	void run() {
 
 		Config config = ConfigUtils.createConfig();
 		Path out = Path.of(utils.getOutputDirectory()).resolve("out");

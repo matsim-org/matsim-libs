@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -44,7 +44,7 @@ public class IntersectionSimplifierTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testComplexIntersection() {
+	void testComplexIntersection() {
 		Network network = null;
 		try {
 			network = buildComplexIntersection();
@@ -58,7 +58,7 @@ public class IntersectionSimplifierTest {
 	}
 
 	@Test
-	public void testSimplifyCallOnlyOnce() {
+	void testSimplifyCallOnlyOnce() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 		try{
@@ -79,7 +79,7 @@ public class IntersectionSimplifierTest {
 
 
 	@Test
-	public void testGetClusteredNode() {
+	void testGetClusteredNode() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 
@@ -100,7 +100,7 @@ public class IntersectionSimplifierTest {
 
 
 	@Test
-	public void testSimplifyOne() {
+	void testSimplifyOne() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 		Network simpleNetwork = is.simplify(network);
@@ -122,7 +122,7 @@ public class IntersectionSimplifierTest {
 	}
 
 	@Test
-	public void testSimplifyTwo() {
+	void testSimplifyTwo() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(30.0, 4);
 		Network simpleNetwork = is.simplify(network);
@@ -147,7 +147,7 @@ public class IntersectionSimplifierTest {
 	 * The network cleaner will/should ensure that full connectivity remains.
 	 */
 	@Test
-	public void testNetworkCleaner() {
+	void testNetworkCleaner() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 		Network simpleNetwork = is.simplify(network);
@@ -182,7 +182,7 @@ public class IntersectionSimplifierTest {
 	}
 
 	@Test
-	public void testNetworkSimplifier() {
+	void testNetworkSimplifier() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 		Network simpleNetwork = is.simplify(network);

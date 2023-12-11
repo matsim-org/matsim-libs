@@ -1,7 +1,7 @@
 package playground.vsp.andreas.bvgAna.level1;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -13,11 +13,10 @@ import org.matsim.vehicles.Vehicle;
 import playground.vsp.andreas.bvgAna.level1.AgentId2DepartureDelayAtStopMapData;
 
 public class AgentId2DepartureDelayAtStopMapDataTest {
-	
-		
+
 
 	@Test
-	public void testAgentId2DepartureDelayAtStopMapData() {
+	void testAgentId2DepartureDelayAtStopMapData() {
 		
 //        assign Ids to routes, vehicles and agents to be used in Test
         

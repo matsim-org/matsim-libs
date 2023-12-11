@@ -24,8 +24,8 @@
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,7 +42,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-/**
+ /**
  * @author thibautd
  */
 public class ScenarioByConfigInjectionTest {
@@ -50,8 +50,8 @@ public class ScenarioByConfigInjectionTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testAttributeConvertersAreInjected_deprecated() {
+	 @Test
+	 void testAttributeConvertersAreInjected_deprecated() {
 		log.info( "create test scenario" );
 		final Config config = createTestScenario();
 

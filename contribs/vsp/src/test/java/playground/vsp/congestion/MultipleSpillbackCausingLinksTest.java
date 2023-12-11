@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,7 +69,7 @@ public class MultipleSpillbackCausingLinksTest {
 	 * (2) an agent may have two different links as next link in the route and therefore correct one should be adopted.
 	 */
 	@Test
-	public final void multipleSpillBackTest(){
+	final void multipleSpillBackTest(){
 
 		/*
 		 * 10 agents

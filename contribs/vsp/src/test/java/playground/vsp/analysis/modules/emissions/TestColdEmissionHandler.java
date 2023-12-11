@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdE
 public class TestColdEmissionHandler {
 
 	@Test
-	public final void testEmissionPerPersonColdEventHandler(){
+	final void testEmissionPerPersonColdEventHandler(){
 
 		//vehicle=person. this handler counts the cold emission events per vehicle id
 		EmissionsPerPersonColdEventHandler handler = new EmissionsPerPersonColdEventHandler();

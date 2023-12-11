@@ -1,7 +1,7 @@
 package org.matsim.api.core.v01;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 public class IdSetTest {
 
 	@Test
-	public void testAddContainsRemoveSize() {
+	void testAddContainsRemoveSize() {
 		IdSet<Person> set = new IdSet<>(Person.class);
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -56,7 +56,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testIterator() {
+	void testIterator() {
 		IdSet<Person> set = new IdSet<>(Person.class);
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -85,7 +85,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		IdSet<Person> set = new IdSet<>(Person.class);
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -110,7 +110,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testAddAll() {
+	void testAddAll() {
 		IdSet<Person> set1 = new IdSet<>(Person.class);
 		IdSet<Person> set2 = new IdSet<>(Person.class);
 
@@ -142,7 +142,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testRemoveAll() {
+	void testRemoveAll() {
 		IdSet<Person> set1 = new IdSet<>(Person.class);
 		IdSet<Person> set2 = new IdSet<>(Person.class);
 
@@ -173,7 +173,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testRetainAll() {
+	void testRetainAll() {
 		IdSet<Person> set1 = new IdSet<>(Person.class);
 		IdSet<Person> set2 = new IdSet<>(Person.class);
 
@@ -205,7 +205,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testContainsAll() {
+	void testContainsAll() {
 		IdSet<Person> set1 = new IdSet<>(Person.class);
 		IdSet<Person> set2 = new IdSet<>(Person.class);
 
@@ -233,7 +233,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testToArray() {
+	void testToArray() {
 		IdSet<Person> set = new IdSet<>(Person.class);
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -302,7 +302,7 @@ public class IdSetTest {
 	}
 
 	@Test
-	public void testEqualsAndHashCode() {
+	void testEqualsAndHashCode() {
 		Id<Person> id1 = Id.create("1", Person.class);
 		Id<Person> id2 = Id.create("2", Person.class);
 		Id<Person> id3 = Id.create("3", Person.class);

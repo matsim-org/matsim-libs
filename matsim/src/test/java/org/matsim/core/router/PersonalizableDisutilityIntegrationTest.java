@@ -20,7 +20,7 @@
 package org.matsim.core.router;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +47,7 @@ import org.matsim.vehicles.VehicleUtils;
 public class PersonalizableDisutilityIntegrationTest {
 
 	@Test
-	public void testPersonAvailableForDisutility_Dijkstra() {
+	void testPersonAvailableForDisutility_Dijkstra() {
 		Fixture f = new Fixture();
 
 		Dijkstra router = new Dijkstra(f.network, f.costFunction, new FreeSpeedTravelTime());
@@ -61,7 +61,7 @@ public class PersonalizableDisutilityIntegrationTest {
 	}
 
 	@Test
-	public void testPersonAvailableForDisutility_AStarEuclidean() {
+	void testPersonAvailableForDisutility_AStarEuclidean() {
 		Fixture f = new Fixture();
 		PreProcessEuclidean preprocess = new PreProcessEuclidean(f.costFunction);
 		preprocess.run(f.network);
@@ -76,7 +76,7 @@ public class PersonalizableDisutilityIntegrationTest {
 	}
 
 	@Test
-	public void testPersonAvailableForDisutility_SpeedyALT() {
+	void testPersonAvailableForDisutility_SpeedyALT() {
 		Fixture f = new Fixture();
 		LeastCostPathCalculatorFactory routerFactory = new SpeedyALTFactory();
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser / Senozon AG
@@ -31,7 +31,7 @@ import org.junit.Test;
 public class ObjectAttributesUtilsTest {
 
 	@Test
-	public void testGetAllAttributes() {
+	void testGetAllAttributes() {
 		ObjectAttributes oa = new ObjectAttributes();
 		oa.putAttribute("1", "a", "A");
 		oa.putAttribute("1", "b", "B");
@@ -44,9 +44,9 @@ public class ObjectAttributesUtilsTest {
 		Assert.assertTrue(names.contains("c"));
 		Assert.assertFalse(names.contains("d"));
 	}
-	
+
 	@Test
-	public void testGetAllAttributes_isImmutable() {
+	void testGetAllAttributes_isImmutable() {
 		ObjectAttributes oa = new ObjectAttributes();
 		oa.putAttribute("1", "a", "A");
 		oa.putAttribute("1", "b", "B");

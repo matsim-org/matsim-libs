@@ -24,8 +24,8 @@ package org.matsim.contrib.signals.controller.fixedTime;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,7 +85,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void test2SequentialPlansCompleteDay(){
+	void test2SequentialPlansCompleteDay(){
 		ScenarioRunner runner = new ScenarioRunner(0.0, 3600*1.0, 3600*1.0, 3600*24.0);
 		runner.setNoSimHours(1);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -109,7 +109,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SequentialPlansUncompleteDayEnd(){
+	void test2SequentialPlansUncompleteDayEnd(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(0.0, 3600*1.0, 3600*1.0, 3600*2.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -137,7 +137,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SequentialPlansUncompleteDayStart(){
+	void test2SequentialPlansUncompleteDayStart(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1.0, 3600*2.0, 3600*2.0, 3600*24.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -165,7 +165,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SequentialPlans1SecGap(){
+	void test2SequentialPlans1SecGap(){
 		ScenarioRunner runner = new ScenarioRunner(0.0, 3600*1.0, 3600*1.0+1, 3600*24.0);
 		runner.setNoSimHours(1);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -189,7 +189,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SequentialPlans1HourGap(){
+	void test2SequentialPlans1HourGap(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*0.0, 3600*1.0, 3600*2.0, 3600*24.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -218,7 +218,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SequentialPlans1HourGap2TimesOff(){
+	void test2SequentialPlans1HourGap2TimesOff(){
 		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*1.0, 3600*2.0, 3600*3.0);
 		runner.setNoSimHours(3);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -251,7 +251,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SequentialPlansOverMidnight(){
+	void test2SequentialPlansOverMidnight(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*22.0, 3600*1.0, 3600*1.0, 3600*22.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -273,7 +273,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test1SignalPlanUncompleteDay(){
+	void test1SignalPlanUncompleteDay(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1.0, 3600*2.0, null, null)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -307,7 +307,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 2. all day signal plan starts again/ is still active, when simulation time exceeds 12pm
 	 */
 	@Test
-	public void test1AllDaySignalPlanOverMidnightLateStart(){
+	void test1AllDaySignalPlanOverMidnightLateStart(){
 		ScenarioRunner runner = new ScenarioRunner(null, null, null, null); // i.e. new ScenarioRunner(0.0, 0.0, null, null);
 		runner.setSimStart_h(23);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -336,7 +336,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 2. should directly start at time 0.0
 	 */
 	@Test
-	public void test1AllDaySignalPlanMidnightStart(){
+	void test1AllDaySignalPlanMidnightStart(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(null, null, null, null)).run(); // i.e. new ScenarioRunner(0.0, 0.0, null, null);
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -356,7 +356,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2SignalPlanFor25h(){
+	void test2SignalPlanFor25h(){
 		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*12.0, 3600*12.0, 3600*24.0);
 		runner.setNoSimHours(25);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -382,7 +382,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void testSimStartAfterFirstDayPlan(){
+	void testSimStartAfterFirstDayPlan(){
 		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*1.0, 3600*23.0, 3600*24.0);
 		runner.setSimStart_h(23);
 		runner.setNoSimHours(3);
@@ -419,7 +419,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 1. overlapping signal plans (uncomplete day) result in an exception
 	 */
 	@Test
-	public void test2PlansSameTimesUncompleteDay(){
+	void test2PlansSameTimesUncompleteDay(){
 		final String exceptionMessageOverlapping21 = "Signal plans SignalPlan2 and SignalPlan1 of signal system SignalSystem-3 overlap.";
 
 		try{
@@ -436,7 +436,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 1. overlapping signal plans (complete day) result in an exception
 	 */
 	@Test
-	public void test2PlansSameTimesCompleteDay(){
+	void test2PlansSameTimesCompleteDay(){
 		final String exceptionMessageHoleDay = "Signal system SignalSystem-3 has multiple plans but at least one of them covers the hole day. "
 				+ "If multiple signal plans are used, they are not allowed to overlap.";
 
@@ -451,7 +451,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void test2OverlappingPlans(){
+	void test2OverlappingPlans(){
 		final String exceptionMessageOverlapping12 = "Signal plans SignalPlan1 and SignalPlan2 of signal system SignalSystem-3 overlap.";
 
 		try{
@@ -464,7 +464,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void testNegativeOffset() {
+	void testNegativeOffset() {
 		//plan1 is valid all day
 		ScenarioRunner sr = new ScenarioRunner(0.0, 0.0, null, null);
 		int offset1 = -3;
@@ -479,7 +479,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void testNegativeOffsetEqualCycleTime() {
+	void testNegativeOffsetEqualCycleTime() {
 		//plan1 is valid all day
 		ScenarioRunner sr = new ScenarioRunner(0.0, 0.0, null, null);
 		int offset1 = -120;
@@ -494,7 +494,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void testTwoPlansWithNegativeOffsets(){
+	void testTwoPlansWithNegativeOffsets(){
 		ScenarioRunner sr = new ScenarioRunner(0.0*3600, 1.0*3600, 1.0*3600, 2.*3600 );
 
 		int offset1 = -3;
@@ -516,7 +516,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	public void testTwoPlansWithNegativeOffsetsEqualCycleTime(){
+	void testTwoPlansWithNegativeOffsetsEqualCycleTime(){
 		ScenarioRunner sr = new ScenarioRunner(0.0*3600, 1.0*3600, 1.0*3600, 2.*3600 );
 
 		int offset1 = -3;

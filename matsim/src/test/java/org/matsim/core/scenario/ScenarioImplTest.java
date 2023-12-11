@@ -20,7 +20,7 @@
 package org.matsim.core.scenario;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.households.Households;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -31,7 +31,7 @@ import org.matsim.vehicles.Vehicles;
  */
 public class ScenarioImplTest {
 	@Test
-	public void testAddAndGetScenarioElement() {
+	void testAddAndGetScenarioElement() {
 		final MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final Object element1 = new Object();
@@ -59,7 +59,7 @@ public class ScenarioImplTest {
 	}
 
 	@Test
-	public void testCannotAddAnElementToAnExistingName() {
+	void testCannotAddAnElementToAnExistingName() {
 		final MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final String name = "bruce_wayne";
@@ -78,7 +78,7 @@ public class ScenarioImplTest {
 	}
 
 	@Test
-	public void testRemoveElement() {
+	void testRemoveElement() {
 		final MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final Object element = new Object();

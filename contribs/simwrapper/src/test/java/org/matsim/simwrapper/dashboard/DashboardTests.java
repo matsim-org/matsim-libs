@@ -1,8 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,7 +37,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void defaults() {
+	void defaults() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
@@ -49,7 +49,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void stuckAgents() {
+	void stuckAgents() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
@@ -61,7 +61,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void trip() {
+	void trip() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
@@ -72,7 +72,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void tripRef() {
+	void tripRef() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
@@ -84,7 +84,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void populationAttribute() {
+	void populationAttribute() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
@@ -98,7 +98,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void traffic() {
+	void traffic() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
 

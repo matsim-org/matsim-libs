@@ -9,8 +9,8 @@
 package org.matsim.contrib.simulatedannealing;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.core.config.Config;
@@ -52,7 +52,7 @@ public class SimulatedAnnealingConfigGroupTest {
 	}
 
 	@Test
-	public void loadConfigGroupTest() throws IOException {
+	void loadConfigGroupTest() throws IOException {
 
 		/* Test that exported values are correct imported again */
 		Path configFile = writeConfig(tempFolder);
@@ -66,7 +66,7 @@ public class SimulatedAnnealingConfigGroupTest {
 
 
 	@Test
-	public void perturbationParamsTest() {
+	void perturbationParamsTest() {
 		Config config = createConfig();
 		SimulatedAnnealingConfigGroup saConfig = ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
 

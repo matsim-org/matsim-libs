@@ -23,7 +23,7 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +40,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testClone() {
+	void testClone() {
 		Id<Link> id1 = Id.create(1, Link.class);
 		Id<Link> id2 = Id.create(2, Link.class);
 		Id<Link> id3 = Id.create(3, Link.class);

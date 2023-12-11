@@ -19,8 +19,8 @@
 package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -35,7 +35,7 @@ public class RunSignalSystemsExampleTest {
 	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void testExampleWithHoles() {
+	final void testExampleWithHoles() {
 		boolean usingOTFVis = false ;
 		try {
 			RunSignalSystemsExampleWithHoles.run(usingOTFVis);
@@ -46,7 +46,7 @@ public class RunSignalSystemsExampleTest {
 	}
 
 	@Test
-	public final void testMinimalExample() {
+	final void testMinimalExample() {
 		try {
 			Config config = ConfigUtils.loadConfig("./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml");
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

@@ -21,7 +21,7 @@
 package org.matsim.core.router;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,7 +48,7 @@ import java.util.List;
 public class BackwardFastMultiNodeTest {
 
 	@Test
-	public void testBackwardsFastMultiNodeDijkstra_OneToOne() {
+	void testBackwardsFastMultiNodeDijkstra_OneToOne() {
 		runTestBackwardsFastMultiNodeDijkstra_OneToOne(true);
 		runTestBackwardsFastMultiNodeDijkstra_OneToOne(false);
 	}
@@ -113,7 +113,7 @@ public class BackwardFastMultiNodeTest {
 	 * Search only cheapest to node. n5 should not be found.
 	 */
 	@Test
-	public void testBackwardsFastMultiNodeDijkstra_OneToMany() {
+	void testBackwardsFastMultiNodeDijkstra_OneToMany() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness(0.);
@@ -203,7 +203,7 @@ public class BackwardFastMultiNodeTest {
 	}
 
 	@Test
-	public void testBackwardsFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
+	void testBackwardsFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness(0.);

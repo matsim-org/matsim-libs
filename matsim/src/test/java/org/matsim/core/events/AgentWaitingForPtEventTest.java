@@ -20,8 +20,8 @@
 package org.matsim.core.events;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
@@ -37,7 +37,7 @@ public class AgentWaitingForPtEventTest {
 	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
-	public void testReadWriteXml() {
+	void testReadWriteXml() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
 		Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);

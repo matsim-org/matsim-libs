@@ -21,7 +21,7 @@ package org.matsim.contrib.bicycle.run;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -79,7 +79,7 @@ public class BicycleTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testNormal() {
+	void testNormal() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -113,7 +113,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testCobblestone() {
+	void testCobblestone() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -146,7 +146,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testPedestrian() {
+	void testPedestrian() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -175,7 +175,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testLane() {
+	void testLane() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -204,7 +204,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testGradient() {
+	void testGradient() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -233,7 +233,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testGradientLane() {
+	void testGradientLane() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -263,7 +263,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testNormal10It() {
+	void testNormal10It() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
@@ -294,7 +294,8 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
-	@Test public void testLinkBasedScoring() {
+	@Test
+	void testLinkBasedScoring() {
 //		{
 //			Config config = createConfig( 0 );
 //			BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get( "bicycle" );
@@ -325,7 +326,9 @@ public class BicycleTest {
 		}
 //		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
-	@Test public void testLinkVsLegMotorizedScoring() {
+
+	@Test
+	void testLinkVsLegMotorizedScoring() {
 		// --- withOUT additional car traffic:
 //		{
 //			Config config2 = createConfig( 0 );
@@ -411,6 +414,7 @@ public class BicycleTest {
 		}
 //		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
+
 //	@Test public void testMotorizedInteraction() {
 ////		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
 //		Config config = createConfig( 10 );
@@ -441,7 +445,7 @@ public class BicycleTest {
 //	}
 
 	@Test
-	public void testInfrastructureSpeedFactor() {
+	void testInfrastructureSpeedFactor() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 
@@ -536,7 +540,7 @@ public class BicycleTest {
 	}
 
 	@Test
-	public void testInfrastructureSpeedFactorDistanceMoreRelevantThanTravelTime() {
+	void testInfrastructureSpeedFactorDistanceMoreRelevantThanTravelTime() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 

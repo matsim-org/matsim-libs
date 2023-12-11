@@ -27,8 +27,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -48,7 +48,7 @@ public class TestAvFlowFactor {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testAvFlowFactor() throws MalformedURLException {
+	void testAvFlowFactor() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);

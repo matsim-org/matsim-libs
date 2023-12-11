@@ -20,7 +20,7 @@
 package org.matsim.core.router;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,7 +64,7 @@ public class TripRouterFactoryImplTest {
 	 * such as railways.
 	 */
 	@Test
-	public void testRestrictedNetworkNoPt() throws Exception {
+	void testRestrictedNetworkNoPt() throws Exception {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit( false );
 
@@ -152,7 +152,7 @@ public class TripRouterFactoryImplTest {
 	 * Checks that routes are found when using a monomodal network (ie modes are not restricted)
 	 */
 	@Test
-	public void testMonomodalNetwork() throws Exception {
+	void testMonomodalNetwork() throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();

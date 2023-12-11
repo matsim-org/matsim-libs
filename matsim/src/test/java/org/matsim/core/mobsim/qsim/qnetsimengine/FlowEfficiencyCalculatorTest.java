@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Provides;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +50,7 @@ import java.util.Arrays;
 
 public class FlowEfficiencyCalculatorTest {
 	@Test
-	public void testFlowEfficiencyCalculator() {
+	void testFlowEfficiencyCalculator() {
 		// In this test we send 1000 vehicles over a link with capacity 500. We then
 		// define a custom FlowEfficiencyCalculator that varies the flow efficiency
 		// globally. We see that with infinite flow efficiency, vehicles move in

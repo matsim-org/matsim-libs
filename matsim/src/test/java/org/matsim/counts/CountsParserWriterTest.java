@@ -27,8 +27,8 @@ import java.util.Iterator;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -45,7 +45,7 @@ public class CountsParserWriterTest {
 	 * @author ahorni
 	 */
 	@Test
-	public void testParserWriter() {
+	void testParserWriter() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
@@ -91,7 +91,7 @@ public class CountsParserWriterTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testWriteParse_nameIsNull() throws SAXException, ParserConfigurationException, IOException {
+	void testWriteParse_nameIsNull() throws SAXException, ParserConfigurationException, IOException {
 		CountsFixture f = new CountsFixture();
 		f.setUp();
 		f.counts.setName(null);

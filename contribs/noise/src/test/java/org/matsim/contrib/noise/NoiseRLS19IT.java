@@ -23,8 +23,8 @@
 package org.matsim.contrib.noise;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -54,7 +54,7 @@ public class NoiseRLS19IT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testShielding() {
+	void testShielding() {
         final RLS19ShieldingCorrection shieldingCorrection = new RLS19ShieldingCorrection();
 
 
@@ -94,8 +94,8 @@ public class NoiseRLS19IT {
 
     }
 
-    @Test
-    public void testEmission() {
+	@Test
+	void testEmission() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Network network = scenario.getNetwork();
         Node from = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
@@ -127,8 +127,8 @@ public class NoiseRLS19IT {
         Assert.assertEquals("Wrong final noise link emission!", 84.23546653306667, noiseLink.getEmission(), MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void testImmission() {
+	@Test
+	void testImmission() {
 
         final RLS19ShieldingCorrection shieldingCorrection = new RLS19ShieldingCorrection();
 

@@ -20,8 +20,8 @@
 package org.matsim.contrib.minibus.replanning;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
@@ -36,7 +36,7 @@ public class EndRouteExtensionTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-    public final void testRun() {
+	final void testRun() {
 
 		Operator coop = PScenarioHelper.createCoop2111to2333();
 
@@ -98,7 +98,7 @@ public class EndRouteExtensionTest {
 	}
 
 	@Test
-    public final void testRunVShapedRoute() {
+	final void testRunVShapedRoute() {
 
 		Operator coop = PScenarioHelper.createCoopRouteVShaped();
 

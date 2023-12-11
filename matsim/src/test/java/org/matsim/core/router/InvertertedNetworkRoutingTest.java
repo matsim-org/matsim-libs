@@ -18,8 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim.core.router;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
@@ -45,7 +44,7 @@ public class InvertertedNetworkRoutingTest {
 
 
 	@Test
-	public void testInvertedNetworkLegRouter() {
+	void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
 		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig() );

@@ -27,8 +27,8 @@ import java.util.Queue;
 import java.util.Random;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -50,7 +50,7 @@ public class JointPlanIOTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDumpAndRead() throws Exception {
+	void testDumpAndRead() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final Scenario scenario = createScenario( jointPlans );
 		final Population population = scenario.getPopulation();
@@ -94,7 +94,7 @@ public class JointPlanIOTest {
 	}
 
 	@Test
-	public void testPlansOrderIsStableInCoreIO() throws Exception {
+	void testPlansOrderIsStableInCoreIO() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final Scenario scenario = createScenario( jointPlans );
 

@@ -20,8 +20,8 @@
 package org.matsim.core.utils.io;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.xml.sax.Attributes;
@@ -48,7 +48,7 @@ public class MatsimXmlParserTest {
 	public File tempFolder;
 
 	@Test
-	public void testParsingReservedEntities_AttributeValue() {
+	void testParsingReservedEntities_AttributeValue() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value&quot;&amp;&lt;&gt;value\">content</dummy>";
 
@@ -66,7 +66,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParsingReservedEntities_Content() {
+	void testParsingReservedEntities_Content() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value\">content&quot;&amp;&lt;&gt;content</dummy>";
 
@@ -88,7 +88,7 @@ public class MatsimXmlParserTest {
 	 * Based on a (non-reproducible) bug message on the users-mailing list 2012-04-26.
 	 */
 	@Test
-	public void testParsing_WindowsLinebreaks() {
+	void testParsing_WindowsLinebreaks() {
 		String str = """
 			<?xml version='1.0' encoding='UTF-8'?>\r
 			<root>\r
@@ -134,7 +134,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParsingPlusSign() {
+	void testParsingPlusSign() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value+value\">content+content</dummy>";
 
@@ -152,7 +152,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_parseEntities() {
+	void testParse_parseEntities() {
 		String xml = """
 			<?xml version='1.0' encoding='UTF-8'?>
 			<!DOCTYPE a SYSTEM "network_v1.dtd" [
@@ -183,7 +183,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_dtdValidation() {
+	void testParse_dtdValidation() {
 		String xml = """
 			<?xml version='1.0' encoding='UTF-8'?>
 			<!DOCTYPE network SYSTEM "network_v2.dtd" ><network>
@@ -220,7 +220,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_xsdValidationSuccess() {
+	void testParse_xsdValidationSuccess() {
 		String xml = """
 			<?xml version="1.0" encoding="UTF-8"?>
 
@@ -255,7 +255,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_xsdValidationFailure() {
+	void testParse_xsdValidationFailure() {
 		String xml = """
 			<?xml version="1.0" encoding="UTF-8"?>
 
@@ -298,7 +298,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_preventXEEattack_woodstox() throws IOException {
+	void testParse_preventXEEattack_woodstox() throws IOException {
 		// XEE: XML eXternal Entity attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 
 		String secretValue = "S3CR3T";
@@ -345,7 +345,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_preventXEEattack_xerces() throws IOException {
+	void testParse_preventXEEattack_xerces() throws IOException {
 		// XEE: XML eXternal Entity attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 
 		String secretValue = "S3CR3T";

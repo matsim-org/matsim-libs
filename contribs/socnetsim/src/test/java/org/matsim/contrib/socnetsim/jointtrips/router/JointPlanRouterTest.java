@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +56,7 @@ import org.matsim.facilities.Facility;
  */
 public class JointPlanRouterTest {
 	@Test
-	public void testDriverIdIsKept() throws Exception {
+	void testDriverIdIsKept() throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		final PopulationFactory populationFactory =
                 ScenarioUtils.createScenario(
@@ -111,7 +111,7 @@ public class JointPlanRouterTest {
 	}
 
 	@Test
-	public void testPassengerIdIsKept() throws Exception {
+	void testPassengerIdIsKept() throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		final PopulationFactory populationFactory =
                 ScenarioUtils.createScenario(

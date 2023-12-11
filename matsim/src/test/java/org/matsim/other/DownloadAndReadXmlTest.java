@@ -21,8 +21,8 @@ package org.matsim.other;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -42,11 +42,10 @@ public class DownloadAndReadXmlTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Ignore
-	@Test
-	/**
+	@Test /**
 	 * Http downloads from the SVN server will be forbidden soon, according to jwilk.
 	 */
-	public final void testHttpFromSvn() {
+	final void testHttpFromSvn() {
 
 		Config config = ConfigUtils.createConfig();
 		System.out.println(utils.getInputDirectory() + "../../");
@@ -66,7 +65,7 @@ public class DownloadAndReadXmlTest {
 	}
 
 	@Test
-	public final void testHttpsFromSvn() {
+	final void testHttpsFromSvn() {
 
 		Config config = ConfigUtils.createConfig();
 		System.out.println(utils.getInputDirectory() + "../../");

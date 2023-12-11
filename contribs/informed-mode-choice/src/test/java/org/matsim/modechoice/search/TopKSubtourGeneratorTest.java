@@ -1,6 +1,6 @@
 package org.matsim.modechoice.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.PrepareForMobsim;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TopKSubtourGeneratorTest extends ScenarioTest {
 
 	@Test
-	public void subtours() {
+	void subtours() {
 
 		// Subtours need mapped locations
 		PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);

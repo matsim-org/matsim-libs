@@ -24,8 +24,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -38,7 +38,7 @@ public class ObjectAttributesXmlIOTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReadWrite() throws IOException, SAXException, ParserConfigurationException {
+	void testReadWrite() throws IOException, SAXException, ParserConfigurationException {
 		ObjectAttributes oa1 = new ObjectAttributes();
 		oa1.putAttribute("one", "a", "A");
 		oa1.putAttribute("one", "b", Integer.valueOf(1));
@@ -55,7 +55,7 @@ public class ObjectAttributesXmlIOTest {
 	}
 
 	@Test
-	public void testReadWrite_CustomAttribute() {
+	void testReadWrite_CustomAttribute() {
 		ObjectAttributes oa1 = new ObjectAttributes();
 		MyTuple t = new MyTuple(3, 4);
 		oa1.putAttribute("1", "A", t);

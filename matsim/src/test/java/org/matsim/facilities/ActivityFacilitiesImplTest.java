@@ -20,7 +20,7 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 public class ActivityFacilitiesImplTest {
 
 	@Test
-	public void testAddActivityFacility() {
+	void testAddActivityFacility() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
@@ -48,7 +48,7 @@ public class ActivityFacilitiesImplTest {
 	}
 
 	@Test
-	public void testAddActivityFacility_addingTwice() {
+	void testAddActivityFacility_addingTwice() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
@@ -69,7 +69,7 @@ public class ActivityFacilitiesImplTest {
 	}
 
 	@Test
-	public void testAddActivityFacility_sameId() {
+	void testAddActivityFacility_sameId() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
@@ -92,7 +92,7 @@ public class ActivityFacilitiesImplTest {
 	 * is used internally, and if the map is modifiable at all...
 	 */
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));

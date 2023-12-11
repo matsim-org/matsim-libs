@@ -20,8 +20,7 @@
 package org.matsim.core.network.algorithms;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +38,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class NetworkMergeDoubleLinksTest {
 
 	@Test
-	public void testRun_remove() {
+	void testRun_remove() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.REMOVE);
 		merger.run(f.network);
@@ -70,7 +69,7 @@ public class NetworkMergeDoubleLinksTest {
 	}
 
 	@Test
-	public void testRun_additive() {
+	void testRun_additive() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.ADDITIVE);
 		merger.run(f.network);
@@ -101,7 +100,7 @@ public class NetworkMergeDoubleLinksTest {
 	}
 
 	@Test
-	public void testRun_maximum() {
+	void testRun_maximum() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.MAXIMUM);
 		merger.run(f.network);

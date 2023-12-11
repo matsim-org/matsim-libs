@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Income.IncomePeriod;
@@ -59,7 +59,8 @@ public class HouseholdsIoTest {
 	private final Id<Household> id24 = Id.create("24", Household.class);
 	private final Id<Household> id25 = Id.create("25", Household.class);
 
-	@Test public void testBasicReaderWriter() throws IOException {
+	@Test
+	void testBasicReaderWriter() throws IOException {
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
 		reader.readFile(utils.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);

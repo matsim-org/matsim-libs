@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -257,22 +257,22 @@ public class RecomposeJointPlanAlgorithmTest {
 	}
 
 	@Test
-	public void testIndividualPlans() throws Exception {
+	void testIndividualPlans() throws Exception {
 		test( createRandomFixtureWithIndividualPlans( new Random( 1234 ) ) );
 	}
 
 	@Test
-	public void testUniqueJointPlan() throws Exception {
+	void testUniqueJointPlan() throws Exception {
 		test( createRandomFixtureWithOneBigJointPlan( new Random( 1234 ) ) );
 	}
 
 	@Test
-	public void testJointAndIndividualPlans() throws Exception {
+	void testJointAndIndividualPlans() throws Exception {
 		test( createRandomFixtureWithJointAndIndividualPlans( new Random( 1234 ) ) );
 	}
 
 	@Test
-	public void testIncompleteLinks() throws Exception {
+	void testIncompleteLinks() throws Exception {
 		test( createRandomFixtureWithIncompleteLinks( new Random( 1234 ) ) );
 	}
 

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
@@ -70,7 +70,7 @@ public class CustomEventTest {
 	}
 
 	@Test
-	public void testCustomEventCanBeWrittenAndRead_XML() {
+	void testCustomEventCanBeWrittenAndRead_XML() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
@@ -109,7 +109,7 @@ public class CustomEventTest {
 	}
 
 	@Test
-	public void testCustomEventCanBeWrittenAndRead_Json() {
+	void testCustomEventCanBeWrittenAndRead_Json() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();

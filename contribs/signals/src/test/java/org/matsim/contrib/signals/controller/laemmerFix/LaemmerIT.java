@@ -26,8 +26,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -78,7 +78,7 @@ public class LaemmerIT {
 	 * single intersection with demand (equals flow capacity) only in NS-direction. signals should show green only for the NS-direction.
 	 */
 	@Test
-	public void testSingleCrossingScenarioDemandNS() {
+	void testSingleCrossingScenarioDemandNS() {
 		Fixture fixture = new Fixture(1800, 0, 5.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -107,7 +107,7 @@ public class LaemmerIT {
 	 * single intersection with high demand in WE-direction, very low demand in NS-direction but minimum green time. I.e. the NS-signal should show green for exactly this 5 seconds per cycle.
 	 */
 	@Test
-	public void testSingleCrossingScenarioLowVsHighDemandWithMinG(){
+	void testSingleCrossingScenarioLowVsHighDemandWithMinG(){
 		Fixture fixture = new Fixture(90, 1800, 5.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -140,7 +140,7 @@ public class LaemmerIT {
 	 * single intersection with high demand in WE-direction, very low demand in NS-direction. No minimum green time! I.e. the NS-signal should show green for less than 5 seconds per cycle.
 	 */
 	@Test
-	public void testSingleCrossingScenarioLowVsHighDemandWoMinG(){
+	void testSingleCrossingScenarioLowVsHighDemandWoMinG(){
 		Fixture fixture = new Fixture(90, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -171,7 +171,7 @@ public class LaemmerIT {
 	 * directions with the same demand-capacity-ration should get green for more or less the same time
 	 */
 	@Test
-	public void testSingleCrossingScenarioEqualDemandCapacityRatio(){
+	void testSingleCrossingScenarioEqualDemandCapacityRatio(){
 		Fixture fixture = new Fixture(900, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -206,7 +206,7 @@ public class LaemmerIT {
 	 * for low demand, i.e. an occupancy rate of 0.5 in the example of nico kuehnel's master thesis, the optimizing regime should be better than the stabilizing regime.
 	 */
 	@Test
-	public void testSingleCrossingScenarioStabilizingVsOptimizingRegimeLowDemand(){
+	void testSingleCrossingScenarioStabilizingVsOptimizingRegimeLowDemand(){
 		Fixture fixtureStab = new Fixture(360, 1440, 0.0, Regime.STABILIZING);
 		SignalAnalysisTool signalAnalyzerStab = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzerStab = fixtureStab.run(signalAnalyzerStab);
@@ -293,7 +293,7 @@ public class LaemmerIT {
 	 * no standard cycle pattern). The stabilizing regime should still be stable, the combined regime should be the best.
 	 */
 	@Test
-	public void testSingleCrossingScenarioStabilizingVsOptimizingRegimeHighDemand(){
+	void testSingleCrossingScenarioStabilizingVsOptimizingRegimeHighDemand(){
 		Fixture fixtureStab = new Fixture(360, 1800, 0.0, Regime.STABILIZING);
 		SignalAnalysisTool signalAnalyzerStab = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzerStab = fixtureStab.run(signalAnalyzerStab);
@@ -374,7 +374,7 @@ public class LaemmerIT {
 	 * exactly doubled (same departure times).
 	 */
 	@Test
-	public void testSingleCrossingScenarioWithDifferentFlowCapacityFactors(){
+	void testSingleCrossingScenarioWithDifferentFlowCapacityFactors(){
 		Fixture fixtureFlowCap1 = new Fixture(360, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzerFlowCap1 = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzerFlowCap1 = fixtureFlowCap1.run(signalAnalyzerFlowCap1);
@@ -431,7 +431,7 @@ public class LaemmerIT {
 	 * Test Laemmer with multiple iterations (some variables have to be reset after iterations).
 	 */
 	@Test
-	public void testMultipleIterations() {
+	void testMultipleIterations() {
 		Fixture fixture0It = new Fixture(500, 2000, 5.0, Regime.COMBINED);
 		fixture0It.setLastIteration(0);
 		fixture0It.addLeftTurnTraffic();

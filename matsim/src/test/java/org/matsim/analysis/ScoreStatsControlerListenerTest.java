@@ -7,8 +7,8 @@ import java.util.ListIterator;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,7 +52,7 @@ public class ScoreStatsControlerListenerTest {
 	private Population population = scenario.getPopulation();
 
 	@Test
-	public void testScoreStatsControlerListner() throws IOException {
+	void testScoreStatsControlerListner() throws IOException {
 
 		/************************************
 		 * Person - creating person 1

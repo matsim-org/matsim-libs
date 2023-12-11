@@ -23,7 +23,7 @@ package org.matsim.contrib.emissions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.matsim.contrib.emissions.Pollutant.CO;
@@ -64,7 +64,7 @@ public class TestHbefaWarmEmissionFactorKey{
 	}
 
 	@Test
-	public final void testEqualsForCompleteKeys(){
+	final void testEqualsForCompleteKeys(){
 
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal' 
 		// and set some parameters
@@ -100,7 +100,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		assertFalse(message, different.equals(normal));
 		assertFalse(message, normal.equals(different));
 	}
-	
+
 	// the following tests each compare a incomplete key to a complete key
 	// wanted result:
 	// completeData.equals(partialData) -> return false
@@ -108,7 +108,7 @@ public class TestHbefaWarmEmissionFactorKey{
 	// exception: if the vehicleAttributes are set to 'average' by default
 	
 	@Test
-	public final void testEqualsForIncompleteKeys_vehicleCategory() {
+	final void testEqualsForIncompleteKeys_vehicleCategory() {
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
 		// and set some parameters
 		setUp();
@@ -128,9 +128,9 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		assertFalse(result);
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_pollutant() {
+	final void testEqualsForIncompleteKeys_pollutant() {
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
 		// and set some parameters
 		setUp();
@@ -145,9 +145,9 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		var result = noPollutant.equals(normal);
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_roadCategory() {
+	final void testEqualsForIncompleteKeys_roadCategory() {
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
 		// and set some parameters
 		setUp();
@@ -172,9 +172,9 @@ public class TestHbefaWarmEmissionFactorKey{
 		Assert.assertTrue(message2, equalErr);
 		assertFalse(message, normal.equals(noRoadCat));
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_trafficSituation() {
+	final void testEqualsForIncompleteKeys_trafficSituation() {
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
 		// and set some parameters
 		setUp();
@@ -191,9 +191,9 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		assertFalse(result);
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_emptyKey() {
+	final void testEqualsForIncompleteKeys_emptyKey() {
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
 		// and set some parameters
 		setUp();
@@ -206,9 +206,9 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		assertFalse(result);
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_vehicleAttributes(){
+	final void testEqualsForIncompleteKeys_vehicleAttributes(){
 
 		// if no vehicle attributes are set manually they are set to 'average' by default
 		// thus, the equals method should not throw nullpointer exceptions but return false or respectively true

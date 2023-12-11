@@ -23,7 +23,7 @@ package org.matsim.core.network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
@@ -44,12 +44,12 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	public Network getEmptyTestNetwork() {
 		return new NetworkImpl(new LinkFactoryImpl());
 	}
-	
+
 	/**
 	 * Tests if the default values of a network instance are the same as the defaults specified in the network_v1.dtd
 	 */
 	@Test
-	public void testDefaultValues(){
+	void testDefaultValues(){
 		Network net = new NetworkImpl(new LinkFactoryImpl());
 		Assert.assertEquals(7.5, net.getEffectiveCellSize(), 0.0);
 		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
@@ -72,7 +72,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 * second time.
 	 */
 	@Test
-	public void testAddLink_existingId() {
+	void testAddLink_existingId() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -102,14 +102,14 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addLink(link2); // adding the same link again should just be ignored
 		Assert.assertEquals(2, network.getLinks().size());
 	}
-	
+
 	/**
 	 * Tests that if a link is added when its associated nodes are not in the network,
 	 * an exception is thrown. If the node is already in the network, no exception 
 	 * should be thrown. 
 	 */
 	@Test
-	public void testAddLink_noNodes(){
+	void testAddLink_noNodes(){
 		Network n = NetworkUtils.createNetwork();
         Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
 		Node b = n.getFactory().createNode(Id.create("b", Node.class), new Coord(1000.0, 0.0));
@@ -156,9 +156,9 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		}
 	}
 
-	
+
 	@Test
-	public void testAddNode_existingId() {
+	void testAddNode_existingId() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -180,14 +180,14 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addNode(node3);
 		Assert.assertEquals(3, network.getNodes().size());
 	}
-	
+
 	/**
 	 * MATSIM-278, 10jun2015: adding a node if quadtree only contained one node
 	 * 
 	 * @author mrieser / Senozon AG
 	 */
 	@Test
-	public void testAddNode_singleNodeFirstOnly() {
+	void testAddNode_singleNodeFirstOnly() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
@@ -210,7 +210,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 * @author droeder / Senozon Deutschland GmbH
 	 */
 	@Test
-	public void testAddTwoNodes_initializedEmptyQuadtree() {
+	void testAddTwoNodes_initializedEmptyQuadtree() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
@@ -231,7 +231,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	}
 
 	@Test
-	public void testRemoveLink_alsoInQuadTrees() {
+	void testRemoveLink_alsoInQuadTrees() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
@@ -269,7 +269,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	}
 
 	@Test
-	public void testAddLink_alsoInQuadTrees() {
+	void testAddLink_alsoInQuadTrees() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
@@ -296,7 +296,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	}
 
 	@Test
-	public void testAddLink_intoEmptyQuadTree() {
+	void testAddLink_intoEmptyQuadTree() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 
 		Assert.assertEquals(0, network.getLinks().size());

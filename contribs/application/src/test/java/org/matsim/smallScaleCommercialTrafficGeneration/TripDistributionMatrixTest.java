@@ -21,8 +21,8 @@ package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -47,7 +47,7 @@ public class TripDistributionMatrixTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
+	void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -137,7 +137,7 @@ public class TripDistributionMatrixTest {
 	}
 
 	@Test
-	public void testTripDistributionGoodsTraffic() throws IOException {
+	void testTripDistributionGoodsTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();

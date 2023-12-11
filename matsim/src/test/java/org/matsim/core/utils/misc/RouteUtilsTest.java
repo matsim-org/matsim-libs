@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,9 +40,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RouteUtilsTest {
-	
+
 	@Test
-	public void testCalculateCoverage() {
+	void testCalculateCoverage() {
 		Fixture f = new Fixture();
 		f.network.getLinks().get(f.linkIds[0]).setLength(100.0);
 		f.network.getLinks().get(f.linkIds[1]).setLength(200.0);
@@ -85,7 +85,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetNodes() {
+	void testGetNodes() {
 		Fixture f = new Fixture();
 		Link startLink = f.network.getLinks().get(f.linkIds[0]);
 		Link endLink = f.network.getLinks().get(f.linkIds[5]);
@@ -104,7 +104,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetNodes_SameStartEndLink() {
+	void testGetNodes_SameStartEndLink() {
 		Fixture f = new Fixture();
 		Link startLink = f.network.getLinks().get(f.linkIds[2]);
 		Link endLink = f.network.getLinks().get(f.linkIds[2]);
@@ -117,7 +117,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetNodes_NoLinksBetween() {
+	void testGetNodes_NoLinksBetween() {
 		Fixture f = new Fixture();
 		Id<Link> startLinkId = f.linkIds[3];
 		Id<Link> endLinkId = f.linkIds[4];
@@ -131,7 +131,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetNodes_CircularRoute() {
+	void testGetNodes_CircularRoute() {
 		Fixture f = new Fixture();
 		Id<Link> id99 = Id.create("99", Link.class);
 		f.network.addLink(f.network.getFactory().createLink(id99, f.network.getNodes().get(f.nodeIds[6]), f.network.getNodes().get(f.nodeIds[0])));
@@ -155,7 +155,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetLinksFromNodes() {
+	void testGetLinksFromNodes() {
 		Fixture f = new Fixture();
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		List<Link> links = RouteUtils.getLinksFromNodes(nodes);
@@ -186,7 +186,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetSubRoute() {
+	void testGetSubRoute() {
 		Fixture f = new Fixture();
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(f.linkIds[0], f.linkIds[5]);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -202,7 +202,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetSubRoute_fullRoute() {
+	void testGetSubRoute_fullRoute() {
 		Fixture f = new Fixture();
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(f.linkIds[0], f.linkIds[5]);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -220,7 +220,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetSubRoute_emptySubRoute() {
+	void testGetSubRoute_emptySubRoute() {
 		Fixture f = new Fixture();
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(f.linkIds[0], f.linkIds[5]);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -234,7 +234,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testGetSubRoute_sameStartEnd() {
+	void testGetSubRoute_sameStartEnd() {
 		Fixture f = new Fixture();
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(f.linkIds[0], f.linkIds[5]);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -248,7 +248,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testCalcDistance() {
+	void testCalcDistance() {
 		Fixture f = new Fixture();
 		f.network.getLinks().get(f.linkIds[0]).setLength(100.0);
 		f.network.getLinks().get(f.linkIds[1]).setLength(200.0);
@@ -270,7 +270,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testCalcDistance_sameStartEndRoute() {
+	void testCalcDistance_sameStartEndRoute() {
 		Fixture f = new Fixture();
 		f.network.getLinks().get(f.linkIds[0]).setLength(100.0);
 		f.network.getLinks().get(f.linkIds[1]).setLength(200.0);
@@ -287,7 +287,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testCalcDistance_subsequentStartEndRoute() {
+	void testCalcDistance_subsequentStartEndRoute() {
 		Fixture f = new Fixture();
 		f.network.getLinks().get(f.linkIds[0]).setLength(100.0);
 		f.network.getLinks().get(f.linkIds[1]).setLength(200.0);
@@ -303,7 +303,7 @@ public class RouteUtilsTest {
 	}
 
 	@Test
-	public void testCalcDistance_oneLinkRoute() {
+	void testCalcDistance_oneLinkRoute() {
 		Fixture f = new Fixture();
 		f.network.getLinks().get(f.linkIds[0]).setLength(100.0);
 		f.network.getLinks().get(f.linkIds[1]).setLength(200.0);

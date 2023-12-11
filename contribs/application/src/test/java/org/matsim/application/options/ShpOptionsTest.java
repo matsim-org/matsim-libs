@@ -2,8 +2,8 @@ package org.matsim.application.options;
 
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
@@ -23,7 +23,7 @@ public class ShpOptionsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void readZip() {
+	void readZip() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
@@ -43,7 +43,7 @@ public class ShpOptionsTest {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
@@ -66,7 +66,7 @@ public class ShpOptionsTest {
 	}
 
 	@Test
-	public void testGetGeometry() {
+	void testGetGeometry() {
 
 		Path input = Path.of(utils.getClassInputDirectory()
 						.replace("ShpOptionsTest", "CreateLandUseShpTest")

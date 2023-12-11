@@ -27,7 +27,7 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -321,7 +321,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testDepartureTimes() throws Exception {
+	void testDepartureTimes() throws Exception {
 		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm(TimeInterpretation.create(ConfigUtils.createConfig()));
 		for ( Fixture fixture : fixtures ) {
 			testee.run( fixture.jointPlan );

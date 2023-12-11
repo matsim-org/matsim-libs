@@ -24,8 +24,8 @@ import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,7 +60,7 @@ public class TinyAccessibilityTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void runFromEvents() {
+	void runFromEvents() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file
@@ -86,7 +86,7 @@ public class TinyAccessibilityTest {
 	}
 
 	@Test
-	public void testWithBoundingBox() {
+	void testWithBoundingBox() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file

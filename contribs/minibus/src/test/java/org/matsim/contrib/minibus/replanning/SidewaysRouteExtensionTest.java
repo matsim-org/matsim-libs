@@ -20,8 +20,8 @@
 package org.matsim.contrib.minibus.replanning;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
@@ -47,7 +47,7 @@ public class SidewaysRouteExtensionTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-    public final void testRun() {
+	final void testRun() {
 
 		Operator coop = PScenarioHelper.createCoop2414to3444();
 

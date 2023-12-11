@@ -22,8 +22,8 @@ package org.matsim.withinday.utils;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +44,8 @@ public class ReplacePlanElementsTest {
 	/**
 	 * @author cdobler
 	 */
-	@Test public void testReplaceActivity() {
+	@Test
+	void testReplaceActivity() {
 		Plan plan = createSamplePlan();
 		Activity oldActivity = (Activity)plan.getPlanElements().get(0);
 		Activity newActivity = PopulationUtils.createActivityFromCoord("s", new Coord((double) 200, (double) 200));
@@ -67,7 +68,8 @@ public class ReplacePlanElementsTest {
 	/**
 	 * @author cdobler
 	 */
-	@Test public void testReplaceLeg() {
+	@Test
+	void testReplaceLeg() {
 		Plan plan = createSamplePlan();
 		Leg oldLeg = (Leg)plan.getPlanElements().get(1);
 		Leg newLeg = PopulationUtils.createLeg(TransportMode.walk);

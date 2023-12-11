@@ -20,8 +20,8 @@
 package org.matsim.contrib.signals.integration.invertednetworks;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.builder.Signals;
@@ -47,7 +47,7 @@ public class InvertedNetworksSignalsIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void testSignalsInvertedNetworkRouting() {
+	final void testSignalsInvertedNetworkRouting() {
 		InvertedNetworkRoutingSignalsFixture f = new InvertedNetworkRoutingSignalsFixture(false, false, true);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
@@ -67,7 +67,7 @@ public class InvertedNetworksSignalsIT {
 	}
 
 	@Test
-	public final void testSignalsInvertedNetworkRoutingIterations() {
+	final void testSignalsInvertedNetworkRoutingIterations() {
 		InvertedNetworkRoutingSignalsFixture f = new InvertedNetworkRoutingSignalsFixture(false, false, true);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().controller().setLastIteration(1);

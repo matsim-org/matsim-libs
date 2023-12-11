@@ -19,9 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
@@ -42,7 +44,7 @@ public class IOUtilsTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testInitOutputDirLogging() throws IOException {
+	void testInitOutputDirLogging() throws IOException {
 		System.out.println(utils.getOutputDirectory());
 		String outDir = utils.getOutputDirectory();
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outDir);
@@ -57,7 +59,7 @@ public class IOUtilsTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testDeleteDir() throws IOException {
+	void testDeleteDir() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String testDir = outputDir + "a";
 		String someFilename = testDir + "/a.txt";
@@ -75,17 +77,19 @@ public class IOUtilsTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test(expected = UncheckedIOException.class)
-	public void testDeleteDir_InexistentDir() {
-		String outputDir = utils.getOutputDirectory();
-		String testDir = outputDir + "a";
-		File dir = new File(testDir);
-		IOUtils.deleteDirectoryRecursively(dir.toPath());
-		Assert.assertFalse(dir.exists());
+	@Test
+	void testDeleteDir_InexistentDir() {
+		assertThrows(UncheckedIOException.class, () -> {
+			String outputDir = utils.getOutputDirectory();
+			String testDir = outputDir + "a";
+			File dir = new File(testDir);
+			IOUtils.deleteDirectoryRecursively(dir.toPath());
+			Assert.assertFalse(dir.exists());
+		});
 	}
 
 	@Test
-	public void testGetBufferedReader_encodingMacRoman() throws IOException {
+	void testGetBufferedReader_encodingMacRoman() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_MacRoman.txt");
 		BufferedReader reader = IOUtils.getBufferedReader(url, Charset.forName("MacRoman"));
 		String line = reader.readLine();
@@ -94,7 +98,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_encodingIsoLatin1() throws IOException {
+	void testGetBufferedReader_encodingIsoLatin1() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt");
 		BufferedReader reader = IOUtils.getBufferedReader(url, Charset.forName("ISO-8859-1"));
 		String line = reader.readLine();
@@ -103,7 +107,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_encodingUTF8() throws IOException {
+	void testGetBufferedReader_encodingUTF8() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_UTF8.txt");
 		BufferedReader reader = IOUtils.getBufferedReader(url);
 		String line = reader.readLine();
@@ -112,7 +116,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_encodingMacRoman() throws IOException {
+	void testGetBufferedWriter_encodingMacRoman() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_MacRoman.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, Charset.forName("MacRoman"), false);
@@ -124,7 +128,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_encodingIsoLatin1() throws IOException {
+	void testGetBufferedWriter_encodingIsoLatin1() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_IsoLatin1.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, Charset.forName("ISO-8859-1"), false);
@@ -136,7 +140,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_encodingUTF8() throws IOException {
+	void testGetBufferedWriter_encodingUTF8() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_UTF8.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -148,7 +152,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_overwrite() throws IOException {
+	void testGetBufferedWriter_overwrite() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -163,7 +167,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_append() throws IOException {
+	void testGetBufferedWriter_append() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
@@ -178,7 +182,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_overwrite_gzipped() throws IOException {
+	void testGetBufferedWriter_overwrite_gzipped() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -192,18 +196,20 @@ public class IOUtilsTest {
 		Assert.assertEquals("bbb", line);
 	}
 
-	@Test(expected = UncheckedIOException.class)
-	public void testGetBufferedWriter_append_gzipped() throws IOException {
-		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
-		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
-		writer.write("aaa");
-		writer.close();
-		IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+	@Test
+	void testGetBufferedWriter_append_gzipped() throws IOException {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.gz";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
 	}
 
 	@Test
-	public void testGetBufferedWriter_gzipped() throws IOException {
+	void testGetBufferedWriter_gzipped() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -213,18 +219,20 @@ public class IOUtilsTest {
 		Assert.assertTrue("compressed file should be less than 50 bytes, but is " + file.length(), file.length() < 50);
 	}
 
-	@Test(expected = UncheckedIOException.class)
-	public void testGetBufferedWriter_append_lz4() throws IOException {
-		String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
-		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
-		writer.write("aaa");
-		writer.close();
-		IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+	@Test
+	void testGetBufferedWriter_append_lz4() throws IOException {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
 	}
 
 	@Test
-	public void testGetBufferedWriter_lz4() throws IOException {
+	void testGetBufferedWriter_lz4() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -237,18 +245,20 @@ public class IOUtilsTest {
 		Assert.assertEquals("12345678901234567890123456789012345678901234567890", content);
 	}
 
-	@Test(expected = UncheckedIOException.class)
-	public void testGetBufferedWriter_append_bz2() throws IOException {
-		String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
-		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
-		writer.write("aaa");
-		writer.close();
-		IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+	@Test
+	void testGetBufferedWriter_append_bz2() throws IOException {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
 	}
 
 	@Test
-	public void testGetBufferedWriter_bz2() throws IOException {
+	void testGetBufferedWriter_bz2() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -259,7 +269,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_append_zst() throws IOException {
+	void testGetBufferedWriter_append_zst() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.zst";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
@@ -274,7 +284,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedWriter_zst() throws IOException {
+	void testGetBufferedWriter_zst() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.zst";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -285,7 +295,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithoutBOM() throws IOException {
+	void testGetInputStream_UTFwithoutBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write("ABCdef".getBytes());
@@ -297,7 +307,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM() throws IOException {
+	void testGetInputStream_UTFwithBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -310,7 +320,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_Compressed() throws IOException {
+	void testGetInputStream_UTFwithBOM_Compressed() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.gz";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -323,7 +333,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_Lz4() throws IOException {
+	void testGetInputStream_UTFwithBOM_Lz4() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.lz4";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -336,7 +346,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_bz2() throws IOException {
+	void testGetInputStream_UTFwithBOM_bz2() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.bz2";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -349,7 +359,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_zst() throws IOException {
+	void testGetInputStream_UTFwithBOM_zst() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.zst";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -362,7 +372,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithoutBOM() throws IOException {
+	void testGetBufferedReader_UTFwithoutBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write("ABCdef".getBytes());
@@ -386,7 +396,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM() throws IOException {
+	void testGetBufferedReader_UTFwithBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -411,7 +421,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_Compressed() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_Compressed() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.gz";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -441,7 +451,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_lz4() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_lz4() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.lz4";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -466,7 +476,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_bz2() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_bz2() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.bz2";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -491,7 +501,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_zst() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_zst() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.zst";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -522,7 +532,7 @@ public class IOUtilsTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testGetBufferedWriter_withPlusInFilename() throws IOException {
+	void testGetBufferedWriter_withPlusInFilename() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test+test.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(IOUtils.getFileUrl(filename));
 		writer.write("hello world!");
@@ -534,7 +544,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testNewUrl() throws MalformedURLException {
+	void testNewUrl() throws MalformedURLException {
 		URL context = Paths.get("").toUri().toURL();
 		System.out.println(context.toString());
 		URL url = IOUtils.extendUrl(context, "C:\\windows\\directory\\filename.txt");
@@ -542,7 +552,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testResolveFileOrResource() throws URISyntaxException, IOException {
+	void testResolveFileOrResource() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/testfile.jar");
 		String jarUrlString = "file:" + jarFile.getAbsolutePath(); // URLs require absolute paths
@@ -558,7 +568,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
+	void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/test directory/testfile.jar");
 		String fileUrlString = "jar:" + jarFile.toURI().toString() + "!/the_file.txt";
@@ -574,7 +584,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testEncryptedFile() throws IOException {
+	void testEncryptedFile() throws IOException {
 
 		System.setProperty(CipherUtils.ENVIRONMENT_VARIABLE, "abc123");
 

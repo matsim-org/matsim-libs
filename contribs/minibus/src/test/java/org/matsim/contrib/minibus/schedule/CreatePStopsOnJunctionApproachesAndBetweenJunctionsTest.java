@@ -20,8 +20,8 @@
 package org.matsim.contrib.minibus.schedule;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +42,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-    public final void testPScenarioHelperTestNetwork() {
+	final void testPScenarioHelperTestNetwork() {
 
 		Network net = PScenarioHelper.createTestNetwork().getNetwork();
 		PConfigGroup pC = new PConfigGroup();
@@ -107,7 +107,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 
 	/** {@link org.matsim.core.network.algorithms.intersectionSimplifier.IntersectionSimplifierTest} */
 	@Test
-    public final void testComplexIntersection() {
+	final void testComplexIntersection() {
 
 		Network network = buildComplexIntersection();
 		PConfigGroup pC = new PConfigGroup();

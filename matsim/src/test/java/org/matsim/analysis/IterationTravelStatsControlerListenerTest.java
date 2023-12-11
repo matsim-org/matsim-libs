@@ -11,8 +11,8 @@ import java.io.Reader;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +54,7 @@ public class IterationTravelStatsControlerListenerTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControlerListener() {
 
 		Plans plans = new Plans();
 

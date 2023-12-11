@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.estimator;
 
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.extension.estimator.impl.ConstantDrtEstimator;
@@ -78,7 +78,7 @@ public class MultiModaFixedDrtLegEstimatorTest {
 	}
 
 	@Test
-	public void run() {
+	void run() {
 
 		String out = utils.getOutputDirectory();
 

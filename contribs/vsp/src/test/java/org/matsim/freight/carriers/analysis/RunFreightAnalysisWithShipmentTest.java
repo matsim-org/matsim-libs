@@ -22,8 +22,8 @@
 package org.matsim.freight.carriers.analysis;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -47,8 +47,8 @@ public class RunFreightAnalysisWithShipmentTest {
     @RegisterExtension
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Test
-    public void runShipmentTrackerTest(){
+	@Test
+	void runShipmentTrackerTest(){
         final String inputPath = testUtils.getClassInputDirectory();
         File networkFile = new File(inputPath + "/shipment/output_network.xml.gz");
         File carrierFile = new File(inputPath + "/shipment/output_carriers.xml");

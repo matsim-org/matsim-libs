@@ -22,8 +22,8 @@
  package org.matsim.core.network;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,15 +33,15 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+ /**
  * @author thibautd
  */
 public class NetworkV2IOTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testNetworkAttributes() {
+	 @Test
+	 void testNetworkAttributes() {
 		final Scenario sc = createTestNetwork( false );
 
 		new NetworkWriter( sc.getNetwork() ).writeV2( utils.getOutputDirectory()+"network.xml" );
@@ -54,8 +54,8 @@ public class NetworkV2IOTest {
 				read.getNetwork().getAttributes().getAttribute( "year" ) );
 	}
 
-	@Test
-	public void testNodesAttributes() {
+	 @Test
+	 void testNodesAttributes() {
 		final Scenario sc = createTestNetwork( false );
 
 		new NetworkWriter( sc.getNetwork() ).writeV2( utils.getOutputDirectory()+"network.xml" );
@@ -74,8 +74,8 @@ public class NetworkV2IOTest {
 				read.getNetwork().getNodes().get( id ).getAttributes().getAttribute( "Developper Meeting" ) );
 	}
 
-	@Test
-	public void testNo3DCoord() {
+	 @Test
+	 void testNo3DCoord() {
 		// should be done through once "mixed" network as soon as possible
 		final Scenario sc = createTestNetwork( false );
 
@@ -92,8 +92,8 @@ public class NetworkV2IOTest {
 				zhCoord.hasZ() );
 	}
 
-	@Test
-	public void test3DCoord() {
+	 @Test
+	 void test3DCoord() {
 		// should be done through once "mixed" network as soon as possible
 		final Scenario sc = createTestNetwork(	true );
 
@@ -115,8 +115,8 @@ public class NetworkV2IOTest {
 				MatsimTestUtils.EPSILON );
 	}
 
-	@Test
-	public void testLinksAttributes() {
+	 @Test
+	 void testLinksAttributes() {
 		final Scenario sc = createTestNetwork( false );
 
 		new NetworkWriter( sc.getNetwork() ).writeV2( utils.getOutputDirectory()+"network.xml" );

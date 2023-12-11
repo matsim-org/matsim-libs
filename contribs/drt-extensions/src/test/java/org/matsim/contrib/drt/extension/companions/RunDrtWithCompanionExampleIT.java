@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -52,7 +52,7 @@ public class RunDrtWithCompanionExampleIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunDrtWithCompanions() {
+	void testRunDrtWithCompanions() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());

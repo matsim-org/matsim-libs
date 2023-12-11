@@ -24,8 +24,8 @@ import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -82,7 +82,7 @@ public class CadytsCarIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void testInitialization() {
+	final void testInitialization() {
 		final String CADYTS_STRATEGY_NAME = "ccc";
 
 		String inputDir = this.utils.getClassInputDirectory();
@@ -154,7 +154,7 @@ public class CadytsCarIT {
 
 	//--------------------------------------------------------------
 	@Test
-	public final void testCalibrationAsScoring() throws IOException {
+	final void testCalibrationAsScoring() throws IOException {
 
 		final double beta=30. ;
 		final int lastIteration = 20 ;

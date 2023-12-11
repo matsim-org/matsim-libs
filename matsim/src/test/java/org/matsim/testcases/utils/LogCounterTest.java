@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public class LogCounterTest {
 	private final static Logger LOG = LogManager.getLogger(LogCounterTest.class);
 
 	@Test
-	public void testLogCounter_INFO() throws IOException {
+	void testLogCounter_INFO() throws IOException {
 		LogCounter counter = new LogCounter(Level.INFO);
 		counter.activate();
 		LOG.info("hello world - this is just a test");
@@ -50,7 +50,7 @@ public class LogCounterTest {
 	}
 
 	@Test
-	public void testLogCounter_WARN() throws IOException {
+	void testLogCounter_WARN() throws IOException {
 		LogCounter counter = new LogCounter(Level.WARN);
 		counter.activate();
 		LOG.info("hello world - this is just a test");

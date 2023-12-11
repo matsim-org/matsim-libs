@@ -33,7 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -1233,17 +1233,17 @@ public class HighestWeightSelectorTest {
 	// Tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testSelectedPlansNonBlocking() throws Exception {
+	void testSelectedPlansNonBlocking() throws Exception {
 		testSelectedPlans( false , false );
 	}
 
 	@Test
-	public void testSelectedPlansForbidding() throws Exception {
+	void testSelectedPlansForbidding() throws Exception {
 		testSelectedPlans( false , true );
 	}
 
 	@Test
-	public void testSelectedPlansBlocking() throws Exception {
+	void testSelectedPlansBlocking() throws Exception {
 		testSelectedPlans( true , false );
 	}
 
@@ -1252,7 +1252,7 @@ public class HighestWeightSelectorTest {
 	 * particularly when pruning unplausible plans.
 	 */
 	@Test
-	public void testNoSideEffects() throws Exception {
+	void testNoSideEffects() throws Exception {
 		HighestScoreSumSelector selector =
 				new HighestScoreSumSelector(
 					new EmptyIncompatiblePlansIdentifierFactory(),

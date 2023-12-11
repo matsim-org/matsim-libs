@@ -1,7 +1,7 @@
 package org.matsim.api.core.v01;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 public class IdMapTest {
 
 	@Test
-	public void testPutGetRemoveSize() {
+	void testPutGetRemoveSize() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		Assert.assertEquals(0, map.size());
@@ -50,7 +50,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testIterable() {
+	void testIterable() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		map.put(Id.create(1, Person.class), "one");
@@ -78,7 +78,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testForEach() {
+	void testForEach() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		map.put(Id.create(1, Person.class), "one");
@@ -105,7 +105,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testContainsKey() {
+	void testContainsKey() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		map.put(Id.create(1, Person.class), "one");
@@ -137,7 +137,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testContainsValue() {
+	void testContainsValue() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		map.put(Id.create(1, Person.class), "one");
@@ -155,7 +155,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testPutAll_IdMap() {
+	void testPutAll_IdMap() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		IdMap<Person, String> map2 = new IdMap<>(Person.class, 10);
@@ -177,7 +177,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testPutAll_GenericMap() {
+	void testPutAll_GenericMap() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		Map<Id<Person>, String> map2 = new HashMap<>();
@@ -199,7 +199,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		map.put(Id.create(1, Person.class), "one");
@@ -222,7 +222,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testValues() {
+	void testValues() {
 		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
 
 		map.put(Id.create(1, Person.class), "one");
@@ -257,7 +257,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testKeySet() {
+	void testKeySet() {
 		Id<Person> id1 = Id.create(1, Person.class);
 		Id<Person> id2 = Id.create(2, Person.class);
 		Id<Person> id3 = Id.create(3, Person.class);
@@ -298,7 +298,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testEntrySet() {
+	void testEntrySet() {
 		Id<Person> id1 = Id.create(1, Person.class);
 		Id<Person> id2 = Id.create(2, Person.class);
 		Id<Person> id3 = Id.create(3, Person.class);
@@ -352,7 +352,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testIterator_iterate() {
+	void testIterator_iterate() {
 		Id<Person> id1 = Id.create(1, Person.class);
 		Id<Person> id2 = Id.create(2, Person.class);
 		Id<Person> id3 = Id.create(3, Person.class);
@@ -393,7 +393,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testIterator_remove() {
+	void testIterator_remove() {
 		Id<Person> id1 = Id.create(1, Person.class);
 		Id<Person> id2 = Id.create(2, Person.class);
 		Id<Person> id3 = Id.create(3, Person.class);
@@ -430,7 +430,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testKeySetToArray() {
+	void testKeySetToArray() {
 		Id<Person> id1 = Id.create(1, Person.class);
 		Id<Person> id2 = Id.create(2, Person.class);
 		Id<Person> id3 = Id.create(3, Person.class);
@@ -454,7 +454,7 @@ public class IdMapTest {
 	}
 
 	@Test
-	public void testEqualsAndHashCode() {
+	void testEqualsAndHashCode() {
 		Id<Person> id1 = Id.create(1, Person.class);
 		Id<Person> id2 = Id.create(2, Person.class);
 		Id<Person> id3 = Id.create(3, Person.class);

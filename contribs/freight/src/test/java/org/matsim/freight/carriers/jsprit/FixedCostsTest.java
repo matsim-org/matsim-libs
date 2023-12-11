@@ -31,8 +31,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -186,7 +186,7 @@ public class FixedCostsTest  {
 	 * nearby service1: 8km -> 8 EUR; service2: 36km -> 36 EUR  --> total 44EUR -> score = -44
 	 */
 	@Test
-	public final void test_carrier1CostsAreCorrectly() {
+	final void test_carrier1CostsAreCorrectly() {
 
 		Assert.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
@@ -195,7 +195,7 @@ public class FixedCostsTest  {
 	 * carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 	 */
 	@Test
-	public final void test_carrier2CostsAreCorrectly() {
+	final void test_carrier2CostsAreCorrectly() {
 		Assert.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
@@ -204,7 +204,7 @@ public class FixedCostsTest  {
 	 * should use A for short trip (8 EUR) and B for the long trip (10.36 EUR)
 	*/
 	@Test
-	public final void test_carrier3CostsAreCorrectly() {
+	final void test_carrier3CostsAreCorrectly() {
 		Assert.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 

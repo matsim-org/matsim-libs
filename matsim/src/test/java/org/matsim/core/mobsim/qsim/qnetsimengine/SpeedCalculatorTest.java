@@ -1,8 +1,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Singleton;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +37,8 @@ public class SpeedCalculatorTest{
     private final Config config = ConfigUtils.createConfig();
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 
-    @Test public void limitedByVehicleSpeed() {
+	@Test
+	void limitedByVehicleSpeed() {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
@@ -48,7 +49,9 @@ public class SpeedCalculatorTest{
 
         assertEquals( type.getMaximumVelocity(), getSpeedOnLink( link, vehicle ), 0.0 );
     }
-    @Test public void limitedByLinkSpeed() {
+
+	@Test
+	void limitedByLinkSpeed() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 
@@ -61,7 +64,9 @@ public class SpeedCalculatorTest{
 
         assertEquals( link.getFreespeed(), getSpeedOnLink( link, vehicle ), 0.0 );
     }
-    @Test public void bikeWithSpecificLinkSpeedCalculator() {
+
+	@Test
+	void bikeWithSpecificLinkSpeedCalculator() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 
@@ -76,7 +81,9 @@ public class SpeedCalculatorTest{
         assertEquals( type.getMaximumVelocity()*1.5, getSpeedOnLink( link, vehicle ), 0.0 );
         // (specific link speed calculator uses speed that is larger than maximum vehicle speed)
     }
-    @Test public void bikeLimitedByLinkFreespeed() {
+
+	@Test
+	void bikeLimitedByLinkFreespeed() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 

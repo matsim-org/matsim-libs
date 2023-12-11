@@ -22,8 +22,8 @@ package org.matsim.core.router;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +61,7 @@ public class PseudoTransitRoutingModuleTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 		final Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);

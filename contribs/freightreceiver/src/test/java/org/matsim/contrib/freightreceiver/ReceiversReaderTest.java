@@ -21,8 +21,8 @@
 package org.matsim.contrib.freightreceiver;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.TimeWindow;
@@ -41,7 +41,7 @@ public class ReceiversReaderTest {
 	 * from the original DFG code.
 	 */
 	@Test
-	public void testBasicV2(){
+	void testBasicV2(){
 		Receivers receivers = new Receivers();
 		try {
 			new ReceiversReader(receivers).readFile(utils.getClassInputDirectory() + "receivers_v2_basic.xml");
@@ -59,7 +59,7 @@ public class ReceiversReaderTest {
 	}
 
 	@Test
-	public void testV2() {
+	void testV2() {
 		Receivers receivers = new Receivers();
 		try {
 		new ReceiversReader(receivers).readFile(utils.getClassInputDirectory() + "receivers_v2_full.xml");

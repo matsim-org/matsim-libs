@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -32,8 +32,8 @@ import org.matsim.core.utils.misc.Time;
  */
 public class RooftopUtilsTest {
 
-    @Test
-    public void testSortAndFilterConnections() {
+	@Test
+	void testSortAndFilterConnections() {
         List<ODConnection> connections = new ArrayList<>();
 
         // we'll misuse the transferCount as a connection identifier
@@ -65,8 +65,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(4, connections.get(4).transferCount, 0.0);
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_1() {
+	@Test
+	void testCalcAverageAdaptionTime_1() {
         List<ODConnection> connections = new ArrayList<>();
 
         // 15-min headway, starting at 07:50, so the first rooftop is short and the last rooftop is cut
@@ -106,8 +106,8 @@ public class RooftopUtilsTest {
         // the frequency would be 3600 / 219 / 4 = 4.1096
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_2() {
+	@Test
+	void testCalcAverageAdaptionTime_2() {
         List<ODConnection> connections = new ArrayList<>();
 
         // 15-min headway, starting at 07:59 (so the first rooftop is cut, and the last is short)
@@ -124,8 +124,8 @@ public class RooftopUtilsTest {
         // the frequency would be 3600 / 225 / 4 = 4.0
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_noEarlierDeparture() {
+	@Test
+	void testCalcAverageAdaptionTime_noEarlierDeparture() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -143,8 +143,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(1000.0, adaptionTime, 1e-7);
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_noLaterDeparture() {
+	@Test
+	void testCalcAverageAdaptionTime_noLaterDeparture() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -160,8 +160,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(900.0, adaptionTime, 1e-7);
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_noDepartureInRange() {
+	@Test
+	void testCalcAverageAdaptionTime_noDepartureInRange() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -177,8 +177,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(2600.0, adaptionTime, 1e-7);
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_singleDepartureEarly() {
+	@Test
+	void testCalcAverageAdaptionTime_singleDepartureEarly() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -193,8 +193,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(4800.0, adaptionTime, 1e-7);
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_singleDepartureInRange() {
+	@Test
+	void testCalcAverageAdaptionTime_singleDepartureInRange() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0;
@@ -209,8 +209,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(1300.0, adaptionTime, 1e-7);
     }
 
-    @Test
-    public void testCalcAverageAdaptionTime_singleDepartureLate() {
+	@Test
+	void testCalcAverageAdaptionTime_singleDepartureLate() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0;
@@ -225,8 +225,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(2400.0, adaptionTime, 1e-7);
     }
 
-    @Test
-    public void testCalcConnectionShares() {
+	@Test
+	void testCalcConnectionShares() {
         List<ODConnection> connections = new ArrayList<>();
 
         // 15-min headway
@@ -283,8 +283,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(2.0 / 60.0, shares.get(c5), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_noEarlierDeparture() {
+	@Test
+	void testCalculationShares_noEarlierDeparture() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -310,8 +310,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(0.0, shares.get(c1), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_noEarlierDeparture2() {
+	@Test
+	void testCalculationShares_noEarlierDeparture2() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -339,8 +339,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(1.0 / 3.0, shares.get(c1), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_noLaterDeparture() {
+	@Test
+	void testCalculationShares_noLaterDeparture() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -368,8 +368,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(5.0 / 6.0, shares.get(c1), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_noDepartureInRange() {
+	@Test
+	void testCalculationShares_noDepartureInRange() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -397,8 +397,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(1.0 / 3.0, shares.get(c1), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_singleDepartureEarly() {
+	@Test
+	void testCalculationShares_singleDepartureEarly() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -408,8 +408,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(1.0, shares.get(c0), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_singleDepartureInRange() {
+	@Test
+	void testCalculationShares_singleDepartureInRange() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;
@@ -419,8 +419,8 @@ public class RooftopUtilsTest {
         Assert.assertEquals(1.0, shares.get(c0), 1e-7);
     }
 
-    @Test
-    public void testCalculationShares_singleDepartureLate() {
+	@Test
+	void testCalculationShares_singleDepartureLate() {
         List<ODConnection> connections = new ArrayList<>();
 
         ODConnection c0, c1;

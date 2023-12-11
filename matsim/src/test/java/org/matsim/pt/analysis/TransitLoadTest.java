@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -47,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
 public class TransitLoadTest {
 
 	@Test
-	public void testTransitLoad_singleLine() {
+	void testTransitLoad_singleLine() {
 		TransitScheduleFactory factory = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = factory.createTransitSchedule();
 		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create(0, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);

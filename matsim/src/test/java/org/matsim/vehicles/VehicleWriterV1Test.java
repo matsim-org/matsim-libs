@@ -27,8 +27,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -59,7 +59,8 @@ public class VehicleWriterV1Test {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	@Test public void testWriter() {
+	@Test
+	void testWriter() {
 
 		String outfileName = utils.getOutputDirectory() + "testOutputVehicles.xml";
 

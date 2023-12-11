@@ -22,8 +22,8 @@ package org.matsim.core.events.algorithms;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -47,7 +47,7 @@ public class EventWriterXMLTest {
 	 * values are correctly encoded when written to a file.
 	 */
 	@Test
-	public void testSpecialCharacters() {
+	void testSpecialCharacters() {
 		String filename = this.utils.getOutputDirectory() + "testEvents.xml";
 		EventWriterXML writer = new EventWriterXML(filename);
 
@@ -76,7 +76,7 @@ public class EventWriterXMLTest {
 	}
 
 	@Test
-	public void testNullAttribute() {
+	void testNullAttribute() {
 		String filename = this.utils.getOutputDirectory() + "testEvents.xml";
 		EventWriterXML writer = new EventWriterXML(filename);
 

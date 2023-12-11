@@ -32,7 +32,7 @@ import com.google.inject.ProvisionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -52,12 +52,13 @@ import jakarta.inject.Inject;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class QSimComponentsTest {
+	public class QSimComponentsTest {
 	private static final Logger log = LogManager.getLogger( QSimComponentsTest.class ) ;
 
-	@Test
-	public void testAddComponentViaString() {
+	 @Test
+	 void testAddComponentViaString() {
 
 		// request "abc" component by config:
 		Config config = ConfigUtils.createConfig();
@@ -97,12 +98,13 @@ public class QSimComponentsTest {
 
 		Assert.assertTrue( "MockMobsimListener was not added to QSim", handler.hasBeenCalled() ) ;
 	}
-	/**
-	 * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without requesting the "abc"
-	 * component by config.  "abc" will not be activated (although it is "registered" = added as a qsim module).
-	 */
-	@Test
-	public void testAddModuleOnly() {
+
+	 /**
+	  * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without requesting the "abc"
+	  * component by config.  "abc" will not be activated (although it is "registered" = added as a qsim module).
+	  */
+	 @Test
+	 void testAddModuleOnly() {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -140,52 +142,57 @@ public class QSimComponentsTest {
 		Assert.assertFalse( "MockMobsimListener was added to QSim although it should not have been added", handler.hasBeenCalled() ) ;
 	}
 
-	/**
-	 * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without registering the "abc"
-	 * module.  Evidently, it throws an exception.
-	 */
-	@Test( expected = ProvisionException.class )
-	public void testAddComponentOnly() {
-		Config config = ConfigUtils.createConfig();
+	 /**
+	  * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without registering the "abc"
+	  * module.  Evidently, it throws an exception.
+	  */
+	 @Test
+	 void testAddComponentOnly() {
+		 assertThrows(ProvisionException.class, () -> {
+				Config config = ConfigUtils.createConfig();
 
-		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-		List<String> list = new ArrayList<>( qsimComponentsConfig.getActiveComponents() ) ; // contains the "standard components" (*)
-		list.add( "abc" ) ;
-		qsimComponentsConfig.setActiveComponents( list );
+				QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
+				List<String> list = new ArrayList<>( qsimComponentsConfig.getActiveComponents() ) ; // contains the "standard components" (*)
+				list.add("abc") ;
+				qsimComponentsConfig.setActiveComponents(list);
 
-		log.warn( "" );
-		log.warn( "qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
-		for( String component : qsimComponentsConfig.getActiveComponents() ){
-			log.warn( component );
-		}
-		log.warn( "" );
+				log.warn("");
+				log.warn("qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
+				for (String component : qsimComponentsConfig.getActiveComponents()) {
+					log.warn(component);
+				}
+				log.warn("");
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		EventsManager eventsManager = EventsUtils.createEventsManager();
+				Scenario scenario = ScenarioUtils.createScenario(config);
+				EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-		eventsManager.addHandler( handler );
+				AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
+				eventsManager.addHandler(handler);
 
-		AbstractQSimModule module = new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				addQSimComponentBinding( "abc" ).to(  MockMobsimListener.class ) ;
-			}
-		};
+				AbstractQSimModule module = new AbstractQSimModule() {
+					@Override
+					protected void configureQSim() {
+						addQSimComponentBinding("abc").to(MockMobsimListener.class) ;
+					}
+				};
 
-		new QSimBuilder(config) //
-								.useDefaultComponents() // uses components from config
-								.useDefaultQSimModules() // registers the default modules (needed here because of (*))
+				new QSimBuilder(config) //
+						.useDefaultComponents() // uses components from config
+						.useDefaultQSimModules() // registers the default modules (needed here because of (*))
 //								.addQSimModule(module) // registers the additional modules
-								.build(scenario, eventsManager) //
-								.run();
+						.build(scenario, eventsManager) //
+						.run();
 
-	}
-	/**
-	 * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but request the "abc" component twice.
-	 */
-	@Test
-//			( expected = IllegalStateException.class )
-	public void testAddComponentViaStringTwice() {
+			});
+
+		}
+
+	 /**
+	  * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but request the "abc" component twice.
+	  */
+	 //			( expected = IllegalStateException.class )
+	 @Test
+	 void testAddComponentViaStringTwice() {
 
 		// request "abc" component by config:
 		Config config = ConfigUtils.createConfig();
@@ -228,8 +235,8 @@ public class QSimComponentsTest {
 	}
 
 
-	@Test
-	public void testGenericAddComponentMethod() {
+	 @Test
+	 void testGenericAddComponentMethod() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -258,8 +265,8 @@ public class QSimComponentsTest {
 		Assert.assertTrue( handler.hasBeenCalled() ) ;
 	}
 
-	@Test
-	public void testGenericAddComponentMethodWithoutConfiguringIt() {
+	 @Test
+	 void testGenericAddComponentMethodWithoutConfiguringIt() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -281,8 +288,8 @@ public class QSimComponentsTest {
 		Assert.assertFalse( handler.hasBeenCalled() ) ;
 	}
 
-	@Test
-	public void testMultipleBindings() {
+	 @Test
+	 void testMultipleBindings() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -308,8 +315,8 @@ public class QSimComponentsTest {
 		Assert.assertTrue(mockEngineB.isCalled);
 	}
 
-	@Test
-	public void testExplicitAnnotationConfiguration() {
+	 @Test
+	 void testExplicitAnnotationConfiguration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -332,8 +339,8 @@ public class QSimComponentsTest {
 		Assert.assertTrue(mockEngine.isCalled);
 	}
 
-	@Test
-	public void testManualConfiguration() {
+	 @Test
+	 void testManualConfiguration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -356,8 +363,8 @@ public class QSimComponentsTest {
 		Assert.assertTrue(mockEngine.isCalled);
 	}
 
-	@Test
-	public void testUseConfigGroup() {
+	 @Test
+	 void testUseConfigGroup() {
 		Config config = ConfigUtils.createConfig();
 
 		QSimComponentsConfigGroup componentsConfig = new QSimComponentsConfigGroup();

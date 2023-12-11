@@ -1,7 +1,7 @@
 package org.matsim.core.router.speedy;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,8 +16,8 @@ import org.matsim.core.router.speedy.SpeedyGraph.LinkIterator;
  */
 public class SpeedyGraphTest {
 
-    @Test
-    public void testConstruction() {
+	@Test
+	void testConstruction() {
         Id.resetCaches();
 
         Fixture f = new Fixture();

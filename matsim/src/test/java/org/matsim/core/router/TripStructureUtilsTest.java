@@ -25,7 +25,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +43,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author thibautd
@@ -375,9 +379,8 @@ public class TripStructureUtilsTest {
 	}
 
 
-
 	@Test
-	public void testActivities() throws Exception {
+	void testActivities() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Activity> acts =
 				TripStructureUtils.getActivities(
@@ -398,7 +401,7 @@ public class TripStructureUtilsTest {
 	}
 
 	@Test
-	public void testTrips() throws Exception {
+	void testTrips() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
 				TripStructureUtils.getTrips(fixture.plan);
@@ -436,7 +439,7 @@ public class TripStructureUtilsTest {
 	}
 
 	@Test
-	public void testLegs() throws Exception {
+	void testLegs() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
 				TripStructureUtils.getTrips(fixture.plan);
@@ -454,29 +457,31 @@ public class TripStructureUtilsTest {
 	}
 
 
-	@Test( expected=NullPointerException.class )
-	public void testNPEWhenLocationNullInSubtourAnalysis() {
-		// this may sound surprising, but for a long time the algorithm
-		// was perfectly fine with that if assertions were disabled...
+	@Test
+	void testNPEWhenLocationNullInSubtourAnalysis() {
+		assertThrows(NullPointerException.class, () -> {
+			// this may sound surprising, but for a long time the algorithm
+			// was perfectly fine with that if assertions were disabled...
 
-		final Plan plan = populationFactory.createPlan();
+			final Plan plan = populationFactory.createPlan();
 
-		// link ids are null
-		plan.addActivity(
-				populationFactory.createActivityFromCoord(
-					"type",
-						new Coord((double) 0, (double) 0)) );
-		plan.addLeg( populationFactory.createLeg( "mode" ) );
-		plan.addActivity(
-				populationFactory.createActivityFromCoord(
-					"type",
-						new Coord((double) 0, (double) 0)) );
+			// link ids are null
+			plan.addActivity(
+					populationFactory.createActivityFromCoord(
+							"type",
+							new Coord((double) 0, (double) 0)));
+			plan.addLeg(populationFactory.createLeg("mode"));
+			plan.addActivity(
+					populationFactory.createActivityFromCoord(
+							"type",
+							new Coord((double) 0, (double) 0)));
 
-		TripStructureUtils.getSubtours( plan );
+			TripStructureUtils.getSubtours(plan);
+		});
 	}
 
 	@Test
-	public void testSubtourCoords() {
+	void testSubtourCoords() {
 
 		final Plan plan = populationFactory.createPlan();
 
@@ -507,7 +512,7 @@ public class TripStructureUtilsTest {
 	}
 
 	@Test
-	public void testFindTripAtPlanElement() {
+	void testFindTripAtPlanElement() {
 		Fixture theFixture = null ;
 		for( Fixture fixture : fixtures ){
 			if ( fixture.name.equals( WITH_ACCESS_EGRESS ) ){

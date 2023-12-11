@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -16,7 +16,7 @@ import org.matsim.vehicles.Vehicle;
 public class AgentId2DepartureDelayAtStopMapTest {
 
 	@Test
-	public void testAgentId2DepartureDelayAtStopMap() {
+	void testAgentId2DepartureDelayAtStopMap() {
 
 		Set<Id<Person>> idSet = new TreeSet<>();
 		for (int ii=0; ii<15; ii++){

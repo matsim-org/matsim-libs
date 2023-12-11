@@ -24,8 +24,8 @@
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,7 +49,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.File;
 import java.net.URL;
 
-/**
+ /**
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
@@ -65,8 +65,8 @@ public class TransitScheduleReprojectionIOTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testInput() {
+	 @Test
+	 void testInput() {
 		URL transitSchedule = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader( originalScenario ).readURL(transitSchedule );
@@ -77,8 +77,8 @@ public class TransitScheduleReprojectionIOTest {
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
 
-	@Test
-	public void testOutput() {
+	 @Test
+	 void testOutput() {
 		URL transitSchedule = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(originalScenario).readURL(transitSchedule );
@@ -92,8 +92,8 @@ public class TransitScheduleReprojectionIOTest {
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		// read transitschedule.xml into empty scenario:
 		Scenario originalScenario ;
 		{
@@ -151,8 +151,8 @@ public class TransitScheduleReprojectionIOTest {
 		}
 	}
 
-	@Test
-	public void testWithControlerAndAttributes() {
+	 @Test
+	 void testWithControlerAndAttributes() {
 		// read transit schedule into empty scenario:
 		Scenario originalScenario ;
 		{

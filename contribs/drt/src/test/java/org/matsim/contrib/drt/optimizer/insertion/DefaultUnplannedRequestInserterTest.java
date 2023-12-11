@@ -32,8 +32,8 @@ import static org.mockito.Mockito.when;
 import java.util.*;
 
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -74,7 +74,7 @@ public class DefaultUnplannedRequestInserterTest {
 	public final ForkJoinPoolExtension forkJoinPoolExtension = new ForkJoinPoolExtension();
 
 	@Test
-	public void nothingToSchedule() {
+	void nothingToSchedule() {
 		var fleet = fleet(vehicle("1"));
 		var unplannedRequests = requests();
 		double now = 15;
@@ -89,7 +89,7 @@ public class DefaultUnplannedRequestInserterTest {
 	}
 
 	@Test
-	public void notScheduled_rejected() {
+	void notScheduled_rejected() {
 		var fleet = fleet();//no vehicles -> impossible to schedule
 		var unplannedRequests = requests(request1);
 		double now = 15;
@@ -122,7 +122,7 @@ public class DefaultUnplannedRequestInserterTest {
 	}
 
 	@Test
-	public void notScheduled_addedToRetry() {
+	void notScheduled_addedToRetry() {
 		var fleet = fleet();//no vehicles -> impossible to schedule
 		var unplannedRequests = requests(request1);
 		double now = 15;
@@ -159,7 +159,7 @@ public class DefaultUnplannedRequestInserterTest {
 	}
 
 	@Test
-	public void firstRetryOldRequest_thenHandleNewRequest() {
+	void firstRetryOldRequest_thenHandleNewRequest() {
 		var fleet = fleet();//no vehicles -> impossible to schedule
 		var unplannedRequests = requests(request1);
 		double now = 15;
@@ -194,7 +194,7 @@ public class DefaultUnplannedRequestInserterTest {
 	}
 
 	@Test
-	public void acceptedRequest() {
+	void acceptedRequest() {
 		var vehicle1 = vehicle("1");
 		var fleet = fleet(vehicle1);
 		var unplannedRequests = requests(request1);

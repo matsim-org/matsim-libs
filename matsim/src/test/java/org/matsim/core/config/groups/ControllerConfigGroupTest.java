@@ -24,7 +24,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 
 public class ControllerConfigGroupTest {
@@ -36,7 +36,7 @@ public class ControllerConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testEventsFileFormat() {
+	void testEventsFileFormat() {
 		ControllerConfigGroup cg = new ControllerConfigGroup();
 		Set<EventsFileFormat> formats;
 		// test initial value
@@ -86,7 +86,7 @@ public class ControllerConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testMobsim() {
+	void testMobsim() {
 		ControllerConfigGroup cg = new ControllerConfigGroup();
 		// test initial value
 		Assert.assertEquals("qsim", cg.getMobsim());
@@ -108,7 +108,7 @@ public class ControllerConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testWritePlansInterval() {
+	void testWritePlansInterval() {
 		ControllerConfigGroup cg = new ControllerConfigGroup();
 		// test initial value
 		Assert.assertEquals(50, cg.getWritePlansInterval());
@@ -125,7 +125,7 @@ public class ControllerConfigGroupTest {
 	 * returned with the getters and setters.
 	 */
 	@Test
-	public void testLink2LinkRouting(){
+	void testLink2LinkRouting(){
 		ControllerConfigGroup cg = new ControllerConfigGroup();
 		//initial value
 		Assert.assertFalse(cg.isLinkToLinkRoutingEnabled());
@@ -148,7 +148,7 @@ public class ControllerConfigGroupTest {
 	 * returned with the getters and setters.
 	 */
 	@Test
-	public void testWriteSnapshotInterval(){
+	void testWriteSnapshotInterval(){
 		ControllerConfigGroup cg = new ControllerConfigGroup();
 		//initial value
 		Assert.assertEquals(1, cg.getWriteSnapshotsInterval());

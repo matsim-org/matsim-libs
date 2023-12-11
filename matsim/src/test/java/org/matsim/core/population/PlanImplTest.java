@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,7 +49,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testCreateAndAddActAndLeg() {
+	void testCreateAndAddActAndLeg() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		try {
 			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -68,7 +68,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_Between() {
+	void testInsertActLeg_Between() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -97,7 +97,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_AtEnd() {
+	void testInsertActLeg_AtEnd() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -126,7 +126,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_AtWrongPosition() {
+	void testInsertActLeg_AtWrongPosition() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -152,7 +152,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_AtStart() {
+	void testInsertActLeg_AtStart() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -179,7 +179,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_BehindEnd() {
+	void testInsertActLeg_BehindEnd() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -212,7 +212,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void testCopyPlan_NetworkRoute() {
+	void testCopyPlan_NetworkRoute() {
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
@@ -243,7 +243,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void testCopyPlan_GenericRoute() {
+	void testCopyPlan_GenericRoute() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
@@ -277,7 +277,7 @@ public class PlanImplTest {
 	 * @author meisterk
 	 */
 	@Test
-	public void testRemoveActivity() {
+	void testRemoveActivity() {
 
 		Plan testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(testee, "h", new Coord(0, 0));
@@ -297,7 +297,7 @@ public class PlanImplTest {
 	 * @author meisterk
 	 */
 	@Test
-	public void testRemoveLeg() {
+	void testRemoveLeg() {
 		Plan testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(testee, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( testee, TransportMode.car );
@@ -313,7 +313,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void addMultipleLegs() {
+	void addMultipleLegs() {
 		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
 		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
@@ -330,7 +330,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void addMultipleActs() {
+	void addMultipleActs() {
 		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
 		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
@@ -345,7 +345,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void createAndAddMultipleLegs() {
+	void createAndAddMultipleLegs() {
 		Plan p = PopulationUtils.createPlan();
 		PopulationUtils.createAndAddActivity(p, "h");
 		PopulationUtils.createAndAddLeg( p, TransportMode.walk );
@@ -362,7 +362,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void createAndAddMultipleActs() {
+	void createAndAddMultipleActs() {
 		Plan p = PopulationUtils.createPlan();
 		PopulationUtils.createAndAddActivity(p, "h");
 		PopulationUtils.createAndAddLeg( p, TransportMode.walk );

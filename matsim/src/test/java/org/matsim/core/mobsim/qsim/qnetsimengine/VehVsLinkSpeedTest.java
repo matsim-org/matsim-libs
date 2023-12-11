@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -77,9 +77,9 @@ public class VehVsLinkSpeedTest {
 		};
 		return Arrays.asList(vehSpeeds);
 	}
-	
-	@Test 
-	public void testVehicleSpeed(){
+
+	@Test
+	void testVehicleSpeed(){
 		SimpleNetwork net = new SimpleNetwork();
 		
 		Id<Person> id = Id.createPersonId(0);

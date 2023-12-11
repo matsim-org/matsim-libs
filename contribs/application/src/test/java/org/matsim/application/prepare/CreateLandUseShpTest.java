@@ -1,8 +1,8 @@
 package org.matsim.application.prepare;
 
 import org.junit.Assume;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Files;
@@ -16,7 +16,7 @@ public class CreateLandUseShpTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void convert() {
+	void convert() {
 
 		Path input = Path.of(utils.getClassInputDirectory(), "andorra-latest-free.shp.zip");
 

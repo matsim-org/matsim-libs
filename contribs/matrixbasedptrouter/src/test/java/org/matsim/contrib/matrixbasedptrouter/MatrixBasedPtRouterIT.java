@@ -26,8 +26,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Coord;
@@ -66,7 +66,7 @@ public class MatrixBasedPtRouterIT {
 	 * the travel time computed by the PtMatrix are compared (should be equal).
 	 */
 	@Test
-	public void testIntegration() throws IOException {
+	void testIntegration() throws IOException {
 
 		String path = utils.getOutputDirectory();
 

@@ -20,8 +20,8 @@
 package org.matsim.core.events;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +39,7 @@ public class TransitDriverStartsEventTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testWriteReadXml() {
+	void testWriteReadXml() {
 		final TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(36095.2,
 				Id.create("ptDrvr-1", Person.class),
 				Id.create("vehicle-bus5", Vehicle.class),

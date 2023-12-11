@@ -24,15 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
 public class DensityClusterTest{
-	
-	
+
+
 	/**
 	 * Tests if the following cluster pattern is clustered into two clusters:
 	 *       ___________  
@@ -46,7 +46,7 @@ public class DensityClusterTest{
 	 * 		|___________|
 	 */		
 	@Test
-	public void testDJCluster(){
+	void testDJCluster(){
 		List<Node> al = buildTestArrayList();
 		DensityCluster djc = new DensityCluster(al, false);
 		djc.clusterInput(2, 3);

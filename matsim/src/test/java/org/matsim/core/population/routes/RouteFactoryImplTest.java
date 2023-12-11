@@ -18,8 +18,7 @@
  * *********************************************************************** */
 
 package org.matsim.core.population.routes;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +39,7 @@ import org.junit.Assert;
 public class RouteFactoryImplTest {
 
 	@Test
-	public void testConstructor_DefaultNetworkRouteType() {
+	void testConstructor_DefaultNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		PopulationFactory pf = scenario.getPopulation().getFactory();
@@ -52,7 +51,7 @@ public class RouteFactoryImplTest {
 	}
 
 	@Test
-	public void testConstructor_LinkNetworkRouteType() {
+	void testConstructor_LinkNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.LinkNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -65,7 +64,7 @@ public class RouteFactoryImplTest {
 	}
 
 	@Test
-	public void testConstructor_HeavyCompressedNetworkRouteType() {
+	void testConstructor_HeavyCompressedNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.HeavyCompressedNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -78,7 +77,7 @@ public class RouteFactoryImplTest {
 	}
 
 	@Test
-	public void testConstructor_MediumCompressedNetworkRouteType() {
+	void testConstructor_MediumCompressedNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.MediumCompressedNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);

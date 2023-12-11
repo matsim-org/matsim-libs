@@ -23,8 +23,8 @@
 package org.matsim.core.router.old;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -58,8 +58,8 @@ public class PlanRouterTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void passesVehicleFromOldPlan() {
+	@Test
+	void passesVehicleFromOldPlan() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -88,8 +88,8 @@ public class PlanRouterTest {
         }
     }
 
-    @Test
-    public void keepsVehicleIfTripRouterUsesOneAlready() {
+	@Test
+	void keepsVehicleIfTripRouterUsesOneAlready() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);

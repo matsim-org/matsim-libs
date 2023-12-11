@@ -26,8 +26,8 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,7 +58,7 @@ public class RunCarsharingIT {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void test() {
+	final void test() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new FreeFloatingConfigGroup(),
 				new OneWayCarsharingConfigGroup(),

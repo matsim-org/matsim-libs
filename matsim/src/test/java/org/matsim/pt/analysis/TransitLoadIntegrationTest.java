@@ -20,8 +20,8 @@
 package org.matsim.pt.analysis;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -44,7 +44,7 @@ public class TransitLoadIntegrationTest {
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testIntegration() {
+	void testIntegration() {
 		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
 		cfg.controller().setLastIteration(0);
 		cfg.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);

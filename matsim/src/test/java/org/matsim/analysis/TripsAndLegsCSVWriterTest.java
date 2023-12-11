@@ -21,8 +21,8 @@
 package org.matsim.analysis;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.analysis.TripsAndLegsCSVWriter.NoLegsWriterExtension;
 import org.matsim.analysis.TripsAndLegsCSVWriter.NoTripWriterExtension;
 import org.matsim.api.core.v01.*;
@@ -116,7 +116,7 @@ public class TripsAndLegsCSVWriterTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTripsAndLegsCSVWriter() {
+	void testTripsAndLegsCSVWriter() {
 
 		Plans plans = new Plans();
 

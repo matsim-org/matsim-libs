@@ -1,6 +1,6 @@
 package org.matsim.core.network;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -21,8 +21,8 @@ public class NetworkCollectorTest {
         return network;
     }
 
-    @Test
-    public void testWithSequentialStream() {
+	@Test
+	void testWithSequentialStream() {
 
         var network = getNetworkFromExample();
 
@@ -32,8 +32,8 @@ public class NetworkCollectorTest {
         assertTrue(NetworkUtils.compare(network, collectedNetwork));
     }
 
-    @Test
-    public void testWithParallelStream() {
+	@Test
+	void testWithParallelStream() {
 
         var network = getNetworkFromExample();
 
@@ -43,8 +43,8 @@ public class NetworkCollectorTest {
         assertTrue(NetworkUtils.compare(network, collectedNetwork));
     }
 
-    @Test
-    public void testWithFilter() {
+	@Test
+	void testWithFilter() {
 
         var network = getNetworkFromExample();
         // choose link 73 because both of its nodes have multiple in and out links

@@ -20,7 +20,7 @@
 package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,7 +53,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 	 * Tests whether daily constants are considered in the scoring.
 	 */
 	@Test
-	public void test1() throws Exception {
+	void test1() throws Exception {
 		final Network network = createNetwork();
 		final CharyparNagelLegScoring scoring1 = createScoringOnlyConstants( network );
 		final CharyparNagelLegScoring scoring2 = createDefaultPlusConstants( network );

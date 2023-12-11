@@ -22,8 +22,8 @@ package org.matsim.counts;
 
 import static org.junit.Assert.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestUtils;
@@ -35,7 +35,8 @@ public class CountsParserTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testSEElementCounts() throws SAXException {
+	@Test
+	void testSEElementCounts() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -53,7 +54,8 @@ public class CountsParserTest {
 		}
 	}
 
-	@Test public void testSEElementCountWithoutCoords() throws SAXException {
+	@Test
+	void testSEElementCountWithoutCoords() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -70,7 +72,8 @@ public class CountsParserTest {
 		reader.endElement("", "counts", "counts");
 	}
 
-	@Test public void testSEElementCountWithCoords() throws SAXException {
+	@Test
+	void testSEElementCountWithCoords() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -88,7 +91,8 @@ public class CountsParserTest {
 		reader.endElement("", "counts", "counts");
 	}
 
-	@Test public void testSEElementVolume() throws SAXException {
+	@Test
+	void testSEElementVolume() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);

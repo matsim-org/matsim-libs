@@ -30,9 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -76,7 +75,7 @@ public class RunDrtExampleIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
+	void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -103,7 +102,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtExampleWithNoRejections_SelectiveSearch() {
+	void testRunDrtExampleWithNoRejections_SelectiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -137,7 +136,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
+	void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -172,7 +171,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtExampleWithRequestRetry() {
+	void testRunDrtExampleWithRequestRetry() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -201,7 +200,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtStopbasedExample() {
+	void testRunDrtStopbasedExample() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_stop_based_drt_config.xml");
@@ -224,7 +223,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtStopbasedExampleWithFlexibleStopDuration() {
+	void testRunDrtStopbasedExampleWithFlexibleStopDuration() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_stop_based_drt_config.xml");
@@ -259,7 +258,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunServiceAreabasedExampleWithSpeedUp() {
+	void testRunServiceAreabasedExampleWithSpeedUp() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_serviceArea_based_drt_config.xml");
@@ -282,7 +281,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtExampleWithIncrementalStopDuration() {
+	void testRunDrtExampleWithIncrementalStopDuration() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -321,7 +320,7 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
-	public void testRunDrtWithPrebooking() {
+	void testRunDrtWithPrebooking() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_drt_config.xml");

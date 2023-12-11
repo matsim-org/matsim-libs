@@ -21,8 +21,8 @@
 package org.matsim.core.utils.geometry;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -49,7 +49,7 @@ public class GeometryUtilsTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void testIntersectingLinks() {
+	final void testIntersectingLinks() {
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil"), "config.xml" ) ) ;
 

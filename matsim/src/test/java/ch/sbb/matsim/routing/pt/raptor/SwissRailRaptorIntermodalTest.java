@@ -22,7 +22,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,8 +69,8 @@ import java.util.Map;
  */
 public class SwissRailRaptorIntermodalTest {
 
-    @Test
-    public void testIntermodalTrip() {
+	@Test
+	void testIntermodalTrip() {
         IntermodalFixture f = new IntermodalFixture();
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
@@ -133,8 +133,8 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
-    @Test
-    public void testIntermodalTrip_TripRouterIntegration() {
+	@Test
+	void testIntermodalTrip_TripRouterIntegration() {
         IntermodalFixture f = new IntermodalFixture();
 
         RoutingModule walkRoutingModule = new TeleportationRoutingModule(TransportMode.walk, f.scenario, 1.1, 1.3);
@@ -214,8 +214,8 @@ public class SwissRailRaptorIntermodalTest {
 		Assert.assertEquals(0.0, ((Activity)planElements.get(7)).getMaximumDuration().seconds(), 0.0);
     }
 
-    @Test
-    public void testIntermodalTrip_walkOnlyNoSubpop() {
+	@Test
+	void testIntermodalTrip_walkOnlyNoSubpop() {
         IntermodalFixture f = new IntermodalFixture();
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
@@ -262,12 +262,12 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
-    /**
-     * Test that if start and end are close to each other, such that the intermodal
-     * access and egress go to/from the same stop, still a direct transit_walk is returned.
-     */
-    @Test
-    public void testIntermodalTrip_withoutPt() {
+	/**
+	* Test that if start and end are close to each other, such that the intermodal
+	* access and egress go to/from the same stop, still a direct transit_walk is returned.
+	*/
+	@Test
+	void testIntermodalTrip_withoutPt() {
         IntermodalFixture f = new IntermodalFixture();
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
@@ -302,8 +302,8 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
-    @Test
-    public void testDirectWalkFactor() {
+	@Test
+	void testDirectWalkFactor() {
         IntermodalFixture f = new IntermodalFixture();
 
         f.config.scoring().setPerforming_utils_hr(6.0);
@@ -392,8 +392,8 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
-    @Test
-    public void testAccessEgressModeFasterThanPt() {
+	@Test
+	void testAccessEgressModeFasterThanPt() {
         IntermodalFixture f = new IntermodalFixture();
         /*
          * setDirectWalkFactor(Double.POSITIVE_INFINITY) leads to the case where in SwissRailRaptor.calcRoute() both the found
@@ -486,9 +486,8 @@ public class SwissRailRaptorIntermodalTest {
 	}
 
 
-
-    @Test
-    public void testIntermodalTrip_competingAccess() {
+	@Test
+	void testIntermodalTrip_competingAccess() {
         IntermodalFixture f = new IntermodalFixture();
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
@@ -580,10 +579,10 @@ public class SwissRailRaptorIntermodalTest {
         }
     }
 
-    // Checks RandomAccessEgressModeRaptorStopFinder. The desired result is that the StopFinder will try out the different
-    // access/egress modes, regardless of the modes' freespeeds.
-    @Test
-    public void testIntermodalTrip_RandomAccessEgressModeRaptorStopFinder() {
+	// Checks RandomAccessEgressModeRaptorStopFinder. The desired result is that the StopFinder will try out the different
+	// access/egress modes, regardless of the modes' freespeeds.
+	@Test
+	void testIntermodalTrip_RandomAccessEgressModeRaptorStopFinder() {
         IntermodalFixture f = new IntermodalFixture();
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
@@ -682,13 +681,13 @@ public class SwissRailRaptorIntermodalTest {
         }
     }
 
-    /**
-     * Tests the following situation: two stops A and B close to each other, A has intermodal access, B not.
-     * The route is fastest from B to C, with intermodal access to A and then transferring from A to B.
-     * Make sure that in such cases the correct transit_walks are generated around stops A and B for access to pt.
-     */
-    @Test
-    public void testIntermodalTrip_accessTransfer() {
+	/**
+	* Tests the following situation: two stops A and B close to each other, A has intermodal access, B not.
+	* The route is fastest from B to C, with intermodal access to A and then transferring from A to B.
+	* Make sure that in such cases the correct transit_walks are generated around stops A and B for access to pt.
+	*/
+	@Test
+	void testIntermodalTrip_accessTransfer() {
         IntermodalTransferFixture f = new IntermodalTransferFixture();
 
         Facility fromFac = new FakeFacility(new Coord(10000, 500), Id.create("from", Link.class)); // stop B or C
@@ -731,17 +730,17 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
     }
 
-    /**
-     * When using intermodal access/egress, transfers at the beginning are allowed to
-     * be able to transfer from a stop with intermodal access/egress to another stop
-     * with better connections to the destination. Earlier versions of SwissRailRaptor
-     * had a bug that resulted in only stops where such transfers were possible to be
-     * used for route finding, but not stops directly reachable and usable.
-     * This test tries to cover this case to make sure, route finding works as expected
-     * in all cases.
-     */
-    @Test
-    public void testIntermodalTrip_singleReachableStop() {
+	/**
+	* When using intermodal access/egress, transfers at the beginning are allowed to
+	* be able to transfer from a stop with intermodal access/egress to another stop
+	* with better connections to the destination. Earlier versions of SwissRailRaptor
+	* had a bug that resulted in only stops where such transfers were possible to be
+	* used for route finding, but not stops directly reachable and usable.
+	* This test tries to cover this case to make sure, route finding works as expected
+	* in all cases.
+	*/
+	@Test
+	void testIntermodalTrip_singleReachableStop() {
         IntermodalTransferFixture f = new IntermodalTransferFixture();
 
         f.srrConfig.getIntermodalAccessEgressParameterSets().removeIf(paramset -> paramset.getMode().equals("bike")); // we only want "walk" as mode
@@ -777,8 +776,8 @@ public class SwissRailRaptorIntermodalTest {
 
     }
 
-    @Test
-    public void testIntermodalTrip_egressTransfer() {
+	@Test
+	void testIntermodalTrip_egressTransfer() {
         IntermodalTransferFixture f = new IntermodalTransferFixture();
 
         Facility fromFac = new FakeFacility(new Coord(20000, 100), Id.create("from", Link.class)); // stop D
@@ -821,12 +820,12 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals("to", legBike.getRoute().getEndLinkId().toString());
     }
 
-    /**
-     * If there is no pt stop within the search radius, the Raptor will assign a transit_walk route from the fromFacility
-     * to the toFacility. In this case, the search radius is 500, but the fromFacility is 600 away from stop A.
-     */
-    @Test
-    public void testIntermodalTrip_noPtStopsInRadius() {
+	/**
+	* If there is no pt stop within the search radius, the Raptor will assign a transit_walk route from the fromFacility
+	* to the toFacility. In this case, the search radius is 500, but the fromFacility is 600 away from stop A.
+	*/
+	@Test
+	void testIntermodalTrip_noPtStopsInRadius() {
         IntermodalTransferFixture f = new IntermodalTransferFixture();
 
         f.srrConfig.getIntermodalAccessEgressParameterSets().removeIf(paramset -> paramset.getMode().equals("bike")); // we only want "walk" as mode
@@ -843,7 +842,7 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
-    /**
+	/**
 	 * The agent is placed close to stop B, which is bike accessible. The agent is 600 meters away from stop B, which
 	 * puts it inside the Bike Radius for Access/Egress Mode but not in the Walk radius. This test is meant to verify
 	 * that the Swiss Rail Raptor will give the agent a transit_walk route if all the applicable intermodal
@@ -858,8 +857,8 @@ public class SwissRailRaptorIntermodalTest {
 	 * Swiss Rail Raptor will return a transit_walk between the fromFacility and the toFacility.
 	 */
 
-    @Test
-    public void testIntermodalTrip_accessModeRouterReturnsNull() {
+	@Test
+	void testIntermodalTrip_accessModeRouterReturnsNull() {
 
         // Part 1: Bike is very fast. Bike Router will return intermodal route including bike, pt, and walk.
         IntermodalTransferFixture f = new IntermodalTransferFixture();
@@ -919,17 +918,18 @@ public class SwissRailRaptorIntermodalTest {
 
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs2);
     }
-    /**
-     *
-     * The agent has a super-fast bike. So in theory it is faster to travel
-     * from stop_3 to the destination. However, with the introduced trip share
-     * constraint it will still take the closest stop accessible by the bike.
-     * If this constraint is not used the agent will take pt_3 stop as an
-     * access stop to his final destination.
-     *
-     */
-    @Test
-    public void testIntermodalTrip_tripLengthShare() {
+
+	/**
+	*
+	* The agent has a super-fast bike. So in theory it is faster to travel
+	* from stop_3 to the destination. However, with the introduced trip share
+	* constraint it will still take the closest stop accessible by the bike.
+	* If this constraint is not used the agent will take pt_3 stop as an
+	* access stop to his final destination.
+	*
+	*/
+	@Test
+	void testIntermodalTrip_tripLengthShare() {
         IntermodalFixture f = new IntermodalFixture();
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
@@ -995,8 +995,8 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
-    @Test
-    public void testIntermodalTrip_activityInteraction() {
+	@Test
+	void testIntermodalTrip_activityInteraction() {
     	double bikeInteractionDuration = 1.0;
     	double walkSpeed = 1.1;
         IntermodalFixture f = new IntermodalFixture();
@@ -1110,14 +1110,14 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
-    /**
-     *
-     * This test tests the intermodal router when access modes
-     * have interaction activities and it tests the inclusion of the
-     * pt interaction activities by the SwissRailRaptorRoutingModule
-     */
-    @Test
-    public void testIntermodalTrip_activityInteractionAdd() {
+	/**
+	*
+	* This test tests the intermodal router when access modes
+	* have interaction activities and it tests the inclusion of the
+	* pt interaction activities by the SwissRailRaptorRoutingModule
+	*/
+	@Test
+	void testIntermodalTrip_activityInteractionAdd() {
     	double bikeInteractionDuration = 1.0;
     	double walkSpeed = 1.1;
         IntermodalFixture f = new IntermodalFixture();
@@ -1238,7 +1238,7 @@ public class SwissRailRaptorIntermodalTest {
     }
 
 	@Test
-	public void testIntermodalTripWithAccessAndEgressTimesAtStops() {
+	void testIntermodalTripWithAccessAndEgressTimesAtStops() {
 		IntermodalFixture f = new IntermodalFixture();
 		f.scenario.getTransitSchedule().getFacilities().values()
 				.forEach(stopFacility -> TransitScheduleUtils.setSymmetricStopAccessEgressTime(stopFacility,120.0));

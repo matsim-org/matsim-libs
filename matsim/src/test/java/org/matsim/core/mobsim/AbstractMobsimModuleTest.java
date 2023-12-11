@@ -24,7 +24,7 @@
 import java.util.Collections;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
@@ -32,9 +32,9 @@ import org.matsim.core.mobsim.framework.AbstractMobsimModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-public class AbstractMobsimModuleTest {
-	@Test
-	public void testOverrides() {
+ public class AbstractMobsimModuleTest {
+	 @Test
+	 void testOverrides() {
 		AbstractMobsimModule moduleA = new AbstractMobsimModule() {
 			@Override
 			protected void configureMobsim() {

@@ -1,8 +1,8 @@
 package org.matsim.contrib.freightreceiver;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freightreceiver.run.chessboard.ReceiverChessboardScenario;
@@ -22,8 +22,8 @@ public class ReceiversTest {
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void testSetupReceivers() {
+	@Test
+	void testSetupReceivers() {
         try {
             @SuppressWarnings("unused")
             Receivers receivers = setupReceivers();
@@ -33,8 +33,8 @@ public class ReceiversTest {
         }
     }
 
-    @Test
-    public void getReceivers() {
+	@Test
+	void getReceivers() {
         Receivers receivers = setupReceivers();
         Map<Id<Receiver>, Receiver> map = receivers.getReceivers();
         Assert.assertNotNull("Map must exist.", map);
@@ -50,8 +50,8 @@ public class ReceiversTest {
         }
     }
 
-    @Test
-    public void getReceiver() {
+	@Test
+	void getReceiver() {
         Receivers receivers = setupReceivers();
         Receiver receiverExists = receivers.getReceiver(Id.create("1", Receiver.class));
         Assert.assertNotNull("Should find receiver.", receiverExists);
@@ -59,8 +59,8 @@ public class ReceiversTest {
         Assert.assertNull("Should not find receiver.", receiverDoesNotExist);
     }
 
-    @Test
-    public void addReceiver() {
+	@Test
+	void addReceiver() {
         Receivers receivers = setupReceivers();
         Assert.assertEquals("Wrong number of receivers.", 5, receivers.getReceivers().size());
 
@@ -74,8 +74,8 @@ public class ReceiversTest {
         /*TODO Should we maybe check if a receiver is NOT overwritten? */
     }
 
-    @Test
-    public void createAndAddProductType() {
+	@Test
+	void createAndAddProductType() {
         Receivers receivers = setupReceivers();
         Assert.assertEquals("Wrong number of product types.", 2, receivers.getAllProductTypes().size());
 
@@ -84,8 +84,8 @@ public class ReceiversTest {
         Assert.assertTrue("Should contain new product types", receivers.getAllProductTypes().contains(test));
     }
 
-    @Test
-    public void getProductType() {
+	@Test
+	void getProductType() {
         Receivers receivers = setupReceivers();
         try {
             ProductType p1 = receivers.getProductType(Id.create("P1", ProductType.class));
@@ -103,8 +103,8 @@ public class ReceiversTest {
         }
     }
 
-    @Test
-    public void getAllProductTypes() {
+	@Test
+	void getAllProductTypes() {
         Receivers receivers = setupReceivers();
         Collection<ProductType> types = receivers.getAllProductTypes();
         Assert.assertNotNull("Must have product types.", types);
@@ -124,8 +124,8 @@ public class ReceiversTest {
         Assert.assertEquals("Wrong capacity", 2.0, p2.getRequiredCapacity(), MatsimTestUtils.EPSILON);
     }
 
-    @Test
-    public void getAttributes() {
+	@Test
+	void getAttributes() {
         Receivers receivers = setupReceivers();
         Assert.assertNotNull("Should find attributed.", receivers.getAttributes());
         Assert.assertEquals("Wrong number of attributes.", 0, receivers.getAttributes().size());
@@ -134,16 +134,16 @@ public class ReceiversTest {
         Assert.assertEquals("Wrong number of attributes.", 1, receivers.getAttributes().size());
     }
 
-    @Test
-    public void setDescription() {
+	@Test
+	void setDescription() {
         Receivers receivers = setupReceivers();
         Assert.assertEquals("Wrong description.", "Chessboard", receivers.getDescription());
         receivers.setDescription("Dummy");
         Assert.assertEquals("Wrong description.", "Dummy", receivers.getDescription());
     }
 
-    @Test
-    public void getDescription() {
+	@Test
+	void getDescription() {
         Receivers receivers = setupReceivers();
         Assert.assertEquals("Wrong description.", "Chessboard", receivers.getDescription());
     }

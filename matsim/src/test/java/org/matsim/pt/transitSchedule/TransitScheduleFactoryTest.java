@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,14 +50,14 @@ public class TransitScheduleFactoryTest {
 	}
 
 	@Test
-	public void testCreateTransitSchedule() {
+	void testCreateTransitSchedule() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		Assert.assertEquals(builder, schedule.getFactory());
 	}
 
 	@Test
-	public void testCreateTransitLine() {
+	void testCreateTransitLine() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id<TransitLine> id = Id.create(1, TransitLine.class);
 		TransitLine line = builder.createTransitLine(id);
@@ -65,7 +65,7 @@ public class TransitScheduleFactoryTest {
 	}
 
 	@Test
-	public void testCreateTransitRoute() {
+	void testCreateTransitRoute() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id<TransitRoute> id = Id.create(2, TransitRoute.class);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(Id.create(3, Link.class), Id.create(4, Link.class));
@@ -82,7 +82,7 @@ public class TransitScheduleFactoryTest {
 	}
 
 	@Test
-	public void testCreateTransitRouteStop() {
+	void testCreateTransitRouteStop() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(5, TransitStopFacility.class), new Coord((double) 6, (double) 6), false);
 		double arrivalOffset = 23;
@@ -94,7 +94,7 @@ public class TransitScheduleFactoryTest {
 	}
 
 	@Test
-	public void testCreateTransitStopFacility() {
+	void testCreateTransitStopFacility() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id<TransitStopFacility> id1 = Id.create(6, TransitStopFacility.class);
 		Coord coord1 = new Coord((double) 511, (double) 1980);
@@ -113,7 +113,7 @@ public class TransitScheduleFactoryTest {
 	}
 
 	@Test
-	public void testCreateDeparture() {
+	void testCreateDeparture() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id<Departure> id = Id.create(8, Departure.class);
 		double time = 9.0*3600;

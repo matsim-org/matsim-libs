@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -41,7 +41,7 @@ import org.matsim.vehicles.Vehicle;
 public class TransitDriverStartsEventHandlerIntegrationTest {
 
 	@Test
-	public void testProcessEventIntegration() {
+	void testProcessEventIntegration() {
 		EventsManager em = EventsUtils.createEventsManager();
 		TransitDriverStartsEvent e1 = new TransitDriverStartsEvent(12345, Id.create("driver", Person.class),
 				Id.create("veh", Vehicle.class), Id.create("line", TransitLine.class), Id.create("route", TransitRoute.class), Id.create("dep", Departure.class));

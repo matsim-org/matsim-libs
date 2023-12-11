@@ -30,7 +30,7 @@ import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -89,7 +89,7 @@ public class MergingTest {
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testProbOne() throws Exception {
+	void testProbOne() throws Exception {
 		JointPlanMergingAlgorithm algo =
 			new JointPlanMergingAlgorithm(
 					jointPlans.getFactory(),
@@ -116,7 +116,7 @@ public class MergingTest {
 	}
 
 	@Test
-	public void testProbZero() throws Exception {
+	void testProbZero() throws Exception {
 		JointPlanMergingAlgorithm algo =
 			new JointPlanMergingAlgorithm(
 					jointPlans.getFactory(),

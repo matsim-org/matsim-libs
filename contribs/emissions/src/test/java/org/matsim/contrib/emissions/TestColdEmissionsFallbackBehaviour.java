@@ -21,8 +21,10 @@
 
 package org.matsim.contrib.emissions;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -80,7 +82,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 * -> should calculate value
 	 */
 	@Test
-	public void testColdDetailedValueOnlyDetailed() {
+	void testColdDetailedValueOnlyDetailed() {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
@@ -98,13 +100,15 @@ public class TestColdEmissionsFallbackBehaviour {
 	 *
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testCold_DetailedElseAbort_ShouldAbort1() {
-		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+	@Test
+	void testCold_DetailedElseAbort_ShouldAbort1() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		emissionModule.getColdEmissionAnalysisModule()
-				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToTechnologyAverage.getType(), 
-						vehicleFallbackToTechnologyAverage.getId(), link.getId(), startTime, parkingDuration, distance);
+			emissionModule.getColdEmissionAnalysisModule()
+					.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToTechnologyAverage.getType(),
+							vehicleFallbackToTechnologyAverage.getId(), link.getId(), startTime, parkingDuration, distance);
+		});
 	}
 
 	/**
@@ -115,13 +119,15 @@ public class TestColdEmissionsFallbackBehaviour {
 	 *
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testCold_DetailedElseAbort_ShouldAbort2() {
-		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+	@Test
+	void testCold_DetailedElseAbort_ShouldAbort2() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		emissionModule.getColdEmissionAnalysisModule()
-				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToTechnologyAverage.getType(), 
-						vehicleFallbackToAverageTable.getId(), link.getId(), startTime, parkingDuration, distance);
+			emissionModule.getColdEmissionAnalysisModule()
+					.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToTechnologyAverage.getType(),
+							vehicleFallbackToAverageTable.getId(), link.getId(), startTime, parkingDuration, distance);
+		});
 	}
 
 
@@ -134,7 +140,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 * ---> should calculate value from detailed value
 	 */
 	@Test
-	public void testCold_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
+	void testCold_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
@@ -153,7 +159,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 * ---> should calculate value from technology average
 	 */
 	@Test
-	public void testCold_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
+	void testCold_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
@@ -172,13 +178,15 @@ public class TestColdEmissionsFallbackBehaviour {
 	 *
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testCold_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
-		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+	@Test
+	void testCold_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		emissionModule.getColdEmissionAnalysisModule()
-				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToAverageTable.getType(),
-						vehicleFallbackToAverageTable.getId(), link.getId(), startTime, parkingDuration, distance);
+			emissionModule.getColdEmissionAnalysisModule()
+					.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToAverageTable.getType(),
+							vehicleFallbackToAverageTable.getId(), link.getId(), startTime, parkingDuration, distance);
+		});
 	}
 
 // ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------
@@ -190,7 +198,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 * ---> should calculate value from detailed value
 	 */
 	@Test
-	public void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
+	void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
@@ -209,7 +217,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 * ---> should calculate value from technology average
 	 */
 	@Test
-	public void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
+	void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
@@ -229,7 +237,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 * ---> should calculate value from average table
 	 */
 	@Test
-	public void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
+	void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()

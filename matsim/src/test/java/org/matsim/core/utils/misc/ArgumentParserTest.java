@@ -26,8 +26,8 @@ import static org.junit.Assert.fail;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -44,7 +44,8 @@ public class ArgumentParserTest {
 	/**
 	 * Test if regular arguments (no options) are correctly recognized.
 	 */
-	@Test public void testArguments() {
+	@Test
+	void testArguments() {
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"a", "bc", "def=g", "hjk=lmn opq"});
 		Iterator<String> iter = parser.iterator();
@@ -58,7 +59,8 @@ public class ArgumentParserTest {
 	/**
 	 * Test if short options (beginning with '-'), which can be written in a collapsed form, are correctly recognized.
 	 */
-	@Test public void testShortOptions() {
+	@Test
+	void testShortOptions() {
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"-a", "-b", "-cd", "-efg", "-h=j", "-kl=m", "-nop=qrs", "-tu=vw xyz", "=", "-", "-=", "-1", "-2=", "-=3", "-=4=5"}, true);
 		Iterator<String> iter = parser.iterator();
@@ -96,7 +98,8 @@ public class ArgumentParserTest {
 	/**
 	 * Test if long options (beginning with '--') are correctly recognized.
 	 */
-	@Test public void testLongOptions() {
+	@Test
+	void testLongOptions() {
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"--a", "--bc", "--def=ghj", "--kl=mn op", "=", "--qr=", "--=", "--=st", "--=uv=wxy z"}, true);
 		Iterator<String> iter = parser.iterator();
@@ -118,7 +121,8 @@ public class ArgumentParserTest {
 	/**
 	 * Test if a mix of arguments and options are correctly recognized.
 	 */
-	@Test public void testMixed() {
+	@Test
+	void testMixed() {
 		// first test it with short arguments enabled
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"-xcf", "myfile.tgz", "file1", "file2", "--verbose"}, true);

@@ -23,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,32 +61,32 @@ public class GroupCompositionPenalizerTest {
 	private final double utilAlone = -1;
 
 	@Test
-	public void testFullOverlap() {
+	void testFullOverlap() {
 		test( new double[]{10 , 20} , new double[]{5 , 25} );
 	}
 
 	@Test
-	public void testInnerOverlap() {
+	void testInnerOverlap() {
 		test( new double[]{5 , 25} , new double[]{10 , 20} );
 	}
 
 	@Test
-	public void testPartialOverlap() {
+	void testPartialOverlap() {
 		test( new double[]{5 , 20 } , new double[]{10 , 25} );
 	}
 
 	@Test
-	public void testExactOverlap() {
+	void testExactOverlap() {
 		test( new double[]{10 , 20} , new double[]{10 , 20} );
 	}
 
 	@Test
-	public void testComeAndGo() {
+	void testComeAndGo() {
 		test( new double[]{10 , 11 , 15 , 20} , new double[]{10 , 20} );
 	}
 
 	@Test
-	public void testInstantaneousComeAndGo() {
+	void testInstantaneousComeAndGo() {
 		test( new double[]{10 , 15 , 15 , 20} , new double[]{5 , 20} );
 	}
 

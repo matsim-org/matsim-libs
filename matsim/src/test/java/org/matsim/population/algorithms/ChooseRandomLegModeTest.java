@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,7 +47,8 @@ public class ChooseRandomLegModeTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testRandomChoice() {
+	@Test
+	void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), false);
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
@@ -76,7 +77,8 @@ public class ChooseRandomLegModeTest {
 		assertTrue("expected to find walk-mode", foundWalkMode);
 	}
 
-	@Test public void testRandomChoiceWithinListedModesOnly() {
+	@Test
+	void testRandomChoiceWithinListedModesOnly() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), true);
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
@@ -105,7 +107,8 @@ public class ChooseRandomLegModeTest {
 		assertTrue("expected to find walk-mode", foundWalkMode);
 	}
 
-	@Test public void testRandomChoiceWithinListedModesOnlyWorks() {
+	@Test
+	void testRandomChoiceWithinListedModesOnlyWorks() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), true);
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
@@ -117,15 +120,16 @@ public class ChooseRandomLegModeTest {
 	}
 
 
-
-	@Test public void testHandleEmptyPlan() {
+	@Test
+	void testHandleEmptyPlan() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), false);
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
-	@Test public void testHandlePlanWithoutLeg() {
+	@Test
+	void testHandlePlanWithoutLeg() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), false);
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
@@ -136,7 +140,8 @@ public class ChooseRandomLegModeTest {
 	/**
 	 * Test that all the legs have the same, changed mode
 	 */
-	@Test public void testMultipleLegs() {
+	@Test
+	void testMultipleLegs() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom(), false);
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
@@ -152,7 +157,8 @@ public class ChooseRandomLegModeTest {
 		assertEquals("unexpected leg mode in leg 3.", TransportMode.pt, ((Leg) plan.getPlanElements().get(5)).getMode());
 	}
 
-	@Test public void testIgnoreCarAvailability_Never() {
+	@Test
+	void testIgnoreCarAvailability_Never() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike}, MatsimRandom.getRandom(), false);
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -169,7 +175,8 @@ public class ChooseRandomLegModeTest {
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
 
-	@Test public void testIgnoreCarAvailability_Never_noChoice() {
+	@Test
+	void testIgnoreCarAvailability_Never_noChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom(), false);
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -182,7 +189,8 @@ public class ChooseRandomLegModeTest {
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
 
-	@Test public void testIgnoreCarAvailability_Always() {
+	@Test
+	void testIgnoreCarAvailability_Always() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike}, new Random(1), false);
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));

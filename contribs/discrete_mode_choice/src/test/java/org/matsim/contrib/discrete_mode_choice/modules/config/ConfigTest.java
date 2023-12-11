@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -25,7 +25,7 @@ public class ConfigTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReadWriteConfig() {
+	void testReadWriteConfig() {
 		// Create config
 		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
 		Config config = ConfigUtils.createConfig(dmcConfig);
@@ -46,7 +46,7 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void testReadWriteConfigMultipleTimes() throws IOException {
+	void testReadWriteConfigMultipleTimes() throws IOException {
 		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
 		Config config1 = ConfigUtils.createConfig(dmcConfig);
 
@@ -85,7 +85,7 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void testSetTripConstraints() {
+	void testSetTripConstraints() {
 		DiscreteModeChoiceConfigGroup dmcConfig1 = new DiscreteModeChoiceConfigGroup();
 		dmcConfig1.setTripConstraints(Arrays.asList("A", "B", "C"));
 

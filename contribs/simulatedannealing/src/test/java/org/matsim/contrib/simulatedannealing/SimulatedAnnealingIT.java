@@ -1,8 +1,8 @@
 package org.matsim.contrib.simulatedannealing;
 
 import com.google.inject.TypeLiteral;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -35,7 +35,7 @@ public class SimulatedAnnealingIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIntegratedAnnealingInQSim() {
+	void testIntegratedAnnealingInQSim() {
 
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,14 +44,14 @@ public class NetworkSimplifierTest {
 	}
 
 	@Test
-	public void testBuildNetwork() {
+	void testBuildNetwork() {
 		Network network = buildNetwork();
 		assertEquals("Wrong number of nodes.", 6, network.getNodes().size());
 		assertEquals("Wrong number of links.", 5, network.getLinks().size());
 	}
 
 	@Test
-	public void testRun() {
+	void testRun() {
 		Network network = buildNetwork();
 
 		NetworkSimplifier nst = new NetworkSimplifier();
@@ -62,9 +62,9 @@ public class NetworkSimplifierTest {
 		assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("DE-EF")));
 	}
 
-	
+
 	@Test
-	public void testRunMergeLinkStats() {
+	void testRunMergeLinkStats() {
 		Network network = buildNetwork();
 		
 		NetworkSimplifier nst = new NetworkSimplifier();
@@ -85,7 +85,7 @@ public class NetworkSimplifierTest {
 	}
 
 	@Test
-	public void testDifferentAttributesPerDirection() {
+	void testDifferentAttributesPerDirection() {
 		/*
 		 Test-Network
 

@@ -24,8 +24,8 @@
 import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,13 +52,13 @@ import java.util.LinkedHashSet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class TravelTimeCalculatorModuleTest {
+ public class TravelTimeCalculatorModuleTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testOneTravelTimeCalculatorForAll() {
+	 @Test
+	 void testOneTravelTimeCalculatorForAll() {
 		Config config = ConfigUtils.createConfig();
 		config.travelTimeCalculator().setSeparateModes(false);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -93,8 +93,8 @@ public class TravelTimeCalculatorModuleTest {
 	}
 
 
-	@Test
-	public void testOneTravelTimeCalculatorPerMode() {
+	 @Test
+	 void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
 
 //		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );

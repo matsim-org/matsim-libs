@@ -3,8 +3,8 @@ package org.matsim.simwrapper.dashboard;
 import com.google.common.collect.Iterables;
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.MATSimApplication;
@@ -37,7 +37,7 @@ public class EmissionsDashboardTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void generate() {
+	void generate() {
 
 		// This test can only run if the password is set
 		Assume.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);

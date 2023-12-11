@@ -24,8 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
@@ -48,19 +48,19 @@ public class FullExplorationVsCuttoffTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testFullExplorationVsCuttoffNonBlocking() throws Exception {
+	void testFullExplorationVsCuttoffNonBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffNonBlocking()" );
 		testFullExplorationVsCuttoff( new EmptyIncompatiblePlansIdentifierFactory() , false );
 	}
 
 	@Test
-	public void testFullExplorationVsCuttoffBlocking() throws Exception {
+	void testFullExplorationVsCuttoffBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffBlocking()" );
 		testFullExplorationVsCuttoff( new EmptyIncompatiblePlansIdentifierFactory() , true );
 	}
 
 	@Test
-	public void testFullExplorationVsCuttoffIncompatibility() throws Exception {
+	void testFullExplorationVsCuttoffIncompatibility() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffIncompatibility()" );
 		testFullExplorationVsCuttoff(
 				new FewGroupsIncompatibilityFactory(),
@@ -68,7 +68,7 @@ public class FullExplorationVsCuttoffTest {
 	}
 
 	@Test
-	public void testFullExplorationVsCuttoffIncompatibilityBlocking() throws Exception {
+	void testFullExplorationVsCuttoffIncompatibilityBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffIncompatibilityBlocking()" );
 		testFullExplorationVsCuttoff(
 				new FewGroupsIncompatibilityFactory(),

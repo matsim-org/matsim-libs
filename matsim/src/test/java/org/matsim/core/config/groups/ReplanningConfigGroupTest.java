@@ -27,8 +27,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -55,7 +55,7 @@ public class ReplanningConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testParamNames() {
+	void testParamNames() {
 		ReplanningConfigGroup configGroup = new ReplanningConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
 		configGroup.addParam("Module_1", "ReRoute");
@@ -79,7 +79,7 @@ public class ReplanningConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testCheckConsistency() {
+	void testCheckConsistency() {
 		// start with a simple configuration with exactly one module defined
 		ReplanningConfigGroup configGroup = new ReplanningConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
@@ -148,7 +148,7 @@ public class ReplanningConfigGroupTest {
 	}
 
 	@Test
-	public void testIOWithFormatChange() {
+	void testIOWithFormatChange() {
 		final ReplanningConfigGroup initialGroup = createTestConfigGroup();
 
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";

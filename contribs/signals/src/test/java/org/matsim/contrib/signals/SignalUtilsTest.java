@@ -22,8 +22,7 @@ package org.matsim.contrib.signals;
 import java.util.Map;
 
 import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.utils.SignalUtils;
@@ -42,7 +41,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public class SignalUtilsTest {
 
 	@Test
-	public final void testCreateAndAddSignalGroups4Signals() {
+	final void testCreateAndAddSignalGroups4Signals() {
 		Id<SignalSystem> id1 = Id.create("1", SignalSystem.class);
 		Id<SignalGroup> idSg1 = Id.create("1", SignalGroup.class);
 		Id<SignalGroup> idSg3 = Id.create("3", SignalGroup.class);

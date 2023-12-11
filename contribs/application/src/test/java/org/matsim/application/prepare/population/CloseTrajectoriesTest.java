@@ -1,8 +1,8 @@
 package org.matsim.application.prepare.population;
 
 import org.assertj.core.api.Condition;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -21,7 +21,7 @@ public class CloseTrajectoriesTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void main() {
+	void main() {
 
 		Path input = Path.of(utils.getPackageInputDirectory(), "persons.xml");
 

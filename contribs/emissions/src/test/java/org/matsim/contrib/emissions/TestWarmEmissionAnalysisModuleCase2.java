@@ -21,7 +21,7 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
@@ -126,7 +126,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	 */
 
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
 		//-- set up tables, event handler, parameters, module
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
@@ -186,7 +186,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	 * average values are used
 	 */
 	@Test
-	public void testCounters3(){
+	void testCounters3(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 

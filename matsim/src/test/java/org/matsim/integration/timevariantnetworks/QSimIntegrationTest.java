@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -79,7 +79,8 @@ public class QSimIntegrationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testFreespeed() {
+	@Test
+	void testFreespeed() {
 		Config config = utils.loadConfig((String)null);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -125,7 +126,8 @@ public class QSimIntegrationTest {
 	 *
 	 * @author illenberger
 	 */
-	@Test public void testCapacity() {
+	@Test
+	void testCapacity() {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
@@ -196,7 +198,8 @@ public class QSimIntegrationTest {
 	 *
 	 * @author dgrether
 	 */
-	@Test public void testZeroCapacity() {
+	@Test
+	void testZeroCapacity() {
 		final double capacityFactor = 0.0;
 
 		Config config = utils.loadConfig((String)null);

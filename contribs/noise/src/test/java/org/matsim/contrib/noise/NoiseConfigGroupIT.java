@@ -23,8 +23,8 @@
 package org.matsim.contrib.noise;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,7 +44,7 @@ public class NoiseConfigGroupIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void test0(){
+	final void test0(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
@@ -72,7 +72,7 @@ public class NoiseConfigGroupIT {
 	}
 
 	@Test
-	public final void test1(){
+	final void test1(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());

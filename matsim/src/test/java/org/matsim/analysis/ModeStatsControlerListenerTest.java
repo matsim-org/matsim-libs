@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +56,7 @@ public class ModeStatsControlerListenerTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testModeStatsControlerListener() {
+	void testModeStatsControlerListener() {
 
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		final List<PlanElement> planElem = new ArrayList<PlanElement>();

@@ -6,8 +6,8 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,10 +35,10 @@ public class CalculateAngleTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
-    * @author aneumann
-    */
+	* @author aneumann
+	*/
 	@Test
-	public void testGetLeftLane() {
+	void testGetLeftLane() {
 		Config conf = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
 		new MatsimNetworkReader(scenario.getNetwork()).parse(conf.network().getInputFileURL(conf.getContext()));
@@ -67,7 +67,7 @@ public class CalculateAngleTest {
 	 * @author dgrether
 	 */
 	@Test
-	public void testGetOutLinksSortedByAngle(){
+	void testGetOutLinksSortedByAngle(){
 		Scenario scenario;
 		double twicePi = Math.PI * 2;
 		double piStep = Math.PI / 180.0;

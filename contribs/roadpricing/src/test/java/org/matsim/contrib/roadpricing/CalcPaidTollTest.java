@@ -25,8 +25,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -56,7 +56,7 @@ public class CalcPaidTollTest {
 	static private final Logger log = LogManager.getLogger(CalcPaidTollTest.class);
 
 	@Test
-	public void testDistanceToll() {
+	void testDistanceToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing1.xml";
 
@@ -92,7 +92,7 @@ public class CalcPaidTollTest {
 	}
 
 	@Test
-	public void testAreaToll() {
+	void testAreaToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing2.xml";
 
@@ -143,7 +143,7 @@ public class CalcPaidTollTest {
 	}
 
 	@Test
-	public void testCordonToll() {
+	void testCordonToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing3.xml";
 

@@ -22,8 +22,7 @@
  package org.matsim.analysis;
 
 import java.util.ArrayList;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,10 +44,10 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import org.junit.Assert;
 
-public class CalcAverageTripLengthTest {
+ public class CalcAverageTripLengthTest {
 
-	@Test
-	public void testWithRoute() {
+	 @Test
+	 void testWithRoute() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
@@ -112,8 +111,8 @@ public class CalcAverageTripLengthTest {
 		Assert.assertEquals(500.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 	}
 
-	@Test
-	public void testWithRoute_OneLinkRoute() {
+	 @Test
+	 void testWithRoute_OneLinkRoute() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
@@ -149,8 +148,8 @@ public class CalcAverageTripLengthTest {
 		Assert.assertEquals(100.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 	}
 
-	@Test
-	public void testWithRoute_StartEndOnSameLink() {
+	 @Test
+	 void testWithRoute_StartEndOnSameLink() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();

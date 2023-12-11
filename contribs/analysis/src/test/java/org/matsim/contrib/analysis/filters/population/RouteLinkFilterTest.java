@@ -23,8 +23,8 @@ package org.matsim.contrib.analysis.filters.population;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -54,7 +54,8 @@ public class RouteLinkFilterTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testRouteLinkFilter() {
+	@Test
+	void testRouteLinkFilter() {
 		// used to set the default dtd-location
 		utils.loadConfig((String)null);
 		Population population = getTestPopulation();

@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.Config;
@@ -19,8 +19,8 @@ import org.matsim.examples.ExamplesUtils;
 
 public class ActivityWithOnlyFacilityIdTest {
 
-    @Test
-    public void testSiouxFallsWithOnlyFacilityIds() {
+	@Test
+	void testSiouxFallsWithOnlyFacilityIds() {
         URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
         Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));

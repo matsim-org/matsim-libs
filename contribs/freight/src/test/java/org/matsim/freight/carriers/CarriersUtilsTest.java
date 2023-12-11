@@ -22,8 +22,8 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -40,7 +40,7 @@ public class CarriersUtilsTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testAddAndGetVehicleToCarrier() {
+	void testAddAndGetVehicleToCarrier() {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),VehicleUtils.getDefaultVehicleType());
@@ -61,7 +61,7 @@ public class CarriersUtilsTest {
 	}
 
 	@Test
-	public void testAddAndGetServiceToCarrier() {
+	void testAddAndGetServiceToCarrier() {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<CarrierService> serviceId = Id.create("testVehicle", CarrierService.class);
 		CarrierService service1 = CarrierService.Builder.newInstance(serviceId,Id.createLinkId("link0") )
@@ -83,7 +83,7 @@ public class CarriersUtilsTest {
 	}
 
 	@Test
-	public void testAddAndGetShipmentToCarrier() {
+	void testAddAndGetShipmentToCarrier() {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<CarrierShipment> shipmentId = Id.create("testVehicle", CarrierShipment.class);
 		CarrierShipment service1 = CarrierShipment.Builder.newInstance(shipmentId,Id.createLinkId("link0"), Id.createLinkId("link1"), 20 ).build();
@@ -104,7 +104,7 @@ public class CarriersUtilsTest {
 	}
 
 	@Test
-	public void testGetSetJspritIteration(){
+	void testGetSetJspritIteration(){
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		//jspirtIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
 		Assert.assertEquals(Integer.MIN_VALUE, CarriersUtils.getJspritIterations(carrier) );

@@ -22,7 +22,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigReader;
@@ -43,8 +43,8 @@ public class RaptorUtilsTest {
         System.setProperty("matsim.preferLocalDtds", "true");
     }
 
-    @Test
-    public void testConfigLoading() {
+	@Test
+	void testConfigLoading() {
         // prepare config
         SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
         Config config1 = ConfigUtils.createConfig(srrConfig);

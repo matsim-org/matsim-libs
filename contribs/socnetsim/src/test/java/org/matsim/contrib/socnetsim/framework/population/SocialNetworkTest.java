@@ -24,7 +24,9 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
@@ -32,14 +34,16 @@ import org.matsim.api.core.v01.population.Person;
  * @author thibautd
  */
 public class SocialNetworkTest {
-	@Test( expected=IllegalStateException.class )
-	public void testFailsIfAddingDirectedTieInReflectiveNetwork() {
-		final SocialNetwork sn = new SocialNetworkImpl( true );
-		sn.addMonodirectionalTie( Id.create( 1 , Person.class ) , Id.create( 2 , Person.class ) );
+	@Test
+	void testFailsIfAddingDirectedTieInReflectiveNetwork() {
+		assertThrows(IllegalStateException.class, () -> {
+			final SocialNetwork sn = new SocialNetworkImpl( true );
+			sn.addMonodirectionalTie(Id.create(1, Person.class), Id.create(2, Person.class));
+		});
 	}
 
 	@Test
-	public void testMonodirectionalTie() {
+	void testMonodirectionalTie() {
 		final Id<Person> ego = Id.create( 1 , Person.class );
 		final Id<Person> alter = Id.create( 2 , Person.class );
 
@@ -65,7 +69,7 @@ public class SocialNetworkTest {
 	}
 
 	@Test
-	public void testBidirectionalTie() {
+	void testBidirectionalTie() {
 		final Id<Person> ego = Id.create( 1 , Person.class );
 		final Id<Person> alter = Id.create( 2 , Person.class );
 
@@ -91,7 +95,7 @@ public class SocialNetworkTest {
 	}
 
 	@Test
-	public void testRemoveEgo() {
+	void testRemoveEgo() {
 		final SocialNetworkImpl sn = new SocialNetworkImpl( true );
 
 		final Id<Person> ego = Id.create( "ego" , Person.class );

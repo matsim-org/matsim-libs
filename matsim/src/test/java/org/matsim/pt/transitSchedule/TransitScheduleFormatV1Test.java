@@ -28,8 +28,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -65,7 +65,8 @@ public class TransitScheduleFormatV1Test {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
+	@Test
+	void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
         Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));

@@ -32,7 +32,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -119,7 +119,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	}
 
 	@Test
-	public void testEnoughVehiclesForEverybody() {
+	void testEnoughVehiclesForEverybody() {
 		// tests that one vehicle is allocated to each one if possible
 		final Random random = new Random( 1234 );
 
@@ -147,7 +147,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	}
 
 	@Test
-	public void testOneVehiclePerTwoPersons() {
+	void testOneVehiclePerTwoPersons() {
 		// tests that the allocation minimizes overlaps
 		final Random random = new Random( 1234 );
 
@@ -181,7 +181,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	}
 
 	@Test
-	public void testRandomness() {
+	void testRandomness() {
 		final Random random = new Random( 1234 );
 
 		final Map<Id, Id> allocations = new HashMap<Id, Id>();
@@ -222,7 +222,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	}
 
 	@Test
-	public void testDeterminism() {
+	void testDeterminism() {
 		final Map<Id, Id> allocations = new HashMap<Id, Id>();
 		final Set<Id> agentsWithSeveralVehicles = new HashSet<Id>();
 		for ( int i = 0; i < 50 ; i++ ) {

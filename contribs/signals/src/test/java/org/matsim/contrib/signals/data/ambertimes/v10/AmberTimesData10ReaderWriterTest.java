@@ -22,8 +22,8 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -49,7 +49,7 @@ public class AmberTimesData10ReaderWriterTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testParser() throws IOException, JAXBException, SAXException,
+	void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		AmberTimesData atd = new AmberTimesDataImpl();
 		AmberTimesReader10 reader = new AmberTimesReader10(atd);
@@ -59,7 +59,7 @@ public class AmberTimesData10ReaderWriterTest {
 	}
 
 	@Test
-	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
 		String testoutput = this.testUtils.getOutputDirectory() + "testAtdOutput.xml";
 		log.debug("reading file...");

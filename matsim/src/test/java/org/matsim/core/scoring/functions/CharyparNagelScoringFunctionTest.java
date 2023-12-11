@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -131,7 +131,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the calculation of the zero-utility-duration.
 	 */
 	@Test
-	public void testZeroUtilityDuration() {
+	void testZeroUtilityDuration() {
 		double zeroUtilDurW = getZeroUtilDuration_hrs(8.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_hrs(16.0, 1.0);
 		double zeroUtilDurW2 = getZeroUtilDuration_hrs(8.0, 2.0);
@@ -181,13 +181,13 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function when all parameters are set to 0.
 	 */
 	@Test
-	public void testZero() {
+	void testZero() {
 		Fixture f = new Fixture();
 		assertEquals(0.0, calcScore(f), EPSILON);
 	}
 
 	@Test
-	public void testTravelingAndConstantCar() {
+	void testTravelingAndConstantCar() {
 		Fixture f = new Fixture();
 		final double traveling = -6.0;
 		f.config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
@@ -198,7 +198,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testTravelingPtAndConstantPt() {
+	void testTravelingPtAndConstantPt() {
 		Fixture f = new Fixture();
 		final double travelingPt = -9.0;
 		f.config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
@@ -209,7 +209,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testTravelingWalkAndConstantWalk() {
+	void testTravelingWalkAndConstantWalk() {
 		Fixture f = new Fixture();
 		final double travelingWalk = -18.0;
 		f.config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
@@ -220,7 +220,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testTravelingBikeAndConstantBike(){
+	void testTravelingBikeAndConstantBike(){
 		Fixture f = new Fixture();
 		final double travelingBike = -6.0;
 		f.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(travelingBike);
@@ -234,7 +234,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the performing part of the scoring function.
 	 */
 	@Test
-	public void testPerforming() {
+	void testPerforming() {
 		Fixture f = new Fixture();
 
 		double perf = +6.0;
@@ -266,7 +266,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the performing part of the scoring function when an activity has an OpeningTime set.
 	 */
 	@Test
-	public void testOpeningTime() {
+	void testOpeningTime() {
 		Fixture f = new Fixture();
 		double perf = +6.0;
 		f.config.scoring().setPerforming_utils_hr(perf);
@@ -284,7 +284,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the performing part of the scoring function when an activity has a ClosingTime set.
 	 */
 	@Test
-	public void testClosingTime() {
+	void testClosingTime() {
 		Fixture f = new Fixture();
 		double perf = +6.0;
 		f.config.scoring().setPerforming_utils_hr(perf);
@@ -302,7 +302,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the performing part of the scoring function when an activity has OpeningTime and ClosingTime set.
 	 */
 	@Test
-	public void testOpeningClosingTime() {
+	void testOpeningClosingTime() {
 		Fixture f = new Fixture();
 		double perf_hrs = +6.0;
 		f.config.scoring().setPerforming_utils_hr(perf_hrs);
@@ -366,7 +366,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the waiting part of the scoring function.
 	 */
 	@Test
-	public void testWaitingTime() {
+	void testWaitingTime() {
 		Fixture f = new Fixture();
 		double waiting = -10.0;
 		f.config.scoring().setMarginalUtlOfWaiting_utils_hr(waiting);
@@ -383,7 +383,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function in regards to early departures.
 	 */
 	@Test
-	public void testEarlyDeparture() {
+	void testEarlyDeparture() {
 		Fixture f = new Fixture();
 		double disutility = -10.0;
 		f.config.scoring().setEarlyDeparture_utils_hr(disutility);
@@ -399,7 +399,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function in regards to early departures.
 	 */
 	@Test
-	public void testMinimumDuration() {
+	void testMinimumDuration() {
 		Fixture f = new Fixture();
 		double disutility = -10.0;
 		f.config.scoring().setEarlyDeparture_utils_hr(disutility);
@@ -415,7 +415,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function in regards to late arrival.
 	 */
 	@Test
-	public void testLateArrival() {
+	void testLateArrival() {
 		Fixture f = new Fixture();
 		double disutility = -10.0;
 		f.config.scoring().setLateArrival_utils_hr(disutility);
@@ -432,7 +432,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * could gain.
 	 */
 	@Test
-	public void testStuckPenalty() {
+	void testStuckPenalty() {
 		Fixture f = new Fixture();
 		// test 1 where late arrival has the biggest impact
 		f.config.scoring().setLateArrival_utils_hr(-18.0);
@@ -469,7 +469,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testDistanceCostScoringCar() {
+	void testDistanceCostScoringCar() {
 		Fixture f = new Fixture();
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
 		f.config.scoring().setMarginalUtilityOfMoney(1.0);
@@ -488,7 +488,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testDistanceCostScoringPt() {
+	void testDistanceCostScoringPt() {
 		Fixture f = new Fixture();
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
 		f.config.scoring().setMarginalUtilityOfMoney(1.0);
@@ -510,7 +510,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test how the scoring function reacts when the first and the last activity do not have the same act-type.
 	 */
 	@Test
-	public void testDifferentFirstLastAct() {
+	void testDifferentFirstLastAct() {
 		Fixture f = new Fixture();
 		// change the last act to something different than the first act
 		((Activity) f.plan.getPlanElements().get(8)).setType("h2");
@@ -546,7 +546,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * when the first and last activity aren't the same.
 	 */
 	@Test
-	public void testNoNightActivity() {
+	void testNoNightActivity() {
 
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_hrs(7.0, 1.0);
@@ -587,7 +587,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * aforementioned plan.
 	 */
 	@Test
-	public void testAddMoney() {
+	void testAddMoney() {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
@@ -629,7 +629,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Tests if the scoring function correctly handles {@link PersonScoreEvent}.
 	 */
 	@Test
-	public void testAddScore() {
+	void testAddScore() {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
@@ -668,7 +668,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testUnusualMode() {
+	void testUnusualMode() {
 		Fixture f = new Fixture();
 		Leg leg = (Leg) f.plan.getPlanElements().get(1);
 		leg.setMode("sackhuepfen");

@@ -20,8 +20,8 @@
 package org.matsim.core.utils.io;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +44,7 @@ public class OsmNetworkReaderTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testConversion() {
+	void testConversion() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -63,7 +63,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithDetails() {
+	void testConversionWithDetails() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -84,7 +84,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithDetails_witMemoryOptimized() {
+	void testConversionWithDetails_witMemoryOptimized() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -106,7 +106,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithSettings() {
+	void testConversionWithSettings() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -127,7 +127,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithSettings_withMemoryOptimization() {
+	void testConversionWithSettings_withMemoryOptimization() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -148,7 +148,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithSettingsAndDetails() {
+	void testConversionWithSettingsAndDetails() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -169,7 +169,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversion_MissingNodeRef() {
+	void testConversion_MissingNodeRef() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
@@ -200,7 +200,7 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversion_maxspeeds() {
+	void testConversion_maxspeeds() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
@@ -261,7 +261,7 @@ public class OsmNetworkReaderTest {
 	 * Reported by jjoubert,15nov2012.
 	 */
 	@Test
-	public void testConversion_emptyWay() {
+	void testConversion_emptyWay() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();

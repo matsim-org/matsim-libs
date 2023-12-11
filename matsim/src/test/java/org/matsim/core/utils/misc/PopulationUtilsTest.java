@@ -21,8 +21,8 @@ package org.matsim.core.utils.misc;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ public class PopulationUtilsTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void testLegOverlap() {
+	void testLegOverlap() {
 		Fixture f = new Fixture() ;
 		List<Leg> legs1 = PopulationUtils.getLegs(f.plan1) ;
 		List<Leg> legs2 = PopulationUtils.getLegs(f.plan2);
@@ -68,7 +68,7 @@ public class PopulationUtilsTest {
 	}
 
 	@Test
-	public void testActivityOverlap() {
+	void testActivityOverlap() {
 		Fixture f = new Fixture() ;
 		List<Activity> acts1 = PopulationUtils.getActivities(f.plan1, StageActivityHandling.StagesAsNormalActivities ) ;
 		List<Activity> acts2 = PopulationUtils.getActivities(f.plan2, StageActivityHandling.StagesAsNormalActivities ) ;
@@ -150,14 +150,14 @@ public class PopulationUtilsTest {
 	}
 
 	@Test
-	public void testEmptyPopulation() {
+	void testEmptyPopulation() {
 		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
 	}
 
 	@Test
-	public void testEmptyPopulationVsOnePerson() {
+	void testEmptyPopulationVsOnePerson() {
 		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Person person = s2.getPopulation().getFactory().createPerson(Id.create("1", Person.class));
@@ -167,7 +167,7 @@ public class PopulationUtilsTest {
 	}
 
 	@Test
-	public void testCompareBigPopulationWithItself() {
+	void testCompareBigPopulationWithItself() {
 		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";

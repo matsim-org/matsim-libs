@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -75,7 +75,7 @@ public class SeepageTest {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
 	}
-	
+
 	/**
 	 *  Two carAgents end act at time 948 and 949 sec and walkAgent ends act at 49 sec.
 	 *  Link length is 1 km and flow capacity 1 PCU/min. Speed of car and walk is 20 mps and 1 mps.
@@ -83,8 +83,8 @@ public class SeepageTest {
 	 *  WalkAgent joins queue at 1050 sec but leave link before second car at 1060 sec and thus blocking link for another 6 sec(flowCap*PCU)
 	 *  Thus, second car leaves link after walkAgent.
 	 */
-	@Test 
-	public void seepageOfWalkInCongestedRegime(){
+	@Test
+	void seepageOfWalkInCongestedRegime(){
 
 		SimpleNetwork net = new SimpleNetwork();
 		

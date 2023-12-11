@@ -2,8 +2,8 @@ package org.matsim.core.router;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,7 +30,7 @@ public class FallbackRoutingModuleTest{
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void calcRoute(){
+	void calcRoute(){
 
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );

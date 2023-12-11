@@ -21,8 +21,8 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -73,7 +73,7 @@ public class CarrierEventsReadersTest {
 	);
 
 	@Test
-	public void testWriteReadServiceBasedEvents() {
+	void testWriteReadServiceBasedEvents() {
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
 		EventsManager eventsManager2 = EventsUtils.createEventsManager();
 		EventsCollector collector1 = new EventsCollector();
@@ -101,7 +101,7 @@ public class CarrierEventsReadersTest {
 
 
 	@Test
-	public void testReadServiceBasedEvents() {
+	void testReadServiceBasedEvents() {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
@@ -119,7 +119,7 @@ public class CarrierEventsReadersTest {
 	}
 
 	@Test
-	public void testWriteReadShipmentBasedEvents() {
+	void testWriteReadShipmentBasedEvents() {
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
 		EventsManager eventsManager2 = EventsUtils.createEventsManager();
 		EventsCollector collector1 = new EventsCollector();
@@ -146,7 +146,7 @@ public class CarrierEventsReadersTest {
 	}
 
 	@Test
-	public void testReadShipmentBasedEvents() {
+	void testReadShipmentBasedEvents() {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
@@ -169,7 +169,7 @@ public class CarrierEventsReadersTest {
 	 * This test is inspired by the DrtEventsReaderTest from michalm.
 	 */
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		carrierEvents.forEach(writer::handleEvent);

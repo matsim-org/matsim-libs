@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contribs.discrete_mode_choice.components.estimators.UniformTripEstimator;
@@ -35,7 +35,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class RandomUtilityTest {
 	@Test
-	public void testRandomUtility() throws NoFeasibleChoiceException {
+	void testRandomUtility() throws NoFeasibleChoiceException {
 		TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
 		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
 		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();

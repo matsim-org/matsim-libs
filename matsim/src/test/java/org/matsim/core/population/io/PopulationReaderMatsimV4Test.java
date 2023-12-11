@@ -27,7 +27,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -61,7 +61,7 @@ public class PopulationReaderMatsimV4Test {
 	 * @throws IOException
 	 */
 	@Test
-	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		final Population population = scenario.getPopulation();
@@ -154,7 +154,7 @@ public class PopulationReaderMatsimV4Test {
 	 * @author mrieser
 	 */
 	@Test
-	public void testReadRouteWithoutActivityLinks() {
+	void testReadRouteWithoutActivityLinks() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -188,7 +188,7 @@ public class PopulationReaderMatsimV4Test {
 	 * @author mrieser
 	 */
 	@Test
-	public void testReadActivity() {
+	void testReadActivity() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = (Network) scenario.getNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
@@ -219,9 +219,9 @@ public class PopulationReaderMatsimV4Test {
 		Assert.assertEquals(link3.getId(), ((Activity) plan.getPlanElements().get(0)).getLinkId());
 		Assert.assertEquals(Id.create("2", Link.class), ((Activity) plan.getPlanElements().get(2)).getLinkId());
 	}
-	
+
 	@Test
-	public void testReadingRoutesWithoutType() {
+	void testReadingRoutesWithoutType() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		final Population population = scenario.getPopulation();
@@ -276,7 +276,7 @@ public class PopulationReaderMatsimV4Test {
 	}
 
 	@Test
-	public void testRepeatingLegs() {
+	void testRepeatingLegs() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		final Population population = scenario.getPopulation();
@@ -306,7 +306,7 @@ public class PopulationReaderMatsimV4Test {
 	}
 
 	@Test
-	public void testRepeatingActs() {
+	void testRepeatingActs() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		final Population population = scenario.getPopulation();

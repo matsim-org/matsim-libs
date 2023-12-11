@@ -25,15 +25,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser / SBB
  */
 public class FloatMatrixIOTest {
 
-    @Test
-    public void testIO() throws IOException {
+	@Test
+	void testIO() throws IOException {
         Set<String> zoneIds = new HashSet<>();
         zoneIds.add("un");
         zoneIds.add("dos");

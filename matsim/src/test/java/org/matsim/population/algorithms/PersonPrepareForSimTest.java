@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,7 +58,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class PersonPrepareForSimTest {
 
 	@Test
-	public void testRun_MultimodalNetwork() {
+	void testRun_MultimodalNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Id<Link> link1id = Id.createLinkId("1");
@@ -90,7 +90,7 @@ public class PersonPrepareForSimTest {
 	}
 
 	@Test
-	public void testRun_MultimodalScenario() {
+	void testRun_MultimodalScenario() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Id<Link> link1id = Id.createLinkId("1");
@@ -120,9 +120,9 @@ public class PersonPrepareForSimTest {
 		Assert.assertEquals(link1id, a1.getLinkId());
 		Assert.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
-	
+
 	@Test
-	public void testSingleLegTripRoutingMode() {
+	void testSingleLegTripRoutingMode() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
@@ -171,7 +171,7 @@ public class PersonPrepareForSimTest {
 					TripStructureUtils.getRoutingMode(leg));
 		}
 	}
-	
+
 	/**
 	 * Fallback modes are outdated with the introduction of routingMode. So, we want the simulation to crash if we encounter
 	 * them <b>after</b> {@link PrepareForSimImpl} was run (and adapted outdated plans). However, for the time being we do not
@@ -181,7 +181,7 @@ public class PersonPrepareForSimTest {
 	 * checked explicitly).
 	 */
 	@Test
-	public void testSingleFallbackModeLegTrip() {
+	void testSingleFallbackModeLegTrip() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
@@ -231,9 +231,9 @@ public class PersonPrepareForSimTest {
 					TripStructureUtils.getRoutingMode(leg));
 		}
 	}
-	
+
 	@Test
-	public void testCorrectTripsRemainUnchanged() {
+	void testCorrectTripsRemainUnchanged() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
@@ -358,9 +358,9 @@ public class PersonPrepareForSimTest {
 			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg11));
 		}
 	}
-		
+
 	@Test
-	public void testRoutingModeConsistency() {
+	void testRoutingModeConsistency() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
@@ -429,7 +429,7 @@ public class PersonPrepareForSimTest {
 	}
 
 	@Test
-	public void testReplaceExperimentalTransitRoute() {
+	void testReplaceExperimentalTransitRoute() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Id<Link> startLink = Id.createLinkId("1");

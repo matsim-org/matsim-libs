@@ -21,8 +21,8 @@ package org.matsim.core.network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +54,7 @@ public class NetworkUtilsTest {
 	 * Test method for {@link org.matsim.core.network.NetworkUtils#isMultimodal(org.matsim.api.core.v01.network.Network)}.
 	 */
 	@Test
-	public final void testIsMultimodal() {
+	final void testIsMultimodal() {
 
 		Config config = utils.createConfigWithInputResourcePathAsContext();
 		config.network().setInputFile("network.xml" );
@@ -70,7 +70,7 @@ public class NetworkUtilsTest {
 
 	@SuppressWarnings("static-method")
 	@Test
-	public final void getOutLinksSortedByAngleTest() {
+	final void getOutLinksSortedByAngleTest() {
 		final Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		// (we need the network to properly connect the links)
 
@@ -146,7 +146,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testfindNearestPointOnLink(){
+	void testfindNearestPointOnLink(){
 		Network network = NetworkUtils.createNetwork();
         Coord n1 = new Coord(1, 1);
 		Coord n2 = new Coord(100,100);
@@ -204,7 +204,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void getOriginalGeometry() {
+	void getOriginalGeometry() {
 
         var network = NetworkUtils.createNetwork();
         var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
@@ -235,7 +235,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void getOriginalGeometry_noGeometryStored() {
+	void getOriginalGeometry_noGeometryStored() {
 
         var network = NetworkUtils.createNetwork();
         var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
@@ -263,7 +263,7 @@ public class NetworkUtilsTest {
 	 * splits an empty string ("") into string[""]...
 	 */
 	@Test
-	public void getOriginalGeometry_emptyGeometryStored() {
+	void getOriginalGeometry_emptyGeometryStored() {
 
         var network = NetworkUtils.createNetwork();
         var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));

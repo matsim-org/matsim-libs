@@ -2,7 +2,7 @@ package org.matsim.core.mobsim.hermes;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -114,7 +114,7 @@ public class HermesTransitTest {
 	 * Makes sure Hermes works also when not all stop facilities are used by transit lines.
 	 */
 	@Test
-	public void testSuperflousStopFacilities() {
+	void testSuperflousStopFacilities() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -199,7 +199,7 @@ public class HermesTransitTest {
 	 * Makes sure Hermes works also when transit routes in different lines have the same Id
 	 */
 	@Test
-	public void testRepeatedRouteIds() {
+	void testRepeatedRouteIds() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -301,7 +301,7 @@ public class HermesTransitTest {
 	 * Originally, this resulted in wrong events because there was an exception that there is at most one stop per link.
 	 */
 	@Test
-	public void testConsecutiveStopsWithSameLink_1() {
+	void testConsecutiveStopsWithSameLink_1() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -394,7 +394,7 @@ public class HermesTransitTest {
 	 * and this 0 meters than resulted in infinite values somewhere later on.
 	 */
 	@Test
-	public void testConsecutiveStopsWithSameLink_2() {
+	void testConsecutiveStopsWithSameLink_2() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -487,7 +487,7 @@ public class HermesTransitTest {
 	 * Makes sure Hermes does not produce exceptions when the configured end time is before the latest transit event
 	 */
 	@Test
-	public void testEarlyEnd() {
+	void testEarlyEnd() {
 		double baseTime = 30 * 3600 - 10; // HERMES has a default of 30:00:00 as end time, so let's start later
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
@@ -558,7 +558,7 @@ public class HermesTransitTest {
 	 * Makes sure Hermes correctly handles strange transit routes with some links before the first stop is served.
 	 */
 	@Test
-	public void testLinksAtRouteStart() {
+	void testLinksAtRouteStart() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -628,7 +628,7 @@ public class HermesTransitTest {
 	 * In some cases, the time information of linkEnter/linkLeave events was wrong.
 	 */
 	@Test
-	public void testDeterministicCorrectTiming() {
+	void testDeterministicCorrectTiming() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -753,7 +753,7 @@ public class HermesTransitTest {
 	 * Tests that event times are correct when a transit route starts with some links before arriving at the first stop.
 	 */
 	@Test
-	public void testDeterministicCorrectTiming_initialLinks() {
+	void testDeterministicCorrectTiming_initialLinks() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);
@@ -872,7 +872,7 @@ public class HermesTransitTest {
 	 * Tests that everything is correct when a transit route ends with some links after arriving at the last stop.
 	 */
 	@Test
-	public void testTrailingLinksInRoute() {
+	void testTrailingLinksInRoute() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
 		f.config.hermes().setDeterministicPt(this.isDeterministic);

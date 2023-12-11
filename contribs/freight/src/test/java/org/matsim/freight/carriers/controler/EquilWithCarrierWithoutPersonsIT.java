@@ -21,9 +21,11 @@
 
 package org.matsim.freight.carriers.controler;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -53,7 +55,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	public void testMobsimWithCarrierRunsWithoutException() {
+	void testMobsimWithCarrierRunsWithoutException() {
 		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
@@ -66,39 +68,41 @@ public class EquilWithCarrierWithoutPersonsIT {
 		controler.run();
 	}
 
-	@Test(expected = IllegalStateException.class )
-	public void testWithoutCarrierRoutes() {
-		Config config = EquilWithCarrierWithPersonsIT.commonConfig( testUtils );
-		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario( config, testUtils );
+	@Test
+	void testWithoutCarrierRoutes() {
+		assertThrows(IllegalStateException.class, () -> {
+			Config config = EquilWithCarrierWithPersonsIT.commonConfig(testUtils);
+			Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario(config, testUtils);
 
-		// set the routes to null:
-		for( Carrier carrier : CarriersUtils.getCarriers( scenario ).getCarriers().values() ){
-			for( ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours() ){
-				for( Tour.TourElement tourElement : tour.getTour().getTourElements() ){
-					if ( tourElement instanceof Tour.Leg ) {
-						((Tour.Leg) tourElement).setRoute( null );
+			// set the routes to null:
+			for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
+					for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
+						if (tourElement instanceof Tour.Leg) {
+							((Tour.Leg) tourElement).setRoute(null);
+						}
 					}
 				}
 			}
-		}
 
-		controler = new Controler(scenario);
-		controler.addOverridingModule(new CarrierModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
-				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
-			}
+			controler = new Controler(scenario);
+			controler.addOverridingModule(new CarrierModule());
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
+					bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
+				}
+			});
+
+			// this fails in CarrierAgent#createDriverPlans(...).  Could be made pass there, but then does not seem to drive on network.  Would
+			// need carrier equivalent to PersonPrepareForSim.  Could then adapt this test accordingly. kai, jul'22
+			controler.run();
 		});
-
-		// this fails in CarrierAgent#createDriverPlans(...).  Could be made pass there, but then does not seem to drive on network.  Would
-		// need carrier equivalent to PersonPrepareForSim.  Could then adapt this test accordingly. kai, jul'22
-		controler.run();
 	}
 
 	@Test
-	public void testScoringInMeters(){
+	void testScoringInMeters(){
 		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
@@ -118,7 +122,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	public void testScoringInSecondsWoTimeWindowEnforcement(){
+	void testScoringInSecondsWoTimeWindowEnforcement(){
 		setUp();
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
 		if ( false ){
@@ -145,7 +149,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	public void testScoringInSecondsWTimeWindowEnforcement(){
+	void testScoringInSecondsWTimeWindowEnforcement(){
 		setUp();
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
 		if ( true ){
@@ -173,7 +177,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	public void testScoringInSecondsWithWithinDayRescheduling(){
+	void testScoringInSecondsWithWithinDayRescheduling(){
 		setUp();
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
 		if ( true ){
@@ -197,7 +201,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	public void testEventFilessAreEqual(){
+	void testEventFilessAreEqual(){
 		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {

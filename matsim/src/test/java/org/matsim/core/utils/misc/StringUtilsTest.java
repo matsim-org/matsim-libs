@@ -22,8 +22,8 @@ package org.matsim.core.utils.misc;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -41,7 +41,8 @@ public class StringUtilsTest {
 	 * Tests the method explode(String, char), which should always return the same as
 	 * String.split(String) does.
 	 */
-	@Test public void testExplode() {
+	@Test
+	void testExplode() {
 		String[] testStrings = {"a:b", "ab:cd", "ab::cd", ":ab:cd", "ab:cd:", ":ab:cd:", "::ab::cd::", "a", "ab", ""};
 		for (String test : testStrings) {
 			String[] resultExplode = StringUtils.explode(test, ':');
@@ -57,7 +58,8 @@ public class StringUtilsTest {
 	 * Tests the method explode(String, char, int), which should always return the same as
 	 * String.split(String, int) does.
 	 */
-	@Test public void testExplodeLimit() {
+	@Test
+	void testExplodeLimit() {
 		String[] testStrings = {"a:b", "a:b:c", "a:b:c:d", "a:::b:c", ":::::", "a", ""};
 		for (String test : testStrings) {
 			String[] resultExplode = StringUtils.explode(test, ':', 3);

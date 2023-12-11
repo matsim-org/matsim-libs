@@ -23,8 +23,8 @@ package org.matsim.core.replanning.strategies;
 import com.google.inject.Singleton;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -66,7 +66,7 @@ public class DeterministicMultithreadedReplanningIT {
 	 * with the same number of threads.
 	 */
 	@Test
-	public void testTimeAllocationMutator() {
+	void testTimeAllocationMutator() {
 		int lastIteration = 5;
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(lastIteration);
@@ -113,7 +113,7 @@ public class DeterministicMultithreadedReplanningIT {
 	 * the same results with the same number of threads.
 	 */
 	@Test
-	public void testReRouteTimeAllocationMutator() {
+	void testReRouteTimeAllocationMutator() {
 		int lastIteration = 5;
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(lastIteration);
@@ -166,7 +166,7 @@ public class DeterministicMultithreadedReplanningIT {
 	 * REGARDLESS the number of threads using only one agent.
 	 */
 	@Test
-	public void testReRouteOneAgent() {
+	void testReRouteOneAgent() {
 		int lastIteration = 5;
 
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
@@ -221,7 +221,7 @@ public class DeterministicMultithreadedReplanningIT {
 	 * REGARDLESS the same number of threads.
 	 */
 	@Test
-	public void testReRoute() {
+	void testReRoute() {
 		int lastIteration = 5;
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(lastIteration);

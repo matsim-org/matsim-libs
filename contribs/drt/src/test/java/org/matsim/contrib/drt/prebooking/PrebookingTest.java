@@ -2,8 +2,8 @@ package org.matsim.contrib.drt.prebooking;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -18,7 +18,7 @@ public class PrebookingTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void withoutPrebookedRequests() {
+	void withoutPrebookedRequests() {
 		/*-
 		 * Standard test running with prebooking but without any prebooked requests
 		 */
@@ -66,7 +66,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void oneRequestArrivingLate() {
+	void oneRequestArrivingLate() {
 		/*-
 		 * One request arriving after the requested departure time. Vehicle should wait
 		 * and depart with appropriate delay (taking into account a fixed duration for
@@ -105,7 +105,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void oneRequestArrivingEarly() {
+	void oneRequestArrivingEarly() {
 		/*-
 		 * One request arriving in advance before the requested departure time. Vehicle
 		 * will pickup up agent and then depart after the duration to enter the vehicle.
@@ -143,7 +143,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void twoSequentialRequests() {
+	void twoSequentialRequests() {
 		/*-
 		 * Two requests that are scheduled in advance.
 		 * - First the early one is submitted, then the late one
@@ -176,7 +176,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void twoSequentialRequests_inverseSubmission() {
+	void twoSequentialRequests_inverseSubmission() {
 		/*-
 		 * Two requests that are scheduled in advance.
 		 * - First the late one is submitted, then the early one (inverse of above test).
@@ -210,7 +210,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void sameTrip_differentDepartureTime() {
+	void sameTrip_differentDepartureTime() {
 		/*-
 		 * Two requests with the same origin and destination, but distinct departure time.
 		 * - First, early one is submitted, then late one.
@@ -248,7 +248,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void sameTrip_sameDepartureTime() {
+	void sameTrip_sameDepartureTime() {
 		/*-
 		 * Two requests with the same origin and destination, and same departure time.
 		 * - First, A is submitted, then B.
@@ -286,7 +286,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void sameTrip_extendPickupDuration() {
+	void sameTrip_extendPickupDuration() {
 		/*-
 		 * Two requests with the same origin and destination, different departure times.
 		 * - First, A is submitted with departure time 2000
@@ -330,7 +330,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void sameTrip_splitPickup() {
+	void sameTrip_splitPickup() {
 		/*-
 		 * Two requests with the same origin and destination, different departure times.
 		 * - First, A is submitted with departure time 2000
@@ -377,7 +377,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void sameTrip_inverseSubmission_noPrepending() {
+	void sameTrip_inverseSubmission_noPrepending() {
 		/*-
 		 * Two requests with the same origin and destination, different departure times.
 		 * - First, A is submitted with departure time 2020
@@ -435,7 +435,7 @@ public class PrebookingTest {
 	}
 
 	@Test
-	public void sameTrip_inverseSubmission_splitPickup() {
+	void sameTrip_inverseSubmission_splitPickup() {
 		/*-
 		 * Two requests with the same origin and destination, different departure times.
 		 * - First, A is submitted with departure time 2020

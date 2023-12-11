@@ -33,8 +33,8 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -50,7 +50,7 @@ public class ShapeFileWriterTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testShapeFileWriter() throws IOException{
+	void testShapeFileWriter() throws IOException{
 
 		String inFile = "src/test/resources/" + utils.getInputDirectory() + "test.shp";
 
@@ -75,7 +75,7 @@ public class ShapeFileWriterTest {
 	}
 
 	@Test
-	public void testShapeFileWriterWithSelfCreatedContent() throws IOException {
+	void testShapeFileWriterWithSelfCreatedContent() throws IOException {
 		String outFile = utils.getOutputDirectory() + "/test.shp";
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("EvacuationArea");
@@ -108,7 +108,7 @@ public class ShapeFileWriterTest {
 	}
 
 	@Test
-	public void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Polygon() throws IOException {
+	void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Polygon() throws IOException {
 		String outFile = utils.getOutputDirectory() + "test.shp";
 
 		PolygonFeatureFactory ff = new PolygonFeatureFactory.Builder()
@@ -137,7 +137,7 @@ public class ShapeFileWriterTest {
 	}
 
 	@Test
-	public void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Polyline() throws IOException {
+	void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Polyline() throws IOException {
 		String outFile = utils.getOutputDirectory() + "test.shp";
 
 		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
@@ -166,7 +166,7 @@ public class ShapeFileWriterTest {
 	}
 
 	@Test
-	public void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Point() throws IOException {
+	void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Point() throws IOException {
 		String outFile = utils.getOutputDirectory() + "test.shp";
 
 		PointFeatureFactory ff = new PointFeatureFactory.Builder()

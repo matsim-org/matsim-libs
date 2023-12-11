@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -45,7 +45,8 @@ public class SelectedPlans2ESRIShapeTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testSelectedPlansActsShape() throws IOException {
+	@Test
+	void testSelectedPlansActsShape() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 
 		String outShp = utils.getOutputDirectory() + "acts.shp";
@@ -69,7 +70,8 @@ public class SelectedPlans2ESRIShapeTest {
 		Assert.assertEquals(2235, writtenFeatures.size());
 	}
 
-	@Test public void testSelectedPlansLegsShape() throws IOException {
+	@Test
+	void testSelectedPlansLegsShape() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 
 		String outShp = utils.getOutputDirectory() + "legs.shp";

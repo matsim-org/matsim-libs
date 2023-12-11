@@ -21,8 +21,8 @@
 package org.matsim.contrib.roadpricing;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -43,7 +43,7 @@ public class RoadPricingControlerIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testPaidTollsEndUpInScores() {
+	void testPaidTollsEndUpInScores() {
 		// first run basecase
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
 		config.controller().setLastIteration(0);

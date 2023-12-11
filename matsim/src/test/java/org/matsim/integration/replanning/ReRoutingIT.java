@@ -27,8 +27,8 @@ import java.util.EnumSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -77,7 +77,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingDijkstra() throws MalformedURLException {
+	void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		Controler controler = new Controler(scenario);
@@ -88,7 +88,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingAStarLandmarks() throws MalformedURLException {
+	void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		Controler controler = new Controler(scenario);
@@ -99,7 +99,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingSpeedyALT() throws MalformedURLException {
+	void testReRoutingSpeedyALT() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
 		Controler controler = new Controler(scenario);

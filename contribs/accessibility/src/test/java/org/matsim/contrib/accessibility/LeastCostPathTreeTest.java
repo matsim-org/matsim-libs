@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -24,9 +24,9 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
 public class LeastCostPathTreeTest {
 	
 	Scenario scenario;
-	
+
 	@Test
-	public void testRouteChoiceTestSpanningTree(){
+	void testRouteChoiceTestSpanningTree(){
 		this.scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(CreateTestNetwork.createTriangularNetwork()).build() ;
 		compareRouteChoices();
 	}

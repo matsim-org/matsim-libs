@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -100,7 +100,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testAgentsExecuteSameNumberOfActsAsPlanned() {
+	void testAgentsExecuteSameNumberOfActsAsPlanned() {
 
 		boolean fail = false;
 		String personsWithDifferingActCount = "";
@@ -123,7 +123,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testCarAndBikeAgent() {
+	void testCarAndBikeAgent() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Charge during leisure + bike"), List.of());
 		Assert.assertEquals(1, plugins.size(), 0);
 
@@ -142,7 +142,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testTripleCharger() {
+	void testTripleCharger() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Triple Charger"), List.of());
 		Assert.assertEquals(plugins.size(), 3., 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
@@ -169,7 +169,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testChargerSelectionShopping() {
+	void testChargerSelectionShopping() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Charging during shopping"), List.of());
 		Assert.assertEquals(1, plugins.size(), 0);
 
@@ -187,7 +187,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testLongDistance() {
+	void testLongDistance() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Charger Selection long distance leg"),
 				List.of());
 		Assert.assertEquals(1, plugins.size(), 0);
@@ -207,7 +207,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testTwin() {
+	void testTwin() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Charger Selection long distance twin"),
 				List.of());
 		Assert.assertEquals(1, plugins.size(), 0);
@@ -226,7 +226,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testDoubleCharger() {
+	void testDoubleCharger() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Double Charger"), List.of());
 		Assert.assertEquals(1, plugins.size(), 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
@@ -243,7 +243,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testNotEnoughTimeCharger() {
+	void testNotEnoughTimeCharger() {
 		//TODO this test succeeds if the corresponding agents is deleted
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Not enough time so no charge"), List.of());
 		Assert.assertTrue(plugins.isEmpty());
@@ -253,7 +253,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testEarlyCharger() {
+	void testEarlyCharger() {
 		//this guy starts with more energy than the others, exceeds the threshold at the 3rd leg but can only charge during first non-home-act. charge is lasting long enough so no additional charge is needed
 
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Not enough time so charging early"),
@@ -274,7 +274,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testHomeCharger() {
+	void testHomeCharger() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Home Charger"), List.of());
 		Assert.assertEquals(1, plugins.size(), 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
@@ -288,7 +288,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testNoRoundTripSoNoHomeCharge() {
+	void testNoRoundTripSoNoHomeCharge() {
 		//TODO this test succeeds if the corresponding agents is deleted
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("No Round Trip So No Home Charge"),
 				List.of());
@@ -301,7 +301,7 @@ public class UrbanEVTests {
 	}
 
 	@Test
-	public void testDoubleChargerHomeCharger() {
+	void testDoubleChargerHomeCharger() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Double Charger Home Charger"), List.of());
 		Assert.assertEquals(plugins.size(), 2, 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);

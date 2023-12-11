@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,7 +30,7 @@ public class FreightDemandGenerationUtilsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testPreparePopulation() {
+	void testPreparePopulation() {
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
 		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
@@ -79,8 +79,9 @@ public class FreightDemandGenerationUtilsTest {
 		Assert.assertEquals(0, person.getPlans().size());
 		Assert.assertNull(person.getSelectedPlan());
 	}
+
 	@Test
-	public void testCoordOfMiddlePointOfLink() {
+	void testCoordOfMiddlePointOfLink() {
 		Network network = NetworkUtils.readNetwork("https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
 		Link link = network.getLinks().get(Id.createLinkId("i(8,8)"));
 		Coord middlePoint = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
@@ -91,8 +92,9 @@ public class FreightDemandGenerationUtilsTest {
 		Assert.assertEquals(5000, middlePoint2.getX(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(7500, middlePoint2.getY(), MatsimTestUtils.EPSILON);
 	}
+
 	@Test
-	public void testReducePopulationToShapeArea() {
+	void testReducePopulationToShapeArea() {
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
 		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
@@ -104,8 +106,9 @@ public class FreightDemandGenerationUtilsTest {
 		Assert.assertFalse(population.getPersons().containsKey(Id.createPersonId("person2")));
 		Assert.assertFalse(population.getPersons().containsKey(Id.createPersonId("person4")));
 	}
+
 	@Test
-	public void testCheckPositionInShape_link() {
+	void testCheckPositionInShape_link() {
 		Network network = NetworkUtils.readNetwork("https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
 		Link link = network.getLinks().get(Id.createLinkId("i(8,8)"));
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
@@ -120,8 +123,9 @@ public class FreightDemandGenerationUtilsTest {
 		Assert.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area2"}, null));
 
 	}
+
 	@Test
-	public void testCheckPositionInShape_point() {
+	void testCheckPositionInShape_point() {
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath,"WGS84", null);
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();

@@ -20,7 +20,7 @@
 package org.matsim.core.router;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,8 +43,8 @@ import org.matsim.facilities.ActivityFacility;
 
 public class MultimodalLinkChooserTest {
 
-    @Test
-    public void testDecideOnLink() {
+	@Test
+	void testDecideOnLink() {
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 

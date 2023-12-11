@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,12 +34,12 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class JointPlansTest {
 	@Test
-	public void testExceptionAddWithCache( ) throws Exception {
+	void testExceptionAddWithCache() throws Exception {
 		testExceptionAdd( true );
 	}
 
 	@Test
-	public void testExceptionAddWithoutCache( ) throws Exception {
+	void testExceptionAddWithoutCache() throws Exception {
 		testExceptionAdd( false );
 	}
 
@@ -74,12 +74,12 @@ public class JointPlansTest {
 	}
 
 	@Test
-	public void testExceptionRemoveWithCache( ) throws Exception {
+	void testExceptionRemoveWithCache() throws Exception {
 		testExceptionRemove( true );
 	}
 
 	@Test
-	public void testExceptionRemoveWithoutCache( ) throws Exception {
+	void testExceptionRemoveWithoutCache() throws Exception {
 		testExceptionRemove( false );
 	}
 
@@ -115,12 +115,12 @@ public class JointPlansTest {
 	}
 
 	@Test
-	public void testAddAndGetSeveralInstancesWithCache( ) {
+	void testAddAndGetSeveralInstancesWithCache() {
 		testAddAndGetSeveralInstances( true );
 	}
 
 	@Test
-	public void testAddAndGetSeveralInstancesWithoutCache( ) {
+	void testAddAndGetSeveralInstancesWithoutCache() {
 		testAddAndGetSeveralInstances( false );
 	}
 
@@ -200,12 +200,12 @@ public class JointPlansTest {
 
 
 	@Test
-	public void testClearWithoutCache( ) {
+	void testClearWithoutCache() {
 		testClear( false );
 	}
 
 	@Test
-	public void testClearWithCache( ) {
+	void testClearWithCache() {
 		testClear( true );
 	}
 

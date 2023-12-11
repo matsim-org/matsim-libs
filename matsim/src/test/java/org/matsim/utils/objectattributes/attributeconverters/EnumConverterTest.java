@@ -22,9 +22,9 @@
  package org.matsim.utils.objectattributes.attributeconverters;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-/**
+ /**
  * @author thibautd
  */
 public class EnumConverterTest {
@@ -38,8 +38,8 @@ public class EnumConverterTest {
 		}
 	}
 
-	@Test
-	public void testFromString() {
+	 @Test
+	 void testFromString() {
 		final EnumConverter<MyEnum> converter = new EnumConverter<>( MyEnum.class );
 
 		MyEnum some = converter.convert( "SOME_CONSTANT" );
@@ -49,8 +49,8 @@ public class EnumConverterTest {
 		Assert.assertEquals("unexpected enum", MyEnum.SOME_OTHER_CONSTANT, other);
 	}
 
-	@Test
-	public void testToString() {
+	 @Test
+	 void testToString() {
 		final EnumConverter<MyEnum> converter = new EnumConverter<>( MyEnum.class );
 
 		Assert.assertEquals( "unexpected String value", "SOME_CONSTANT", converter.convertToString( MyEnum.SOME_CONSTANT ) );
