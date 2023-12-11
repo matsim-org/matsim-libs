@@ -25,7 +25,7 @@ package org.matsim.contrib.roadpricing;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -120,8 +120,8 @@ public class AvoidTolledRouteTest {
 		controler2.getConfig().controller().setCreateGraphs(false);
 		controler2.run();
 
-		Assert.assertEquals("Base Case: all agents should use the faster route.", 3, (Integer) linkId2demand1.get(Id.createLinkId("link_4_5")), 0);
-		Assert.assertEquals("Pricing: all agents should use the slow but untolled route.", 3, linkId2demand2.get(Id.createLinkId("link_1_2")), 0);
+		Assertions.assertEquals(3, (Integer) linkId2demand1.get(Id.createLinkId("link_4_5")), 0, "Base Case: all agents should use the faster route.");
+		Assertions.assertEquals(3, linkId2demand2.get(Id.createLinkId("link_1_2")), 0, "Pricing: all agents should use the slow but untolled route.");
 
 	}
 }

@@ -20,7 +20,7 @@
 
 package org.matsim.integration.replanning;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -89,15 +89,15 @@ public class ResumableRunsIT {
 		// comparison
 		long cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
 		long cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.10/10.plans.xml.gz");
-		Assert.assertEquals("Plans must not be altered just be reading in and writing out again.", cksum1, cksum2);
+		Assertions.assertEquals(cksum1, cksum2, "Plans must not be altered just be reading in and writing out again.");
 
 		cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.events.xml.gz");
 		cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.10/10.events.xml.gz");
-		Assert.assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
+		Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same when resuming runs.");
 
 		cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.11/11.events.xml.gz");
 		cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.11/11.events.xml.gz");
-		Assert.assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
+		Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same when resuming runs.");
 	}
 
 }

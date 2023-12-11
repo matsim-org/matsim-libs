@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,19 +115,19 @@ public class GroupPlansTest {
 		final GroupPlans testee = new GroupPlans( jointPlans , indivPlans );
 
 		assertEquals(
-				"wrong number of individual plans",
 				indivPlans.size(),
-				testee.getIndividualPlans().size());
+				testee.getIndividualPlans().size(),
+				"wrong number of individual plans");
 
 		assertEquals(
-				"wrong number of joint plans",
 				jointPlans.size(),
-				testee.getJointPlans().size());
+				testee.getJointPlans().size(),
+				"wrong number of joint plans");
 
 		assertEquals(
-				"wrong total number of indiv plans",
 				indivPlans.size() + nIndivInJoints,
-				testee.getAllIndividualPlans().size());
+				testee.getAllIndividualPlans().size(),
+				"wrong total number of indiv plans");
 	}
 
 	@Test
@@ -138,14 +136,14 @@ public class GroupPlansTest {
 			GroupPlans copy = GroupPlans.copyPlans( factory , plans );
 
 			assertEquals(
-					"wrong number of individual plans in copy",
 					plans.getIndividualPlans().size(),
-					copy.getIndividualPlans().size());
+					copy.getIndividualPlans().size(),
+					"wrong number of individual plans in copy");
 
 			assertEquals(
-					"wrong number of joint plans in copy",
 					plans.getJointPlans().size(),
-					copy.getJointPlans().size());
+					copy.getJointPlans().size(),
+					"wrong number of joint plans in copy");
 		}
 	}
 
@@ -155,20 +153,20 @@ public class GroupPlansTest {
 			GroupPlans copy = GroupPlans.copyPlans( factory , plans );
 
 			assertNotSame(
-					"copy is the same instance",
 					plans,
-					copy);
+					copy,
+					"copy is the same instance");
 
 			for (Plan p : plans.getIndividualPlans()) {
 				assertFalse(
-						"the copy contains references from the copied",
-						copy.getIndividualPlans().contains( p ));
+						copy.getIndividualPlans().contains( p ),
+						"the copy contains references from the copied");
 			}
 
 			for (JointPlan copiedJointPlan : plans.getJointPlans()) {
 				assertFalse(
-						"the copy contains references from the copied",
-						copy.getJointPlans().contains( copiedJointPlan ));
+						copy.getJointPlans().contains( copiedJointPlan ),
+						"the copy contains references from the copied");
 
 				JointPlan copyJointPlan = getCopy( copiedJointPlan , copy );
 				for (Plan copyIndivPlan : copyJointPlan.getIndividualPlans().values()) {
@@ -179,8 +177,8 @@ public class GroupPlansTest {
 					//		JointPlanFactory.getPlanLinks().getJointPlan( copyIndivPlan ));
 
 					assertFalse(
-							"individual plans were not copied when copying joint plan",
-							copiedJointPlan.getIndividualPlans().values().contains( copyIndivPlan ));
+							copiedJointPlan.getIndividualPlans().values().contains( copyIndivPlan ),
+							"individual plans were not copied when copying joint plan");
 				}
 			}
 		}

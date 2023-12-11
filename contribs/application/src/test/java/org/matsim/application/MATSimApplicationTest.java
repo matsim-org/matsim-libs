@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MATSimApplicationTest {
 
@@ -36,7 +36,7 @@ public class MATSimApplicationTest {
 
 		int ret = MATSimApplication.execute(TestScenario.class, "--help");
 
-		assertEquals("Return code should be 0", 0, ret);
+		assertEquals(0, ret, "Return code should be 0");
 	}
 
 	@Test

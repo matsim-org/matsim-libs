@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,27 +35,27 @@ public class ObjectPoolTest {
 		final String instance2 = new String( "jojo" );
 		final String instance3 = new String( "jojo" );
 
-		assertTrue("the two variables should be different objects", instance1 != instance2);
+		assertTrue(instance1 != instance2, "the two variables should be different objects");
 		
 		assertSame(
-				"first instance not returned when pooled",
 				instance1,
-				pool.getPooledInstance( instance1 ));
+				pool.getPooledInstance( instance1 ),
+				"first instance not returned when pooled");
 
 		assertNotSame(
-				"second instance returned instead of first",
 				instance2,
-				pool.getPooledInstance( instance2 ));
+				pool.getPooledInstance( instance2 ),
+				"second instance returned instead of first");
 
 		assertSame(
-				"first instance not returned while pooled",
 				instance1,
-				pool.getPooledInstance( instance2 ));
+				pool.getPooledInstance( instance2 ),
+				"first instance not returned while pooled");
 
 		assertSame(
-				"first instance not returned while pooled",
 				instance1,
-				pool.getPooledInstance( instance3 ));
+				pool.getPooledInstance( instance3 ),
+				"first instance not returned while pooled");
 	}
 
 	// TODO test forgetting

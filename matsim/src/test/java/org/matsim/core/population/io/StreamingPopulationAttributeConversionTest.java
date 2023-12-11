@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -85,10 +85,10 @@ public class StreamingPopulationAttributeConversionTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get(personId0);
 		final Object readAttribute = readPerson.getAttributes().getAttribute("job");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
+		Assertions.assertEquals(
 				attribute,
-				readAttribute);
+				readAttribute,
+				"unexpected read attribute");
 	}
 
 	private static class CustomClass {

@@ -22,7 +22,7 @@
 
 package org.matsim.core.router;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,7 @@ public class TripRouterModuleTest {
                     scenario.getNetwork(),
                     ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(new FreeSpeedTravelTime()),
                     new FreeSpeedTravelTime());
-            Assert.assertNotNull(pathCalculator);
+            Assertions.assertNotNull(pathCalculator);
         }
     }
 

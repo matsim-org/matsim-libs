@@ -20,9 +20,9 @@
 
 package org.matsim.core.replanning.strategies;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -126,16 +126,16 @@ public class TimeAllocationMutatorModuleTest {
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
 			act1End = act1.getEndTime().seconds();
-			assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
+			assertTrue(act1End >= 0.0, "activity end time cannot be smaller than 0, is " + act1End);
 			// test end time of act2
 			diff = act2Dur - act2.getMaximumDuration().seconds();
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
 			act2Dur = act2.getMaximumDuration().seconds();
-			assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
+			assertTrue(act2Dur >= 0.0, "activity duration cannot be smaller than 0, is " + act2Dur);
 		}
-		assertTrue("mutation range differences wrong (act1).", minDiff1 <= maxDiff1);
-		assertTrue("mutation range differences wrong (act2).", minDiff2 <= maxDiff2);
+		assertTrue(minDiff1 <= maxDiff1, "mutation range differences wrong (act1).");
+		assertTrue(minDiff2 <= maxDiff2, "mutation range differences wrong (act2).");
 
 		/* The following asserts are dependent on random numbers.
 		 * But I would still expect that we get up to at least 95% of the limit...   */
@@ -146,7 +146,7 @@ public class TimeAllocationMutatorModuleTest {
 	}
 
 	private static void assertValueInRange(final String message, final double actual, final double lowerLimit, final double upperLimit) {
-		assertTrue(message + " actual: " + actual + ", range: " + lowerLimit + "..." + upperLimit, (lowerLimit <= actual) && (actual <= upperLimit));
+		assertTrue((lowerLimit <= actual) && (actual <= upperLimit), message + " actual: " + actual + ", range: " + lowerLimit + "..." + upperLimit);
 	}
 
 
@@ -182,10 +182,10 @@ public class TimeAllocationMutatorModuleTest {
 						affectingDuration, new Random(2011),24*3600,false,1);
 		mutator.run(plan);
 
-		Assert.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
-		Assert.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
-		Assert.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
-		Assert.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
 	}
 
 	@Test
@@ -227,19 +227,19 @@ public class TimeAllocationMutatorModuleTest {
 
 		mutator.run(plan);
 
-		Assert.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
-		Assert.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
-		Assert.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
-		Assert.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
+		Assertions.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
 
 		// check whether activity times are equal or less than latestEndTime
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity activity) {
 				if (activity.getStartTime().isDefined()) {
-					Assert.assertTrue(activity.getStartTime().seconds() <= latestEndTime);
+					Assertions.assertTrue(activity.getStartTime().seconds() <= latestEndTime);
 				}
 				if (activity.getEndTime().isDefined()) {
-					Assert.assertTrue(activity.getEndTime().seconds() <= latestEndTime);
+					Assertions.assertTrue(activity.getEndTime().seconds() <= latestEndTime);
 				}
 			}
 		}
@@ -271,8 +271,8 @@ public class TimeAllocationMutatorModuleTest {
 
 		double firstActEndTime = act.getEndTime().seconds();
 		double secondActDuration = act2.getMaximumDuration().seconds();
-		Assert.assertEquals(firstActEndTime,leg1.getDepartureTime().seconds(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(firstActEndTime+secondActDuration+leg1.getTravelTime().seconds(),leg2.getDepartureTime().seconds(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(firstActEndTime,leg1.getDepartureTime().seconds(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(firstActEndTime+secondActDuration+leg1.getTravelTime().seconds(),leg2.getDepartureTime().seconds(), MatsimTestUtils.EPSILON);
 
 
 

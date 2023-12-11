@@ -1,6 +1,6 @@
 package org.matsim.contrib.emissions.analysis;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.contrib.emissions.Pollutant.HC;
 
 import java.util.ArrayList;

@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -301,16 +301,12 @@ public class UmlaufDriverTest {
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
 		assertEquals(2, queueVehicle.getPassengers().size());
-		assertEquals("driver must not proceed in stop list when persons entered.",
-				stop1, driver.getNextTransitStop());
+		assertEquals(stop1, driver.getNextTransitStop(), "driver must not proceed in stop list when persons entered.");
 		assertEquals(0, tracker.getAgentsAtFacility(stop1.getId()).size());
-		assertEquals("stop time must be 0 when nobody enters or leaves",
-				0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON, "stop time must be 0 when nobody enters or leaves");
 		assertEquals(2, queueVehicle.getPassengers().size());
-		assertEquals("driver must proceed in stop list when no persons entered.",
-				stop2, driver.getNextTransitStop());
-		assertEquals("driver must return same stop again when queried again without handling stop.",
-				stop2, driver.getNextTransitStop());
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must proceed in stop list when no persons entered.");
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must return same stop again when queried again without handling stop.");
 
 		tracker.addAgentToStop(110, agent3, stop2.getId());
 		double stoptime1 = driver.handleTransitStop(stop2, 150);
@@ -321,11 +317,10 @@ public class UmlaufDriverTest {
 		double stoptime2 = driver.handleTransitStop(stop2, 160);
 		assertTrue(stoptime2 > 0);
 		assertEquals(4, queueVehicle.getPassengers().size());
-		assertTrue("The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2,
-				stoptime1 > stoptime2);
+		assertTrue(stoptime1 > stoptime2,
+				"The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2);
 		tracker.addAgentToStop(163, agent5, stop2.getId());
-		assertEquals("vehicle should have reached capacity, so not more passenger can enter.",
-				0.0, driver.handleTransitStop(stop2, 170), MatsimTestUtils.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop2, 170), MatsimTestUtils.EPSILON, "vehicle should have reached capacity, so not more passenger can enter.");
 	}
 
 	@Test
@@ -381,15 +376,11 @@ public class UmlaufDriverTest {
 		assertEquals(4, queueVehicle.getPassengers().size());
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
-		assertEquals("driver must not proceed in stop list when persons entered.",
-				stop1, driver.getNextTransitStop());
+		assertEquals(stop1, driver.getNextTransitStop(), "driver must not proceed in stop list when persons entered.");
 		assertEquals(2, queueVehicle.getPassengers().size());
-		assertEquals("stop time must be 0 when nobody enters or leaves",
-				0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON);
-		assertEquals("driver must proceed in stop list when no persons entered.",
-				stop2, driver.getNextTransitStop());
-		assertEquals("driver must return same stop again when queried again without handling stop.",
-				stop2, driver.getNextTransitStop());
+		assertEquals(0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON, "stop time must be 0 when nobody enters or leaves");
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must proceed in stop list when no persons entered.");
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must return same stop again when queried again without handling stop.");
 
 		assertTrue(driver.handleTransitStop(stop2, 150) > 0);
 		assertEquals(0, queueVehicle.getPassengers().size());

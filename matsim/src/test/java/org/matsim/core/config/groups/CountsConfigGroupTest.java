@@ -19,7 +19,7 @@
 
 package org.matsim.core.config.groups;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,44 +31,44 @@ public class CountsConfigGroupTest {
 	void testWriteCountsInterval() {
 		CountsConfigGroup cg = new CountsConfigGroup();
 		// test initial value
-		Assert.assertEquals(10, cg.getWriteCountsInterval());
-		Assert.assertEquals("10", cg.getValue("writeCountsInterval"));
+		Assertions.assertEquals(10, cg.getWriteCountsInterval());
+		Assertions.assertEquals("10", cg.getValue("writeCountsInterval"));
 		// test setting with setMobsim
 		cg.setWriteCountsInterval(4);
-		Assert.assertEquals(4, cg.getWriteCountsInterval());
-		Assert.assertEquals("4", cg.getValue("writeCountsInterval"));
+		Assertions.assertEquals(4, cg.getWriteCountsInterval());
+		Assertions.assertEquals("4", cg.getValue("writeCountsInterval"));
 		// test setting with addParam
 		cg.addParam("writeCountsInterval", "2");
-		Assert.assertEquals(2, cg.getWriteCountsInterval());
-		Assert.assertEquals("2", cg.getValue("writeCountsInterval"));
+		Assertions.assertEquals(2, cg.getWriteCountsInterval());
+		Assertions.assertEquals("2", cg.getValue("writeCountsInterval"));
 	}
 
 	@Test
 	void testGetParams_writeCountsInterval() {
 		CountsConfigGroup cg = new CountsConfigGroup();
-		Assert.assertNotNull(cg.getParams().get("writeCountsInterval"));
+		Assertions.assertNotNull(cg.getParams().get("writeCountsInterval"));
 	}
 
 	@Test
 	void testWriteAverageOverIterations() {
 		CountsConfigGroup cg = new CountsConfigGroup();
 		// test initial value
-		Assert.assertEquals(5, cg.getAverageCountsOverIterations());
-		Assert.assertEquals("5", cg.getValue("averageCountsOverIterations"));
+		Assertions.assertEquals(5, cg.getAverageCountsOverIterations());
+		Assertions.assertEquals("5", cg.getValue("averageCountsOverIterations"));
 		// test setting with setMobsim
 		cg.setAverageCountsOverIterations(4);
-		Assert.assertEquals(4, cg.getAverageCountsOverIterations());
-		Assert.assertEquals("4", cg.getValue("averageCountsOverIterations"));
+		Assertions.assertEquals(4, cg.getAverageCountsOverIterations());
+		Assertions.assertEquals("4", cg.getValue("averageCountsOverIterations"));
 		// test setting with addParam
 		cg.addParam("averageCountsOverIterations", "2");
-		Assert.assertEquals(2, cg.getAverageCountsOverIterations());
-		Assert.assertEquals("2", cg.getValue("averageCountsOverIterations"));
+		Assertions.assertEquals(2, cg.getAverageCountsOverIterations());
+		Assertions.assertEquals("2", cg.getValue("averageCountsOverIterations"));
 	}
 
 	@Test
 	void testGetParams_averageCountsOverIterations() {
 		CountsConfigGroup cg = new CountsConfigGroup();
-		Assert.assertNotNull(cg.getParams().get("averageCountsOverIterations"));
+		Assertions.assertNotNull(cg.getParams().get("averageCountsOverIterations"));
 	}
 	
 }

@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetsim.jointtrips.qsim;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -214,16 +214,16 @@ public class JointTravelingSimulationIntegrationTest {
 						}
 
 						arrCount.incrementAndGet();
-						Assert.assertEquals(
-							"run "+scNr+": unexpected joint arrival time",
+						Assertions.assertEquals(
 							arrival,
 							event.getTime(),
-							MatsimTestUtils.EPSILON);
+							MatsimTestUtils.EPSILON,
+							"run "+scNr+": unexpected joint arrival time");
 
-						Assert.assertEquals(
-								"run "+scNr+": unexpected arrival location for mode "+mode,
+						Assertions.assertEquals(
 								fixture.doLink,
-								event.getLinkId() );
+								event.getLinkId(),
+								"run "+scNr+": unexpected arrival location for mode "+mode );
 					}
 				}
 			});
@@ -257,15 +257,15 @@ public class JointTravelingSimulationIntegrationTest {
 			// for easier tracking of test failures
 			logFinalQSimState( qsim );
 
-			Assert.assertEquals(
-					"run "+i+": unexpected number of joint arrivals",
+			Assertions.assertEquals(
 					N_LAPS * 3,
-					arrCount.get());
+					arrCount.get(),
+					"run "+i+": unexpected number of joint arrivals");
 
-			Assert.assertEquals(
-					"run "+i+": unexpected number of agents arriving at destination",
+			Assertions.assertEquals(
 					N_LAPS * sc.getPopulation().getPersons().size(),
-					atDestCount.get());
+					atDestCount.get(),
+					"run "+i+": unexpected number of agents arriving at destination");
 		}
 	}
 
@@ -328,10 +328,10 @@ public class JointTravelingSimulationIntegrationTest {
 			final JointQSimFactory factory = new JointQSimFactory( );
 			factory.createMobsim( sc , events ).run();
 
-			Assert.assertEquals(
-					"not as many leave events as enter events",
+			Assertions.assertEquals(
 					enterCount.get(),
-					leaveCount.get());
+					leaveCount.get(),
+					"not as many leave events as enter events");
 		}
 	}
 

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,8 +41,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -79,9 +79,9 @@ public class FixedGroupsIT {
 			final Collection<ReplanningGroup> expected,
 			final Collection<ReplanningGroup> actual) {
 		assertEquals(
-				"not the same number of groups",
 				expected.size(),
-				actual.size());
+				actual.size(),
+				"not the same number of groups");
 
 		final Iterator<ReplanningGroup> expectedIter = expected.iterator();
 		final Iterator<ReplanningGroup> actualIter = actual.iterator();
@@ -95,10 +95,10 @@ public class FixedGroupsIT {
 			final Iterator<Person> actualGroupIterator = actualGroup.getPersons().iterator();
 			for (Person expectedPerson : expectedGroup.getPersons()) {
 				assertEquals(
-						"groups "+expectedGroup+" and "+actualGroup+" in position "+
-						c+" are not equal or do not present the persons in the same order",
 						expectedPerson.getId(),
-						actualGroupIterator.next().getId());
+						actualGroupIterator.next().getId(),
+						"groups "+expectedGroup+" and "+actualGroup+" in position "+
+						c+" are not equal or do not present the persons in the same order");
 			}
 		}
 	}

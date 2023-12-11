@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.minibus.schedule;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -69,12 +69,12 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 		}
 
 		/* 4 inner junctions with 4 approaches + 8 outer junctions with 3 approaches + 4 corners without junctions = 40 approach links */
-		Assert.assertEquals("All 40 junction approach links got a paratransit stop", 40, numberOfParaStops, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(40, numberOfParaStops, MatsimTestUtils.EPSILON, "All 40 junction approach links got a paratransit stop");
 
 		/* Check whether these links are included as specified in the config */
-		Assert.assertNotNull("Paratransit stop at link without real pt stop", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + realPtStopLink, TransitStopFacility.class)));
-		Assert.assertNotNull("Paratransit stop at link with small capacity", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooLowCapacityLink, TransitStopFacility.class)));
-		Assert.assertNotNull("Paratransit stop at link with high freespeed", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooHighFreespeedLink, TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + realPtStopLink, TransitStopFacility.class)), "Paratransit stop at link without real pt stop");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooLowCapacityLink, TransitStopFacility.class)), "Paratransit stop at link with small capacity");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooHighFreespeedLink, TransitStopFacility.class)), "Paratransit stop at link with high freespeed");
 
 		TransitScheduleFactoryImpl tSF = new TransitScheduleFactoryImpl();
 
@@ -97,11 +97,11 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 			}
 		}
 
-		Assert.assertEquals("All car links minus one stop from formal transit got a paratransit stop", 40 - 3, numberOfParaStops, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(40 - 3, numberOfParaStops, MatsimTestUtils.EPSILON, "All car links minus one stop from formal transit got a paratransit stop");
 
-		Assert.assertNull("No paratransit stop at link with real pt stop", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + realPtStopLink, TransitStopFacility.class)));
-		Assert.assertNull("No paratransit stop at link with too small capacity", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooLowCapacityLink, TransitStopFacility.class)));
-		Assert.assertNull("No paratransit stop at link with too high freespeed", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooHighFreespeedLink, TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + realPtStopLink, TransitStopFacility.class)), "No paratransit stop at link with real pt stop");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooLowCapacityLink, TransitStopFacility.class)), "No paratransit stop at link with too small capacity");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + tooHighFreespeedLink, TransitStopFacility.class)), "No paratransit stop at link with too high freespeed");
 
 	}
 
@@ -123,76 +123,76 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 			}
 		}
 
-		Assert.assertEquals("Check number of paratransit stops", 16, numberOfParaStops, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(16, numberOfParaStops, MatsimTestUtils.EPSILON, "Check number of paratransit stops");
 
 		/* approaches to (unclustered) dead-ends */
-		Assert.assertNotNull("Should find paratransit stop 'p_2_1'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "2_1", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find paratransit stop 'p_4_3'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "4_3", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find paratransit stop 'p_9_10'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "9_10", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find paratransit stop 'p_30_31'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_31", TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "2_1", TransitStopFacility.class)), "Should find paratransit stop 'p_2_1'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "4_3", TransitStopFacility.class)), "Should find paratransit stop 'p_4_3'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "9_10", TransitStopFacility.class)), "Should find paratransit stop 'p_9_10'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_31", TransitStopFacility.class)), "Should find paratransit stop 'p_30_31'");
 
 		/* left junction: clustered nodes 5-6-7-8 */
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_2_5'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "2_5", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_4_6'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "4_6", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_19_8'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "19_8", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_9_7'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "9_7", TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "2_5", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_2_5'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "4_6", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_4_6'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "19_8", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_19_8'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "9_7", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_9_7'");
 
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '5_6'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "5_6", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '6_8'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "6_8", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '8_7'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "8_7", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '7_5'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_5", TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "5_6", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '5_6'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "6_8", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '6_8'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "8_7", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '8_7'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_5", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '7_5'");
 
 		/* clustered nodes 11-12: dead-end, therefore only one stop approaching */
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_13_12'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "13_12", TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "13_12", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_13_12'");
 
 		/* right junction: clustered nodes 13-14-15-16-17-18-19-20-21-22-23-24 */
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_6_15'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "6_15", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_12_14'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "12_14", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_27_22'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "27_22", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_25_23'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "25_23", TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "6_15", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_6_15'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "12_14", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_12_14'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "27_22", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_27_22'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "25_23", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_25_23'");
 		// in-junction links
 		// east-west, north-south
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '15_16'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "15_16", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '16_17'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "16_17", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '17_18'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "17_18", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '14_17'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "14_17", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '17_21'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "17_21", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '21_24'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "21_24", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '22_21'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "22_21", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '21_20'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "21_20", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '20_19'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "20_19", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '23_20'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "23_20", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '20_16'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "20_16", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '16_13'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "16_13", TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "15_16", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '15_16'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "16_17", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '16_17'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "17_18", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '17_18'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "14_17", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '14_17'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "17_21", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '17_21'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "21_24", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '21_24'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "22_21", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '22_21'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "21_20", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '21_20'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "20_19", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '20_19'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "23_20", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '23_20'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "20_16", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '20_16'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "16_13", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '16_13'");
 		// outer avoidance links
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '15_13'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "15_13", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '14_18'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "14_18", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '22_24'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "22_24", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '23_19'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "23_19", TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "15_13", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '15_13'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "14_18", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '14_18'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "22_24", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '22_24'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "23_19", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '23_19'");
 		// crossing
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '17_20'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "17_20", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '20_17'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "20_17", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '16_21'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "16_21", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link in junction '21_16'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "21_16", TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "17_20", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '17_20'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "20_17", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '20_17'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "16_21", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '16_21'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "21_16", TransitStopFacility.class)), "Should NOT find paratransit stop at link in junction '21_16'");
 
 		/* clustered nodes 25-26: dead-end, therefore only one stop approaching */
-		Assert.assertNotNull("Should find junction approach paratransit stop 'p_24_25'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "24_25", TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "24_25", TransitStopFacility.class)), "Should find junction approach paratransit stop 'p_24_25'");
 
 		/* links exiting junctions (towards dead-ends) */
-		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '7_2'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_2", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '5_4'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "5_4", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '8_9'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "8_9", TransitStopFacility.class)));
-		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '18_19'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_2", TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_2", TransitStopFacility.class)), "Should NOT find paratransit stop at link exiting junction '7_2'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "5_4", TransitStopFacility.class)), "Should NOT find paratransit stop at link exiting junction '5_4'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "8_9", TransitStopFacility.class)), "Should NOT find paratransit stop at link exiting junction '8_9'");
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_2", TransitStopFacility.class)), "Should NOT find paratransit stop at link exiting junction '18_19'");
 
 		/* Infill Stops between junctions / dead-ends */
-		Assert.assertNotNull("Should find infill paratransit stop 'p_30_29'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_29", TransitStopFacility.class)));
-		Assert.assertNotNull("Should find infill paratransit stop 'p_27_28'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "27_28", TransitStopFacility.class)));
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_29", TransitStopFacility.class)), "Should find infill paratransit stop 'p_30_29'");
+		Assertions.assertNotNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "27_28", TransitStopFacility.class)), "Should find infill paratransit stop 'p_27_28'");
 
 		/* Check whether CalcTopoTypes is considered (type 8 : intersections only) */
 		pC.addParam("TopoTypesForStops", "8");
 
 		transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pC, new NetworkConfigGroup());
-		Assert.assertNull("Should NOT find paratransit stop at link with wrong topo type (not an intersection) '30_31'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_31", TransitStopFacility.class)));
+		Assertions.assertNull(transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_31", TransitStopFacility.class)), "Should NOT find paratransit stop at link with wrong topo type (not an intersection) '30_31'");
 	}
 
 	/**

@@ -20,7 +20,7 @@
 
 package org.matsim.core.utils.collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collection;
 import java.util.ConcurrentModificationException;

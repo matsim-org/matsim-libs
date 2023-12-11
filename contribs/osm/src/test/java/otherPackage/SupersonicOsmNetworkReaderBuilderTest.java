@@ -1,10 +1,10 @@
 package otherPackage;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-
-import static org.junit.Assert.assertNotNull;
 
 public class SupersonicOsmNetworkReaderBuilderTest {
 

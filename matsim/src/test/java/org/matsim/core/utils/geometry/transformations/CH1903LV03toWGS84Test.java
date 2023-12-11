@@ -19,7 +19,7 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
@@ -40,7 +40,7 @@ public class CH1903LV03toWGS84Test {
 
 		CH1903LV03toWGS84 converter = new CH1903LV03toWGS84();
 		Coord n = converter.transform(new Coord((double) 700000, (double) 100000));
-		Assert.assertEquals(xx, n.getX(), epsilon);
-		Assert.assertEquals(yy, n.getY(), epsilon);
+		Assertions.assertEquals(xx, n.getX(), epsilon);
+		Assertions.assertEquals(yy, n.getY(), epsilon);
 	}
 }

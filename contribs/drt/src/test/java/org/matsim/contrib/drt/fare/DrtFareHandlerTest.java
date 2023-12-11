@@ -21,7 +21,7 @@
 package org.matsim.contrib.drt.fare;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -77,7 +77,7 @@ public class DrtFareHandlerTest {
 			events.flush();
 
 			//fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
-			Assert.assertEquals(-4.0, fare.getValue(), 0);
+			Assertions.assertEquals(-4.0, fare.getValue(), 0);
 		}
 		{
 			// test minFarePerTrip
@@ -91,7 +91,7 @@ public class DrtFareHandlerTest {
 			 * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
 			 * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
 			 */
-			Assert.assertEquals(-5.5, fare.getValue(), 0);
+			Assertions.assertEquals(-5.5, fare.getValue(), 0);
 		}
 	}
 

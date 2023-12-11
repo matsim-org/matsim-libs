@@ -21,7 +21,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -110,27 +110,27 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals("wrong number of legs.", 5, legs.size());
+        Assertions.assertEquals(5, legs.size(), "wrong number of legs.");
         Leg leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.pt, leg.getMode());
-        Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.pt, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(3);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(4);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
 	@Test
@@ -186,32 +186,32 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(pe);
         }
 
-        Assert.assertEquals("wrong number of PlanElements.", 9, planElements.size());
-        Assert.assertTrue(planElements.get(0) instanceof Leg);
-        Assert.assertTrue(planElements.get(1) instanceof Activity);
-        Assert.assertTrue(planElements.get(2) instanceof Leg);
-        Assert.assertTrue(planElements.get(3) instanceof Activity);
-        Assert.assertTrue(planElements.get(4) instanceof Leg);
-        Assert.assertTrue(planElements.get(5) instanceof Activity);
-        Assert.assertTrue(planElements.get(6) instanceof Leg);
-        Assert.assertTrue(planElements.get(7) instanceof Activity);
-        Assert.assertTrue(planElements.get(8) instanceof Leg);
+        Assertions.assertEquals(9, planElements.size(), "wrong number of PlanElements.");
+        Assertions.assertTrue(planElements.get(0) instanceof Leg);
+        Assertions.assertTrue(planElements.get(1) instanceof Activity);
+        Assertions.assertTrue(planElements.get(2) instanceof Leg);
+        Assertions.assertTrue(planElements.get(3) instanceof Activity);
+        Assertions.assertTrue(planElements.get(4) instanceof Leg);
+        Assertions.assertTrue(planElements.get(5) instanceof Activity);
+        Assertions.assertTrue(planElements.get(6) instanceof Leg);
+        Assertions.assertTrue(planElements.get(7) instanceof Activity);
+        Assertions.assertTrue(planElements.get(8) instanceof Leg);
 
-        Assert.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(1)).getType());
-        Assert.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(3)).getType());
-        Assert.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(5)).getType());
-        Assert.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(7)).getType());
+        Assertions.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(1)).getType());
+        Assertions.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(3)).getType());
+        Assertions.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(5)).getType());
+        Assertions.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(7)).getType());
 
-        Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(0)).getMode());
-        Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(2)).getMode());
-        Assert.assertEquals(TransportMode.pt, ((Leg) planElements.get(4)).getMode());
-        Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(6)).getMode());
-        Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(8)).getMode());
+        Assertions.assertEquals(TransportMode.bike, ((Leg) planElements.get(0)).getMode());
+        Assertions.assertEquals(TransportMode.walk, ((Leg) planElements.get(2)).getMode());
+        Assertions.assertEquals(TransportMode.pt, ((Leg) planElements.get(4)).getMode());
+        Assertions.assertEquals(TransportMode.walk, ((Leg) planElements.get(6)).getMode());
+        Assertions.assertEquals(TransportMode.bike, ((Leg) planElements.get(8)).getMode());
 
-		Assert.assertEquals(0.0, ((Activity)planElements.get(1)).getMaximumDuration().seconds(), 0.0);
-		Assert.assertEquals(0.0, ((Activity)planElements.get(3)).getMaximumDuration().seconds(), 0.0);
-		Assert.assertEquals(0.0, ((Activity)planElements.get(5)).getMaximumDuration().seconds(), 0.0);
-		Assert.assertEquals(0.0, ((Activity)planElements.get(7)).getMaximumDuration().seconds(), 0.0);
+		Assertions.assertEquals(0.0, ((Activity)planElements.get(1)).getMaximumDuration().seconds(), 0.0);
+		Assertions.assertEquals(0.0, ((Activity)planElements.get(3)).getMaximumDuration().seconds(), 0.0);
+		Assertions.assertEquals(0.0, ((Activity)planElements.get(5)).getMaximumDuration().seconds(), 0.0);
+		Assertions.assertEquals(0.0, ((Activity)planElements.get(7)).getMaximumDuration().seconds(), 0.0);
     }
 
 	@Test
@@ -247,19 +247,19 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals("wrong number of legs.", 3, legs.size());
+        Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
         Leg leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.pt, leg.getMode());
-        Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.pt, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
 	/**
@@ -299,7 +299,7 @@ public class SwissRailRaptorIntermodalTest {
 
         List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7*3600, f.dummyPerson));
 
-        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+        Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
     }
 
 	@Test
@@ -352,11 +352,11 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals("wrong number of legs.", 1, legs.size());
+        Assertions.assertEquals(1, legs.size(), "wrong number of legs.");
         Leg leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
 
         // direct walk factor on
         f.config.transitRouter().setDirectWalkFactor(Double.POSITIVE_INFINITY);
@@ -369,27 +369,27 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg1);
         }
 
-        Assert.assertEquals("wrong number of legs.", 5, legs.size());
+        Assertions.assertEquals(5, legs.size(), "wrong number of legs.");
         leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.pt, leg.getMode());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.pt, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(3);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(4);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_3", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
 	@Test
@@ -449,39 +449,39 @@ public class SwissRailRaptorIntermodalTest {
 		//returnNull
 		data.config.setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.returnNull);
 		List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7*3600, f.dummyPerson));
-		Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+		Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
 
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac2, toFac2, 7*3600, f.dummyPerson));
-		Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+		Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
 
 		//forbid
 		data.config.setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid);
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7*3600, f.dummyPerson));
-		Assert.assertNotNull("The router should find a pt route and not return null, but did return null", legs);
-		Assert.assertTrue( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
+		Assertions.assertNotNull(legs, "The router should find a pt route and not return null, but did return null");
+		Assertions.assertTrue( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
 
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac2, toFac2, 7*3600, f.dummyPerson));
-		Assert.assertNull("The router should not find a pt route and return null, but did return something else", legs);
+		Assertions.assertNull(legs, "The router should not find a pt route and return null, but did return something else");
 
 		//avoid
 		data.config.setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.avoid);
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7*3600, f.dummyPerson));
-		Assert.assertNotNull("The router should find a pt route and not return null, but did return null", legs);
-		Assert.assertTrue( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
+		Assertions.assertNotNull(legs, "The router should find a pt route and not return null, but did return null");
+		Assertions.assertTrue( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
 
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac2, toFac2, 7*3600, f.dummyPerson));
-		Assert.assertNotNull("The router should find a pt route and not return null, but did return null", legs);
-		Assert.assertFalse( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
+		Assertions.assertNotNull(legs, "The router should find a pt route and not return null, but did return null");
+		Assertions.assertFalse( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
 
 		//allow
 		data.config.setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.allow);
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7*3600, f.dummyPerson));
-		Assert.assertFalse( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
-		Assert.assertNotNull("The router should find a pt route and not return null, but did return something else.", legs);
+		Assertions.assertFalse( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
+		Assertions.assertNotNull(legs, "The router should find a pt route and not return null, but did return something else.");
 
 		legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac2, toFac2, 7*3600, f.dummyPerson));
-		Assert.assertNotNull("The router should find a pt route and not return null, but did return null", legs);
-		Assert.assertFalse( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
+		Assertions.assertNotNull(legs, "The router should find a pt route and not return null, but did return null");
+		Assertions.assertFalse( legs.stream().filter(Leg.class::isInstance).anyMatch(planElement -> ((Leg) planElement).getMode().equals(TransportMode.pt)));
 
 	}
 
@@ -533,19 +533,19 @@ public class SwissRailRaptorIntermodalTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.bike, leg.getMode());
-            Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.bike, leg.getMode());
+            Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.bike, leg.getMode());
-            Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.bike, leg.getMode());
+            Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
         }
 
         // second check: decrease bike speed, walk should be the better option
@@ -563,19 +563,19 @@ public class SwissRailRaptorIntermodalTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
         }
     }
 
@@ -638,19 +638,19 @@ public class SwissRailRaptorIntermodalTest {
 
                 { // Test 1: Checks whether the amount of legs is correct, whether the legs have the correct modes,
                   // and whether the legs start and end on the correct links
-                    Assert.assertEquals("wrong number of legs.", 3, legs.size());
+                    Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
                     Leg leg = (Leg) legs.get(0);
-                    Assert.assertTrue((leg.getMode().equals(TransportMode.bike)) || (leg.getMode().equals(TransportMode.walk)));
-                    Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-                    Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
+                    Assertions.assertTrue((leg.getMode().equals(TransportMode.bike)) || (leg.getMode().equals(TransportMode.walk)));
+                    Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+                    Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getEndLinkId());
                     leg = (Leg) legs.get(1);
-                    Assert.assertEquals(TransportMode.pt, leg.getMode());
-                    Assert.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
-                    Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+                    Assertions.assertEquals(TransportMode.pt, leg.getMode());
+                    Assertions.assertEquals(Id.create("pt_3", Link.class), leg.getRoute().getStartLinkId());
+                    Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
                     leg = (Leg) legs.get(2);
-                    Assert.assertTrue((leg.getMode().equals(TransportMode.bike)) || (leg.getMode().equals(TransportMode.walk)));
-                    Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-                    Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+                    Assertions.assertTrue((leg.getMode().equals(TransportMode.bike)) || (leg.getMode().equals(TransportMode.walk)));
+                    Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+                    Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
                 }
 
                 { // Test 2: Counts all different access/egress mode combinations. The assertions occur later.
@@ -671,11 +671,11 @@ public class SwissRailRaptorIntermodalTest {
 
             { // Test 2: Tests whether Router chooses all 4 combinations of walk and bike. Also checks that no other
               // combination is present.
-                Assert.assertTrue(numWalkWalk > 0);
-                Assert.assertTrue(numWalkBike > 0);
-                Assert.assertTrue(numBikeWalk > 0);
-                Assert.assertTrue(numBikeBike > 0);
-				Assert.assertEquals(0, numOther);
+                Assertions.assertTrue(numWalkWalk > 0);
+                Assertions.assertTrue(numWalkBike > 0);
+                Assertions.assertTrue(numBikeWalk > 0);
+                Assertions.assertTrue(numBikeBike > 0);
+				Assertions.assertEquals(0, numOther);
 
             }
         }
@@ -702,32 +702,32 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals(5, legs.size());
+        Assertions.assertEquals(5, legs.size());
 
         Leg legBike = (Leg) legs.get(0);
-        Assert.assertEquals("bike", legBike.getMode());
-        Assert.assertEquals("from", legBike.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("bike_B", legBike.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals("bike", legBike.getMode());
+        Assertions.assertEquals("from", legBike.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("bike_B", legBike.getRoute().getEndLinkId().toString());
 
         Leg legTransfer = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.walk, legTransfer.getMode());
-        Assert.assertEquals("bike_B", legTransfer.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legTransfer.getMode());
+        Assertions.assertEquals("bike_B", legTransfer.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
 
         Leg legTransfer2 = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.walk, legTransfer2.getMode());
-        Assert.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("CC", legTransfer2.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legTransfer2.getMode());
+        Assertions.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("CC", legTransfer2.getRoute().getEndLinkId().toString());
 
         Leg legPT = (Leg) legs.get(3);
-        Assert.assertEquals("pt", legPT.getMode());
-        Assert.assertEquals("CC", legPT.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("DD", legPT.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals("pt", legPT.getMode());
+        Assertions.assertEquals("CC", legPT.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("DD", legPT.getRoute().getEndLinkId().toString());
 
         Leg legAccess = (Leg) legs.get(4);
-        Assert.assertEquals(TransportMode.walk, legAccess.getMode());
-        Assert.assertEquals("DD", legAccess.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legAccess.getMode());
+        Assertions.assertEquals("DD", legAccess.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
     }
 
 	/**
@@ -757,22 +757,22 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals(3, legs.size());
+        Assertions.assertEquals(3, legs.size());
 
         Leg legAccess = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.walk, legAccess.getMode());
-        Assert.assertEquals("from", legAccess.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("EE", legAccess.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legAccess.getMode());
+        Assertions.assertEquals("from", legAccess.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("EE", legAccess.getRoute().getEndLinkId().toString());
 
         Leg legPT = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.pt, legPT.getMode());
-        Assert.assertEquals("EE", legPT.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("FF", legPT.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.pt, legPT.getMode());
+        Assertions.assertEquals("EE", legPT.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("FF", legPT.getRoute().getEndLinkId().toString());
 
         Leg legEgress = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.walk, legEgress.getMode());
-        Assert.assertEquals("FF", legEgress.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("to", legEgress.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legEgress.getMode());
+        Assertions.assertEquals("FF", legEgress.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("to", legEgress.getRoute().getEndLinkId().toString());
 
     }
 
@@ -792,32 +792,32 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals(5, legs.size());
+        Assertions.assertEquals(5, legs.size());
 
         Leg legAccess = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.walk, legAccess.getMode());
-        Assert.assertEquals("from", legAccess.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("DD", legAccess.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legAccess.getMode());
+        Assertions.assertEquals("from", legAccess.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("DD", legAccess.getRoute().getEndLinkId().toString());
 
         Leg legPT = (Leg) legs.get(1);
-        Assert.assertEquals("pt", legPT.getMode());
-        Assert.assertEquals("DD", legPT.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("CC", legPT.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals("pt", legPT.getMode());
+        Assertions.assertEquals("DD", legPT.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("CC", legPT.getRoute().getEndLinkId().toString());
 
         Leg legTransfer = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.walk, legTransfer.getMode());
-        Assert.assertEquals("CC", legTransfer.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legTransfer.getMode());
+        Assertions.assertEquals("CC", legTransfer.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
 
         Leg legTransfer2 = (Leg) legs.get(3);
-        Assert.assertEquals(TransportMode.walk, legTransfer2.getMode());
-        Assert.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("bike_B", legTransfer2.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legTransfer2.getMode());
+        Assertions.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("bike_B", legTransfer2.getRoute().getEndLinkId().toString());
 
         Leg legBike = (Leg) legs.get(4);
-        Assert.assertEquals("bike", legBike.getMode());
-        Assert.assertEquals("bike_B", legBike.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("to", legBike.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals("bike", legBike.getMode());
+        Assertions.assertEquals("bike_B", legBike.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("to", legBike.getRoute().getEndLinkId().toString());
     }
 
 	/**
@@ -839,7 +839,7 @@ public class SwissRailRaptorIntermodalTest {
 
         List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7.5 * 3600, f.dummyPerson));
 
-        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+        Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
     }
 
 	/**
@@ -875,27 +875,27 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals(4, legs.size());
+        Assertions.assertEquals(4, legs.size());
 
         Leg legBike = (Leg) legs.get(0);
-        Assert.assertEquals("bike", legBike.getMode());
-        Assert.assertEquals("from", legBike.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("bike_B", legBike.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals("bike", legBike.getMode());
+        Assertions.assertEquals("from", legBike.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("bike_B", legBike.getRoute().getEndLinkId().toString());
 
         Leg legTransfer = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.walk, legTransfer.getMode());
-        Assert.assertEquals("bike_B", legTransfer.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legTransfer.getMode());
+        Assertions.assertEquals("bike_B", legTransfer.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
 
         Leg legTransfer2 = (Leg) legs.get(2);
-        Assert.assertEquals("pt", legTransfer2.getMode());
-        Assert.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("AA", legTransfer2.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals("pt", legTransfer2.getMode());
+        Assertions.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("AA", legTransfer2.getRoute().getEndLinkId().toString());
 
         Leg legAccess = (Leg) legs.get(3);
-        Assert.assertEquals(TransportMode.walk, legAccess.getMode());
-        Assert.assertEquals("AA", legAccess.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
+        Assertions.assertEquals(TransportMode.walk, legAccess.getMode());
+        Assertions.assertEquals("AA", legAccess.getRoute().getStartLinkId().toString());
+        Assertions.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
 
 
         // Part 2: Change bike router to return null.
@@ -916,7 +916,7 @@ public class SwissRailRaptorIntermodalTest {
 
         List<? extends PlanElement> legs2 = raptor2.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson));
 
-        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs2);
+        Assertions.assertNull(legs2, "The router should not find a route and return null, but did return something else.");
     }
 
 	/**
@@ -972,27 +972,27 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals("wrong number of legs.", 5, legs.size());
+        Assertions.assertEquals(5, legs.size(), "wrong number of legs.");
         Leg leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(1);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.pt, leg.getMode());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.pt, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(3);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(4);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
 	@Test
@@ -1082,32 +1082,32 @@ public class SwissRailRaptorIntermodalTest {
         for (PlanElement leg : legs) {
             System.out.println(leg);
         }
-        Assert.assertEquals("wrong number of segments.", 6, legs.size());
+        Assertions.assertEquals(6, legs.size(), "wrong number of segments.");
         Leg leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getEndLinkId());
         Activity act = (Activity)legs.get(1);
-        Assert.assertEquals("bike interaction", act.getType());
-        Assert.assertEquals(1.0, act.getMaximumDuration().seconds(), 0.01);
+        Assertions.assertEquals("bike interaction", act.getType());
+        Assertions.assertEquals(1.0, act.getMaximumDuration().seconds(), 0.01);
         leg = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
         double arrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
         leg = (Leg) legs.get(3);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
         leg = (Leg) legs.get(4);
-        Assert.assertEquals(TransportMode.pt, leg.getMode());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
-        Assert.assertTrue((int)leg.getDepartureTime().seconds() >= (int)arrivalTime );
+        Assertions.assertEquals(TransportMode.pt, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertTrue((int)leg.getDepartureTime().seconds() >= (int)arrivalTime );
         leg = (Leg) legs.get(5);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
 	/**
@@ -1205,36 +1205,36 @@ public class SwissRailRaptorIntermodalTest {
             System.out.println(leg);
         }
 
-        Assert.assertEquals("wrong number of segments.", 9, legs.size());
+        Assertions.assertEquals(9, legs.size(), "wrong number of segments.");
         Leg leg = (Leg) legs.get(0);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getEndLinkId());
         Activity act = (Activity)legs.get(1);
-        Assert.assertEquals("bike interaction", act.getType());
-        Assert.assertEquals(bikeInteractionDuration, act.getMaximumDuration().seconds(), 0.01);
+        Assertions.assertEquals("bike interaction", act.getType());
+        Assertions.assertEquals(bikeInteractionDuration, act.getMaximumDuration().seconds(), 0.01);
         leg = (Leg) legs.get(2);
-        Assert.assertEquals(TransportMode.bike, leg.getMode());
-        Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.bike, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
         act = (Activity)legs.get(3);
-        Assert.assertEquals("pt interaction", act.getType());
+        Assertions.assertEquals("pt interaction", act.getType());
         leg = (Leg) legs.get(4);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
         act = (Activity)legs.get(5);
-        Assert.assertEquals("pt interaction", act.getType());
+        Assertions.assertEquals("pt interaction", act.getType());
         leg = (Leg) legs.get(6);
-        Assert.assertEquals(TransportMode.pt, leg.getMode());
-        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.pt, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
         act = (Activity)legs.get(7);
-        Assert.assertEquals("pt interaction", act.getType());
+        Assertions.assertEquals("pt interaction", act.getType());
         leg = (Leg) legs.get(8);
-        Assert.assertEquals(TransportMode.walk, leg.getMode());
-        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assertions.assertEquals(TransportMode.walk, leg.getMode());
+        Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+        Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
 
 	@Test
@@ -1279,25 +1279,25 @@ public class SwissRailRaptorIntermodalTest {
 			System.out.println(leg);
 		}
 
-		Assert.assertEquals("wrong number of legs.", 5, legs.size());
+		Assertions.assertEquals(5, legs.size(), "wrong number of legs.");
 		Leg	leg = (Leg) legs.get(1);
-		Assert.assertEquals(TransportMode.walk, leg.getMode());
-		Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getEndLinkId());
-		Assert.assertEquals(120.0,leg.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(TransportMode.walk, leg.getMode());
+		Assertions.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getEndLinkId());
+		Assertions.assertEquals(120.0,leg.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 		leg = (Leg) legs.get(2);
-		Assert.assertEquals(TransportMode.pt, leg.getMode());
-		Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+		Assertions.assertEquals(TransportMode.pt, leg.getMode());
+		Assertions.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
 		leg = (Leg) legs.get(3);
-		Assert.assertEquals(TransportMode.walk, leg.getMode());
-		Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
-		Assert.assertEquals(120.0,leg.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(TransportMode.walk, leg.getMode());
+		Assertions.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
+		Assertions.assertEquals(120.0,leg.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 		leg = (Leg) legs.get(4);
-		Assert.assertEquals(TransportMode.bike, leg.getMode());
-		Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+		Assertions.assertEquals(TransportMode.bike, leg.getMode());
+		Assertions.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
 	}
 
 

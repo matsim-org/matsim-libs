@@ -23,7 +23,7 @@ package org.matsim.contrib.signals.controller.sylvia;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -118,12 +118,12 @@ public class SylviaIT {
 		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertEquals("total signal green time of signal group 1 is wrong", 2900, totalSignalGreenTimes.get(signalGroupId1), 50);
-		Assert.assertEquals("total signal green time of signal group 2 is wrong", 2000, totalSignalGreenTimes.get(signalGroupId2), 50);
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 30, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 20, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
+		Assertions.assertEquals(2900, totalSignalGreenTimes.get(signalGroupId1), 50, "total signal green time of signal group 1 is wrong");
+		Assertions.assertEquals(2000, totalSignalGreenTimes.get(signalGroupId2), 50, "total signal green time of signal group 2 is wrong");
+		Assertions.assertEquals(30, avgSignalGreenTimePerCycle.get(signalGroupId1), 1, "avg green time per cycle of signal group 1 is wrong");
+		Assertions.assertEquals(20, avgSignalGreenTimePerCycle.get(signalGroupId2), 1, "avg green time per cycle of signal group 2 is wrong");
 		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
-		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
+		Assertions.assertEquals(60, avgCycleTimePerSystem.get(signalSystemId), 1, "avg cycle time of the system is wrong");
 	}
 
 	/**
@@ -157,12 +157,12 @@ public class SylviaIT {
 		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertEquals("total signal green time of signal group 2 is wrong", 2900, totalSignalGreenTimes.get(signalGroupId2), 50);
-		Assert.assertEquals("total signal green time of signal group 1 is wrong", 2000, totalSignalGreenTimes.get(signalGroupId1), 50);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 30, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 20, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
+		Assertions.assertEquals(2900, totalSignalGreenTimes.get(signalGroupId2), 50, "total signal green time of signal group 2 is wrong");
+		Assertions.assertEquals(2000, totalSignalGreenTimes.get(signalGroupId1), 50, "total signal green time of signal group 1 is wrong");
+		Assertions.assertEquals(30, avgSignalGreenTimePerCycle.get(signalGroupId2), 1, "avg green time per cycle of signal group 2 is wrong");
+		Assertions.assertEquals(20, avgSignalGreenTimePerCycle.get(signalGroupId1), 1, "avg green time per cycle of signal group 1 is wrong");
 		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
-		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
+		Assertions.assertEquals(60, avgCycleTimePerSystem.get(signalSystemId), 1, "avg cycle time of the system is wrong");
 	}
 
 	/**
@@ -184,11 +184,11 @@ public class SylviaIT {
 		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertTrue("total signal green time of group 1 is not bigger than of group 2", totalSignalGreenTimes.get(signalGroupId1) > totalSignalGreenTimes.get(signalGroupId2));
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
+		Assertions.assertTrue(totalSignalGreenTimes.get(signalGroupId1) > totalSignalGreenTimes.get(signalGroupId2), "total signal green time of group 1 is not bigger than of group 2");
+		Assertions.assertEquals(45, avgSignalGreenTimePerCycle.get(signalGroupId1), 5, "avg green time per cycle of signal group 1 is wrong");
+		Assertions.assertEquals(5, avgSignalGreenTimePerCycle.get(signalGroupId2), 5, "avg green time per cycle of signal group 2 is wrong");
 		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
-		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
+		Assertions.assertEquals(60, avgCycleTimePerSystem.get(signalSystemId), 1, "avg cycle time of the system is wrong");
 	}
 
 	private SignalAnalysisTool runScenario(double[] noPersons, int offset) {

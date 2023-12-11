@@ -28,7 +28,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EquiDistAgentSnapshotInfoBuilderTest {
 

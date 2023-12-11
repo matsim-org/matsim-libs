@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -482,17 +482,17 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 
 				final List<Trip> newTrips = TripStructureUtils.getTrips( plan );
 				
-				Assert.assertEquals(
-						"number of trips changed with mode mutation!?",
+				Assertions.assertEquals(
 						initNTrips,
-						newTrips.size());
+						newTrips.size(),
+						"number of trips changed with mode mutation!?");
 
 				final Collection<Subtour> newSubtours = TripStructureUtils.getSubtours( plan );
 
-				Assert.assertEquals(
-						"number of subtours changed with mode mutation!?",
+				Assertions.assertEquals(
 						initSubtours.size(),
-						newSubtours.size());
+						newSubtours.size(),
+						"number of subtours changed with mode mutation!?");
 
 				final List<Subtour> mutated = new ArrayList<Subtour>();
 				for ( Subtour newSubtour : newSubtours ) {
@@ -501,9 +501,9 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 					}
 				}
 
-				Assert.assertFalse(
-						"no mutated subtours",
-						mutated.isEmpty() );
+				Assertions.assertFalse(
+						mutated.isEmpty(),
+						"no mutated subtours" );
 
 				int nMutatedWithoutMutatedFather = 0;
 				for ( Subtour s : mutated ) {
@@ -512,17 +512,17 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 					}
 
 					for ( Trip t : s.getTrips() ) {
-						Assert.assertEquals(
-								"unexpected mutated trip length",
+						Assertions.assertEquals(
 								1,
-								t.getTripElements().size());
+								t.getTripElements().size(),
+								"unexpected mutated trip length");
 					}
 				}
 
-				Assert.assertEquals(
-						"unexpected number of roots in mutated subtours",
+				Assertions.assertEquals(
 						1,
-						nMutatedWithoutMutatedFather);
+						nMutatedWithoutMutatedFather,
+						"unexpected number of roots in mutated subtours");
 			}
 		}
 	}

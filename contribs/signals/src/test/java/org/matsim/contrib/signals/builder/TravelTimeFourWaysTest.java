@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.signals.builder;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -125,7 +125,7 @@ public class TravelTimeFourWaysTest {
 
 		eventsXmlWriter.closeFile();
 //	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
 	}
 
 }

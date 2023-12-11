@@ -20,7 +20,7 @@
 
 package org.matsim.households;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -42,10 +42,10 @@ public class HouseholdImplTest {
 		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
 		Household hh2 = new HouseholdImpl(Id.create("1", Household.class));
 
-		assertEquals("Shouldn't have a household.", 0, hhs.getHouseholds().size());
+		assertEquals(0, hhs.getHouseholds().size(), "Shouldn't have a household.");
 		hhs.addHousehold(hh1);
-		assertEquals("Didn't add the household.", 1, hhs.getHouseholds().size());
-		assertEquals("Should have added the household.", hh1, hhs.getHouseholds().get(hh1.getId()));
+		assertEquals(1, hhs.getHouseholds().size(), "Didn't add the household.");
+		assertEquals(hh1, hhs.getHouseholds().get(hh1.getId()), "Should have added the household.");
 		try{
 			hhs.addHousehold(hh2);
 			fail("Should not have accepted household with similar Id.");
@@ -64,12 +64,12 @@ public class HouseholdImplTest {
 		Household hh2 = new HouseholdImpl(Id.create("2", Household.class));
 
 		hhs.addHousehold(hh1);
-		assertEquals("Should have the first household added.", 1, hhs.getHouseholds().size());
-		assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));
+		assertEquals(1, hhs.getHouseholds().size(), "Should have the first household added.");
+		assertTrue(hhs.getHouseholds().containsValue(hh1), "First household not present.");
 		hhs.addHousehold(hh2);
-		assertEquals("Should have the first AND second household added.", 2, hhs.getHouseholds().size());
-		assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));
-		assertTrue("Second household not present.", hhs.getHouseholds().containsValue(hh2));
+		assertEquals(2, hhs.getHouseholds().size(), "Should have the first AND second household added.");
+		assertTrue(hhs.getHouseholds().containsValue(hh1), "First household not present.");
+		assertTrue(hhs.getHouseholds().containsValue(hh2), "Second household not present.");
 	}
 
 }

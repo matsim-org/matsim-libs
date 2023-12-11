@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.Optional;

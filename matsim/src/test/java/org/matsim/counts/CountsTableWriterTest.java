@@ -20,12 +20,12 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;

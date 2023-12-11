@@ -3,7 +3,7 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -92,11 +92,11 @@ public class VehId2DelayAtStopMapTest {
 
 //        testing if first and last entries match
 
-		Assert.assertEquals(data.get(vehId1).getFirst().toString(), testMap.getVehId2DelayAtStopMap().get(vehId1).getFirst().toString());
-		Assert.assertEquals(data.get(vehId2).getFirst().toString(), testMap.getVehId2DelayAtStopMap().get(vehId2).getFirst().toString());
+		Assertions.assertEquals(data.get(vehId1).getFirst().toString(), testMap.getVehId2DelayAtStopMap().get(vehId1).getFirst().toString());
+		Assertions.assertEquals(data.get(vehId2).getFirst().toString(), testMap.getVehId2DelayAtStopMap().get(vehId2).getFirst().toString());
 
-		Assert.assertEquals(data.get(vehId1).getLast().toString(), testMap.getVehId2DelayAtStopMap().get(vehId1).getLast().toString());
-		Assert.assertEquals(data.get(vehId2).getLast().toString(), testMap.getVehId2DelayAtStopMap().get(vehId2).getLast().toString());
+		Assertions.assertEquals(data.get(vehId1).getLast().toString(), testMap.getVehId2DelayAtStopMap().get(vehId1).getLast().toString());
+		Assertions.assertEquals(data.get(vehId2).getLast().toString(), testMap.getVehId2DelayAtStopMap().get(vehId2).getLast().toString());
 
 
 	}

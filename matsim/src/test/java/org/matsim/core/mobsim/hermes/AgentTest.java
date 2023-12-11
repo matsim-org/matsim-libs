@@ -19,9 +19,10 @@
 
 package org.matsim.core.mobsim.hermes;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.util.Assert;
-import static org.junit.Assert.assertEquals;
 
 public class AgentTest {
 

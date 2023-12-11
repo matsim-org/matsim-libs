@@ -21,8 +21,8 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -142,11 +142,11 @@ public class GroupCompositionPenalizerTest {
 		eventsToScore.finish();
 
 		final double score = penalizer.getScore();
-		Assert.assertEquals(
-				"unexpected score",
+		Assertions.assertEquals(
 				calcExpectedScore( times1[ 0 ] , times1[ times1.length - 1 ] , times2[ 0 ] , times2[ times2.length - 1 ]),
 				score,
-				1E-9 );
+				1E-9,
+				"unexpected score" );
 	}
 
 	private double calcExpectedScore( final double start1, final double end1, final double start2, final double end2 ) {

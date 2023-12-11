@@ -21,13 +21,13 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

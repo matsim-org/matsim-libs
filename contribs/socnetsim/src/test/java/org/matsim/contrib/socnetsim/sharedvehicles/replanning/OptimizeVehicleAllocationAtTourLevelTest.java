@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -137,9 +137,9 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 						false,
 						false).run( randomized );
 				 final double randomizedOverlap = algo.calcOverlap( randomized );
-				 Assert.assertTrue(
-						 "["+i+","+j+"] found better solution than optimized one: "+randomizedOverlap+" < "+optimizedOverlap,
-						 optimizedOverlap <= randomizedOverlap );
+				 Assertions.assertTrue(
+						 optimizedOverlap <= randomizedOverlap,
+						 "["+i+","+j+"] found better solution than optimized one: "+randomizedOverlap+" < "+optimizedOverlap );
 			}
 			counter.printCounter();
 		}

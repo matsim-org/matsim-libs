@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.controler.Controler;
@@ -58,13 +58,13 @@ public class SBBTransitQSimEngineIntegrationTest {
         controler.run();
 
         Mobsim mobsim = controler.getInjector().getInstance(Mobsim.class);
-        Assert.assertNotNull(mobsim);
-        Assert.assertEquals(QSim.class, mobsim.getClass());
+        Assertions.assertNotNull(mobsim);
+        Assertions.assertEquals(QSim.class, mobsim.getClass());
 
         QSim qsim = (QSim) mobsim;
         QSimComponentsConfig components = qsim.getChildInjector().getInstance(QSimComponentsConfig.class);
-        Assert.assertTrue(components.hasNamedComponent(SBBTransitEngineQSimModule.COMPONENT_NAME));
-        Assert.assertFalse(components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME));
+        Assertions.assertTrue(components.hasNamedComponent(SBBTransitEngineQSimModule.COMPONENT_NAME));
+        Assertions.assertFalse(components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME));
     }
 
 	@Test
@@ -86,9 +86,9 @@ public class SBBTransitQSimEngineIntegrationTest {
 
         try {
             controler.run();
-            Assert.fail("Expected exception, got none.");
+            Assertions.fail("Expected exception, got none.");
         } catch (RuntimeException e) {
-            Assert.assertTrue(e.getMessage().endsWith("This will not work! common modes = train"));
+            Assertions.assertTrue(e.getMessage().endsWith("This will not work! common modes = train"));
         }
     }
 

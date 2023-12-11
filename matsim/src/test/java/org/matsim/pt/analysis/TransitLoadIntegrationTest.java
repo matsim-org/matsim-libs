@@ -19,7 +19,7 @@
 
 package org.matsim.pt.analysis;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -71,6 +71,6 @@ public class TransitLoadIntegrationTest {
 		Departure departure = route.getDepartures().get(Id.create("07", Departure.class));
 		int load = transitload.getLoadAtDeparture(line, route, stopFacility, departure);
 
-		Assert.assertEquals("wrong number of passengers.", 4, load);
+		Assertions.assertEquals(4, load, "wrong number of passengers.");
 	}
 }

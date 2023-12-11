@@ -22,7 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -119,7 +119,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
 
 		String message = "The expected emissions for " + testCase1.toString() + " are " + pollutants.size() * (Double) testCase1.get(4) + " but were " + sumOfEmissions;
-		Assert.assertEquals(message, pollutants.size() * (Double) testCase1.get(4), sumOfEmissions, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(pollutants.size() * (Double) testCase1.get(4), sumOfEmissions, MatsimTestUtils.EPSILON, message);
 	}
 
 	private static ColdEmissionAnalysisModule setUp() {

@@ -27,7 +27,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -77,7 +77,7 @@ public class IntegrationIT {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
 		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
-		Assert.assertEquals("The score of both runs are not the same", scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 	}
 
 	private static double generateCarrierPlans(Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes) {

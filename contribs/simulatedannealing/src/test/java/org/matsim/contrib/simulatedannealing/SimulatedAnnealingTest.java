@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.contrib.simulatedannealing.acceptor.Acceptor;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
@@ -62,7 +62,7 @@ public class SimulatedAnnealingTest {
 			simulatedAnnealing.notifyAfterMobsim(new AfterMobsimEvent(null, i, false));
 		}
 
-		Assert.assertEquals("matsim", simulatedAnnealing.getCurrentState().get().accepted().get());
+		Assertions.assertEquals("matsim", simulatedAnnealing.getCurrentState().get().accepted().get());
 	}
 
 	private PerturbatorFactory<String> perturbatorFactory() {

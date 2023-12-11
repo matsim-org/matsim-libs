@@ -20,7 +20,7 @@ package org.matsim.core.utils.misc;
 
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -58,11 +58,11 @@ public class PopulationUtilsTest {
 		List<Leg> legs3 = PopulationUtils.getLegs(f.plan3);
 
 //		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
-		Assert.assertEquals( 4., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
+		Assertions.assertEquals( 4., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
 		// (no route is now counted as "same route" and thus reaps the reward. kai, jul'18)
 
 //		Assert.assertEquals( 1., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
-		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+		Assertions.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
 		// (no route is now counted as "same route" and thus reaps the reward. kai, jul'18)
 
 	}
@@ -74,8 +74,8 @@ public class PopulationUtilsTest {
 		List<Activity> acts2 = PopulationUtils.getActivities(f.plan2, StageActivityHandling.StagesAsNormalActivities ) ;
 		List<Activity> acts3 = PopulationUtils.getActivities(f.plan3, StageActivityHandling.StagesAsNormalActivities ) ;
 
-		Assert.assertEquals( 6., PopulationUtils.calculateSimilarity( acts1, acts2 , 1., 1., 0. ) , 0.001 ) ;
-		Assert.assertEquals( 5., PopulationUtils.calculateSimilarity( acts1, acts3 , 1., 1., 0. ) , 0.001 ) ;
+		Assertions.assertEquals( 6., PopulationUtils.calculateSimilarity( acts1, acts2 , 1., 1., 0. ) , 0.001 ) ;
+		Assertions.assertEquals( 5., PopulationUtils.calculateSimilarity( acts1, acts3 , 1., 1., 0. ) , 0.001 ) ;
 	}
 
 	private static class Fixture {
@@ -153,7 +153,7 @@ public class PopulationUtilsTest {
 	void testEmptyPopulation() {
 		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
+		Assertions.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
 	}
 
 	@Test
@@ -162,8 +162,8 @@ public class PopulationUtilsTest {
 		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Person person = s2.getPopulation().getFactory().createPerson(Id.create("1", Person.class));
 		s2.getPopulation().addPerson(person);
-		Assert.assertFalse(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
-		Assert.assertFalse(PopulationUtils.equalPopulation(s2.getPopulation(), s1.getPopulation()));
+		Assertions.assertFalse(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
+		Assertions.assertFalse(PopulationUtils.equalPopulation(s2.getPopulation(), s1.getPopulation()));
 	}
 
 	@Test
@@ -173,7 +173,7 @@ public class PopulationUtilsTest {
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		new MatsimNetworkReader(s1.getNetwork()).readFile(netFileName);
 		new PopulationReader(s1).readFile(popFileName);
-		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s1.getPopulation()));
+		Assertions.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s1.getPopulation()));
 	}
 
 }

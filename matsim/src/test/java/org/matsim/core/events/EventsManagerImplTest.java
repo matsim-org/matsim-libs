@@ -21,7 +21,7 @@ package org.matsim.core.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,7 +45,7 @@ public class EventsManagerImplTest {
 		manager.initProcessing();
 		manager.processEvent(new MyEvent(123.45));
 		manager.finishProcessing();
-		Assert.assertEquals("EventHandler was not called.", 1, handler.counter);
+		Assertions.assertEquals(1, handler.counter, "EventHandler was not called.");
 	}
 
 	/**
@@ -60,12 +60,12 @@ public class EventsManagerImplTest {
 		try {
 			manager.processEvent(new MyEvent(123.45));
 			manager.finishProcessing();
-			Assert.fail("expected exception, but got none.");
+			Assertions.fail("expected exception, but got none.");
 		} catch (final RuntimeException e) {
 			log.info("Catched expected exception.", e);
 
-			Assert.assertEquals(1, handler.counter);
-			Assert.assertTrue(e.getCause() instanceof ArithmeticException);
+			Assertions.assertEquals(1, handler.counter);
+			Assertions.assertTrue(e.getCause() instanceof ArithmeticException);
 		}
 	}
 

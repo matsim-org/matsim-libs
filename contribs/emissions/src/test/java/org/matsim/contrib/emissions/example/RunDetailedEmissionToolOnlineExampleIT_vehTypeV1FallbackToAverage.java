@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -27,8 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author nagel

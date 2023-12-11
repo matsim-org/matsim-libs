@@ -20,7 +20,7 @@
 
 package org.matsim.core.network.io;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 import java.util.Stack;
@@ -53,14 +53,14 @@ public class NetworkReaderMatsimV1Test {
 	void testAllowedModes_singleMode() {
 		Link link = prepareTestAllowedModes("car");
 		Set<String> modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 1, modes.size());
-		assertTrue("wrong mode.", modes.contains(TransportMode.car));
+		assertEquals(1, modes.size(), "wrong number of allowed modes.");
+		assertTrue(modes.contains(TransportMode.car), "wrong mode.");
 
 		// make sure we do not just get some default-value back...
 		link = prepareTestAllowedModes("bike");
 		modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 1, modes.size());
-		assertTrue("wrong mode.", modes.contains(TransportMode.bike));
+		assertEquals(1, modes.size(), "wrong number of allowed modes.");
+		assertTrue(modes.contains(TransportMode.bike), "wrong mode.");
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class NetworkReaderMatsimV1Test {
 	void testAllowedModes_emptyMode() {
 		Link link = prepareTestAllowedModes("");
 		Set<String> modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 0, modes.size());
+		assertEquals(0, modes.size(), "wrong number of allowed modes.");
 	}
 
 	/**
@@ -80,22 +80,22 @@ public class NetworkReaderMatsimV1Test {
 	void testAllowedModes_multipleModes() {
 		Link link = prepareTestAllowedModes("car,bus");
 		Set<String> modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 2, modes.size());
-		assertTrue("wrong mode.", modes.contains(TransportMode.car));
-		assertTrue("wrong mode.", modes.contains("bus"));
+		assertEquals(2, modes.size(), "wrong number of allowed modes.");
+		assertTrue(modes.contains(TransportMode.car), "wrong mode.");
+		assertTrue(modes.contains("bus"), "wrong mode.");
 
 		link = prepareTestAllowedModes("bike,bus,walk");
 		modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 3, modes.size());
-		assertTrue("wrong mode.", modes.contains(TransportMode.bike));
-		assertTrue("wrong mode.", modes.contains("bus"));
-		assertTrue("wrong mode.", modes.contains(TransportMode.walk));
+		assertEquals(3, modes.size(), "wrong number of allowed modes.");
+		assertTrue(modes.contains(TransportMode.bike), "wrong mode.");
+		assertTrue(modes.contains("bus"), "wrong mode.");
+		assertTrue(modes.contains(TransportMode.walk), "wrong mode.");
 
 		link = prepareTestAllowedModes("pt, train"); // test with space after comma
 		modes = link.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 2, modes.size());
-		assertTrue("wrong mode.", modes.contains(TransportMode.pt));
-		assertTrue("wrong mode.", modes.contains("train"));
+		assertEquals(2, modes.size(), "wrong number of allowed modes.");
+		assertTrue(modes.contains(TransportMode.pt), "wrong mode.");
+		assertTrue(modes.contains("train"), "wrong mode.");
 	}
 
 	/**
@@ -131,9 +131,9 @@ public class NetworkReaderMatsimV1Test {
 		reader.startTag("link", atts, context);
 
 		// start test
-		assertEquals("expected one link.", 1, network.getLinks().size());
+		assertEquals(1, network.getLinks().size(), "expected one link.");
 		Link link = network.getLinks().get(Id.create("1", Link.class));
-		assertNotNull("expected link with id=1.", link);
+		assertNotNull(link, "expected link with id=1.");
 
 		return link;
 	}

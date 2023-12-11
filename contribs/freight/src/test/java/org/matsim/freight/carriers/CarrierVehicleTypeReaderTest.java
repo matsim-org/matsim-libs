@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CarrierVehicleTypeReaderTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;

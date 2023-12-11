@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.population.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,13 +141,13 @@ public class PermissibleModesCalculatorImplTest {
 			final List<String> expected,
 			final Collection<String> actual) {
 		assertEquals(
-				expected+" and "+actual+" have incompatible sizes for fixture "+fixtureName,
 				expected.size(),
-				actual.size());
+				actual.size(),
+				expected+" and "+actual+" have incompatible sizes for fixture "+fixtureName);
 
 		assertTrue(
-				expected+" and "+actual+" are not compatible for fixture "+fixtureName,
-				expected.containsAll( actual ));
+				expected.containsAll( actual ),
+				expected+" and "+actual+" are not compatible for fixture "+fixtureName);
 	}
 }
 

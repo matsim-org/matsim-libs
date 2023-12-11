@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -44,8 +46,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -402,9 +402,9 @@ public class RandomSelectorsTest {
 						jointPlans , group );
 				if (previous != null) {
 					assertEquals(
-							"different results with the same random seed",
 							previous,
-							selected);
+							selected,
+							"different results with the same random seed");
 				}
 
 				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
@@ -432,9 +432,9 @@ public class RandomSelectorsTest {
 
 				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
 
-				Assert.assertEquals( "unexpected selected plan size" ,
-						selected.getAllIndividualPlans().size(),
-						group.getPersons().size() );
+				Assertions.assertEquals( selected.getAllIndividualPlans().size(),
+						group.getPersons().size(),
+						"unexpected selected plan size" );
 			}
 		}
 		groupCount.printCounter();

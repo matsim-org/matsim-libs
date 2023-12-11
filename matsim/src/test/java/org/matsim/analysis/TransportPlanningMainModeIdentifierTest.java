@@ -6,7 +6,7 @@ package org.matsim.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
@@ -98,6 +98,6 @@ public class TransportPlanningMainModeIdentifierTest {
 
 	private void validateValues(Plan plan, String mainMode) {
 		String mainModeIdentified = identifyMainMode(plan.getPlanElements());
-		Assert.assertEquals(mainModeIdentified, mainMode);
+		Assertions.assertEquals(mainModeIdentified, mainMode);
 	}
 }

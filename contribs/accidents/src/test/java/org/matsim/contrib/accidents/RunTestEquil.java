@@ -2,7 +2,8 @@ package org.matsim.contrib.accidents;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import org.junit.Assert;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -88,7 +89,7 @@ public class RunTestEquil {
 					int agents = 100;
 					int lengthKM = 35;
 					double accidentCostsManualCalculation = (agents  * lengthKM  * 61.785) / 1000. * 10;
-					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+					Assertions.assertEquals(accidentCostsManualCalculation, accidentCosts , 0.01, "wrong accident costs");
 				}
 				// link 1
 				if (lineCounter == 11 && column == 121) {
@@ -96,7 +97,7 @@ public class RunTestEquil {
 					int agents = 100;
 					int lengthKM = 10;
 					double accidentCostsManualCalculation = (agents  * lengthKM  * 61.785) / 1000. * 10;
-					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+					Assertions.assertEquals(accidentCostsManualCalculation, accidentCosts , 0.01, "wrong accident costs");
 				}
 
 				//  link 6
@@ -105,7 +106,7 @@ public class RunTestEquil {
 					int agents = 100;
 					int lengthKM = 10;
 					double accidentCostsManualCalculation = (agents  * lengthKM  * 34.735) / 1000. * 10;
-					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+					Assertions.assertEquals(accidentCostsManualCalculation, accidentCosts , 0.01, "wrong accident costs");
 				}
 
 				//  link 15
@@ -114,7 +115,7 @@ public class RunTestEquil {
 					int agents = 100;
 					int lengthKM = 5;
 					double accidentCostsManualCalculation = (agents  * lengthKM  * 31.63) / 1000. * 10;
-					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+					Assertions.assertEquals(accidentCostsManualCalculation, accidentCosts , 0.01, "wrong accident costs");
 				}
 			}
 

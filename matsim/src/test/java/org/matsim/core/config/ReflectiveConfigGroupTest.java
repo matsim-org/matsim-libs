@@ -31,8 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -363,7 +362,7 @@ public class ReflectiveConfigGroupTest {
 		final String param = "my unknown param";
 		final String value = "my val";
 		testee.addParam(param, value);
-		Assert.assertEquals("unexpected stored value", value, testee.getValue(param));
+		Assertions.assertEquals(value, testee.getValue(param), "unexpected stored value");
 	}
 
 	@Test

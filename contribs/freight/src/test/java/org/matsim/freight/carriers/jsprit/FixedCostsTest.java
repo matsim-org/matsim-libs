@@ -29,8 +29,8 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -188,7 +188,7 @@ public class FixedCostsTest  {
 	@Test
 	final void test_carrier1CostsAreCorrectly() {
 
-		Assert.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	/*
@@ -196,7 +196,7 @@ public class FixedCostsTest  {
 	 */
 	@Test
 	final void test_carrier2CostsAreCorrectly() {
-		Assert.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	/*
@@ -205,7 +205,7 @@ public class FixedCostsTest  {
 	*/
 	@Test
 	final void test_carrier3CostsAreCorrectly() {
-		Assert.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	private static CarrierService createMatsimService(String id, String to, int size) {

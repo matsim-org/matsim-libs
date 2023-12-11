@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -794,18 +794,16 @@ public class TripStructureUtilsSubtoursTest {
 			TripStructureUtils.getSubtours( fixture.plan );
 
 		assertEquals(
-				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
-				"unexpected number of subtours in "+subtours,
 				fixture.expectedSubtours.size(),
-				subtours.size() );
+				subtours.size(),
+				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
+				"unexpected number of subtours in "+subtours );
 
 		assertEquals(
-				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
-				"uncompatible subtours",
-				// do not bother about iteration order,
-				// but ensure you get some information on failure
 				new HashSet<Subtour>( fixture.expectedSubtours ),
-				new HashSet<Subtour>( subtours ) );
+				new HashSet<Subtour>( subtours ),
+				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
+				"uncompatible subtours" );
 	}
 
 	@Test
@@ -820,9 +818,9 @@ public class TripStructureUtilsSubtoursTest {
 		}
 
 		assertTrue(
+				hadException,
 				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
-				"no exception was thrown!",
-				hadException);
+				"no exception was thrown!");
 	}
 
 	@Test
@@ -838,10 +836,10 @@ public class TripStructureUtilsSubtoursTest {
 			}
 
 			assertEquals(
-					"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
-					"unexpected total number of trips in subtours without subsubtours",
 					countTrips,
-					nTrips);
+					nTrips,
+					"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
+					"unexpected total number of trips in subtours without subsubtours");
 		}
 	}
 
@@ -853,17 +851,17 @@ public class TripStructureUtilsSubtoursTest {
 			for (Subtour s : subtours) {
 				for ( Subtour child : s.getChildren() ) {
 					assertEquals(
-							"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
-							"wrong father!",
 							child.getParent(),
-							s);
+							s,
+							"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
+							"wrong father!");
 				}
 
 				if ( s.getParent() != null ) {
 					assertTrue(
+							s.getParent().getChildren().contains( s ),
 							"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
-							"father does not have subtour has a child",
-							s.getParent().getChildren().contains( s ));
+							"father does not have subtour has a child");
 				}
 			}
 		}

@@ -20,7 +20,7 @@
 
 package org.matsim.core.scoring;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -65,7 +65,7 @@ public class EventsToScoreTest {
 		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator"));
 		events.finishProcessing();
 		e2s.finish();
-		Assert.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
+		Assertions.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
 	}
 
 	@Test
@@ -105,53 +105,53 @@ public class EventsToScoreTest {
 
 			switch(mockIteration){
 			case 99:
-				Assert.assertEquals(1.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(1.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 100:
 				// first MSA iteration; plain score should be ok:
-				Assert.assertEquals(2.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(2.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 101:
 				// second MSA iteration
 				// (2+3)/2 = 2.5
-				Assert.assertEquals(2.5, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(2.5, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 102:
 				// 3rd MSA iteration
 				// (2+3+4)/3 = 3
-				Assert.assertEquals(3.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(3.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 103:
 				// (2+3+4+5)/4 = 3.5
-				Assert.assertEquals(3.5, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(3.5, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 104:
 				// 3rd MSA iteration
-				Assert.assertEquals(4.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(4.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 105:
 				// 3rd MSA iteration
-				Assert.assertEquals(4.5, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(4.5, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 106:
 				// 3rd MSA iteration
-				Assert.assertEquals(5.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(5.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 107:
 				// 3rd MSA iteration
-				Assert.assertEquals(5.5, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(5.5, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 108:
 				// 3rd MSA iteration
-				Assert.assertEquals(6.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(6.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 109:
 				// 3rd MSA iteration
-				Assert.assertEquals(6.5, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(6.5, person.getSelectedPlan().getScore(), 0);
 				break ;
 			case 110:
 				// 3rd MSA iteration
-				Assert.assertEquals(7.0, person.getSelectedPlan().getScore(), 0);
+				Assertions.assertEquals(7.0, person.getSelectedPlan().getScore(), 0);
 				break ;
 			}
 

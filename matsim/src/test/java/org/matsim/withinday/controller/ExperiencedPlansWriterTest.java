@@ -22,7 +22,7 @@ package org.matsim.withinday.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -124,7 +124,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		 */
 		File file = new File(this.utils.getOutputDirectory() + "/ITERS/it.0/0." +
 				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
-		Assert.assertTrue(file.exists());
+		Assertions.assertTrue(file.exists());
 
 		Config experiencedConfig = ConfigUtils.createConfig();
 		experiencedConfig.plans().setInputFile(this.utils.getOutputDirectory() + "/ITERS/it.0/0." +
@@ -139,10 +139,10 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		Leg leg02 = (Leg) p02.getSelectedPlan().getPlanElements().get(1);
 
 		// expect leg from p01 to be unchanged
-		Assert.assertEquals(1, ((NetworkRoute) leg01.getRoute()).getLinkIds().size());
+		Assertions.assertEquals(1, ((NetworkRoute) leg01.getRoute()).getLinkIds().size());
 
 		// expect leg from p02 to be adapted
-		Assert.assertEquals(3, ((NetworkRoute) leg02.getRoute()).getLinkIds().size());
+		Assertions.assertEquals(3, ((NetworkRoute) leg02.getRoute()).getLinkIds().size());
 	}
 
 	private static class WriterInitializer implements StartupListener {

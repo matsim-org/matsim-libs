@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.accessibility.logsumComputations;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -73,7 +73,7 @@ public class CompareLogsumFormulasTest {
 		double Ai = computeLogsum(betaWalkTT, betaWalkTD, cik1TT, cik2TT, cik3TT, cik1TD, cik2TD, cik3TD);
 		double Ai2 =computeTransformedLogsum(betaWalkTT, betaWalkTD, cijTT, cjk1TT, cjk2TT, cjk3TT, cijTD, cjk1TD, cjk2TD, cjk3TD);
 
-		Assert.assertTrue( Ai == Ai2 );
+		Assertions.assertTrue( Ai == Ai2 );
 	}
 
 	/**

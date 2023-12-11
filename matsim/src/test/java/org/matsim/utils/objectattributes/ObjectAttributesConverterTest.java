@@ -21,7 +21,7 @@
 
  package org.matsim.utils.objectattributes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Month;
@@ -30,10 +30,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
- /**
+	/**
  * @author thibautd
  */
 public class ObjectAttributesConverterTest {
@@ -45,14 +45,14 @@ public class ObjectAttributesConverterTest {
 		// And is thus unavailable to the ObjectAttributesConverter
 		// So use something from the standard library, as there is no way this goes away
 		String converted = converter.convertToString(Month.JANUARY);
-		Assert.assertEquals("unexpected string converted from enum value", "JANUARY", converted);
+		Assertions.assertEquals("JANUARY", converted, "unexpected string converted from enum value");
 	}
 
 	 @Test
 	 void testStringToEnum() {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
-		Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
+		Assertions.assertEquals(Month.JANUARY, converted, "unexpected enum converted from String value");
 	}
 
 	 @Test

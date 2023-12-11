@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +52,7 @@ public class CarrierPlanReaderV1Test {
 		Carriers carriers = new Carriers();
 		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		Assert.assertEquals(1, carriers.getCarriers().size());
+		Assertions.assertEquals(1, carriers.getCarriers().size());
 	}
 
 	@Test
@@ -66,18 +66,18 @@ public class CarrierPlanReaderV1Test {
 		Carriers carriers = new Carriers();
 		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		Assert.assertEquals(1, carriers.getCarriers().size());
+		Assertions.assertEquals(1, carriers.getCarriers().size());
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
-		Assert.assertEquals(1, carrier.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1, carrier.getSelectedPlan().getScheduledTours().size());
 		Leg leg = (Leg) carrier.getSelectedPlan().getScheduledTours()
 				.iterator().next().getTour().getTourElements().get(0);
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals("23", route.getStartLinkId().toString());
-		Assert.assertEquals("2", route.getLinkIds().get(0).toString());
-		Assert.assertEquals("3", route.getLinkIds().get(1).toString());
-		Assert.assertEquals("4", route.getLinkIds().get(2).toString());
-		Assert.assertEquals("15", route.getEndLinkId().toString());
+		Assertions.assertEquals(3, route.getLinkIds().size());
+		Assertions.assertEquals("23", route.getStartLinkId().toString());
+		Assertions.assertEquals("2", route.getLinkIds().get(0).toString());
+		Assertions.assertEquals("3", route.getLinkIds().get(1).toString());
+		Assertions.assertEquals("4", route.getLinkIds().get(2).toString());
+		Assertions.assertEquals("15", route.getEndLinkId().toString());
 	}
 
 	@Test
@@ -92,9 +92,9 @@ public class CarrierPlanReaderV1Test {
 		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
-		Assert.assertNotNull(carrier.getSelectedPlan());
-		Assert.assertEquals(-100.0, carrier.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2,carrier.getPlans().size());
+		Assertions.assertNotNull(carrier.getSelectedPlan());
+		Assertions.assertEquals(-100.0, carrier.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2,carrier.getPlans().size());
 	}
 
 	@Test
@@ -109,8 +109,8 @@ public class CarrierPlanReaderV1Test {
 		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils_unscored_unselected.xml");
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
-		Assert.assertNull(carrier.getSelectedPlan());
-		Assert.assertEquals(2,carrier.getPlans().size());
+		Assertions.assertNull(carrier.getSelectedPlan());
+		Assertions.assertEquals(2,carrier.getPlans().size());
 	}
 
 }

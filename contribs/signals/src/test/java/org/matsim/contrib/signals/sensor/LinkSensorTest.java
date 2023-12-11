@@ -1,9 +1,9 @@
 package org.matsim.contrib.signals.sensor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -155,7 +155,7 @@ public class LinkSensorTest {
 		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
 		LinkSensor sensor = new LinkSensor(link);
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(0, numberOfCars);
+		Assertions.assertEquals(0, numberOfCars);
 		
 		Id<Person> agId2 = Id.createPersonId(2);
 		Id<Vehicle> vehId1 = Id.create(1, Vehicle.class);
@@ -164,7 +164,7 @@ public class LinkSensorTest {
 		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, vehId1, link.getId());
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(1, numberOfCars);
+		Assertions.assertEquals(1, numberOfCars);
 		//expect NullPointerException as feature is still switched of
 		NullPointerException e = null;
 		try {
@@ -173,32 +173,32 @@ public class LinkSensorTest {
 		catch (NullPointerException ex){
 			e = ex;
 		}
-		Assert.assertNotNull(e);
+		Assertions.assertNotNull(e);
 
 		LinkEnterEvent enterEvent2 = new LinkEnterEvent(10.0, vehId2, link.getId());
 		sensor.handleEvent(enterEvent2);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(2, numberOfCars);
+		Assertions.assertEquals(2, numberOfCars);
 		
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, vehId1, link.getId());
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(1, numberOfCars);
+		Assertions.assertEquals(1, numberOfCars);
 		
 		VehicleLeavesTrafficEvent link2WaitEvent = new VehicleLeavesTrafficEvent(110.0, agId2, link.getId(), vehId2, TransportMode.car, 1.0);
 		sensor.handleEvent(link2WaitEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(0, numberOfCars);
+		Assertions.assertEquals(0, numberOfCars);
 		
 		PersonEntersVehicleEvent enterVehEvent = new PersonEntersVehicleEvent(120., agId2, vehId2);
 		sensor.handleEvent(enterVehEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(1, numberOfCars);
+		Assertions.assertEquals(1, numberOfCars);
 
 		leaveEvent = new LinkLeaveEvent(120.0, vehId2, link.getId());
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(0, numberOfCars);
+		Assertions.assertEquals(0, numberOfCars);
 	}
 
 	@Test
@@ -208,9 +208,9 @@ public class LinkSensorTest {
 		LinkSensor sensor = new LinkSensor(link);
 		sensor.registerDistanceToMonitor(100.0);
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(0, numberOfCars);
+		Assertions.assertEquals(0, numberOfCars);
 		int numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 0.0);
-		Assert.assertEquals(0, numberOfCarsInDistance);
+		Assertions.assertEquals(0, numberOfCarsInDistance);
 		
 		Id<Person> agId2 = Id.createPersonId(2);
 		Id<Vehicle> vehId1 = Id.create(1, Vehicle.class);
@@ -219,12 +219,12 @@ public class LinkSensorTest {
 		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, vehId1, link.getId());
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(1, numberOfCars);
+		Assertions.assertEquals(1, numberOfCars);
 
 		enterEvent = new LinkEnterEvent(1.0, vehId2, link.getId());
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
-		Assert.assertEquals(2, numberOfCars);
+		Assertions.assertEquals(2, numberOfCars);
 
 		//expect NullPointerException as feature is not switched on for distance 500.0 m
 		NullPointerException e = null;
@@ -234,43 +234,43 @@ public class LinkSensorTest {
 		catch (NullPointerException ex){
 			e = ex;
 		}
-		Assert.assertNotNull(e);
+		Assertions.assertNotNull(e);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 10.0);
-		Assert.assertEquals(0, numberOfCarsInDistance);
+		Assertions.assertEquals(0, numberOfCarsInDistance);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 83.0);
-		Assert.assertEquals(0, numberOfCarsInDistance);
+		Assertions.assertEquals(0, numberOfCarsInDistance);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 84.0);
-		Assert.assertEquals(1, numberOfCarsInDistance);
+		Assertions.assertEquals(1, numberOfCarsInDistance);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 85.0);
-		Assert.assertEquals(2, numberOfCarsInDistance);
+		Assertions.assertEquals(2, numberOfCarsInDistance);
 		
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, vehId1, link.getId());
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 100.0);
-		Assert.assertEquals(1, numberOfCarsInDistance);
+		Assertions.assertEquals(1, numberOfCarsInDistance);
 		
 		VehicleLeavesTrafficEvent link2WaitEvent = new VehicleLeavesTrafficEvent(101.0, agId2, link.getId(), vehId2, TransportMode.car, 1.0);
 		sensor.handleEvent(link2WaitEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);
-		Assert.assertEquals(0, numberOfCarsInDistance);
+		Assertions.assertEquals(0, numberOfCarsInDistance);
 		
 		PersonEntersVehicleEvent enterVehEvent = new PersonEntersVehicleEvent(120., agId2, vehId2);
 		sensor.handleEvent(enterVehEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);
-		Assert.assertEquals(1, numberOfCarsInDistance);
+		Assertions.assertEquals(1, numberOfCarsInDistance);
 
 		leaveEvent = new LinkLeaveEvent(120.0, vehId2, link.getId());
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);
-		Assert.assertEquals(0, numberOfCarsInDistance);
+		Assertions.assertEquals(0, numberOfCarsInDistance);
 		
 	}
 	

@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,10 +48,10 @@ public class ObjectAttributesXmlIOTest {
 
 		ObjectAttributes oa2 = new ObjectAttributes();
 		new ObjectAttributesXmlReader(oa2).readFile(this.utils.getOutputDirectory() + "oa.xml");
-		Assert.assertEquals("A", oa2.getAttribute("one", "a"));
-		Assert.assertEquals(Integer.valueOf(1), oa2.getAttribute("one", "b"));
-		Assert.assertEquals(Double.valueOf(1.5), oa2.getAttribute("two", "c"));
-		Assert.assertEquals(Boolean.TRUE, oa2.getAttribute("two", "d"));
+		Assertions.assertEquals("A", oa2.getAttribute("one", "a"));
+		Assertions.assertEquals(Integer.valueOf(1), oa2.getAttribute("one", "b"));
+		Assertions.assertEquals(Double.valueOf(1.5), oa2.getAttribute("two", "c"));
+		Assertions.assertEquals(Boolean.TRUE, oa2.getAttribute("two", "d"));
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class ObjectAttributesXmlIOTest {
 		writer.putAttributeConverter(MyTuple.class, converter);
 		writer.writeFile(this.utils.getOutputDirectory() + "oa.xml");
 
-		Assert.assertFalse("toString() should return something different from converter to test functionality.", t.toString().equals(converter.convertToString(t)));
+		Assertions.assertFalse(t.toString().equals(converter.convertToString(t)), "toString() should return something different from converter to test functionality.");
 
 		ObjectAttributes oa2 = new ObjectAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(oa2);
@@ -72,11 +72,11 @@ public class ObjectAttributesXmlIOTest {
 		reader.readFile(this.utils.getOutputDirectory() + "oa.xml");
 
 		Object o = oa2.getAttribute("1", "A");
-		Assert.assertNotNull(o);
-		Assert.assertEquals(MyTuple.class, o.getClass());
+		Assertions.assertNotNull(o);
+		Assertions.assertEquals(MyTuple.class, o.getClass());
 		MyTuple t2 = (MyTuple) o;
-		Assert.assertEquals(3, t2.a);
-		Assert.assertEquals(4, t2.b);
+		Assertions.assertEquals(3, t2.a);
+		Assertions.assertEquals(4, t2.b);
 	}
 
 }

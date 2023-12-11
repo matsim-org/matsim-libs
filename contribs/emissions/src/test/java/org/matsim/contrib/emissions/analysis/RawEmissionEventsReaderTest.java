@@ -12,7 +12,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RawEmissionEventsReaderTest {
 

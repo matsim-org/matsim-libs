@@ -1,6 +1,6 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -153,7 +153,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		// run:
 		controler.run();
 
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
@@ -218,7 +218,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		controler.run();
 
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
@@ -429,7 +429,7 @@ public class FrozenEpsilonLocaChoiceIT{
 					}
 
 					void check( double val, double actual ){
-						Assert.assertEquals( val, actual, 2.*Math.max( 5, Math.sqrt( val ) ) );
+						Assertions.assertEquals( val, actual, 2.*Math.max( 5, Math.sqrt( val ) ) );
 					}
 
 				} );

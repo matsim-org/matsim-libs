@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
@@ -85,10 +85,10 @@ public class DrtWithExtensionsConfigGroupTest {
         Config config = ConfigUtils.createConfig();
         ConfigUtils.loadConfig(config, configFile.toString());
         DrtWithExtensionsConfigGroup loadedCfg = ConfigUtils.addOrGetModule(config, DrtWithExtensionsConfigGroup.class);
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().isPresent());
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(0).equals(WEIGHT_1));
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(1).equals(WEIGHT_2));
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(2).equals(WEIGHT_3));
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().isPresent());
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(0).equals(WEIGHT_1));
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(1).equals(WEIGHT_2));
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(2).equals(WEIGHT_3));
     }
 
 }

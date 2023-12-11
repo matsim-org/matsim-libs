@@ -19,7 +19,7 @@
 
 package org.matsim.facilities;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,9 +34,9 @@ public class ActivityFacilitiesFactoryImplTest {
 		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
 		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new Coord((double) 5, (double) 11));
 
-		Assert.assertEquals("1980", facility.getId().toString());
-		Assert.assertEquals(5.0, facility.getCoord().getX(), 1e-9);
-		Assert.assertEquals(11.0, facility.getCoord().getY(), 1e-9);
+		Assertions.assertEquals("1980", facility.getId().toString());
+		Assertions.assertEquals(5.0, facility.getCoord().getX(), 1e-9);
+		Assertions.assertEquals(11.0, facility.getCoord().getY(), 1e-9);
 	}
 
 	@Test
@@ -44,8 +44,8 @@ public class ActivityFacilitiesFactoryImplTest {
 		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
 		ActivityOption option = factory.createActivityOption("leisure");
 
-		Assert.assertEquals("leisure", option.getType());
-		Assert.assertEquals(Integer.MAX_VALUE, option.getCapacity(), 1e-9);
+		Assertions.assertEquals("leisure", option.getType());
+		Assertions.assertEquals(Integer.MAX_VALUE, option.getCapacity(), 1e-9);
 	}
 
 }

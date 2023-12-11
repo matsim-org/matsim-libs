@@ -21,7 +21,7 @@ package org.matsim.analysis;
 
 import java.io.File;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -86,10 +86,10 @@ public class CalcLinkStatsTest {
 
 		cls.addData(analyzer, ttimes);
 
-		Assert.assertEquals(3.0, cls.getAvgLinkVolumes(link1.getId())[0], 1e-8);
-		Assert.assertEquals(1.0, cls.getAvgLinkVolumes(link2.getId())[0], 1e-8);
-		Assert.assertEquals(1.0, cls.getAvgLinkVolumes(link1.getId())[1], 1e-8);
-		Assert.assertEquals(4.0, cls.getAvgLinkVolumes(link2.getId())[1], 1e-8);
+		Assertions.assertEquals(3.0, cls.getAvgLinkVolumes(link1.getId())[0], 1e-8);
+		Assertions.assertEquals(1.0, cls.getAvgLinkVolumes(link2.getId())[0], 1e-8);
+		Assertions.assertEquals(1.0, cls.getAvgLinkVolumes(link1.getId())[1], 1e-8);
+		Assertions.assertEquals(4.0, cls.getAvgLinkVolumes(link2.getId())[1], 1e-8);
 
 		analyzer.reset(1);
 		// generate some pseudo traffic for hour 0: 4 veh on link 1; 3 veh on link 2
@@ -111,15 +111,15 @@ public class CalcLinkStatsTest {
 
 		cls.addData(analyzer, ttimes);
 
-		Assert.assertEquals(3.5, cls.getAvgLinkVolumes(link1.getId())[0], 1e-8);
-		Assert.assertEquals(2.0, cls.getAvgLinkVolumes(link2.getId())[0], 1e-8);
-		Assert.assertEquals(2.5, cls.getAvgLinkVolumes(link1.getId())[1], 1e-8);
-		Assert.assertEquals(3.0, cls.getAvgLinkVolumes(link2.getId())[1], 1e-8);
+		Assertions.assertEquals(3.5, cls.getAvgLinkVolumes(link1.getId())[0], 1e-8);
+		Assertions.assertEquals(2.0, cls.getAvgLinkVolumes(link2.getId())[0], 1e-8);
+		Assertions.assertEquals(2.5, cls.getAvgLinkVolumes(link1.getId())[1], 1e-8);
+		Assertions.assertEquals(3.0, cls.getAvgLinkVolumes(link2.getId())[1], 1e-8);
 
 		cls.reset();
 
-		Assert.assertEquals(0, cls.getAvgLinkVolumes(link1.getId()).length);
-		Assert.assertEquals(0, cls.getAvgLinkVolumes(link2.getId()).length);
+		Assertions.assertEquals(0, cls.getAvgLinkVolumes(link1.getId()).length);
+		Assertions.assertEquals(0, cls.getAvgLinkVolumes(link2.getId()).length);
 	}
 
 	/**
@@ -196,22 +196,22 @@ public class CalcLinkStatsTest {
 		cls.addData(analyzer, ttimes);
 
 		// volumes
-		Assert.assertEquals(3.0, cls.getAvgLinkVolumes(link1.getId())[0], 1e-8);
-		Assert.assertEquals(1.0, cls.getAvgLinkVolumes(link2.getId())[0], 1e-8);
-		Assert.assertEquals(1.0, cls.getAvgLinkVolumes(link1.getId())[1], 1e-8);
-		Assert.assertEquals(4.0, cls.getAvgLinkVolumes(link2.getId())[1], 1e-8);
+		Assertions.assertEquals(3.0, cls.getAvgLinkVolumes(link1.getId())[0], 1e-8);
+		Assertions.assertEquals(1.0, cls.getAvgLinkVolumes(link2.getId())[0], 1e-8);
+		Assertions.assertEquals(1.0, cls.getAvgLinkVolumes(link1.getId())[1], 1e-8);
+		Assertions.assertEquals(4.0, cls.getAvgLinkVolumes(link2.getId())[1], 1e-8);
 
 		// travel times
-		Assert.assertEquals( 1530/3., cls.getAvgTravelTimes(link1.getId())[0], 1e-8 );
-		Assert.assertEquals( 30./1., cls.getAvgTravelTimes(link2.getId())[0], 1e-8 );
-		Assert.assertEquals( 200./1., cls.getAvgTravelTimes(link1.getId())[1], 1e-8 );
-		Assert.assertEquals( 100./4., cls.getAvgTravelTimes(link2.getId())[1], 1e-8 );
-		Assert.assertEquals( link2.getLength() / link2.getFreespeed(), cls.getAvgTravelTimes(link2.getId())[3], 1e-8 );
+		Assertions.assertEquals( 1530/3., cls.getAvgTravelTimes(link1.getId())[0], 1e-8 );
+		Assertions.assertEquals( 30./1., cls.getAvgTravelTimes(link2.getId())[0], 1e-8 );
+		Assertions.assertEquals( 200./1., cls.getAvgTravelTimes(link1.getId())[1], 1e-8 );
+		Assertions.assertEquals( 100./4., cls.getAvgTravelTimes(link2.getId())[1], 1e-8 );
+		Assertions.assertEquals( link2.getLength() / link2.getFreespeed(), cls.getAvgTravelTimes(link2.getId())[3], 1e-8 );
 
 		cls.reset();
 
-		Assert.assertEquals(0, cls.getAvgLinkVolumes(link1.getId()).length);
-		Assert.assertEquals(0, cls.getAvgLinkVolumes(link2.getId()).length);
+		Assertions.assertEquals(0, cls.getAvgLinkVolumes(link1.getId()).length);
+		Assertions.assertEquals(0, cls.getAvgLinkVolumes(link2.getId()).length);
 	}
 
 	@Test
@@ -273,13 +273,13 @@ public class CalcLinkStatsTest {
 
 		String filename = this.util.getOutputDirectory() + "linkstats.txt";
 		cls.writeFile(filename);
-		Assert.assertTrue(new File(filename).exists());
+		Assertions.assertTrue(new File(filename).exists());
 		CalcLinkStats cls2 = new CalcLinkStats(network);
 		cls2.readFile(filename);
 
-		Assert.assertEquals(3.5, cls2.getAvgLinkVolumes(link1.getId())[0], 1e-8);
-		Assert.assertEquals(2.0, cls2.getAvgLinkVolumes(link2.getId())[0], 1e-8);
-		Assert.assertEquals(2.5, cls2.getAvgLinkVolumes(link1.getId())[1], 1e-8);
-		Assert.assertEquals(3.0, cls2.getAvgLinkVolumes(link2.getId())[1], 1e-8);
+		Assertions.assertEquals(3.5, cls2.getAvgLinkVolumes(link1.getId())[0], 1e-8);
+		Assertions.assertEquals(2.0, cls2.getAvgLinkVolumes(link2.getId())[0], 1e-8);
+		Assertions.assertEquals(2.5, cls2.getAvgLinkVolumes(link1.getId())[1], 1e-8);
+		Assertions.assertEquals(3.0, cls2.getAvgLinkVolumes(link2.getId())[1], 1e-8);
 	}
 }

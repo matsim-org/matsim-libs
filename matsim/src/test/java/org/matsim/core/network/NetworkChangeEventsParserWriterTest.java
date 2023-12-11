@@ -20,7 +20,7 @@
 
 package org.matsim.core.network;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -38,8 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NetworkChangeEventsParserWriterTest {
@@ -116,7 +116,7 @@ public class NetworkChangeEventsParserWriterTest {
 		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
 
 		// the main test is that there is no exception
-		Assert.assertTrue(changeEvents2.isEmpty());
+		Assertions.assertTrue(changeEvents2.isEmpty());
 	}
 
 	@Test
@@ -139,12 +139,12 @@ public class NetworkChangeEventsParserWriterTest {
 		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
 		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
 
-		Assert.assertFalse(changeEvents2.isEmpty());
-		Assert.assertEquals(1, changeEvents2.size());
+		Assertions.assertFalse(changeEvents2.isEmpty());
+		Assertions.assertEquals(1, changeEvents2.size());
 		NetworkChangeEvent event2 = changeEvents2.get(0);
-		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
-		Assert.assertEquals(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, event2.getFlowCapacityChange().getType());
-		Assert.assertEquals(event.getFlowCapacityChange().getValue(), event2.getFlowCapacityChange().getValue(), 1e-10);
+		Assertions.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assertions.assertEquals(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, event2.getFlowCapacityChange().getType());
+		Assertions.assertEquals(event.getFlowCapacityChange().getValue(), event2.getFlowCapacityChange().getValue(), 1e-10);
 	}
 
 	@Test
@@ -167,12 +167,12 @@ public class NetworkChangeEventsParserWriterTest {
 		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
 		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
 
-		Assert.assertFalse(changeEvents2.isEmpty());
-		Assert.assertEquals(1, changeEvents2.size());
+		Assertions.assertFalse(changeEvents2.isEmpty());
+		Assertions.assertEquals(1, changeEvents2.size());
 		NetworkChangeEvent event2 = changeEvents2.get(0);
-		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
-		Assert.assertEquals(NetworkChangeEvent.ChangeType.FACTOR, event2.getLanesChange().getType());
-		Assert.assertEquals(event.getLanesChange().getValue(), event2.getLanesChange().getValue(), 1e-10);
+		Assertions.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assertions.assertEquals(NetworkChangeEvent.ChangeType.FACTOR, event2.getLanesChange().getType());
+		Assertions.assertEquals(event.getLanesChange().getValue(), event2.getLanesChange().getValue(), 1e-10);
 	}
 
 	@Test
@@ -195,12 +195,12 @@ public class NetworkChangeEventsParserWriterTest {
 		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
 		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
 
-		Assert.assertFalse(changeEvents2.isEmpty());
-		Assert.assertEquals(1, changeEvents2.size());
+		Assertions.assertFalse(changeEvents2.isEmpty());
+		Assertions.assertEquals(1, changeEvents2.size());
 		NetworkChangeEvent event2 = changeEvents2.get(0);
-		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
-		Assert.assertEquals(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, event2.getFreespeedChange().getType());
-		Assert.assertEquals(event.getFreespeedChange().getValue(), event2.getFreespeedChange().getValue(), 1e-10);
+		Assertions.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assertions.assertEquals(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, event2.getFreespeedChange().getType());
+		Assertions.assertEquals(event.getFreespeedChange().getValue(), event2.getFreespeedChange().getValue(), 1e-10);
 	}
 
 	@Test
@@ -223,12 +223,12 @@ public class NetworkChangeEventsParserWriterTest {
 		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
 		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
 
-		Assert.assertFalse(changeEvents2.isEmpty());
-		Assert.assertEquals(1, changeEvents2.size());
+		Assertions.assertFalse(changeEvents2.isEmpty());
+		Assertions.assertEquals(1, changeEvents2.size());
 		NetworkChangeEvent event2 = changeEvents2.get(0);
-		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
-		Assert.assertEquals(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, event2.getFreespeedChange().getType());
-		Assert.assertEquals(event.getFreespeedChange().getValue(), event2.getFreespeedChange().getValue(), 1e-10);
+		Assertions.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assertions.assertEquals(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, event2.getFreespeedChange().getType());
+		Assertions.assertEquals(event.getFreespeedChange().getValue(), event2.getFreespeedChange().getValue(), 1e-10);
 	}
 
 }

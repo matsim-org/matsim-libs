@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -262,20 +262,20 @@ public class TinyAccessibilityTest {
 				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- car value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
 				if (tuple.getFirst().getCoord().getX() == 50.) {
 					if (tuple.getFirst().getCoord().getY() == 50.) {
-						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assert.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
 					} else if (tuple.getFirst().getCoord().getY() == 150.) {
-						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assert.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
 					}
 				}
 				if (tuple.getFirst().getCoord().getX() == 150.) {
 					if (tuple.getFirst().getCoord().getY() == 50.) {
-						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assert.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
 					} else if (tuple.getFirst().getCoord().getY() == 150.) {
-						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assert.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
 					}
 				}
 			}

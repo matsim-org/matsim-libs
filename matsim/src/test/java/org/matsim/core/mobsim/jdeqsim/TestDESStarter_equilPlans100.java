@@ -21,6 +21,8 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -28,9 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import static org.junit.Assert.assertEquals;
-
- public class TestDESStarter_equilPlans100 extends AbstractJDEQSimTest {
+	public class TestDESStarter_equilPlans100 extends AbstractJDEQSimTest {
 
 	 @Test
 	 void test_equilPlans100_TestHandlerDetailedEventChecker() {

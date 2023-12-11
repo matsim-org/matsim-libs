@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.ListIterator;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -543,14 +543,18 @@ public class ScoreStatsControlerListenerTest {
 				double avgBest = (avgbest > 0) ? Double.parseDouble(column[avgbest]) : 0;
 				double avgAverage = (avgaverage > 0) ? Double.parseDouble(column[avgaverage]) : 0;
 
-				Assert.assertEquals("avg. executed score does not match", (getScore(population, "avgexecuted")/(4-itr)), avgExecuted,
-						0);
-				Assert.assertEquals("avg. worst score does not match", (getScore(population, "avgworst")/(4-itr)), avgWorst,
-						0);
-				Assert.assertEquals("avg. best score does not match", (getScore(population, "avgbest")/(4-itr)), avgBest,
-						0);
-				Assert.assertEquals("avg average score does not match", (getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
-						0);
+				Assertions.assertEquals((getScore(population, "avgexecuted")/(4-itr)), avgExecuted,
+						0,
+						"avg. executed score does not match");
+				Assertions.assertEquals((getScore(population, "avgworst")/(4-itr)), avgWorst,
+						0,
+						"avg. worst score does not match");
+				Assertions.assertEquals((getScore(population, "avgbest")/(4-itr)), avgBest,
+						0,
+						"avg. best score does not match");
+				Assertions.assertEquals((getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
+						0,
+						"avg average score does not match");
 			}
 			iteration++;
 		}

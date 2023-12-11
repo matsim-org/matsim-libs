@@ -1,7 +1,7 @@
 package org.matsim.freightDemandGeneration;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -57,7 +57,7 @@ public class FreightDemandGenerationTest {
 			LogManager.getLogger(this.getClass()).fatal("there was an exception: \n" + ee);
 			ee.printStackTrace();
 			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 }

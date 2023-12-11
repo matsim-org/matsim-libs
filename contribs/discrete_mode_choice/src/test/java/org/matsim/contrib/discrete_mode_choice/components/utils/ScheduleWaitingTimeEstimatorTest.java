@@ -1,5 +1,7 @@
 package org.matsim.contrib.discrete_mode_choice.components.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -24,8 +26,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 public class ScheduleWaitingTimeEstimatorTest {
 	@Test

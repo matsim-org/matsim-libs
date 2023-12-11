@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -68,7 +68,7 @@ public class AgentId2PtTripTravelTimeMapTest {
 
 //	        first tests, this works
 
-	        Assert.assertEquals(event4.getTime()-event3.getTime(), test.getAgentId2PtTripTravelTimeMap().get(agentId1).get(0).getTotalTripTravelTime(), 0.);
+	        Assertions.assertEquals(event4.getTime()-event3.getTime(), test.getAgentId2PtTripTravelTimeMap().get(agentId1).get(0).getTotalTripTravelTime(), 0.);
 
 
 	}

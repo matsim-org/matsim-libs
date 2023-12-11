@@ -26,7 +26,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -70,8 +70,8 @@ public class TestAvFlowFactor {
 		controler.getEvents().addHandler(vehicleTimeCounter);
 		controler.run();
 
-		Assert.assertEquals(vehicleTimeCounter.lastAVEnterTime, 32598, 0.1);
-		Assert.assertEquals(vehicleTimeCounter.lastNonAVEnterTime, 36179, 0.1);
+		Assertions.assertEquals(vehicleTimeCounter.lastAVEnterTime, 32598, 0.1);
+		Assertions.assertEquals(vehicleTimeCounter.lastNonAVEnterTime, 36179, 0.1);
 
 	}
 

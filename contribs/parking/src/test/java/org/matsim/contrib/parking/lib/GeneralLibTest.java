@@ -1,6 +1,6 @@
 package org.matsim.contrib.parking.lib;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;

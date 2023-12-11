@@ -19,11 +19,11 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.testcases.MatsimTestUtils;

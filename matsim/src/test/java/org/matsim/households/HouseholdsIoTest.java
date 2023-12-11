@@ -19,7 +19,7 @@
 
 package org.matsim.households;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class HouseholdsIoTest {
 		assertEquals(50000.0d, hh.getIncome().getIncome(), MatsimTestUtils.EPSILON);
 
 		Attributes currentAttributes = hh.getAttributes();
-		assertNotNull("Custom attributes from household with id 23 should not be empty.", currentAttributes);
+		assertNotNull(currentAttributes, "Custom attributes from household with id 23 should not be empty.");
 		String customAttributeName = "customAttribute1";
 		String customContent = (String)currentAttributes.getAttribute(customAttributeName);
 		assertEquals("customValue1", customContent);

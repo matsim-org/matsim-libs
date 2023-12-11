@@ -1,6 +1,6 @@
 package org.matsim.core.population.io;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -35,7 +35,7 @@ public class ParallelPopulationReaderTest {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		try {
 			new ParallelPopulationReaderMatsimV4(scenario).readStream(stream);
-			Assert.fail("Expected exception");
+			Assertions.fail("Expected exception");
 		} catch (Exception expected) {
 			expected.printStackTrace();
 		}
@@ -65,7 +65,7 @@ public class ParallelPopulationReaderTest {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		try {
 			new ParallelPopulationReaderMatsimV6(null, null, scenario).readStream(stream);
-			Assert.fail("Expected exception");
+			Assertions.fail("Expected exception");
 		} catch (Exception expected) {
 			expected.printStackTrace();
 		}

@@ -32,8 +32,8 @@ import java.util.Set;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -162,11 +162,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 
 			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent2.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 116.0)) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
-				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(9.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			}
 
 		}
@@ -210,7 +210,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 			totalDelay += event.getDelay();
 		}
-		Assert.assertEquals("wrong total delay.", 50.0, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(50.0, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay.");
 
 	}
 
@@ -251,7 +251,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 			totalDelay += event.getDelay();
 		}
-		Assert.assertEquals("wrong total delay.", 30.0, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30.0, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay.");
 
 	}
 
@@ -292,7 +292,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 			totalDelay += event.getDelay();
 		}
-		Assert.assertEquals("wrong total delay.", 32.0, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(32.0, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay.");
 
 	}
 
@@ -424,10 +424,10 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		controler.run();
 
 		{ // controlling and showing the conditions of the test:
-			Assert.assertEquals("entering agents in timeBin1.", 3.0, enterCounter.get(timeBin1), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("entering agents in timeBin2.", 3.0, enterCounter.get(timeBin2), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("leaving agents in timeBin1.", 1.0, leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("leaving agents in timeBin1.", 5.0, leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(3.0, enterCounter.get(timeBin1), MatsimTestUtils.EPSILON, "entering agents in timeBin1.");
+			Assertions.assertEquals(3.0, enterCounter.get(timeBin2), MatsimTestUtils.EPSILON, "entering agents in timeBin2.");
+			Assertions.assertEquals(1.0, leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON, "leaving agents in timeBin1.");
+			Assertions.assertEquals(5.0, leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON, "leaving agents in timeBin1.");
 		}
 
 		// for both time-bins ("28800-29700" and "29700-30600")
@@ -436,15 +436,15 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		// the congestion effects of each 3 cars are the same,
 		// the fact that 2 of the first 3 cars leave the link in the next time-bin should be irrelevant
 
-		Assert.assertEquals("avgValue1 == avgValue2", avgValue1, avgValue2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgValue3 == avgValue3", avgValue3, avgValue4, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgValue1 == avgValue3", avgValue1, avgValue3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(avgValue1, avgValue2, MatsimTestUtils.EPSILON, "avgValue1 == avgValue2");
+		Assertions.assertEquals(avgValue3, avgValue4, MatsimTestUtils.EPSILON, "avgValue3 == avgValue3");
+		Assertions.assertEquals(avgValue1, avgValue3, MatsimTestUtils.EPSILON, "avgValue1 == avgValue3");
 
-		Assert.assertEquals("avgOldValue1 == avgOldValue2", avgOldValue1, avgOldValue2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgOldValue3 == avgOldValue3", avgOldValue3, avgOldValue4, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgOldValue1 == avgOldValue3", avgOldValue1, avgOldValue3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(avgOldValue1, avgOldValue2, MatsimTestUtils.EPSILON, "avgOldValue1 == avgOldValue2");
+		Assertions.assertEquals(avgOldValue3, avgOldValue4, MatsimTestUtils.EPSILON, "avgOldValue3 == avgOldValue3");
+		Assertions.assertEquals(avgOldValue1, avgOldValue3, MatsimTestUtils.EPSILON, "avgOldValue1 == avgOldValue3");
 
-		Assert.assertEquals("avgValue1 == avgOldValue1", avgValue1, avgOldValue1, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(avgValue1, avgOldValue1, MatsimTestUtils.EPSILON, "avgValue1 == avgOldValue1");
 
 	 }
 
@@ -493,15 +493,15 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		}
 
-		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(congestionEvents.size(), 3, MatsimTestUtils.EPSILON, "numberOfCongestionEvents");
 
 		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent2))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 4., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(4., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}
 		}
 	}
@@ -552,15 +552,15 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		}
 
-		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(congestionEvents.size(), 3, MatsimTestUtils.EPSILON, "numberOfCongestionEvents");
 
 		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 4., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(4., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent3))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}
 		}
 
@@ -613,15 +613,15 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		}
 
-		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(congestionEvents.size(), 3, MatsimTestUtils.EPSILON, "numberOfCongestionEvents");
 
 		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 5., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(5., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent2))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 8., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(8., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}
 		}
 
@@ -682,11 +682,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 
 			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent2.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 116.0)) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
-				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(9.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			}
 		}
 

@@ -25,7 +25,7 @@ import java.util.SortedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -66,10 +66,10 @@ public class FixResponsiveSignalResultsIT {
 
 		LOG.info("SignalGroup1: onset " + group1Setting.getOnset() + ", dropping " + group1Setting.getDropping());
 		LOG.info("SignalGroup2: onset " + group2Setting.getOnset() + ", dropping " + group2Setting.getDropping());
-		Assert.assertEquals(0, group1Setting.getOnset());
-		Assert.assertEquals(25, group1Setting.getDropping());
-		Assert.assertEquals(30, group2Setting.getOnset());
-		Assert.assertEquals(55, group2Setting.getDropping());
+		Assertions.assertEquals(0, group1Setting.getOnset());
+		Assertions.assertEquals(25, group1Setting.getDropping());
+		Assertions.assertEquals(30, group2Setting.getOnset());
+		Assertions.assertEquals(55, group2Setting.getDropping());
 	}
 
 }

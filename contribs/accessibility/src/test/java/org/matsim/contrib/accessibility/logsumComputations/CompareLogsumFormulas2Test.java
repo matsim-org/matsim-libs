@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.accessibility.logsumComputations;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -66,7 +66,7 @@ public class CompareLogsumFormulas2Test {
 		double Sum2 =PreFactor * AggregationSum;
 		System.out.println(Sum2);
 
-		Assert.assertTrue( Sum1 == Sum2 );
+		Assertions.assertTrue( Sum1 == Sum2 );
 	}
 
 }

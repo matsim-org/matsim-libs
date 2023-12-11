@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -198,18 +198,18 @@ public class DynamicGroupIdentifierTest {
 		final GroupIdentifier testee = new DynamicGroupIdentifier( fixture.scenario );
 
 		final Collection<ReplanningGroup> groups = testee.identifyGroups( fixture.scenario.getPopulation() );
-		Assert.assertEquals(
-				"unexpected number of groups",
+		Assertions.assertEquals(
 				fixture.expectedNGroups,
-				groups.size() );
+				groups.size(),
+				"unexpected number of groups" );
 
 		int n = 0;
 		for ( ReplanningGroup g : groups ) n += g.getPersons().size();
 
-		Assert.assertEquals(
-				"unexpected number of persons in groups",
+		Assertions.assertEquals(
 				fixture.scenario.getPopulation().getPersons().size(),
-				n );
+				n,
+				"unexpected number of persons in groups" );
 	}
 
 	private static class Fixture {

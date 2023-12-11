@@ -1,7 +1,7 @@
 package playground.vsp.airPollution.flatEmissions;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static playground.vsp.airPollution.flatEmissions.EmissionCostFactors.NOx;
 
 import org.junit.jupiter.api.Test;

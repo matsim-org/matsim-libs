@@ -1,7 +1,7 @@
 package playground.vsp.scoring;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -116,19 +116,19 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulation
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncome")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
-		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of ", 20 * 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(20 * 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON, "for the rich person, 100 money units should be equal to a score of ");
 
 		ScoringParameters paramsPoor = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("lowIncome")));
 		CharyparNagelMoneyScoring moneyScoringPoor = new CharyparNagelMoneyScoring(paramsPoor);
 		moneyScoringPoor.addMoney(100);
-		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of ", 20 * 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(20 * 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON, "for the poor person, 100 money units should be equal to a score of ");
 
-		Assert.assertTrue("100 money units should worth more for a poor person than for a rich person", moneyScoringPoor.getScore() > moneyScoringRich.getScore());
+		Assertions.assertTrue(moneyScoringPoor.getScore() > moneyScoringRich.getScore(), "100 money units should worth more for a poor person than for a rich person");
 	}
 
 	private void makeAssert(ScoringParameters params, double income, double marginalUtilityOfWaitingPt_s){
-		Assert.assertEquals("marginalUtilityOfMoney is wrong", 20 * 1 / income , params.marginalUtilityOfMoney, 0.);
-		Assert.assertEquals("marginalUtilityOfWaitingPt_s is wrong", marginalUtilityOfWaitingPt_s , params.marginalUtilityOfWaitingPt_s, 0.);
+		Assertions.assertEquals(20 * 1 / income , params.marginalUtilityOfMoney, 0., "marginalUtilityOfMoney is wrong");
+		Assertions.assertEquals(marginalUtilityOfWaitingPt_s , params.marginalUtilityOfWaitingPt_s, 0., "marginalUtilityOfWaitingPt_s is wrong");
 	}
 
 

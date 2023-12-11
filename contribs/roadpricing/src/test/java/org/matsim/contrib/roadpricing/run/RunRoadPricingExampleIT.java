@@ -1,6 +1,6 @@
 package org.matsim.contrib.roadpricing.run;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -19,7 +19,7 @@ public class RunRoadPricingExampleIT {
 			RunRoadPricingExample.main(args);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Example should run without exceptions.");
+			Assertions.fail("Example should run without exceptions.");
 		}
 	}
 }

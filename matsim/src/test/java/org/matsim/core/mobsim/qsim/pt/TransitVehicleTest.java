@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -102,19 +102,19 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 
 		assert population != null;
 		for (Person person : population.getPersons().values()) {
-			Assert.assertNotNull(person.getSelectedPlan());
-			Assert.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
-			Assert.assertTrue(person.getAttributes().getAsMap().containsKey("vehicles"));
-			Assert.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
-			Assert.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
+			Assertions.assertNotNull(person.getSelectedPlan());
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("vehicles"));
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
 		}
 
-		Assert.assertEquals(CarriersUtils.addOrGetCarriers(scenarioWSolution).getCarriers().size(),
+		Assertions.assertEquals(CarriersUtils.addOrGetCarriers(scenarioWSolution).getCarriers().size(),
 				CarriersUtils.addOrGetCarriers(scenarioWOSolution).getCarriers().size(), 0);
 		int countedTours = 0;
 		for (Carrier carrier_withSolution : CarriersUtils.addOrGetCarriers(scenarioWSolution).getCarriers().values()) {
 			countedTours += carrier_withSolution.getSelectedPlan().getScheduledTours().size();
 		}
-		Assert.assertEquals(population.getPersons().size(), countedTours, 0);
+		Assertions.assertEquals(population.getPersons().size(), countedTours, 0);
 	}
 }

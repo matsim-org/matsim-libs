@@ -1,7 +1,7 @@
 package org.matsim.counts;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -66,10 +66,10 @@ public class CountsV2Test {
 		Assertions.assertThatNoException().isThrownBy(() -> reader.readFile(filename));
 
 		Map<Id<Link>, MeasurementLocation<Link>> countMap = counts.getMeasureLocations();
-		Assert.assertEquals(21, countMap.size());
+		Assertions.assertEquals(21, countMap.size());
 
 		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurableForMode(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
-		Assert.assertFalse(onlyDailyValues);
+		Assertions.assertFalse(onlyDailyValues);
 
 		assertThat(dummyCounts.getMeasurableTypes())
 			.isEqualTo(counts.getMeasurableTypes());

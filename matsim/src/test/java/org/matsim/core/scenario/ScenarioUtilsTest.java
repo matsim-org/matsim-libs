@@ -21,7 +21,7 @@ package org.matsim.core.scenario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 
@@ -36,11 +36,11 @@ public class ScenarioUtilsTest {
 	void testCreateScenario_nullConfig() {
 		try {
 			Scenario s = ScenarioUtils.createScenario(null);
-			Assert.fail("expected NPE, but got none." + s.toString());
+			Assertions.fail("expected NPE, but got none." + s.toString());
 		}
 		catch (NullPointerException e) {
 			log.info("Catched expected NPE.", e);
-			Assert.assertTrue("Message in NPE should not be empty.", e.getMessage().length() > 0);
+			Assertions.assertTrue(e.getMessage().length() > 0, "Message in NPE should not be empty.");
 		}
 	}
 }

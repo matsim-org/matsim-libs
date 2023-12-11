@@ -2,7 +2,7 @@ package org.matsim.contrib.roadpricing.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -19,7 +19,7 @@ public class RunRoadPricingFromCodeIT {
 			RunRoadPricingFromCode.main(args);
 		} catch (Exception e){
 			e.printStackTrace();
-			Assert.fail("Example should run without exception.");
+			Assertions.fail("Example should run without exception.");
 		}
 	}
 }

@@ -22,8 +22,8 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -85,8 +85,8 @@ public class PersonPrepareForSimTest {
 
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-		Assert.assertEquals(link1id, activity1.getLinkId());
-		Assert.assertEquals(link1id, activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assertions.assertEquals(link1id, activity1.getLinkId());
+		Assertions.assertEquals(link1id, activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 
 	@Test
@@ -117,8 +117,8 @@ public class PersonPrepareForSimTest {
 		
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 		
-		Assert.assertEquals(link1id, a1.getLinkId());
-		Assert.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assertions.assertEquals(link1id, a1.getLinkId());
+		Assertions.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 
 	@Test
@@ -145,8 +145,9 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals(TransportMode.pt,
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode!");
 		}
 		
 		// test routing mode set
@@ -167,8 +168,9 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals(TransportMode.pt,
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode!");
 		}
 	}
 
@@ -204,7 +206,7 @@ public class PersonPrepareForSimTest {
 
 			try {
 				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
 		
@@ -226,9 +228,10 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assert.assertEquals("wrong leg mode replacement", "drt67_fallback", leg.getMode());
-			Assert.assertEquals("wrong routing mode set", "drt67_fallback",
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals("drt67_fallback", leg.getMode(), "wrong leg mode replacement");
+			Assertions.assertEquals("drt67_fallback",
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode set");
 		}
 	}
 
@@ -268,14 +271,14 @@ public class PersonPrepareForSimTest {
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 			
 			// Check leg modes remain unchanged
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, leg2.getMode(), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong routing mode!");
 			
 			// Check routing mode:
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
 		}
 		
 		// test complicated intermodal trip with consistent routing modes passes unchanged
@@ -345,17 +348,17 @@ public class PersonPrepareForSimTest {
 			
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 			
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg3));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg4));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg5));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg6));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg7));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg8));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg9));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg10));
-			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg11));
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg4), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg5), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg6), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg7), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg8), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg9), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg10), "wrong routing mode set");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg11), "wrong routing mode set");
 		}
 	}
 
@@ -392,7 +395,7 @@ public class PersonPrepareForSimTest {
 			
 			try {
 				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
 		
@@ -423,7 +426,7 @@ public class PersonPrepareForSimTest {
 			
 			try {
 				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
 	}
@@ -467,13 +470,13 @@ public class PersonPrepareForSimTest {
 
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-		Assert.assertEquals(DefaultTransitPassengerRoute.ROUTE_TYPE, leg.getRoute().getRouteType());
-		Assert.assertEquals(startLink, leg.getRoute().getStartLinkId());
-		Assert.assertEquals(endLink, leg.getRoute().getEndLinkId());
-		Assert.assertEquals(stopFacility1.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getAccessStopId());
-		Assert.assertEquals(stopFacility2.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getEgressStopId());
-		Assert.assertEquals(line, ((DefaultTransitPassengerRoute) leg.getRoute()).getLineId());
-		Assert.assertEquals(route, ((DefaultTransitPassengerRoute) leg.getRoute()).getRouteId());
+		Assertions.assertEquals(DefaultTransitPassengerRoute.ROUTE_TYPE, leg.getRoute().getRouteType());
+		Assertions.assertEquals(startLink, leg.getRoute().getStartLinkId());
+		Assertions.assertEquals(endLink, leg.getRoute().getEndLinkId());
+		Assertions.assertEquals(stopFacility1.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getAccessStopId());
+		Assertions.assertEquals(stopFacility2.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getEgressStopId());
+		Assertions.assertEquals(line, ((DefaultTransitPassengerRoute) leg.getRoute()).getLineId());
+		Assertions.assertEquals(route, ((DefaultTransitPassengerRoute) leg.getRoute()).getRouteId());
 	}
 
 	private static class DummyRouter implements PlanAlgorithm {

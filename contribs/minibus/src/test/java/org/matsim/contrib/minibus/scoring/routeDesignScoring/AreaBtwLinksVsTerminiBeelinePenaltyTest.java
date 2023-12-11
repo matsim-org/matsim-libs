@@ -22,8 +22,8 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -133,7 +133,7 @@ public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
 		double actual = penalty.getScore(pPlan1, route1);
 		// area 10 x 10 = 100; beeline termini ({0,0}, {10,0}) = 10
 		double expected = -1 * ((10.0 * 10.0 / 10.0) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 	}
 	
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,13 +44,13 @@ public class CollectionUtilsTest {
 		set.add("Bbb");
 		set.add("Ddd");
 		set.add("Ccc");
-		Assert.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.setToString(set));
+		Assertions.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.setToString(set));
 	}
 
 	@Test
 	void testArrayToString() {
 		String[] array = new String[] {"Aaa", "Bbb", "Ddd", "Ccc"};
-		Assert.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.arrayToString(array));
+		Assertions.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.arrayToString(array));
 	}
 
 	@Test
@@ -68,20 +68,20 @@ public class CollectionUtilsTest {
 		for (String str : testStrings) {
 			log.info("testing String: " + str);
 			Set<String> set = CollectionUtils.stringToSet(str);
-			Assert.assertEquals(4, set.size());
+			Assertions.assertEquals(4, set.size());
 			Iterator<String> iter = set.iterator();
-			Assert.assertEquals("Aaa", iter.next());
-			Assert.assertEquals("Bbb", iter.next());
-			Assert.assertEquals("Ddd", iter.next());
-			Assert.assertEquals("Ccc", iter.next());
-			Assert.assertFalse(iter.hasNext());
+			Assertions.assertEquals("Aaa", iter.next());
+			Assertions.assertEquals("Bbb", iter.next());
+			Assertions.assertEquals("Ddd", iter.next());
+			Assertions.assertEquals("Ccc", iter.next());
+			Assertions.assertFalse(iter.hasNext());
 		}
 	}
 
 	@Test
 	void testNullStringToSet() {
 		Set<String> set = CollectionUtils.stringToSet(null);
-		Assert.assertEquals(0, set.size());
+		Assertions.assertEquals(0, set.size());
 	}
 
 	@Test
@@ -99,18 +99,18 @@ public class CollectionUtilsTest {
 		for (String str : testStrings) {
 			log.info("testing String: " + str);
 			String[] array = CollectionUtils.stringToArray(str);
-			Assert.assertEquals(4, array.length);
-			Assert.assertEquals("Aaa", array[0]);
-			Assert.assertEquals("Bbb", array[1]);
-			Assert.assertEquals("Ddd", array[2]);
-			Assert.assertEquals("Ccc", array[3]);
+			Assertions.assertEquals(4, array.length);
+			Assertions.assertEquals("Aaa", array[0]);
+			Assertions.assertEquals("Bbb", array[1]);
+			Assertions.assertEquals("Ddd", array[2]);
+			Assertions.assertEquals("Ccc", array[3]);
 		}
 	}
 
 	@Test
 	void testNullStringToArray() {
 		String[] array = CollectionUtils.stringToArray(null);
-		Assert.assertEquals(0, array.length);
+		Assertions.assertEquals(0, array.length);
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class CollectionUtilsTest {
 		set.add(Id.create("Bbb", Link.class));
 		set.add(Id.create("Ddd", Link.class));
 		set.add(Id.create("Ccc", Link.class));
-		Assert.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.idSetToString(set));		
+		Assertions.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.idSetToString(set));		
 	}
 
 }

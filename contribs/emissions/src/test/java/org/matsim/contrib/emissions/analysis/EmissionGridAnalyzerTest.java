@@ -32,8 +32,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class EmissionGridAnalyzerTest {

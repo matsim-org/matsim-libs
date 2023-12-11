@@ -20,7 +20,7 @@
 
 package org.matsim.analysis;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 
@@ -181,7 +181,7 @@ public class LegHistogramTest {
 
 		histo.reset(1);
 		modes = histo.getLegModes();
-		assertEquals("After reset, there should be 0 known leg-modes", 0, modes.size());
+		assertEquals(0, modes.size(), "After reset, there should be 0 known leg-modes");
 		assertFalse(modes.contains(TransportMode.car));
 	}
 }

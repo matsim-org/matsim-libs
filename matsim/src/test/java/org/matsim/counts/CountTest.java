@@ -20,11 +20,11 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Iterator;
 
 import org.junit.Before;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -47,15 +47,15 @@ public class CountTest {
 	void testCreateVolume() {
 		Count count = counts.createAndAddCount(Id.create(0, Link.class), "1");
 		Volume volume = count.createVolume(1, 100.0);
-		assertTrue("Creation and initialization of volume failed", volume.getHourOfDayStartingWithOne()==1);
-		assertTrue("Creation and initialization of volume failed", volume.getValue()==100.0);
+		assertTrue(volume.getHourOfDayStartingWithOne()==1, "Creation and initialization of volume failed");
+		assertTrue(volume.getValue()==100.0, "Creation and initialization of volume failed");
 	}
 
 	@Test
 	void testGetVolume() {
 		Count count = counts.createAndAddCount(Id.create(0, Link.class), "1");
 		count.createVolume(1, 100.0);
-		assertTrue("Getting volume failed", count.getVolume(1).getValue() == 100.0);
+		assertTrue(count.getVolume(1).getValue() == 100.0, "Getting volume failed");
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class CountTest {
 		Iterator<Volume> vol_it = count.getVolumes().values().iterator();
 		while (vol_it.hasNext()) {
 			Volume v = vol_it.next();
-			assertTrue("Getting volumes failed", v.getValue() == 100.0);
+			assertTrue(v.getValue() == 100.0, "Getting volumes failed");
 		}
 
 	}

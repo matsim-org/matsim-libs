@@ -18,8 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim.core.router;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -137,15 +136,15 @@ public class TripRouterFactoryImplTest {
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
 
-		Assert.assertEquals(
-				"unexpected route length "+r.getLinkIds(),
+		Assertions.assertEquals(
 				1,
-				r.getLinkIds().size() );
+				r.getLinkIds().size(),
+				"unexpected route length "+r.getLinkIds() );
 
-		Assert.assertEquals(
-				"unexpected link",
+		Assertions.assertEquals(
 				l2c.getId(),
-				r.getLinkIds().get( 0 ));
+				r.getLinkIds().get( 0 ),
+				"unexpected link");
 	}
 
 	/**
@@ -213,15 +212,15 @@ public class TripRouterFactoryImplTest {
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
 
-		Assert.assertEquals(
-				"unexpected route length "+r.getLinkIds(),
+		Assertions.assertEquals(
 				1,
-				r.getLinkIds().size() );
+				r.getLinkIds().size(),
+				"unexpected route length "+r.getLinkIds() );
 
-		Assert.assertEquals(
-				"unexpected link",
+		Assertions.assertEquals(
 				l2short.getId(),
-				r.getLinkIds().get( 0 ));
+				r.getLinkIds().get( 0 ),
+				"unexpected link");
 	}
 
 	private static class LinkFacility implements Facility {

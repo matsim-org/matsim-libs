@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -130,8 +130,8 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
 		controler.run();
 
-		Assert.assertEquals(true, ttmobsimListener.isCase1());
-		Assert.assertEquals(true, ttmobsimListener.isCase2());
+		Assertions.assertEquals(true, ttmobsimListener.isCase1());
+		Assertions.assertEquals(true, ttmobsimListener.isCase2());
 
 	}
 

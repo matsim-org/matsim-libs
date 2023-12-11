@@ -21,7 +21,7 @@ package org.matsim.contrib.minibus.replanning;
 
 import java.io.File;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +52,7 @@ public class TimeProviderTest {
 		double startTime = 3600.0;
 		double endTime = startTime;
 
-		Assert.assertEquals("New time (There is only one slot, thus time is zero)", 0.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "New time (There is only one slot, thus time is zero)");
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class TimeProviderTest {
 		double startTime = 3600.0;
 		double endTime = startTime;
 
-		Assert.assertEquals("Same start and end time. Should return start time", 3600.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Same start and end time. Should return start time");
 	}
 
 	@Test
@@ -86,8 +86,8 @@ public class TimeProviderTest {
 		double startTime = 7500.0;
 		double endTime = 19400.0;
 
-		Assert.assertEquals("Check time", 7200.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time", 11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7200.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Check time");
+		Assertions.assertEquals(11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Check time");
 
 		Id<Person> agentId = Id.create("id", Person.class);
 		Id<Link> linkId = Id.create("id", Link.class);
@@ -96,11 +96,11 @@ public class TimeProviderTest {
 			tP.handleEvent(new ActivityEndEvent(500.0 * i, agentId, linkId, facilityId, "type"));
 		}
 
-		Assert.assertEquals("Check time", 9000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time", 10800.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Check time");
+		Assertions.assertEquals(10800.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Check time");
 
 		tP.reset(1);
-		Assert.assertEquals("Check time", 11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time", 9900.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Check time");
+		Assertions.assertEquals(9900.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON, "Check time");
 	}
 }

@@ -22,7 +22,7 @@ package org.matsim.integration.population;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -91,7 +91,7 @@ public class NonAlternatingPlanElementsIT {
 		controler.getConfig().controller().setCreateGraphs(false);
         controler.run();
 
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
 	@Test
@@ -123,7 +123,7 @@ public class NonAlternatingPlanElementsIT {
 		controler.getConfig().controller().setCreateGraphs(false);
         controler.run();
 
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
 	// TODO: make more complicated plans when testing subtour mode choice

@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -187,13 +187,13 @@ public class VehicleWaitingTest {
 			.run();
 
 		for ( Id<Person> id : personIds ) {
-			Assert.assertNotNull(
-					"no arrivals for person "+id,
-					arrivalCounts.get( id ) );
-			Assert.assertEquals(
-					"unexpected number of arrivals for person "+id,
+			Assertions.assertNotNull(
+					arrivalCounts.get( id ),
+					"no arrivals for person "+id );
+			Assertions.assertEquals(
 					nLaps * 2,
-					arrivalCounts.get( id ).intValue());
+					arrivalCounts.get( id ).intValue(),
+					"unexpected number of arrivals for person "+id);
 		}
 	}
 }

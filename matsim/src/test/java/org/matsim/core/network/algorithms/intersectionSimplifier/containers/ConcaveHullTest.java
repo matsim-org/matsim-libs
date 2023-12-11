@@ -19,7 +19,7 @@
 
 package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
@@ -38,11 +38,11 @@ public class ConcaveHullTest {
 	void testConstructor(){
 		GeometryCollection gcIncorrect = setupWithDuplicates();
 		ConcaveHull ch1 = new ConcaveHull(gcIncorrect, 2);
-		Assert.assertEquals("Duplicates not removed.", 8, ch1.getInputPoints());
+		Assertions.assertEquals(8, ch1.getInputPoints(), "Duplicates not removed.");
 
 		GeometryCollection gcCorrect = setup();
 		ConcaveHull ch2 = new ConcaveHull(gcCorrect, 2);
-		Assert.assertEquals("Wrong number of input points.", 8, ch2.getInputPoints());
+		Assertions.assertEquals(8, ch2.getInputPoints(), "Wrong number of input points.");
 	}
 
 
@@ -50,7 +50,7 @@ public class ConcaveHullTest {
 		GeometryCollection gc = setup();
 		ConcaveHull ch = new ConcaveHull(gc, 1.0);
 		Geometry g = ch.getConcaveHull();
-		Assert.assertTrue("Wrong geometry created.", g instanceof Polygon);
+		Assertions.assertTrue(g instanceof Polygon, "Wrong geometry created.");
 	}
 
 

@@ -21,8 +21,7 @@
 package org.matsim.core.replanning.strategies;
 
 import com.google.inject.Singleton;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -98,13 +97,13 @@ public class DeterministicMultithreadedReplanningIT {
 			long cksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
-			Assert.assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
+			Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			Assert.assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
+			Assertions.assertEquals(pcksum1, pcksum2, "The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 	}
 
@@ -151,13 +150,13 @@ public class DeterministicMultithreadedReplanningIT {
 			long cksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
-			Assert.assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
+			Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			Assert.assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
+			Assertions.assertEquals(pcksum1, pcksum2, "The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 	}
 
@@ -205,13 +204,13 @@ public class DeterministicMultithreadedReplanningIT {
 			long cksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
-			Assert.assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
+			Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			Assert.assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
+			Assertions.assertEquals(pcksum1, pcksum2, "The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 
 	}
@@ -257,13 +256,13 @@ public class DeterministicMultithreadedReplanningIT {
 			long cksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
-			Assert.assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
+			Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			Assert.assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
+			Assertions.assertEquals(pcksum1, pcksum2, "The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.");
 		}
 	}
 

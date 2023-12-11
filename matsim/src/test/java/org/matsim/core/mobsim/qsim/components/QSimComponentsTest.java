@@ -31,7 +31,7 @@ import com.google.inject.BindingAnnotation;
 import com.google.inject.ProvisionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -96,7 +96,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 								.build(scenario, eventsManager) //
 								.run();
 
-		Assert.assertTrue( "MockMobsimListener was not added to QSim", handler.hasBeenCalled() ) ;
+		Assertions.assertTrue( handler.hasBeenCalled(), "MockMobsimListener was not added to QSim" ) ;
 	}
 
 	 /**
@@ -139,7 +139,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 								.build(scenario, eventsManager) //
 								.run();
 
-		Assert.assertFalse( "MockMobsimListener was added to QSim although it should not have been added", handler.hasBeenCalled() ) ;
+		Assertions.assertFalse( handler.hasBeenCalled(), "MockMobsimListener was added to QSim although it should not have been added" ) ;
 	}
 
 	 /**
@@ -231,7 +231,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 								.build(scenario, eventsManager) //
 								.run();
 
-		Assert.assertTrue( "MockMobsimListener was not added to QSim", handler.hasBeenCalled() ) ;
+		Assertions.assertTrue( handler.hasBeenCalled(), "MockMobsimListener was not added to QSim" ) ;
 	}
 
 
@@ -262,7 +262,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 								.build(scenario, eventsManager) //
 								.run();
 
-		Assert.assertTrue( handler.hasBeenCalled() ) ;
+		Assertions.assertTrue( handler.hasBeenCalled() ) ;
 	}
 
 	 @Test
@@ -285,7 +285,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 								.build(scenario, eventsManager) //
 								.run();
 
-		Assert.assertFalse( handler.hasBeenCalled() ) ;
+		Assertions.assertFalse( handler.hasBeenCalled() ) ;
 	}
 
 	 @Test
@@ -311,8 +311,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 				.build(scenario, eventsManager) //
 				.run();
 
-		Assert.assertTrue(mockEngineA.isCalled);
-		Assert.assertTrue(mockEngineB.isCalled);
+		Assertions.assertTrue(mockEngineA.isCalled);
+		Assertions.assertTrue(mockEngineB.isCalled);
 	}
 
 	 @Test
@@ -336,7 +336,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 				.build(scenario, eventsManager) //
 				.run();
 
-		Assert.assertTrue(mockEngine.isCalled);
+		Assertions.assertTrue(mockEngine.isCalled);
 	}
 
 	 @Test
@@ -360,7 +360,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 				.build(scenario, eventsManager) //
 				.run();
 
-		Assert.assertTrue(mockEngine.isCalled);
+		Assertions.assertTrue(mockEngine.isCalled);
 	}
 
 	 @Test
@@ -388,7 +388,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 				.build(scenario, eventsManager) //
 				.run();
 
-		Assert.assertTrue(mockEngine.isCalled);
+		Assertions.assertTrue(mockEngine.isCalled);
 	}
 
 	// ---

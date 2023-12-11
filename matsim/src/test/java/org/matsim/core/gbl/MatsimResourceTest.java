@@ -20,11 +20,11 @@
 
 package org.matsim.core.gbl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.awt.Image;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 

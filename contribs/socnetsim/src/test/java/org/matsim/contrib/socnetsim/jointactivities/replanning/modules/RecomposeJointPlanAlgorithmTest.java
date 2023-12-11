@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointactivities.replanning.modules;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -286,32 +286,32 @@ public class RecomposeJointPlanAlgorithmTest {
 		algo.run( fixture.groupPlans );
 
 		assertEquals(
-				"unexpected number of plans",
 				initialNPlans,
-				fixture.groupPlans.getAllIndividualPlans().size());
+				fixture.groupPlans.getAllIndividualPlans().size(),
+				"unexpected number of plans");
 
 		assertEquals(
-				"unexpected number of joint plans",
 				fixture.expectedNJointPlans,
-				fixture.groupPlans.getJointPlans().size());
+				fixture.groupPlans.getJointPlans().size(),
+				"unexpected number of joint plans");
 
 		for (JointPlan jp : fixture.groupPlans.getJointPlans()) {
 			final Set<Id<Person>> ids = jp.getIndividualPlans().keySet();
 			assertTrue(
-					"unexpected joint plan "+ids+": not in "+fixture.expectedJointPlanStructure,
-					fixture.expectedJointPlanStructure.contains( ids ));
+					fixture.expectedJointPlanStructure.contains( ids ),
+					"unexpected joint plan "+ids+": not in "+fixture.expectedJointPlanStructure);
 		}
 
 		assertEquals(
-				"unexpected number of individual plans",
 				fixture.expectedNIndivPlans,
-				fixture.groupPlans.getIndividualPlans().size());
+				fixture.groupPlans.getIndividualPlans().size(),
+				"unexpected number of individual plans");
 
 		for (Plan p : fixture.groupPlans.getIndividualPlans()) {
 			final Set<Id<Person>> ids = Collections.singleton( p.getPerson().getId() );
 			assertTrue(
-					"unexpected individual plan "+ids+": not in "+fixture.expectedJointPlanStructure,
-					fixture.expectedJointPlanStructure.contains( ids ));
+					fixture.expectedJointPlanStructure.contains( ids ),
+					"unexpected individual plan "+ids+": not in "+fixture.expectedJointPlanStructure);
 		}
 	}
 }

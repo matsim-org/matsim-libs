@@ -21,7 +21,7 @@ package org.matsim.examples.simple;
 
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -206,10 +206,10 @@ public class PtScoringTest {
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
 
 			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(-21.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(-21.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(27.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(27.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 		}
@@ -362,10 +362,10 @@ public class PtScoringTest {
 
 			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
 //				Assert.assertEquals(89.14608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-				Assert.assertEquals(-19.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(-19.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(29.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(29.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 		}
@@ -449,10 +449,10 @@ public class PtScoringTest {
 			System.out.println("agent score: " + pp.getSelectedPlan().getScore() ) ;
 
 			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(89.13108279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(89.13108279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(137.1310827971504, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(137.1310827971504, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 		}
 
@@ -531,10 +531,10 @@ public class PtScoringTest {
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
 
 			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(89.87441613048377, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(89.87441613048377, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(137.87441613048375, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(137.87441613048375, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 

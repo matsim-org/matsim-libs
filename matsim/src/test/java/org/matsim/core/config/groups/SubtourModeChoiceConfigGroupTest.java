@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,40 +38,40 @@ public class SubtourModeChoiceConfigGroupTest {
 			SubtourModeChoiceConfigGroup.MODES,
 			"foot,car,balloon" );
 		assertArrayEquals(
-				msg,
 				new String[]{"foot", "car", "balloon" },
-				group.getModes() );
+				group.getModes(),
+				msg );
 		assertEquals(
-				msgString,
 				"foot,car,balloon",
 				group.getValue(
-					SubtourModeChoiceConfigGroup.MODES ));
+					SubtourModeChoiceConfigGroup.MODES ),
+				msgString);
 
 		group.addParam( 
 			SubtourModeChoiceConfigGroup.MODES,
 			"    rocket,bike" );
 		assertArrayEquals(
-				msg,
 				new String[]{"rocket", "bike" },
-				group.getModes() );
+				group.getModes(),
+				msg );
 		assertEquals(
-				msgString,
 				"rocket,bike",
 				group.getValue(
-					SubtourModeChoiceConfigGroup.MODES ));
+					SubtourModeChoiceConfigGroup.MODES ),
+				msgString);
 
 		group.addParam( 
 			SubtourModeChoiceConfigGroup.MODES,
 			"skateboard       ,      		  unicycle      " );
 		assertArrayEquals(
-				msg,
 				new String[]{"skateboard", "unicycle" },
-				group.getModes() );
+				group.getModes(),
+				msg );
 		assertEquals(
-				msgString,
 				"skateboard,unicycle",
 				group.getValue(
-					SubtourModeChoiceConfigGroup.MODES ));
+					SubtourModeChoiceConfigGroup.MODES ),
+				msgString);
 	}
 
 	@Test
@@ -87,40 +84,40 @@ public class SubtourModeChoiceConfigGroupTest {
 			SubtourModeChoiceConfigGroup.CHAINBASEDMODES,
 			"foot,car,balloon" );
 		assertArrayEquals(
-				msg,
 				new String[]{"foot", "car", "balloon" },
-				group.getChainBasedModes() );
+				group.getChainBasedModes(),
+				msg );
 		assertEquals(
-				msgString,
 				"foot,car,balloon",
 				group.getValue(
-				SubtourModeChoiceConfigGroup.CHAINBASEDMODES));
+				SubtourModeChoiceConfigGroup.CHAINBASEDMODES),
+				msgString);
 
 		group.addParam( 
 			SubtourModeChoiceConfigGroup.CHAINBASEDMODES,
 			"    rocket,bike" );
 		assertArrayEquals(
-				msg,
 				new String[]{"rocket", "bike" },
-				group.getChainBasedModes() );
+				group.getChainBasedModes(),
+				msg );
 		assertEquals(
-				msgString,
 				"rocket,bike",
 				group.getValue(
-					SubtourModeChoiceConfigGroup.CHAINBASEDMODES));
+					SubtourModeChoiceConfigGroup.CHAINBASEDMODES),
+				msgString);
 
 		group.addParam( 
 			SubtourModeChoiceConfigGroup.CHAINBASEDMODES,
 			"skateboard       ,      		  unicycle      " );
 		assertArrayEquals(
-				msg,
 				new String[]{"skateboard", "unicycle" },
-				group.getChainBasedModes() );
+				group.getChainBasedModes(),
+				msg );
 		assertEquals(
-				msgString,
 				"skateboard,unicycle",
 				group.getValue(
-					SubtourModeChoiceConfigGroup.CHAINBASEDMODES));
+					SubtourModeChoiceConfigGroup.CHAINBASEDMODES),
+				msgString);
 	}
 
 	@Test
@@ -128,18 +125,18 @@ public class SubtourModeChoiceConfigGroupTest {
 		SubtourModeChoiceConfigGroup group = new SubtourModeChoiceConfigGroup();
 
 		assertFalse(
-				"default value is not backward compatible",
-				group.considerCarAvailability() );
+				group.considerCarAvailability(),
+				"default value is not backward compatible" );
 
 		group.addParam( 
 			SubtourModeChoiceConfigGroup.CARAVAIL,
 			"true" );	
-		assertTrue( "the value was not set to true" , group.considerCarAvailability() );
+		assertTrue( group.considerCarAvailability(), "the value was not set to true" );
 
 		group.addParam( 
 			SubtourModeChoiceConfigGroup.CARAVAIL,
 			"false" );	
-		assertFalse( "the value was not set to false" , group.considerCarAvailability() );
+		assertFalse( group.considerCarAvailability(), "the value was not set to false" );
 	}
 }
 

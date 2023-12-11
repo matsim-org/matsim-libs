@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.roadpricing.run;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
@@ -31,8 +33,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author vsp-gleich
@@ -55,14 +55,14 @@ public class RoadPricingByConfigfileTest {
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, EventsUtils.compareEventsFiles( expected, actual ));
+				Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, EventsUtils.compareEventsFiles( expected, actual ));
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
-				Assert.assertTrue("Populations are different", PopulationUtils.comparePopulations( expected, actual ));
+				Assertions.assertTrue(PopulationUtils.comparePopulations( expected, actual ), "Populations are different");
 			}
 
 

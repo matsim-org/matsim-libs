@@ -20,14 +20,14 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -92,7 +92,7 @@ public class WalkTravelTimeTest {
 
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0, 0);
 
 		// increase age
 		PersonUtils.setAge(person, 80);
@@ -102,7 +102,7 @@ public class WalkTravelTimeTest {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0, 0);
 
 		// change gender
 		PersonUtils.setSex(person, "f");
@@ -112,7 +112,7 @@ public class WalkTravelTimeTest {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0, 0);
 
 		// change slope from 0% to -10%
 		h2 = -0.1;
@@ -126,7 +126,7 @@ public class WalkTravelTimeTest {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0, 0);
 
 		// change slope from -10% to 10%
 		h2 = 0.1;
@@ -139,7 +139,7 @@ public class WalkTravelTimeTest {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0, 0);
 	}
 
 	private void printInfo(Person p, double expected, double calculated, double slope) {

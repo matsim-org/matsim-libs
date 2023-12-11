@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -74,18 +74,18 @@ public class LinkSpeedCalculatorIntegrationTest {
 			.run();
 
 		List<Event> events = collector.getEvents();
-		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
+		Assertions.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getVehicleId().toString());
-		Assert.assertEquals("2", lee.getLinkId().toString());
+		Assertions.assertEquals("1", lee.getVehicleId().toString());
+		Assertions.assertEquals("2", lee.getLinkId().toString());
 
-		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
+		Assertions.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getVehicleId().toString());
-		Assert.assertEquals("2", lle.getLinkId().toString());
+		Assertions.assertEquals("1", lle.getVehicleId().toString());
+		Assertions.assertEquals("2", lle.getLinkId().toString());
 
 		// by default, the link takes 10 seconds to travel along, plus 1 second in the buffer, makes total of 11 seconds
-		Assert.assertEquals(11, lle.getTime() - lee.getTime(), 1e-8);
+		Assertions.assertEquals(11, lle.getTime() - lee.getTime(), 1e-8);
 	}
 
 	@SuppressWarnings("static-method")
@@ -126,18 +126,18 @@ public class LinkSpeedCalculatorIntegrationTest {
 		builder.build( scenario, eventsManager ).run() ;
 
 		List<Event> events = collector.getEvents();
-		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
+		Assertions.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getVehicleId().toString());
-		Assert.assertEquals("2", lee.getLinkId().toString());
+		Assertions.assertEquals("1", lee.getVehicleId().toString());
+		Assertions.assertEquals("2", lee.getLinkId().toString());
 
-		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
+		Assertions.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getVehicleId().toString());
-		Assert.assertEquals("2", lle.getLinkId().toString());
+		Assertions.assertEquals("1", lle.getVehicleId().toString());
+		Assertions.assertEquals("2", lle.getLinkId().toString());
 
 		// with 5 per second, the link takes 20 seconds to travel along, plus 1 second in the buffer, makes total of 21 seconds
-		Assert.assertEquals(21, lle.getTime() - lee.getTime(), 1e-8);
+		Assertions.assertEquals(21, lle.getTime() - lee.getTime(), 1e-8);
 	}
 
 	@SuppressWarnings("static-method")
@@ -183,18 +183,18 @@ public class LinkSpeedCalculatorIntegrationTest {
 		new QSimBuilder( config ).useDefaults().addOverridingQSimModule( overrides ).build( scenario, eventsManager ).run() ;
 
 		List<Event> events = collector.getEvents();
-		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
+		Assertions.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getVehicleId().toString());
-		Assert.assertEquals("2", lee.getLinkId().toString());
+		Assertions.assertEquals("1", lee.getVehicleId().toString());
+		Assertions.assertEquals("2", lee.getLinkId().toString());
 
-		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
+		Assertions.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getVehicleId().toString());
-		Assert.assertEquals("2", lle.getLinkId().toString());
+		Assertions.assertEquals("1", lle.getVehicleId().toString());
+		Assertions.assertEquals("2", lle.getLinkId().toString());
 
 		// the link should take 5 seconds to travel along, plus 1 second in the buffer, makes total of 6 seconds
-		Assert.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
+		Assertions.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
 	}
 
 	static class CustomLinkSpeedCalculator implements LinkSpeedCalculator {

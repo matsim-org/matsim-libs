@@ -23,7 +23,7 @@
  */
 package org.matsim.contrib.otfvis;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
@@ -61,7 +61,7 @@ public class OTFVisIT {
 		OTFVis.main(args);
 
 		File f = new File(mviFilename);
-		Assert.assertTrue("No mvi file written!", f.exists());
+		Assertions.assertTrue(f.exists(), "No mvi file written!");
 	}
 
 	@Test
@@ -83,9 +83,9 @@ public class OTFVisIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
 	}
 
 }

@@ -26,8 +26,8 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -179,10 +179,10 @@ public class CarrierControlerUtilsIT {
 
 	@Test
 	void numberOfToursIsCorrect() {
-		Assert.assertEquals(2, carrierWServices.getSelectedPlan().getScheduledTours().size());
-		Assert.assertEquals(1, carrierWShipments.getSelectedPlan().getScheduledTours().size());
-		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours().size());
-		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(2, carrierWServices.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1, carrierWShipments.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours().size());
 	}
 
 
@@ -191,7 +191,7 @@ public class CarrierControlerUtilsIT {
 	 */
 	@Test
 	void toursInitialCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assertions.assertEquals(-270.462, carrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
@@ -213,7 +213,7 @@ public class CarrierControlerUtilsIT {
 	 */
 	@Test
 	void toursInitialCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assertions.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -237,7 +237,7 @@ public class CarrierControlerUtilsIT {
 	 */
 	@Test
 	void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assertions.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
@@ -263,7 +263,7 @@ public class CarrierControlerUtilsIT {
 	 */
 	@Test
 	void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assertions.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){

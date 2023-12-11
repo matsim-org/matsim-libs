@@ -19,7 +19,7 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,11 +44,11 @@ public class LanesBasedWidthCalculatorTest {
 		l1.setNumberOfLanes(2.0);
 
 
-		Assert.assertEquals("The default in the Network is set to a value that is possibly not conform to the default in network_v1.dtd", 3.75, net.getEffectiveLaneWidth(), 1e-10);
+		Assertions.assertEquals(3.75, net.getEffectiveLaneWidth(), 1e-10, "The default in the Network is set to a value that is possibly not conform to the default in network_v1.dtd");
 		((Network)net).setEffectiveLaneWidth(1.0);
 		double w = new LanesBasedWidthCalculator((Network) net, 1.0).getWidth(l1);
-		Assert.assertFalse(Double.isNaN(w));
-		Assert.assertEquals(2.0, w, 1e-10);
+		Assertions.assertFalse(Double.isNaN(w));
+		Assertions.assertEquals(2.0, w, 1e-10);
 	}
 
 }

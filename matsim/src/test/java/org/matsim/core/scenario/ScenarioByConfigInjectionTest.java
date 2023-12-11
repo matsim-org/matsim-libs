@@ -23,7 +23,7 @@
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -42,7 +42,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
- /**
+	/**
  * @author thibautd
  */
 public class ScenarioByConfigInjectionTest {
@@ -81,10 +81,10 @@ public class ScenarioByConfigInjectionTest {
 		Object stupid = person.getAttributes().getAttribute( "stupidAttribute" );
 
 		// TODO test for ALL attribute containers...
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 
 		log.info( "get person attribute" );
 		stupid = scenario.getPopulation()
@@ -93,10 +93,10 @@ public class ScenarioByConfigInjectionTest {
 				.getAttributes()
 				.getAttribute( "otherAttribute" );
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 
 		log.info( "get activity attribute" );
 		stupid = scenario.getPopulation()
@@ -108,10 +108,10 @@ public class ScenarioByConfigInjectionTest {
 				.getAttributes()
 				.getAttribute( "actAttribute" );
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 
 		log.info( "get leg attribute" );
 		stupid = scenario.getPopulation()
@@ -123,20 +123,20 @@ public class ScenarioByConfigInjectionTest {
 				.getAttributes()
 				.getAttribute( "legAttribute" );
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 
 		log.info( "get network attribute" );
 		stupid = scenario.getNetwork()
 				.getAttributes()
 				.getAttribute( "networkAttribute" );
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 
 		log.info( "get Link attribute" );
 		stupid = scenario.getNetwork()
@@ -145,10 +145,10 @@ public class ScenarioByConfigInjectionTest {
 				.getAttributes()
 				.getAttribute( "linkAttribute" );
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 
 		log.info( "get Node attribute" );
 		stupid = scenario.getNetwork()
@@ -157,10 +157,10 @@ public class ScenarioByConfigInjectionTest {
 				.getAttributes()
 				.getAttribute( "nodeAttribute" );
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
+		Assertions.assertEquals(
 				StupidClass.class,
-				stupid.getClass() );
+				stupid.getClass(),
+				"Unexpected type of read in attribute" );
 	}
 
 	private Config createTestScenario() {

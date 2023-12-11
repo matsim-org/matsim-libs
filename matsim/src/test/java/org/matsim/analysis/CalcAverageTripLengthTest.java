@@ -22,6 +22,8 @@
  package org.matsim.analysis;
 
 import java.util.ArrayList;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,9 +44,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import org.junit.Assert;
-
- public class CalcAverageTripLengthTest {
+	public class CalcAverageTripLengthTest {
 
 	 @Test
 	 void testWithRoute() {
@@ -89,9 +89,9 @@ import org.junit.Assert;
 
 		// test simple route, startLink should not be included, endLink should
 		CalcAverageTripLength catl = new CalcAverageTripLength(network);
-		Assert.assertEquals(0.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 		catl.run(plan);
-		Assert.assertEquals(300.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(300.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 
 		// extend route by one link, test again
 		linkIds.add(l3.getId());
@@ -100,7 +100,7 @@ import org.junit.Assert;
 
 		catl = new CalcAverageTripLength(network);
 		catl.run(plan);
-		Assert.assertEquals(700.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(700.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 
 		// don't reset catl, modify route, test average
 		linkIds.remove(1);
@@ -108,7 +108,7 @@ import org.junit.Assert;
 		((Activity) act2).setLinkId(l3.getId());
 
 		catl.run(plan);
-		Assert.assertEquals(500.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 	}
 
 	 @Test
@@ -145,7 +145,7 @@ import org.junit.Assert;
 		// test simple route, startLink should not be included, endLink should be
 		CalcAverageTripLength catl = new CalcAverageTripLength(network);
 		catl.run(plan);
-		Assert.assertEquals(100.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 	}
 
 	 @Test
@@ -178,7 +178,7 @@ import org.junit.Assert;
 		// test simple route, none of the links should be included, as there is no real traffic
 		CalcAverageTripLength catl = new CalcAverageTripLength(network);
 		catl.run(plan);
-		Assert.assertEquals(0.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 	}
 
 }

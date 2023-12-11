@@ -33,8 +33,7 @@ import org.matsim.vehicles.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NetworkRoutingInclAccessEgressModuleTest {
 

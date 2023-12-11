@@ -21,7 +21,7 @@
 
  package org.matsim.core.controler;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -30,7 +30,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
- /**
+	/**
  * @author mrieser / senozon
  */
 public class ControlerListenerManagerImplTest {
@@ -44,32 +44,32 @@ public class ControlerListenerManagerImplTest {
 		m.addControlerListener(ecl);
 		
 		m.fireControlerStartupEvent();
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(0, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(0, ecl.nOfIterStarts);
-		Assert.assertEquals(0, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(0, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(0, ecl.nOfIterStarts);
+		Assertions.assertEquals(0, ecl.nOfShutdowns);
 		
 		m.fireControlerIterationStartsEvent(0, false);
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(1, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(1, ecl.nOfIterStarts);
-		Assert.assertEquals(0, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(1, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(1, ecl.nOfIterStarts);
+		Assertions.assertEquals(0, ecl.nOfShutdowns);
 		
 		m.fireControlerIterationStartsEvent(1, false);
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(2, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(2, ecl.nOfIterStarts);
-		Assert.assertEquals(0, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(2, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(2, ecl.nOfIterStarts);
+		Assertions.assertEquals(0, ecl.nOfShutdowns);
 		
 		m.fireControlerShutdownEvent(false, 1);
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(2, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(2, ecl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(2, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(2, ecl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfShutdowns);
 	}
 
 	 @Test
@@ -81,32 +81,32 @@ public class ControlerListenerManagerImplTest {
 		m.addCoreControlerListener(ecl);
 		
 		m.fireControlerStartupEvent();
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(0, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(0, ecl.nOfIterStarts);
-		Assert.assertEquals(0, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(0, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(0, ecl.nOfIterStarts);
+		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
 		m.fireControlerIterationStartsEvent(0, false);
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(1, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(1, ecl.nOfIterStarts);
-		Assert.assertEquals(0, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(1, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(1, ecl.nOfIterStarts);
+		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
 		m.fireControlerIterationStartsEvent(1, false);
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(2, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(2, ecl.nOfIterStarts);
-		Assert.assertEquals(0, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(2, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(2, ecl.nOfIterStarts);
+		Assertions.assertEquals(0, ecl.nOfShutdowns);
 		
 		m.fireControlerShutdownEvent(false, 1);
-		Assert.assertEquals(1, ccl.nOfStartups);
-		Assert.assertEquals(2, ccl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfStartups);
-		Assert.assertEquals(2, ecl.nOfIterStarts);
-		Assert.assertEquals(1, ecl.nOfShutdowns);
+		Assertions.assertEquals(1, ccl.nOfStartups);
+		Assertions.assertEquals(2, ccl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfStartups);
+		Assertions.assertEquals(2, ecl.nOfIterStarts);
+		Assertions.assertEquals(1, ecl.nOfShutdowns);
 	}
 	
 	private static class CountingControlerListener implements StartupListener, IterationStartsListener {

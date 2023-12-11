@@ -22,7 +22,7 @@ package org.matsim.core.utils.collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -40,11 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test for {@link QuadTree}.
@@ -111,7 +107,7 @@ public class QuadTreeTest {
 		QuadTree<String> qt = new QuadTree<>(-50.0, -50.0, 50.0, 50.0);
 		try {
 			qt.put( -100 , 0 , "-100 0" );
-			Assert.fail( "no exception when adding an element on the left" );
+			Assertions.fail( "no exception when adding an element on the left" );
 		}
 		catch (IllegalArgumentException e) {
 			log.info( "catched expected exception" , e );
@@ -119,7 +115,7 @@ public class QuadTreeTest {
 
 		try {
 			qt.put( 100 , 0 , "100 0" );
-			Assert.fail( "no exception when adding an element on the right" );
+			Assertions.fail( "no exception when adding an element on the right" );
 		}
 		catch (IllegalArgumentException e) {
 			log.info( "catched expected exception" , e );
@@ -127,7 +123,7 @@ public class QuadTreeTest {
 
 		try {
 			qt.put( 0 , 100 , "0 100" );
-			Assert.fail( "no exception when adding an element above" );
+			Assertions.fail( "no exception when adding an element above" );
 		}
 		catch (IllegalArgumentException e) {
 			log.info( "catched expected exception" , e );
@@ -135,7 +131,7 @@ public class QuadTreeTest {
 
 		try {
 			qt.put( 0 , -100 , "0 -100" );
-			Assert.fail( "no exception when adding an element below" );
+			Assertions.fail( "no exception when adding an element below" );
 		}
 		catch (IllegalArgumentException e) {
 			log.info( "catched expected exception" , e );
@@ -189,19 +185,19 @@ public class QuadTreeTest {
 
 		// test "distance" get with critical distances
 		values = qt.getDisk(90.0, 0.0, 9.0);
-		assertEquals("test with distance 9.0", 0, values.size());
+		assertEquals(0, values.size(), "test with distance 9.0");
 
 		values = qt.getDisk(90.0, 0.0, 9.999);
-		assertEquals("test with distance 9.999", 0, values.size());
+		assertEquals(0, values.size(), "test with distance 9.999");
 
 		values = qt.getDisk(90.0, 0.0, 10.0);
-		assertEquals("test with distance 10.0", 1, values.size());
+		assertEquals(1, values.size(), "test with distance 10.0");
 
 		values = qt.getDisk(90.0, 0.0, 10.001);
-		assertEquals("test with distance 10.001", 1, values.size());
+		assertEquals(1, values.size(), "test with distance 10.001");
 
 		values = qt.getDisk(90.0, 0.0, 11.0);
-		assertEquals("test with distance 11.0", 1, values.size());
+		assertEquals(1, values.size(), "test with distance 11.0");
 
 		// test "area"
 		values.clear();
@@ -363,14 +359,14 @@ public class QuadTreeTest {
 										distance );
 
 							//log.info( "testing foci "+f1+" and "+f2+", distance="+distance+", expected="+expected );
-							Assert.assertEquals(
-									"unexpected number of elements returned for foci "+f1+" and "+f2+", distance="+distance,
+							Assertions.assertEquals(
 									expected.size(),
-									actual.size() );
+									actual.size(),
+									"unexpected number of elements returned for foci "+f1+" and "+f2+", distance="+distance );
 
-							Assert.assertTrue(
-									"unexpected elements returned for foci "+f1+" and "+f2+", distance="+distance,
-									expected.containsAll( actual ) );
+							Assertions.assertTrue(
+									expected.containsAll( actual ),
+									"unexpected elements returned for foci "+f1+" and "+f2+", distance="+distance );
 						}
 					}
 				}
@@ -388,9 +384,9 @@ public class QuadTreeTest {
 		
 		Collection<String> values = new ArrayList<>();
 		qt.getRectangle(new Rect(400, 300, 700, 900), values);
-		Assert.assertEquals(2, values.size());
-		Assert.assertTrue(values.contains("node2"));
-		Assert.assertTrue(values.contains("node3"));
+		Assertions.assertEquals(2, values.size());
+		Assertions.assertTrue(values.contains("node2"));
+		Assertions.assertTrue(values.contains("node3"));
 	}
 
 	@Test
@@ -403,15 +399,15 @@ public class QuadTreeTest {
 
 		Collection<String> values = new ArrayList<>();
 		qt.getRectangle(new Rect(90, -10, 600, +10), values);
-		Assert.assertEquals(2, values.size());
-		Assert.assertTrue(values.contains("node2"));
-		Assert.assertTrue(values.contains("node3"));
+		Assertions.assertEquals(2, values.size());
+		Assertions.assertTrue(values.contains("node2"));
+		Assertions.assertTrue(values.contains("node3"));
 
 		Collection<String> values2 = new ArrayList<>();
 		qt.getRectangle(new Rect(90, 0, 600, 0), values2);
-		Assert.assertEquals(2, values2.size());
-		Assert.assertTrue(values2.contains("node2"));
-		Assert.assertTrue(values2.contains("node3"));
+		Assertions.assertEquals(2, values2.size());
+		Assertions.assertTrue(values2.contains("node2"));
+		Assertions.assertTrue(values2.contains("node3"));
 	}
 
 	/**
@@ -704,11 +700,11 @@ public class QuadTreeTest {
 		}
 
 		List<String> items = new ArrayList<>(qt.values());
-		Assert.assertEquals(1000, items.size());
+		Assertions.assertEquals(1000, items.size());
 		items.sort(String::compareTo);
 		expected.sort(String::compareTo);
 		for (int i = 0; i < 1000; i++) {
-			Assert.assertEquals(expected.get(i), items.get(i));
+			Assertions.assertEquals(expected.get(i), items.get(i));
 		}
 	}
 

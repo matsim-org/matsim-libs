@@ -1,6 +1,6 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -39,7 +39,7 @@ public class VehId2DelayAtStopMapDataTest {
         
 //        testing
         
-        Assert.assertNotNull(mapData);
+        Assertions.assertNotNull(mapData);
         
         
         

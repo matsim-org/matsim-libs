@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.minibus.schedule;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -60,7 +60,7 @@ public class CreateStopsForAllCarLinksTest {
 			}
 		}
 
-		Assert.assertEquals("All car links got a paratransit stop", numberOfCarLinks, numberOfParaStops, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(numberOfCarLinks, numberOfParaStops, MatsimTestUtils.EPSILON, "All car links got a paratransit stop");
 
 		TransitScheduleFactoryImpl tSF = new TransitScheduleFactoryImpl();
 
@@ -78,7 +78,7 @@ public class CreateStopsForAllCarLinksTest {
 			}
 		}
 
-		Assert.assertEquals("All car links minus one stop from formal transit got a paratransit stop", numberOfCarLinks - 1, numberOfParaStops, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(numberOfCarLinks - 1, numberOfParaStops, MatsimTestUtils.EPSILON, "All car links minus one stop from formal transit got a paratransit stop");
 
 	}
 

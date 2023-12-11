@@ -21,7 +21,7 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -72,8 +72,8 @@ public class TestForEmergenceTime {
 			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
 			for(CongestionEvent event : congestionEvents){
 				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
-					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON);
-					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
+					Assertions.assertEquals(8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON, "wrong emergence time");
+					Assertions.assertEquals(Id.createLinkId("3"), event.getLinkId(), "wrong linkId");
 				}
 			}
 		}

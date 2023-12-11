@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 

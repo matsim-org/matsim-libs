@@ -23,9 +23,9 @@ package org.matsim.contrib.analysis.kai;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -172,7 +172,7 @@ public class KNAnalysisEventsHandlerTest {
 			LogManager.getLogger(this.getClass()).info( "comparing " + str );
 			final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
 			final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
-			Assert.assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+			Assertions.assertEquals(expectedChecksum, actualChecksum, "Output files differ.");
 		}
 	}
 

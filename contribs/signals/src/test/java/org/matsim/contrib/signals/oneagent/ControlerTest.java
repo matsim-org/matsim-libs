@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.oneagent;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -120,10 +120,10 @@ public class ControlerTest {
 		@Override
 		public void handleEvent(SignalGroupStateChangedEvent e) {
 			if (e.getNewState().equals(SignalGroupState.RED)){
-				Assert.assertEquals(0.0, e.getTime(), 1e-7);
+				Assertions.assertEquals(0.0, e.getTime(), 1e-7);
 			}
 			else if (e.getNewState().equals(SignalGroupState.GREEN)) {
-				Assert.assertEquals(100.0, e.getTime(), 1e-7);
+				Assertions.assertEquals(100.0, e.getTime(), 1e-7);
 			}
 		}
 	}
@@ -137,7 +137,7 @@ public class ControlerTest {
 		@Override
 		public void handleEvent(LinkEnterEvent e){
 			if (e.getLinkId().equals(linkId2)) {
-				Assert.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
 			}
 		}
 	}

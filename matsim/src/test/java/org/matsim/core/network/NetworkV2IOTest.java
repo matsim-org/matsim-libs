@@ -21,7 +21,7 @@
 
  package org.matsim.core.network;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -33,7 +33,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
- /**
+	/**
  * @author thibautd
  */
 public class NetworkV2IOTest {
@@ -49,9 +49,9 @@ public class NetworkV2IOTest {
 		final Scenario read = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader( read.getNetwork() ).readFile( utils.getOutputDirectory()+"network.xml" );
 
-		Assert.assertEquals( "unexpected year in network metadata",
-				sc.getNetwork().getAttributes().getAttribute( "year" ),
-				read.getNetwork().getAttributes().getAttribute( "year" ) );
+		Assertions.assertEquals( sc.getNetwork().getAttributes().getAttribute( "year" ),
+				read.getNetwork().getAttributes().getAttribute( "year" ),
+				"unexpected year in network metadata" );
 	}
 
 	 @Test
@@ -65,13 +65,13 @@ public class NetworkV2IOTest {
 
 		final Id<Node> id = Id.createNodeId( "Zurich" );
 
-		Assert.assertEquals( "unexpected internet attribute in node metadata",
-				"good",
-				read.getNetwork().getNodes().get( id ).getAttributes().getAttribute( "Internet" ) );
+		Assertions.assertEquals( "good",
+				read.getNetwork().getNodes().get( id ).getAttributes().getAttribute( "Internet" ),
+				"unexpected internet attribute in node metadata" );
 
-		Assert.assertEquals( "unexpected meeting attribute in node metadata",
-				false,
-				read.getNetwork().getNodes().get( id ).getAttributes().getAttribute( "Developper Meeting" ) );
+		Assertions.assertEquals( false,
+				read.getNetwork().getNodes().get( id ).getAttributes().getAttribute( "Developper Meeting" ),
+				"unexpected meeting attribute in node metadata" );
 	}
 
 	 @Test
@@ -88,8 +88,8 @@ public class NetworkV2IOTest {
 
 		final Coord zhCoord = read.getNetwork().getNodes().get( zh ).getCoord();
 
-		Assert.assertFalse( "did not expect Z",
-				zhCoord.hasZ() );
+		Assertions.assertFalse( zhCoord.hasZ(),
+				"did not expect Z" );
 	}
 
 	 @Test
@@ -106,13 +106,13 @@ public class NetworkV2IOTest {
 
 		final Coord zhCoord = read.getNetwork().getNodes().get( zh ).getCoord();
 
-		Assert.assertTrue( "did expect Z",
-				zhCoord.hasZ() );
+		Assertions.assertTrue( zhCoord.hasZ(),
+				"did expect Z" );
 
-		Assert.assertEquals( "unexpected Z value",
-				400,
+		Assertions.assertEquals( 400,
 				zhCoord.getZ() ,
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"unexpected Z value" );
 	}
 
 	 @Test
@@ -126,9 +126,9 @@ public class NetworkV2IOTest {
 
 		final Id<Link> id = Id.createLinkId( "trip" );
 
-		Assert.assertEquals( "unexpected mode attribute in link metadata",
-				3,
-				read.getNetwork().getLinks().get( id ).getAttributes().getAttribute( "number of modes" ) );
+		Assertions.assertEquals( 3,
+				read.getNetwork().getLinks().get( id ).getAttributes().getAttribute( "number of modes" ),
+				"unexpected mode attribute in link metadata" );
 	}
 
 	private Scenario createTestNetwork( boolean threeD) {

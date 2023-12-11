@@ -20,7 +20,7 @@
 
 package org.matsim.core.network.algorithms;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -65,14 +65,14 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode4, toNode4, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a sink / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 5, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(5, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
 	@Test
@@ -104,14 +104,14 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("6", Link.class), fromNode5, toNode5, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a sink / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 6, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(6, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
 	@Test
@@ -140,14 +140,14 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode4, toNode4, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a source / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 5, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(5, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
 	@Test
@@ -179,14 +179,14 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("6", Link.class), fromNode5, toNode5, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a source / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 6, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(6, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
 }

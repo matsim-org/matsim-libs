@@ -1,6 +1,6 @@
 package org.matsim.application.prepare.counts;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -159,7 +159,7 @@ public class CreateCountsFromBAStDataTest {
 			MeasurementLocation<Link> actual = map.get(supposed);
 			String actualStation = actual.getStationName();
 
-			Assert.assertEquals(station, actualStation);
+			Assertions.assertEquals(station, actualStation);
 		}
 	}
 
@@ -181,6 +181,6 @@ public class CreateCountsFromBAStDataTest {
 			"--manual-matched-counts=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
 		};
 
-		Assert.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
+		Assertions.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
 	}
 }

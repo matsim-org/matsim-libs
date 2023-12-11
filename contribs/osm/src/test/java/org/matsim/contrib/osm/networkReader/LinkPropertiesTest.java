@@ -1,9 +1,9 @@
 package org.matsim.contrib.osm.networkReader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.network.Link;
-
-import static org.junit.Assert.assertEquals;
 
 public class LinkPropertiesTest {
 

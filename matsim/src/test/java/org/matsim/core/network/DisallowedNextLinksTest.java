@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
@@ -33,19 +33,19 @@ public class DisallowedNextLinksTest {
 		dnl0.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1")));
 		dnl1.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1")));
 
-		Assert.assertEquals(dnl0, dnl1);
-		Assert.assertEquals(dnl1, dnl0);
+		Assertions.assertEquals(dnl0, dnl1);
+		Assertions.assertEquals(dnl1, dnl0);
 
 		dnl1.addDisallowedLinkSequence("bike", List.of(Id.createLinkId("0")));
 
-		Assert.assertNotEquals(dnl0, dnl1);
-		Assert.assertNotEquals(dnl1, dnl0);
+		Assertions.assertNotEquals(dnl0, dnl1);
+		Assertions.assertNotEquals(dnl1, dnl0);
 	}
 
 	@Test
 	void testIsEmpty() {
 		DisallowedNextLinks dnl= new DisallowedNextLinks();
-		Assert.assertTrue(dnl.isEmpty());
+		Assertions.assertTrue(dnl.isEmpty());
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class DisallowedNextLinksTest {
 		Map<String, List<List<Id<Link>>>> map = Map.of(
 				"bike", List.of(List.of(Id.createLinkId("0"))),
 				"car", List.of(List.of(Id.createLinkId("0"), Id.createLinkId("1")), List.of(Id.createLinkId("0"))));
-		Assert.assertEquals(map, dnl.getAsMap());
+		Assertions.assertEquals(map, dnl.getAsMap());
 	}
 
 	@Test
@@ -72,30 +72,30 @@ public class DisallowedNextLinksTest {
 
 		Map<String, List<List<Id<Link>>>> map = Map.of(
 				"car", List.of(List.of(Id.createLinkId("0"), Id.createLinkId("1")), List.of(Id.createLinkId("0"))));
-		Assert.assertEquals(map, dnl.getAsMap());
+		Assertions.assertEquals(map, dnl.getAsMap());
 	}
 
 	@Test
 	void testNotAddingDuplicates() {
 		DisallowedNextLinks dnl = new DisallowedNextLinks();
 
-		Assert.assertTrue(dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1"))));
-		Assert.assertFalse(dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1"))));
-		Assert.assertFalse(dnl.addDisallowedLinkSequence("car", Collections.emptyList()));
+		Assertions.assertTrue(dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1"))));
+		Assertions.assertFalse(dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1"))));
+		Assertions.assertFalse(dnl.addDisallowedLinkSequence("car", Collections.emptyList()));
 	}
 
 	@Test
 	void testNotAddingEmpty() {
 		DisallowedNextLinks dnl = new DisallowedNextLinks();
 
-		Assert.assertFalse(dnl.addDisallowedLinkSequence("car", Collections.emptyList()));
+		Assertions.assertFalse(dnl.addDisallowedLinkSequence("car", Collections.emptyList()));
 	}
 
 	@Test
 	void testNotAddingSequenceWithDuplicates() {
 		DisallowedNextLinks dnl = new DisallowedNextLinks();
 
-		Assert.assertFalse(dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("0"))));
+		Assertions.assertFalse(dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("0"))));
 	}
 
 	@Test
@@ -107,8 +107,8 @@ public class DisallowedNextLinksTest {
 		dnl1.addDisallowedLinkSequence("car", List.of(Id.createLinkId("4"), Id.createLinkId("5")));
 		dnl1.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1")));
 
-		Assert.assertEquals(dnl0, dnl1);
-		Assert.assertEquals(dnl0.hashCode(), dnl1.hashCode());
+		Assertions.assertEquals(dnl0, dnl1);
+		Assertions.assertEquals(dnl0.hashCode(), dnl1.hashCode());
 	}
 
 	@Test
@@ -122,10 +122,10 @@ public class DisallowedNextLinksTest {
 		String s = ac.convertToString(dnl0);
 		DisallowedNextLinks dnl1 = ac.convert(s);
 
-		Assert.assertEquals("{\"car\":[[\"0\",\"1\",\"2\"],[\"0\",\"3\"]],\"bike\":[[\"10\",\"11\"]]}", s);
-		Assert.assertEquals(dnl0, dnl1);
-		Assert.assertEquals(dnl0.hashCode(), dnl1.hashCode());
-		Assert.assertSame(dnl0.getDisallowedLinkSequences("car").get(0).get(0),
+		Assertions.assertEquals("{\"car\":[[\"0\",\"1\",\"2\"],[\"0\",\"3\"]],\"bike\":[[\"10\",\"11\"]]}", s);
+		Assertions.assertEquals(dnl0, dnl1);
+		Assertions.assertEquals(dnl0.hashCode(), dnl1.hashCode());
+		Assertions.assertSame(dnl0.getDisallowedLinkSequences("car").get(0).get(0),
 				dnl1.getDisallowedLinkSequences("car").get(0).get(0));
 	}
 
@@ -143,9 +143,9 @@ public class DisallowedNextLinksTest {
 		new MatsimNetworkReader(network).readFile(tempFile.toString());
 
 		DisallowedNextLinks dnl1 = NetworkUtils.getDisallowedNextLinks(network.getLinks().get(l1.getId()));
-		Assert.assertEquals(dnl0, dnl1);
-		Assert.assertEquals(dnl0.hashCode(), dnl1.hashCode());
-		Assert.assertSame(l1.getId(), dnl1.getDisallowedLinkSequences("car").get(0).get(0));
+		Assertions.assertEquals(dnl0, dnl1);
+		Assertions.assertEquals(dnl0.hashCode(), dnl1.hashCode());
+		Assertions.assertSame(l1.getId(), dnl1.getDisallowedLinkSequences("car").get(0).get(0));
 	}
 
 	static Network createNetwork() {

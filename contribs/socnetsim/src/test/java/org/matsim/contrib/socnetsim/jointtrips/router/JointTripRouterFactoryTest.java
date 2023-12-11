@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -227,10 +227,10 @@ public class JointTripRouterFactoryTest {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.PASSENGER ) ) {
 						final Id actualDriver = ((PassengerRoute) ((Leg) pe).getRoute()).getDriverId();
 
-						Assert.assertEquals(
-								"wrong driver Id",
+						Assertions.assertEquals(
 								driver,
-								actualDriver);
+								actualDriver,
+								"wrong driver Id");
 					}
 				}
 
@@ -264,14 +264,14 @@ public class JointTripRouterFactoryTest {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.DRIVER ) ) {
 						final Collection<Id<Person>> actualPassengers = ((DriverRoute) ((Leg) pe).getRoute()).getPassengersIds();
 
-						Assert.assertEquals(
-								"wrong number of passengers",
+						Assertions.assertEquals(
 								passengerIds.size(),
-								actualPassengers.size());
+								actualPassengers.size(),
+								"wrong number of passengers");
 
-						Assert.assertTrue(
-								"wrong passengers ids: "+actualPassengers+" is not "+passengerIds,
-								passengerIds.containsAll( actualPassengers ));
+						Assertions.assertTrue(
+								passengerIds.containsAll( actualPassengers ),
+								"wrong passengers ids: "+actualPassengers+" is not "+passengerIds);
 					}
 				}
 

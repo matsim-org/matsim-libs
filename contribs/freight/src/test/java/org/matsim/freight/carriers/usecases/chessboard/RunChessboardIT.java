@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
@@ -55,17 +55,17 @@ public class RunChessboardIT {
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
 				PopulationComparison.Result result = new PopulationComparison().compare(expected, actual);
-				Assert.assertSame(PopulationComparison.Result.equal, result);
+				Assertions.assertSame(PopulationComparison.Result.equal, result);
 			}
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
 				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+				Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
 			}
 		} catch (Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong");
+			Assertions.fail("something went wrong");
 		}
 
 	}

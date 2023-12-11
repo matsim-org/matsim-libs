@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -241,10 +241,10 @@ public class CourtesyEventsTest {
 
 		eventManager.finishProcessing();
 
-		Assert.assertEquals(
-				"wrong number of events in "+collected,
+		Assertions.assertEquals(
 				expectedCourtesy,
-				collected.size() );
+				collected.size(),
+				"wrong number of events in "+collected );
 	}
 }
 

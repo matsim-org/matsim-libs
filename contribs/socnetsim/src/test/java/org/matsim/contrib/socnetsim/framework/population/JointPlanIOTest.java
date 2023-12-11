@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -70,25 +70,25 @@ public class JointPlanIOTest {
 				final JointPlan read = reReadJointPlans.getJointPlan( plan );
 
 				if ( dumped == null ) {
-					Assert.assertNull(
-							"dumped is null but read is not",
-							read );
+					Assertions.assertNull(
+							read,
+							"dumped is null but read is not" );
 					continue;
 				}
 
-				Assert.assertNotNull(
-						"dumped is not null but read is",
-						read );
+				Assertions.assertNotNull(
+						read,
+						"dumped is not null but read is" );
 
-				Assert.assertEquals(
-						"dumped has not the same size as read",
+				Assertions.assertEquals(
 						dumped.getIndividualPlans().size(),
-						read.getIndividualPlans().size() );
+						read.getIndividualPlans().size(),
+						"dumped has not the same size as read" );
 
-				Assert.assertTrue(
-						"plans in dumped and read do not match",
+				Assertions.assertTrue(
 						dumped.getIndividualPlans().values().containsAll(
-								read.getIndividualPlans().values() ) );
+								read.getIndividualPlans().values() ),
+						"plans in dumped and read do not match" );
 			}
 		}
 	}
@@ -115,11 +115,11 @@ public class JointPlanIOTest {
 			final Iterator<? extends Plan> readPlans = readPerson.getPlans().iterator();
 			while( dumpedPlans.hasNext() ) {
 				// score are set different for every plan in the sequence
-				Assert.assertEquals(
-						"order of plans have changed through IO",
+				Assertions.assertEquals(
 						dumpedPlans.next().getScore(),
 						readPlans.next().getScore(),
-						MatsimTestUtils.EPSILON );
+						MatsimTestUtils.EPSILON,
+						"order of plans have changed through IO" );
 			}
 		}
 	}

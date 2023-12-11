@@ -22,7 +22,7 @@ package org.matsim.contrib.signals.data.conflicts;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -63,32 +63,32 @@ public class SignalConflictDataReaderWriterTest {
 	}
 
 	private void compare(ConflictData conflictData1, ConflictData conflictData2) {
-		Assert.assertEquals("not the same number of intersections", conflictData1.getConflictsPerNode().size(), conflictData2.getConflictsPerNode().size());
+		Assertions.assertEquals(conflictData1.getConflictsPerNode().size(), conflictData2.getConflictsPerNode().size(), "not the same number of intersections");
 		for (IntersectionDirections intersection1 : conflictData1.getConflictsPerSignalSystem().values()) {
 			IntersectionDirections intersection2 = conflictData2.getConflictsPerSignalSystem().get(intersection1.getSignalSystemId());
-			Assert.assertNotNull("no conflict data exists for signal system " + intersection1.getSignalSystemId(), intersection2);
-			Assert.assertEquals("not the same node, but the same signal system " + intersection1.getSignalSystemId(), intersection1.getNodeId(), intersection2.getNodeId());
-			Assert.assertEquals("not the same number of direction at node " + intersection1.getNodeId(), intersection1.getDirections().size(), intersection2.getDirections().size());
+			Assertions.assertNotNull(intersection2, "no conflict data exists for signal system " + intersection1.getSignalSystemId());
+			Assertions.assertEquals(intersection1.getNodeId(), intersection2.getNodeId(), "not the same node, but the same signal system " + intersection1.getSignalSystemId());
+			Assertions.assertEquals(intersection1.getDirections().size(), intersection2.getDirections().size(), "not the same number of direction at node " + intersection1.getNodeId());
 			for (Direction dir1 : intersection1.getDirections().values()) {
 				Direction dir2 = intersection2.getDirections().get(dir1.getId());
-				Assert.assertNotNull("no direction exists for id " + dir1.getId(), dir2);
-				Assert.assertEquals("direction " + dir1.getId() + " has not the same from link", dir1.getFromLink(), dir2.getFromLink());
-				Assert.assertEquals("direction " + dir1.getId() + " has not the same to link", dir1.getToLink(), dir2.getToLink());
-				Assert.assertEquals("not the same number of conflicting directions for direction " + dir1.getId(), dir1.getConflictingDirections().size(), dir2.getConflictingDirections().size());
-				Assert.assertEquals("not the same number of directions with right of way for direction " + dir1.getId(), dir1.getDirectionsWithRightOfWay().size(), dir2.getDirectionsWithRightOfWay().size());
-				Assert.assertEquals("not the same number of directions which must yield for direction " + dir1.getId(), dir1.getDirectionsWhichMustYield().size(), dir2.getDirectionsWhichMustYield().size());
-				Assert.assertEquals("not the same number of non-conflicting directions for direction " + dir1.getId(), dir1.getNonConflictingDirections().size(), dir2.getNonConflictingDirections().size());
+				Assertions.assertNotNull(dir2, "no direction exists for id " + dir1.getId());
+				Assertions.assertEquals(dir1.getFromLink(), dir2.getFromLink(), "direction " + dir1.getId() + " has not the same from link");
+				Assertions.assertEquals(dir1.getToLink(), dir2.getToLink(), "direction " + dir1.getId() + " has not the same to link");
+				Assertions.assertEquals(dir1.getConflictingDirections().size(), dir2.getConflictingDirections().size(), "not the same number of conflicting directions for direction " + dir1.getId());
+				Assertions.assertEquals(dir1.getDirectionsWithRightOfWay().size(), dir2.getDirectionsWithRightOfWay().size(), "not the same number of directions with right of way for direction " + dir1.getId());
+				Assertions.assertEquals(dir1.getDirectionsWhichMustYield().size(), dir2.getDirectionsWhichMustYield().size(), "not the same number of directions which must yield for direction " + dir1.getId());
+				Assertions.assertEquals(dir1.getNonConflictingDirections().size(), dir2.getNonConflictingDirections().size(), "not the same number of non-conflicting directions for direction " + dir1.getId());
 				for (Id<Direction> conflDir1 : dir1.getConflictingDirections()) {
-					Assert.assertTrue("direction " + conflDir1 + " is not a conflicting direction for " + dir1.getId(), dir2.getConflictingDirections().contains(conflDir1));
+					Assertions.assertTrue(dir2.getConflictingDirections().contains(conflDir1), "direction " + conflDir1 + " is not a conflicting direction for " + dir1.getId());
 				}
 				for (Id<Direction> conflDir1 : dir1.getDirectionsWithRightOfWay()) {
-					Assert.assertTrue("direction " + conflDir1 + " is not a direction with right of way for " + dir1.getId(), dir2.getDirectionsWithRightOfWay().contains(conflDir1));
+					Assertions.assertTrue(dir2.getDirectionsWithRightOfWay().contains(conflDir1), "direction " + conflDir1 + " is not a direction with right of way for " + dir1.getId());
 				}
 				for (Id<Direction> conflDir1 : dir1.getDirectionsWhichMustYield()) {
-					Assert.assertTrue("direction " + conflDir1 + " is not a direction which must yield for " + dir1.getId(), dir2.getDirectionsWhichMustYield().contains(conflDir1));
+					Assertions.assertTrue(dir2.getDirectionsWhichMustYield().contains(conflDir1), "direction " + conflDir1 + " is not a direction which must yield for " + dir1.getId());
 				}
 				for (Id<Direction> conflDir1 : dir1.getNonConflictingDirections()) {
-					Assert.assertTrue("direction " + conflDir1 + " is not a non-conflicting direction for " + dir1.getId(), dir2.getNonConflictingDirections().contains(conflDir1));
+					Assertions.assertTrue(dir2.getNonConflictingDirections().contains(conflDir1), "direction " + conflDir1 + " is not a non-conflicting direction for " + dir1.getId());
 				}
 			}
 		}

@@ -23,7 +23,7 @@ package org.matsim.contrib.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -76,7 +76,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -132,7 +132,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -151,7 +151,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -207,7 +207,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 
 		double expectedValue = 31.1947174; // = 200m * 155.973587 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 

@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.zip.GZIPInputStream;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -149,12 +149,14 @@ public class IterationTravelStatsControlerListenerTest {
 					Person personInScenario = scenario.getPopulation().getPersons().get(personId);
 					Activity firstActivity = identifyFirstActivity(personInScenario);
 
-					Assert.assertEquals("wrong score", personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON);
-					Assert.assertEquals("x coordinate does not match", firstActivity.getCoord().getX(), x,
-							MatsimTestUtils.EPSILON);
-					Assert.assertEquals("y coordinate does not match", firstActivity.getCoord().getY(), y,
-							MatsimTestUtils.EPSILON);
-					Assert.assertEquals("type of first activity does not match", firstActivity.getType(), column[first_act_type]);
+					Assertions.assertEquals(personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON, "wrong score");
+					Assertions.assertEquals(firstActivity.getCoord().getX(), x,
+							MatsimTestUtils.EPSILON,
+							"x coordinate does not match");
+					Assertions.assertEquals(firstActivity.getCoord().getY(), y,
+							MatsimTestUtils.EPSILON,
+							"y coordinate does not match");
+					Assertions.assertEquals(firstActivity.getType(), column[first_act_type], "type of first activity does not match");
 
 					break;
 			}

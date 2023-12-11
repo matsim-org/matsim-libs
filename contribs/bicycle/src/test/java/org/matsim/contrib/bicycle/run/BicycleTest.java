@@ -20,7 +20,7 @@ package org.matsim.contrib.bicycle.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -63,8 +63,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
 
 /**
@@ -97,8 +97,9 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
+		assertEquals(FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew),
+				"Different event files.");
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -107,9 +108,9 @@ public class BicycleTest {
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of persons " + personId + " are different");
 		}
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test
@@ -134,14 +135,15 @@ public class BicycleTest {
 			Scenario scenarioCurrent = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 			new PopulationReader( scenarioReference ).readFile( utils.getInputDirectory() + "output_plans.xml.gz" );
 			new PopulationReader( scenarioCurrent ).readFile( utils.getOutputDirectory() + "output_plans.xml.gz" );
-			assertTrue( "Populations are different", PopulationUtils.equalPopulation( scenarioReference.getPopulation(), scenarioCurrent.getPopulation() ) );
+			assertTrue( PopulationUtils.equalPopulation( scenarioReference.getPopulation(), scenarioCurrent.getPopulation() ), "Populations are different" );
 		}
 		{
 			LOG.info( "Checking MATSim events file ..." );
 			final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 			final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-			assertEquals( "Different event files.", FILES_ARE_EQUAL,
-					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew ));
+			assertEquals( FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew ),
+					"Different event files.");
 		}
 	}
 
@@ -164,14 +166,15 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
+		assertEquals(FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew),
+				"Different event files.");
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test
@@ -193,14 +196,15 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
+		assertEquals(FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew),
+				"Different event files.");
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test
@@ -222,14 +226,15 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
+		assertEquals(FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew),
+				"Different event files.");
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test
@@ -252,14 +257,15 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
+		assertEquals(FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew),
+				"Different event files.");
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test
@@ -284,14 +290,15 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
+		assertEquals(FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew),
+				"Different event files.");
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test
@@ -322,7 +329,7 @@ public class BicycleTest {
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of persons " + personId + " are different");
 		}
 //		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
@@ -410,7 +417,7 @@ public class BicycleTest {
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of person=" + personId + " are different");
 		}
 //		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
@@ -528,14 +535,14 @@ public class BicycleTest {
 
 		controler.run();
 
-		Assert.assertEquals("All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0", 3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Only the car user should use the shortest route", 1, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON, "All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0");
+		Assertions.assertEquals(1, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON, "Only the car user should use the shortest route");
 
-		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(0), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
+		Assertions.assertEquals(1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(1), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
+		Assertions.assertEquals(1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(2), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
 
-		Assert.assertEquals("Wrong travel time (car user)", Math.ceil( 10000 / (13.88) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(Math.ceil( 10000 / (13.88) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON, "Wrong travel time (car user)");
 
 	}
 
@@ -615,11 +622,11 @@ public class BicycleTest {
 
 		controler.run();
 
-		Assert.assertEquals("All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1", 4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time (car user)", Math.ceil(10000 / 13.88 ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON, "All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1");
+		Assertions.assertEquals(Math.ceil(10000 / 13.88 ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON, "Wrong travel time (car user)");
+		Assertions.assertEquals(Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(1), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
+		Assertions.assertEquals(Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
+		Assertions.assertEquals(Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
 	}
 
 	private Config createConfig( int lastIteration ){

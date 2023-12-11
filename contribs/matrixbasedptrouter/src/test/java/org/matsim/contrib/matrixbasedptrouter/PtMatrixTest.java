@@ -26,11 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
@@ -138,8 +137,8 @@ public class PtMatrixTest {
 				// the agents will walk 50 m to the nearest pt stop and 50 m back to their origin facility, so the total travel distance have to be 100 m.
 				if(origin == destination){
 
-					Assert.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
-					Assert.assertTrue(totalTravelDistance == 100.);
+					Assertions.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(totalTravelDistance == 100.);
 				}
 
 				// test travel time and distance for neighboring origins and destinations
@@ -147,13 +146,13 @@ public class PtMatrixTest {
 
 					// test total walk travel distance and time
 					// in the test network the total walk distance always is 100 m, because the euclidean distance between a facility and its nearest pt stop always is 50 m
-					Assert.assertTrue(walkTravelDistance == 100.);
-					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(walkTravelDistance == 100.);
+					Assertions.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 
 					// test pt travel distance and time
 					// in the test network the euclidean distance between neighboring pt stops always is 180 m
-					Assert.assertTrue(ptTravelDistance == 180.*beelineDistanceFactor);
-					Assert.assertTrue(ptTravelTime == (180./defaultPtSpeed)*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelDistance == 180.*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelTime == (180./defaultPtSpeed)*beelineDistanceFactor);
 				}
 
 				 // test travel times and distances for diagonal origin destination pairs
@@ -166,16 +165,16 @@ public class PtMatrixTest {
 
 					// test total walk travel distance and time
 					// in the test network the total walk distance always is 100 m, because the euclidean distance between a facility and its nearest pt stop always is 50 m
-					Assert.assertTrue(walkTravelDistance == 100.);
-					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(walkTravelDistance == 100.);
+					Assertions.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 
 					// test upper bounds for pt travel distance and time (as described above)
-					Assert.assertTrue(ptTravelDistance <= euclideanDistance*beelineDistanceFactor);
-					Assert.assertTrue(ptTravelTime <= (euclideanDistance/defaultPtSpeed)*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelDistance <= euclideanDistance*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelTime <= (euclideanDistance/defaultPtSpeed)*beelineDistanceFactor);
 
 					// test lower bounds for pt travel distance and time (as described above)
-					Assert.assertTrue(ptTravelDistance >= 180.*beelineDistanceFactor);
-					Assert.assertTrue(ptTravelTime >= (180./defaultPtSpeed)*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelDistance >= 180.*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelTime >= (180./defaultPtSpeed)*beelineDistanceFactor);
 				}
 			}
 		}
@@ -246,8 +245,8 @@ public class PtMatrixTest {
 				// the agents will walk 50 m to the nearest pt stop and 50 m back to their origin facility, so the total travel distance have to be 100 m.
 				if(origin == destination){
 
-					Assert.assertTrue(totalTravelDistance == 100.);
-					Assert.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(totalTravelDistance == 100.);
+					Assertions.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
 				}
 
 				// test travel time and distance for different origins and destinations
@@ -255,13 +254,13 @@ public class PtMatrixTest {
 
 					// test total walk travel distance and time
 					// in the test network the total walk distance always is 100 m, because the euclidean distance between a facility and its nearest pt stop always is 50 m
-					Assert.assertTrue(walkTravelDistance == 100.);
-					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(walkTravelDistance == 100.);
+					Assertions.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 
 					// test pt travel distance and time
 					// in the csv-file the pt travel distance is given as 100 m; the pt travel time as 100 min
-					Assert.assertTrue(ptTravelDistance == 100.);
-					Assert.assertTrue(ptTravelTime == 100. * 60); // multiplied by 60 to convert minutes to seconds (csv-files are saved in minutes; matsim works with seconds)
+					Assertions.assertTrue(ptTravelDistance == 100.);
+					Assertions.assertTrue(ptTravelTime == 100. * 60); // multiplied by 60 to convert minutes to seconds (csv-files are saved in minutes; matsim works with seconds)
 				}
 			}
 		}

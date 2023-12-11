@@ -23,7 +23,7 @@ package org.matsim.contrib.signals.controller.fixedTime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -98,14 +98,14 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
 		log.info("First cycle time after 1am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(1));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -122,18 +122,18 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 2am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(2));
 		log.info("Number of signal events after 2am " + signalAnalyzer.getNumberOfSignalEventsInHour(2));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		/* "5 + " because there is SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH of 5 seconds that is added to each signal plans end time as buffer */
-		Assert.assertEquals("Number of signal off events is wrong.", 1, signalAnalyzer.getNumberOfOffEvents());
-		Assert.assertEquals("Signals where unexpectedly switched on after 2am.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on after 2am.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(2));
+		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on after 2am.");
+		Assertions.assertTrue(3 > signalAnalyzer.getNumberOfSignalEventsInHour(2), "Signals where unexpectedly switched on after 2am.");
 		/* "3 >" because last signal switches of the second plan are allowed at 2am and switch off is only after 5 seconds (in 2:00:05 am) */
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -150,18 +150,18 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 2am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(2));
 		log.info("Number of signal events between 0am and 1am " + signalAnalyzer.getNumberOfSignalEventsInHour(0));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 3600*1, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600*1, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*2, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if first hour is simulated correctly without signals
-		Assert.assertEquals("Signals where unexpectedly switched on between 0am and 1am.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on between 0am and 1am.", 1 > signalAnalyzer.getNumberOfSignalEventsInHour(0));
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on between 0am and 1am.");
+		Assertions.assertTrue(1 > signalAnalyzer.getNumberOfSignalEventsInHour(0), "Signals where unexpectedly switched on between 0am and 1am.");
 		/* "1 > " because the first signal event should be at 1am, i.e. outside (after) this count interval */
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -178,14 +178,14 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
 		log.info("First cycle time after 1am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(1));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1+1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -202,19 +202,19 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 2am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(2));
 		log.info("Number of signal events between 1am and 2am " + signalAnalyzer.getNumberOfSignalEventsInHour(1));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*2, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*1, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600*1, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		/* "5 + " because there is SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH of 5 seconds that is added to each signal plans end time as buffer */
-		Assert.assertEquals("Number of signal off events is wrong.", 1, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if break between signal plans is simulated correctly
-		Assert.assertEquals("Signals where unexpectedly switched on between the signal plans.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on between the signal plans.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(1));
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on between the signal plans.");
+		Assertions.assertTrue(3 > signalAnalyzer.getNumberOfSignalEventsInHour(1), "Signals where unexpectedly switched on between the signal plans.");
 		/* "3 >" because last signal switches of the first plan are allowed at 1am and switch off is only after 5 seconds (in 1:00:05 am) */
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -235,19 +235,19 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("Number of signal events between 1am and 2am " + signalAnalyzer.getNumberOfSignalEventsInHour(1));
 		log.info("Number of signal events after 3am " + signalAnalyzer.getNumberOfSignalEventsInHour(3));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*3, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
+		Assertions.assertEquals(3600*3, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		/* "5 + " because there is SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH of 5 seconds that is added to each signal plans end time as buffer */
-		Assert.assertEquals("Number of signal off events is wrong.", 2, signalAnalyzer.getNumberOfOffEvents());
-		Assert.assertEquals("Signals where unexpectedly switched on between the signal plans.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on between the signal plans.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(1));
+		Assertions.assertEquals(2, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on between the signal plans.");
+		Assertions.assertTrue(3 > signalAnalyzer.getNumberOfSignalEventsInHour(1), "Signals where unexpectedly switched on between the signal plans.");
 		/* "3 >" because last signal switches of the first plan are allowed at 1am and switch off is only after 5 seconds (in 1:00:05 am) */
-		Assert.assertEquals("Signals where unexpectedly switched on after the last signal plan.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(3), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on after 3am.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(3));
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(3), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on after the last signal plan.");
+		Assertions.assertTrue(3 > signalAnalyzer.getNumberOfSignalEventsInHour(3), "Signals where unexpectedly switched on after 3am.");
 		/* "3 >" because last signal switches of the second plan are allowed at 3am and switch off is only after 5 seconds (in 3:00:05 am) */
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -262,14 +262,14 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
 		log.info("First cycle time after 1am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(1));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if signal plans are both running
-		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Cycle time of first signal plan wrong.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Cycle time of second signal plan wrong.");
 	}
 
 	@Test
@@ -287,17 +287,17 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("Number of signal events between 0am and 1am " + signalAnalyzer.getNumberOfSignalEventsInHour(0));
 		log.info("Number of signal events after 2am " + signalAnalyzer.getNumberOfSignalEventsInHour(2));
 		// test time when signal plan is switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 3600.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 1, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Number of signal off events is wrong.", 1, signalAnalyzer.getNumberOfOffEvents());
-		Assert.assertEquals("Signals where unexpectedly switched on before 1am.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on before 1am.", 1 > signalAnalyzer.getNumberOfSignalEventsInHour(0));
+		Assertions.assertEquals(3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on before 1am.");
+		Assertions.assertTrue(1 > signalAnalyzer.getNumberOfSignalEventsInHour(0), "Signals where unexpectedly switched on before 1am.");
 		/* "1 > " because the first signal event should be at 1am, i.e. outside (after) this count interval */
-		Assert.assertEquals("Signal plan is not active between 1am and 2am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Signals where unexpectedly switched on after 2am.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on after 2am.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(2));
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Signal plan is not active between 1am and 2am.");
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on after 2am.");
+		Assertions.assertTrue(3 > signalAnalyzer.getNumberOfSignalEventsInHour(2), "Signals where unexpectedly switched on after 2am.");
 		/* "3 >" because last signal switches of the first plan are allowed at 2am and switch off is only after 5 seconds (in 2:00:05 am) */
 	}
 
@@ -320,14 +320,14 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(23));
 		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
 		// test time when signal plan is switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 3600*23, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600*23, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*24, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if signal plan is running for more than 24h
-		Assert.assertEquals("Signal plan is not active between 11pmam and 12pm.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(23), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Signal plan is not active anymore after 0am next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(23), MatsimTestUtils.EPSILON, "Signal plan is not active between 11pmam and 12pm.");
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON, "Signal plan is not active anymore after 0am next day.");
 	}
 
 	/**
@@ -346,13 +346,13 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
 		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
 		// test time when signal plan is switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 1, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 0.0, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if signal plan is running for more than 24h
-		Assert.assertEquals("Signal plan is not active between 0am and 1am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Signal plan is not active between 0am and 1am.");
 	}
 
 	@Test
@@ -370,15 +370,15 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 12am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(12));
 		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 3, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*24, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
-		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
+		Assertions.assertEquals(0, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if signal plans are correctly running for more than 24h
-		Assert.assertEquals("First signal plan is not active between 0am and 1am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Second signal plan is not active between 12am and 1pm.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(12), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("First signal plan is not active again after 0am next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "First signal plan is not active between 0am and 1am.");
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(12), MatsimTestUtils.EPSILON, "Second signal plan is not active between 12am and 1pm.");
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON, "First signal plan is not active again after 0am next day.");
 	}
 
 	@Test
@@ -400,18 +400,18 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("Number of signal events before 11pm " + signalAnalyzer.getNumberOfSignalEventsInHour(22));
 		log.info("Number of signal events after 1am next day " + signalAnalyzer.getNumberOfSignalEventsInHour(25));
 		// test time when signal plans are switched on and off
-		Assert.assertEquals("First signal state event unexpected.", 23*3600, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(23*3600, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*24, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*25, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Number of signal off events is wrong.", 1, signalAnalyzer.getNumberOfOffEvents());
-		Assert.assertEquals("Signals where unexpectedly switched on before 11pm.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(22), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on before 11pm.", 1 > signalAnalyzer.getNumberOfSignalEventsInHour(22));
-		Assert.assertEquals("Signals where unexpectedly switched on after 1am next day.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(25), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("Signals where unexpectedly switched on after 1am next day.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(25));
+		Assertions.assertEquals(3600*25, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(22), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on before 11pm.");
+		Assertions.assertTrue(1 > signalAnalyzer.getNumberOfSignalEventsInHour(22), "Signals where unexpectedly switched on before 11pm.");
+		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(25), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on after 1am next day.");
+		Assertions.assertTrue(3 > signalAnalyzer.getNumberOfSignalEventsInHour(25), "Signals where unexpectedly switched on after 1am next day.");
 		// test if signal plans are correctly running
-		Assert.assertEquals("Second signal plan is not active between 11pm and 12pm.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(23), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("First signal plan is not active between 0am and 1pm next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(23), MatsimTestUtils.EPSILON, "Second signal plan is not active between 11pm and 12pm.");
+		Assertions.assertEquals(120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON, "First signal plan is not active between 0am and 1pm next day.");
 	}
 
 	/**
@@ -424,10 +424,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		try{
 			(new ScenarioRunner(0.0, 1.0, 0.0, 1.0)).run();
-			Assert.fail("The simulation has not stopped with an exception although the signal plans overlap.");
+			Assertions.fail("The simulation has not stopped with an exception although the signal plans overlap.");
 		} catch (UnsupportedOperationException e) {
 			log.info("Exception message: " + e.getMessage());
-			Assert.assertEquals("Wrong exception message.", exceptionMessageOverlapping21, e.getMessage());
+			Assertions.assertEquals(exceptionMessageOverlapping21, e.getMessage(), "Wrong exception message.");
 		}
 	}
 
@@ -443,10 +443,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		try{
 			(new ScenarioRunner(0.0, 0.0, 0.0, 0.0)).run();
 //			(new ScenarioRunner(1.0, 1.0, 1.0, 1.0)).run(); // alternativ. produces same results
-			Assert.fail("The simulation has not stopped with an exception although multiple signal plans exist and at least one of them covers the hole day (i.e. they overlap).");
+			Assertions.fail("The simulation has not stopped with an exception although multiple signal plans exist and at least one of them covers the hole day (i.e. they overlap).");
 		} catch (UnsupportedOperationException e) {
 			log.info("Exception message: " + e.getMessage());
-			Assert.assertEquals("Wrong exception message.", exceptionMessageHoleDay, e.getMessage());
+			Assertions.assertEquals(exceptionMessageHoleDay, e.getMessage(), "Wrong exception message.");
 		}
 	}
 
@@ -456,10 +456,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		try{
 			(new ScenarioRunner(0.0, 2.0, 1.0, 3.0)).run();
-			Assert.fail("The simulation has not stopped with an exception although the signal plans overlap.");
+			Assertions.fail("The simulation has not stopped with an exception although the signal plans overlap.");
 		} catch (UnsupportedOperationException e) {
 			log.info("Exception message: " + e.getMessage());
-			Assert.assertEquals("Wrong exception message.", exceptionMessageOverlapping12, e.getMessage());
+			Assertions.assertEquals(exceptionMessageOverlapping12, e.getMessage(), "Wrong exception message.");
 		}
 	}
 
@@ -474,8 +474,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		// in this case, the first event should be a RED-switch at second 57
 		log.info("Offset " + offset1 + " leads to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
-		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!", 60+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(60+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	@Test
@@ -489,8 +489,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		// in this case, the first event should be a GREEN-switch at second 0
 		log.info("Offset " + offset1 + " leads to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
-		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!", 120+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(120+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	@Test
@@ -511,8 +511,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		// in this case, the first event should be a RED-switch at second 3625
 		log.info("Offsets " + offset1 + " and " + offset2 + " with a simulation start at second " + simStart_s + " lead to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
- 		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!", simStart_s+30+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);
+ 		Assertions.assertEquals(simStart_s+30+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	@Test
@@ -533,8 +533,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		// in this case, the first event should be a GREEN-switch at second 3600
 		log.info("Offsets " + offset1 + " and " + offset2 + " with a simulation start at second " + simStart_s + " lead to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
- 		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!", simStart_s+60+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);
+ 		Assertions.assertEquals(simStart_s+60+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	private class ScenarioRunner{

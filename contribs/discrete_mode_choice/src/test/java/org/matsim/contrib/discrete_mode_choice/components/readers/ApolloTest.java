@@ -1,11 +1,11 @@
 package org.matsim.contrib.discrete_mode_choice.components.readers;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.net.URL;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.contribs.discrete_mode_choice.components.readers.ApolloParameterReader;
 import org.matsim.contribs.discrete_mode_choice.components.readers.ApolloParameters;
 

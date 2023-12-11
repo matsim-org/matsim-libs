@@ -2,7 +2,7 @@ package org.matsim.core.controler;
 
 import java.io.File;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -37,24 +37,24 @@ public class TerminationTest {
 	void testSimulationEndsOnInterval() {
 		prepareExperiment(2, 4, ControllerConfigGroup.CleanIterations.keep).run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
 		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.4/4.events.xml.gz");
 		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
+		Assertions.assertEquals(iterationOutput, mainOutput);
 	}
 
 	@Test
 	void testOnlyRunIterationZero() {
 		prepareExperiment(2, 0, ControllerConfigGroup.CleanIterations.keep).run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.0/0.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.0/0.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
 		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.0/0.events.xml.gz");
 		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
+		Assertions.assertEquals(iterationOutput, mainOutput);
 	}
 
 	@Test
@@ -64,19 +64,19 @@ public class TerminationTest {
 
 		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.keep).run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
 		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.3/3.events.xml.gz");
 		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
+		Assertions.assertEquals(iterationOutput, mainOutput);
 	}
 
 	@Test
 	void testSimulationEndDeleteIters() {
 		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.delete).run();
-		Assert.assertFalse(new File(utils.getOutputDirectory(), "/ITERS").exists());
+		Assertions.assertFalse(new File(utils.getOutputDirectory(), "/ITERS").exists());
 	}
 
 	private Controler prepareExperiment(int interval, int criterion, ControllerConfigGroup.CleanIterations iters) {
@@ -114,14 +114,14 @@ public class TerminationTest {
 
 		controller.run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
 		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.4/4.events.xml.gz");
 		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
+		Assertions.assertEquals(iterationOutput, mainOutput);
 	}
 
 	@Test
@@ -170,14 +170,14 @@ public class TerminationTest {
 
 		controler.run();
 
-		Assert.assertEquals(12, (int) controler.getIterationNumber());
+		Assertions.assertEquals(12, (int) controler.getIterationNumber());
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.12/12.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.12/12.events.xml.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
 		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.12/12.events.xml.gz");
 		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
+		Assertions.assertEquals(iterationOutput, mainOutput);
 	}
 
 	@Singleton

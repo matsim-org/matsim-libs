@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.noise;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -53,22 +53,22 @@ public class NoiseConfigGroupIT {
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
 		// test the config parameters
-		Assert.assertEquals("wrong config parameter", 12345., noiseParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(12345., noiseParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON, "wrong config parameter");
 
 		String actForRecPtGrid = noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[0] + "," + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[1] + "," + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[2];
-		Assert.assertEquals("wrong config parameter", "home,sleep,eat", actForRecPtGrid);
+		Assertions.assertEquals("home,sleep,eat", actForRecPtGrid, "wrong config parameter");
 
 		String actForSpatFct = noiseParameters.getConsideredActivitiesForDamageCalculationArray()[0] + "," + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[1] + "," + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[2];
-		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);
+		Assertions.assertEquals("work,leisure,other", actForSpatFct, "wrong config parameter");
 
-		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);
-		Assert.assertFalse("wrong config parameter", noiseParameters.isComputeNoiseDamages());
+		Assertions.assertEquals(12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON, "wrong config parameter");
+		Assertions.assertFalse(noiseParameters.isComputeNoiseDamages(), "wrong config parameter");
 
 		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesArray()[0] + "," + noiseParameters.getHgvIdPrefixesArray()[1] + "," + noiseParameters.getHgvIdPrefixesArray()[2] + "," + noiseParameters.getHgvIdPrefixesArray()[3];
-		Assert.assertEquals("wrong config parameter", "lkw,LKW,HGV,hgv", hgvIdPrefixes);
+		Assertions.assertEquals("lkw,LKW,HGV,hgv", hgvIdPrefixes, "wrong config parameter");
 
 		String tunnelLinkIds = noiseParameters.getTunnelLinkIDsSet().toArray()[0] + "," + noiseParameters.getTunnelLinkIDsSet().toArray()[1];
-		Assert.assertEquals("wrong config parameter", "link1,link2", tunnelLinkIds);
+		Assertions.assertEquals("link1,link2", tunnelLinkIds, "wrong config parameter");
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class NoiseConfigGroupIT {
 		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controller().getOutputDirectory() + "/output_config.xml", new NoiseConfigGroup());
 		NoiseConfigGroup outputNoiseParameters = (NoiseConfigGroup) outputConfig.getModule("noise");
 
-		Assert.assertEquals("input and output config parameters are not the same", noiseParameters.toString(), outputNoiseParameters.toString());
+		Assertions.assertEquals(noiseParameters.toString(), outputNoiseParameters.toString(), "input and output config parameters are not the same");
 	}
 
 }

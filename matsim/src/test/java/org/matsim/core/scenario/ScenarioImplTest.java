@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.households.Households;
@@ -41,20 +41,20 @@ public class ScenarioImplTest {
 
 		s.addScenarioElement( name1 , element1 );
 		s.addScenarioElement( name2 , element2 );
-		Assert.assertSame(
-				"unexpected scenario element",
+		Assertions.assertSame(
 				element1,
-				s.getScenarioElement( name1 ) );
+				s.getScenarioElement( name1 ),
+				"unexpected scenario element" );
 		// just check that it is got, not removed
-		Assert.assertSame(
-				"unexpected scenario element",
+		Assertions.assertSame(
 				element1,
-				s.getScenarioElement( name1 ) );
+				s.getScenarioElement( name1 ),
+				"unexpected scenario element" );
 
-		Assert.assertSame(
-				"unexpected scenario element",
+		Assertions.assertSame(
 				element2,
-				s.getScenarioElement( name2 ) );
+				s.getScenarioElement( name2 ),
+				"unexpected scenario element" );
 
 	}
 
@@ -72,9 +72,9 @@ public class ScenarioImplTest {
 			return;
 		}
 		catch (Exception e) {
-			Assert.fail( "wrong exception thrown when trying to add an element for an existing name "+e.getClass().getName() );
+			Assertions.fail( "wrong exception thrown when trying to add an element for an existing name "+e.getClass().getName() );
 		}
-		Assert.fail( "no exception thrown when trying to add an element for an existing name" );
+		Assertions.fail( "no exception thrown when trying to add an element for an existing name" );
 	}
 
 	@Test
@@ -85,13 +85,13 @@ public class ScenarioImplTest {
 		final String name = "clark_kent";
 
 		s.addScenarioElement( name , element );
-		Assert.assertSame(
-				"unexpected removed element",
+		Assertions.assertSame(
 				element,
-				s.removeScenarioElement( name ) );
-		Assert.assertNull(
-				"element was not removed",
-				s.getScenarioElement( name ) );
+				s.removeScenarioElement( name ),
+				"unexpected removed element" );
+		Assertions.assertNull(
+				s.getScenarioElement( name ),
+				"element was not removed" );
 
 	}
 

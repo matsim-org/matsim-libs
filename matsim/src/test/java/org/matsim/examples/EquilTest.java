@@ -25,7 +25,7 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -102,6 +102,6 @@ public class EquilTest  {
 		writer.closeFile();
 
 		final EventsFileComparator.Result result = new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceFileName , eventsFileName );
-		Assert.assertEquals("different event files.", EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result, "different event files." );
 	}
 }

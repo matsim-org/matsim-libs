@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -227,10 +227,10 @@ public class CoalitionSelectorTest {
 
 			final GroupPlans expected = fixture.expectedSelectedPlans;
 
-			Assert.assertEquals(
-					"unexpected selected plan in test instance <<"+fixture.name+">> ",
+			Assertions.assertEquals(
 					expected,
-					selected);
+					selected,
+					"unexpected selected plan in test instance <<"+fixture.name+">> ");
 		}
 		catch (Exception e) {
 			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );

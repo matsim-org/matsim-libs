@@ -20,7 +20,7 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -47,9 +47,9 @@ public class StringUtilsTest {
 		for (String test : testStrings) {
 			String[] resultExplode = StringUtils.explode(test, ':');
 			String[] resultSplit = test.split(":");
-			assertEquals("Different result lengths with test string \"" + test + "\"", resultSplit.length, resultExplode.length);
+			assertEquals(resultSplit.length, resultExplode.length, "Different result lengths with test string \"" + test + "\"");
 			for (int i = 0; i < resultExplode.length; i++) {
-				assertEquals("Different result part " + i + " when testing string: \"" + test + "\"", resultSplit[i], resultExplode[i]);
+				assertEquals(resultSplit[i], resultExplode[i], "Different result part " + i + " when testing string: \"" + test + "\"");
 			}
 		}
 	}
@@ -64,9 +64,9 @@ public class StringUtilsTest {
 		for (String test : testStrings) {
 			String[] resultExplode = StringUtils.explode(test, ':', 3);
 			String[] resultSplit = test.split(":", 3);
-			assertEquals("Different result lengths with test string \"" + test + "\"", resultSplit.length, resultExplode.length);
+			assertEquals(resultSplit.length, resultExplode.length, "Different result lengths with test string \"" + test + "\"");
 			for (int i = 0; i < resultExplode.length; i++) {
-				assertEquals("Different result part " + i + " when testing string: \"" + test + "\"", resultSplit[i], resultExplode[i]);
+				assertEquals(resultSplit[i], resultExplode[i], "Different result part " + i + " when testing string: \"" + test + "\"");
 			}
 		}
 	}

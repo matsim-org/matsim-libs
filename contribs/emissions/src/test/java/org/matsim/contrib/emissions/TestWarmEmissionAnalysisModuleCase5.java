@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -137,10 +137,10 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 
 		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2 * zeroLinklength / (zeroFreeVelocity + zeroSgVelocity) * 3.6);
-		Assert.assertEquals( DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
 
 		emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
-		Assert.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
 		warmEmissions.clear();
 
 	}

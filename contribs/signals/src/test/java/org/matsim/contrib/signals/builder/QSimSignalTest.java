@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -123,7 +123,7 @@ public class QSimSignalTest implements
 			runQSimWithSignals(scenario, false);
 
 			// if this code is reached, no exception has been thrown
-			Assert.fail("The simulation should abort because of intergreens violation.");
+			Assertions.fail("The simulation should abort because of intergreens violation.");
 		});
 	}
 
@@ -162,7 +162,7 @@ public class QSimSignalTest implements
 			runQSimWithSignals(scenario, false);
 
 			// if this code is reached, no exception has been thrown
-			Assert.fail("The simulation should abort because of intergreens violation.");
+			Assertions.fail("The simulation should abort because of intergreens violation.");
 		});
 	}
 
@@ -236,10 +236,10 @@ public class QSimSignalTest implements
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
 		if (e.getLinkId().equals( fixture.linkId1 )){
-			Assert.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 		else if (e.getLinkId().equals( fixture.linkId2 )){
-			Assert.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 	}
 

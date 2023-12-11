@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -93,9 +93,9 @@ public class PlanRouterWithVehicleRessourcesTest {
 		for ( Trip trip : TripStructureUtils.getTrips( plan ) ) {
 			for (Leg l : trip.getLegsOnly()) {
 				assertEquals(
-					"unexpected vehicle id",
 					vehicleId,
-					((NetworkRoute) l.getRoute()).getVehicleId());
+					((NetworkRoute) l.getRoute()).getVehicleId(),
+					"unexpected vehicle id");
 			}
 		}
 	}

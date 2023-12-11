@@ -20,8 +20,8 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,10 +88,10 @@ public class ControlerEventsTest {
 		controler.run(config);
 		//test for startup events
 		StartupEvent startup = listener.getStartupEvent();
-		assertNotNull("No ControlerStartupEvent fired!", startup);
+		assertNotNull(startup, "No ControlerStartupEvent fired!");
 		//test for shutdown
 		ShutdownEvent shutdown = listener.getShutdownEvent();
-		assertNotNull("No ControlerShutdownEvent fired!", shutdown);
+		assertNotNull(shutdown, "No ControlerShutdownEvent fired!");
 		//test for iterations
 		//setup
 		List<IterationStartsEvent> setupIt = listener.getIterationStartsEvents();

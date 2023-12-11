@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.roadpricing;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.Iterator;

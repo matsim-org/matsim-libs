@@ -2,7 +2,7 @@ package org.matsim.contrib.multimodal;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.utils.io.IOUtils;
@@ -27,7 +27,7 @@ public class RunMultimodalExampleTest{
 			RunMultimodalExample.main( args );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail();
+			Assertions.fail();
 		}
 
 	}

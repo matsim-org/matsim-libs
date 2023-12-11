@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.minibus.PConstants;
@@ -62,15 +62,15 @@ public class SidewaysRouteExtensionTest {
 
 		PPlan testPlan = null;
 
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start stop", "p_2414", coop.getBestPlan().getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", coop.getBestPlan().getStopsToBeServed().get(1).getId().toString());
-		Assert.assertNull("Test plan should be null", testPlan);
+		Assertions.assertEquals(1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON, "Compare number of vehicles");
+		Assertions.assertEquals("p_2414", coop.getBestPlan().getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", coop.getBestPlan().getStopsToBeServed().get(1).getId().toString(), "Compare end stop");
+		Assertions.assertNull(testPlan, "Test plan should be null");
 
 		// buffer too small
 		testPlan = strat.run(coop);
 
-		Assert.assertNull("Test plan should be null", testPlan);
+		Assertions.assertNull(testPlan, "Test plan should be null");
 
 		parameter = new ArrayList<>();
 		parameter.add("100.0");
@@ -82,12 +82,12 @@ public class SidewaysRouteExtensionTest {
 		testPlan = strat.run(coop);
 
 		// enough buffer to add a stop located directly at the beeline
-		Assert.assertNotNull("Test plan should not be null", testPlan);
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
 
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2324", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2324", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2324", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2324", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 
 		parameter = new ArrayList<>();
@@ -100,11 +100,11 @@ public class SidewaysRouteExtensionTest {
 		testPlan = strat.run(coop);
 
 		// enough buffer 0.5 * 3000m = 1500m
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2223", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2223", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		coop.getBestPlan().setStopsToBeServed(testPlan.getStopsToBeServed());
 		coop.getBestPlan().setLine(coop.getRouteProvider().createTransitLineFromOperatorPlan(coop.getId(), testPlan));
@@ -112,13 +112,13 @@ public class SidewaysRouteExtensionTest {
 		testPlan = strat.run(coop);
 
 		// and again stacking - therefore, enlarging the effective buffer
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2212", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2223", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(3).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2212", testPlan.getStopsToBeServed().get(4).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2223", testPlan.getStopsToBeServed().get(5).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2212", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2212", testPlan.getStopsToBeServed().get(4).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(5).getId().toString(), "Compare end stop");
 
 		parameter = new ArrayList<>();
 		parameter.add("4000.0");
@@ -131,74 +131,74 @@ public class SidewaysRouteExtensionTest {
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2324", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2324", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2324", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2324", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2223", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2223", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2223", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2223", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2223", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_3323", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3323", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3323", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_3323", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_3433", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3433", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3433", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_3433", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2423", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2423", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2423", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2423", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2322", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2322", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2322", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2322", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// quite a lot buffer covering all nodes
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2221", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2221", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2221", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2221", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		parameter = new ArrayList<>();
 		parameter.add("100.0");
@@ -211,20 +211,20 @@ public class SidewaysRouteExtensionTest {
 		testPlan = strat.run(coop);
 
 		// can now choose among stops at the outer edges
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_2324", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2324", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_2324", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_2324", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 		testPlan = strat.run(coop);
 
 		// can now choose among stops at the outer edges
-		Assert.assertNotNull("Test plan should not be null", testPlan);
-		Assert.assertEquals("Compare start stop", "p_2414", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_B", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_3444", testPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_B", testPlan.getStopsToBeServed().get(3).getId().toString());
+		Assertions.assertNotNull(testPlan, "Test plan should not be null");
+		Assertions.assertEquals("p_2414", testPlan.getStopsToBeServed().get(0).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_B", testPlan.getStopsToBeServed().get(1).getId().toString(), "Compare start stop");
+		Assertions.assertEquals("p_3444", testPlan.getStopsToBeServed().get(2).getId().toString(), "Compare end stop");
+		Assertions.assertEquals("p_B", testPlan.getStopsToBeServed().get(3).getId().toString(), "Compare end stop");
 
 	}
 }

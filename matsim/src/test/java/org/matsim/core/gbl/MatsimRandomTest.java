@@ -20,8 +20,8 @@
 
 package org.matsim.core.gbl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 
@@ -131,7 +131,7 @@ public class MatsimRandomTest {
 	 */
 	private void assertEqualRandomNumberGenerators(final Random rng1, final Random rng2) {
 		for (int i = 0; i < 10; i++) {
-			assertEquals("different element at position " + i, rng1.nextDouble(), rng2.nextDouble(), MatsimTestUtils.EPSILON);
+			assertEquals(rng1.nextDouble(), rng2.nextDouble(), MatsimTestUtils.EPSILON, "different element at position " + i);
 		}
 	}
 }

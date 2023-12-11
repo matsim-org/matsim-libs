@@ -1,10 +1,10 @@
 package org.matsim.contrib.cadyts.car;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Ignore;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,8 +44,8 @@ public class CadytsCarWithPtScenarioIT {
             }
         });
         controler.run();
-        assertTrue("There's at least one bus on the test link", bussesSeenOnLink.get() > 0);
-        assertTrue("This test runs to the end, meaning cadyts doesn't throw an exception with pt", true);
+        assertTrue(bussesSeenOnLink.get() > 0, "There's at least one bus on the test link");
+        assertTrue(true, "This test runs to the end, meaning cadyts doesn't throw an exception with pt");
     }
 
 }

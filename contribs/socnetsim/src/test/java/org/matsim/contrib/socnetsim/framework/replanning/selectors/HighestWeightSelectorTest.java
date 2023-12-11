@@ -31,8 +31,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -1268,16 +1268,16 @@ public class HighestWeightSelectorTest {
 					fixture.jointPlans,
 					fixture.group );
 
-		Assert.assertEquals(
-				"unexpected change in group size for fixture "+fixture.name,
+		Assertions.assertEquals(
 				initialGroupSize,
-				fixture.group.getPersons().size() );
+				fixture.group.getPersons().size(),
+				"unexpected change in group size for fixture "+fixture.name );
 
 		for (Person p : fixture.group.getPersons()) {
-			Assert.assertEquals(
-					"unexpected change in the number of plans for agent "+p.getId()+" in fixture "+fixture.name,
+			Assertions.assertEquals(
 					planCounts.get( p.getId() ).intValue(),
-					p.getPlans().size() );
+					p.getPlans().size(),
+					"unexpected change in the number of plans for agent "+p.getId()+" in fixture "+fixture.name );
 		}
 	}
 
@@ -1307,10 +1307,10 @@ public class HighestWeightSelectorTest {
 					(forbidding ?
 					 	fixture.expectedSelectedPlansWhenForbidding :
 						fixture.expectedSelectedPlans);
-		Assert.assertEquals(
-				"unexpected selected plan in test instance <<"+fixture.name+">> ",
+		Assertions.assertEquals(
 				expected,
-				selected);
+				selected,
+				"unexpected selected plan in test instance <<"+fixture.name+">> ");
 	}
 
 	private static class CollectionBasedPlanForbidderFactory implements IncompatiblePlansIdentifierFactory {

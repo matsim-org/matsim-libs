@@ -19,8 +19,9 @@
 
 package org.matsim.core.network.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +49,7 @@ public class NetworkSimplifierPass2WayTest {
         int counter = 0;
         for (Network network : networks) {
             System.out.println("Running simplifier on network "+counter);
-            assertEquals("Wrong number of links", 10, network.getLinks().size());
+            assertEquals(10, network.getLinks().size(), "Wrong number of links");
 
             NetworkSimplifier networkSimplifier = new NetworkSimplifier();
             networkSimplifier.setMergeLinkStats(false);
@@ -56,13 +57,13 @@ public class NetworkSimplifierPass2WayTest {
 
             network.getLinks().values().stream().forEach(l ->System.out.println(l.toString()));
 
-            assertEquals("Wrong number of links", 4, network.getLinks().size());
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
+            assertEquals(4, network.getLinks().size(), "Wrong number of links");
+            assertNotNull(network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")), "Expected link not found.");
 
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("CB")));
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("BA")));
+            assertNotNull(network.getLinks().get(Id.createLinkId("CB")), "Expected link not found.");
+            assertNotNull(network.getLinks().get(Id.createLinkId("BA")), "Expected link not found.");
 
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("FE-ED-DC")));
+            assertNotNull(network.getLinks().get(Id.createLinkId("FE-ED-DC")), "Expected link not found.");
 
         }
 

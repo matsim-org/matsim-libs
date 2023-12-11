@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -64,7 +64,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
@@ -88,7 +88,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
@@ -114,7 +114,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 

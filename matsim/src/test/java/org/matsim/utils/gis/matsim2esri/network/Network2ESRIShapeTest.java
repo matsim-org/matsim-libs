@@ -22,7 +22,7 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import java.util.Collection;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +61,7 @@ public class Network2ESRIShapeTest   {
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class Network2ESRIShapeTest   {
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class Network2ESRIShapeTest   {
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class Network2ESRIShapeTest   {
 		new Links2ESRIShape(network,outputFileShp, builder).write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
 	@Test
@@ -146,6 +146,6 @@ public class Network2ESRIShapeTest   {
 		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
-		Assert.assertEquals(network.getNodes().size(), writtenFeatures.size());
+		Assertions.assertEquals(network.getNodes().size(), writtenFeatures.size());
 	}
 }

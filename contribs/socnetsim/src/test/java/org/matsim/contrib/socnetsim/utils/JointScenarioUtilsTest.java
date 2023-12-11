@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.utils;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,9 +63,9 @@ public class JointScenarioUtilsTest {
 		final Population loadedPopulation = loadedScenario.getPopulation();
 
 		assertEquals(
-				"read pop is not the same size as dumped",
 				dumpedPopulation.getPersons().size(),
-				loadedPopulation.getPersons().size());
+				loadedPopulation.getPersons().size(),
+				"read pop is not the same size as dumped");
 
 		for (Person person : loadedPopulation.getPersons().values()) {
 			final Person dumpedPerson = dumpedPopulation.getPersons().get( person.getId() );
@@ -74,40 +74,40 @@ public class JointScenarioUtilsTest {
 			final Plan loadedPlan = person.getPlans().get( 0 );
 
 			assertEquals(
-					"incompatible plan sizes",
 					dumpedPlan.getPlanElements().size(),
-					loadedPlan.getPlanElements().size());
+					loadedPlan.getPlanElements().size(),
+					"incompatible plan sizes");
 
 			final Leg dumpedLeg = (Leg) dumpedPlan.getPlanElements().get( 1 );
 			final Leg loadedLeg = (Leg) loadedPlan.getPlanElements().get( 1 );
 
 			if (dumpedLeg.getMode().equals( JointActingTypes.DRIVER )) {
 				assertEquals(
-						"wrong route class",
 						DriverRoute.class,
-						loadedLeg.getRoute().getClass());
+						loadedLeg.getRoute().getClass(),
+						"wrong route class");
 
 				final Collection<Id<Person>> dumpedPassengers = ((DriverRoute) dumpedLeg.getRoute()).getPassengersIds();
 				final Collection<Id<Person>> loadedPassengers = ((DriverRoute) loadedLeg.getRoute()).getPassengersIds();
 
 				assertEquals(
-						"unexpected passenger ids",
 						dumpedPassengers,
-						loadedPassengers);
+						loadedPassengers,
+						"unexpected passenger ids");
 			}
 			else {
 				assertEquals(
-						"wrong route class",
 						PassengerRoute.class,
-						loadedLeg.getRoute().getClass());
+						loadedLeg.getRoute().getClass(),
+						"wrong route class");
 
 				final Id<Person> dumpedDriver = ((PassengerRoute) dumpedLeg.getRoute()).getDriverId();
 				final Id<Person> loadedDriver = ((PassengerRoute) loadedLeg.getRoute()).getDriverId();
 
 				assertEquals(
-						"unexpected passenger ids",
 						dumpedDriver,
-						loadedDriver);
+						loadedDriver,
+						"unexpected passenger ids");
 			}
 		}
 	}

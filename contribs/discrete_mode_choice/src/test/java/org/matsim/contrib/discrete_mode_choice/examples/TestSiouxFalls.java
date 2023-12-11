@@ -1,12 +1,12 @@
 package org.matsim.contrib.discrete_mode_choice.examples;
 
-import static org.junit.Assert.assertEquals;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;

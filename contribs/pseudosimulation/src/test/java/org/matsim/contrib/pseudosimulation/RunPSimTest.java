@@ -3,8 +3,8 @@ package org.matsim.contrib.pseudosimulation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.FixMethodOrder;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runners.MethodSorters;
@@ -103,7 +103,7 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.86084460860525, psimScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(138.86084460860525, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
 
 	}
 
@@ -129,7 +129,7 @@ public class RunPSimTest {
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.8303325803256, qsimScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(131.8303325803256, qsimScore, MatsimTestUtils.EPSILON, "Default controler score changed.");
 	}
 
 	class ExecScoreTracker implements ShutdownListener {

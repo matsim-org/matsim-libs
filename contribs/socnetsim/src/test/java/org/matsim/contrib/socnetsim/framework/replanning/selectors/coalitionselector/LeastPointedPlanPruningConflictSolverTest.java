@@ -21,7 +21,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -120,14 +120,14 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		for ( PlanRecord r : fixture.allRecords ) {
 			if ( fixture.expectedUnfeasiblePlans.contains( r.getPlan() ) ) {
-				Assert.assertFalse(
-						"plan "+r.getPlan()+" unexpectedly feasible",
-						r.isFeasible() );
+				Assertions.assertFalse(
+						r.isFeasible(),
+						"plan "+r.getPlan()+" unexpectedly feasible" );
 			}
 			else {
-				Assert.assertTrue(
-						"plan "+r.getPlan()+" unexpectedly unfeasible",
-						r.isFeasible() );
+				Assertions.assertTrue(
+						r.isFeasible(),
+						"plan "+r.getPlan()+" unexpectedly unfeasible" );
 			}
 		}
 	}

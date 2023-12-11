@@ -2,7 +2,7 @@ package org.matsim.core.config;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -27,7 +27,7 @@ public class CommandLineTest{
 		Config config = ConfigUtils.loadConfig( args ) ;
 		CommandLine cmd = ConfigUtils.getCommandLine( args );
 
-		Assert.assertEquals( "abc", cmd.getOption( "something" ).get() );
+		Assertions.assertEquals( "abc", cmd.getOption( "something" ).get() );
 
 	}
 
@@ -45,7 +45,7 @@ public class CommandLineTest{
 			Config config = ConfigUtils.loadConfig(args) ;
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 
-			Assert.assertEquals("abc", cmd.getOption("someting").get());
+			Assertions.assertEquals("abc", cmd.getOption("someting").get());
 
 		});
 
@@ -67,7 +67,7 @@ public class CommandLineTest{
 			String[] args = {configFilename, "--config:mockConfigGroup.abc=28"};
 			Config config = ConfigUtils.loadConfig( args );
 			MockConfigGroup mcg = ConfigUtils.addOrGetModule( config, MockConfigGroup.class ) ;
-			Assert.assertEquals( 28., mcg.getAbc(), 0. );
+			Assertions.assertEquals( 28., mcg.getAbc(), 0. );
 		}
 	}
 
@@ -92,9 +92,9 @@ public class CommandLineTest{
 			String[] args = { configFilename, "--config:mockConfigGroup.mockSet[*=*].test=c" };
 			Config config = ConfigUtils.loadConfig(args);
 			MockConfigGroup mockConfigGroup = ConfigUtils.addOrGetModule(config, MockConfigGroup.class);
-			Assert.assertEquals(2, mockConfigGroup.getParameterSets(MockParameterSet.SET_TYPE).size());
+			Assertions.assertEquals(2, mockConfigGroup.getParameterSets(MockParameterSet.SET_TYPE).size());
 			for (ConfigGroup parameterSet : mockConfigGroup.getParameterSets(MockParameterSet.SET_TYPE)) {
-				Assert.assertEquals("c", ((MockParameterSet) parameterSet).test);
+				Assertions.assertEquals("c", ((MockParameterSet) parameterSet).test);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class CommandLineTest{
 			String[] args = {configFilename, "--config:mockConfigGroup.abc=28"};
 			Config config = ConfigUtils.loadConfig( args, new MockConfigGroup() );
 			MockConfigGroup mcg = ConfigUtils.addOrGetModule( config, MockConfigGroup.class ) ;
-			Assert.assertEquals( 28., mcg.getAbc(), 0. );
+			Assertions.assertEquals( 28., mcg.getAbc(), 0. );
 		}
 	}
 

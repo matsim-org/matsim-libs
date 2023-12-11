@@ -21,7 +21,7 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtilsTest.createNetwork;
 import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem.createFromPreparedGeometries;
 

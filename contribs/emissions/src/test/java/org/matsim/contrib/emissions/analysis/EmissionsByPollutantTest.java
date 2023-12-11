@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions.analysis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.matsim.contrib.emissions.Pollutant.CO;
 import static org.matsim.contrib.emissions.Pollutant.NO2;
 

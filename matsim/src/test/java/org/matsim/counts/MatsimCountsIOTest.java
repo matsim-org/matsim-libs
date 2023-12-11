@@ -21,14 +21,14 @@
 
  package org.matsim.counts;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
- /**
+	/**
  * @author mrieser / Simunto GmbH
  */
 public class MatsimCountsIOTest {
@@ -77,7 +77,7 @@ public class MatsimCountsIOTest {
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
 		ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		reader.parse(stream);
-		Assert.assertEquals(1, counts.getCounts().size());
+		Assertions.assertEquals(1, counts.getCounts().size());
 	}
 
 	 /**
@@ -124,7 +124,7 @@ public class MatsimCountsIOTest {
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
 		ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		reader.parse(stream);
-		Assert.assertEquals(1, counts.getCounts().size());
+		Assertions.assertEquals(1, counts.getCounts().size());
 	}
 
 	 @Test

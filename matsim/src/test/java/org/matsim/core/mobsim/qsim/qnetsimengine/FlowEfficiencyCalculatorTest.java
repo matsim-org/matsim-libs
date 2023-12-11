@@ -22,7 +22,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Provides;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -60,16 +60,16 @@ public class FlowEfficiencyCalculatorTest {
 		double latestArrivalTime;
 
 		latestArrivalTime = runTestScenario(Double.POSITIVE_INFINITY);
-		Assert.assertEquals(1003.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(1003.0, latestArrivalTime, 1e-3);
 
 		latestArrivalTime = runTestScenario(1.0);
-		Assert.assertEquals(8195.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(8195.0, latestArrivalTime, 1e-3);
 
 		latestArrivalTime = runTestScenario(2.0);
-		Assert.assertEquals(4599.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(4599.0, latestArrivalTime, 1e-3);
 
 		latestArrivalTime = runTestScenario(0.5);
-		Assert.assertEquals(15388.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(15388.0, latestArrivalTime, 1e-3);
 	}
 
 	public double runTestScenario(double factor) {

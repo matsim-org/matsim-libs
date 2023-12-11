@@ -19,7 +19,7 @@
 
 package org.matsim.facilities;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -99,32 +99,32 @@ public class ActivityFacilitiesSourceTest {
 				break;
 			case fromFile:
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNotNull(af.getLinkId());
+					Assertions.assertNotNull(af.getLinkId());
 				}
 				break;
 			case setInScenario:
-				Assert.assertEquals("wrong number of facilities", 2, activityFacilities.getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(2, activityFacilities.getFacilities().size(), MatsimTestUtils.EPSILON, "wrong number of facilities");
 				if (facilitiesWithCoordOnly) {
 					for (ActivityFacility af : activityFacilities.getFacilities().values()){
-						Assert.assertNotNull(af.getLinkId());
+						Assertions.assertNotNull(af.getLinkId());
 					}
 				} else {
 					for (ActivityFacility af : activityFacilities.getFacilities().values()){
-						Assert.assertNull(af.getCoord());
+						Assertions.assertNull(af.getCoord());
 					}
 				}
 				break;
 			case onePerActivityLinkInPlansFile:
-				Assert.assertEquals("wrong number of facilities", 4, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(4, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON, "wrong number of facilities");
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNotNull(af.getLinkId());
+					Assertions.assertNotNull(af.getLinkId());
 				}
 				break;
 			case onePerActivityLocationInPlansFile:
-				Assert.assertEquals("wrong number of facilities", 2, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(2, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON, "wrong number of facilities");
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNotNull(af.getCoord());
-					Assert.assertNotNull(af.getLinkId());
+					Assertions.assertNotNull(af.getCoord());
+					Assertions.assertNotNull(af.getLinkId());
 				}
 				break;
 		}

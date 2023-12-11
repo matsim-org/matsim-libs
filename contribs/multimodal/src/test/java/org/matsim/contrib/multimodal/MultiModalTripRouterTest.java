@@ -21,7 +21,7 @@
 package org.matsim.contrib.multimodal;
 
 import com.google.inject.name.Names;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -200,7 +200,7 @@ public class MultiModalTripRouterTest {
 					break;
 				}
 			}
-			Assert.assertTrue(validMode);
+			Assertions.assertTrue(validMode);
 
 		}
 	}

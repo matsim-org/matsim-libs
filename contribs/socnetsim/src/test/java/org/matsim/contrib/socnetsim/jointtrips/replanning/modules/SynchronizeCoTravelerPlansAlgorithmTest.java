@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -331,16 +331,16 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 					final Double endTime = fixture.expectedEndTimes.remove( activity );
 					if ( endTime == null ) continue;
 
-					Assert.assertEquals(
-							"unexpected end time for "+activity,
+					Assertions.assertEquals(
 							endTime.doubleValue(), activity.getEndTime().seconds(),
-							MatsimTestUtils.EPSILON);
+							MatsimTestUtils.EPSILON,
+							"unexpected end time for "+activity);
 				}
 			}
 
-			Assert.assertTrue(
-					"some activities were not found: "+fixture.expectedEndTimes.keySet(),
-					fixture.expectedEndTimes.isEmpty() );
+			Assertions.assertTrue(
+					fixture.expectedEndTimes.isEmpty(),
+					"some activities were not found: "+fixture.expectedEndTimes.keySet() );
 		}
 	}
 

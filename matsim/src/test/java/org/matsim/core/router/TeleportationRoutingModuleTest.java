@@ -19,7 +19,7 @@
 
 package org.matsim.core.router;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -59,9 +59,9 @@ public class TeleportationRoutingModuleTest {
 						"mode",
 						scenario, 10.0, 1.0);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
-		Assert.assertEquals(100.0, tt, 10e-7);
-		Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 10e-7);
-		Assert.assertEquals(100.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+		Assertions.assertEquals(100.0, tt, 10e-7);
+		Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 10e-7);
+		Assertions.assertEquals(100.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 
         router =
 				new TeleportationRoutingModule(
@@ -70,9 +70,9 @@ public class TeleportationRoutingModuleTest {
 						20.0,
 						1.0);
 		tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
-		Assert.assertEquals(50.0, tt, 10e-7);
-		Assert.assertEquals(50.0, leg.getTravelTime().seconds(), 10e-7);
-		Assert.assertEquals(50.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+		Assertions.assertEquals(50.0, tt, 10e-7);
+		Assertions.assertEquals(50.0, leg.getTravelTime().seconds(), 10e-7);
+		Assertions.assertEquals(50.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 
 //		Activity otherToAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 1000));
 		Facility otherToAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
@@ -85,8 +85,8 @@ public class TeleportationRoutingModuleTest {
 						10.0,
 						manhattanBeelineDistanceFactor);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);
-		Assert.assertEquals(200.0, tt, 10e-7);
-		Assert.assertEquals(200.0, leg.getTravelTime().seconds(), 10e-7);
-		Assert.assertEquals(200.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+		Assertions.assertEquals(200.0, tt, 10e-7);
+		Assertions.assertEquals(200.0, leg.getTravelTime().seconds(), 10e-7);
+		Assertions.assertEquals(200.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 	}
 }

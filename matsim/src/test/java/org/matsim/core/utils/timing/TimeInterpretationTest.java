@@ -20,11 +20,11 @@
 
 package org.matsim.core.utils.timing;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

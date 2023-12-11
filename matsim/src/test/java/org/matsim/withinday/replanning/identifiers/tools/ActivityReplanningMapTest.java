@@ -20,12 +20,12 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;

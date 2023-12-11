@@ -21,7 +21,7 @@ package org.matsim.core.scoring;
 
 import java.util.Collections;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -88,8 +88,7 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new VehicleLeavesTrafficEvent(30.0, agentId, Id.createLinkId("l3"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
-		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
-				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
+		Assertions.assertEquals(10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME), EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!");
 	}
 
 	@Test
@@ -130,8 +129,7 @@ public class EventsToLegsTest {
 
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId1, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
-		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
-				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
+		Assertions.assertEquals(10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME), EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!");
 	}
 
 	@Test
@@ -148,8 +146,7 @@ public class EventsToLegsTest {
 		//driver leaves out vehicle after 10 seconds, no driving at all
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 0.0, "car");
-		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
-				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
+		Assertions.assertEquals(10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME), EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!");
 	}
 
 	@Test
@@ -170,8 +167,7 @@ public class EventsToLegsTest {
 				new VehicleLeavesTrafficEvent(25.0, agentId1, Id.createLinkId("l1"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 500.0, "car");
-		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
-				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
+		Assertions.assertEquals(10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME), EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!");
 	}
 
 	@Test
@@ -228,12 +224,12 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(100.0, passengerId, transitVehiceId));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(1000.0, passengerId, accessLinkId, "pt"));
 		
-		Assert.assertEquals(10.0, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-3);
-		Assert.assertEquals(1000.0 - 10.0, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-3);
-		Assert.assertTrue(lh.handledLeg.getLeg().getRoute() instanceof TransitPassengerRoute);
+		Assertions.assertEquals(10.0, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-3);
+		Assertions.assertEquals(1000.0 - 10.0, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-3);
+		Assertions.assertTrue(lh.handledLeg.getLeg().getRoute() instanceof TransitPassengerRoute);
 		
 		TransitPassengerRoute route = (TransitPassengerRoute) lh.handledLeg.getLeg().getRoute();
-		Assert.assertEquals(100.0, route.getBoardingTime().seconds(), 1e-3);
+		Assertions.assertEquals(100.0, route.getBoardingTime().seconds(), 1e-3);
 	}
 
 	private static Scenario createTriangularNetwork() {
@@ -266,12 +262,12 @@ public class EventsToLegsTest {
 
 	private void assertLeg(RememberingLegHandler lh, double departureTime, double travelTime, double distance,
 			String mode) {
-		Assert.assertNotNull(lh.handledLeg);
-		Assert.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime().seconds(), 1e-9);
-		Assert.assertEquals(distance, lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
-		Assert.assertEquals(mode, lh.handledLeg.getLeg().getMode());
+		Assertions.assertNotNull(lh.handledLeg);
+		Assertions.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-9);
+		Assertions.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-9);
+		Assertions.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime().seconds(), 1e-9);
+		Assertions.assertEquals(distance, lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
+		Assertions.assertEquals(mode, lh.handledLeg.getLeg().getMode());
 	}
 
 	private static class RememberingLegHandler implements LegHandler {

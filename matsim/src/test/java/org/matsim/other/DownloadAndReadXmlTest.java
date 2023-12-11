@@ -19,8 +19,8 @@
 
 package org.matsim.other;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -58,10 +58,10 @@ public class DownloadAndReadXmlTest {
 		Network network = scenario.getNetwork();
 
 		// 3 pt nodes and 4 x 4 car nodes
-		Assert.assertEquals(3 + 4 * 4, network.getNodes().size());
+		Assertions.assertEquals(3 + 4 * 4, network.getNodes().size());
 
 		// 6 pt links and 3 links * 2 directions * 4 times in parallel * 2 (horizontally and vertically)
-		Assert.assertEquals(6 + 3 * 2 * 4 * 2, network.getLinks().size());
+		Assertions.assertEquals(6 + 3 * 2 * 4 * 2, network.getLinks().size());
 	}
 
 	@Test
@@ -78,10 +78,10 @@ public class DownloadAndReadXmlTest {
 		Network network = scenario.getNetwork();
 
 		// 3 pt nodes and 4 x 4 car nodes
-		Assert.assertEquals(3 + 4 * 4, network.getNodes().size());
+		Assertions.assertEquals(3 + 4 * 4, network.getNodes().size());
 
 		// 6 pt links and 3 links * 2 directions * 4 times in parallel * 2 (horizontally and vertically)
-		Assert.assertEquals(6 + 3 * 2 * 4 * 2, network.getLinks().size());
+		Assertions.assertEquals(6 + 3 * 2 * 4 * 2, network.getLinks().size());
 	}
 
 }

@@ -23,7 +23,7 @@ import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -138,14 +138,14 @@ public class TravelTimeOneWayTestIT {
 			log.debug("tF = 60s, " + resultsWoSignals.numberOfVehPassedDuringTimeToMeasure + ", " + resultsWoSignals.numberOfVehPassed + ", "
 					+ resultsWoSignals.firstVehPassTime_s + ", " + resultsWoSignals.lastVehPassTime_s);
 		} else {
-			Assert.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
+			Assertions.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
 		}
 
 		// compare values
-		Assert.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.firstVehPassTime_s, resultsWoSignals.firstVehPassTime_s, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.numberOfVehPassed, resultsWoSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.numberOfVehPassedDuringTimeToMeasure, resultsWoSignals.numberOfVehPassedDuringTimeToMeasure, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(resultsWithSignals.firstVehPassTime_s, resultsWoSignals.firstVehPassTime_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(resultsWithSignals.numberOfVehPassed, resultsWoSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(resultsWithSignals.numberOfVehPassedDuringTimeToMeasure, resultsWoSignals.numberOfVehPassedDuringTimeToMeasure, MatsimTestUtils.EPSILON);
 	}
 
 	private static void runAndTestDifferentGreensplitSignals(final Scenario scenario) {
@@ -167,8 +167,8 @@ public class TravelTimeOneWayTestIT {
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
-			Assert.assertEquals((dropping * linkCapacity / circulationTime), stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
-			Assert.assertEquals(5000.0, stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassed, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals((dropping * linkCapacity / circulationTime), stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
+			Assertions.assertEquals(5000.0, stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassed, MatsimTestUtils.EPSILON);
 		}
 	}
 

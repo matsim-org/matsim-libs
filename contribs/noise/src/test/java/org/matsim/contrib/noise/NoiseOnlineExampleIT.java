@@ -25,7 +25,7 @@ package org.matsim.contrib.noise;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.XYTRecord;
@@ -169,13 +169,13 @@ public class NoiseOnlineExampleIT {
 
 		//check whether on the fly caluclation equals file based aggregation terms
 		for(Map.Entry<Id<ReceiverPoint>, Double> entry: ldenByRp.entrySet()) {
-			Assert.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getLden(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getLden(), MatsimTestUtils.EPSILON);
 		}
 		for(Map.Entry<Id<ReceiverPoint>, Double> entry: l69ByRp.entrySet()) {
-			Assert.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL69(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL69(), MatsimTestUtils.EPSILON);
 		}
 		for(Map.Entry<Id<ReceiverPoint>, Double> entry: l1619ByRp.entrySet()) {
-			Assert.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL1619(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL1619(), MatsimTestUtils.EPSILON);
 		}
 	}
 

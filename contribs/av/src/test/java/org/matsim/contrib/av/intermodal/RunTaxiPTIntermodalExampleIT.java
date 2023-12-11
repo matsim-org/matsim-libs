@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -83,7 +83,7 @@ public class RunTaxiPTIntermodalExampleIT {
 			}
 		}
 
-		Assert.assertTrue("no pt agent has any intermodal route (=taxi for access or egress to pt)",
-				intermodalTripCounter > 0);
+		Assertions.assertTrue(intermodalTripCounter > 0,
+				"no pt agent has any intermodal route (=taxi for access or egress to pt)");
 	}
 }

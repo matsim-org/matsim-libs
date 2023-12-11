@@ -1,6 +1,6 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,8 +36,8 @@ public class AgentId2DepartureDelayAtStopMapDataTest {
         
 //        run tests for 1 event each, can be expanded later if needed
         
-        Assert.assertEquals((Double)event3.getTime(), data.getAgentDepartsPTInteraction().get(0));
-		Assert.assertEquals((Double)event1.getTime(), data.getAgentEntersVehicle().get(0));
+        Assertions.assertEquals((Double)event3.getTime(), data.getAgentDepartsPTInteraction().get(0));
+		Assertions.assertEquals((Double)event1.getTime(), data.getAgentEntersVehicle().get(0));
 		
 		
 		

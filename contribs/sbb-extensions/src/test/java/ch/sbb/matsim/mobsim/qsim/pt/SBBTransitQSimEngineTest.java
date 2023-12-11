@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -65,8 +65,8 @@ public class SBBTransitQSimEngineTest {
     private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineTest.class);
 
     private static void assertEqualEvent(Class<? extends Event> eventClass, double time, Event event) {
-        Assert.assertTrue(event.getClass().isAssignableFrom(event.getClass()));
-        Assert.assertEquals(time, event.getTime(), 1e-7);
+        Assertions.assertTrue(event.getClass().isAssignableFrom(event.getClass()));
+        Assertions.assertEquals(time, event.getTime(), 1e-7);
     }
 
 	@Test
@@ -81,9 +81,9 @@ public class SBBTransitQSimEngineTest {
         trEngine.insertAgentsIntoMobsim();
 
         Map<Id<Person>, MobsimAgent> agents = qSim.getAgents();
-        Assert.assertEquals("Expected one driver as agent.", 1, agents.size());
+        Assertions.assertEquals(1, agents.size(), "Expected one driver as agent.");
         MobsimAgent agent = agents.values().iterator().next();
-        Assert.assertTrue(agent instanceof SBBTransitDriverAgent);
+        Assertions.assertTrue(agent instanceof SBBTransitDriverAgent);
         SBBTransitDriverAgent driver = (SBBTransitDriverAgent) agent;
         TransitRoute route = driver.getTransitRoute();
         List<TransitRouteStop> stops = route.getStops();
@@ -95,7 +95,7 @@ public class SBBTransitQSimEngineTest {
         assertNextStop(driver, stops.get(3), depTime);
         assertNextStop(driver, stops.get(4), depTime);
 
-        Assert.assertNull(driver.getNextRouteStop());
+        Assertions.assertNull(driver.getNextRouteStop());
     }
 
     private void assertNextStop(SBBTransitDriverAgent driver, TransitRouteStop stop, double routeDepTime) {
@@ -103,7 +103,7 @@ public class SBBTransitQSimEngineTest {
         double depOffset = stop.getDepartureOffset().or(stop.getArrivalOffset()).seconds();
         TransitStopFacility f = stop.getStopFacility();
 
-        Assert.assertEquals(stop, driver.getNextRouteStop());
+        Assertions.assertEquals(stop, driver.getNextRouteStop());
 
         driver.arrive(stop, routeDepTime + arrOffset);
         double stopTimeSum = 0.0;
@@ -112,8 +112,8 @@ public class SBBTransitQSimEngineTest {
             stopTime = driver.handleTransitStop(f, routeDepTime + arrOffset + stopTimeSum);
             stopTimeSum += stopTime;
         } while (stopTime > 0);
-        Assert.assertEquals(depOffset - arrOffset, stopTimeSum, 1e-7);
-        Assert.assertEquals("last stop time should have been 0.0", 0.0, stopTime, 1e-7);
+        Assertions.assertEquals(depOffset - arrOffset, stopTimeSum, 1e-7);
+        Assertions.assertEquals(0.0, stopTime, 1e-7, "last stop time should have been 0.0");
         driver.depart(f, routeDepTime + depOffset);
     }
 
@@ -141,7 +141,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 15, allEvents.size());
+        Assertions.assertEquals(15, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -189,7 +189,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 22, allEvents.size());
+        Assertions.assertEquals(22, allEvents.size(), "wrong number of events.");
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger
         assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(1)); // passenger
         assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(2)); // passenger
@@ -241,7 +241,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 36, allEvents.size());
+        Assertions.assertEquals(36, allEvents.size(), "wrong number of events.");
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger 1
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(1)); // passenger 2
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(2)); // passenger 3
@@ -305,7 +305,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 23, allEvents.size());
+        Assertions.assertEquals(23, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -357,7 +357,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 13, allEvents.size());
+        Assertions.assertEquals(13, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 35000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 35000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 35000, allEvents.get(2));
@@ -404,7 +404,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 13, allEvents.size());
+        Assertions.assertEquals(13, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 35000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 35000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 35000, allEvents.get(2));
@@ -450,7 +450,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 23, allEvents.size());
+        Assertions.assertEquals(23, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -505,7 +505,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 23, allEvents.size());
+        Assertions.assertEquals(23, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -550,7 +550,7 @@ public class SBBTransitQSimEngineTest {
 
         try {
             qSim.run();
-            Assert.fail("Expected a RuntimeException due misconfiguration, but got none.");
+            Assertions.fail("Expected a RuntimeException due misconfiguration, but got none.");
         } catch (RuntimeException e) {
             log.info("Caught expected exception, all is fine.", e);
         }
@@ -586,7 +586,7 @@ public class SBBTransitQSimEngineTest {
             if (iteration == 0 || iteration == 3 || iteration == 6 || iteration == 9) {
                 expectedEventsCount = 23;
             }
-            Assert.assertEquals("wrong number of events in iteration " + iteration, expectedEventsCount, collector.getEvents().size());
+            Assertions.assertEquals(expectedEventsCount, collector.getEvents().size(), "wrong number of events in iteration " + iteration);
         }
     }
 }

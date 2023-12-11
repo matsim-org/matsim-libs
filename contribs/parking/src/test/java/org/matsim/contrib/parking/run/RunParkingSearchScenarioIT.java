@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.parking.run;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -57,7 +57,7 @@ public class RunParkingSearchScenarioIT {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong");
+			Assertions.fail("something went wrong");
 		}
 	}
 
@@ -75,7 +75,7 @@ public class RunParkingSearchScenarioIT {
 			new RunParkingSearchExample().run(config, false);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong");
+			Assertions.fail("something went wrong");
 		}
 	}
 
@@ -101,7 +101,7 @@ public class RunParkingSearchScenarioIT {
 				for (Id<Person> personId : expected.getPersons().keySet()) {
 					double scoreReference = expected.getPersons().get(personId).getSelectedPlan().getScore();
 					double scoreCurrent = actual.getPersons().get(personId).getSelectedPlan().getScore();
-					Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of person=" + personId + " are different");
 				}
 
 			}
@@ -109,11 +109,11 @@ public class RunParkingSearchScenarioIT {
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 				EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
-				Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+				Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong");
+			Assertions.fail("something went wrong");
 		}
 	}
 
@@ -139,7 +139,7 @@ public class RunParkingSearchScenarioIT {
 				for (Id<Person> personId : expected.getPersons().keySet()) {
 					double scoreReference = expected.getPersons().get(personId).getSelectedPlan().getScore();
 					double scoreCurrent = actual.getPersons().get(personId).getSelectedPlan().getScore();
-					Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of person=" + personId + " are different");
 				}
 
 			}
@@ -147,11 +147,11 @@ public class RunParkingSearchScenarioIT {
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 				EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
-				Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+				Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong");
+			Assertions.fail("something went wrong");
 		}
 	}
 }

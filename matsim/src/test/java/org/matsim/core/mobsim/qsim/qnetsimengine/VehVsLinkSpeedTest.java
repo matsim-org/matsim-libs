@@ -19,7 +19,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
-import org.junit.Assert;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -123,8 +124,7 @@ public class VehVsLinkSpeedTest {
 		double carTravelTime = travelTime1.get(desiredLink.getId()); // 1000 / min(25, vehSpeed)
 		double speedUsedInSimulation = Math.round( desiredLink.getLength() / (carTravelTime - 1) );
 
-		Assert.assertEquals("In the simulation minimum of vehicle speed and link speed should be used.", 
-				Math.min(vehSpeed, MAX_SPEED_ON_LINK), speedUsedInSimulation, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(Math.min(vehSpeed, MAX_SPEED_ON_LINK), speedUsedInSimulation, MatsimTestUtils.EPSILON, "In the simulation minimum of vehicle speed and link speed should be used.");
 	}
 
 	private static final class SimpleNetwork{

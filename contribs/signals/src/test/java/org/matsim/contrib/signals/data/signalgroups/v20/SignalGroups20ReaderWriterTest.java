@@ -29,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -97,28 +97,28 @@ public class SignalGroups20ReaderWriterTest {
 
 
 	private void checkContent(SignalGroupsData sgd) {
-		Assert.assertNotNull(sgd);
-		Assert.assertNotNull(sgd.getSignalGroupDataBySignalSystemId());
-		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id23));
+		Assertions.assertNotNull(sgd);
+		Assertions.assertNotNull(sgd.getSignalGroupDataBySignalSystemId());
+		Assertions.assertNotNull(sgd.getSignalGroupDataBySystemId(id23));
 
 		//sg23
 		Map<Id<SignalGroup>,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
-		Assert.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
+		Assertions.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
 
 		Set<Id<Signal>> sg = ss23.get(idSg1).getSignalIds();
-		Assert.assertTrue(sg.contains(id1));
+		Assertions.assertTrue(sg.contains(id1));
 
 		//sg42
-		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
+		Assertions.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
 		Map<Id<SignalGroup>,SignalGroupData> ss42 = sgd.getSignalGroupDataBySystemId(id42);
-		Assert.assertEquals(id42,ss42.get(idSg1).getSignalSystemId());
+		Assertions.assertEquals(id42,ss42.get(idSg1).getSignalSystemId());
 
 		sg =  ss42.get(idSg1).getSignalIds();
-		Assert.assertTrue(sg.contains(id1));
+		Assertions.assertTrue(sg.contains(id1));
 		sg =  ss42.get(idSg2).getSignalIds();
-		Assert.assertTrue(sg.contains(id1));
-		Assert.assertTrue(sg.contains(id4));
-		Assert.assertTrue(sg.contains(id5));
+		Assertions.assertTrue(sg.contains(id1));
+		Assertions.assertTrue(sg.contains(id4));
+		Assertions.assertTrue(sg.contains(id5));
 
 
 

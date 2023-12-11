@@ -27,8 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import jakarta.inject.Inject;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -110,40 +109,40 @@ public class ScoreStatsModuleTest {
 			if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 				{
 					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75686659291274, array[0], DELTA);
-					Assert.assertEquals(64.78366379257605, array[1], DELTA);
+					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
+					Assertions.assertEquals(64.78366379257605, array[1], DELTA);
 				} {
 					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75686659291274, array[0], DELTA);
-					Assert.assertEquals(64.84180132563583, array[1], DELTA);
+					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
+					Assertions.assertEquals(64.84180132563583, array[1], DELTA);
 				}{
 					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75686659291274, array[0], DELTA);
-					Assert.assertEquals(64.81273255910591, array[1], DELTA);
+					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
+					Assertions.assertEquals(64.81273255910591, array[1], DELTA);
 				}{
 					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75686659291274, array[0], DELTA);
-					Assert.assertEquals(64.84180132563583, array[1], DELTA);
+					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
+					Assertions.assertEquals(64.84180132563583, array[1], DELTA);
 				}
 				} else {
 					// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
 //					if(config.qsim().isUsingFastCapacityUpdate()) {
 						{
 						Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-						Assert.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
 						}{
 						Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
-						Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
 						}{
 						Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[0], array[0], DELTA);
-						Assert.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[1], array[1], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[0], array[0], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[1], array[1], DELTA);
 						}{
 						Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-						Assert.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
+						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
 						}
 //					} else {
 //						{

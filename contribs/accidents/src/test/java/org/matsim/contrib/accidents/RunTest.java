@@ -3,7 +3,7 @@ package org.matsim.contrib.accidents;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -86,12 +86,12 @@ public class RunTest {
 
 					if (lineCounter == 0 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
-						Assert.assertEquals("wrong accident costs", 10.38, accidentCosts , MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(10.38, accidentCosts , MatsimTestUtils.EPSILON, "wrong accident costs");
 					}
 
 					if (lineCounter == 1 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
-						Assert.assertEquals("wrong accident costs", 16.68, accidentCosts , MatsimTestUtils.EPSILON);
+						Assertions.assertEquals(16.68, accidentCosts , MatsimTestUtils.EPSILON, "wrong accident costs");
 					}
 
 				}

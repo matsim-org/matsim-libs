@@ -32,7 +32,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
@@ -70,7 +70,7 @@ public class ShapeFileWriterTest {
 			SimpleFeature ft1 = it1.next();
 			Geometry g1 = (Geometry) ft1.getDefaultGeometry();
 
-			Assert.assertEquals(g.getCoordinates().length, g1.getCoordinates().length);
+			Assertions.assertEquals(g.getCoordinates().length, g1.getCoordinates().length);
 
 	}
 
@@ -102,7 +102,7 @@ public class ShapeFileWriterTest {
 		SimpleFeature ft1 = it1.next();
 		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
 
-		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+		Assertions.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
 
 
 	}
@@ -133,7 +133,7 @@ public class ShapeFileWriterTest {
 		SimpleFeature ft1 = it1.next();
 		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
 
-		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+		Assertions.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class ShapeFileWriterTest {
 		SimpleFeature ft1 = it1.next();
 		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
 
-		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+		Assertions.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
 	}
 
 	@Test
@@ -190,6 +190,6 @@ public class ShapeFileWriterTest {
 		SimpleFeature ft1 = it1.next();
 		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
 
-		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+		Assertions.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
 	}
 }

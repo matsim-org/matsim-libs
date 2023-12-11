@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import org.apache.logging.log4j.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -99,18 +98,18 @@ public class InsertionRemovalIterativeActionTest {
 		final String finalPlanDescr = jointPlan.toString();
 
 		assertEquals(
+				N_COUPLES - 1,
+				d,
 				"unexpected number of driver trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				N_COUPLES - 1,
-				d);
+				+finalPlanDescr);
 
 		assertEquals(
+				N_COUPLES - 1,
+				p,
 				"unexpected number of passenger trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				N_COUPLES - 1,
-				p);
+				+finalPlanDescr);
 	}
 
 	@Test
@@ -142,18 +141,18 @@ public class InsertionRemovalIterativeActionTest {
 		final String finalPlanDescr = jointPlan.toString();
 
 		assertEquals(
+				0,
+				d,
 				"unexpected number of driver trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				0,
-				d);
+				+finalPlanDescr);
 
 		assertEquals(
+				0,
+				p,
 				"unexpected number of passenger trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				0,
-				p);
+				+finalPlanDescr);
 	}
 
 	@Test
@@ -178,21 +177,21 @@ public class InsertionRemovalIterativeActionTest {
 				final Leg l = (Leg) pe;
 				final String mode = l.getMode();
 				if ( JointActingTypes.DRIVER.equals( mode ) ) {
-					Assert.assertNotNull(
-							"route must not be null",
-							l.getRoute() );
-					Assert.assertTrue(
-							"unexpected route type "+l.getRoute().getClass().getName(),
-							l.getRoute() instanceof DriverRoute );
+					Assertions.assertNotNull(
+							l.getRoute(),
+							"route must not be null" );
+					Assertions.assertTrue(
+							l.getRoute() instanceof DriverRoute,
+							"unexpected route type "+l.getRoute().getClass().getName() );
 					d++;
 				}
 				if ( JointActingTypes.PASSENGER.equals( mode ) ) {
-					Assert.assertNotNull(
-							"route must not be null",
-							l.getRoute() );
-					Assert.assertTrue(
-							"unexpected route type "+l.getRoute().getClass().getName(),
-							l.getRoute() instanceof PassengerRoute );
+					Assertions.assertNotNull(
+							l.getRoute(),
+							"route must not be null" );
+					Assertions.assertTrue(
+							l.getRoute() instanceof PassengerRoute,
+							"unexpected route type "+l.getRoute().getClass().getName() );
 					p++;
 				}
 			}
@@ -201,18 +200,18 @@ public class InsertionRemovalIterativeActionTest {
 		final String finalPlanDescr = jointPlan.toString();
 
 		assertEquals(
+				1,
+				d,
 				"unexpected number of driver trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				1,
-				d);
+				+finalPlanDescr);
 
 		assertEquals(
+				1,
+				p,
 				"unexpected number of passenger trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				1,
-				p);
+				+finalPlanDescr);
 	}
 
 	@Test
@@ -237,21 +236,21 @@ public class InsertionRemovalIterativeActionTest {
 				final Leg l = (Leg) pe;
 				final String mode = l.getMode();
 				if ( JointActingTypes.DRIVER.equals( mode ) ) {
-					Assert.assertNotNull(
-							"route must not be null",
-							l.getRoute() );
-					Assert.assertTrue(
-							"unexpected route type "+l.getRoute().getClass().getName(),
-							l.getRoute() instanceof DriverRoute );
+					Assertions.assertNotNull(
+							l.getRoute(),
+							"route must not be null" );
+					Assertions.assertTrue(
+							l.getRoute() instanceof DriverRoute,
+							"unexpected route type "+l.getRoute().getClass().getName() );
 					d++;
 				}
 				if ( JointActingTypes.PASSENGER.equals( mode ) ) {
-					Assert.assertNotNull(
-							"route must not be null",
-							l.getRoute() );
-					Assert.assertTrue(
-							"unexpected route type "+l.getRoute().getClass().getName(),
-							l.getRoute() instanceof PassengerRoute );
+					Assertions.assertNotNull(
+							l.getRoute(),
+							"route must not be null" );
+					Assertions.assertTrue(
+							l.getRoute() instanceof PassengerRoute,
+							"unexpected route type "+l.getRoute().getClass().getName() );
 					p++;
 				}
 			}
@@ -260,18 +259,18 @@ public class InsertionRemovalIterativeActionTest {
 		final String finalPlanDescr = jointPlan.toString();
 
 		assertEquals(
+				N_COUPLES,
+				d,
 				"unexpected number of driver trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				N_COUPLES,
-				d);
+				+finalPlanDescr);
 
 		assertEquals(
+				N_COUPLES,
+				p,
 				"unexpected number of passenger trips when passing from plan "
 				+initialPlanDescr+" to plan "
-				+finalPlanDescr,
-				N_COUPLES,
-				p);
+				+finalPlanDescr);
 	}
 
 

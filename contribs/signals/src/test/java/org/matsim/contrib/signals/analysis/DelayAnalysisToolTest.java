@@ -3,7 +3,7 @@ package org.matsim.contrib.signals.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -88,7 +88,7 @@ public class DelayAnalysisToolTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()).useDefaults().build(scenario, events).run();
 
-		Assert.assertEquals("Total Delay of one agent is not correct", 0.0, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, handler.getTotalDelay(), MatsimTestUtils.EPSILON, "Total Delay of one agent is not correct");
 		if(WRITE_OUTPUT){
 			generateOutput(scenario, eventslist);
 		}
@@ -125,7 +125,7 @@ public class DelayAnalysisToolTest {
 		for(int i=0; i<NUMBER_OF_PERSONS; i++){
 			expectedDelay +=  i;
 		}
-		Assert.assertEquals("Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.", expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON, "Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.");
 	}
 
 	private void generateOutput(Scenario scenario, final List<Event> eventslist) {

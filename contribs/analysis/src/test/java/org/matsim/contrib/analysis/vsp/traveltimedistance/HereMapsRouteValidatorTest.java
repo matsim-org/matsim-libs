@@ -8,7 +8,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.*;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HereMapsRouteValidatorTest {
 	@RegisterExtension

@@ -1,6 +1,6 @@
 package org.matsim.contrib.parking.lib.obj;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;

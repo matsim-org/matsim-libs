@@ -20,7 +20,7 @@
 
 package org.matsim.api.core.v01;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -63,22 +63,22 @@ public class CoordTest {
 	void testGetX() {
 		// 2D
 		Coord c2 = new Coord(0.0, 1.0);
-		assertEquals("Wrong x-value.", 0.0, c2.getX(), MatsimTestUtils.EPSILON);
+		assertEquals(0.0, c2.getX(), MatsimTestUtils.EPSILON, "Wrong x-value.");
 
 		// 3D
 		Coord c3 = new Coord(0.0, 1.0, 2.0);
-		assertEquals("Wrong x-value.", 0.0, c3.getX(), MatsimTestUtils.EPSILON);
+		assertEquals(0.0, c3.getX(), MatsimTestUtils.EPSILON, "Wrong x-value.");
 	}
 
 	@Test
 	void testGetY() {
 		// 2D
 		Coord c2 = new Coord(0.0, 1.0);
-		assertEquals("Wrong y-value.", 1.0, c2.getY(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, c2.getY(), MatsimTestUtils.EPSILON, "Wrong y-value.");
 
 		// 3D
 		Coord c3 = new Coord(0.0, 1.0, 2.0);
-		assertEquals("Wrong y-value.", 1.0, c3.getY(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, c3.getY(), MatsimTestUtils.EPSILON, "Wrong y-value.");
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class CoordTest {
 		
 		// 3D
 		Coord c3 = new Coord(0.0, 1.0, 2.0);
-		assertEquals("Wrong z-value.", 2.0, c3.getZ(), MatsimTestUtils.EPSILON);
+		assertEquals(2.0, c3.getZ(), MatsimTestUtils.EPSILON, "Wrong z-value.");
 	}
 
 	@Test
@@ -110,15 +110,15 @@ public class CoordTest {
 		Coord c3b = new Coord(0.0, 1.0, 2.0);
 		Coord c3c = new Coord(0.0, 1.0, 3.0);
 		
-		assertFalse("Coordinates should not be equal.", c2a.equals(dummy));
-		assertTrue("Coordinates should not be equal.", c2a.equals(c2b));
-		assertFalse("Coordinates should not be equal.", c2a.equals(c2c));
-		assertFalse("2D coordinate should not be equal to 3D coordinate.", c2a.equals(c3a));
+		assertFalse(c2a.equals(dummy), "Coordinates should not be equal.");
+		assertTrue(c2a.equals(c2b), "Coordinates should not be equal.");
+		assertFalse(c2a.equals(c2c), "Coordinates should not be equal.");
+		assertFalse(c2a.equals(c3a), "2D coordinate should not be equal to 3D coordinate.");
 		
-		assertFalse("Coordinates should not be equal.", c3a.equals(dummy));
-		assertTrue("Coordinates should not be equal.", c3a.equals(c3b));
-		assertFalse("Coordinates should not be equal.", c3a.equals(c3c));
-		assertFalse("3D coordinate should not be equal to 2D coordinate.", c3a.equals(c2a));
+		assertFalse(c3a.equals(dummy), "Coordinates should not be equal.");
+		assertTrue(c3a.equals(c3b), "Coordinates should not be equal.");
+		assertFalse(c3a.equals(c3c), "Coordinates should not be equal.");
+		assertFalse(c3a.equals(c2a), "3D coordinate should not be equal to 2D coordinate.");
 	}
 
 	@Test

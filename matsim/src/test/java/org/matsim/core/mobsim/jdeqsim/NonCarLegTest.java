@@ -24,6 +24,8 @@
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -35,9 +37,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import static org.junit.Assert.assertTrue;
-
- public class NonCarLegTest extends AbstractJDEQSimTest {
+	public class NonCarLegTest extends AbstractJDEQSimTest {
 
 	 @Test
 	 void test_EmptyCarRoute() {

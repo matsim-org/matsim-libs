@@ -22,7 +22,7 @@ package org.matsim.integration.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -48,14 +48,14 @@ public class TransitDriverStartsEventHandlerIntegrationTest {
 		TransitDriverStartsTestEventHandler eh = new TransitDriverStartsTestEventHandler();
 		em.addHandler(eh);
 
-		Assert.assertEquals(0, eh.events.size());
+		Assertions.assertEquals(0, eh.events.size());
 
 		em.initProcessing();
 		em.processEvent(e1);
 		em.finishProcessing();
 
-		Assert.assertEquals(1, eh.events.size());
-		Assert.assertEquals(e1, eh.events.get(0));
+		Assertions.assertEquals(1, eh.events.size());
+		Assertions.assertEquals(e1, eh.events.get(0));
 	}
 
 	/*package*/ static class TransitDriverStartsTestEventHandler implements TransitDriverStartsEventHandler {

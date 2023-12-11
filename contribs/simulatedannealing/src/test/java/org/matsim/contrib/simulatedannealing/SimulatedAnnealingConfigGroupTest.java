@@ -8,7 +8,7 @@
  */
 package org.matsim.contrib.simulatedannealing;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
@@ -59,9 +59,9 @@ public class SimulatedAnnealingConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, configFile.toString());
 		SimulatedAnnealingConfigGroup loadedCfg = ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
-		Assert.assertEquals(42., loadedCfg.alpha, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(42., loadedCfg.initialTemperature, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(TemperatureFunction.DefaultFunctions.exponentialAdditive, loadedCfg.coolingSchedule);
+		Assertions.assertEquals(42., loadedCfg.alpha, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(42., loadedCfg.initialTemperature, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(TemperatureFunction.DefaultFunctions.exponentialAdditive, loadedCfg.coolingSchedule);
 	}
 
 
@@ -70,7 +70,7 @@ public class SimulatedAnnealingConfigGroupTest {
 		Config config = createConfig();
 		SimulatedAnnealingConfigGroup saConfig = ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
 
-		Assert.assertTrue(saConfig.getPerturbationParams().isEmpty());
+		Assertions.assertTrue(saConfig.getPerturbationParams().isEmpty());
 
 		saConfig.addPerturbationParams(new SimulatedAnnealingConfigGroup.PerturbationParams("perturb", 1.) {
 			@Override
@@ -79,9 +79,9 @@ public class SimulatedAnnealingConfigGroupTest {
 			}
 		});
 
-		Assert.assertFalse(saConfig.getPerturbationParams().isEmpty());
-		Assert.assertTrue(saConfig.getPerturbationParamsPerType().containsKey("perturb"));
-		Assert.assertEquals(1., saConfig.getPerturbationParamsPerType().get("perturb").weight, MatsimTestUtils.EPSILON);
+		Assertions.assertFalse(saConfig.getPerturbationParams().isEmpty());
+		Assertions.assertTrue(saConfig.getPerturbationParamsPerType().containsKey("perturb"));
+		Assertions.assertEquals(1., saConfig.getPerturbationParamsPerType().get("perturb").weight, MatsimTestUtils.EPSILON);
 
 	}
 }

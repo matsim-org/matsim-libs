@@ -20,7 +20,7 @@
 
 package org.matsim.core.population.routes.heavycompressed;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -69,9 +69,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link1.getId(), linkIds, link4.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 
@@ -96,9 +96,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link0.getId(), linkIds, link4.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 
@@ -124,8 +124,8 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		NetworkRoute route = new HeavyCompressedNetworkRoute(link0.getId(), link4.getId(), HeavyCompressedNetworkRouteFactory.createCompressionData(network, subsequentLinks));
 		// NO route.setLinks() here!
 
-		Assert.assertEquals("expected 0 links.", 0, route.getLinkIds().size());
-		Assert.assertEquals("expected 0 link ids.", 0, route.getLinkIds().size());
+		Assertions.assertEquals(0, route.getLinkIds().size(), "expected 0 links.");
+		Assertions.assertEquals(0, route.getLinkIds().size(), "expected 0 link ids.");
 	}
 
 	@Test
@@ -169,15 +169,15 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		ArrayList<Id<Link>> srcRoute = new ArrayList<>(5);
 		Collections.addAll(srcRoute, link3.getId(), link4.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, link5.getId());
-		Assert.assertEquals(2, route1.getLinkIds().size());
+		Assertions.assertEquals(2, route1.getLinkIds().size());
 
 		HeavyCompressedNetworkRoute route2 = route1.clone();
 
 		srcRoute.add(link5.getId());
 		route2.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 
-		Assert.assertEquals(2, route1.getLinkIds().size());
-		Assert.assertEquals(3, route2.getLinkIds().size());
+		Assertions.assertEquals(2, route1.getLinkIds().size());
+		Assertions.assertEquals(3, route2.getLinkIds().size());
 	}
 
 	@Test
@@ -195,9 +195,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link1.getId(), linkIds, link4.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 
@@ -221,9 +221,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link1.getId(), linkIds, linkLoop5.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 
@@ -249,9 +249,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link1.getId(), linkIds, link4.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 
@@ -287,9 +287,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link1.getId(), linkIds, link23.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 
@@ -316,9 +316,9 @@ public class HeavyCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		route.setLinkIds(link2.getId(), linkIds, link2.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		Assertions.assertEquals(linkIds.size(), linksId2.size(), "wrong number of links.");
 		for (int i = 0, n = linkIds.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+			Assertions.assertEquals(linkIds.get(i), linksId2.get(i), "different link at position " + i);
 		}
 	}
 

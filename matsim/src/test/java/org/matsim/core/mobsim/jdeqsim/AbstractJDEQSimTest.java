@@ -21,7 +21,7 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-public abstract class AbstractJDEQSimTest {
+ public abstract class AbstractJDEQSimTest {
 
 	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -228,7 +228,7 @@ public abstract class AbstractJDEQSimTest {
 
 		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(deqsimEventsFile);
 		for (int i=0;i<copyEventList.size();i++){
-			assertTrue("events not equal.", CppEventFileParser.equals(copyEventList.get(i), deqSimLog.get(i)));
+			assertTrue(CppEventFileParser.equals(copyEventList.get(i), deqSimLog.get(i)), "events not equal.");
 		}
 	}
 

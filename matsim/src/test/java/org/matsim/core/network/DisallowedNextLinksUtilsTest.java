@@ -3,7 +3,7 @@ package org.matsim.core.network;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,7 +15,7 @@ public class DisallowedNextLinksUtilsTest {
 
 	@Test
 	void testNoDisallowedNextLinks() {
-		Assert.assertTrue(DisallowedNextLinksUtils.isValid(n));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(n));
 	}
 
 	@Test
@@ -28,7 +28,7 @@ public class DisallowedNextLinksUtilsTest {
 		dnl.addDisallowedLinkSequence("car", List.of(l1.getId(), l3.getId()));
 		dnl.addDisallowedLinkSequence("bike", List.of(l1.getId()));
 
-		Assert.assertFalse(DisallowedNextLinksUtils.isValid(n));
+		Assertions.assertFalse(DisallowedNextLinksUtils.isValid(n));
 	}
 
 	@Test
@@ -41,7 +41,7 @@ public class DisallowedNextLinksUtilsTest {
 		dnl.addDisallowedLinkSequence("car", List.of(l1.getId(), l3.getId()));
 		dnl.addDisallowedLinkSequence("bike", List.of(Id.createLinkId("a")));
 
-		Assert.assertFalse(DisallowedNextLinksUtils.isValid(n));
+		Assertions.assertFalse(DisallowedNextLinksUtils.isValid(n));
 	}
 
 	@Test
@@ -55,6 +55,6 @@ public class DisallowedNextLinksUtilsTest {
 		dnl.addDisallowedLinkSequence("car", List.of(l3.getId(), l5.getId()));
 		dnl.addDisallowedLinkSequence("bike", List.of(l3.getId()));
 
-		Assert.assertTrue(DisallowedNextLinksUtils.isValid(n));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(n));
 	}
 }

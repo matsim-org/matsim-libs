@@ -26,8 +26,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,8 +42,7 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author thibautd
@@ -388,14 +387,14 @@ public class TripStructureUtilsTest {
 						StageActivityHandling.ExcludeStageActivities);
 
 			assertEquals(
-					"unexpected number of activities in "+acts+" for fixture "+fixture.name,
 					fixture.expectedNActs,
-					acts.size() );
+					acts.size(),
+					"unexpected number of activities in "+acts+" for fixture "+fixture.name );
 
 			for (Activity act : acts) {
 				assertFalse(
-						"found a dummy act in "+acts+" for fixture "+fixture.name,
-						StageActivityTypeIdentifier.isStageActivity( act.getType() ));
+						StageActivityTypeIdentifier.isStageActivity( act.getType() ),
+						"found a dummy act in "+acts+" for fixture "+fixture.name);
 			}
 		}
 	}
@@ -407,16 +406,16 @@ public class TripStructureUtilsTest {
 				TripStructureUtils.getTrips(fixture.plan);
 
 			assertEquals(
-					"unexpected number of trips in "+trips+" for fixture "+fixture.name,
 					fixture.expectedNTrips,
-					trips.size() );
+					trips.size(),
+					"unexpected number of trips in "+trips+" for fixture "+fixture.name );
 
 			for (Trip trip : trips) {
 				for (PlanElement pe : trip.getTripElements()) {
 					if (pe instanceof Leg) continue;
 					assertTrue(
-							"found a non-dummy act in "+trip.getTripElements()+" for fixture "+fixture.name,
-							StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ));
+							StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ),
+							"found a non-dummy act in "+trip.getTripElements()+" for fixture "+fixture.name);
 				}
 
 				final int indexOfStart =
@@ -431,9 +430,9 @@ public class TripStructureUtilsTest {
 							indexOfEnd );
 
 				assertEquals(
-						"trip in Trip is not the same as in plan for fixture "+fixture.name,
 						inPlan,
-						trip.getTripElements());
+						trip.getTripElements(),
+						"trip in Trip is not the same as in plan for fixture "+fixture.name);
 			}
 		}
 	}
@@ -450,9 +449,9 @@ public class TripStructureUtilsTest {
 			}
 
 			assertEquals(
-					"getLegsOnly() does not returns the right number of legs",
 					fixture.expectedNLegs,
-					countLegs);
+					countLegs,
+					"getLegsOnly() does not returns the right number of legs");
 		}
 	}
 
@@ -535,8 +534,8 @@ public class TripStructureUtilsTest {
 					log.info( tripElement );
 				}
 				log.info( "" );
-				Assert.assertEquals( 9, trip.getTripElements().size() );
-				Assert.assertEquals( 5, trip.getLegsOnly().size() );
+				Assertions.assertEquals( 9, trip.getTripElements().size() );
+				Assertions.assertEquals( 5, trip.getLegsOnly().size() );
 			}
 			{
 				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan, TripStructureUtils::isStageActivityType ) ;
@@ -546,8 +545,8 @@ public class TripStructureUtilsTest {
 					log.info( tripElement );
 				}
 				log.info( "" );
-				Assert.assertEquals( 9, trip.getTripElements().size() );
-				Assert.assertEquals( 5, trip.getLegsOnly().size() );
+				Assertions.assertEquals( 9, trip.getTripElements().size() );
+				Assertions.assertEquals( 5, trip.getLegsOnly().size() );
 			}
 			{
 				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals ) ;
@@ -557,8 +556,8 @@ public class TripStructureUtilsTest {
 					log.info( tripElement );
 				}
 				log.info( "" );
-				Assert.assertEquals( 5, trip.getTripElements().size() );
-				Assert.assertEquals( 3, trip.getLegsOnly().size() );
+				Assertions.assertEquals( 5, trip.getTripElements().size() );
+				Assertions.assertEquals( 3, trip.getLegsOnly().size() );
 			}
 		}
 

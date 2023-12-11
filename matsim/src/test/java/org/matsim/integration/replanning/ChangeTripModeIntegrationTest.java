@@ -20,8 +20,8 @@
 
 package org.matsim.integration.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -130,11 +130,11 @@ public class ChangeTripModeIntegrationTest {
 		manager.run(population, 0, injector.getInstance(ReplanningContext.class));
 
 		// test that everything worked as expected
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
 		assertEquals(TransportMode.walk, newLeg.getMode());
-		assertNotNull("the leg should now have a route.", newLeg.getRoute());
+		assertNotNull(newLeg.getRoute(), "the leg should now have a route.");
 	}
 
 }

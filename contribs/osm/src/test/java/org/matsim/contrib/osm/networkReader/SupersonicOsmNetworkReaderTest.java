@@ -30,7 +30,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SupersonicOsmNetworkReaderTest {
 

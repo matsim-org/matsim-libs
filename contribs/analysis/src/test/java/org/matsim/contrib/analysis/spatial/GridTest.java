@@ -1,10 +1,10 @@
 package org.matsim.contrib.analysis.spatial;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 

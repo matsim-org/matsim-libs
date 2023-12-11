@@ -22,7 +22,7 @@ package org.matsim.core.replanning.modules;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -42,7 +42,7 @@ public class AbstractMultithreadedModuleTest {
 		config.addCoreModules();
 		config.global().setNumberOfThreads(3);
 		DummyAbstractMultithreadedModule testee = new DummyAbstractMultithreadedModule(config.global());
-		Assert.assertEquals(3, testee.getNumOfThreads());
+		Assertions.assertEquals(3, testee.getNumOfThreads());
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class AbstractMultithreadedModuleTest {
 			testee.handlePlan(null);
 			testee.handlePlan(null);
 			testee.finishReplanning();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 		} catch (Exception e) {
 			log.info("Catched expected exception.", e);
 		}

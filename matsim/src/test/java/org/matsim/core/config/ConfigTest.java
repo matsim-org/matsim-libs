@@ -21,7 +21,7 @@ package org.matsim.core.config;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,8 +36,8 @@ public class ConfigTest {
 
 		config.addModule(group);
 
-		Assert.assertNull(group.getA());
-		Assert.assertNull(group.getB());
+		Assertions.assertNull(group.getA());
+		Assertions.assertNull(group.getB());
 
 		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
 				"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
@@ -49,8 +49,8 @@ public class ConfigTest {
 				"</config>";
 		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
 
-		Assert.assertEquals("aaa", group.getA());
-		Assert.assertEquals("bbb", group.getB());
+		Assertions.assertEquals("aaa", group.getA());
+		Assertions.assertEquals("bbb", group.getB());
 	}
 
 	@Test
@@ -58,8 +58,8 @@ public class ConfigTest {
 		Config config = new Config();
 		ConfigTestGroup group = new ConfigTestGroup();
 
-		Assert.assertNull(group.getA());
-		Assert.assertNull(group.getB());
+		Assertions.assertNull(group.getA());
+		Assertions.assertNull(group.getB());
 
 		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
 				"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
@@ -71,15 +71,15 @@ public class ConfigTest {
 				"</config>";
 		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
 
-		Assert.assertEquals("aaa", config.getParam("ctg", "a"));
-		Assert.assertEquals("bbb", config.getParam("ctg", "b"));
-		Assert.assertNull(group.getA());
-		Assert.assertNull(group.getB());
+		Assertions.assertEquals("aaa", config.getParam("ctg", "a"));
+		Assertions.assertEquals("bbb", config.getParam("ctg", "b"));
+		Assertions.assertNull(group.getA());
+		Assertions.assertNull(group.getB());
 
 		config.addModule(group);
 
-		Assert.assertEquals("aaa", group.getA());
-		Assert.assertEquals("bbb", group.getB());
+		Assertions.assertEquals("aaa", group.getA());
+		Assertions.assertEquals("bbb", group.getB());
 	}
 
 	private static class ConfigTestGroup extends ConfigGroup {

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -69,7 +69,7 @@ public class ControlerMobsimIntegrationTest {
 		c.getConfig().controller().setDumpDataAtEnd(false);
 		c.getConfig().controller().setWriteEventsInterval(0);
 		c.run();
-		Assert.assertEquals(1, mf.callCount);
+		Assertions.assertEquals(1, mf.callCount);
 	}
 
 	@Test

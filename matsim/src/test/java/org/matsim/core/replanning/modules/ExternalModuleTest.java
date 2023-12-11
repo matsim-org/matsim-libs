@@ -22,8 +22,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -82,7 +82,7 @@ public class ExternalModuleTest {
             }
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
-        Assert.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
+        Assertions.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
     }
 
 	@Test
@@ -99,7 +99,7 @@ public class ExternalModuleTest {
             }
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
-        Assert.assertFalse(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
+        Assertions.assertFalse(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
     }
 
     private Population loadPopulation(String filename) {

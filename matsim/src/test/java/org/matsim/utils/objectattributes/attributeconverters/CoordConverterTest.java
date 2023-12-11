@@ -20,7 +20,7 @@
 
 package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
@@ -32,12 +32,12 @@ public class CoordConverterTest {
         final CoordConverter converter = new CoordConverter();
         String a = "(224489.3667496938;6757449.720111595)";
         Coord coord = converter.convert(a);
-        Assert.assertEquals(coord.hasZ(), false);
-        Assert.assertEquals(coord.getX(), 224489.3667496938, 0.00005);
-        Assert.assertEquals(coord.getY(), 6757449.720111595, 0.00005);
+        Assertions.assertEquals(coord.hasZ(), false);
+        Assertions.assertEquals(coord.getX(), 224489.3667496938, 0.00005);
+        Assertions.assertEquals(coord.getY(), 6757449.720111595, 0.00005);
 
         String b = converter.convertToString(coord);
-        Assert.assertEquals(a, b);
+        Assertions.assertEquals(a, b);
     }
 
 }

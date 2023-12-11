@@ -20,12 +20,12 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -168,9 +168,9 @@ public class TransitScheduleTest {
 		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		TransitStopFacility stop1b = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 10, (double) 10), false);
 		schedule.addStopFacility(stop1);
-		Assert.assertFalse(schedule.removeStopFacility(stop1b));
-		Assert.assertTrue(schedule.removeStopFacility(stop1));
-		Assert.assertFalse(schedule.removeStopFacility(stop1));
+		Assertions.assertFalse(schedule.removeStopFacility(stop1b));
+		Assertions.assertTrue(schedule.removeStopFacility(stop1));
+		Assertions.assertFalse(schedule.removeStopFacility(stop1));
 	}
 
 	@Test
@@ -179,9 +179,9 @@ public class TransitScheduleTest {
 		TransitLine line1 = new TransitLineImpl(Id.create(1, TransitLine.class));
 		TransitLine line1b = new TransitLineImpl(Id.create(1, TransitLine.class));
 		schedule.addTransitLine(line1);
-		Assert.assertFalse(schedule.removeTransitLine(line1b));
-		Assert.assertTrue(schedule.removeTransitLine(line1));
-		Assert.assertFalse(schedule.removeTransitLine(line1));
+		Assertions.assertFalse(schedule.removeTransitLine(line1b));
+		Assertions.assertTrue(schedule.removeTransitLine(line1));
+		Assertions.assertFalse(schedule.removeTransitLine(line1));
 	}
 	
 }

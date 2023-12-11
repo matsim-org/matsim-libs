@@ -22,7 +22,7 @@ package org.matsim.utils.objectattributes;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,11 +38,11 @@ public class ObjectAttributesUtilsTest {
 		oa.putAttribute("1", "c", "C");
 		
 		Collection<String> names = ObjectAttributesUtils.getAllAttributeNames(oa, "1");
-		Assert.assertEquals(3, names.size());
-		Assert.assertTrue(names.contains("a"));
-		Assert.assertTrue(names.contains("b"));
-		Assert.assertTrue(names.contains("c"));
-		Assert.assertFalse(names.contains("d"));
+		Assertions.assertEquals(3, names.size());
+		Assertions.assertTrue(names.contains("a"));
+		Assertions.assertTrue(names.contains("b"));
+		Assertions.assertTrue(names.contains("c"));
+		Assertions.assertFalse(names.contains("d"));
 	}
 
 	@Test
@@ -55,13 +55,13 @@ public class ObjectAttributesUtilsTest {
 		Collection<String> names = ObjectAttributesUtils.getAllAttributeNames(oa, "1");
 		try {
 			names.add("d");
-			Assert.fail("Expected immutability-exception");
+			Assertions.fail("Expected immutability-exception");
 		} catch (Exception everythingOkay) {
 		}
 
 		try {
 			names.remove("b");
-			Assert.fail("Expected immutability-exception");
+			Assertions.fail("Expected immutability-exception");
 		} catch (Exception everythingOkay) {
 		}
 		
@@ -69,7 +69,7 @@ public class ObjectAttributesUtilsTest {
 			Iterator<String> iter = names.iterator();
 			iter.next();
 			iter.remove();
-			Assert.fail("Expected immutability-exception");
+			Assertions.fail("Expected immutability-exception");
 		} catch (Exception everythingOkay) {
 		}
 		

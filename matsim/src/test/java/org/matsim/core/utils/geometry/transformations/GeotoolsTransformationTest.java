@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -56,8 +57,8 @@ public class GeotoolsTransformationTest {
 		double yWGS84 = coordWGS84.getY();
 
 
-		org.junit.Assert.assertEquals(targetX, xWGS84, delta);
-		org.junit.Assert.assertEquals(targetY, yWGS84, delta);
+		Assertions.assertEquals(targetX, xWGS84, delta);
+		Assertions.assertEquals(targetY, yWGS84, delta);
 
 	}
 

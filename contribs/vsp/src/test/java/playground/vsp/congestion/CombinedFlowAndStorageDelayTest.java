@@ -21,7 +21,7 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -85,12 +85,12 @@ public class CombinedFlowAndStorageDelayTest {
 
 		for(CongestionEvent e : congestionEvents){
 			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getCausingAgentId().equals(Id.createPersonId("1"))){
-				Assert.assertEquals("Delay caused by agent 2 is not correct.", 100, e.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(100, e.getDelay(), MatsimTestUtils.EPSILON, "Delay caused by agent 2 is not correct.");
 				// this is not captured by only leaving agents list.
 			}
 		}
 
-		Assert.assertEquals("Number of congestion events are not correct.", 4, congestionEvents.size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(4, congestionEvents.size(), MatsimTestUtils.EPSILON, "Number of congestion events are not correct.");
 	}
 
 //	@Test
@@ -104,11 +104,11 @@ public class CombinedFlowAndStorageDelayTest {
 
 		for(CongestionEvent e : congestionEvents){
 			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getLinkId().equals(Id.createLinkId("2"))){
-				Assert.assertEquals("Wrong causing agent", Id.createPersonId("1"), e.getCausingAgentId());
+				Assertions.assertEquals(Id.createPersonId("1"), e.getCausingAgentId(), "Wrong causing agent");
 				// this is not captured by only leaving agents list.
 			}
 		}
-		Assert.assertEquals("Number of congestion events are not correct.", 3, congestionEvents.size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, congestionEvents.size(), MatsimTestUtils.EPSILON, "Number of congestion events are not correct.");
 	}
 
 	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){

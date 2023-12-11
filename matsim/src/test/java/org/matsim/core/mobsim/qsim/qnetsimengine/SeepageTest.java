@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -156,9 +156,9 @@ public class SeepageTest {
 		int carTravelTime = travelTime2.get(Id.createLinkId("2")).intValue();
 
 //		if(this.isUsingFastCapacityUpdate) {
-			Assert.assertEquals("Wrong car travel time", 115, carTravelTime);
-			Assert.assertEquals("Wrong walk travel time.", 1009, walkTravelTime);
-			Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
+			Assertions.assertEquals(115, carTravelTime, "Wrong car travel time");
+			Assertions.assertEquals(1009, walkTravelTime, "Wrong walk travel time.");
+			Assertions.assertEquals(894, walkTravelTime-carTravelTime, "Seepage is not implemented");
 //		} else {
 //			Assert.assertEquals("Wrong car travel time", 116, carTravelTime);
 //			Assert.assertEquals("Wrong walk travel time.", 1010, walkTravelTime);

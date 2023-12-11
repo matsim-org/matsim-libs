@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -48,7 +48,7 @@ public class CreateSignalInputExampleTest {
 			(new CreateSignalInputExample()).run(testUtils.getOutputDirectory());
 		} catch (IOException e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong") ;
+			Assertions.fail("something went wrong") ;
 		}
 		// compare signal output
 		{
@@ -56,16 +56,16 @@ public class CreateSignalInputExampleTest {
 			final String referenceFilename = DIR_TO_COMPARE_WITH + "signal_systems.xml";
 			log.info( "outputFilename=" + outputFilename ) ;
 			log.info( "referenceFilename=" + referenceFilename ) ;
-			Assert.assertEquals("different signal system files",
-					CRCChecksum.getCRCFromFile(outputFilename),
-					CRCChecksum.getCRCFromFile(referenceFilename));
+			Assertions.assertEquals(CRCChecksum.getCRCFromFile(outputFilename),
+					CRCChecksum.getCRCFromFile(referenceFilename),
+					"different signal system files");
 		}
-		Assert.assertEquals("different signal group files",
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
-		Assert.assertEquals("different signal control files",
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"),
+				"different signal group files");
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"),
+				"different signal control files");
 	}
 
 }

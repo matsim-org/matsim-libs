@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.fixedTimeSignals;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
@@ -41,7 +41,7 @@ public class RunSignalSystemsExampleTest {
 			RunSignalSystemsExampleWithHoles.run(usingOTFVis);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong: " + ee.getMessage()) ;
+			Assertions.fail("something went wrong: " + ee.getMessage()) ;
 		}
 	}
 
@@ -56,7 +56,7 @@ public class RunSignalSystemsExampleTest {
 			RunSignalSystemsExample.run(config, false);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong: " + ee.getMessage()) ;
+			Assertions.fail("something went wrong: " + ee.getMessage()) ;
 		}
 	}
 

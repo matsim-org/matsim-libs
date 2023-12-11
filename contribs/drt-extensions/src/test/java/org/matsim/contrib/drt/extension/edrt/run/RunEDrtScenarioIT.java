@@ -18,11 +18,11 @@
 
 package org.matsim.contrib.drt.extension.edrt.run;
 
-import static org.junit.Assert.assertEquals;
-
 import java.net.URL;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;

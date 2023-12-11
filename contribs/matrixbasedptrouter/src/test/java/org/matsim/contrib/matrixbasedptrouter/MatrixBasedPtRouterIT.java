@@ -25,7 +25,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
@@ -129,7 +129,7 @@ public class MatrixBasedPtRouterIT {
 		double actualTtime = ((Leg)person.getSelectedPlan().getPlanElements().get(1)).getTravelTime().seconds();
 
 		//compare computed and actual travel time
-		Assert.assertEquals(ttime, actualTtime, 0);
+		Assertions.assertEquals(ttime, actualTtime, 0);
 
 	}
 

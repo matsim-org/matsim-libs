@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -71,9 +71,9 @@ public class CharyparNagelWithSubpopulationsTest {
 		function2.handleLeg(leg);
 		function2.finish();
 
-		Assert.assertFalse(
-				"same score for legs of agents in different subpopulations",
-				Math.abs( function1.getScore() - function2.getScore() ) < 1E-9 );
+		Assertions.assertFalse(
+				Math.abs( function1.getScore() - function2.getScore() ) < 1E-9,
+				"same score for legs of agents in different subpopulations" );
 	}
 
 	@Test
@@ -102,9 +102,9 @@ public class CharyparNagelWithSubpopulationsTest {
 		function2.handleActivity( act );
 		function2.finish();
 
-		Assert.assertFalse(
-				"same score for legs of agents in different subpopulations",
-				Math.abs( function1.getScore() - function2.getScore() ) < 1E-9 );
+		Assertions.assertFalse(
+				Math.abs( function1.getScore() - function2.getScore() ) < 1E-9,
+				"same score for legs of agents in different subpopulations" );
 	}
 
 	private Scenario createTestScenario() {

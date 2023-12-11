@@ -20,7 +20,7 @@
 
 package org.matsim.examples;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -92,8 +92,9 @@ public class OnePercentBerlin10sIT {
 		writer.closeFile();
 
 		System.out.println("reffile: " + referenceEventsFileName);
-		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+		assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ),
+				"different event files" );
 
 	}
 
@@ -136,8 +137,9 @@ public class OnePercentBerlin10sIT {
 
 		writer.closeFile();
 
-		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+		assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ),
+				"different event files" );
 
 	}
 

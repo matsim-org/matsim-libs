@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,7 +64,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
- public class NetsimRoutingConsistencyTest {
+	public class NetsimRoutingConsistencyTest {
 		/*
 * This test shows that the travel time that is predicted with the
 * NetworkRoutingModule is NOT equivalent to the travel time that is produced by
@@ -202,8 +202,8 @@ import org.matsim.vehicles.VehicleUtils;
 			// +1s per link
 			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
 
-			Assert.assertEquals(netsimTravelTime, 303.0, 1e-3);
-			Assert.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+			Assertions.assertEquals(netsimTravelTime, 303.0, 1e-3);
+			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
 		}
 
 		/*
@@ -290,8 +290,8 @@ import org.matsim.vehicles.VehicleUtils;
 			// +1s per link
 			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
 
-			Assert.assertEquals(netsimTravelTime, 303.0, 1e-3);
-			Assert.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+			Assertions.assertEquals(netsimTravelTime, 303.0, 1e-3);
+			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
 		}
 
 		class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {

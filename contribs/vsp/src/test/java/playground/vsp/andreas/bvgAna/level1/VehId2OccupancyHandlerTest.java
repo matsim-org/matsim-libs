@@ -1,8 +1,8 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import playground.vsp.andreas.bvgAna.level1.VehId2OccupancyHandler;
 
@@ -15,7 +15,7 @@ public class VehId2OccupancyHandlerTest {
 		
 //		to be implemented
 				
-		Assert.assertNotNull(test);
+		Assertions.assertNotNull(test);
 		
 	}
 

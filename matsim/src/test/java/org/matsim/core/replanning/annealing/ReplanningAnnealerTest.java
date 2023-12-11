@@ -3,8 +3,8 @@ package org.matsim.core.replanning.annealing;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -200,12 +200,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -217,12 +217,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedMsaAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedMsaAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -234,12 +234,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedGeometricAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedGeometricAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -251,12 +251,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedExponentialAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedExponentialAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -269,12 +269,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedSigmoidAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedSigmoidAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -287,8 +287,8 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
-        Assert.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
+        Assertions.assertEquals(expectedParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
     }
 
 	@Test
@@ -307,13 +307,13 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedTwoParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
-        Assert.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
+        Assertions.assertEquals(expectedTwoParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -326,12 +326,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedInnovationSwitchoffAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedInnovationSwitchoffAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -344,12 +344,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedFreezeEarlyAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedFreezeEarlyAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 	@Test
@@ -369,12 +369,12 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assert.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(targetSubpop);
 
-        Assert.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
 
 }

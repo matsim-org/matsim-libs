@@ -21,10 +21,10 @@
 
  package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
- /**
+	/**
  * @author thibautd
  */
 public class EnumConverterTest {
@@ -45,15 +45,15 @@ public class EnumConverterTest {
 		MyEnum some = converter.convert( "SOME_CONSTANT" );
 		MyEnum other = converter.convert( "SOME_OTHER_CONSTANT" );
 
-		Assert.assertEquals("unexpected enum", MyEnum.SOME_CONSTANT, some);
-		Assert.assertEquals("unexpected enum", MyEnum.SOME_OTHER_CONSTANT, other);
+		Assertions.assertEquals(MyEnum.SOME_CONSTANT, some, "unexpected enum");
+		Assertions.assertEquals(MyEnum.SOME_OTHER_CONSTANT, other, "unexpected enum");
 	}
 
 	 @Test
 	 void testToString() {
 		final EnumConverter<MyEnum> converter = new EnumConverter<>( MyEnum.class );
 
-		Assert.assertEquals( "unexpected String value", "SOME_CONSTANT", converter.convertToString( MyEnum.SOME_CONSTANT ) );
-		Assert.assertEquals( "unexpected String value", "SOME_OTHER_CONSTANT", converter.convertToString( MyEnum.SOME_OTHER_CONSTANT ) );
+		Assertions.assertEquals( "SOME_CONSTANT", converter.convertToString( MyEnum.SOME_CONSTANT ), "unexpected String value" );
+		Assertions.assertEquals( "SOME_OTHER_CONSTANT", converter.convertToString( MyEnum.SOME_OTHER_CONSTANT ), "unexpected String value" );
 	}
 }

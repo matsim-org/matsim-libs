@@ -21,7 +21,7 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
 import org.matsim.testcases.MatsimTestUtils;
 
 
- public class TestMessageQueue {
+	public class TestMessageQueue {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();

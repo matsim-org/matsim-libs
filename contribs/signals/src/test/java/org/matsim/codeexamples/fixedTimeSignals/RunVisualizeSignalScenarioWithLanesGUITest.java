@@ -1,6 +1,6 @@
 package org.matsim.codeexamples.fixedTimeSignals;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -22,7 +22,7 @@ public class RunVisualizeSignalScenarioWithLanesGUITest {
 			VisualizeSignalScenarioWithLanes.run(startOtfvis);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong") ;
+			Assertions.fail("something went wrong") ;
 		}
 	}
 
@@ -38,7 +38,7 @@ public class RunVisualizeSignalScenarioWithLanesGUITest {
 			VisualizeSignalScenario.run(false);
 		} catch (Exception ee) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong");
+			Assertions.fail("something went wrong");
 		}
 	}
 

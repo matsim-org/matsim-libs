@@ -23,7 +23,7 @@
 
 
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +39,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import java.util.Objects;
 import java.util.function.Consumer;
 
- public class HouseholdAttributeConversionTest {
+	public class HouseholdAttributeConversionTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -77,10 +77,10 @@ import java.util.function.Consumer;
 		final Household readHousehold = readHouseholds.getHouseholds().get(id);
 		final Object readAttribute = readHousehold.getAttributes().getAttribute("attribute");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
+		Assertions.assertEquals(
 				attribute,
-				readAttribute);
+				readAttribute,
+				"unexpected read attribute");
 	}
 
 	private static class CustomClass {

@@ -18,8 +18,7 @@
  * *********************************************************************** */
 
 package org.matsim.withinday.trafficmonitoring;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -59,7 +58,7 @@ public class TtmobsimListener implements MobsimAfterSimStepListener {
 				this.networkChangeEventTime = nce.getStartTime();
 				this.reducedFreespeed = nce.getFreespeedChange().getValue();
 
-				Assert.assertEquals(true, this.reducedFreespeed < this.link.getFreespeed());
+				Assertions.assertEquals(true, this.reducedFreespeed < this.link.getFreespeed());
 			}
 		}
 	}
@@ -69,18 +68,18 @@ public class TtmobsimListener implements MobsimAfterSimStepListener {
 
 		if (e.getSimulationTime() <= networkChangeEventTime) {
 
-			Assert.assertEquals("Wrong travel time at time step " + e.getSimulationTime() + ". Should be the freespeed travel time.",
-					Math.ceil(link.getLength()/link.getFreespeed()),
+			Assertions.assertEquals(Math.ceil(link.getLength()/link.getFreespeed()),
 					Math.ceil(travelTime.getLinkTravelTime(link, e.getSimulationTime(), null, null)),
-					testUtils.EPSILON);
+					testUtils.EPSILON,
+					"Wrong travel time at time step " + e.getSimulationTime() + ". Should be the freespeed travel time.");
 
 			case1 = true;
 
 		} else {
-			Assert.assertEquals("Wrong travel time at time step " + e.getSimulationTime() + ". Should be the travel time resulting from the network change event (reduced freespeed).",
-					Math.ceil(link.getLength() / reducedFreespeed),
+			Assertions.assertEquals(Math.ceil(link.getLength() / reducedFreespeed),
 					Math.ceil(travelTime.getLinkTravelTime(link, e.getSimulationTime(), null, null)),
-					testUtils.EPSILON);
+					testUtils.EPSILON,
+					"Wrong travel time at time step " + e.getSimulationTime() + ". Should be the travel time resulting from the network change event (reduced freespeed).");
 
 			case2 = true;
 		}

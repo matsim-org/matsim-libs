@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.emissions.EmissionUtils;
@@ -59,7 +59,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 
 	}
 
@@ -131,6 +131,6 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
 }

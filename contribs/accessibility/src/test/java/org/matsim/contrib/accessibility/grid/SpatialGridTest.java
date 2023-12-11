@@ -1,6 +1,6 @@
 package org.matsim.contrib.accessibility.grid;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Network;
@@ -32,11 +32,11 @@ public class SpatialGridTest {
 		// get number of rows
 		int rows = testGrid.getNumRows();
 		double numOfExpectedRows = ((nbb.getYMax() - nbb.getYMin()) / cellSize) + 1;
-		Assert.assertTrue(rows == numOfExpectedRows);
+		Assertions.assertTrue(rows == numOfExpectedRows);
 
 		// get number of columns
 		int cols = testGrid.getNumCols(0);
 		double numOfExpectedCols = ((nbb.getXMax() - nbb.getXMin()) / cellSize) + 1;
-		Assert.assertTrue(cols == numOfExpectedCols);
+		Assertions.assertTrue(cols == numOfExpectedCols);
 	}
 }

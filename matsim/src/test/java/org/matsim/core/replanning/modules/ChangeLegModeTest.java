@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -122,7 +122,7 @@ public class ChangeLegModeTest {
 			Integer count = counter.get(leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
-		Assert.assertEquals(0, counter.get("car").intValue());
+		Assertions.assertEquals(0, counter.get("car").intValue());
 	}
 
 	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
@@ -141,13 +141,13 @@ public class ChangeLegModeTest {
 		for (int i = 0; i < 50; i++) {
 			module.handlePlan(plan);
 			Integer count = counter.get(leg.getMode());
-			Assert.assertNotNull("unexpected mode: " + leg.getMode(), count);
+			Assertions.assertNotNull(count, "unexpected mode: " + leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
 		for (Map.Entry<String, Integer> entry : counter.entrySet()) {
 			int count = entry.getValue().intValue();
-			Assert.assertTrue("mode " + entry.getKey() + " was never chosen.", count > 0);
+			Assertions.assertTrue(count > 0, "mode " + entry.getKey() + " was never chosen.");
 		}
 	}
 }

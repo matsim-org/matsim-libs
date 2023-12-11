@@ -3,7 +3,7 @@
  */
 package org.matsim.analysis;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -103,14 +103,14 @@ public class VolumesAnalyzerTest {
 		double[] volume = analyzer.getVolumesPerHourForLink(link1);
 		int[] volumeForLink = analyzer.getVolumesForLink(link1);
 
-		Assert.assertEquals(volume[1], 2.0, 0);
-		Assert.assertEquals(volume[2], 3.0, 0);
-		Assert.assertEquals(volume[3], 2.0, 0);
-		Assert.assertEquals(volume[6], 5.0, 0);
-		Assert.assertEquals(volumeForLink[1], 2, 0);
-		Assert.assertEquals(volumeForLink[2], 3, 0);
-		Assert.assertEquals(volumeForLink[3], 2, 0);
-		Assert.assertEquals(volumeForLink[6], 5, 0);
+		Assertions.assertEquals(volume[1], 2.0, 0);
+		Assertions.assertEquals(volume[2], 3.0, 0);
+		Assertions.assertEquals(volume[3], 2.0, 0);
+		Assertions.assertEquals(volume[6], 5.0, 0);
+		Assertions.assertEquals(volumeForLink[1], 2, 0);
+		Assertions.assertEquals(volumeForLink[2], 3, 0);
+		Assertions.assertEquals(volumeForLink[3], 2, 0);
+		Assertions.assertEquals(volumeForLink[6], 5, 0);
 
 		VolumesAnalyzer analyzerBike = new VolumesAnalyzer(3600, 86400, network, true);
 
@@ -128,8 +128,8 @@ public class VolumesAnalyzerTest {
 
 		double[] volumeBike = analyzerBike.getVolumesPerHourForLink(link2, TransportMode.bike);
 		int[] volumeForLinkBike = analyzerBike.getVolumesForLink(link2, TransportMode.bike);
-		Assert.assertEquals(volumeBike[6], 3.0, 0);
-		Assert.assertEquals(volumeForLinkBike[6], 3, 0);
+		Assertions.assertEquals(volumeBike[6], 3.0, 0);
+		Assertions.assertEquals(volumeForLinkBike[6], 3, 0);
 
 	}
 }

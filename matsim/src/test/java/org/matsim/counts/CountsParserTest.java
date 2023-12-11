@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -44,9 +44,9 @@ public class CountsParserTest {
 
 		reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
 
-		assertEquals("Counts attribute setting failed", "testName", counts.getName());
-		assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
-		assertEquals("Counts attribute setting failed", 2000, counts.getYear());
+		assertEquals("testName", counts.getName(), "Counts attribute setting failed");
+		assertEquals("testDesc", counts.getDescription(), "Counts attribute setting failed");
+		assertEquals(2000, counts.getYear(), "Counts attribute setting failed");
 		try {
 			reader.endElement("", "counts", "counts");
 		} catch (SAXException e) {
@@ -65,8 +65,8 @@ public class CountsParserTest {
 		reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
 
 		Count count = counts.getCount(Id.create(1, Link.class));
-		assertEquals("Count attribute setting failed", "testNr", count.getCsLabel());
-		assertNull("Count attributes x,y should not be set", count.getCoord());
+		assertEquals("testNr", count.getCsLabel(), "Count attribute setting failed");
+		assertNull(count.getCoord(), "Count attributes x,y should not be set");
 
 		reader.endElement("", "count", "count");
 		reader.endElement("", "counts", "counts");
@@ -83,9 +83,9 @@ public class CountsParserTest {
 		reader.startElement("", "count", "count", attributeFactory.createCountAttributesWithCoords());
 
 		Count count = counts.getCount(Id.create(1, Link.class));
-		assertNotNull("Count attribute x,y setting failed", count.getCoord());
-		assertEquals("Count attribute x setting failed", 123.456, count.getCoord().getX(), MatsimTestUtils.EPSILON);
-		assertEquals("Count attribute y setting failed", 987.654, count.getCoord().getY(), MatsimTestUtils.EPSILON);
+		assertNotNull(count.getCoord(), "Count attribute x,y setting failed");
+		assertEquals(123.456, count.getCoord().getX(), MatsimTestUtils.EPSILON, "Count attribute x setting failed");
+		assertEquals(987.654, count.getCoord().getY(), MatsimTestUtils.EPSILON, "Count attribute y setting failed");
 
 		reader.endElement("", "count", "count");
 		reader.endElement("", "counts", "counts");
@@ -102,7 +102,7 @@ public class CountsParserTest {
 		reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
 		reader.startElement("", "volume", "volume", attributeFactory.createVolumeAttributes());
 
-		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), MatsimTestUtils.EPSILON);
+		assertEquals(100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), MatsimTestUtils.EPSILON, "Volume attribute setting failed");
 
 		reader.endElement("", "volume", "volume");
 		reader.endElement("", "count", "count");

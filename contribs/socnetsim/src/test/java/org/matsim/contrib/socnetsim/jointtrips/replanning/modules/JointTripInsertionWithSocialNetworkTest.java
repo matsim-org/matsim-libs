@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -90,9 +90,9 @@ public class JointTripInsertionWithSocialNetworkTest {
 				agentsToIgnore.add( actedUpon.getDriverId() );
 				agentsToIgnore.add( actedUpon.getPassengerId() );
 
-				Assert.assertTrue(
-						"passenger not alter of driver!",
-						sn.getAlters( actedUpon.getDriverId() ).contains( actedUpon.getPassengerId() ) );
+				Assertions.assertTrue(
+						sn.getAlters( actedUpon.getDriverId() ).contains( actedUpon.getPassengerId() ),
+						"passenger not alter of driver!" );
 			}
 
 			log.info( "there were "+agentsToIgnore.size()+" agents handled" );

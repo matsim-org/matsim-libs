@@ -20,11 +20,11 @@
 
 package org.matsim.integration;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -300,7 +300,7 @@ public class SimulateAndScoreTest {
 		scorer.finish();
 
 		Double score = plan.getScore();
-		assertEquals("Expecting -1.0 from travel time, -1.0 from travel distance.", -2.0, score, MatsimTestUtils.EPSILON);
+		assertEquals(-2.0, score, MatsimTestUtils.EPSILON, "Expecting -1.0 from travel time, -1.0 from travel distance.");
 
 	}
 

@@ -5,7 +5,7 @@ import org.matsim.application.analysis.TestAnalysis;
 import org.matsim.application.analysis.TestDependentAnalysis;
 import org.matsim.application.options.ShpOptions;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationUtilsTest {
 

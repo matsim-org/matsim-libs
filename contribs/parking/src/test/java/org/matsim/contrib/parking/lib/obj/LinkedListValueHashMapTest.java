@@ -1,10 +1,10 @@
 package org.matsim.contrib.parking.lib.obj;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.HashMapInverter;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 

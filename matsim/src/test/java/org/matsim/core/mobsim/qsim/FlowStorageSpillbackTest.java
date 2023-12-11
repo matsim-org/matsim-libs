@@ -23,7 +23,8 @@
 package org.matsim.core.mobsim.qsim;
 
 import java.util.*;
-import org.junit.Assert;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -136,7 +137,7 @@ public class FlowStorageSpillbackTest {
 
 			if (event.getVehicleId().equals(vehicleOfPerson.get(this.testAgent4)) && event.getLinkId().equals(this.linkId2)) {
 //				if(this.isUsingFastCapacityUpdate) {
-					Assert.assertEquals("wrong link leave time.", 169., event.getTime(), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(169., event.getTime(), MatsimTestUtils.EPSILON, "wrong link leave time.");
 //				} else {
 //					Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
 //				}

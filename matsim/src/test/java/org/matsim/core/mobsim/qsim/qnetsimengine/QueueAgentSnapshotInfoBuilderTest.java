@@ -1,5 +1,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -27,8 +29,6 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
-
-import static org.junit.Assert.assertEquals;
 
 public class QueueAgentSnapshotInfoBuilderTest {
 

@@ -19,8 +19,8 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -166,8 +166,8 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		Id<Person> id = Id.createPersonId("lowIncomeLowCarAsc");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 0.5d, 0.5d);
-		Assert.assertEquals(-0.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -175,8 +175,8 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		Id<Person> id = Id.createPersonId("highIncomeLowCarAsc");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1.5d, 0.5d);
-		Assert.assertEquals(-0.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -184,9 +184,9 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		Id<Person> id = Id.createPersonId("mediumIncomeHighCarAsc");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d, 0.5d);
-		Assert.assertEquals(-2.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(-50.0d, params.modeParams.get(TransportMode.bike).constant, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-2.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-50.0d, params.modeParams.get(TransportMode.bike).constant, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -212,14 +212,14 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncomeLowCarAsc")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
-		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of 66.66", 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON, "for the rich person, 100 money units should be equal to a score of 66.66");
 
 		ScoringParameters paramsPoor = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("lowIncomeLowCarAsc")));
 		CharyparNagelMoneyScoring moneyScoringPoor = new CharyparNagelMoneyScoring(paramsPoor);
 		moneyScoringPoor.addMoney(100);
-		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of 200.00", 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON, "for the poor person, 100 money units should be equal to a score of 200.00");
 
-		Assert.assertTrue("100 money units should worth more for a poor person than for a rich person", moneyScoringPoor.getScore() > moneyScoringRich.getScore());
+		Assertions.assertTrue(moneyScoringPoor.getScore() > moneyScoringRich.getScore(), "100 money units should worth more for a poor person than for a rich person");
 	}
 
 	@Test
@@ -229,27 +229,23 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		Leg carLegZeroDistanceTenSeconds = createLeg(TransportMode.car,  0.0d, 10.0d );
 
 		legScoringRichCarLeg.handleLeg(carLegZeroDistanceTenSeconds);
-		Assert.assertEquals("for the rich person with low car asc, a 0 meter and 10s car trip should be equal to a score of ",
-				-0.1d -0.001d * 10 -7.5*1./1.5 -0.3, legScoringRichCarLeg.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.1d -0.001d * 10 -7.5*1./1.5 -0.3, legScoringRichCarLeg.getScore(), MatsimTestUtils.EPSILON, "for the rich person with low car asc, a 0 meter and 10s car trip should be equal to a score of ");
 
 		ScoringParameters paramsMediumIncomeHighCarAsc = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("mediumIncomeHighCarAsc")));
 		CharyparNagelLegScoring legScoringMediumIncomeHighCarAsc = new CharyparNagelLegScoring(paramsMediumIncomeHighCarAsc, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
 		legScoringMediumIncomeHighCarAsc.handleLeg(carLegZeroDistanceTenSeconds);
-		Assert.assertEquals("for the medium person with high car asc, a 0 meter and 10s car trip should be equal to a score of ",
-				-2.1d -0.001d * 10 -7.5*1./1.0 -0.3, legScoringMediumIncomeHighCarAsc.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-2.1d -0.001d * 10 -7.5*1./1.0 -0.3, legScoringMediumIncomeHighCarAsc.getScore(), MatsimTestUtils.EPSILON, "for the medium person with high car asc, a 0 meter and 10s car trip should be equal to a score of ");
 
 		// bike has no person specific asc for high income person and is not affected
 		CharyparNagelLegScoring legScoringRichBikeLeg = new CharyparNagelLegScoring(paramsRich, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
 		Leg bikeLegZeroDistanceZeroSeconds = createLeg(TransportMode.bike,  0.0d, 0.0d );
 		legScoringRichBikeLeg.handleLeg(bikeLegZeroDistanceZeroSeconds);
-		Assert.assertEquals("for the rich person with low car asc, a 0 meter and 0s bike trip should be equal to a score of ",
-				-0.55d, legScoringRichBikeLeg.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.55d, legScoringRichBikeLeg.getScore(), MatsimTestUtils.EPSILON, "for the rich person with low car asc, a 0 meter and 0s bike trip should be equal to a score of ");
 
 		// bike has a person specific asc for the medium income person
 		CharyparNagelLegScoring legScoringMediumIncomeBikeLeg = new CharyparNagelLegScoring(paramsMediumIncomeHighCarAsc, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
 		legScoringMediumIncomeBikeLeg.handleLeg(bikeLegZeroDistanceZeroSeconds);
-		Assert.assertEquals("for the medium income person with high car asc, a 0 meter and 0s bike trip should be equal to a score of ",
-				-50.0d, legScoringMediumIncomeBikeLeg.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-50.0d, legScoringMediumIncomeBikeLeg.getScore(), MatsimTestUtils.EPSILON, "for the medium income person with high car asc, a 0 meter and 0s bike trip should be equal to a score of ");
 	}
 
 	private static Leg createLeg(String mode, double distance, double travelTime) {
@@ -263,8 +259,8 @@ public class PersonScoringParametersFromPersonAttributesTest {
 	}
 
 	private void makeAssertMarginalUtilityOfMoneyAndPtWait(ScoringParameters params, double income, double marginalUtilityOfWaitingPt_s){
-		Assert.assertEquals("marginalUtilityOfMoney is wrong", 1 / income , params.marginalUtilityOfMoney, 0.);
-		Assert.assertEquals("marginalUtilityOfWaitingPt_s is wrong", marginalUtilityOfWaitingPt_s , params.marginalUtilityOfWaitingPt_s, 0.);
+		Assertions.assertEquals(1 / income , params.marginalUtilityOfMoney, 0., "marginalUtilityOfMoney is wrong");
+		Assertions.assertEquals(marginalUtilityOfWaitingPt_s , params.marginalUtilityOfWaitingPt_s, 0., "marginalUtilityOfWaitingPt_s is wrong");
 	}
 
 

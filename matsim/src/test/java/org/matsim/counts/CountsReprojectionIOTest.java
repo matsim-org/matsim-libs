@@ -23,7 +23,7 @@
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -38,7 +38,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
- /**
+	/**
  * @author thibautd
  */
 public class CountsReprojectionIOTest {
@@ -108,16 +108,16 @@ public class CountsReprojectionIOTest {
 			final Coord originalCoord = originalCounts.getCount( id ).getCoord();
 			final Coord internalCoord = internalCounts.getCount( id ).getCoord();
 
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
+			Assertions.assertNotEquals(
 					originalCoord.getX(),
 					internalCoord.getX(),
-					epsilon );
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
+					epsilon,
+					"No coordinates transform performed!" );
+			Assertions.assertNotEquals(
 					originalCoord.getY(),
 					internalCoord.getY(),
-					epsilon );
+					epsilon,
+					"No coordinates transform performed!" );
 		}
 
 
@@ -128,41 +128,41 @@ public class CountsReprojectionIOTest {
 			final Coord originalCoord = originalCounts.getCount( id ).getCoord();
 			final Coord dumpedCoord = dumpedCounts.getCount( id ).getCoord();
 
-			Assert.assertEquals(
-					"coordinates were not reprojected for dump",
+			Assertions.assertEquals(
 					originalCoord.getX(),
 					dumpedCoord.getX(),
-					epsilon );
-			Assert.assertEquals(
-					"coordinates were not reprojected for dump",
+					epsilon,
+					"coordinates were not reprojected for dump" );
+			Assertions.assertEquals(
 					originalCoord.getY(),
 					dumpedCoord.getY(),
-					epsilon );
+					epsilon,
+					"coordinates were not reprojected for dump" );
 		}
 	}
 
 	private void assertCountsAreReprojectedCorrectly(
 			Counts<Link> originalCounts,
 			Counts<Link> reprojectedCounts) {
-		Assert.assertEquals(
-				"unexpected number of counts",
+		Assertions.assertEquals(
 				originalCounts.getCounts().size(),
-				reprojectedCounts.getCounts().size() );
+				reprojectedCounts.getCounts().size(),
+				"unexpected number of counts" );
 
 		for ( Id<Link> id : originalCounts.getCounts().keySet() ) {
 			final Coord original = originalCounts.getCount( id ).getCoord();
 			final Coord transformed = reprojectedCounts.getCount( id ).getCoord();
 
-			Assert.assertEquals(
-					"wrong reprojected X value",
+			Assertions.assertEquals(
 					original.getX() + 1000 ,
 					transformed.getX(),
-					MatsimTestUtils.EPSILON );
-			Assert.assertEquals(
-					"wrong reprojected Y value",
+					MatsimTestUtils.EPSILON,
+					"wrong reprojected X value" );
+			Assertions.assertEquals(
 					original.getY() + 1000 ,
 					transformed.getY(),
-					MatsimTestUtils.EPSILON );
+					MatsimTestUtils.EPSILON,
+					"wrong reprojected Y value" );
 		}
 	}
 

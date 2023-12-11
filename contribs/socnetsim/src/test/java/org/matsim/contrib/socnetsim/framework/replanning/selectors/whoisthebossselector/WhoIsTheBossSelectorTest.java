@@ -31,9 +31,9 @@ import java.util.Set;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -83,17 +83,17 @@ public class WhoIsTheBossSelectorTest {
 			}
 			else {
 				countNonNull++;
-				Assert.assertEquals(
-						"unexpected number of plans in selected plan",
+				Assertions.assertEquals(
 						group.getPersons().size(),
-						selected.getAllIndividualPlans().size() );
+						selected.getAllIndividualPlans().size(),
+						"unexpected number of plans in selected plan" );
 
 				final Set<Id> groupIds = getGroupIds( group );
 				final Set<Id> selectedIds = getPlanIds( selected );
-				Assert.assertEquals(
-						"unexpected agent ids in selected plan",
+				Assertions.assertEquals(
 						groupIds,
-						selectedIds );
+						selectedIds,
+						"unexpected agent ids in selected plan" );
 			}
 		}
 		counter.printCounter();

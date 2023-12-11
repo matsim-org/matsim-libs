@@ -20,8 +20,8 @@
 
 package org.matsim.core.events;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.Map;
@@ -62,15 +62,14 @@ public abstract class XmlEventsTester {
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.finishProcessing();
 
-		assertEquals("there must be 1 event.", 1, collector.getEvents().size());
+		assertEquals(1, collector.getEvents().size(), "there must be 1 event.");
 		Event readEvent = collector.getEvents().iterator().next();
-		assertEquals("event has wrong class.", event.getClass(), readEvent.getClass());
+		assertEquals(event.getClass(), readEvent.getClass(), "event has wrong class.");
 
 		Map<String, String> writtenAttributes = event.getAttributes();
 		Map<String, String> readAttributes = readEvent.getAttributes();
 		for (Map.Entry<String, String> attribute : writtenAttributes.entrySet()) {
-			assertEquals("attribute '" + attribute.getKey() + "' is different after reading the event.",
-					attribute.getValue(), readAttributes.get(attribute.getKey()));
+			assertEquals(attribute.getValue(), readAttributes.get(attribute.getKey()), "attribute '" + attribute.getKey() + "' is different after reading the event.");
 		}
 
 		return (T) readEvent;

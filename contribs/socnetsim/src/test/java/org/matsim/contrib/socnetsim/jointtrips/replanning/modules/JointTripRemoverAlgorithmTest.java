@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -983,9 +981,9 @@ public class JointTripRemoverAlgorithmTest {
 			final List<PlanElement> expected,
 			final List<PlanElement> actual) {
 		assertEquals(
-				fixtureName+": sizes do not match "+expected+" and "+actual,
 				expected.size(),
-				actual.size());
+				actual.size(),
+				fixtureName+": sizes do not match "+expected+" and "+actual);
 
 		Iterator<PlanElement> expectedIter = expected.iterator();
 		Iterator<PlanElement> actualIter = actual.iterator();
@@ -1021,43 +1019,43 @@ public class JointTripRemoverAlgorithmTest {
 
 	private void assertLegsMatch(final Leg exp,final Leg act) {
 		assertEquals(
-				"wrong mode",
 				exp.getMode(),
-				act.getMode());
+				act.getMode(),
+				"wrong mode");
 
 		if ( exp.getMode().equals( JointActingTypes.DRIVER ) ) {
 			Collection<Id<Person>> expIds = ((DriverRoute) exp.getRoute()).getPassengersIds();
 			Collection<Id<Person>> actIds = ((DriverRoute) act.getRoute()).getPassengersIds();
 			assertEquals(
-					"wrong number of passengers",
 					expIds.size(),
-					actIds.size());
+					actIds.size(),
+					"wrong number of passengers");
 
 			assertTrue(
-					"wrong passenger ids",
-					actIds.containsAll( expIds ));
+					actIds.containsAll( expIds ),
+					"wrong passenger ids");
 		}
 		else if ( exp.getMode().equals( JointActingTypes.PASSENGER ) ) {
 			Id expId = ((PassengerRoute) exp.getRoute()).getDriverId();
 			Id actId = ((PassengerRoute) act.getRoute()).getDriverId();
 
 			assertEquals(
-					"wrong driver Id",
 					expId,
-					actId);
+					actId,
+					"wrong driver Id");
 		}
 	}
 
 	private void assertActivitiesMatch(final Activity exp, final Activity act) {
 		assertEquals(
-				"wrong type",
 				exp.getType(),
-				act.getType());
+				act.getType(),
+				"wrong type");
 
 		assertEquals(
-				"wrong link",
 				exp.getLinkId(),
-				act.getLinkId());
+				act.getLinkId(),
+				"wrong link");
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

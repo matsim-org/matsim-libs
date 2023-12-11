@@ -26,7 +26,7 @@ import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -54,21 +54,21 @@ public class CountsParserWriterTest {
 
 		// test if required fields of schema are filled out:
 		// Counts:
-		Assert.assertNotNull(fixture.counts.getCounts());
-		Assert.assertTrue(fixture.counts.getYear()>2000);
-		Assert.assertNotNull(fixture.counts.getName());
+		Assertions.assertNotNull(fixture.counts.getCounts());
+		Assertions.assertTrue(fixture.counts.getYear()>2000);
+		Assertions.assertNotNull(fixture.counts.getName());
 
 		// Count & Volume
 		Iterator<Count> c_it = fixture.counts.getCounts().values().iterator();
 		while (c_it.hasNext()) {
 			Count c = c_it.next();
-			Assert.assertNotNull(c.getId());
+			Assertions.assertNotNull(c.getId());
 
 			Iterator<Volume> vol_it = c.getVolumes().values().iterator();
 			while (vol_it.hasNext()) {
 				Volume v = vol_it.next();
-				Assert.assertTrue(v.getHourOfDayStartingWithOne()>0);
-				Assert.assertTrue(v.getValue()>=0.0);
+				Assertions.assertTrue(v.getHourOfDayStartingWithOne()>0);
+				Assertions.assertTrue(v.getValue()>=0.0);
 			}//while
 		}//while
 
@@ -80,7 +80,7 @@ public class CountsParserWriterTest {
 		CountsWriter counts_writer = new CountsWriter(fixture.counts);
 		counts_writer.write(filename);
 		File f = new File(filename);
-		Assert.assertTrue(f.length() > 0.0);
+		Assertions.assertTrue(f.length() > 0.0);
 	}
 
 	/**
@@ -95,12 +95,12 @@ public class CountsParserWriterTest {
 		CountsFixture f = new CountsFixture();
 		f.setUp();
 		f.counts.setName(null);
-		Assert.assertNull(f.counts.getName());
+		Assertions.assertNull(f.counts.getName());
 		String filename = this.utils.getOutputDirectory() + "counts.xml";
 		new CountsWriterV1(f.counts).write(filename);
 
 		Counts counts2 = new Counts();
 		new CountsReaderMatsimV1(counts2).readFile(filename);
-		Assert.assertEquals("", counts2.getName());
+		Assertions.assertEquals("", counts2.getName());
 	}
 }

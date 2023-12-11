@@ -24,8 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -167,7 +167,7 @@ public class CalcLegTimesTest {
 
 		calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
-		Assert.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
+		Assertions.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
 				readResult(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
 
 	}

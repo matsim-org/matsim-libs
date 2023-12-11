@@ -48,12 +48,12 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
 
 public class ModalDistanceCadytsSingleDistanceIT {
 

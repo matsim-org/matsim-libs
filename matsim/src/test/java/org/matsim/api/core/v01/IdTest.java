@@ -22,14 +22,14 @@
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.collections.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
 
- public class IdTest {
+	public class IdTest {
 
 	private final static Logger LOG = LogManager.getLogger(IdTest.class);
 
@@ -38,8 +38,8 @@ import java.util.List;
 		Id<TLink> linkId1 = Id.create("1", TLink.class);
 		Id<TLink> linkId2 = Id.create("2", TLink.class);
 		
-		Assert.assertEquals("1", linkId1.toString());
-		Assert.assertEquals("2", linkId2.toString());
+		Assertions.assertEquals("1", linkId1.toString());
+		Assertions.assertEquals("2", linkId2.toString());
 	}
 
 	 @Test
@@ -47,13 +47,13 @@ import java.util.List;
 		Id<TNode> nodeId1 = Id.create("1", TNode.class);
 		Id<TLink> linkId1 = Id.create(nodeId1, TLink.class);
 		
-		Assert.assertEquals("1", linkId1.toString());
+		Assertions.assertEquals("1", linkId1.toString());
 	}
 
 	 @Test
 	 void testIdConstructor_Null() {
 		Id<TLink> linkId1 = Id.create((Id) null, TLink.class);
-		Assert.assertNull(linkId1);
+		Assertions.assertNull(linkId1);
 	}
 
 	 @Test
@@ -62,8 +62,8 @@ import java.util.List;
 		Id<TLink> linkId2 = Id.create("2", TLink.class);
 		Id<TLink> linkId1again = Id.create("1", TLink.class);
 		
-		Assert.assertTrue(linkId1 == linkId1again);
-		Assert.assertFalse(linkId1 == linkId2);
+		Assertions.assertTrue(linkId1 == linkId1again);
+		Assertions.assertFalse(linkId1 == linkId2);
 	}
 
 	 @Test
@@ -71,7 +71,7 @@ import java.util.List;
 		Id<TLink> linkId1 = Id.create("1", TLink.class);
 		Id<TNode> nodeId1 = Id.create("1", TNode.class);
 		
-		Assert.assertFalse((Id) linkId1 == (Id) nodeId1);
+		Assertions.assertFalse((Id) linkId1 == (Id) nodeId1);
 	}
 
 	 @Test
@@ -81,10 +81,10 @@ import java.util.List;
 		Id<TLink> linkId1again = Id.create("1", TLink.class);
 		Id<TNode> nodeId1 = Id.create("1", TNode.class);
 
-		Assert.assertTrue(linkId1.compareTo(linkId2) < 0);
-		Assert.assertTrue(linkId1.compareTo(linkId1) == 0);
-		Assert.assertTrue(linkId1.compareTo(linkId1again) == 0);
-		Assert.assertTrue(linkId2.compareTo(linkId1) > 0);
+		Assertions.assertTrue(linkId1.compareTo(linkId2) < 0);
+		Assertions.assertTrue(linkId1.compareTo(linkId1) == 0);
+		Assertions.assertTrue(linkId1.compareTo(linkId1again) == 0);
+		Assertions.assertTrue(linkId2.compareTo(linkId1) > 0);
 
 //		try {
 //			Assert.assertTrue(linkId1.compareTo((Id) nodeId1) == 0);
@@ -99,20 +99,20 @@ import java.util.List;
 		Id.create("1", TLink.class);
 		Id.create("2", TLink.class);
 		int count = Id.getNumberOfIds(TLink.class);
-		Assert.assertTrue(count > 0); // it might be > 2 if other tests have run before creating Ids of this class
+		Assertions.assertTrue(count > 0); // it might be > 2 if other tests have run before creating Ids of this class
 		Id.resetCaches();
-		Assert.assertEquals(0, Id.getNumberOfIds(TLink.class));
+		Assertions.assertEquals(0, Id.getNumberOfIds(TLink.class));
 		Id.create("1", TLink.class);
 		Id.create("2", TLink.class);
 		Id.create("3", TLink.class);
-		Assert.assertEquals(3, Id.getNumberOfIds(TLink.class));
+		Assertions.assertEquals(3, Id.getNumberOfIds(TLink.class));
 	}
 
 	 @Test
 	 void testResetCaches_onlyFromJUnit() throws InterruptedException {
 		Id.create("1", TLink.class);
 		int countBefore = Id.getNumberOfIds(TLink.class);
-		Assert.assertTrue(countBefore > 0);
+		Assertions.assertTrue(countBefore > 0);
 
 		Runnable runnable = () -> {
 			Id.resetCaches();
@@ -129,9 +129,9 @@ import java.util.List;
 			LOG.info("Caught exception: " + t.getSecond().getMessage());
 		}
 
-		Assert.assertFalse("There should have be an exception!", caughtExceptions.isEmpty());
+		Assertions.assertFalse(caughtExceptions.isEmpty(), "There should have be an exception!");
 		int countAfter = Id.getNumberOfIds(TLink.class);
-		Assert.assertEquals("The number of created Ids should not have changed.", countBefore, countAfter);
+		Assertions.assertEquals(countBefore, countAfter, "The number of created Ids should not have changed.");
 	}
 
 	private static class TLink {}

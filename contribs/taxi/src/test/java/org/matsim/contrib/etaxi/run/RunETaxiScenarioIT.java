@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -68,13 +68,13 @@ public class RunETaxiScenarioIT {
 			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
 
 			boolean result = PopulationUtils.comparePopulations(expected, actual);
-			Assert.assertTrue(result);
+			Assertions.assertTrue(result);
 		}
 		{
 			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 			String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 			EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
-			Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 		}
 	}
 }

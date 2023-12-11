@@ -20,8 +20,7 @@
 package org.matsim.contrib.ev.temperature;
 
 import jakarta.inject.Inject;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -71,10 +70,10 @@ public class TemperatureChangeModuleIntegrationTest {
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
 			if (event.getLinkId().equals(Id.createLinkId("link1"))) {
-				Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), -10.0, 0.001);
+				Assertions.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), -10.0, 0.001);
 			}
 			if (event.getLinkId().equals(Id.createLinkId("link2"))) {
-				Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), 30.0, 0.001);
+				Assertions.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), 30.0, 0.001);
 			}
 		}
 	}

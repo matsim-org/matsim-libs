@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -27,8 +27,6 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author nagel
@@ -65,7 +63,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 }

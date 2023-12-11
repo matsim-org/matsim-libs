@@ -1,7 +1,7 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -57,7 +57,7 @@ public class StopId2LineId2PulkTest {
 	     *
 	     */
 
-	    Assert.assertEquals(event2, test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
+	    Assertions.assertEquals(event2, test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
 
 	    System.out.println(test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
 	    System.out.println(event2.getVehicleId());

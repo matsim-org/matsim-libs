@@ -19,7 +19,7 @@
 
 package org.matsim.core.events;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -47,11 +47,11 @@ public class TransitDriverStartsEventTest {
 				Id.create("route-R1", TransitRoute.class),
 				Id.create("departure-D-1", Departure.class));
 		final TransitDriverStartsEvent event2 = XmlEventsTester.testWriteReadXml(this.utils.getOutputDirectory() + "events.xml", event1);
-		Assert.assertEquals(event1.getTime(), event2.getTime(), 1.0e-9);
-		Assert.assertEquals(event1.getDriverId(), event2.getDriverId());
-		Assert.assertEquals(event1.getVehicleId(), event2.getVehicleId());
-		Assert.assertEquals(event1.getTransitRouteId(), event2.getTransitRouteId());
-		Assert.assertEquals(event1.getTransitLineId(), event2.getTransitLineId());
-		Assert.assertEquals(event1.getDepartureId(), event2.getDepartureId());
+		Assertions.assertEquals(event1.getTime(), event2.getTime(), 1.0e-9);
+		Assertions.assertEquals(event1.getDriverId(), event2.getDriverId());
+		Assertions.assertEquals(event1.getVehicleId(), event2.getVehicleId());
+		Assertions.assertEquals(event1.getTransitRouteId(), event2.getTransitRouteId());
+		Assertions.assertEquals(event1.getTransitLineId(), event2.getTransitLineId());
+		Assertions.assertEquals(event1.getDepartureId(), event2.getDepartureId());
 	}
 }

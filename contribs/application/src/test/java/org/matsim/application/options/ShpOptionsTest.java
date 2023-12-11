@@ -1,7 +1,7 @@
 package org.matsim.application.options;
 
-import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
@@ -86,6 +86,6 @@ public class ShpOptionsTest {
 			expectedGeometry = expectedGeometry.union(geometryToJoin);
 		}
 
-		Assert.assertTrue(geometry.equals(expectedGeometry));
+		Assertions.assertTrue(geometry.equals(expectedGeometry));
 	}
 }

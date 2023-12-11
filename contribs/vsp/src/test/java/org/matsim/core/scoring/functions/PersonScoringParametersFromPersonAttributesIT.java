@@ -19,7 +19,7 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -80,10 +80,9 @@ public class PersonScoringParametersFromPersonAttributesIT {
             double personSpecificModeConstant = Double.parseDouble(PersonUtils.getModeConstants(person).get(TransportMode.car));
 
             // each person has 3 legs -> score should 3 x personSpecificModeConstant since all other scoring parameters are 0
-            Assert.assertEquals("Score deviates from what is expected given the personSpecificModeConstant.",
-                    personSpecificModeConstant, score / 3, MatsimTestUtils.EPSILON);
-            Assert.assertTrue("personSpecificModeConstant has value 0 or higher, this should never happen with log normal distribution for given mean -1 and sigma 1",
-                    personSpecificModeConstant < 0.0d);
+            Assertions.assertEquals(personSpecificModeConstant, score / 3, MatsimTestUtils.EPSILON, "Score deviates from what is expected given the personSpecificModeConstant.");
+            Assertions.assertTrue(personSpecificModeConstant < 0.0d,
+                    "personSpecificModeConstant has value 0 or higher, this should never happen with log normal distribution for given mean -1 and sigma 1");
         }
     }
 }

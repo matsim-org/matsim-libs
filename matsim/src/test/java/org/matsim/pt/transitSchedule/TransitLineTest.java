@@ -20,7 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 
@@ -62,7 +62,7 @@ public class TransitLineTest {
 		Id<TransitLine> id = Id.create(511, TransitLine.class);
 		TransitLine tLine = createTransitLine(id);
 		assertNotNull(tLine);
-		assertEquals("different ids.", id.toString(), tLine.getId().toString());
+		assertEquals(id.toString(), tLine.getId().toString(), "different ids.");
 	}
 
 	@Test

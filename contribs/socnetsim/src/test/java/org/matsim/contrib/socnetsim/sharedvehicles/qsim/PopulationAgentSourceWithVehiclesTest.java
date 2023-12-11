@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles.qsim;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 
@@ -118,8 +118,8 @@ public class PopulationAgentSourceWithVehiclesTest {
 		}
 
 		assertTrue(
-				"did not get an exception with inconsistent setting",
-				gotException);
+				gotException,
+				"did not get an exception with inconsistent setting");
 	}
 
 	@Test
@@ -199,8 +199,8 @@ public class PopulationAgentSourceWithVehiclesTest {
 		}
 
 		assertFalse(
-				"got an exception with consistent setting",
-				gotException);
+				gotException,
+				"got an exception with consistent setting");
 	}
 }
 

@@ -20,6 +20,7 @@
 package org.matsim.contrib.minibus.genericUtils;
 
 import java.util.ArrayList;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
@@ -29,7 +30,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import org.junit.Assert;
 import org.junit.Before;
 
 /**
@@ -56,7 +56,7 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(40, 0));
 		
 		int indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
-		Assert.assertEquals(2, indexSecondTerminusStop);
+		Assertions.assertEquals(2, indexSecondTerminusStop);
 		
 		/* 
 		 * rectangular line
@@ -74,7 +74,7 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(0, 10));
 		
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
-		Assert.assertEquals(2, indexSecondTerminusStop);
+		Assertions.assertEquals(2, indexSecondTerminusStop);
 		
 		/* 
 		 * triangular line both candidate stops at same distance from first terminus
@@ -91,7 +91,7 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(0, 10));
 
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
-		Assert.assertEquals(1, indexSecondTerminusStop);
+		Assertions.assertEquals(1, indexSecondTerminusStop);
 		
 		/* 
 		 * triangular line many stops
@@ -112,7 +112,7 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(0, 20));
 		
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
-		Assert.assertEquals(5, indexSecondTerminusStop);
+		Assertions.assertEquals(5, indexSecondTerminusStop);
 		
 		/* 
 		 * TODO: Currently failing, would require a more elaborate algorithm to determine the terminus stop

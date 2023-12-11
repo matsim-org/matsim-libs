@@ -31,7 +31,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -139,9 +139,9 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			final Set<Id> allocated = new HashSet<Id>();
 			for ( Plan p : testPlan.getAllIndividualPlans() ) {
 				final Id v = assertSingleVehicleAndGetVehicleId( p );
-				Assert.assertTrue(
-						"vehicle "+v+" already allocated",
-						v == null || allocated.add( v ) );
+				Assertions.assertTrue(
+						v == null || allocated.add( v ),
+						"vehicle "+v+" already allocated" );
 			}
 		}
 	}
@@ -174,9 +174,9 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			}
 
 			final int max = Collections.max( counts.values() );
-			Assert.assertTrue(
-					"one vehicle was allocated "+max+" times while maximum expected was 2 in "+counts,
-					max <= 2 );
+			Assertions.assertTrue(
+					max <= 2,
+					"one vehicle was allocated "+max+" times while maximum expected was 2 in "+counts );
 		}
 	}
 
@@ -215,10 +215,10 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			}
 		}
 
-		Assert.assertEquals(
-				"unexpected number of agents having got several vehicles",
+		Assertions.assertEquals(
 				allocations.size(),
-				agentsWithSeveralVehicles.size() );
+				agentsWithSeveralVehicles.size(),
+				"unexpected number of agents having got several vehicles" );
 	}
 
 	@Test
@@ -254,10 +254,10 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			}
 		}
 
-		Assert.assertEquals(
-				"unexpected number of agents having got several vehicles",
+		Assertions.assertEquals(
 				0,
-				agentsWithSeveralVehicles.size() );
+				agentsWithSeveralVehicles.size(),
+				"unexpected number of agents having got several vehicles" );
 	}
 
 	private static Id assertSingleVehicleAndGetVehicleId(final Plan p) {
@@ -270,13 +270,13 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			if ( !MODE.equals( leg.getMode() ) ) continue;
 			final NetworkRoute r = (NetworkRoute) leg.getRoute();
 			
-			Assert.assertNotNull(
-					"null vehicle id in route",
-					r.getVehicleId() );
+			Assertions.assertNotNull(
+					r.getVehicleId(),
+					"null vehicle id in route" );
 
-			Assert.assertTrue(
-					"vehicle "+r.getVehicleId()+" not the same as "+v,
-					v == null || r.getVehicleId().equals( v ) );
+			Assertions.assertTrue(
+					v == null || r.getVehicleId().equals( v ),
+					"vehicle "+r.getVehicleId()+" not the same as "+v );
 
 			v = r.getVehicleId();
 		}

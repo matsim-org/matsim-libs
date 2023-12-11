@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,8 +49,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static org.junit.Assert.assertNull;
-
 /**
  * @author thibautd
  */
@@ -72,8 +72,8 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 		JointPlan jointPlan = createPlanWithJointTrips();
 
 		assertNull(
-				"unexpected removed trips",
-				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ) );
+				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ),
+				"unexpected removed trips" );
 
 	}
 
@@ -89,8 +89,8 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 
 		assertNull(
-				"unexpected removed trips",
-				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ) );
+				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ),
+				"unexpected removed trips" );
 
 	}
 

@@ -17,9 +17,9 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.freightreceiver;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.junit.Assert;
 
 
 public class ReceiverPlanTest {
@@ -30,8 +30,8 @@ public class ReceiverPlanTest {
 		Receiver receiver = ReceiverUtils.newInstance( Id.create( "1", Receiver.class ) );
 		ReceiverPlan.Builder builder = ReceiverPlan.Builder.newInstance(receiver, true);
 		ReceiverPlan plan = builder.build();
-		Assert.assertEquals("Wrong receiver Id", Id.create("1", Receiver.class), plan.getReceiver().getId());
-		Assert.assertNull("Score should be null", plan.getScore());
+		Assertions.assertEquals(Id.create("1", Receiver.class), plan.getReceiver().getId(), "Wrong receiver Id");
+		Assertions.assertNull(plan.getScore(), "Score should be null");
 	}
 
 	/* TODO Add tests to check ReceiverOrders */

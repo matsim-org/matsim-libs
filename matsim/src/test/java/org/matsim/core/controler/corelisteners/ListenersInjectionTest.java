@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.controler.corelisteners;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.IterationStopWatch;
@@ -98,10 +98,10 @@ public class ListenersInjectionTest {
 		final ControlerListener o1 = injector.getInstance( klass );
 		final ControlerListener o2 = injector.getInstance( klass );
 
-		Assert.assertSame(
-				"Two different instances of "+klass.getName()+" returned by injector!",
+		Assertions.assertSame(
 				o1,
-				o2 );
+				o2,
+				"Two different instances of "+klass.getName()+" returned by injector!" );
 	}
 }
 

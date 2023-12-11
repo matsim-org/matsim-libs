@@ -1,6 +1,6 @@
 package org.matsim.contrib.emissions.events;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -82,7 +82,7 @@ public class VehicleLeavesTrafficEventTest {
         }
 		final String expected = utils.getClassInputDirectory() + emissionEventsFileName;
 		EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, resultingEvents);
-        Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+        Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
     }
 
 }

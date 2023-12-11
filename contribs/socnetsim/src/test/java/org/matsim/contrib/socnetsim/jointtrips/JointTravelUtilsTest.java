@@ -20,8 +20,8 @@
 package org.matsim.contrib.socnetsim.jointtrips;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -806,12 +806,12 @@ public class JointTravelUtilsTest {
 		for ( Fixture f : fixtures ) {
 			JointTravelStructure struct = JointTravelUtils.analyseJointTravel(f.plan);
 
-			Assert.assertEquals(
+			Assertions.assertEquals(
+					f.structure,
+					struct,
 					"wrong structure for fixture "+f.name+
 					" of size "+f.structure.getJointTrips().size()+
-					" compared to result of size "+struct.getJointTrips().size(),
-					f.structure,
-					struct);
+					" compared to result of size "+struct.getJointTrips().size());
 		}
 	}
 
@@ -820,14 +820,14 @@ public class JointTravelUtilsTest {
 		for ( Fixture f : fixtures ) {
 			List<DriverTrip> trips = JointTravelUtils.parseDriverTrips(f.plan);
 
-			Assert.assertEquals(
-					"wrong number of driver trips: "+f.driverTrips+" is the target, got "+trips,
+			Assertions.assertEquals(
 					f.driverTrips.size(),
-					trips.size());
+					trips.size(),
+					"wrong number of driver trips: "+f.driverTrips+" is the target, got "+trips);
 
-			Assert.assertTrue(
-					"wrong driver trips: "+f.driverTrips+" is the target, got "+trips,
-					trips.containsAll( f.driverTrips ));
+			Assertions.assertTrue(
+					trips.containsAll( f.driverTrips ),
+					"wrong driver trips: "+f.driverTrips+" is the target, got "+trips);
 		}
 	}
 

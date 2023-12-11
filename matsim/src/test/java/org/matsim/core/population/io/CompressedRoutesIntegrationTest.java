@@ -19,7 +19,7 @@
 
 package org.matsim.core.population.io;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,7 +42,7 @@ public class CompressedRoutesIntegrationTest {
 		Scenario s = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(s.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		new ParallelPopulationReaderMatsimV4(s).readFile("test/scenarios/equil/plans1.xml");
-		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(1, s.getPopulation().getPersons().size());
 		Leg firstPersonsLeg = (Leg) s.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan().getPlanElements().get(1);
 //		Assert.assertTrue(firstPersonsLeg.getRoute() instanceof CompressedNetworkRouteImpl);
 	}

@@ -22,7 +22,7 @@ package org.matsim.testcases.utils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,12 +41,12 @@ public class LogCounterTest {
 		LOG.info("hello world - this is just a test");
 		LOG.warn("hello world - this is just a test");
 		counter.deactivate();
-		Assert.assertEquals(1, counter.getInfoCount());
-		Assert.assertEquals(1, counter.getWarnCount());
+		Assertions.assertEquals(1, counter.getInfoCount());
+		Assertions.assertEquals(1, counter.getWarnCount());
 		LOG.info("hello world - this is just a test"); // this should not be counted
 		LOG.warn("hello world - this is just a test"); // this should not be counted
-		Assert.assertEquals(1, counter.getInfoCount());
-		Assert.assertEquals(1, counter.getWarnCount());
+		Assertions.assertEquals(1, counter.getInfoCount());
+		Assertions.assertEquals(1, counter.getWarnCount());
 	}
 
 	@Test
@@ -56,11 +56,11 @@ public class LogCounterTest {
 		LOG.info("hello world - this is just a test");
 		LOG.warn("hello world - this is just a test");
 		counter.deactivate();
-		Assert.assertEquals(0, counter.getInfoCount());
-		Assert.assertEquals(1, counter.getWarnCount());
+		Assertions.assertEquals(0, counter.getInfoCount());
+		Assertions.assertEquals(1, counter.getWarnCount());
 		LOG.info("hello world - this is just a test"); // this should not be counted
 		LOG.warn("hello world - this is just a test"); // this should not be counted
-		Assert.assertEquals(0, counter.getInfoCount());
-		Assert.assertEquals(1, counter.getWarnCount());
+		Assertions.assertEquals(0, counter.getInfoCount());
+		Assertions.assertEquals(1, counter.getWarnCount());
 	}
 }

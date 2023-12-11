@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -216,10 +216,10 @@ public class RandomJointLocationChoiceTest {
 					f.angle,
 					f.distance );
 
-			Assert.assertEquals(
-					"wrong facility for fixture "+f,
+			Assertions.assertEquals(
 					f.expectedFacility,
-					fac.getId() );
+					fac.getId(),
+					"wrong facility for fixture "+f );
 		}
 
 	}

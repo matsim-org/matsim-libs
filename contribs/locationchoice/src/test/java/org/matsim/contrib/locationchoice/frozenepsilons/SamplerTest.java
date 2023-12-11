@@ -22,6 +22,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,8 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static org.junit.Assert.assertTrue;
 
 public class SamplerTest {
 

@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -67,7 +67,7 @@ public class SelectedPlans2ESRIShapeTest {
 		sp.write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
-		Assert.assertEquals(2235, writtenFeatures.size());
+		Assertions.assertEquals(2235, writtenFeatures.size());
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class SelectedPlans2ESRIShapeTest {
 		sp.write();
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
-		Assert.assertEquals(1431, writtenFeatures.size());
+		Assertions.assertEquals(1431, writtenFeatures.size());
 	}
 
 }

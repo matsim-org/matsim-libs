@@ -21,13 +21,13 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage1;
 import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;
 
- public class TestScheduler {
+	public class TestScheduler {
 
 	 // the time at the end of the simulation is equal to the time of the last message processed
 	 @Test
@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;
 		Message m1=new DummyMessage();
 		sm1.sendMessage(m1, sm1, 9000);
 		scheduler.startSimulation();
-		Assert.assertEquals(9000.0, scheduler.getSimTime(), 0.0);
+		Assertions.assertEquals(9000.0, scheduler.getSimTime(), 0.0);
 	}
 
 	 // a message is scheduled and unscheduled before starting the simulation
@@ -50,7 +50,7 @@ import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;
 		sm1.sendMessage(m1, sm1, 1);
 		scheduler.unschedule(m1);
 		scheduler.startSimulation();
-		Assert.assertEquals(0.0, scheduler.getSimTime(), 0.0);
+		Assertions.assertEquals(0.0, scheduler.getSimTime(), 0.0);
 	}
 
 	 // We shedule two messages, but the first message deletes upon handling the message the second message.
@@ -68,7 +68,7 @@ import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;
 
 
 		scheduler.startSimulation();
-		Assert.assertEquals(1.0, scheduler.getSimTime(), 0.0);
+		Assertions.assertEquals(1.0, scheduler.getSimTime(), 0.0);
 	}
 
 

@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -173,13 +173,13 @@ public class LexicographicRemoverTest {
 
 		for ( Person p : f.group.getPersons() ) {
 			final Plan expectedRemoved = f.expectedRemovedPlans.get( p.getId() );
-			Assert.assertFalse(
-					expectedRemoved+" not removed for person "+p,
-					p.getPlans().contains( expectedRemoved ) );
+			Assertions.assertFalse(
+					p.getPlans().contains( expectedRemoved ),
+					expectedRemoved+" not removed for person "+p );
 
-			Assert.assertNull(
-					"MEMORY LEAK: There is still a joint plan associated to removed plan "+expectedRemoved,
-					f.jointPlans.getJointPlan( expectedRemoved ) );
+			Assertions.assertNull(
+					f.jointPlans.getJointPlan( expectedRemoved ),
+					"MEMORY LEAK: There is still a joint plan associated to removed plan "+expectedRemoved );
 		}
 	}
 

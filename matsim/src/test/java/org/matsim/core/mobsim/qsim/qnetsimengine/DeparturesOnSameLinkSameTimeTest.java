@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -71,16 +71,16 @@ public class DeparturesOnSameLinkSameTimeTest {
 		Map<Id<Vehicle>,Map<Id<Link>, Double>> carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3600);
 
 		double diff_carAgents_departureLink_LeaveTimes = carLinkLeaveTime.get(secondAgent).get(departureLink) - carLinkLeaveTime.get(firstAgent).get(departureLink);
-		Assert.assertEquals("Both car agents should leave at the gap of 1 sec.", 1., Math.abs(diff_carAgents_departureLink_LeaveTimes), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(1., Math.abs(diff_carAgents_departureLink_LeaveTimes), MatsimTestUtils.EPSILON, "Both car agents should leave at the gap of 1 sec." );
 
 		double diff_motorbikeAgents_departureLink_LeaveTimes = motorbikeLinkLeaveTime.get(secondAgent).get(departureLink) - motorbikeLinkLeaveTime.get(firstAgent).get(departureLink);
-		Assert.assertEquals("Both motorbike agents should leave at the same time.", 0., diff_motorbikeAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(0., diff_motorbikeAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON, "Both motorbike agents should leave at the same time." );
 
 		// for flow cap more than 3600, both cars also should leave link l_1 at the same time.
 		carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3601);
 
 		diff_carAgents_departureLink_LeaveTimes = carLinkLeaveTime.get(secondAgent).get(departureLink) - carLinkLeaveTime.get(firstAgent).get(departureLink);
-		Assert.assertEquals("Both car agents should leave at the same time", 0., diff_carAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(0., diff_carAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON, "Both car agents should leave at the same time" );
 	}
 
 	private Map<Id<Vehicle>,Map<Id<Link>, Double>> getLinkEnterTime (String travelMode, double departureLinkCapacity){

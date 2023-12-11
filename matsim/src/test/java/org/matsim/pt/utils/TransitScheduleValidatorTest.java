@@ -22,7 +22,7 @@
 package org.matsim.pt.utils;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -89,11 +89,11 @@ public class TransitScheduleValidatorTest {
 
 		schedule.getMinimalTransferTimes().set(id1, id2, 120);
 		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertTrue(result.getIssues().isEmpty());
+		Assertions.assertTrue(result.getIssues().isEmpty());
 
 		schedule.getMinimalTransferTimes().set(id1, id2, 0);
 		result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertEquals("Should warn against implausible transfer time.", 1, result.getIssues().size());
+		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against implausible transfer time.");
 	}
 
 	@Test
@@ -112,14 +112,14 @@ public class TransitScheduleValidatorTest {
 
 		schedule.getMinimalTransferTimes().set(id1, id3, 120);
 		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertEquals("Should warn against missing stop3.", 1, result.getIssues().size());
-		Assert.assertTrue("Message should contain hint about stop3 being missing. " + result.getIssues().get(0).getMessage(), result.getIssues().get(0).getMessage().contains("stop3"));
+		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against missing stop3.");
+		Assertions.assertTrue(result.getIssues().get(0).getMessage().contains("stop3"), "Message should contain hint about stop3 being missing. " + result.getIssues().get(0).getMessage());
 		schedule.getMinimalTransferTimes().remove(id1, id3);
 
 		schedule.getMinimalTransferTimes().set(id4, id2, 120);
 		result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertEquals("Should warn against missing stop4.", 1, result.getIssues().size());
-		Assert.assertTrue("Message should contain hint about stop4 being missing. " + result.getIssues().get(0).getMessage(), result.getIssues().get(0).getMessage().contains("stop4"));
+		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against missing stop4.");
+		Assertions.assertTrue(result.getIssues().get(0).getMessage().contains("stop4"), "Message should contain hint about stop4 being missing. " + result.getIssues().get(0).getMessage());
 	}
 
 }

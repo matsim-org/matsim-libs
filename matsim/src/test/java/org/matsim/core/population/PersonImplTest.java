@@ -20,7 +20,7 @@
 
 package org.matsim.core.population;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,12 +106,12 @@ public class PersonImplTest {
 		Plan selPlan = PersonUtils.createAndAddPlan(person, true);
 		PersonUtils.createAndAddPlan(person, false);
 
-		assertEquals("person should have 4 plans.", 4, person.getPlans().size());
+		assertEquals(4, person.getPlans().size(), "person should have 4 plans.");
 
 		PersonUtils.removeUnselectedPlans(person);
 
-		assertEquals("person should have 1 plan.", 1, person.getPlans().size());
-		assertEquals("remaining plan should be selPlan.", selPlan, person.getPlans().get(0));
+		assertEquals(1, person.getPlans().size(), "person should have 1 plan.");
+		assertEquals(selPlan, person.getPlans().get(0), "remaining plan should be selPlan.");
 	}
 
 	@Test
@@ -123,21 +123,21 @@ public class PersonImplTest {
 		Plan p4 = PersonUtils.createAndAddPlan(person, false);
 		Plan p5 = PopulationUtils.createPlan(null);
 
-		assertEquals("wrong number of plans.", 4, person.getPlans().size());
-		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
+		assertEquals(4, person.getPlans().size(), "wrong number of plans.");
+		assertEquals(p2, person.getSelectedPlan(), "expected different selected plan.");
 		assertTrue(person.removePlan(p3));
-		assertEquals("wrong number of plans.", 3, person.getPlans().size());
-		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
+		assertEquals(3, person.getPlans().size(), "wrong number of plans.");
+		assertEquals(p2, person.getSelectedPlan(), "expected different selected plan.");
 		assertFalse(person.removePlan(p5));
-		assertEquals("wrong number of plans.", 3, person.getPlans().size());
+		assertEquals(3, person.getPlans().size(), "wrong number of plans.");
 		assertTrue(person.removePlan(p2));
-		assertEquals("wrong number of plans.", 2, person.getPlans().size());
-		assertNotSame("removed plan still set as selected.", p2, person.getSelectedPlan());
-		assertFalse("plan cannot be removed twice.", person.removePlan(p2));
-		assertEquals("wrong number of plans.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "wrong number of plans.");
+		assertNotSame(p2, person.getSelectedPlan(), "removed plan still set as selected.");
+		assertFalse(person.removePlan(p2), "plan cannot be removed twice.");
+		assertEquals(2, person.getPlans().size(), "wrong number of plans.");
 		assertTrue(person.removePlan(p1));
 		assertTrue(person.removePlan(p4));
-		assertEquals("wrong number of plans.", 0, person.getPlans().size());
+		assertEquals(0, person.getPlans().size(), "wrong number of plans.");
 	}
 
 	@Test

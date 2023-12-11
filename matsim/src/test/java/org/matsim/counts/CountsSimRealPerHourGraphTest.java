@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,6 +39,6 @@ public class CountsSimRealPerHourGraphTest {
 		fixture.setUp();
 
 		CountsSimRealPerHourGraph eg = new CountsSimRealPerHourGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
-		assertNotNull("No graph is created", eg.createChart(0));
+		assertNotNull(eg.createChart(0), "No graph is created");
 	}
 }

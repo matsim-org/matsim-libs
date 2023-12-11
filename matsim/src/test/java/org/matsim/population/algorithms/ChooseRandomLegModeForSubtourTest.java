@@ -21,7 +21,7 @@
 package org.matsim.population.algorithms;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,9 +197,9 @@ public class ChooseRandomLegModeForSubtourTest {
 				testee.run(plan);
 
 				assertEquals(
-						"unexpected plan size",
 						3,
-						plan.getPlanElements().size());
+						plan.getPlanElements().size(),
+						"unexpected plan size");
 
 				final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
 
@@ -214,11 +214,11 @@ public class ChooseRandomLegModeForSubtourTest {
 				}
 			}
 			assertTrue(
+					hasCar && hasPt && hasWalk,
 					"expected subtours with car, pt and walk, got"+
 					(hasCar ? " car" : " NO car")+","+
 					(hasPt ? " pt" : " NO pt")+","+
-					(hasWalk ? " walk" : " NO walk"),
-					hasCar && hasPt && hasWalk);
+					(hasWalk ? " walk" : " NO walk"));
 		}
 		{ // test with special single trip subtour settings
 			testee.setSingleTripSubtourModes(new String[] {"pt", "walk"});
@@ -230,9 +230,9 @@ public class ChooseRandomLegModeForSubtourTest {
 				testee.run(plan);
 
 				assertEquals(
-						"unexpected plan size",
 						3,
-						plan.getPlanElements().size());
+						plan.getPlanElements().size(),
+						"unexpected plan size");
 
 				final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
 
@@ -247,11 +247,11 @@ public class ChooseRandomLegModeForSubtourTest {
 				}
 			}
 			assertTrue(
+					!hasCar && hasPt && hasWalk,
 					"expected subtours with NO car, pt and walk, got"+
 					(hasCar ? " car" : " NO car")+","+
 					(hasPt ? " pt" : " NO pt")+","+
-					(hasWalk ? " walk" : " NO walk"),
-					!hasCar && hasPt && hasWalk);
+					(hasWalk ? " walk" : " NO walk"));
 		}
 
 	}
@@ -401,17 +401,17 @@ public class ChooseRandomLegModeForSubtourTest {
 				Id<Link> nextLocation = nextActivity.getLinkId();
 				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
-							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),
 							currentLocation,
-							carLocation);
+							carLocation,
+							"wrong car location at leg "+legCount+" in "+plan.getPlanElements());
 					carLocation = nextLocation;
 				}
 				currentLocation = nextLocation;
 			}
 			assertEquals(
-					"wrong car location at the end of "+plan.getPlanElements(),
 					firstLocation,
-					carLocation);
+					carLocation,
+					"wrong car location at the end of "+plan.getPlanElements());
 		}
 	}
 
@@ -435,17 +435,17 @@ public class ChooseRandomLegModeForSubtourTest {
 				Id<Link> nextLocation = nextActivity.getLinkId();
 				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
-							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),
 							currentLocation,
-							carLocation);
+							carLocation,
+							"wrong car location at leg "+legCount+" in "+plan.getPlanElements());
 					carLocation = nextLocation;
 				}
 				currentLocation = nextLocation;
 			}
 			assertEquals(
-					"wrong car location at the end of "+plan.getPlanElements(),
 					firstLocation,
-					carLocation);
+					carLocation,
+					"wrong car location at the end of "+plan.getPlanElements());
 		}
 	}
 
@@ -460,9 +460,9 @@ public class ChooseRandomLegModeForSubtourTest {
 			TripStructureUtils.getSubtours(	plan );
 
 		assertEquals(
-				"number of subtour changed",
 				originalSubtours.size(),
-				mutatedSubtours.size());
+				mutatedSubtours.size(),
+				"number of subtour changed");
 
 		final List<Subtour> mutateds = new ArrayList<Subtour>();
 		for (Subtour mutated : mutatedSubtours) {
@@ -472,14 +472,14 @@ public class ChooseRandomLegModeForSubtourTest {
 			for (Trip trip : mutated.getTripsWithoutSubSubtours()) {
 				if ( expectedMode.equals( trip.getLegsOnly().get( 0 ).getMode() ) ) {
 					assertTrue(
-							"inconsistent mode chain",
-							isFirst || containsMutatedMode );
+							isFirst || containsMutatedMode,
+							"inconsistent mode chain" );
 					containsMutatedMode = true;
 				}
 				else {
 					assertFalse(
-							"inconsistent mode chain",
-							containsMutatedMode );
+							containsMutatedMode,
+							"inconsistent mode chain" );
 				}
 				isFirst = false;
 			}
@@ -488,8 +488,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 
 		assertFalse(
-				"no mutated subtour",
-				mutateds.isEmpty() );
+				mutateds.isEmpty(),
+				"no mutated subtour" );
 
 		int nMutatedWithoutMutatedFather = 0;
 		for ( Subtour s : mutateds ) {
@@ -499,9 +499,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 
 		assertEquals(
-				"unexpected number of roots in mutated subtours",
 				1,
-				nMutatedWithoutMutatedFather);
+				nMutatedWithoutMutatedFather,
+				"unexpected number of roots in mutated subtours");
 	}
 
 	private static Plan createPlan(ActivityFacilities facilities, String facString, String mode) {

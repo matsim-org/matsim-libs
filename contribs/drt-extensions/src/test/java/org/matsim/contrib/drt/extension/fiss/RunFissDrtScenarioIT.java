@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.fiss;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -173,7 +173,7 @@ public class RunFissDrtScenarioIT {
 		}
 
 		run.run();
-		Assert.assertEquals(23817, linkCounter.getLinkLeaveCount());
+		Assertions.assertEquals(23817, linkCounter.getLinkLeaveCount());
 	}
 
 	static class LinkCounter implements LinkLeaveEventHandler {

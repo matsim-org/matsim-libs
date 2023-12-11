@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.population.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -239,9 +239,9 @@ public class TripsToLegsAlgorithmTest {
 		algorithm.run( fixture.plan );
 
 		assertEquals(
-				"wrong structure size for fixture <<"+fixture.name+">>",
 				fixture.expectedPlanStructure.size(),
-				fixture.plan.getPlanElements().size());
+				fixture.plan.getPlanElements().size(),
+				"wrong structure size for fixture <<"+fixture.name+">>");
 
 		final Iterator<PlanElement> expIter = fixture.expectedPlanStructure.iterator();
 		final Iterator<PlanElement> actualIter = fixture.plan.getPlanElements().iterator();
@@ -252,23 +252,23 @@ public class TripsToLegsAlgorithmTest {
 
 			if ( actual instanceof Activity ) {
 				assertTrue(
-						"incompatible Activity/Leg sequence in fixture <<"+fixture.name+">>",
-						expected instanceof Activity );
+						expected instanceof Activity,
+						"incompatible Activity/Leg sequence in fixture <<"+fixture.name+">>" );
 
 				assertEquals(
-						"incompatible activity types in fixture <<"+fixture.name+">>",
 						((Activity) expected).getType(),
-						((Activity) actual).getType());
+						((Activity) actual).getType(),
+						"incompatible activity types in fixture <<"+fixture.name+">>");
 			}
 			else if ( actual instanceof Leg ) {
 				assertTrue(
-						"incompatible types sequence in fixture <<"+fixture.name+">>",
-						expected instanceof Leg );
+						expected instanceof Leg,
+						"incompatible types sequence in fixture <<"+fixture.name+">>" );
 
 				assertEquals(
-						"incompatible leg modes in fixture <<"+fixture.name+">>",
 						((Leg) expected).getMode(),
-						((Leg) actual).getMode());
+						((Leg) actual).getMode(),
+						"incompatible leg modes in fixture <<"+fixture.name+">>");
 			}
 			else {
 				throw new RuntimeException( actual.getClass().getName() );

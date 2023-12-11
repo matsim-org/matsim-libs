@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;

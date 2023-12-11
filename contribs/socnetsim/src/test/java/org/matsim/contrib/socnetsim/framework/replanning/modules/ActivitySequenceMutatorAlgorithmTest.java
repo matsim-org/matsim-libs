@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -54,18 +54,18 @@ public class ActivitySequenceMutatorAlgorithmTest {
 					StageActivityHandling.StagesAsNormalActivities );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
+		Assertions.assertEquals(
 				plan.getPlanElements().size(),
-				7 );
-		Assert.assertEquals(
-				"unexpected type of first in-plan activity",
+				7,
+				"unexpected size of plan "+plan.getPlanElements() );
+		Assertions.assertEquals(
 				((Activity) plan.getPlanElements().get( 2 )).getType(),
-				"l" );
-		Assert.assertEquals(
-				"unexpected type of second in-plan activity",
+				"l",
+				"unexpected type of first in-plan activity" );
+		Assertions.assertEquals(
 				((Activity) plan.getPlanElements().get( 4 )).getType(),
-				"w" );
+				"w",
+				"unexpected type of second in-plan activity" );
 	}
 
 	@Test
@@ -84,14 +84,14 @@ public class ActivitySequenceMutatorAlgorithmTest {
 					StageActivityHandling.StagesAsNormalActivities );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
+		Assertions.assertEquals(
 				plan.getPlanElements().size(),
-				5 );
-		Assert.assertEquals(
-				"unexpected type of first in-plan activity",
+				5,
+				"unexpected size of plan "+plan.getPlanElements() );
+		Assertions.assertEquals(
 				((Activity) plan.getPlanElements().get( 2 )).getType(),
-				"w" );
+				"w",
+				"unexpected type of first in-plan activity" );
 	}
 
 	@Test
@@ -108,10 +108,10 @@ public class ActivitySequenceMutatorAlgorithmTest {
 					StageActivityHandling.StagesAsNormalActivities );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
+		Assertions.assertEquals(
 				plan.getPlanElements().size(),
-				3 );
+				3,
+				"unexpected size of plan "+plan.getPlanElements() );
 	}
 
 	@Test
@@ -134,22 +134,22 @@ public class ActivitySequenceMutatorAlgorithmTest {
 					StageActivityHandling.ExcludeStageActivities );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
+		Assertions.assertEquals(
 				plan.getPlanElements().size(),
-				9 );
-		Assert.assertEquals(
-				"unexpected type of first in-plan activity",
+				9,
+				"unexpected size of plan "+plan.getPlanElements() );
+		Assertions.assertEquals(
 				((Activity) plan.getPlanElements().get( 2 )).getType(),
-				"stage" );
-		Assert.assertEquals(
-				"unexpected type of second in-plan activity",
+				"stage",
+				"unexpected type of first in-plan activity" );
+		Assertions.assertEquals(
 				((Activity) plan.getPlanElements().get( 4 )).getType(),
-				"l" );
-		Assert.assertEquals(
-				"unexpected type of third in-plan activity",
+				"l",
+				"unexpected type of second in-plan activity" );
+		Assertions.assertEquals(
 				((Activity) plan.getPlanElements().get( 6 )).getType(),
-				"w" );
+				"w",
+				"unexpected type of third in-plan activity" );
 	}
 }
 

@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -95,41 +95,41 @@ public class SignalControlData20ReaderWriterTest {
 
 
 	private void checkContent(SignalControlData controlData) {
-		Assert.assertNotNull(controlData);
-		Assert.assertEquals(2, controlData.getSignalSystemControllerDataBySystemId().size());
+		Assertions.assertNotNull(controlData);
+		Assertions.assertEquals(2, controlData.getSignalSystemControllerDataBySystemId().size());
 
 		//first controller
 		SignalSystemControllerData systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId42);
-		Assert.assertNotNull(systemController);
-		Assert.assertNotNull(systemController.getControllerIdentifier());
-		Assert.assertEquals("DefaultPlanbasedSignalSystemController", systemController.getControllerIdentifier());
-		Assert.assertNotNull(systemController.getSignalPlanData());
+		Assertions.assertNotNull(systemController);
+		Assertions.assertNotNull(systemController.getControllerIdentifier());
+		Assertions.assertEquals("DefaultPlanbasedSignalSystemController", systemController.getControllerIdentifier());
+		Assertions.assertNotNull(systemController.getSignalPlanData());
 		SignalPlanData plan = systemController.getSignalPlanData().get(signalPlanId8);
-		Assert.assertNotNull(plan);
+		Assertions.assertNotNull(plan);
 		double startTime = plan.getStartTime();
-		Assert.assertEquals(0.0, startTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, startTime, MatsimTestUtils.EPSILON);
 		double stopTime = plan.getEndTime();
-		Assert.assertEquals(0.0, stopTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, stopTime, MatsimTestUtils.EPSILON);
 		Integer cycleTime = plan.getCycleTime();
-		Assert.assertNotNull(cycleTime);
-		Assert.assertEquals(Integer.valueOf(60), cycleTime);
-		Assert.assertEquals(3, plan.getOffset());
+		Assertions.assertNotNull(cycleTime);
+		Assertions.assertEquals(Integer.valueOf(60), cycleTime);
+		Assertions.assertEquals(3, plan.getOffset());
 
-		Assert.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
+		Assertions.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
 		SignalGroupSettingsData signalGroupSettings = plan.getSignalGroupSettingsDataByGroupId().get(groupId23);
-		Assert.assertNotNull(signalGroupSettings);
-		Assert.assertEquals(groupId23, signalGroupSettings.getSignalGroupId());
-		Assert.assertNotNull(signalGroupSettings.getOnset());
-		Assert.assertEquals(0, signalGroupSettings.getOnset());
-		Assert.assertNotNull(signalGroupSettings.getDropping());
-		Assert.assertEquals(45, signalGroupSettings.getDropping());
+		Assertions.assertNotNull(signalGroupSettings);
+		Assertions.assertEquals(groupId23, signalGroupSettings.getSignalGroupId());
+		Assertions.assertNotNull(signalGroupSettings.getOnset());
+		Assertions.assertEquals(0, signalGroupSettings.getOnset());
+		Assertions.assertNotNull(signalGroupSettings.getDropping());
+		Assertions.assertEquals(45, signalGroupSettings.getDropping());
 
 		//second controller
 		systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId43);
-		Assert.assertNotNull(systemController);
-		Assert.assertNotNull(systemController.getControllerIdentifier());
-		Assert.assertEquals("logicbasedActuatedController", systemController.getControllerIdentifier());
-		Assert.assertNull(systemController.getSignalPlanData());
+		Assertions.assertNotNull(systemController);
+		Assertions.assertNotNull(systemController.getControllerIdentifier());
+		Assertions.assertEquals("logicbasedActuatedController", systemController.getControllerIdentifier());
+		Assertions.assertNull(systemController.getSignalPlanData());
 	}
 
 }

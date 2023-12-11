@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -149,18 +149,18 @@ public class TestWarmEmissionAnalysisModule {
 		catch(RuntimeException re){
 			exceptionThrown = true;
 		}
-		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception",exceptionThrown);
+		Assertions.assertTrue(exceptionThrown,"An average speed higher than the free flow speed should throw a runtime exception");
 
 
 		{ //avg=ff=sg -> use ff factors
 			Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, sgffLinklength / AVG_PASSENGER_CAR_SPEED_FF_KMH * 3.6);
-			Assert.assertEquals(DETAILED_SGFF_FACTOR_FF * sgffLinklength / 1000., warmEmissions.get(NO2), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(DETAILED_SGFF_FACTOR_FF * sgffLinklength / 1000., warmEmissions.get(NO2), MatsimTestUtils.EPSILON);
 		}
 
 
 		{ //avg<sg -> use sg factors
 			Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, 2*sgffLinklength/ AVG_PASSENGER_CAR_SPEED_FF_KMH *3.6 );
-			Assert.assertEquals( DETAILED_SGFF_FACTOR_SG *sgffLinklength/1000., warmEmissions.get(NO2 ), MatsimTestUtils.EPSILON );
+			Assertions.assertEquals( DETAILED_SGFF_FACTOR_SG *sgffLinklength/1000., warmEmissions.get(NO2 ), MatsimTestUtils.EPSILON );
 		}
 	}
 
@@ -191,7 +191,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assert.assertFalse(excep);
+		Assertions.assertFalse(excep);
 
 		excep=false;
 	}
@@ -218,7 +218,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assert.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep); excep=false;
 	}
 
 	@Test
@@ -242,7 +242,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assert.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep); excep=false;
 	}
 
 	@Test
@@ -264,7 +264,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assert.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep); excep=false;
 
 	}
 
@@ -285,25 +285,25 @@ public class TestWarmEmissionAnalysisModule {
 		// ff < avg < ff+1 - handled like free flow
 		double travelTime =  tableLinkLength/(AVG_PASSENGER_CAR_SPEED_FF_KMH +0.5)*3.6;
 		emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, tableLink, travelTime );
-		Assert.assertEquals(0, emissionsModule.getFractionOccurences() );
-		Assert.assertEquals(tableLinkLength/1000., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(1, emissionsModule.getFreeFlowOccurences() );
-		Assert.assertEquals(tableLinkLength/1000, emissionsModule.getKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(0., emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(0, emissionsModule.getStopGoOccurences() );
-		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
+		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
+		Assertions.assertEquals(tableLinkLength/1000., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(1, emissionsModule.getFreeFlowOccurences() );
+		Assertions.assertEquals(tableLinkLength/1000, emissionsModule.getKmCounter(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(0., emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(0, emissionsModule.getStopGoOccurences() );
+		Assertions.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
 		emissionsModule.reset();
 
 		// ff < sg < avg - handled like free flow as well - no additional test needed
 		// avg < ff < sg - handled like stop go 
 		emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, tableLink, 2* tableLinkLength/(AVG_PASSENGER_CAR_SPEED_FF_KMH)*3.6 );
-		Assert.assertEquals(0, emissionsModule.getFractionOccurences() );
-		Assert.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences() );
-		Assert.assertEquals(tableLinkLength/1000, emissionsModule.getKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(tableLinkLength/1000, emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(1, emissionsModule.getStopGoOccurences() );
-		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
+		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
+		Assertions.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(0, emissionsModule.getFreeFlowOccurences() );
+		Assertions.assertEquals(tableLinkLength/1000, emissionsModule.getKmCounter(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(tableLinkLength/1000, emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(1, emissionsModule.getStopGoOccurences() );
+		Assertions.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
 		emissionsModule.reset();
 	}
 

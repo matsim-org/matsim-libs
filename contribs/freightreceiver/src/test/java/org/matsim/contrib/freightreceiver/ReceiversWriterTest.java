@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -46,10 +46,10 @@ public class ReceiversWriterTest {
 			new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).writeV1(utils.getOutputDirectory() + "receivers_v1.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Should write without exception.");
+			Assertions.fail("Should write without exception.");
 		}
 
-		Assert.assertTrue("File should exist.", new File(utils.getOutputDirectory() + "receivers_v1.xml").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory() + "receivers_v1.xml").exists(), "File should exist.");
 	}
 
 	@Test
@@ -63,10 +63,10 @@ public class ReceiversWriterTest {
 			new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).writeV2(utils.getOutputDirectory() + "receivers_v2.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Should write without exception.");
+			Assertions.fail("Should write without exception.");
 		}
 
-		Assert.assertTrue("File should exist.", new File(utils.getOutputDirectory() + "receivers_v2.xml").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory() + "receivers_v2.xml").exists(), "File should exist.");
 	}
 
 }

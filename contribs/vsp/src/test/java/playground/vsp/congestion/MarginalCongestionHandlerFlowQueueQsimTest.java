@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -128,11 +128,11 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 		sim.run();
 
 		for (CongestionEvent event : congestionEvents) {
-			Assert.assertEquals("here the delay should be equal to the inverse of the flow capacity", 3., event.getDelay(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "here the delay should be equal to the inverse of the flow capacity");
 		}
 
-		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong total internalized delay", 9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON, "wrong total delay");
+		Assertions.assertEquals(9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON, "wrong total internalized delay");
 
 	}
 
@@ -168,23 +168,23 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 
 		for (CongestionEvent event : congestionEvents) {
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(6., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 
 			if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(6., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 		}
 
-		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON, "wrong total delay");
 
 		// the second agent is 3 sec delayed and charges the first agent with these 3 sec
 		// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
-		Assert.assertEquals("wrong total internalized delay", 15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON, "wrong total internalized delay");
 	}
 
 	/**
@@ -219,23 +219,23 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 
 		for (CongestionEvent event : congestionEvents) {
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 
 			if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 		}
 
-		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON, "wrong total delay");
 
 		// the second agent is 3 sec delayed and charges the first agent with these 3 sec
 		// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
-		Assert.assertEquals("wrong total internalized delay", 9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON, "wrong total internalized delay");
 	}
 
 	private void setPopulation1(Scenario scenario) {

@@ -22,7 +22,7 @@ package org.matsim.core.replanning;
 
 import java.util.Random;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -80,10 +80,10 @@ public class StrategyManagerSubpopulationsTest {
 						counter.incCounter();
 						Person person1 = population.getPersons().get( person.getId() ) ;
 						Gbl.assertNotNull( person1 );
-						Assert.assertNull(
-							"unexpected subpopulation",
+						Assertions.assertNull(
+							PopulationUtils.getSubpopulation( person1 ),
 //							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
-								PopulationUtils.getSubpopulation( person1 ) );
+								"unexpected subpopulation" );
 
 					}
 
@@ -101,11 +101,12 @@ public class StrategyManagerSubpopulationsTest {
 						counter.incCounter();
 						Person person1 = population.getPersons().get( person.getId() ) ;
 						Gbl.assertNotNull( person1 );
-						Assert.assertEquals(
-							"unexpected subpopulation",
+						Assertions.assertEquals(
 							POP_NAME_1,
 //							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
-								PopulationUtils.getSubpopulation( person1 ) );
+								PopulationUtils.getSubpopulation( person1 ),
+//							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+								"unexpected subpopulation" );
 					}
 
 					@Override
@@ -122,11 +123,12 @@ public class StrategyManagerSubpopulationsTest {
 						counter.incCounter();
 						Person person1 = population.getPersons().get( person.getId() ) ;
 						Gbl.assertNotNull( person1 );
-						Assert.assertEquals(
-							"unexpected subpopulation",
+						Assertions.assertEquals(
 							POP_NAME_2,
 //							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
-								PopulationUtils.getSubpopulation( person1 ) );
+								PopulationUtils.getSubpopulation( person1 ),
+//							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+								"unexpected subpopulation" );
 					}
 
 					@Override

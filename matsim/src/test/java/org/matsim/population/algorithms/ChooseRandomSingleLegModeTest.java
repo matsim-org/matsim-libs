@@ -20,13 +20,10 @@
 
 package org.matsim.population.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Random;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -68,9 +65,9 @@ public class ChooseRandomSingleLegModeTest {
 				fail("unexpected mode: " + mode);
 			}
 		}
-		assertTrue("expected to find car-mode", foundCarMode);
-		assertTrue("expected to find pt-mode", foundPtMode);
-		assertTrue("expected to find walk-mode", foundWalkMode);
+		assertTrue(foundCarMode, "expected to find car-mode");
+		assertTrue(foundPtMode, "expected to find pt-mode");
+		assertTrue(foundWalkMode, "expected to find walk-mode");
 	}
 
 
@@ -97,9 +94,9 @@ public class ChooseRandomSingleLegModeTest {
 				fail("unexpected mode: " + mode);
 			}
 		}
-		assertTrue("expected to find car-mode", foundCarMode);
-		assertTrue("expected to find pt-mode", foundPtMode);
-		assertTrue("expected to find walk-mode", foundWalkMode);
+		assertTrue(foundCarMode, "expected to find car-mode");
+		assertTrue(foundPtMode, "expected to find pt-mode");
+		assertTrue(foundWalkMode, "expected to find walk-mode");
 	}
 
 	@Test
@@ -111,7 +108,7 @@ public class ChooseRandomSingleLegModeTest {
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		String mode = leg.getMode();
-		Assert.assertSame(TransportMode.car, mode);
+		Assertions.assertSame(TransportMode.car, mode);
 	}
 
 	@Test
@@ -186,13 +183,13 @@ public class ChooseRandomSingleLegModeTest {
 		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 	}
 
 	@Test
@@ -206,7 +203,7 @@ public class ChooseRandomSingleLegModeTest {
 		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 	}
 
 	@Test
@@ -220,13 +217,13 @@ public class ChooseRandomSingleLegModeTest {
 		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode(), "unexpected leg mode in leg 1.");
 	}
 
 }

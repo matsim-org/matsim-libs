@@ -21,8 +21,8 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
 import java.util.ArrayList;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -95,7 +95,7 @@ public class StopServedMultipleTimesPenaltyTest {
 		double actual = penalty.getScore(pPlan1, route1);
 		// 4 stops served, but only 3 different stop ids
 		double expected = -1 * ((4.0 / 3) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 	}
 	
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {

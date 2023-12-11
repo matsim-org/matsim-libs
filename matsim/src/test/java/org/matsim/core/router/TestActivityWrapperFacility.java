@@ -22,8 +22,8 @@ package org.matsim.core.router;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -62,15 +62,15 @@ public class TestActivityWrapperFacility {
 		for (Activity activity : activities) {
 			Facility wrapper = FacilitiesUtils.toFacility( activity, null );
 
-			Assert.assertEquals(
-					"wrapped activity returns incorrect coordinate!",
+			Assertions.assertEquals(
 					activity.getCoord(),
-					wrapper.getCoord());
+					wrapper.getCoord(),
+					"wrapped activity returns incorrect coordinate!");
 
-			Assert.assertEquals(
-					"wrapped activity returns incorrect link id!",
+			Assertions.assertEquals(
 					activity.getLinkId(),
-					wrapper.getLinkId());
+					wrapper.getLinkId(),
+					"wrapped activity returns incorrect link id!");
 		}
 	}
 }

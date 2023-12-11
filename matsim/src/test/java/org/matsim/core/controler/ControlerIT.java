@@ -20,8 +20,7 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat;
 
@@ -34,7 +33,7 @@ import java.util.EnumSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -138,13 +137,13 @@ public class ControlerIT {
 		MatsimServices controler = new Controler(config);
 		try {
 			controler.getConfig().setParam("eventsManager", "numberOfThreads", "2");
-			Assert.fail("Expected exception");
+			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
 		}
 		try {
 			controler.getConfig().setParam("eventsManager", "estimatedNumberOfEvents", "200000");
-			Assert.fail("Expected exception");
+			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
 		}
@@ -222,8 +221,8 @@ public class ControlerIT {
 
 		// test if the travel time calculator got the right result
 		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
-		assertEquals("TravelTimeCalculator has wrong result", avgTravelTimeLink2,
-				controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(avgTravelTimeLink2,
+				controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON, "TravelTimeCalculator has wrong result");
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controller().setLastIteration(1);
@@ -239,8 +238,8 @@ public class ControlerIT {
 
 		// test that the plans have the correct travel times
 		// (travel time of the plan does not contain first and last link)
-		assertEquals("ReRoute seems to have wrong travel times.", avgTravelTimeLink2,
-				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		assertEquals(avgTravelTimeLink2,
+				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON, "ReRoute seems to have wrong travel times.");
 	}
 
 	/**
@@ -288,8 +287,8 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue("Custom ScoringFunctionFactory was not set.",
-				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
+		assertTrue(controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory,
+				"Custom ScoringFunctionFactory was not set.");
 	}
 
 	/**
@@ -372,12 +371,12 @@ public class ControlerIT {
 		// but do not assume that the leg will be the same instance...
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
-					"unexpected plan length in "+plan.getPlanElements(),
 					3,
-					plan.getPlanElements().size());
+					plan.getPlanElements().size(),
+					"unexpected plan length in "+plan.getPlanElements());
 			assertNotNull(
-					"null route in plan "+plan.getPlanElements(),
-					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
+					"null route in plan "+plan.getPlanElements());
 		}
 	}
 
@@ -482,16 +481,16 @@ public class ControlerIT {
 		// but do not assume that the leg will be the same instance...
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
-					"unexpected plan length in "+plan.getPlanElements(),
 					expectedPlanLength,
-					plan.getPlanElements().size());
+					plan.getPlanElements().size(),
+					"unexpected plan length in "+plan.getPlanElements());
 			assertNotNull(
-					"null route in plan "+plan.getPlanElements(),
-					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
+					"null route in plan "+plan.getPlanElements());
 			if ( !f.scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 				assertNotNull(
-					"null route in plan "+plan.getPlanElements(),
-					((Leg) plan.getPlanElements().get( 3 )).getRoute());
+					((Leg) plan.getPlanElements().get( 3 )).getRoute(),
+					"null route in plan "+plan.getPlanElements());
 			}
 		}
 	}
@@ -545,8 +544,8 @@ public class ControlerIT {
 		config.controller().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				3 == controler.getConfig().controller().getWriteEventsInterval());
+		assertFalse(3 == controler.getConfig().controller().getWriteEventsInterval(),
+				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
 
 		controler.getConfig().controller().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controller().getWriteEventsInterval());
@@ -589,8 +588,8 @@ public class ControlerIT {
 		config.controller().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				3 == controler.getConfig().controller().getWriteEventsInterval());
+		assertFalse(3 == controler.getConfig().controller().getWriteEventsInterval(),
+				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
         controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -630,8 +629,8 @@ public class ControlerIT {
 		config.controller().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				0 == controler.getConfig().controller().getWriteEventsInterval());
+		assertFalse(0 == controler.getConfig().controller().getWriteEventsInterval(),
+				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
 		controler.getConfig().controller().setWriteEventsInterval(0);
 		assertEquals(0, controler.getConfig().controller().getWriteEventsInterval());
         controler.getConfig().controller().setCreateGraphs(false);
@@ -819,7 +818,7 @@ public class ControlerIT {
 			controler.getConfig().controller().setCreateGraphs(false);
 			controler.getConfig().controller().setDumpDataAtEnd(false);
 			controler.run();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 
 			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
 			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.
@@ -854,7 +853,7 @@ public class ControlerIT {
 			controler.getConfig().controller().setCreateGraphs(false);
 			controler.getConfig().controller().setDumpDataAtEnd(false);
 			controler.run();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 
 			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
 			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.
@@ -889,7 +888,7 @@ public class ControlerIT {
 			controler.getConfig().controller().setCreateGraphs(false);
 			controler.getConfig().controller().setDumpDataAtEnd(false);
 			controler.run();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 
 			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
 			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.
@@ -974,10 +973,10 @@ public class ControlerIT {
 
 			controler.run();
 
-			Assert.assertSame(
-					"adding a Guice module to the controler from a Guice module is allowed but has no effect",
+			Assertions.assertSame(
 					replacementScenario,
-					controler.getScenario());
+					controler.getScenario(),
+					"adding a Guice module to the controler from a Guice module is allowed but has no effect");
 		});
 	}
 

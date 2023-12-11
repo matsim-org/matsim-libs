@@ -22,7 +22,7 @@ package ch.sbb.matsim.contrib.railsim.integration;
 import ch.sbb.matsim.contrib.railsim.RailsimModule;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -289,7 +289,7 @@ public class RailsimIntegrationTest {
 				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") && vehicleArrivesEvent.getFacilityId().toString()
 					.equals("stop_3-4")) {
 
-					Assert.assertEquals("The arrival time of train1 at stop_3-4 has changed.", 29594., event.getTime(), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
 				}
 			}
 		}
@@ -428,17 +428,17 @@ public class RailsimIntegrationTest {
 		for (RailsimTrainStateEvent event : events) {
 
 			if (event.getTime() > Math.ceil(time)) {
-				Assert.fail(
+				Assertions.fail(
 					String.format("No matching event found for time %f, speed %f pos %f, Closest event is%s", time, speed, headPosition, prev));
 			}
 
 			// If all assertions are true, returns successfully
 			try {
-				Assert.assertEquals(Math.ceil(time), event.getTime(), 1e-7);
-				Assert.assertEquals(speed, event.getSpeed(), 1e-5);
-				Assert.assertEquals(targetSpeed, event.getTargetSpeed(), 1e-7);
-				Assert.assertEquals(acceleration, event.getAcceleration(), 1e-5);
-				Assert.assertEquals(headPosition, event.getHeadPosition(), 1e-5);
+				Assertions.assertEquals(Math.ceil(time), event.getTime(), 1e-7);
+				Assertions.assertEquals(speed, event.getSpeed(), 1e-5);
+				Assertions.assertEquals(targetSpeed, event.getTargetSpeed(), 1e-7);
+				Assertions.assertEquals(acceleration, event.getAcceleration(), 1e-5);
+				Assertions.assertEquals(headPosition, event.getHeadPosition(), 1e-5);
 				return;
 			} catch (AssertionError e) {
 				// Check further events in loop

@@ -21,7 +21,7 @@ package org.matsim.core.scoring.functions;
 
 import java.util.Random;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -105,11 +105,11 @@ public class CharyparNagelLegScoringPtChangeTest {
 		scoring2.finish();
 
 		// here, we should get the same score.
-		Assert.assertEquals(
-				"score for car leg differs when changing pt parameters! Probably a problem in line change handling.",
+		Assertions.assertEquals(
 				scoring1.getScore(),
 				scoring2.getScore(),
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"score for car leg differs when changing pt parameters! Probably a problem in line change handling." );
 	}
 
 	private static CharyparNagelLegScoring createScoring(

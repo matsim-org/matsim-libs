@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.locationchoice;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.Test;
@@ -133,7 +133,7 @@ public class LocationChoiceIT {
 		// Secondly, I need to give it two facilities to choose from, because a choice set of size 1 is treated specially
 		// (it is assumed that the one element is the one I'm already on, so nothing is done).
 		// I tricked it. :-)   michaz
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
 		if (!config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {

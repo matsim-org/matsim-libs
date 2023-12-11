@@ -20,13 +20,13 @@
 
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -66,8 +66,8 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600, null, null);
 
-		assertEquals("number of nodes wrong.", 4, path.nodes.size());
-		assertEquals("number of links wrong.", 3, path.links.size());
+		assertEquals(4, path.nodes.size(), "number of nodes wrong.");
+		assertEquals(3, path.links.size(), "number of links wrong.");
 		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(0));
 		assertEquals(network.getNodes().get(Id.create("13", Node.class)), path.nodes.get(1));
 		assertEquals(network.getNodes().get(Id.create("14", Node.class)), path.nodes.get(2));
@@ -87,8 +87,8 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600, null, null);
 
-		assertEquals("number of nodes wrong.", 1, path.nodes.size());
-		assertEquals("number of links wrong.", 0, path.links.size());
+		assertEquals(1, path.nodes.size(), "number of nodes wrong.");
+		assertEquals(0, path.links.size(), "number of links wrong.");
 		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(0));
 	}
 

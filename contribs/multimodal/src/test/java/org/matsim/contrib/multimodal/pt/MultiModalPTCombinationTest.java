@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -130,13 +130,13 @@ public class MultiModalPTCombinationTest {
 		 * "home-transit_walk-pt_interact-pt-pt_interact-transit_walk-home"
 		 */
 		Plan ptPlan = ptPerson.getSelectedPlan();
-		Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
+		Assertions.assertEquals(7, ptPlan.getPlanElements().size(), ptPlan.getPlanElements().toString());
 
 		Plan walkPlan = walkPerson.getSelectedPlan();
 		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			Assert.assertEquals(walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
+			Assertions.assertEquals(7, walkPlan.getPlanElements().size(), walkPlan.getPlanElements().toString());
 		} else {
-			Assert.assertEquals(walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());
+			Assertions.assertEquals(3, walkPlan.getPlanElements().size(), walkPlan.getPlanElements().toString());
 		}
 
 		/*
@@ -203,7 +203,7 @@ public class MultiModalPTCombinationTest {
 			}
 
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(driverId)));
+			Assertions.assertEquals(true, link.getAllowedModes().contains(this.modes.get(driverId)));
 
 			String mode = this.modes.get(driverId);
 			int count = this.leftCountPerMode.get(mode);

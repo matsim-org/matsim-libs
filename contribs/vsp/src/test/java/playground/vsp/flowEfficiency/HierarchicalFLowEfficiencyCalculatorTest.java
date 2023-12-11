@@ -1,8 +1,8 @@
 package playground.vsp.flowEfficiency;
 
 import com.google.inject.Provides;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -68,17 +68,17 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 	@Test
 	void testThatDrtAVMoveFaster(){
 
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(260)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
+		Assertions.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
+		Assertions.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));
+		Assertions.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(260)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
 
-		Assert.assertEquals(7238, handler.lastArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON); //car drivers
-		Assert.assertEquals(1845, handler.lastArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON); //drt drivers
-		Assert.assertEquals(5440, handler.lastArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON); //mixed (car - drt -car - drt - ....)
+		Assertions.assertEquals(7238, handler.lastArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON); //car drivers
+		Assertions.assertEquals(1845, handler.lastArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON); //drt drivers
+		Assertions.assertEquals(5440, handler.lastArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON); //mixed (car - drt -car - drt - ....)
 
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON);
 
 	}
 

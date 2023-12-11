@@ -20,7 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,8 +78,8 @@ public class TransitRouteTest {
 		stops.add(stop);
 
 		TransitRoute tRoute = createTransitRoute(id, route, stops, "train");
-		assertEquals("wrong id.", id.toString(), tRoute.getId().toString());
-		assertEquals("wrong route.", route, tRoute.getRoute());
+		assertEquals(id.toString(), tRoute.getId().toString(), "wrong id.");
+		assertEquals(route, tRoute.getRoute(), "wrong route.");
 		assertEquals(stops.size(), tRoute.getStops().size());
 		assertEquals(stop, tRoute.getStops().get(0));
 		assertEquals("train", tRoute.getTransportMode());

@@ -24,7 +24,7 @@
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +47,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
- public class AbstractQSimModuleTest {
+	public class AbstractQSimModuleTest {
 	 @Test
 	 void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
@@ -74,10 +74,10 @@ import com.google.inject.Injector;
 
 		Injector injector = Guice.createInjector(composite);
 
-		Assert.assertTrue(config.getModules().containsKey("testA"));
-		Assert.assertTrue(config.getModules().containsKey("testB"));
+		Assertions.assertTrue(config.getModules().containsKey("testA"));
+		Assertions.assertTrue(config.getModules().containsKey("testB"));
 
-		Assert.assertEquals("testBString", injector.getInstance(String.class));
+		Assertions.assertEquals("testBString", injector.getInstance(String.class));
 	}
 
 	 @Test
@@ -101,7 +101,7 @@ import com.google.inject.Injector;
 		controler.addOverridingQSimModule(new TestQSimModule(value));
 		controler.run();
 
-		Assert.assertTrue(value.get() > 0);
+		Assertions.assertTrue(value.get() > 0);
 	}
 
 	 @Test
@@ -127,8 +127,8 @@ import com.google.inject.Injector;
 		controler.addOverridingQSimModule(new TestQSimModule(value2));
 		controler.run();
 
-		Assert.assertTrue(value1.get() == 0);
-		Assert.assertTrue(value2.get() > 0);
+		Assertions.assertTrue(value1.get() == 0);
+		Assertions.assertTrue(value2.get() > 0);
 	}
 
 	private class TestQSimModule extends AbstractQSimModule {
@@ -187,7 +187,7 @@ import com.google.inject.Injector;
 
 		controler.run();
 
-		Assert.assertTrue(engine.called);
+		Assertions.assertTrue(engine.called);
 	}
 
 	static private class TestEngine implements MobsimEngine {

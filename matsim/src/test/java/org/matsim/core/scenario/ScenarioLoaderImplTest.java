@@ -20,7 +20,7 @@
 package org.matsim.core.scenario;
 
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -55,18 +55,18 @@ public class ScenarioLoaderImplTest {
 			ScenarioBuilder builder = new ScenarioBuilder(ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
 			// facilities is there by default????
 			Scenario scenario = builder.build() ;
-			Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
-			Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
+			Assertions.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
+			Assertions.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
 			ScenarioUtils.loadScenario(scenario);
-			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
-			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+			Assertions.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+			Assertions.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
 		}
 
 		// load directly:
 		{
 			Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
-			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
-			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+			Assertions.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+			Assertions.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
 		}
 	}
 
@@ -79,7 +79,7 @@ public class ScenarioLoaderImplTest {
 		Population population = scenario.getPopulation();
 		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
 		Gbl.assertNotNull( person );
-		Assert.assertEquals("world", person.getAttributes().getAttribute( "hello" ) );
+		Assertions.assertEquals("world", person.getAttributes().getAttribute( "hello" ) );
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class ScenarioLoaderImplTest {
 			// expected exception
 			caughtException = true ;
 		}
-		Assert.assertTrue( caughtException );
+		Assertions.assertTrue( caughtException );
 	}
 
 
@@ -104,12 +104,12 @@ public class ScenarioLoaderImplTest {
 		config.facilities().setInsistingOnUsingDeprecatedFacilitiesAttributeFile(true);
 		config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(
-				"unexpected attribute value",
+		Assertions.assertEquals(
 				"world",
 				FacilitiesUtils.getFacilityAttribute(
 						scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)),
-						"hello"));
+						"hello"),
+				"unexpected attribute value");
 	}
 
 	@Test
@@ -118,12 +118,12 @@ public class ScenarioLoaderImplTest {
 		config.households().addParam("inputHouseholdAttributesFile", "householdAttributes.xml");
 		config.households().setInsistingOnUsingDeprecatedHouseholdsAttributeFile(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(
-				"unexpected attribute value",
+		Assertions.assertEquals(
 				"world",
 				HouseholdUtils.getHouseholdAttribute(
 						scenario.getHouseholds().getHouseholds().get(Id.create(1, Household.class)),
-						"hello"));
+						"hello"),
+				"unexpected attribute value");
 
 	}
 }

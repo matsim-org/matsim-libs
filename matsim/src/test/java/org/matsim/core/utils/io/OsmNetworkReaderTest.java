@@ -19,7 +19,7 @@
 
 package org.matsim.core.utils.io;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -54,12 +54,12 @@ public class OsmNetworkReaderTest {
 
 		new OsmNetworkReader(net,ct).parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 399, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 872, net.getLinks().size());
+		Assertions.assertEquals(399, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(872, net.getLinks().size(), "number of links is wrong.");
 
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 344, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 794, net.getLinks().size());
+		Assertions.assertEquals(344, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(794, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
@@ -75,12 +75,12 @@ public class OsmNetworkReaderTest {
 		reader.setKeepPaths(true);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3535, net.getLinks().size());
+		Assertions.assertEquals(1844, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3535, net.getLinks().size(), "number of links is wrong.");
 
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3168, net.getLinks().size());
+		Assertions.assertEquals(1561, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3168, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
@@ -97,12 +97,12 @@ public class OsmNetworkReaderTest {
 		reader.setMemoryOptimization(true);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3535, net.getLinks().size());
+		Assertions.assertEquals(1844, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3535, net.getLinks().size(), "number of links is wrong.");
 
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3168, net.getLinks().size());
+		Assertions.assertEquals(1561, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3168, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
@@ -119,11 +119,11 @@ public class OsmNetworkReaderTest {
 		reader.setMemoryOptimization(false);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 67, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 122, net.getLinks().size());
+		Assertions.assertEquals(67, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(122, net.getLinks().size(), "number of links is wrong.");
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 57, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 114, net.getLinks().size());
+		Assertions.assertEquals(57, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(114, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
@@ -140,11 +140,11 @@ public class OsmNetworkReaderTest {
 		reader.setMemoryOptimization(true);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 67, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 122, net.getLinks().size());
+		Assertions.assertEquals(67, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(122, net.getLinks().size(), "number of links is wrong.");
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 57, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 114, net.getLinks().size());
+		Assertions.assertEquals(57, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(114, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
@@ -161,11 +161,11 @@ public class OsmNetworkReaderTest {
 		reader.setHierarchyLayer(47.4, 8.5, 47.2, 8.6, 5);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 769, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 1016, net.getLinks().size());
+		Assertions.assertEquals(769, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(1016, net.getLinks().size(), "number of links is wrong.");
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 441, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 841, net.getLinks().size());
+		Assertions.assertEquals(441, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(841, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
@@ -195,8 +195,8 @@ public class OsmNetworkReaderTest {
 				"  </way>\n" +
 				"</osm>";
 		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
-		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getNodes().size());
-		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getLinks().size());
+		Assertions.assertEquals(0, net.getNodes().size(), "incomplete ways should not be converted.");
+		Assertions.assertEquals(0, net.getLinks().size(), "incomplete ways should not be converted.");
 	}
 
 	@Test
@@ -246,12 +246,12 @@ public class OsmNetworkReaderTest {
 		Link link1 = net.getLinks().get(Id.create("1", Link.class));
 		Link link3 = net.getLinks().get(Id.create("3", Link.class));
 		Link link5 = net.getLinks().get(Id.create("5", Link.class));
-		Assert.assertNotNull("Could not find converted link 1.", link1);
-		Assert.assertNotNull("Could not find converted link 3", link3);
-		Assert.assertNotNull("Could not find converted link 5", link5);
-		Assert.assertEquals(50.0/3.6, link1.getFreespeed(), 1e-8);
-		Assert.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
-		Assert.assertEquals(60.0/3.6, link5.getFreespeed(), 1e-8);
+		Assertions.assertNotNull(link1, "Could not find converted link 1.");
+		Assertions.assertNotNull(link3, "Could not find converted link 3");
+		Assertions.assertNotNull(link5, "Could not find converted link 5");
+		Assertions.assertEquals(50.0/3.6, link1.getFreespeed(), 1e-8);
+		Assertions.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
+		Assertions.assertEquals(60.0/3.6, link5.getFreespeed(), 1e-8);
 	}
 
 	/**
@@ -301,8 +301,8 @@ public class OsmNetworkReaderTest {
 
 		Link link1 = net.getLinks().get(Id.create("1", Link.class));
 		Link link3 = net.getLinks().get(Id.create("3", Link.class));
-		Assert.assertNotNull("Could not find converted link 1.", link1);
-		Assert.assertNotNull("Could not find converted link 3", link3);
-		Assert.assertNull(net.getLinks().get(Id.create("5", Link.class)));
+		Assertions.assertNotNull(link1, "Could not find converted link 1.");
+		Assertions.assertNotNull(link3, "Could not find converted link 3");
+		Assertions.assertNull(net.getLinks().get(Id.create("5", Link.class)));
 	}
 }

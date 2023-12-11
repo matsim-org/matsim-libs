@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.integration.invertednetworks;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.controler.Controler;
@@ -48,7 +48,7 @@ public class InvertedNetworkRoutingIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 
 
@@ -68,7 +68,7 @@ public class InvertedNetworkRoutingIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 
 	@Test
@@ -89,6 +89,6 @@ public class InvertedNetworkRoutingIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 }

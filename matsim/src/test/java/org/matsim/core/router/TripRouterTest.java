@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +64,9 @@ public class TripRouterTest {
 		TripRouter.insertTrip( plan , o , trip , d );
 
 		assertEquals(
-				"insertion did not produce the expected plan length!",
 				13,
-				plan.getPlanElements().size());
+				plan.getPlanElements().size(),
+				"insertion did not produce the expected plan length!");
 
 		int oldIndex = Integer.MIN_VALUE;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -80,8 +80,8 @@ public class TripRouterTest {
 			}
 
 			assertTrue(
-					"wrong inserted sequence: "+plan.getPlanElements(),
-					newIndex > oldIndex);
+					newIndex > oldIndex,
+					"wrong inserted sequence: "+plan.getPlanElements());
 			oldIndex = newIndex;
 		}
 	}
@@ -110,9 +110,9 @@ public class TripRouterTest {
 		TripRouter.insertTrip( plan , o , trip , d );
 
 		assertEquals(
-				"insertion did not produce the expected plan length!",
 				13,
-				plan.getPlanElements().size());
+				plan.getPlanElements().size(),
+				"insertion did not produce the expected plan length!");
 
 		int oldIndex = Integer.MIN_VALUE;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -126,8 +126,8 @@ public class TripRouterTest {
 			}
 
 			assertTrue(
-					"wrong inserted sequence: "+plan.getPlanElements(),
-					newIndex > oldIndex);
+					newIndex > oldIndex,
+					"wrong inserted sequence: "+plan.getPlanElements());
 			oldIndex = newIndex;
 		}
 	}
@@ -159,9 +159,9 @@ public class TripRouterTest {
 		trip.add( PopulationUtils.createLeg("4") );
 
 		assertEquals(
-				"wrong old trip",
 				expected,
-				TripRouter.insertTrip( plan , o , trip , d ) );
+				TripRouter.insertTrip( plan , o , trip , d ),
+				"wrong old trip" );
 	}
 
 	private static class EqualsActivity implements Activity {

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,11 +55,11 @@ public class LeastCostPathTreeTest {
 		printResults(arrivalTime, travelTime); // travel time = cost = (50s+50s) = 100s
 		// check route (visited nodes should be 1,2,4)
 		List<Id<Node>> spTimeVisitedNodes = getVisitedNodes(lcptTime, destination, "Travel Time");
-		Assert.assertTrue( containsNode(spTimeVisitedNodes, Id.create("2", Node.class)));
+		Assertions.assertTrue( containsNode(spTimeVisitedNodes, Id.create("2", Node.class)));
 		// check travel duration
-		Assert.assertTrue( travelTime == 100 );
+		Assertions.assertTrue( travelTime == 100 );
 		// check travel time
-		Assert.assertTrue( arrivalTime - departureTime == 100 );
+		Assertions.assertTrue( arrivalTime - departureTime == 100 );
 		
 		lcptDistance.calculate(this.scenario.getNetwork(), origin, departureTime);
 		double arrivalTimeTD  = lcptDistance.getTree().get( destination.getId() ).getTime();
@@ -67,11 +67,11 @@ public class LeastCostPathTreeTest {
 		printResults(arrivalTimeTD, travelDistance); // travel time = 1000s, cost = (50m+50m) = 100m
 		// check route ( visited nodes should be 1,3,4)
 		List<Id<Node>> spDistenceVisitedNodes = getVisitedNodes(lcptDistance, destination, "Travel Distance");
-		Assert.assertTrue( containsNode(spDistenceVisitedNodes, Id.create("3", Node.class)));
+		Assertions.assertTrue( containsNode(spDistenceVisitedNodes, Id.create("3", Node.class)));
 		// check travel distance
-		Assert.assertTrue( travelDistance == 100 );
+		Assertions.assertTrue( travelDistance == 100 );
 		// check travel time
-		Assert.assertTrue( arrivalTimeTD - departureTime == 1000 );
+		Assertions.assertTrue( arrivalTimeTD - departureTime == 1000 );
 	}
 	
 	private void printResults(double tt, double tc){

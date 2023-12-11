@@ -22,8 +22,8 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Plan;
@@ -98,13 +98,13 @@ public class FullExplorationVsCuttoffTest {
 			final double scoreFull = calcScore( fullResult );
 
 			// allow different results, as long as the scores are identical
-			Assert.assertEquals(
+			Assertions.assertEquals(
+					fastResult,
+					fullResult,
 					"different solutions with both exploration types."+
 					"          full score: "+scoreFull+
 					"          fast: "+scoreFast+
-					"          ",
-					fastResult,
-					fullResult);
+					"          ");
 			if ( fastResult == null ) countNull++;
 		}
 		count.printCounter();

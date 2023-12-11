@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -37,8 +39,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.List;
 import java.util.TreeMap;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author nagel
@@ -63,7 +63,7 @@ public class NetworkUtilsTest {
 
 		Network network = scenario.getNetwork() ;
 
-		Assert.assertTrue( NetworkUtils.isMultimodal( network ) );
+		Assertions.assertTrue( NetworkUtils.isMultimodal( network ) );
 
 	}
 
@@ -127,7 +127,7 @@ public class NetworkUtilsTest {
 
 			Link[] actuals = result.values().toArray( new Link[result.size()] ) ;
 			Link[] expecteds = {liNE,liE,liSE,liS,liSW,liW,liNW} ;
-			Assert.assertArrayEquals(expecteds, actuals);
+			Assertions.assertArrayEquals(expecteds, actuals);
 
 		}
 		log.info("===");
@@ -140,7 +140,7 @@ public class NetworkUtilsTest {
 			}
 			Link[] actuals = result.values().toArray( new Link[result.size()] ) ;
 			Link[] expecteds = {liSW,liW,liNW,liN,liNE,liE,liSE} ;
-			Assert.assertArrayEquals(expecteds, actuals);
+			Assertions.assertArrayEquals(expecteds, actuals);
 		}
 		log.info("===");
 	}

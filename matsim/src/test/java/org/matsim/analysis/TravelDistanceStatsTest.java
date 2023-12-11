@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -376,10 +376,12 @@ public class TravelDistanceStatsTest {
 					double avgLegvalue = (avglegdis > 0) ? Double.parseDouble(column[avglegdis]) : 0;
 					double avgTripvalue = (avgtripdis > 0) ? Double.parseDouble(column[avgtripdis]) : 0;
 
-					Assert.assertEquals("avg. Average Trip distance does not match", (legSum / totalTrip), avgTripvalue,
-							0);
-					Assert.assertEquals("avg. Average Leg distance does not match", (legSum / totalLeg), avgLegvalue,
-							0);
+					Assertions.assertEquals((legSum / totalTrip), avgTripvalue,
+							0,
+							"avg. Average Trip distance does not match");
+					Assertions.assertEquals((legSum / totalLeg), avgLegvalue,
+							0,
+							"avg. Average Leg distance does not match");
 
 					break;
 				}

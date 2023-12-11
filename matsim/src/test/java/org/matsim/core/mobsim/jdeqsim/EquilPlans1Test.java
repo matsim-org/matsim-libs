@@ -38,10 +38,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
- public class EquilPlans1Test extends AbstractJDEQSimTest {
+	public class EquilPlans1Test extends AbstractJDEQSimTest {
 
 	 @Test
 	 void test_EmptyCarRoute() {

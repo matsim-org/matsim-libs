@@ -23,7 +23,7 @@
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -49,7 +49,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.File;
 import java.net.URL;
 
- /**
+	/**
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
@@ -124,10 +124,10 @@ public class TransitScheduleReprojectionIOTest {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"No coordinates transform performed!",
+			Assertions.assertEquals(
 					transformation.transform(originalCoord),
-					internalCoord);
+					internalCoord,
+					"No coordinates transform performed!");
 		}
 
 		final Controler controler = new Controler( scenario );
@@ -144,10 +144,10 @@ public class TransitScheduleReprojectionIOTest {
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"coordinates were reprojected for dump",
+			Assertions.assertEquals(
 					internalCoord,
-					dumpedCoord);
+					dumpedCoord,
+					"coordinates were reprojected for dump");
 		}
 	}
 
@@ -196,16 +196,16 @@ public class TransitScheduleReprojectionIOTest {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"No coordinates transform performed!",
+			Assertions.assertEquals(
 					transformation.transform(originalCoord),
-					internalCoord);
+					internalCoord,
+					"No coordinates transform performed!");
 		}
 
-		Assert.assertEquals(
-				"wrong CRS information after loading",
+		Assertions.assertEquals(
 				TARGET_CRS,
-				ProjectionUtils.getCRS(scenario.getTransitSchedule()));
+				ProjectionUtils.getCRS(scenario.getTransitSchedule()),
+				"wrong CRS information after loading");
 
 		final Controler controler = new Controler( scenario );
 		controler.run();
@@ -221,29 +221,29 @@ public class TransitScheduleReprojectionIOTest {
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"coordinates were reprojected for dump",
+			Assertions.assertEquals(
 					internalCoord,
-					dumpedCoord);
+					dumpedCoord,
+					"coordinates were reprojected for dump");
 		}
 	}
 
 	private void assertCorrectlyReprojected(
 			final TransitSchedule originalSchedule,
 			final TransitSchedule transformedSchedule) {
-		Assert.assertEquals(
-				"unexpected number of stops",
+		Assertions.assertEquals(
 				originalSchedule.getFacilities().size(),
-				transformedSchedule.getFacilities().size() );
+				transformedSchedule.getFacilities().size(),
+				"unexpected number of stops" );
 
 		for ( Id<TransitStopFacility> stopId : originalSchedule.getFacilities().keySet() ) {
 			final Coord original = originalSchedule.getFacilities().get( stopId ).getCoord();
 			final Coord transformed = transformedSchedule.getFacilities().get( stopId ).getCoord();
 
-			Assert.assertEquals(
-					"wrong reprojected X value",
+			Assertions.assertEquals(
 					transformation.transform(original),
-					transformed);
+					transformed,
+					"wrong reprojected X value");
 		}
 	}
 

@@ -21,7 +21,7 @@ package org.matsim.contrib.minibus.routeProvider;
 
 import java.util.ArrayList;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -77,27 +77,27 @@ public class ComplexCircleScheduleProviderTest {
 
 		TransitLine line = prov.createTransitLineFromOperatorPlan(lineId, plan);
 
-		Assert.assertEquals("Transit line ids have to be the same", Id.create(lineId, TransitLine.class), line.getId());
+		Assertions.assertEquals(Id.create(lineId, TransitLine.class), line.getId(), "Transit line ids have to be the same");
 
 		for (TransitRoute route : line.getRoutes().values()) {
-			Assert.assertEquals("Route id have to be the same", Id.create(lineId + "-" + routeId, TransitRoute.class), route.getId());
-			Assert.assertEquals("Number of departures", 14.0, route.getDepartures().size(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(Id.create(lineId + "-" + routeId, TransitRoute.class), route.getId(), "Route id have to be the same");
+			Assertions.assertEquals(14.0, route.getDepartures().size(), MatsimTestUtils.EPSILON, "Number of departures");
 
 			// check links
-			Assert.assertEquals("Start link id has to be the same", refIds.get(0), route.getRoute().getStartLinkId());
+			Assertions.assertEquals(refIds.get(0), route.getRoute().getStartLinkId(), "Start link id has to be the same");
 
 			int i = 1;
 			for (Id<Link> linkId : route.getRoute().getLinkIds()) {
-				Assert.assertEquals("Route link ids have to be the same", refIds.get(i), linkId);
+				Assertions.assertEquals(refIds.get(i), linkId, "Route link ids have to be the same");
 				i++;
 			}
 
-			Assert.assertEquals("End link id has to be the same", refIds.get(refIds.size() - 1), route.getRoute().getEndLinkId());
+			Assertions.assertEquals(refIds.get(refIds.size() - 1), route.getRoute().getEndLinkId(), "End link id has to be the same");
 
 			// check stops
 			i = 0;
 			for (TransitRouteStop stop : route.getStops()) {
-				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId());
+				Assertions.assertEquals(Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId(), "Route stop ids have to be the same");
 				i++;
 			}
 		}
@@ -144,30 +144,30 @@ public class ComplexCircleScheduleProviderTest {
 
 		TransitLine line = prov.createTransitLineFromOperatorPlan(lineId, plan);
 
-		Assert.assertEquals("Transit line ids have to be the same", Id.create(lineId, TransitLine.class), line.getId());
+		Assertions.assertEquals(Id.create(lineId, TransitLine.class), line.getId(), "Transit line ids have to be the same");
 
 		for (TransitRoute route : line.getRoutes().values()) {
-			Assert.assertEquals("Route id have to be the same", Id.create(lineId + "-" + routeId, TransitRoute.class), route.getId());
+			Assertions.assertEquals(Id.create(lineId + "-" + routeId, TransitRoute.class), route.getId(), "Route id have to be the same");
 
 			// check links
-			Assert.assertEquals("Start link id has to be the same", refIds.get(0), route.getRoute().getStartLinkId());
+			Assertions.assertEquals(refIds.get(0), route.getRoute().getStartLinkId(), "Start link id has to be the same");
 
 			int i = 1;
 			for (Id<Link> linkId : route.getRoute().getLinkIds()) {
-				Assert.assertEquals("Route link ids have to be the same", refIds.get(i), linkId);
+				Assertions.assertEquals(refIds.get(i), linkId, "Route link ids have to be the same");
 				i++;
 			}
 
-			Assert.assertEquals("End link id has to be the same", refIds.get(refIds.size() - 1), route.getRoute().getEndLinkId());
+			Assertions.assertEquals(refIds.get(refIds.size() - 1), route.getRoute().getEndLinkId(), "End link id has to be the same");
 
 			// check stops
 			i = 0;
 			for (TransitRouteStop stop : route.getStops()) {
-				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId());
+				Assertions.assertEquals(Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId(), "Route stop ids have to be the same");
 				i++;
 			}
 
-			Assert.assertEquals("Number of departures", 11.0, route.getDepartures().size(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(11.0, route.getDepartures().size(), MatsimTestUtils.EPSILON, "Number of departures");
 		}
 	}
 
@@ -183,7 +183,7 @@ public class ComplexCircleScheduleProviderTest {
 		for (int i = 0; i < 5; i++) {
 			TransitStopFacility stop1 = prov.getRandomTransitStop(0);
 			TransitStopFacility stop2 = prov.getRandomTransitStop(0);
-			Assert.assertNotSame("Stop should not be the same", stop1.getId(), stop2.getId());
+			Assertions.assertNotSame(stop1.getId(), stop2.getId(), "Stop should not be the same");
 		}
 	}
 
@@ -198,6 +198,6 @@ public class ComplexCircleScheduleProviderTest {
 		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getDriverRestTime(), pC.getMode());
 		TransitLine line = prov.createEmptyLineFromOperator(lineId);
 
-		Assert.assertEquals("Transit line ids have to be the same", Id.create(lineId, TransitLine.class), line.getId());
+		Assertions.assertEquals(Id.create(lineId, TransitLine.class), line.getId(), "Transit line ids have to be the same");
 	}
 }

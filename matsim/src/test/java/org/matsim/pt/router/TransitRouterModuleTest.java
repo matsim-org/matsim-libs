@@ -2,7 +2,7 @@ package org.matsim.pt.router;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor;
 import com.google.inject.Injector;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.controler.AbstractModule;
@@ -37,7 +37,7 @@ public class TransitRouterModuleTest {
 		Injector injector = controler.getInjector();
 
 		TransitRouter router = injector.getInstance(TransitRouter.class);
-		Assert.assertEquals(SwissRailRaptor.class, router.getClass());
+		Assertions.assertEquals(SwissRailRaptor.class, router.getClass());
 	}
 
 	private static class DummyMobsim implements Mobsim {

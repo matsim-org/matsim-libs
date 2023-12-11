@@ -23,7 +23,7 @@ package org.matsim.core.replanning.modules;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -98,7 +98,7 @@ public class ChangeSingleLegModeTest {
 			Integer count = counter.get(leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
-		Assert.assertEquals(0, counter.get("car").intValue());
+		Assertions.assertEquals(0, counter.get("car").intValue());
 	}
 
 	private void runTest(final ChangeSingleLegMode module, final String[] possibleModes, final int nOfTries) {
@@ -117,13 +117,13 @@ public class ChangeSingleLegModeTest {
 		for (int i = 0; i < nOfTries; i++) {
 			module.handlePlan(plan);
 			Integer count = counter.get(leg.getMode());
-			Assert.assertNotNull("unexpected mode: " + leg.getMode(), count);
+			Assertions.assertNotNull(count, "unexpected mode: " + leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
 		for (Map.Entry<String, Integer> entry : counter.entrySet()) {
 			int count = entry.getValue().intValue();
-			Assert.assertTrue("mode " + entry.getKey() + " was never chosen.", count > 0);
+			Assertions.assertTrue(count > 0, "mode " + entry.getKey() + " was never chosen.");
 		}
 	}
 }

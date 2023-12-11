@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
@@ -54,8 +54,8 @@ public class TestHbefaVehicleAttributes {
 
 		String assertErrorMessage = "These hbefa vehicle attribute objects should have been the same: ";
 		assertErrorMessage += normal.toString() + " and " + compare.toString();
-		Assert.assertEquals(assertErrorMessage, normal, compare);
-		Assert.assertEquals(assertErrorMessage, compare, normal);
+		Assertions.assertEquals(normal, compare, assertErrorMessage);
+		Assertions.assertEquals(compare, normal, assertErrorMessage);
 
 	}
 
@@ -74,8 +74,8 @@ public class TestHbefaVehicleAttributes {
 		differentValues.setHbefaTechnology(technology);
 		assertErrorMessage = "These hbefa vehicle attribute objects should not have been the same: ";
 		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
-		Assert.assertNotEquals(assertErrorMessage, normal, differentValues);
-		Assert.assertNotEquals(assertErrorMessage, differentValues, normal);
+		Assertions.assertNotEquals(normal, differentValues, assertErrorMessage);
+		Assertions.assertNotEquals(differentValues, normal, assertErrorMessage);
 	}
 
 	@Test
@@ -92,8 +92,8 @@ public class TestHbefaVehicleAttributes {
 		differentValues.setHbefaTechnology(technology);
 		assertErrorMessage = "These hbefa vehicle attribute objects should not have been the same: ";
 		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
-		Assert.assertNotEquals(assertErrorMessage, normal, differentValues);
-		Assert.assertNotEquals(assertErrorMessage, differentValues, normal);
+		Assertions.assertNotEquals(normal, differentValues, assertErrorMessage);
+		Assertions.assertNotEquals(differentValues, normal, assertErrorMessage);
 
 	}
 
@@ -111,8 +111,8 @@ public class TestHbefaVehicleAttributes {
 		differentValues.setHbefaTechnology("other technology");
 		assertErrorMessage = "These hbefa vehicle attribute objects should not have been the same: ";
 		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
-		Assert.assertNotEquals(assertErrorMessage, normal, differentValues);
-		Assert.assertNotEquals(assertErrorMessage, differentValues, normal);
+		Assertions.assertNotEquals(normal, differentValues, assertErrorMessage);
+		Assertions.assertNotEquals(differentValues, normal, assertErrorMessage);
 
 	}
 
@@ -131,13 +131,13 @@ public class TestHbefaVehicleAttributes {
 		noEmConcept.setHbefaSizeClass(sizeClass);
 		noEmConcept.setHbefaTechnology(technology);
 		message = "no em concept was set, therefore " + normal.getHbefaEmConcept() + " should not equal " + noEmConcept.getHbefaEmConcept();
-		Assert.assertNotEquals(message, noEmConcept, normal);
-		Assert.assertNotEquals(message, normal, noEmConcept);
+		Assertions.assertNotEquals(noEmConcept, normal, message);
+		Assertions.assertNotEquals(normal, noEmConcept, message);
 
 		normal.setHbefaEmConcept("average");
 		message = "no em concept was set, therefore " + noEmConcept.getHbefaEmConcept() + "should be set to 'average'";
-		Assert.assertEquals(message, noEmConcept, normal);
-		Assert.assertEquals(message, normal, noEmConcept);
+		Assertions.assertEquals(noEmConcept, normal, message);
+		Assertions.assertEquals(normal, noEmConcept, message);
 	}
 
 
@@ -153,15 +153,15 @@ public class TestHbefaVehicleAttributes {
 		noTechnology.setHbefaEmConcept(concept);
 		noTechnology.setHbefaSizeClass(sizeClass);
 		message = "no technology was set, therefore " + normal.getHbefaTechnology() + " should not equal " + noTechnology.getHbefaTechnology();
-		Assert.assertNotEquals(message, noTechnology, normal);
-		Assert.assertNotEquals(message, normal, noTechnology);
+		Assertions.assertNotEquals(noTechnology, normal, message);
+		Assertions.assertNotEquals(normal, noTechnology, message);
 
 		//set the hbefa technology of the normal vehicle attributes to 'average'
 		//then noTechnology is equal to normal
 		normal.setHbefaTechnology("average");
 		message = "no em concept was set, therefore " + noTechnology.getHbefaEmConcept() + "should be set to 'average'";
-		Assert.assertEquals(message, noTechnology, normal);
-		Assert.assertEquals(message, normal, noTechnology);
+		Assertions.assertEquals(noTechnology, normal, message);
+		Assertions.assertEquals(normal, noTechnology, message);
 
 	}
 
@@ -178,13 +178,13 @@ public class TestHbefaVehicleAttributes {
 		noSize.setHbefaEmConcept(concept);
 		noSize.setHbefaTechnology(technology);
 		message = "no size class was set, therefore " + normal.getHbefaSizeClass() + " should not equal " + noSize.getHbefaSizeClass();
-		Assert.assertNotEquals(message, noSize, normal);
-		Assert.assertNotEquals(message, normal, noSize);
+		Assertions.assertNotEquals(noSize, normal, message);
+		Assertions.assertNotEquals(normal, noSize, message);
 
 		normal.setHbefaSizeClass("average");
 		message = "no size class was set, therefore " + noSize.getHbefaEmConcept() + "should be set to 'average'";
-		Assert.assertEquals(message, noSize, normal);
-		Assert.assertEquals(message, normal, noSize);
+		Assertions.assertEquals(noSize, normal, message);
+		Assertions.assertEquals(normal, noSize, message);
 
 	}
 

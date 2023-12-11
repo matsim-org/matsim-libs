@@ -20,7 +20,7 @@
 
 package org.matsim.pt.config;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.Set;

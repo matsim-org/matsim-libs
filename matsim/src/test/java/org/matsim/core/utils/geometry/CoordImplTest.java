@@ -21,7 +21,7 @@ package org.matsim.core.utils.geometry;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
@@ -62,6 +62,6 @@ public class CoordImplTest {
 			lastValue = hc;
 		}
 
-		Assert.assertEquals("There has been a hashCode collision, which is undesired!", hashCodes.length, cnt);
+		Assertions.assertEquals(hashCodes.length, cnt, "There has been a hashCode collision, which is undesired!");
 	}
 }

@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -128,7 +128,7 @@ public class TestColdEmissionAnalysisModule {
 			} catch (Exception e) {
 				excep = true;
 			}
-			Assert.assertTrue(message, excep);
+			Assertions.assertTrue(excep, message);
 			excep = false;
 		}
 
@@ -154,7 +154,7 @@ public class TestColdEmissionAnalysisModule {
 
 		String message = "The expected emissions for an emissions event with vehicle information string '" + vehInfo11 + "' are " +
 						     numberOfColdEmissions * averageAverageFactor + " but were " + sumOfEmissions;
-		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, sumOfEmissions, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( numberOfColdEmissions * averageAverageFactor, sumOfEmissions, MatsimTestUtils.EPSILON, message );
 		
 	}
 	

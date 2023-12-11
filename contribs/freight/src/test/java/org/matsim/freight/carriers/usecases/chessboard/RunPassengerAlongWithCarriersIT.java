@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
@@ -44,7 +44,7 @@ public class RunPassengerAlongWithCarriersIT {
             abc.run();
         } catch (Exception ee ) {
             ee.printStackTrace();
-            Assert.fail("something went wrong: " + ee.getMessage());
+            Assertions.fail("something went wrong: " + ee.getMessage());
         }
     }
 

@@ -22,8 +22,8 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
 import java.util.ArrayList;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -107,7 +107,7 @@ public class RouteDesignScoringManagerTest {
 		double actual = manager1.scoreRouteDesign(pPlan1);
 		// 6 stop->stop distances of 10 units each in the stops (not stopsToBeServed)
 		double expected = -1 * ((6 * 10 / (10 * Math.sqrt(2))) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 		
 		/* option StopListToEvaluate.pPlanStopsToBeServed */
 		stop2stopVsBeeline.setStopListToEvaluate(StopListToEvaluate.pPlanStopsToBeServed);
@@ -117,7 +117,7 @@ public class RouteDesignScoringManagerTest {
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// 4 stop->stop distances of 10 units each in the stops
 		expected = -1 * ((4 * 10 / (10 * Math.sqrt(2))) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 		
 		pConfig.removeRouteDesignScoreParams(RouteDesignScoreFunctionName.stop2StopVsBeelinePenalty);
 		
@@ -135,7 +135,7 @@ public class RouteDesignScoringManagerTest {
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// x=[-10,10], y=[0,10] -> 20 X 10
 		expected = -1 * ((20 * 10 / (10 * Math.sqrt(2))) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 		
 		/* option StopListToEvaluate.pPlanStopsToBeServed */
 		areaVsBeeline.setStopListToEvaluate(StopListToEvaluate.pPlanStopsToBeServed);
@@ -145,7 +145,7 @@ public class RouteDesignScoringManagerTest {
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// x=[0,10], y=[0,10] -> 10 X 10
 		expected = -1 * ((10 * 10 / (10 * Math.sqrt(2))) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 		
 		/* check summing up of both */
 		pConfig.addRouteDesignScoreParams(stop2stopVsBeeline);
@@ -155,7 +155,7 @@ public class RouteDesignScoringManagerTest {
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// x=[0,10], y=[0,10] -> 10 X 10 ; 4 stop->stop distances of 10 units each in the stops
 		expected = -1 * ((10 * 10 / (10 * Math.sqrt(2))) - 1) + (-1) * ((4 * 10 / (10 * Math.sqrt(2))) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 		
 		/* Check route with only two stops */
 		stopsToBeServed = new ArrayList<>();
@@ -181,7 +181,7 @@ public class RouteDesignScoringManagerTest {
 		actual = manager1.scoreRouteDesign(pPlan2);
 		// would be positive
 		expected = -1;
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 		
 		/* check that no subsidy emerges (no positive route design score) */
 		// high valueToStartScoring -> all scores below would be positive, check that they are capped at 0
@@ -205,7 +205,7 @@ public class RouteDesignScoringManagerTest {
 		actual = manager1.scoreRouteDesign(pPlan3);
 		// would be positive
 		expected = 0;
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 	}
 	
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {

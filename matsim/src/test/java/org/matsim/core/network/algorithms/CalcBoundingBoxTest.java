@@ -19,7 +19,7 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,10 +64,10 @@ public class CalcBoundingBoxTest {
 
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(net);
-		Assert.assertEquals(100, bbox.getMinX(), 1e-9);
-		Assert.assertEquals(600, bbox.getMaxX(), 1e-9);
-		Assert.assertEquals(200, bbox.getMinY(), 1e-9);
-		Assert.assertEquals(700, bbox.getMaxY(), 1e-9);
+		Assertions.assertEquals(100, bbox.getMinX(), 1e-9);
+		Assertions.assertEquals(600, bbox.getMaxX(), 1e-9);
+		Assertions.assertEquals(200, bbox.getMinY(), 1e-9);
+		Assertions.assertEquals(700, bbox.getMaxY(), 1e-9);
 	}
 
 	@Test
@@ -110,9 +110,9 @@ public class CalcBoundingBoxTest {
 
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(net);
-		Assert.assertEquals(-600, bbox.getMinX(), 1e-9);
-		Assert.assertEquals(-100, bbox.getMaxX(), 1e-9);
-		Assert.assertEquals(-700, bbox.getMinY(), 1e-9);
-		Assert.assertEquals(-200, bbox.getMaxY(), 1e-9);
+		Assertions.assertEquals(-600, bbox.getMinX(), 1e-9);
+		Assertions.assertEquals(-100, bbox.getMaxX(), 1e-9);
+		Assertions.assertEquals(-700, bbox.getMinY(), 1e-9);
+		Assertions.assertEquals(-200, bbox.getMaxY(), 1e-9);
 	}
 }

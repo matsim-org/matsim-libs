@@ -20,14 +20,14 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -225,7 +225,7 @@ public class NetworkUtilsTest {
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
-		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertFalse(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -235,7 +235,7 @@ public class NetworkUtilsTest {
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("walk"));
 		}
-		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertFalse(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -245,7 +245,7 @@ public class NetworkUtilsTest {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[3].setAllowedModes(CollectionUtils.stringToSet("car,bike"));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -255,7 +255,7 @@ public class NetworkUtilsTest {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[2].setAllowedModes(CollectionUtils.stringToSet("bike"));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -265,7 +265,7 @@ public class NetworkUtilsTest {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[2].setAllowedModes(CollectionUtils.stringToSet("bike,walk"));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -274,7 +274,7 @@ public class NetworkUtilsTest {
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet(""));
 		}
-		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertFalse(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -284,7 +284,7 @@ public class NetworkUtilsTest {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[2].setAllowedModes(CollectionUtils.stringToSet(""));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
@@ -296,11 +296,11 @@ public class NetworkUtilsTest {
 		Link link1 = net.getLinks().get(Id.create(1, Link.class));
 		Link link2 = net.getLinks().get(Id.create(2, Link.class));
 		
-		Assert.assertEquals(link1, NetworkUtils.getConnectingLink(node1, node2));
-		Assert.assertEquals(link2, NetworkUtils.getConnectingLink(node2, node3));
-		Assert.assertNull(NetworkUtils.getConnectingLink(node1, node3)); // skip one node
-		Assert.assertNull(NetworkUtils.getConnectingLink(node3, node2)); // backwards
-		Assert.assertNull(NetworkUtils.getConnectingLink(node2, node1)); // backwards
+		Assertions.assertEquals(link1, NetworkUtils.getConnectingLink(node1, node2));
+		Assertions.assertEquals(link2, NetworkUtils.getConnectingLink(node2, node3));
+		Assertions.assertNull(NetworkUtils.getConnectingLink(node1, node3)); // skip one node
+		Assertions.assertNull(NetworkUtils.getConnectingLink(node3, node2)); // backwards
+		Assertions.assertNull(NetworkUtils.getConnectingLink(node2, node1)); // backwards
 	}
 	
 	private static class PseudoLink extends FakeLink {

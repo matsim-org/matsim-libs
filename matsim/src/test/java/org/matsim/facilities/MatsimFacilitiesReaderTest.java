@@ -23,7 +23,7 @@
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
- /**
+	/**
  * @author mrieser / Senozon AG
  */
 public class MatsimFacilitiesReaderTest {
@@ -72,16 +72,16 @@ public class MatsimFacilitiesReaderTest {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 		
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		Assert.assertEquals(3, facilities.getFacilities().size());
+		Assertions.assertEquals(3, facilities.getFacilities().size());
 		
 		ActivityFacility fac1 = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
-		Assert.assertEquals(Id.create("Aa", Link.class), fac1.getLinkId());
+		Assertions.assertEquals(Id.create("Aa", Link.class), fac1.getLinkId());
 		
 		ActivityFacility fac10 = facilities.getFacilities().get(Id.create(10, ActivityFacility.class));
-		Assert.assertEquals(Id.create("Bb", Link.class), fac10.getLinkId());
+		Assertions.assertEquals(Id.create("Bb", Link.class), fac10.getLinkId());
 
 		ActivityFacility fac20 = facilities.getFacilities().get(Id.create(20, ActivityFacility.class));
-		Assert.assertNull(fac20.getLinkId());
+		Assertions.assertNull(fac20.getLinkId());
 	}
 
 	 @Test
@@ -120,17 +120,17 @@ public class MatsimFacilitiesReaderTest {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		Assert.assertEquals(3, facilities.getFacilities().size());
+		Assertions.assertEquals(3, facilities.getFacilities().size());
 
 		ActivityFacility fac1 = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
-		Assert.assertTrue(fac1.getCoord().hasZ());
-		Assert.assertEquals(12.3, fac1.getCoord().getZ(), Double.MIN_NORMAL);
+		Assertions.assertTrue(fac1.getCoord().hasZ());
+		Assertions.assertEquals(12.3, fac1.getCoord().getZ(), Double.MIN_NORMAL);
 
 		ActivityFacility fac10 = facilities.getFacilities().get(Id.create(10, ActivityFacility.class));
-		Assert.assertTrue(fac10.getCoord().hasZ());
-		Assert.assertEquals(-4.2, fac10.getCoord().getZ(), Double.MIN_NORMAL);
+		Assertions.assertTrue(fac10.getCoord().hasZ());
+		Assertions.assertEquals(-4.2, fac10.getCoord().getZ(), Double.MIN_NORMAL);
 
 		ActivityFacility fac20 = facilities.getFacilities().get(Id.create(20, ActivityFacility.class));
-		Assert.assertFalse(fac20.getCoord().hasZ());
+		Assertions.assertFalse(fac20.getCoord().hasZ());
 	}
 }

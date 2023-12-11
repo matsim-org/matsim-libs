@@ -20,8 +20,8 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.List;
@@ -57,13 +57,13 @@ public class OutputDelegateTest {
 		new File(utils.getOutputDirectory() + "graphs").mkdir();
 		OutputDelegate outputDelegate=new OutputDelegate(utils.getOutputDirectory() + "graphs/");
 			outputDelegate.addSection(new Section("testOutPutAll"));
-			assertNotNull("No graph was created", sg.createChart(0));
+			assertNotNull(sg.createChart(0), "No graph was created");
 			outputDelegate.addCountsGraph(sg);
 			outputDelegate.outputHtml();
 
 		String filename = utils.getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
 			File fPng = new File(filename);
-			assertTrue("The png output file " + filename + " doesn't exist", fPng.exists());
-			assertTrue("The png output file " + filename + " is empty", fPng.length()>0.0);
+			assertTrue(fPng.exists(), "The png output file " + filename + " doesn't exist");
+			assertTrue(fPng.length()>0.0, "The png output file " + filename + " is empty");
 		}
 }

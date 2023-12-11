@@ -20,10 +20,10 @@
 
 package org.matsim.core.utils.geometry;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
@@ -153,20 +153,20 @@ public class CoordUtilsTest {
 		Coord coord1 = new Coord(3., 2.);
 
 		Coord result = CoordUtils.rotateToRight( coord1 ) ;
-		Assert.assertEquals(  2., result.getX(), MatsimTestUtils.EPSILON ) ;
-		Assert.assertEquals( -3., result.getY(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals(  2., result.getX(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals( -3., result.getY(), MatsimTestUtils.EPSILON ) ;
 
 		result = CoordUtils.rotateToRight( result ) ;
-		Assert.assertEquals( -3., result.getX(), MatsimTestUtils.EPSILON ) ;
-		Assert.assertEquals( -2., result.getY(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals( -3., result.getX(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals( -2., result.getY(), MatsimTestUtils.EPSILON ) ;
 
 		result = CoordUtils.rotateToRight( result ) ;
-		Assert.assertEquals( -2., result.getX(), MatsimTestUtils.EPSILON ) ;
-		 Assert.assertEquals( 3., result.getY(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals( -2., result.getX(), MatsimTestUtils.EPSILON ) ;
+		 Assertions.assertEquals( 3., result.getY(), MatsimTestUtils.EPSILON ) ;
 
 		result = CoordUtils.rotateToRight( result ) ;
-		Assert.assertEquals( coord1.getX(), result.getX(), MatsimTestUtils.EPSILON ) ;
-		Assert.assertEquals( coord1.getY(), result.getY(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals( coord1.getX(), result.getX(), MatsimTestUtils.EPSILON ) ;
+		Assertions.assertEquals( coord1.getY(), result.getY(), MatsimTestUtils.EPSILON ) ;
 	}
 
 	@Test

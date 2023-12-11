@@ -43,12 +43,12 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import jakarta.inject.Singleton;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestPositionEmissionModule {
 

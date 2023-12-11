@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,13 +73,13 @@ public class GroupPlanStrategyTest {
 				if ( PersonUtils.isSelected(plan) ) {
 					// new plan: selection status inverted
 					assertFalse(
-							"old plan still selected",
-							selectedPlans.contains( plan ));
+							selectedPlans.contains( plan ),
+							"old plan still selected");
 				}
 				else {
 					assertTrue(
-							"old plan still selected",
-							selectedPlans.contains( plan ));
+							selectedPlans.contains( plan ),
+							"old plan still selected");
 				}
 			}
 		}
@@ -100,9 +98,9 @@ public class GroupPlanStrategyTest {
 		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 
 		assertEquals(
-				"group size changed by strategy!",
 				groupSize,
-				group.getPersons().size());
+				group.getPersons().size(),
+				"group size changed by strategy!");
 	}
 
 	@Test
@@ -130,13 +128,13 @@ public class GroupPlanStrategyTest {
 		}
 
 		assertEquals(
-				"wrong number of selected plans in joint plans",
 				N_INITIALLY_INDIV_PLANS,
-				countSelectedJoint );
+				countSelectedJoint,
+				"wrong number of selected plans in joint plans" );
 		assertEquals(
-				"wrong number of selected plans in individual plans",
 				N_INITIALLY_JOINT_PLANS,
-				countSelectedIndiv );
+				countSelectedIndiv,
+				"wrong number of selected plans in individual plans" );
 	}
 
 	@Test
@@ -164,13 +162,13 @@ public class GroupPlanStrategyTest {
 		}
 
 		assertEquals(
-				"wrong number of non selected plans in joint plans",
 				N_INITIALLY_JOINT_PLANS,
-				countNonSelectedJoint );
+				countNonSelectedJoint,
+				"wrong number of non selected plans in joint plans" );
 		assertEquals(
-				"wrong number of non selected plans in individual plans",
 				N_INITIALLY_INDIV_PLANS,
-				countNonSelectedIndiv );
+				countNonSelectedIndiv,
+				"wrong number of non selected plans in individual plans" );
 	}
 
 	private ReplanningGroup createTestGroup(final JointPlans jointPlans) {

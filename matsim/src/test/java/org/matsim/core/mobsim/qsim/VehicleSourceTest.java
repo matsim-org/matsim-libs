@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -165,9 +165,9 @@ public class VehicleSourceTest {
 			}
 		}
 		if ( providingVehiclesInPerson ) {
-			Assert.assertFalse( expectedException );
+			Assertions.assertFalse( expectedException );
 		} else {
-			Assert.assertTrue( expectedException );
+			Assertions.assertTrue( expectedException );
 			return ;
 		}
 
@@ -189,12 +189,11 @@ public class VehicleSourceTest {
 
 		switch (this.vehiclesSource ) {
 			case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
-				Assert.assertEquals("Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
-						0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON, "Both car, bike are default vehicles (i.e. identical), thus should have same travel time.");
 				break;
 			case modeVehicleTypesFromVehiclesData:
 			case fromVehiclesData:
-				Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON, "Passing is not executed.");
 				break;
 			default:
 				throw new RuntimeException("not implemented yet.");

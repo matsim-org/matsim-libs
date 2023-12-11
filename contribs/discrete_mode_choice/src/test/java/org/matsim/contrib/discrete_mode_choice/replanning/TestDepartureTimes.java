@@ -1,7 +1,5 @@
 package org.matsim.contrib.discrete_mode_choice.replanning;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -9,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;

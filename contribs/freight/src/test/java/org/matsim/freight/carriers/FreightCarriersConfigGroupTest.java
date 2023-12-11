@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -43,11 +43,11 @@ public class FreightCarriersConfigGroupTest {
 		FreightCarriersConfigGroup freight = new FreightCarriersConfigGroup();
 		Map<String, String> params = freight.getParams();
 
-		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.CARRIERS_FILE));
-		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.CARRIERS_VEHICLE_TYPE));
-		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.VEHICLE_ROUTING_ALGORITHM));
-		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.TRAVEL_TIME_SLICE_WIDTH));
-		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.USE_DISTANCE_CONSTRAINT));
+		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.CARRIERS_FILE));
+		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.CARRIERS_VEHICLE_TYPE));
+		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.VEHICLE_ROUTING_ALGORITHM));
+		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.TRAVEL_TIME_SLICE_WIDTH));
+		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.USE_DISTANCE_CONSTRAINT));
 	}
 
 	@Test
@@ -71,11 +71,11 @@ public class FreightCarriersConfigGroupTest {
 
 		new ConfigReader(config).parse(is);
 
-		Assert.assertEquals("/path/to/carriers.xml", freight.getCarriersFile());
-		Assert.assertEquals("/path/to/carriersVehicleTypes.xml", freight.getCarriersVehicleTypesFile());
-		Assert.assertEquals("/path/to/carriersRoutingAlgorithm.xml", freight.getVehicleRoutingAlgorithmFile());
-		Assert.assertEquals(3600.0, freight.getTravelTimeSliceWidth(), 1e-8);
-		Assert.assertEquals(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption, freight.getUseDistanceConstraintForTourPlanning());
+		Assertions.assertEquals("/path/to/carriers.xml", freight.getCarriersFile());
+		Assertions.assertEquals("/path/to/carriersVehicleTypes.xml", freight.getCarriersVehicleTypesFile());
+		Assertions.assertEquals("/path/to/carriersRoutingAlgorithm.xml", freight.getVehicleRoutingAlgorithmFile());
+		Assertions.assertEquals(3600.0, freight.getTravelTimeSliceWidth(), 1e-8);
+		Assertions.assertEquals(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption, freight.getUseDistanceConstraintForTourPlanning());
 	}
 
 }

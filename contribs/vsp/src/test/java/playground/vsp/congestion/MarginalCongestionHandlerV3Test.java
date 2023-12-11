@@ -29,8 +29,7 @@ import java.util.Map;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -138,11 +137,11 @@ public class MarginalCongestionHandlerV3Test {
 		double outflowRate = 3.; // 1200 veh / h --> 1 veh every 3 sec
 		double inflowRate = 1.; // 1 veh every 1 sec
 		int demand = 20;
-		Assert.assertEquals("wrong total delay", (outflowRate - inflowRate) * (demand * demand - demand) / 2, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals((outflowRate - inflowRate) * (demand * demand - demand) / 2, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay");
 
 		// assert
-		Assert.assertEquals("wrong values for testAgent7", 38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong values for testAgent7", 12.0, personId2affectedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON, "wrong values for testAgent7");
+		Assertions.assertEquals(12.0, personId2affectedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON, "wrong values for testAgent7");
 		// ...
 	 }
 }

@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,6 +38,6 @@ public class CountsTest {
 	void testGetCounts() {
 		final Counts counts = new Counts();
 		counts.createAndAddCount(Id.create(0, Link.class), "1");
-		assertEquals("Getting counts failed", 1, counts.getCounts().size());
+		assertEquals(1, counts.getCounts().size(), "Getting counts failed");
 	}
 }

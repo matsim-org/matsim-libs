@@ -1,7 +1,5 @@
 package org.matsim.contrib.discrete_mode_choice;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,6 +8,8 @@ import java.util.Random;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanBuilder;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanTester;

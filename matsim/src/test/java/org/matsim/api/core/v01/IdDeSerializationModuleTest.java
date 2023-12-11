@@ -3,8 +3,8 @@ package org.matsim.api.core.v01;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.network.Link;
 
@@ -48,7 +48,7 @@ public class IdDeSerializationModuleTest {
 			throw new RuntimeException(e);
 		}
 		System.out.println(s);
-		Assert.assertEquals("{\"0\":\"a\",\"1\":\"b\"}", s);
+		Assertions.assertEquals("{\"0\":\"a\",\"1\":\"b\"}", s);
 
 		// deserialize
 		Map<Id<Link>, String> map1;
@@ -57,10 +57,10 @@ public class IdDeSerializationModuleTest {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-		Assert.assertEquals(map0, map1);
-		Assert.assertEquals(linkId0,
+		Assertions.assertEquals(map0, map1);
+		Assertions.assertEquals(linkId0,
 				map1.keySet().stream().filter(lId -> lId.equals(linkId0)).findFirst().orElseThrow());
-		Assert.assertSame(linkId0,
+		Assertions.assertSame(linkId0,
 				map1.keySet().stream().filter(lId -> lId.equals(linkId0)).findFirst().orElseThrow());
 	}
 
@@ -86,7 +86,7 @@ public class IdDeSerializationModuleTest {
 			throw new RuntimeException(e);
 		}
 		System.out.println(s);
-		Assert.assertEquals("{\"a\":\"0\",\"b\":\"1\"}", s);
+		Assertions.assertEquals("{\"a\":\"0\",\"b\":\"1\"}", s);
 
 		// deserialize
 		Map<String, Id<Link>> map1;
@@ -95,9 +95,9 @@ public class IdDeSerializationModuleTest {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-		Assert.assertEquals(map0, map1);
-		Assert.assertEquals(linkId0, map1.get("a"));
-		Assert.assertSame(linkId0, map1.get("a"));
+		Assertions.assertEquals(map0, map1);
+		Assertions.assertEquals(linkId0, map1.get("a"));
+		Assertions.assertSame(linkId0, map1.get("a"));
 	}
 
 }

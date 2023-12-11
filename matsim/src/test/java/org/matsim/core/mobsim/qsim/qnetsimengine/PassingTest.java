@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
 import jakarta.inject.Inject;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -119,9 +119,9 @@ public class PassingTest {
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		Assert.assertEquals("Wrong car travel time", 51, carTravelTime);
-		Assert.assertEquals("Wrong bike travel time", 201, bikeTravelTime);
-		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
+		Assertions.assertEquals(51, carTravelTime, "Wrong car travel time");
+		Assertions.assertEquals(201, bikeTravelTime, "Wrong bike travel time");
+		Assertions.assertEquals(150, bikeTravelTime-carTravelTime, "Passing is not implemented");
 
 	}
 

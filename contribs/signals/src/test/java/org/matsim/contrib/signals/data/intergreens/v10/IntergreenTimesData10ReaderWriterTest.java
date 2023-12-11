@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -88,22 +88,22 @@ public class IntergreenTimesData10ReaderWriterTest {
 	}
 
 	private void checkContent(IntergreenTimesData itd) {
-		Assert.assertNotNull(itd);
-		Assert.assertNotNull(itd.getIntergreensForSignalSystemDataMap());
-		Assert.assertEquals(2, itd.getIntergreensForSignalSystemDataMap().size());
+		Assertions.assertNotNull(itd);
+		Assertions.assertNotNull(itd.getIntergreensForSignalSystemDataMap());
+		Assertions.assertEquals(2, itd.getIntergreensForSignalSystemDataMap().size());
 		IntergreensForSignalSystemData ig23 = itd.getIntergreensForSignalSystemDataMap().get(systemId23);
-		Assert.assertNotNull(ig23);
-		Assert.assertEquals(Integer.valueOf(5), ig23.getIntergreenTime(groupId1, groupId2));
-		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId3));
-		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId4));
-		Assert.assertNull(ig23.getIntergreenTime(groupId2, groupId3));
+		Assertions.assertNotNull(ig23);
+		Assertions.assertEquals(Integer.valueOf(5), ig23.getIntergreenTime(groupId1, groupId2));
+		Assertions.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId3));
+		Assertions.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId4));
+		Assertions.assertNull(ig23.getIntergreenTime(groupId2, groupId3));
 
 		IntergreensForSignalSystemData ig42 = itd.getIntergreensForSignalSystemDataMap().get(systemId42);
-		Assert.assertNotNull(ig42);
-		Assert.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(groupId1, groupId2));
-		Assert.assertEquals(Integer.valueOf(3), ig42.getIntergreenTime(groupId2, groupId1));
-		Assert.assertNull(ig42.getIntergreenTime(groupId1, groupId3));
-		Assert.assertNull(ig42.getIntergreenTime(groupId1, groupId1));
+		Assertions.assertNotNull(ig42);
+		Assertions.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(groupId1, groupId2));
+		Assertions.assertEquals(Integer.valueOf(3), ig42.getIntergreenTime(groupId2, groupId1));
+		Assertions.assertNull(ig42.getIntergreenTime(groupId1, groupId3));
+		Assertions.assertNull(ig42.getIntergreenTime(groupId1, groupId1));
 	}
 
 }

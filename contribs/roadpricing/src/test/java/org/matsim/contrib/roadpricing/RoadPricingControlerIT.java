@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -73,7 +73,7 @@ public class RoadPricingControlerIT {
 		double scoreTollcase = controler2.getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
 
 		// there should be a score difference
-		Assert.assertEquals(3.0, scoreBasecase - scoreTollcase, MatsimTestUtils.EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
+		Assertions.assertEquals(3.0, scoreBasecase - scoreTollcase, MatsimTestUtils.EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
 	}
 
 }

@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -65,7 +65,7 @@ public class TransitScheduleWriterTest {
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV2(schedule2, new RouteFactories()).readFile(filename);
-		Assert.assertEquals(1, schedule2.getTransitLines().size());
+		Assertions.assertEquals(1, schedule2.getTransitLines().size());
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class TransitScheduleWriterTest {
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule2, new RouteFactories()).readFile(filename);
-		Assert.assertEquals(1, schedule2.getTransitLines().size());
-		Assert.assertEquals("Blue line", schedule2.getTransitLines().get(Id.create(1, TransitLine.class)).getName());
+		Assertions.assertEquals(1, schedule2.getTransitLines().size());
+		Assertions.assertEquals("Blue line", schedule2.getTransitLines().get(Id.create(1, TransitLine.class)).getName());
 	}
 }

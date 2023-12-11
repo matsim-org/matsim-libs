@@ -20,14 +20,14 @@
 
 package org.matsim.integration.always;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
