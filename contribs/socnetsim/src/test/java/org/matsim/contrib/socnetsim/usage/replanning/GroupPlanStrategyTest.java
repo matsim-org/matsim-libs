@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,6 +43,8 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.HighestScoreSumSelector;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author thibautd
@@ -212,7 +212,7 @@ public class GroupPlanStrategyTest {
 
 		return person;
 	}
-	
+
 	private static ReplanningContext createContext() {
 		return null;
 	}

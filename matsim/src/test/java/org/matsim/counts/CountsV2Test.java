@@ -1,6 +1,5 @@
 package org.matsim.counts;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,6 +21,7 @@ import java.util.Set;
 import java.util.SplittableRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CountsV2Test {
@@ -63,7 +63,7 @@ public class CountsV2Test {
 		Counts<Link> counts = new Counts<>();
 		CountsReaderMatsimV2 reader = new CountsReaderMatsimV2(counts, Link.class);
 
-		Assertions.assertThatNoException().isThrownBy(() -> reader.readFile(filename));
+		Assertions.assertDoesNotThrow(() -> reader.readFile(filename));
 
 		Map<Id<Link>, MeasurementLocation<Link>> countMap = counts.getMeasureLocations();
 		Assertions.assertEquals(21, countMap.size());

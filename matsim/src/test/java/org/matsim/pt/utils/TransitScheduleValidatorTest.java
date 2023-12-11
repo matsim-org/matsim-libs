@@ -21,7 +21,6 @@
 
 package org.matsim.pt.utils;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -39,6 +38,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TransitScheduleValidatorTest {
 
 	@Test
@@ -47,7 +48,7 @@ public class TransitScheduleValidatorTest {
 				ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(
 				scenario.getTransitSchedule(), scenario.getNetwork());
-		Assertions.assertThat(validationResult.getIssues()).isEmpty();
+		assertThat(validationResult.getIssues()).isEmpty();
 	}
 
 	@Test
@@ -65,7 +66,7 @@ public class TransitScheduleValidatorTest {
 				scenario.getTransitSchedule(), scenario.getNetwork());
 		System.out.println(validationResult);
 
-		Assertions.assertThat(validationResult.getIssues()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(validationResult.getIssues()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(new TransitScheduleValidator.ValidationResult.ValidationIssue<>(
 						TransitScheduleValidator.ValidationResult.Severity.ERROR,
 						"Transit line Blue Line, route 3to1: Stop 2b cannot be reached along network route.",

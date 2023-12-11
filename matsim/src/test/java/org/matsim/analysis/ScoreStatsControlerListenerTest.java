@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,6 +32,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Aravind
@@ -559,10 +560,10 @@ public class ScoreStatsControlerListenerTest {
 			iteration++;
 		}
 
-		Assertions.assertThat(new File(outDir, "scorestats_group1.csv"))
+		assertThat(new File(outDir, "scorestats_group1.csv"))
 			.isFile();
 
-		Assertions.assertThat(new File(outDir, "scorestats_group2.csv"))
+		assertThat(new File(outDir, "scorestats_group2.csv"))
 			.isFile();
 	}
 
