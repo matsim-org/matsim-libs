@@ -32,8 +32,8 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,10 +63,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author mrieser, michaz
  */
-@RunWith(Parameterized.class)
 public class ChooseRandomLegModeForSubtourTest {
-
-	private double probaForRandomSingleTripMode;
 
 	private static class AllowTheseModesForEveryone implements
 	PermissibleModesCalculator {
@@ -109,17 +106,9 @@ public class ChooseRandomLegModeForSubtourTest {
 			"1 2 2 3 2 2 2 1 4 1",
 	"1 2 3 4 3 1");
 
-	@Parameterized.Parameters(name = "{index}: probaForRandomSingleTripMode == {0}")
-	public static Collection<Object> createTests() {
-		return Arrays.asList(0., 0.5);
-	}
-	public ChooseRandomLegModeForSubtourTest( double proba ) {
-		this.probaForRandomSingleTripMode = proba ;
-	}
-
-
-	@Test
-	void testHandleEmptyPlan() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testHandleEmptyPlan(double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() , new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(),
 				SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -128,8 +117,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
-	@Test
-	void testHandlePlanWithoutLeg() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testHandlePlanWithoutLeg(double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(),
 				SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -140,40 +130,44 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 
-	@Test
-	void testSubTourMutationNetworkBased() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testSubTourMutationNetworkBased(double probaForRandomSingleTripMode) {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
-		this.testSubTourMutationToCar(network);
-		this.testSubTourMutationToPt(network);
-		this.testUnknownModeDoesntMutate(network);
+		this.testSubTourMutationToCar(network, probaForRandomSingleTripMode);
+		this.testSubTourMutationToPt(network, probaForRandomSingleTripMode);
+		this.testUnknownModeDoesntMutate(network, probaForRandomSingleTripMode);
 	}
 
-	@Test
-	void testSubTourMutationFacilitiesBased() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testSubTourMutationFacilitiesBased(double probaForRandomSingleTripMode) {
 		Config config = utils.loadConfig(CONFIGFILE);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFileURL(config.getContext()));
-		this.testSubTourMutationToCar(facilities);
-		this.testSubTourMutationToPt(facilities);
-		this.testUnknownModeDoesntMutate(facilities);
+		this.testSubTourMutationToCar(facilities, probaForRandomSingleTripMode);
+		this.testSubTourMutationToPt(facilities, probaForRandomSingleTripMode);
+		this.testUnknownModeDoesntMutate(facilities, probaForRandomSingleTripMode);
 	}
 
-	@Test
-	void testCarDoesntTeleportFromHome() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testCarDoesntTeleportFromHome(double probaForRandomSingleTripMode) {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
-		testCarDoesntTeleport(network, TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport(network, TransportMode.pt, TransportMode.car);
+		testCarDoesntTeleport(network, TransportMode.car, TransportMode.pt, probaForRandomSingleTripMode);
+		testCarDoesntTeleport(network, TransportMode.pt, TransportMode.car, probaForRandomSingleTripMode);
 	}
 
-	@Test
-	void testSingleTripSubtourHandling() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testSingleTripSubtourHandling(double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {"car", "pt", "walk"};
 
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -257,8 +251,9 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 
-	@Test
-	void testUnclosedSubtour() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testUnclosedSubtour(double probaForRandomSingleTripMode) {
 
 		String[] modes = new String[] {"car", "pt", "walk"};
 
@@ -287,7 +282,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 
-	private void testSubTourMutationToCar(Network network) {
+	private void testSubTourMutationToCar(Network network, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -303,7 +298,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testSubTourMutationToCar(ActivityFacilities facilities) {
+	private void testSubTourMutationToCar(ActivityFacilities facilities, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -319,7 +314,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testUnknownModeDoesntMutate(Network network) {
+	private void testUnknownModeDoesntMutate(Network network, double probaForRandomSingleTripMode) {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -334,7 +329,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testUnknownModeDoesntMutate(ActivityFacilities facilities) {
+	private void testUnknownModeDoesntMutate(ActivityFacilities facilities, double probaForRandomSingleTripMode) {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -349,7 +344,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testSubTourMutationToPt(ActivityFacilities facilities) {
+	private void testSubTourMutationToPt(ActivityFacilities facilities, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -365,7 +360,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testSubTourMutationToPt(Network network) {
+	private void testSubTourMutationToPt(Network network, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -381,7 +376,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testCarDoesntTeleport(Network network, String originalMode, String otherMode) {
+	private void testCarDoesntTeleport(Network network, String originalMode, String otherMode, double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
 
@@ -415,7 +410,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testCarDoesntTeleport(ActivityFacilities facilities, String originalMode, String otherMode) {
+	private void testCarDoesntTeleport(ActivityFacilities facilities, String originalMode, String otherMode, double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
 

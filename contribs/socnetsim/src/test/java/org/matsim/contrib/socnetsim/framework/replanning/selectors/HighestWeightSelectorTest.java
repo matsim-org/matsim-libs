@@ -21,24 +21,22 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -51,12 +49,9 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 /**
  * @author thibautd
  */
-@RunWith(Parameterized.class)
 public class HighestWeightSelectorTest {
 	private static final Logger log =
 		LogManager.getLogger(HighestWeightSelectorTest.class);
-
-	private final Fixture fixture;
 
 	public static class Fixture {
 		final String name;
@@ -85,29 +80,21 @@ public class HighestWeightSelectorTest {
 		}
 	}
 
-	// XXX the SAME instance is used for all tests!
-	// should ot be a problem, but this is contrary to the idea of "fixture"
-	public HighestWeightSelectorTest(final Fixture fixture) {
-		this.fixture = fixture;
-		log.info( "fixture "+fixture.name );
-	}
-
-	@Parameterized.Parameters
-	public static Collection<Fixture[]> fixtures() {
-		return Arrays.asList(
-				new Fixture[]{createIndividualPlans()},
-				new Fixture[]{createFullyJointPlans()},
-				new Fixture[]{createPartiallyJointPlansOneSelectedJp()},
-				new Fixture[]{createPartiallyJointPlansTwoSelectedJps()},
-				new Fixture[]{createPartiallyJointPlansMessOfJointPlans()},
-				new Fixture[]{createPartiallyJointPlansNoSelectedJp()},
-				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()},
-				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()},
-				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()},
-				new Fixture[]{createPlanWithDifferentSolutionIfBlocked()},
-				new Fixture[]{createPlanWithNoSolutionIfBlocked()},
-				new Fixture[]{createIndividualPlansWithSpecialForbidder()},
-				new Fixture[]{createDifferentForbidGroupsPerJointPlan()});
+	public static Stream<Fixture> arguments() {
+		return Stream.of(
+				createIndividualPlans(),
+				createFullyJointPlans(),
+				createPartiallyJointPlansOneSelectedJp(),
+				createPartiallyJointPlansTwoSelectedJps(),
+				createPartiallyJointPlansMessOfJointPlans(),
+				createPartiallyJointPlansNoSelectedJp(),
+				createOneBigJointPlanDifferentNPlansPerAgent(),
+				createOneBigJointPlanDifferentNPlansPerAgent2(),
+				createOneBigJointPlanDifferentNPlansPerAgentWithNullScores(),
+				createPlanWithDifferentSolutionIfBlocked(),
+				createPlanWithNoSolutionIfBlocked(),
+				createIndividualPlansWithSpecialForbidder(),
+				createDifferentForbidGroupsPerJointPlan());
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -1232,27 +1219,31 @@ public class HighestWeightSelectorTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// Tests
 	// /////////////////////////////////////////////////////////////////////////
-	@Test
-	void testSelectedPlansNonBlocking() throws Exception {
-		testSelectedPlans( false , false );
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSelectedPlansNonBlocking(Fixture fixture) throws Exception {
+		testSelectedPlans( fixture, false , false );
 	}
 
-	@Test
-	void testSelectedPlansForbidding() throws Exception {
-		testSelectedPlans( false , true );
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSelectedPlansForbidding(Fixture fixture) throws Exception {
+		testSelectedPlans( fixture, false , true );
 	}
 
-	@Test
-	void testSelectedPlansBlocking() throws Exception {
-		testSelectedPlans( true , false );
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSelectedPlansBlocking(Fixture fixture) throws Exception {
+		testSelectedPlans( fixture, true , false );
 	}
 
 	/**
 	 * Check that plans are not removed from the plans DB in the selection process,
 	 * particularly when pruning unplausible plans.
 	 */
-	@Test
-	void testNoSideEffects() throws Exception {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testNoSideEffects(Fixture fixture) throws Exception {
 		HighestScoreSumSelector selector =
 				new HighestScoreSumSelector(
 					new EmptyIncompatiblePlansIdentifierFactory(),
@@ -1282,6 +1273,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	private void testSelectedPlans(
+			Fixture fixture,
 			final boolean blocking,
 			final boolean forbidding) {
 		if ( blocking && forbidding ) throw new UnsupportedOperationException();

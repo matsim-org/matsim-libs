@@ -25,9 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -51,7 +50,6 @@ import org.matsim.pt.PtConstants;
  * as possible.
  * @author thibautd
  */
-@RunWith(Parameterized.class)
 public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	// transit_walk is not here but is in the fixtures: thus, pt trips are
 	// identified as "known mode" only if trip-level mode detection is done
@@ -60,8 +58,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	private static final String[] CHAIN_BASED_MODES = new String[]{TransportMode.car};
 
 	private static final String STAGE = PtConstants.TRANSIT_ACTIVITY_TYPE;
-	private final double probaForRandomSingleTripMode;
-	
+
 	// /////////////////////////////////////////////////////////////////////////
 	// Fixtures
 	// /////////////////////////////////////////////////////////////////////////
@@ -80,7 +77,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 				final Id<Link> id3 = Id.create( 3, Link.class );
 
 				final Plan plan = fact.createPlan();
-				
+
 				plan.addActivity( fact.createActivityFromLinkId( "h" , id1 ) );
 
 				plan.addLeg( fact.createLeg( TransportMode.transit_walk ) );
@@ -123,7 +120,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 				final Id<Link> id3 = Id.create( 3, Link.class );
 
 				final Plan plan = fact.createPlan();
-				
+
 				plan.addActivity( fact.createActivityFromLinkId( "h" , id1 ) );
 
 				for (int i =0; i < 2; i++) {
@@ -169,7 +166,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 				final Id<Link> id4 = Id.create( 4, Link.class );
 
 				final Plan plan = fact.createPlan();
-				
+
 				plan.addActivity( fact.createActivityFromLinkId( "h" , id1 ) );
 
 				plan.addLeg( fact.createLeg( TransportMode.transit_walk ) );
@@ -265,7 +262,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 				final Id<Link> id4 = Id.create( 4, Link.class );
 
 				final Plan plan = fact.createPlan();
-				
+
 				plan.addActivity( fact.createActivityFromLinkId( "h" , id1 ) );
 
 				plan.addLeg( fact.createLeg( TransportMode.car ) );
@@ -340,7 +337,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 				final Id<Link> id4 = Id.create( 4, Link.class );
 
 				final Plan plan = fact.createPlan();
-				
+
 				plan.addActivity( fact.createActivityFromLinkId( "sleep" , id1 ) );
 				plan.addActivity( fact.createActivityFromLinkId( "shower" , id1 ) );
 				plan.addActivity( fact.createActivityFromLinkId( "breakfast" , id1 ) );
@@ -450,17 +447,9 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
-	@Parameterized.Parameters(name = "{index}: probaForChooseRandomSingleTripMode == {0}")
-	public static Collection<Object> createTests() {
-		return Arrays.asList(0., 0.5);
-	}
-	public ChooseRandomLegModeForSubtourComplexTripsTest( double proba ) {
-		this.probaForRandomSingleTripMode = proba ;
-	}
-
-
-	@Test
-	void testMutatedTrips() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testMutatedTrips(double probaForRandomSingleTripMode) {
 		Config config = ConfigUtils.createConfig();
 		config.subtourModeChoice().setModes(MODES);
 		config.subtourModeChoice().setConsiderCarAvailability(false);
@@ -481,7 +470,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 				testee.run( plan );
 
 				final List<Trip> newTrips = TripStructureUtils.getTrips( plan );
-				
+
 				Assertions.assertEquals(
 						initNTrips,
 						newTrips.size(),

@@ -22,9 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,23 +57,10 @@ import java.util.*;
 
 /**
  * Tests that in congested part, walk (seep mode) can overtake (seep) car mode.
- * 
+ *
  */
-@RunWith(Parameterized.class)
 public class SeepageTest {
 	static private final Logger log = LogManager.getLogger( SeepageTest.class);
-
-	private final boolean isUsingFastCapacityUpdate;
-	
-	public SeepageTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-	
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
 
 	/**
 	 *  Two carAgents end act at time 948 and 949 sec and walkAgent ends act at 49 sec.
@@ -83,16 +69,17 @@ public class SeepageTest {
 	 *  WalkAgent joins queue at 1050 sec but leave link before second car at 1060 sec and thus blocking link for another 6 sec(flowCap*PCU)
 	 *  Thus, second car leaves link after walkAgent.
 	 */
-	@Test
-	void seepageOfWalkInCongestedRegime(){
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void seepageOfWalkInCongestedRegime(boolean isUsingFastCapacityUpdate){
 
 		SimpleNetwork net = new SimpleNetwork();
-		
+
 		Scenario sc = net.scenario;
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		sc.getConfig().qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		
+		sc.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
 		car.setMaximumVelocity(20);
@@ -136,7 +123,7 @@ public class SeepageTest {
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modesType.get(leg.getMode()));
 			sc.getVehicles().addVehicle(vehicle);
 		}
-		
+
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
@@ -152,7 +139,7 @@ public class SeepageTest {
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.createVehicleId("2"));
 		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.createVehicleId("1"));
 
-		int walkTravelTime = travelTime1.get(Id.createLinkId("2")).intValue(); 
+		int walkTravelTime = travelTime1.get(Id.createLinkId("2")).intValue();
 		int carTravelTime = travelTime2.get(Id.createLinkId("2")).intValue();
 
 //		if(this.isUsingFastCapacityUpdate) {
@@ -184,7 +171,7 @@ public class SeepageTest {
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ);
-			
+
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);

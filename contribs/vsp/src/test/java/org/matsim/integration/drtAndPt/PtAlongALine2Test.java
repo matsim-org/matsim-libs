@@ -64,7 +64,6 @@ import com.google.inject.Singleton;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 
-//@RunWith(Parameterized.class)
 public class PtAlongALine2Test {
 	private static final Logger log = LogManager.getLogger(PtAlongALine2Test.class);
 

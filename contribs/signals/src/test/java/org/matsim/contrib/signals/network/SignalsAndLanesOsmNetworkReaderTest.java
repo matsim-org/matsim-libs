@@ -10,14 +10,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,7 +59,6 @@ Some test cases for the OSM-Lane and Signal-Reader
  @author
  */
 
-@RunWith(Parameterized.class)
 public class SignalsAndLanesOsmNetworkReaderTest {
     private static final Logger log = LogManager.getLogger(SignalsAndLanesOsmNetworkReaderTest.class);
 
@@ -66,29 +66,18 @@ public class SignalsAndLanesOsmNetworkReaderTest {
     @RegisterExtension
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        Object[][] data = new Object[][]{{true, true, true},
-                {true, true, false},
-                {true, false, true},
-                {false, true, true},
-                {true, false, false},
-                {false, true, false},
-                {false, false, true},
-                {false, false, false},};
-        return Arrays.asList(data);
+    public static Stream<Arguments> arguments() {
+		return Stream.of(
+			Arguments.of(true, true, true),
+			Arguments.of(true, true, false),
+			Arguments.of(true, false, true),
+			Arguments.of(false, true, true),
+			Arguments.of(true, false, false),
+			Arguments.of(false, true, false),
+			Arguments.of(false, false, true),
+			Arguments.of(false, false, false)
+			);
     }
-
-    @Parameterized.Parameter
-    public boolean setMergeOnewaySignalSystems;
-    @Parameterized.Parameter(1)
-    public boolean setAllowUTurnAtLeftLaneOnly;
-    @Parameterized.Parameter(2)
-    public boolean setMakePedestrianSignals;
-
-
-
-
 
     private static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
@@ -177,8 +166,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 
 
 //    @SuppressWarnings("ConstantConditions")
-	@Test
-	void singleJunction(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void singleJunction(boolean setMergeOnewaySignalSystems, boolean setAllowUTurnAtLeftLaneOnly, boolean setMakePedestrianSignals){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -239,8 +229,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         Assertions.assertEquals(8, signals, "Assert number of Signals");
     }
 
-	@Test
-	void singleJunctionWithBoundingBox(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void singleJunctionWithBoundingBox(boolean setMergeOnewaySignalSystems, boolean setAllowUTurnAtLeftLaneOnly, boolean setMakePedestrianSignals){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -303,8 +294,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         Assertions.assertEquals(8, signals, "Assert number of Signals");
     }
 
-	@Test
-	void singleJunctionBadBoundingBox(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void singleJunctionBadBoundingBox(boolean setMergeOnewaySignalSystems, boolean setAllowUTurnAtLeftLaneOnly, boolean setMakePedestrianSignals){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -360,8 +352,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         }
     }
 
-	@Test
-	void berlinSnippet(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void berlinSnippet(boolean setMergeOnewaySignalSystems, boolean setAllowUTurnAtLeftLaneOnly, boolean setMakePedestrianSignals){
         Path inputfile = Paths.get(matsimTestUtils.getClassInputDirectory());
         inputfile = Paths.get(inputfile.toString(),"berlinSnippet.osm.gz");
 

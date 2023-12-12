@@ -28,8 +28,9 @@ import java.util.TreeMap;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,25 +73,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author tthunig
  *
  */
-@RunWith(Parameterized.class)
 public class NodeTransitionTest {
 
-	@Parameterized.Parameters(name = "{index}: useFastCapUpdate == {0};")
-	public static Collection<Object[]> parameterObjects() {
-		return Arrays.asList(new Object[][]{
-				{true},
-				{false}
-		});
-	}
-
-	private boolean useFastCapUpdate;
-
-	public NodeTransitionTest(boolean useFastCapUpdate) {
-		this.useFastCapUpdate = useFastCapUpdate;
-	}
-
-	@Test
-	void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -157,8 +144,9 @@ public class NodeTransitionTest {
 		Assertions.assertEquals(9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.9285714285714286
 	}
 
-	@Test
-	void testMergeSituationWithMoveVehByVehRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testMergeSituationWithMoveVehByVehRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -232,8 +220,9 @@ public class NodeTransitionTest {
 		Assertions.assertEquals(41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8571428571428571
 	}
 
-	@Test
-	void testMergeSituationWithMoveVehByVehDeterministicPriorities() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testMergeSituationWithMoveVehByVehDeterministicPriorities(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		// note: the deterministic node transition is only implemented for the case when the node is blocked as soon as one outgoing link is full
@@ -301,8 +290,9 @@ public class NodeTransitionTest {
 		Assertions.assertEquals(2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8
 	}
 
-	@Test
-	void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -382,8 +372,9 @@ public class NodeTransitionTest {
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 	}
 
-	@Test
-	void testBlockedNodeSituationWithMoveVehByVehRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBlockedNodeSituationWithMoveVehByVehRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -464,8 +455,9 @@ public class NodeTransitionTest {
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 	}
 
-	@Test
-	void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -553,8 +545,9 @@ public class NodeTransitionTest {
 	 * 2. correct storage capacity bounds for a time bin size smaller than 1 (see e.g. former bug in QueueWithBuffer calculateStorageCapacity);
 	 * 3. both streams are independently (because blockNode=false).
 	 */
-	@Test
-	void testNodeTransitionWithTimeStepSizeSmallerOne() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testNodeTransitionWithTimeStepSizeSmallerOne(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setTimeStepSize(0.5);

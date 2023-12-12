@@ -36,9 +36,8 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -75,24 +74,10 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Provider;
 
-@RunWith(Parameterized.class)
 public class ControlerIT {
 
 	private final static Logger log = LogManager.getLogger(ControlerIT.class);
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
-
-	private final boolean isUsingFastCapacityUpdate;
-
-	public ControlerIT(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-				return Arrays.asList(capacityUpdates);
-		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
-	}
 
 	@Test
 	void testScenarioLoading() {
@@ -155,8 +140,9 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testTravelTimeCalculation() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTravelTimeCalculation(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(ConfigUtils.createConfig());
 		Config config = f.scenario.getConfig();
 
@@ -213,7 +199,7 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(0);
 
-		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
@@ -248,12 +234,13 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testSetScoringFunctionFactory() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testSetScoringFunctionFactory(boolean isUsingFastCapacityUpdate) {
 		final Config config = this.utils.loadConfig((String) null);
 		config.controller().setLastIteration(0);
 
-		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
@@ -296,8 +283,9 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testCalcMissingRoutes() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testCalcMissingRoutes(boolean isUsingFastCapacityUpdate) {
 		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
@@ -343,7 +331,7 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
-		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
@@ -385,8 +373,9 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testCalcMissingActLinks() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testCalcMissingActLinks(boolean isUsingFastCapacityUpdate) {
 		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
@@ -441,7 +430,7 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
-		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);

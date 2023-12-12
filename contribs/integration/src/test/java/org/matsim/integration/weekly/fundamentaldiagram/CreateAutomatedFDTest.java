@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,9 +46,9 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -91,64 +92,49 @@ import org.matsim.vehicles.VehicleUtils;
  * @author amit
  */
 
-@RunWith(Parameterized.class)
 public class CreateAutomatedFDTest {
-
-	/**
-	 * Constructor.  Even if it does not look like one.
-	 */
-	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
-		this.linkDynamics = linkDynamics;
-		this.trafficDynamics = trafficDynamics;
-		this.travelModes = new String [] {"car","bike"};
-	}
-
-	private LinkDynamics linkDynamics;
-	private TrafficDynamics trafficDynamics;
 	private final Map<Id<Person>,String> person2Mode = new HashMap<>();
 
-	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1};")
-	// the convention is that the output of the method marked by "@Parameters" is taken as input to the constructor
-	// before running each test. kai, jul'16
-	public static Collection<Object[]> createFds() {
-		int combos = LinkDynamics.values().length * TrafficDynamics.values().length ;
-		Object [][] combos2run = new Object [combos][2]; // #ld x #td x #params
-		int index = 0;
+	public static Stream<Arguments> arguments() {
+		List<Arguments> result = new LinkedList<>();
 		for (LinkDynamics ld : LinkDynamics.values()) {
 			for (TrafficDynamics td : TrafficDynamics.values()) {
-				combos2run[index] = new Object [] {ld, td};
-				index++;
+				result.add(Arguments.of(ld, td));
 			}
 		}
-		return Arrays.asList(combos2run);
+		return result.stream();
 
 	}
 
-	@Test
-	void fdsCarTruck(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void fdsCarTruck(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics){
 		this.travelModes = new String [] {"car","truck"};
-		run(false);
+		run(false, linkDynamics, trafficDynamics);
 	}
 
-	@Test
-	void fdsCarBike(){
-		run(false);
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void fdsCarBike(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics){
+		run(false,linkDynamics, trafficDynamics);
 	}
 
-	@Test
-	void fdsCarBikeFastCapacityUpdate(){
-		run(true);
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void fdsCarBikeFastCapacityUpdate(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics){
+		run(true, linkDynamics, trafficDynamics);
 	}
 
-	@Test
-	void fdsCarOnly(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void fdsCarOnly(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics){
 		this.travelModes = new String [] {"car"};
-		run(false);
+		run(false, linkDynamics, trafficDynamics);
 	}
 
 	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
-	private String [] travelModes;
+	private String [] travelModes = new String [] {"car","bike"};
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
@@ -156,7 +142,7 @@ public class CreateAutomatedFDTest {
 
 	private final static Logger LOG = LogManager.getLogger(CreateAutomatedFDTest.class);
 
-	private void run(final boolean isUsingFastCapacityUpdate) {
+	private void run(final boolean isUsingFastCapacityUpdate, LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
 
 		MatsimRandom.reset();
 
@@ -675,13 +661,13 @@ public class CreateAutomatedFDTest {
 				} else {
 					flowTableReset();
 				}
-				this.flowTime = new Double(nowTime);
+				this.flowTime = nowTime;
 			}
 			updateLastXFlows900();
 		}
 
 		private void updateLastXFlows900(){
-			Double nowFlow = new Double(this.getCurrentHourlyFlow());
+			Double nowFlow = this.getCurrentHourlyFlow();
 			for (int i=NUMBER_OF_MEMORIZED_FLOWS-2; i>=0; i--){
 				this.lastXFlows900.set(i+1, this.lastXFlows900.get(i).doubleValue());
 			}

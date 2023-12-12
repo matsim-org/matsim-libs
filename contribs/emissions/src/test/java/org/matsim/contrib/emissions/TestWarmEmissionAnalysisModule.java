@@ -20,10 +20,12 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.jupiter.api.Assertions;
+import org.geotools.metadata.iso.quality.TemporalAccuracyImpl;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -38,6 +40,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.matsim.contrib.emissions.Pollutant.*;
 
@@ -48,8 +51,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
  *
- * WarmEmissionAnalysisModule (weam) 
- * public methods and corresponding tests: 
+ * WarmEmissionAnalysisModule (weam)
+ * public methods and corresponding tests:
  * weamParameter - testWarmEmissionAnalysisParameter
  * throw warm EmissionEvent - testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
@@ -61,7 +64,7 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * get top go km couter - testCounters*()
  * get warm emission event counter - testCounters*()
  *
- * private methods and corresponding tests: 
+ * private methods and corresponding tests:
  * rescale warm emissions - rescaleWarmEmissionsTest()
  * calculate warm emissions - implicitly tested
  * convert string 2 tuple - implicitly tested
@@ -70,7 +73,6 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * see test methods for details on the particular test cases
  **/
 
-@RunWith(Parameterized.class)
 public class TestWarmEmissionAnalysisModule {
 	// This used to be one large test class, which had separate table entries for each test, but put them all into the same table.  The result was
 	// difficult if not impossible to debug, and the resulting detailed table was inconsistent in the sense that it did not contain all combinations of
@@ -78,12 +80,8 @@ public class TestWarmEmissionAnalysisModule {
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-
-
-
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
-	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private boolean excep = false;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
@@ -113,24 +111,18 @@ public class TestWarmEmissionAnalysisModule {
 	private final String sgffConcept = "sg ff concept";
 	private final String sgffSizeClass = "sg ff size class";
 
-
-	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
-	public static Collection<Object[]> createCombinations() {
-		List <Object[]> list = new ArrayList<>();
-		list.add( new Object [] {EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction} ) ;
-		list.add( new Object [] {EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed} ) ;
-		return list;
+	public static Stream<EmissionsConfigGroup.EmissionsComputationMethod> arguments() {
+		return Stream.of(
+			EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction,
+			EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed
+		);
 	}
 
-	public TestWarmEmissionAnalysisModule( EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod ) {
-		this.emissionsComputationMethod = emissionsComputationMethod;
-	}
-
-
-	@Test
-	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		setUp(emissionsComputationMethod);
 
 		Id<Vehicle> sgffVehicleId = Id.create("vehicle sg equals ff", Vehicle.class);
 		double sgffLinklength = 4000.;
@@ -164,10 +156,11 @@ public class TestWarmEmissionAnalysisModule {
 		}
 	}
 
-	@Test
-	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions1(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions1(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		setUp(emissionsComputationMethod);
 
 		// case 5 - no entry in any table - must be different to other test case's strings
 		//With the bug fix to handle missing values - this test should no longer throw an error - jm oct'18
@@ -196,10 +189,11 @@ public class TestWarmEmissionAnalysisModule {
 		excep=false;
 	}
 
-	@Test
-	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions2(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions2(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		setUp(emissionsComputationMethod);
 
 		// no vehicle information given
 		Id<Vehicle> noeVehicleId = Id.create("veh 6", Vehicle.class);
@@ -221,12 +215,13 @@ public class TestWarmEmissionAnalysisModule {
 		Assertions.assertTrue(excep); excep=false;
 	}
 
-	@Test
-	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions3(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions3(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		setUp(emissionsComputationMethod);
 
-		// empty vehicle information 
+		// empty vehicle information
 		Id<Vehicle> noeVehicleId = Id.create("veh 7", Vehicle.class);
 		Id<VehicleType> noeVehicleTypeId = Id.create(";;;", VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -245,10 +240,11 @@ public class TestWarmEmissionAnalysisModule {
 		Assertions.assertTrue(excep); excep=false;
 	}
 
-	@Test
-	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions4(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions4(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		setUp(emissionsComputationMethod);
 		//  vehicle information string is 'null'
 		Id<Vehicle> noeVehicleId = Id.create("veh 8", Vehicle.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -268,9 +264,10 @@ public class TestWarmEmissionAnalysisModule {
 
 	}
 
-	@Test
-	void testCounters7(){
-		setUp();
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCounters7(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
+		setUp(emissionsComputationMethod);
 		emissionsModule.reset();
 
 		// case 10 - data in detailed table, stop go speed > free flow speed
@@ -295,7 +292,7 @@ public class TestWarmEmissionAnalysisModule {
 		emissionsModule.reset();
 
 		// ff < sg < avg - handled like free flow as well - no additional test needed
-		// avg < ff < sg - handled like stop go 
+		// avg < ff < sg - handled like stop go
 		emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, tableLink, 2* tableLinkLength/(AVG_PASSENGER_CAR_SPEED_FF_KMH)*3.6 );
 		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assertions.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
@@ -308,7 +305,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 
-	private void setUp() {
+	private void setUp(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod) {
 
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
@@ -322,7 +319,7 @@ public class TestWarmEmissionAnalysisModule {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
+		ecg.setEmissionsComputationMethod( emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
 		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
@@ -451,7 +448,7 @@ public class TestWarmEmissionAnalysisModule {
 
 
 }
-	
 
-	
+
+
 

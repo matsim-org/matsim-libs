@@ -30,9 +30,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,7 +84,6 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mrieser
  */
 
-@RunWith(Parameterized.class)
 public final class QLinkTest {
 
 	@RegisterExtension
@@ -93,21 +91,9 @@ public final class QLinkTest {
 
 	private static final Logger logger = LogManager.getLogger( QLinkTest.class );
 
-	private final boolean isUsingFastCapacityUpdate;
-
-	public QLinkTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
-
-
-	@Test
-	void testInit() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testInit(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertNotNull(f.qlink1);
 		assertEquals(1.0, f.qlink1.getSimulatedFlowCapacityPerTimeStep(), MatsimTestUtils.EPSILON);
@@ -121,8 +107,9 @@ public final class QLinkTest {
 	}
 
 
-	@Test
-	void testAdd() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testAdd(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
@@ -153,8 +140,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test
-	void testGetVehicle_Driving() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetVehicle_Driving(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -219,8 +207,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test
-	void testGetVehicle_Parking() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetVehicle_Parking(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -257,8 +246,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test
-	void testGetVehicle_Departing() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetVehicle_Departing(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -322,8 +312,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test
-	void testBuffer() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBuffer(boolean isUsingFastCapacityUpdate) {
 		Config conf = utils.loadConfig((String)null);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -446,8 +437,9 @@ public final class QLinkTest {
 	}
 
 
-	@Test
-	void testStorageSpaceDifferentVehicleSizes() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testStorageSpaceDifferentVehicleSizes(boolean isUsingFastCapacityUpdate) {
 
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -548,8 +540,9 @@ public final class QLinkTest {
 	}
 
 
-	@Test
-	void testStuckEvents() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testStuckEvents(boolean isUsingFastCapacityUpdate) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);

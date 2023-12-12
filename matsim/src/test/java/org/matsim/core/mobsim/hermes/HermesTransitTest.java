@@ -3,9 +3,9 @@ package org.matsim.core.mobsim.hermes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -67,21 +67,7 @@ import java.util.List;
  *
  * @author mrieser / Simunto
  */
-@RunWith(Parameterized.class)
 public class HermesTransitTest {
-
-	private final boolean isDeterministic;
-
-	public HermesTransitTest(boolean isDeterministic) {
-		this.isDeterministic = isDeterministic;
-	}
-
-	@Parameters(name = "{index}: isDeterministic == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object[] states = new Object[] { false, true };
-		return Arrays.asList(states);
-	}
-
 
 	protected static Hermes createHermes(MutableScenario scenario, EventsManager events) {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -113,11 +99,12 @@ public class HermesTransitTest {
 	/**
 	 * Makes sure Hermes works also when not all stop facilities are used by transit lines.
 	 */
-	@Test
-	void testSuperflousStopFacilities() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testSuperflousStopFacilities(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -198,11 +185,12 @@ public class HermesTransitTest {
 	/**
 	 * Makes sure Hermes works also when transit routes in different lines have the same Id
 	 */
-	@Test
-	void testRepeatedRouteIds() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testRepeatedRouteIds(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -300,11 +288,12 @@ public class HermesTransitTest {
 	 * Makes sure Hermes works with TransitRoutes where two successive stops are on the same link.
 	 * Originally, this resulted in wrong events because there was an exception that there is at most one stop per link.
 	 */
-	@Test
-	void testConsecutiveStopsWithSameLink_1() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testConsecutiveStopsWithSameLink_1(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -393,11 +382,12 @@ public class HermesTransitTest {
 	 * Originally, this resulted in problems as the distance between the stops was 0 meters, given they are on the same link,
 	 * and this 0 meters than resulted in infinite values somewhere later on.
 	 */
-	@Test
-	void testConsecutiveStopsWithSameLink_2() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testConsecutiveStopsWithSameLink_2(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -486,12 +476,13 @@ public class HermesTransitTest {
 	/**
 	 * Makes sure Hermes does not produce exceptions when the configured end time is before the latest transit event
 	 */
-	@Test
-	void testEarlyEnd() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testEarlyEnd(boolean isDeterministic) {
 		double baseTime = 30 * 3600 - 10; // HERMES has a default of 30:00:00 as end time, so let's start later
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -557,11 +548,12 @@ public class HermesTransitTest {
 	/**
 	 * Makes sure Hermes correctly handles strange transit routes with some links before the first stop is served.
 	 */
-	@Test
-	void testLinksAtRouteStart() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testLinksAtRouteStart(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -627,11 +619,12 @@ public class HermesTransitTest {
 	/**
 	 * In some cases, the time information of linkEnter/linkLeave events was wrong.
 	 */
-	@Test
-	void testDeterministicCorrectTiming() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testDeterministicCorrectTiming(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -716,47 +709,48 @@ public class HermesTransitTest {
 		Assertions.assertEquals(3, arrivesAtFacilityEvents.size(), "wrong number of VehicleArrivesAtFacilityEvents.");
 		Assertions.assertEquals(3, departsAtFacilityEvents.size(), "wrong number of VehicleDepartsAtFacilityEvents.");
 
-		if (this.isDeterministic) Assertions.assertEquals(997.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(997.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
 
-		if (this.isDeterministic) Assertions.assertEquals(998.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(998.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(stop1.getId(), arrivesAtFacilityEvents.get(0).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1000.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1000.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(stop1.getId(), departsAtFacilityEvents.get(0).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(f.link1.getId(), linkLeaveEvents.get(0).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(f.link2.getId(), linkEnterEvents.get(0).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1251.0, linkLeaveEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1251.0, linkLeaveEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(f.link2.getId(), linkLeaveEvents.get(1).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1251.0, linkEnterEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1251.0, linkEnterEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(f.link3.getId(), linkEnterEvents.get(1).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1298.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1298.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(stop2.getId(), arrivesAtFacilityEvents.get(1).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1300.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1300.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(stop2.getId(), departsAtFacilityEvents.get(1).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1598.0, arrivesAtFacilityEvents.get(2).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1598.0, arrivesAtFacilityEvents.get(2).getTime(), 1e-8);
 		Assertions.assertEquals(stop3.getId(), arrivesAtFacilityEvents.get(2).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1600.0, departsAtFacilityEvents.get(2).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1600.0, departsAtFacilityEvents.get(2).getTime(), 1e-8);
 		Assertions.assertEquals(stop3.getId(), departsAtFacilityEvents.get(2).getFacilityId());
 	}
 
 	/**
 	 * Tests that event times are correct when a transit route starts with some links before arriving at the first stop.
 	 */
-	@Test
-	void testDeterministicCorrectTiming_initialLinks() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testDeterministicCorrectTiming_initialLinks(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -843,39 +837,40 @@ public class HermesTransitTest {
 
 		Assertions.assertEquals(1000.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
 
-		if (this.isDeterministic) Assertions.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(f.link1.getId(), linkLeaveEvents.get(0).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(f.link2.getId(), linkEnterEvents.get(0).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1058.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1058.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(stop2.getId(), arrivesAtFacilityEvents.get(0).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1060.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1060.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(stop2.getId(), departsAtFacilityEvents.get(0).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1061.0, linkLeaveEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1061.0, linkLeaveEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(f.link2.getId(), linkLeaveEvents.get(1).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1061.0, linkEnterEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1061.0, linkEnterEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(f.link3.getId(), linkEnterEvents.get(1).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1598.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1598.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(stop3.getId(), arrivesAtFacilityEvents.get(1).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1600.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1600.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(stop3.getId(), departsAtFacilityEvents.get(1).getFacilityId());
 	}
 
 	/**
 	 * Tests that everything is correct when a transit route ends with some links after arriving at the last stop.
 	 */
-	@Test
-	void testTrailingLinksInRoute() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTrailingLinksInRoute(boolean isDeterministic) {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
-		f.config.hermes().setDeterministicPt(this.isDeterministic);
+		f.config.hermes().setDeterministicPt(isDeterministic);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -962,37 +957,37 @@ public class HermesTransitTest {
 		Assertions.assertEquals(2, departsAtFacilityEvents.size(), "wrong number of VehicleDepartsAtFacilityEvents.");
 		Assertions.assertEquals(2, personLeavesVehicleEvents.size(), "wrong number of PersonLeavesVehicleEvents.");
 
-		if (this.isDeterministic) Assertions.assertEquals(997.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(997.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
 		Id<Person> transitDriverId = transitDriverStartsEvents.get(0).getDriverId();
 
-		if (this.isDeterministic) Assertions.assertEquals(998.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(998.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(stop1.getId(), arrivesAtFacilityEvents.get(0).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1000.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1000.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(stop1.getId(), departsAtFacilityEvents.get(0).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(f.link1.getId(), linkLeaveEvents.get(0).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(f.link2.getId(), linkEnterEvents.get(0).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1298.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1298.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(stop2.getId(), arrivesAtFacilityEvents.get(1).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1299.0, personLeavesVehicleEvents.get(0).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1299.0, personLeavesVehicleEvents.get(0).getTime(), 1e-8);
 		Assertions.assertEquals(person.getId(), personLeavesVehicleEvents.get(0).getPersonId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1300.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1300.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(stop2.getId(), departsAtFacilityEvents.get(1).getFacilityId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1301.0, linkLeaveEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1301.0, linkLeaveEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(f.link2.getId(), linkLeaveEvents.get(1).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1301.0, linkEnterEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1301.0, linkEnterEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(f.link3.getId(), linkEnterEvents.get(1).getLinkId());
 
-		if (this.isDeterministic) Assertions.assertEquals(1312.0, personLeavesVehicleEvents.get(1).getTime(), 1e-8);
+		if (isDeterministic) Assertions.assertEquals(1312.0, personLeavesVehicleEvents.get(1).getTime(), 1e-8);
 		Assertions.assertEquals(transitDriverId, personLeavesVehicleEvents.get(1).getPersonId());
 
 	}

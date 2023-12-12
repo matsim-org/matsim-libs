@@ -27,9 +27,8 @@ import java.util.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,23 +58,10 @@ import org.matsim.vehicles.Vehicle;
  * @author ikaddoura
  *
  */
-@RunWith(Parameterized.class)
 public class FlowStorageSpillbackTest {
 
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	private final boolean isUsingFastCapacityUpdate;
-
-	public FlowStorageSpillbackTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
 
 	private EventsManager events;
 
@@ -89,13 +75,14 @@ public class FlowStorageSpillbackTest {
 	private Id<Link> linkId3 = Id.create("link3", Link.class);
 	private Id<Link> linkId4 = Id.create("link4", Link.class);
 
-	@Test
-	final void testFlowCongestion(){
+	@ParameterizedTest
+	@ValueSource(booleans = {false, true})
+	final void testFlowCongestion(boolean isUsingFastCapacityUpdate){
 
 		Scenario sc = loadScenario();
 		setPopulation(sc);
 
-		sc.getConfig().qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		sc.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
 

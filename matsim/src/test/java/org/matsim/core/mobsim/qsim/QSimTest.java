@@ -21,19 +21,18 @@
 package org.matsim.core.mobsim.qsim;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -95,28 +94,16 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-@RunWith(Parameterized.class)
 public class QSimTest {
 
 	private final static Logger log = LogManager.getLogger(QSimTest.class);
 
-	private final boolean isUsingFastCapacityUpdate;
-	private final int numberOfThreads;
-
-	public QSimTest(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-		this.numberOfThreads = numberOfThreads;
-	}
-//
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}; numberOfThreads == {1};")
-	public static Collection<Object[]> parameterObjects () {
-		Object[][] capacityUpdates = new Object [][] {
-			new Object[] {true, 1},
-			new Object[] {false, 1},
-			new Object[] {true, 2},
-			new Object[] {false, 2}
-		};
-		return Arrays.asList(capacityUpdates);
+	public static Stream<Arguments> arguments () {
+		return Stream.of(
+			Arguments.of(true, 1),
+			Arguments.of(false, 1),
+			Arguments.of(true, 2),
+			Arguments.of(false, 2));
 	}
 
 	private static QSim createQSim(MutableScenario scenario, EventsManager events) {
@@ -143,8 +130,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testSingleAgent() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgent(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -183,8 +171,9 @@ public class QSimTest {
 	 * @author mrieser
 	 * @author Kai Nagel
 	 */
-	@Test
-	void testSingleAgentWithEndOnLeg() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgentWithEndOnLeg(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -249,8 +238,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testTwoAgent() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testTwoAgent(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
@@ -290,8 +280,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testTeleportationSingleAgent() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testTeleportationSingleAgent(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -337,8 +328,9 @@ public class QSimTest {
 	 *
 	 * @author cdobler
 	 */
-	@Test
-	void testSingleAgentImmediateDeparture() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgentImmediateDeparture(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -382,8 +374,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testSingleAgent_EmptyRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgent_EmptyRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link1
@@ -459,8 +452,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testSingleAgent_LastLinkIsLoop() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgent_LastLinkIsLoop(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
 
@@ -529,8 +523,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testAgentWithoutLeg() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAgentWithoutLeg(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -556,8 +551,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testAgentWithoutLegWithEndtime() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAgentWithoutLegWithEndtime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -584,8 +580,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testAgentWithLastActWithEndtime() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAgentWithLastActWithEndtime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -619,8 +616,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testFlowCapacityDriving() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDriving(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
@@ -684,8 +682,9 @@ public class QSimTest {
 	 *
 	 * @author michaz
 	 */
-	@Test
-	void testFlowCapacityDrivingFraction() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingFraction(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
@@ -739,8 +738,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testFlowCapacityStarting() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityStarting(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
@@ -794,8 +794,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testFlowCapacityMixed() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityMixed(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
@@ -862,8 +863,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testVehicleTeleportationTrue() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testVehicleTeleportationTrue(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -917,8 +919,9 @@ public class QSimTest {
 	 *
 	 * @author michaz
 	 */
-	@Test
-	void testWaitingForCar() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testWaitingForCar(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
@@ -1012,8 +1015,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testVehicleTeleportationFalse() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testVehicleTeleportationFalse(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -1065,8 +1069,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testAssignedVehicles() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAssignedVehicles(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -1121,8 +1126,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testCircleAsRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCircleAsRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
@@ -1179,8 +1185,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testRouteWithEndLinkTwice() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testRouteWithEndLinkTwice(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
@@ -1240,12 +1247,13 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testConsistentRoutes_WrongRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_WrongRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events, isUsingFastCapacityUpdate, numberOfThreads); // route should continue on link 4
 		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -1256,12 +1264,13 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testConsistentRoutes_WrongStartLink() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_WrongStartLink(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
+		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events, isUsingFastCapacityUpdate, numberOfThreads); // first act is on link 1, not 2
 		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -1272,12 +1281,13 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testConsistentRoutes_WrongEndLink() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_WrongEndLink(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events, isUsingFastCapacityUpdate, numberOfThreads); // second act is on link 5, not 4
 		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -1289,12 +1299,13 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testConsistentRoutes_ImpossibleRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_ImpossibleRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events,isUsingFastCapacityUpdate, numberOfThreads); // link 3 is missing
 		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
@@ -1305,29 +1316,32 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testConsistentRoutes_MissingRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_MissingRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
+		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events, isUsingFastCapacityUpdate, numberOfThreads); // no links at all
 		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
-	/** Prepares miscellaneous data for the testConsistentRoutes() tests:
+	/**
+	 * Prepares miscellaneous data for the testConsistentRoutes() tests:
 	 * Creates a network of 6 links, and a population of one person driving from
 	 * link 1 to link 5, and then from link 5 to link 6.
 	 *
-	 * @param startLinkId the start link of the route for the first leg
-	 * @param linkIds the links the agent should travel along on the first leg
-	 * @param endLinkId the end link of the route for the first leg
-	 * @param events the Events object to be used by the simulation.
+	 * @param startLinkId               the start link of the route for the first leg
+	 * @param linkIds                   the links the agent should travel along on the first leg
+	 * @param endLinkId                 the end link of the route for the first leg
+	 * @param events                    the Events object to be used by the simulation.
+	 * @param isUsingFastCapacityUpdate
+	 * @param numberOfThreads
 	 * @return A QueueSimulation which can be started immediately.
-	 *
 	 * @author mrieser
 	 **/
-	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events) {
+	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events, boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		/* enhance network */
@@ -1374,8 +1388,9 @@ public class QSimTest {
 		return logger;
 	}
 
-	@Test
-	void testStartAndEndTime() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testStartAndEndTime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 
 		final Config config = ConfigUtils.createConfig();
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -1440,8 +1455,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	void testCleanupSim_EarlyEnd() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCleanupSim_EarlyEnd(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
@@ -1538,8 +1554,9 @@ public class QSimTest {
 	 *
 	 * @author ikaddoura based on mrieser
 	 */
-	@Test
-	void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG);
@@ -1598,8 +1615,9 @@ public class QSimTest {
 	 *
 	 * @author ikaddoura based on mrieser
 	 */
-	@Test
-	void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG);
@@ -1658,8 +1676,9 @@ public class QSimTest {
 	 *
 	 * @author tschlenther based on ikaddoura based on mrieser
 	 */
-	@Test
-	void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE);
