@@ -1,14 +1,18 @@
 package org.matsim.contrib.drt.prebooking.logic.helpers;
 
-import java.util.PriorityQueue;
+import java.util.*;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import com.google.common.base.Preconditions;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * This service helps to define a PrebookingLogic where at some point in time
@@ -16,7 +20,7 @@ import com.google.common.base.Preconditions;
  * request will happen at a specific time. Once we know that the request will be
  * sent, we can use the present class to put it in a queue, making sure the
  * request will be *booked* the the time we want.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class PrebookingQueue implements MobsimBeforeSimStepListener {
@@ -27,8 +31,11 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 
 	private double currentTime = Double.NEGATIVE_INFINITY;
 
-	public PrebookingQueue(PrebookingManager prebookingManager) {
+	private final PassengerGroupIdentifier groupIdentifier;
+
+	public PrebookingQueue(PrebookingManager prebookingManager, PassengerGroupIdentifier groupIdentifier) {
 		this.prebookingManager = prebookingManager;
+		this.groupIdentifier = groupIdentifier;
 	}
 
 	@Override
@@ -39,9 +46,19 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 	private void performSubmissions(double time) {
 		currentTime = time;
 
+		Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<ScheduledSubmission>> groups = new LinkedHashMap<>();
 		while (!queue.isEmpty() && queue.peek().submissionTime <= time) {
 			var item = queue.poll();
-			prebookingManager.prebook(item.agent(), item.leg(), item.departuretime());
+			Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = groupIdentifier.getGroupId((MobsimPassengerAgent) item.agent);
+			if(groupId.isEmpty()) {
+				prebookingManager.prebook(List.of(new Tuple<>(item.agent(), item.leg())), item.departuretime());
+			} else {
+				groups.computeIfAbsent(groupId.get(), k -> new ArrayList<>()).add(item);
+			}
+		}
+		for (List<ScheduledSubmission> group : groups.values()) {
+			List<Tuple<MobsimAgent, Leg>> personsLegs = group.stream().map(entry -> new Tuple<>(entry.agent, entry.leg)).toList();
+			prebookingManager.prebook(personsLegs, group.get(0).departuretime);
 		}
 	}
 
