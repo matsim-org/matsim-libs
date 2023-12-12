@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils;
+	private MatsimTestUtils utils = new MatsimTestUtils();
 	private IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
 	private Population population;
 

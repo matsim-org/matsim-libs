@@ -51,7 +51,7 @@ import java.util.Set;
 public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils;
+	private MatsimTestUtils utils = new MatsimTestUtils();
 	private PersonScoringParametersFromPersonAttributes personScoringParams;
 	private Population population;
 
