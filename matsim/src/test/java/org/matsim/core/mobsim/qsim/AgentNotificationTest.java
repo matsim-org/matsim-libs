@@ -22,8 +22,7 @@
  package org.matsim.core.mobsim.qsim;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import jakarta.inject.Inject;
 
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -288,8 +288,7 @@ import org.matsim.vehicles.Vehicle;
 			.build(scenario, eventsManager) //
 			.run();
 
-		assumeThat(handler.getEvents(), hasItem(
-				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));
+		Assumptions.assumeTrue(handler.getEvents().stream().anyMatch(e -> e.getTime() == 25200.0 && e instanceof PersonDepartureEvent));
 		assertThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25800.0)).and(instanceOf(MyAgentFactory.MyAgent.HomesicknessEvent.class)))));
 	}

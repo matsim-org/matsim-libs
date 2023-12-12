@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -120,7 +120,7 @@ public class WhoIsTheBossSelectorTest {
 	}
 
 	@Test
-	@Ignore("TODO")
+	@Disabled("TODO")
 	void testBestPlanIsSelectedIfPossible() throws Exception {
 		throw new UnsupportedOperationException( "TODO" );
 	}

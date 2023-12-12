@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -56,7 +56,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 	private String gridScenarioDirectory ="../../example-scenario/input/";
 
-	@Ignore
+	@Disabled
 	@Test
 	final void testDefaultPControler() {
 
@@ -115,7 +115,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		Assertions.assertEquals("16", this.pStatsResults.get(31)[8], "Number of +veh (final iteration)");
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	final void testSubsidyPControler() {
 

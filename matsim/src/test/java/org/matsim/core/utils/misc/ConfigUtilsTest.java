@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -75,8 +74,7 @@ public class ConfigUtilsTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assertions.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim");
-		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
-
+		Assertions.assertTrue(config.network().getInputFile().equals("/home/username/matsim/network.xml") || config.network().getInputFile().equals("/home/username/matsim\\network.xml"));
 	}
 
 	@Test
@@ -84,7 +82,7 @@ public class ConfigUtilsTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assertions.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim/");
-		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
+		Assertions.assertTrue(config.network().getInputFile().equals("/home/username/matsim/network.xml") || config.network().getInputFile().equals("/home/username/matsim\\network.xml"));
 	}
 
 	@Test

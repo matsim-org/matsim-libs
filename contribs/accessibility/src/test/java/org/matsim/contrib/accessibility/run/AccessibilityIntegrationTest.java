@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -76,7 +76,7 @@ public class AccessibilityIntegrationTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
 	void testRunAccessibilityExample() {
 		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
@@ -350,7 +350,7 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-	@Ignore
+	@Disabled
 	@Test
 	void testWithFile(){
 		/*TODO Complete - JWJ, Dec'16 */

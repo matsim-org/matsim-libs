@@ -21,7 +21,7 @@
 
  package org.matsim.core.controler;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	 @Ignore
+	 @Disabled
 	 @Test
 	 void testIterationInServicesEqualsIterationInEvent() {
 

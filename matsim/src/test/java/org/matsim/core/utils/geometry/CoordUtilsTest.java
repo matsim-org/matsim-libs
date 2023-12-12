@@ -22,7 +22,7 @@ package org.matsim.core.utils.geometry;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -53,11 +53,11 @@ public class CoordUtilsTest {
 		Coord c2a = CoordUtils.createCoord(1.0, 1.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
 		Coord c2c = CoordUtils.createCoord(3.0, 3.0);
-		
+
 		Coord c3a = CoordUtils.createCoord(1.0, 1.0, 1.0);
 		Coord c3b = CoordUtils.createCoord(2.0, 2.0, 2.0);
 		Coord c3c = CoordUtils.createCoord(3.0, 3.0, 3.0);
-		
+
 		// 2D
 		assertEquals(c2c, CoordUtils.plus(c2a, c2b));
 		// 3D
@@ -84,11 +84,11 @@ public class CoordUtilsTest {
 		Coord c2a = CoordUtils.createCoord(1.0, 1.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
 		Coord c2c = CoordUtils.createCoord(3.0, 3.0);
-		
+
 		Coord c3a = CoordUtils.createCoord(1.0, 1.0, 1.0);
 		Coord c3b = CoordUtils.createCoord(2.0, 2.0, 2.0);
 		Coord c3c = CoordUtils.createCoord(3.0, 3.0, 3.0);
-		
+
 		// 2D
 		assertEquals(c2a, CoordUtils.minus(c2c, c2b));
 		// 3D
@@ -116,7 +116,7 @@ public class CoordUtilsTest {
 		Coord c2a = CoordUtils.createCoord(1.0, 1.0);
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
 		assertEquals(c2b, CoordUtils.scalarMult(2.0, c2a));
-		
+
 		// 3D
 		Coord c3a = CoordUtils.createCoord(1.0, 1.0, 1.0);
 		Coord c3b = CoordUtils.createCoord(2.0, 2.0, 2.0);
@@ -130,7 +130,7 @@ public class CoordUtilsTest {
 		Coord c2b = CoordUtils.createCoord(2.0, 2.0);
 		Coord c2c = CoordUtils.createCoord(1.0, 1.0);
 		assertEquals(c2c, CoordUtils.getCenter(c2a, c2b));
-		
+
 		// 3D
 		Coord c3a = CoordUtils.createCoord(0.0, 0.0, 0.0);
 		Coord c3b = CoordUtils.createCoord(2.0, 2.0, 2.0);
@@ -170,7 +170,7 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void testGetCenterWOffset() {
 		fail("Not yet implemented");
 	}
@@ -185,7 +185,7 @@ public class CoordUtilsTest {
 		assertEquals(1.0, CoordUtils.calcEuclideanDistance(c2a, c2b), MatsimTestUtils.EPSILON);
 		assertEquals(1.0, CoordUtils.calcEuclideanDistance(c2a, c2c), MatsimTestUtils.EPSILON);
 		assertEquals(Math.sqrt(2.0), CoordUtils.calcEuclideanDistance(c2a, c2d), MatsimTestUtils.EPSILON);
-		
+
 		// 3D
 		Coord c3a = CoordUtils.createCoord(0.0, 0.0, 0.0);
 		Coord c3b = CoordUtils.createCoord(1.0, 0.0, 0.0);
@@ -208,12 +208,12 @@ public class CoordUtilsTest {
 		Coord c2a = CoordUtils.createCoord(0.0, 0.0);
 		Coord c2b = CoordUtils.createCoord(1.0, 1.0);
 		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c2a, c2b), MatsimTestUtils.EPSILON);
-		
+
 		// 3D
 		Coord c3a = CoordUtils.createCoord(0.0, 0.0, 0.0);
 		Coord c3b = CoordUtils.createCoord(1.0, 1.0, 1.0);
 		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c3a, c3b), MatsimTestUtils.EPSILON);
-		
+
 		// Mixed 2D and 3D
 		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c2a, c3b), MatsimTestUtils.EPSILON);
 	}
@@ -222,9 +222,9 @@ public class CoordUtilsTest {
 	@Test
 	void testDistancePointLinesegment() {
 		/* First: 2D */
-		
+
 		/*   * (0,1) c1
-		 * 
+		 *
 		 *  c2 (1,0) *-------* (2,0) c3
 		 */
 		Coord c1 = CoordUtils.createCoord(0.0, 1.0);
@@ -234,23 +234,23 @@ public class CoordUtilsTest {
 		assertEquals(Math.sqrt(2.0), dist, MatsimTestUtils.EPSILON);
 
 		/*                        * (3,1) c1
-		 * 
+		 *
 		 *  c2 (1,0) *-------* (2,0) c3
 		 */
 		c1 = CoordUtils.createCoord(3.0, 1.0);
 		dist = CoordUtils.distancePointLinesegment(c2, c3, c1);
 		assertEquals(Math.sqrt(2.0), dist, MatsimTestUtils.EPSILON);
-		
+
 		/*               * (1.5,1) c1
-		 * 
+		 *
 		 *  c2 (1,0) *-------* (2,0) c3
 		 */
 		c1 = CoordUtils.createCoord(1.5, 1.0);
 		dist = CoordUtils.distancePointLinesegment(c2, c3, c1);
 		assertEquals(Math.sqrt(1.0), dist, MatsimTestUtils.EPSILON);
-		
+
 		/* Second: 3D */
-		
+
 		/* Here the line segment has first/from coordinate (1.0, 1.0, 1.0) and
 		 * a second/to coordinate (2.0, 2.0, 2.0) */
 		c1 = CoordUtils.createCoord(0.0, 0.0, 0.0);
@@ -258,11 +258,11 @@ public class CoordUtilsTest {
 		c3 = CoordUtils.createCoord(2.0, 2.0, 2.0);
 		dist = CoordUtils.distancePointLinesegment(c2, c3, c1);
 		assertEquals(Math.sqrt(3.0), dist, MatsimTestUtils.EPSILON);
-		
+
 		c1 = CoordUtils.createCoord(1.5, 1.5, 1.5);
 		dist = CoordUtils.distancePointLinesegment(c2, c3, c1);
 		assertEquals(0.0, dist, MatsimTestUtils.EPSILON);
-		
+
 		c1 = CoordUtils.createCoord(3.0, 2.0, 3.0);
 		dist = CoordUtils.distancePointLinesegment(c2, c3, c1);
 		assertEquals(CoordUtils.calcEuclideanDistance(c3, c1), dist, MatsimTestUtils.EPSILON);
@@ -274,21 +274,21 @@ public class CoordUtilsTest {
 		Coord point = CoordUtils.createCoord(2.0, 0.0);
 		Coord lineFrom = CoordUtils.createCoord(0.0, 0.0);
 		Coord lineTo = CoordUtils.createCoord(2.0, 2.0);
-		
+
 		Coord projection = CoordUtils.createCoord(1.0, 1.0);
 		assertEquals(projection, CoordUtils.orthogonalProjectionOnLineSegment(lineFrom, lineTo, point));
-		
+
 		/* Second: 3D */
 		lineFrom = CoordUtils.createCoord(0.0, 0.0, 0.0);
 		lineTo = CoordUtils.createCoord(2.0, 2.0, 2.0);
 		point = CoordUtils.createCoord(2.0, 0.0, 1.0);
-		
+
 		projection = CoordUtils.createCoord(1.0, 1.0, 1.0);
 		assertEquals(projection, CoordUtils.orthogonalProjectionOnLineSegment(lineFrom, lineTo, point));
-		
+
 		point = CoordUtils.createCoord(3.0, 3.0, 3.0);
 		assertEquals(point, CoordUtils.orthogonalProjectionOnLineSegment(lineFrom, lineTo, point));
 	}
-	
+
 
 }

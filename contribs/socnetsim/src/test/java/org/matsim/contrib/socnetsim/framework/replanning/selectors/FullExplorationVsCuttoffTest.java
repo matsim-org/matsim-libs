@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,7 +39,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.FullyExplored
 /**
  * @author thibautd
  */
-@Ignore( "expensive")
+@Disabled( "expensive")
 public class FullExplorationVsCuttoffTest {
 	private static final Logger log =
 		LogManager.getLogger(FullExplorationVsCuttoffTest.class);

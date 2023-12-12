@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -60,7 +61,7 @@ public class UrbanEVTests {
 	private static UrbanEVTestHandler handler;
 	private static Map<Id<Person>, List<Activity>> plannedActivitiesPerPerson;
 
-	@BeforeEachClass
+	@BeforeAll
 	public static void run() {
 		Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
 		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/UrbanEVTests/");

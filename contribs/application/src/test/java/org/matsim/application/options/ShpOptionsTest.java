@@ -1,8 +1,7 @@
 package org.matsim.application.options;
 
 import org.assertj.core.data.Offset;
-import org.junit.Assume;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
@@ -32,7 +31,7 @@ public class ShpOptionsTest {
 				.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
@@ -52,7 +51,7 @@ public class ShpOptionsTest {
 				.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
@@ -74,7 +73,7 @@ public class ShpOptionsTest {
 						.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 		Geometry geometry = shp.getGeometry() ;

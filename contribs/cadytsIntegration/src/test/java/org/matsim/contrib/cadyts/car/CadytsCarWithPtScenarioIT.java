@@ -2,7 +2,7 @@ package org.matsim.contrib.cadyts.car;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.matsim.examples.ExamplesUtils;
 public class CadytsCarWithPtScenarioIT {
 
 	@Test
-	@Ignore
+	@Disabled
 	void testCadytsWithPtVehicles() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml"));
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

@@ -314,6 +314,18 @@
                 <version>5.8.0</version>
                 <scope>test</scope>
             </dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>5.8.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest</artifactId>
+				<version>2.2</version>
+				<scope>test</scope>
+			</dependency>
 
 			<dependency>
 				<groupId>tech.tablesaw</groupId>
@@ -378,10 +390,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.matsim.api.core.v01.AutoResetIdCaches</value>
-                        </property>
+						<systemPropertyVariables>
+							<junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
+						</systemPropertyVariables>
                     </properties>
                 </configuration>
             </plugin>
@@ -390,10 +401,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.matsim.api.core.v01.AutoResetIdCaches</value>
-                        </property>
+						<systemPropertyVariables>
+							<junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
+						</systemPropertyVariables>
                     </properties>
                 </configuration>
             </plugin>

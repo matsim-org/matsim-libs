@@ -1,6 +1,6 @@
 package org.matsim.application.prepare;
 
-import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -22,7 +22,7 @@ public class ShapeFileTextLookupTest {
 
         Path input = Path.of(utils.getClassInputDirectory(), "verkehrszellen.csv");
         Path output = Path.of(utils.getOutputDirectory(), "output.csv");
-        Assume.assumeTrue(Files.exists(input));
+        Assumptions.assumeTrue(Files.exists(input));
 
         CommandLine cli = new CommandLine(new ShapeFileTextLookup());
         int ret = cli.execute(

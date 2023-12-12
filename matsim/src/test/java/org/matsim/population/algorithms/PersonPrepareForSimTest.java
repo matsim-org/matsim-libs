@@ -22,7 +22,7 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -94,7 +94,7 @@ public class PersonPrepareForSimTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Id<Link> link1id = Id.createLinkId("1");
-		
+
 		Population pop = sc.getPopulation();
 		Person person;
 		Activity a1;
@@ -114,9 +114,9 @@ public class PersonPrepareForSimTest {
 			person.addPlan(p);
 			pop.addPerson(person);
 		}
-		
+
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-		
+
 		Assertions.assertEquals(link1id, a1.getLinkId());
 		Assertions.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
@@ -149,7 +149,7 @@ public class PersonPrepareForSimTest {
 					TripStructureUtils.getRoutingMode(leg),
 					"wrong routing mode!");
 		}
-		
+
 		// test routing mode set
 		{
 			PopulationFactory pf = pop.getFactory();
@@ -177,8 +177,8 @@ public class PersonPrepareForSimTest {
 	/**
 	 * Fallback modes are outdated with the introduction of routingMode. So, we want the simulation to crash if we encounter
 	 * them <b>after</b> {@link PrepareForSimImpl} was run (and adapted outdated plans). However, for the time being we do not
-	 * explicitly check for outdated modes and hope that an exception will be thrown during routing of that single leg trip, 
-	 * because no router should be registered for those modes (and wasn't registered before introducing routingMode, besides 
+	 * explicitly check for outdated modes and hope that an exception will be thrown during routing of that single leg trip,
+	 * because no router should be registered for those modes (and wasn't registered before introducing routingMode, besides
 	 * "transit_walk" which was also used for access/egress to pt and transfer between pt and therefore is
 	 * checked explicitly).
 	 */
@@ -209,7 +209,7 @@ public class PersonPrepareForSimTest {
 				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
-		
+
 		// test outdated fallback mode single leg trip (arbitrary drt mode)
 		{
 			PopulationFactory pf = pop.getFactory();
@@ -240,7 +240,7 @@ public class PersonPrepareForSimTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
-		
+
 		// test car trip with access/egress walk legs
 		{
 			PopulationFactory pf = pop.getFactory();
@@ -267,20 +267,20 @@ public class PersonPrepareForSimTest {
 			plan.addActivity(activity4);
 			person.addPlan(plan);
 			pop.addPerson(person);
-			
+
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-			
+
 			// Check leg modes remain unchanged
 			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong routing mode!");
 			Assertions.assertEquals(TransportMode.car, leg2.getMode(), "wrong routing mode!");
 			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong routing mode!");
-			
+
 			// Check routing mode:
 			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
 			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
 			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
 		}
-		
+
 		// test complicated intermodal trip with consistent routing modes passes unchanged
 		{
 			PopulationFactory pf = pop.getFactory();
@@ -345,9 +345,9 @@ public class PersonPrepareForSimTest {
 			plan.addActivity(activity12);
 			person.addPlan(plan);
 			pop.addPerson(person);
-			
+
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-			
+
 			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode set");
 			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode set");
 			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode set");
@@ -367,7 +367,7 @@ public class PersonPrepareForSimTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
-		
+
 		// test trip with inconsistent routing modes causes exception
 		{
 			PopulationFactory pf = pop.getFactory();
@@ -392,13 +392,13 @@ public class PersonPrepareForSimTest {
 			plan.addActivity(activity4);
 			person.addPlan(plan);
 			pop.addPerson(person);
-			
+
 			try {
 				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
-		
+
 		// test trip with legs with and others without routing modes causes exception
 		{
 			PopulationFactory pf = pop.getFactory();
@@ -423,7 +423,7 @@ public class PersonPrepareForSimTest {
 			plan.addActivity(activity4);
 			person.addPlan(plan);
 			pop.addPerson(person);
-			
+
 			try {
 				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 				Assertions.fail("expected Exception, got none.");
@@ -484,7 +484,7 @@ public class PersonPrepareForSimTest {
 		public void run(final Plan plan) {
 		}
 	}
-	
+
 	private Link createAndAddNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		Link link1;

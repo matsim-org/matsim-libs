@@ -1,6 +1,6 @@
 package org.matsim.application.prepare;
 
-import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -20,7 +20,7 @@ public class CreateLandUseShpTest {
 
 		Path input = Path.of(utils.getClassInputDirectory(), "andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		Path output = Path.of(utils.getOutputDirectory(), "output.shp");
 

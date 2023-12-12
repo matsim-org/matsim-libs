@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -108,7 +108,7 @@ public class KNAnalysisEventsHandlerTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void testNoEvents() {
 
 		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
@@ -122,7 +122,7 @@ public class KNAnalysisEventsHandlerTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void testAveraging() {
 		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14
 

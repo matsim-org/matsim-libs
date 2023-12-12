@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -46,7 +46,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 	 *
 	 * */
 //	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-	@Ignore //Ignore this test, because the thrown exception during events handling does not always leads to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
+	@Disabled //Ignore this test, because the thrown exception during events handling does not always leads to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
 	@Test
 	final void testDetailed_vehTypeV1() {
 		boolean gotAnException = false ;

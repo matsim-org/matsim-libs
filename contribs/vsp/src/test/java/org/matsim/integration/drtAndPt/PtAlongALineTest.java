@@ -3,7 +3,7 @@ package org.matsim.integration.drtAndPt;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -51,7 +51,7 @@ public class PtAlongALineTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
 	void testPtAlongALine() {
 
@@ -68,7 +68,7 @@ public class PtAlongALineTest {
 	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
 	 * only the middle stop is accessible by bike.
 	 */
-	@Ignore
+	@Disabled
 	@Test
 	void testPtAlongALineWithRaptorAndBike() {
 
@@ -91,7 +91,7 @@ public class PtAlongALineTest {
 	 * Test of Drt. 200 drt Vehicles are generated on Link 499-500, and all Agents rely on these
 	 * drts to get to their destination
 	 */
-	@Ignore
+	@Disabled
 	@Test
 	void testDrtAlongALine() {
 
@@ -202,7 +202,7 @@ public class PtAlongALineTest {
 	 * drt, which is set by a StopFilterAttribute
 	 */
 
-	@Ignore
+	@Disabled
 	@Test
 	void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());

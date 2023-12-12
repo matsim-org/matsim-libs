@@ -20,7 +20,7 @@
 
 package org.matsim.core.scoring;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -252,7 +252,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		as it tests some non-required functionality.
 	 */
 	@Test
-	@Ignore
+	@Disabled
 	void unlikelyTimingOfScoringFunctionStillWorks() {
 		Config config = ConfigUtils.createConfig();
 		config.eventsManager().setNumberOfThreads(8);

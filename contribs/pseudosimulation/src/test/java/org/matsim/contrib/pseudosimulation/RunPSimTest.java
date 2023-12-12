@@ -3,11 +3,11 @@ package org.matsim.contrib.pseudosimulation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runners.MethodSorters;
 import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
@@ -31,7 +31,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class RunPSimTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();

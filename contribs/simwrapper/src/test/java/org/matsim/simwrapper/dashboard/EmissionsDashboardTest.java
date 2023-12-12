@@ -2,7 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import com.google.common.collect.Iterables;
 import org.assertj.core.api.Assertions;
-import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -40,7 +40,7 @@ public class EmissionsDashboardTest {
 	void generate() {
 
 		// This test can only run if the password is set
-		Assume.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
+		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "emissions");
 

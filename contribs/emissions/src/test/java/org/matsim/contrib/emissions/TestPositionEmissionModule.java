@@ -1,6 +1,6 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -59,7 +59,7 @@ public class TestPositionEmissionModule {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	@Ignore
+	@Disabled
 	void simpleTest() {
 
         var emissionConfig = new EmissionsConfigGroup();

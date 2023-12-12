@@ -19,8 +19,9 @@
 
 package org.matsim.other;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -41,7 +42,7 @@ public class DownloadAndReadXmlTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test /**
 	 * Http downloads from the SVN server will be forbidden soon, according to jwilk.
 	 */

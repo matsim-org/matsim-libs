@@ -461,7 +461,7 @@ public class MatsimTransformerTest {
 		// TODO create
 	}
 
-	//	@Ignore		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
+	//	@Disabled		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
 	@Test
 	void createVehicleRoutingProblemBuilderWithShipments_isMadeCorrectly() {
         Carrier carrier = createCarrierWithShipments();

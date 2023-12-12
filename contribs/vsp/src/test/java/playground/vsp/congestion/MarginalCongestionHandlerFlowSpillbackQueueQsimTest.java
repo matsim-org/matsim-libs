@@ -32,7 +32,7 @@ import java.util.Set;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -131,7 +131,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 * V3
 	 *
 	 */
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testFlowAndStorageCongestion_3agents(){
 
@@ -259,7 +259,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 * V10
 	 *
 	 */
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testFlowAndStorageCongestion_3agents_V10() {
 
@@ -309,7 +309,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	// in both iterations the "toll" and the "tollOldValue" should be the same
 	//
 	// 3 iterations are necessary to check the equality of the "toll" and the "tollOldValue"
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testRouting(){
 
@@ -449,7 +449,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 }
 
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testInsertingWaitingVehicles_01(){
 
@@ -508,7 +508,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = true
 	// to compare
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testInsertingWaitingVehicles_02(){
 
@@ -569,7 +569,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
 	// agent 2 is already on link 2 when agent 3 ends his activity,
 	// therefore agent 3 has to wait until agent 2 has left the link
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testInsertingWaitingVehicles_03(){
 
@@ -627,7 +627,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 	}
 
-	@Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
 	final void testStuckTimePeriod(){
 

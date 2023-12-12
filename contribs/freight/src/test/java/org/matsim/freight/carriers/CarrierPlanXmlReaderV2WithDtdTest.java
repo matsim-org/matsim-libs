@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -55,7 +55,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingServices_nuOfServicesIsCorrect(){
 		Assertions.assertEquals(3,testCarrier.getServices().size());
 	}
@@ -77,7 +77,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
 		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
 		Assertions.assertEquals(3,carrierVehicles.size());
@@ -86,25 +86,25 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingCarrier_itReadsFleetSizeCorrectly(){
 		Assertions.assertEquals(FleetSize.INFINITE, testCarrier.getCarrierCapabilities().getFleetSize());
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingCarrier_itReadsShipmentsCorrectly(){
 		Assertions.assertEquals(2, testCarrier.getShipments().size());
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingCarrier_itReadsPlansCorrectly(){
 		Assertions.assertEquals(3, testCarrier.getPlans().size());
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingCarrier_itSelectsPlansCorrectly(){
 		Assertions.assertNotNull(testCarrier.getSelectedPlan());
 	}
@@ -122,7 +122,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingPlans_nuOfToursIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		Assertions.assertEquals(1, plans.get(0).getScheduledTours().size());
@@ -131,7 +131,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
@@ -148,7 +148,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);

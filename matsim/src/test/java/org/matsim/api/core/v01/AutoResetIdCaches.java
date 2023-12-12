@@ -20,8 +20,8 @@
 
 package org.matsim.api.core.v01;
 
-import org.junit.runner.Description;
-import org.junit.runner.notification.RunListener;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestWatcher;
 
 /**
  * Auto-resets Id caches before each test is started. This helps to keep every single unit test independent of others
@@ -48,9 +48,19 @@ import org.junit.runner.notification.RunListener;
  *
  * @author Michal Maciejewski (michalm)
  */
-public class AutoResetIdCaches extends RunListener {
+public class AutoResetIdCaches implements TestWatcher {
 	@Override
-	public void testStarted(Description description) {
+	public void testSuccessful(ExtensionContext context) {
+		Id.resetCaches();
+	}
+
+	@Override
+	public void testAborted(ExtensionContext context, Throwable cause) {
+		Id.resetCaches();
+	}
+
+	@Override
+	public void testFailed(ExtensionContext context, Throwable cause) {
 		Id.resetCaches();
 	}
 }

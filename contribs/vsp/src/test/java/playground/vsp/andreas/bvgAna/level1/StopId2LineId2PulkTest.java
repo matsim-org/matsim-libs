@@ -1,6 +1,6 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -16,7 +16,7 @@ import org.matsim.vehicles.Vehicle;
 public class StopId2LineId2PulkTest {
 
 	@Test
-	@Ignore
+	@Disabled
 	void testStopId2LineId2Pulk() {
 
 //	    assign Ids to routes, vehicles and agents to be used in Test

@@ -1,7 +1,7 @@
 package org.matsim.application;
 
-import org.junit.Assume;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.options.SampleOptions;
@@ -127,13 +127,13 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	@Ignore("Class is deprecated")
+	@Disabled("Class is deprecated")
 	void freight() {
 
 		Path input = Path.of("..", "..", "..", "..",
 				"shared-svn", "komodnext", "data", "freight", "original_data").toAbsolutePath().normalize();
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		Path output = Path.of(utils.getOutputDirectory());
 

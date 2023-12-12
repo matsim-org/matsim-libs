@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -102,7 +102,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 	}
 
 	@Test
-	@Ignore("TODO")
+	@Disabled("TODO")
 	void testVehiclesAreAllocatedAtTheTourLevel() throws Exception {
 		throw new UnsupportedOperationException( "TODO" );
 	}
@@ -133,7 +133,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 				 new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						new Random( j ),
 						vehs,
-						Collections.singleton( MODE ), 
+						Collections.singleton( MODE ),
 						false,
 						false).run( randomized );
 				 final double randomizedOverlap = algo.calcOverlap( randomized );

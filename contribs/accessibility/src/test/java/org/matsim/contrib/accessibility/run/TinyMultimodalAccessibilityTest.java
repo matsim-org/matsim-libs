@@ -21,7 +21,7 @@ package org.matsim.contrib.accessibility.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -69,7 +69,7 @@ public class TinyMultimodalAccessibilityTest {
 
 	// non-deterministic presumably because of multi-threading.  kai, sep'19
 	@Test
-	@Ignore
+	@Disabled
 	void testWithBoundingBox() {
 		final Config config = createTestConfig();
 

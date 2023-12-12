@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -746,7 +746,7 @@ public class PtAlongALine2Test {
 
 	// this test is failing because raptor treats "walk" in a special way.  kai, jul'19
 	@Test
-	@Ignore
+	@Disabled
 	void networkWalkDoesNotWorkWithRaptor() {
 		// test fails with null pointer exception
 
