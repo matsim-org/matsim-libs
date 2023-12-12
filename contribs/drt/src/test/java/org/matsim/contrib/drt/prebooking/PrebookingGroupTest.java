@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.testcases.MatsimTestUtils;
@@ -32,15 +32,10 @@ public class PrebookingGroupTest {
 		if (installLogic) {
 			AttributeBasedPrebookingLogic.install(controller, drtConfig);
 		}
-		controller.addOverridingModule(new AbstractDvrpModeModule(drtConfig.getMode()) {
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtConfig.getMode()) {
 			@Override
-			public void install() {
-				bindModal(PassengerGroupIdentifier.class).toInstance(new PassengerGroupIdentifier() {
-					@Override
-					public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent) {
-						return Optional.of(Id.create("group", PassengerGroup.class));
-					}
-				});
+			protected void configureQSim() {
+				bindModal(PassengerGroupIdentifier.class).toInstance(agent -> Optional.of(Id.create("group", PassengerGroupIdentifier.PassengerGroup.class)));
 			}
 		});
 
