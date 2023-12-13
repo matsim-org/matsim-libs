@@ -6,6 +6,8 @@ import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.MaxDetourInsertionCostCalculator;
+import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
+import org.matsim.contrib.drt.passenger.MaxDetourOfferAcceptor;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -53,6 +55,7 @@ public class MaxDetourConstraintTest {
 				protected void configureQSim() {
 					bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
 						getter -> new MaxDetourInsertionCostCalculator((new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))))));
+					bindModal(DrtOfferAcceptor.class).toProvider(modalProvider(getter -> new MaxDetourOfferAcceptor(180)));
 				}
 			});
 		}

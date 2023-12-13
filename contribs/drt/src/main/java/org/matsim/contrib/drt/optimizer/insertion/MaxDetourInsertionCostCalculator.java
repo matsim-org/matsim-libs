@@ -26,41 +26,16 @@ public class MaxDetourInsertionCostCalculator implements InsertionCostCalculator
 
 	@Override
 	public double calculate(DrtRequest drtRequest, InsertionGenerator.Insertion insertion, InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
-		if (violatesDetour(insertion, insertion.vehicleEntry, drtRequest)) {
+		if (violatesDetour(insertion, insertion.vehicleEntry, drtRequest, detourTimeInfo)) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 		return delegate.calculate(drtRequest, insertion, detourTimeInfo);
 	}
 
-	private boolean violatesDetour(InsertionGenerator.Insertion insertion, VehicleEntry vEntry, DrtRequest drtRequest) {
+	private boolean violatesDetour(InsertionGenerator.Insertion insertion, VehicleEntry vEntry, DrtRequest drtRequest, InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 		// Check if the max travel time constraint for the newly inserted request is violated
-		double rideDuration = insertion.dropoff.newWaypoint.getArrivalTime() - insertion.pickup.newWaypoint.getDepartureTime();
-		if(drtRequest.getMaxRideDuration() < rideDuration) {
-			return true;
-		}
-
-		final int pickupIdx = insertion.pickup.index;
-		Map<Id<Request>, Double> pickUps = new HashMap<>(ongoingRequests);
-
-		for (int s = pickupIdx; s < vEntry.stops.size(); s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-
-			for (AcceptedDrtRequest pickup : stop.task.getPickupRequests().values()) {
-				// consider adding stop duration?
-				pickUps.put(pickup.getId(), stop.getArrivalTime());
-			}
-
-			for (AcceptedDrtRequest dropOff : stop.task.getDropoffRequests().values()) {
-				double arrival = stop.getArrivalTime();
-				double departure = pickUps.get(dropOff.getRequest().getId());
-				double rideTime = arrival - departure;
-				if (dropOff.getMaxRideDuration() < rideTime) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
+		return drtRequest.getMaxRideDuration() < rideDuration;
 	}
 
 	@Override
