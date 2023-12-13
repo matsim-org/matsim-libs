@@ -35,6 +35,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.matsim.smallScaleCommercialTrafficGeneration.SCTUtils.getZoneIndex;
 
 /**
  * @author Ricardo Ewert
@@ -45,10 +48,11 @@ public class LanduseBuildingAnalysisTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
+
 	@Test
 	public void testReadOfDataDistributionPerZoneAndBuildingAnalysis() throws IOException {
-		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
-		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
 		new File(output.resolve("calculatedData").toString()).mkdir();
@@ -60,10 +64,10 @@ public class LanduseBuildingAnalysisTest {
 		String shapeCRS = "EPSG:4326";
 
 		// Test if the reading of the existing data distribution works correctly
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
+						shapeFileLandusePath, getZoneIndex(inputDataDirectory), shapeFileBuildingsPath, null, buildingsPerZone);
 
 		Assert.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
@@ -163,9 +167,9 @@ public class LanduseBuildingAnalysisTest {
 		Assert.assertTrue(buildingsPerZone.containsKey("testArea2_area3"));
 
 		// test for area1
-		HashMap<String, ArrayList<SimpleFeature>> builingsPerArea1 = buildingsPerZone.get("testArea1_area1");
+		Map<String, List<SimpleFeature>> builingsPerArea1 = buildingsPerZone.get("testArea1_area1");
 		Assert.assertEquals(7, builingsPerArea1.size(), MatsimTestUtils.EPSILON);
-		ArrayList<SimpleFeature> inhabitantsBuildings = builingsPerArea1.get("Inhabitants");
+		List<SimpleFeature> inhabitantsBuildings = builingsPerArea1.get("Inhabitants");
 		Assert.assertEquals(4, inhabitantsBuildings.size(), MatsimTestUtils.EPSILON);
 		for (SimpleFeature singleBuilding : inhabitantsBuildings) {
 			int id = (int) (long) singleBuilding.getAttribute("osm_id");
@@ -193,9 +197,9 @@ public class LanduseBuildingAnalysisTest {
 		Assert.assertEquals(6, builingsPerArea1.get("Employee").size(), MatsimTestUtils.EPSILON);
 
 		// test for area2
-		HashMap<String, ArrayList<SimpleFeature>> builingsPerArea2 = buildingsPerZone.get("testArea1_area2");
+		Map<String, List<SimpleFeature>> builingsPerArea2 = buildingsPerZone.get("testArea1_area2");
 		Assert.assertEquals(8, builingsPerArea2.size(), MatsimTestUtils.EPSILON);
-		ArrayList<SimpleFeature> employeeRetail = builingsPerArea2.get("Employee Retail");
+		List<SimpleFeature> employeeRetail = builingsPerArea2.get("Employee Retail");
 		Assert.assertEquals(2, employeeRetail.size(), MatsimTestUtils.EPSILON);
 		for (SimpleFeature singleBuilding : employeeRetail) {
 			int id = (int) (long) singleBuilding.getAttribute("osm_id");
@@ -217,9 +221,9 @@ public class LanduseBuildingAnalysisTest {
 		Assert.assertEquals(8, builingsPerArea2.get("Employee").size(), MatsimTestUtils.EPSILON);
 
 		// test for area3
-		HashMap<String, ArrayList<SimpleFeature>> builingsPerArea3 = buildingsPerZone.get("testArea2_area3");
+		Map<String, List<SimpleFeature>> builingsPerArea3 = buildingsPerZone.get("testArea2_area3");
 		Assert.assertEquals(8, builingsPerArea3.size(), MatsimTestUtils.EPSILON);
-		ArrayList<SimpleFeature> tertiaryRetail = builingsPerArea3.get("Employee Tertiary Sector Rest");
+		List<SimpleFeature> tertiaryRetail = builingsPerArea3.get("Employee Tertiary Sector Rest");
 		Assert.assertEquals(1, tertiaryRetail.size(), MatsimTestUtils.EPSILON);
 		for (SimpleFeature singleBuilding : tertiaryRetail) {
 			int id = (int) (long) singleBuilding.getAttribute("osm_id");
@@ -240,8 +244,8 @@ public class LanduseBuildingAnalysisTest {
 
 	@Test
 	public void testLanduseDistribution() throws IOException {
-		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
-		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
 		new File(output.resolve("calculatedData").toString()).mkdir();
@@ -252,10 +256,10 @@ public class LanduseBuildingAnalysisTest {
 		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 
 		// Analyze resultingData per zone
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
+						shapeFileLandusePath, getZoneIndex(inputDataDirectory), shapeFileBuildingsPath, null, buildingsPerZone);
 
 		Assert.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 

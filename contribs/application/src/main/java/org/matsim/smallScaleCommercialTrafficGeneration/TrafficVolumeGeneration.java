@@ -116,11 +116,11 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @return trafficVolume_start
 	 */
-	static HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
-			ArrayList<String> modesORvehTypes, String trafficType) throws MalformedURLException {
+	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_start, resultingDataPerZone, "start", sample, modesORvehTypes);
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 		Path outputFileStart = output.resolve("calculatedData")
@@ -140,9 +140,9 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @return trafficVolume_stop
 	 */
-	static HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
-			ArrayList<String> modesORvehTypes, String trafficType) throws MalformedURLException {
+	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
 
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, resultingDataPerZone, "stop", sample, modesORvehTypes);
@@ -164,9 +164,9 @@ public class TrafficVolumeGeneration {
 	 * @param sample sample size
 	 */
 	private static void calculateTrafficVolumePerZone(
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String volumeType, double sample,
-			ArrayList<String> modesORvehTypes) {
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone, String volumeType, double sample,
+			List<String> modesORvehTypes) {
 
 		HashMap<Integer, HashMap<String, Double>> generationRates;
 		HashMap<String, HashMap<String, Double>> commitmentRates;
@@ -216,7 +216,7 @@ public class TrafficVolumeGeneration {
 	 * @param trafficVolume traffic volumes for each combination
 	 * @param outputFileInInputFolder location of written output
 	 */
-	private static void writeCSVTrafficVolume(HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
+	private static void writeCSVTrafficVolume(Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
 			Path outputFileInInputFolder) throws MalformedURLException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 				StandardCharsets.UTF_8, true);
@@ -273,9 +273,9 @@ public class TrafficVolumeGeneration {
 	 * @param trafficVolumePerTypeAndZone_stop trafficVolume for stop potentials for each zone
 	 */
 	static void reduceDemandBasedOnExistingCarriers(Scenario scenario,
-			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
+			Map<String, Map<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
@@ -372,8 +372,8 @@ public class TrafficVolumeGeneration {
 	 * @param stopZone end zone
 	 */
 	private static void reduceVolumeForThisExistingJobElement(
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
 			Integer purpose, String startZone, String stopZone) {
 
 		if (startZone != null && stopZone != null) {
@@ -402,7 +402,7 @@ public class TrafficVolumeGeneration {
 	 * @param originalZone zone with volume of 0, although volume in existing model
 	 */
 	private static void reduceVolumeForOtherArea(
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
 			Integer purpose, String volumeType, String originalZone) {
 		ArrayList<TrafficVolumeKey> shuffledKeys = new ArrayList<>(
 				trafficVolumePerTypeAndZone.keySet());

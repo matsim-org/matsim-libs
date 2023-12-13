@@ -41,10 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Ricardo Ewert
@@ -58,14 +55,14 @@ public class LanduseBuildingAnalysis {
 	 * Creates a distribution of the given input data for each zone based on the
 	 * used OSM data.
 	 */
-	static HashMap<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
-			HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection, Path inputDataDirectory,
-			String usedLanduseConfiguration, Path shapeFileLandusePath, Path shapeFileZonePath,
-			Path shapeFileBuildingsPath, String shapeCRS, HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone)
+	static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
+																			 Map<String, List<String>> landuseCategoriesAndDataConnection, Path inputDataDirectory,
+																			 String usedLanduseConfiguration, Path shapeFileLandusePath, ShpOptions.Index zonesIndex,
+																			 Path shapeFileBuildingsPath, String shapeCRS, Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone)
 			throws IOException {
 
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
-		HashMap<String, String> zoneIdNameConnection = new HashMap<>();
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
+		Map<String, String> zoneIdNameConnection = new HashMap<>();
 		Path outputFileInOutputFolder = output.resolve("calculatedData").resolve("dataDistributionPerZone.csv");
 
 		landuseCategoriesAndDataConnection.put("Inhabitants",
@@ -114,7 +111,7 @@ public class LanduseBuildingAnalysis {
 			log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
 
 			HashMap<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
-			createLanduseDistribution(landuseCategoriesPerZone, shapeFileLandusePath, shapeFileZonePath,
+			createLanduseDistribution(landuseCategoriesPerZone, shapeFileLandusePath, zonesIndex,
 					usedLanduseConfiguration, shapeFileBuildingsPath, landuseCategoriesAndDataConnection,
 					buildingsPerZone, zoneIdNameConnection, shapeCRS);
 
@@ -136,14 +133,14 @@ public class LanduseBuildingAnalysis {
 	 * and the original data.
 	 */
 	private static void createResultingDataForLanduseInZones(
-			HashMap<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-			HashMap<String, HashMap<String, Integer>> investigationAreaData,
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
-			HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection) {
+			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
+			Map<String, HashMap<String, Integer>> investigationAreaData,
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+			Map<String, List<String>> landuseCategoriesAndDataConnection) {
 
-		HashMap<String, Object2DoubleOpenHashMap<String>> totalSquareMetersPerCategory = new HashMap<String, Object2DoubleOpenHashMap<String>>();
-		HashMap<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<String, Object2DoubleOpenHashMap<String>>();
-		HashMap<String, Object2DoubleOpenHashMap<String>> totalEmployeesPerCategories = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> totalSquareMetersPerCategory = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesPerCategories = new HashMap<String, Object2DoubleOpenHashMap<String>>();
 
 		investigationAreaData.keySet()
 				.forEach(c -> totalSquareMetersPerCategory.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
@@ -220,22 +217,20 @@ public class LanduseBuildingAnalysis {
 	 * Method create the percentage for each land use category in each zone based on
 	 * the sum of this category in all zones of the zone shape file
 	 */
-	private static void createLanduseDistribution(HashMap<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-			Path shapeFileLandusePath, Path shapeFileZonePath, String usedLanduseConfiguration,
-			Path shapeFileBuildingsPath, HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection,
-			HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone,
-			HashMap<String, String> zoneIdNameConnection, String shapeCRS) {
+	private static void createLanduseDistribution(Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
+												  Path shapeFileLandusePath, Index indexZones, String usedLanduseConfiguration,
+												  Path shapeFileBuildingsPath, Map<String, List<String>> landuseCategoriesAndDataConnection,
+												  Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+												  Map<String, String> zoneIdNameConnection, String shapeCRS) {
 
 		List<String> neededLanduseCategories = List.of("residential", "industrial", "commercial", "retail", "farmyard",
 				"farmland", "construction");
 
 		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 
 		List<SimpleFeature> landuseFeatures = shpLanduse.readFeatures();
-		List<SimpleFeature> zonesFeatures = shpZones.readFeatures();
+		List<SimpleFeature> zonesFeatures = indexZones.getAllFeatures();
 
-		Index indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shpZones.getShapeCrs());
 
 		for (SimpleFeature singleZone : zonesFeatures) {
 			Object2DoubleMap<String> landusePerCategory = new Object2DoubleOpenHashMap<>();
@@ -314,8 +309,8 @@ public class LanduseBuildingAnalysis {
 	 * Analysis the building types so that you have the buildings per zone and type.
 	 */
 	static void analyzeBuildingType(List<SimpleFeature> buildingsFeatures,
-			HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone,
-			HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection, Path shapeFileLandusePath,
+			Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+			Map<String, List<String>> landuseCategoriesAndDataConnection, Path shapeFileLandusePath,
 			Index indexZones, String crsLanduse) {
 
 		Index indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, crsLanduse);
@@ -360,7 +355,7 @@ public class LanduseBuildingAnalysis {
 				categoriesOfBuilding.add("Employee");
 			if (singleZone != null) {
 				categoriesOfBuilding.forEach(c -> buildingsPerZone
-						.computeIfAbsent(singleZone, k -> new HashMap<String, ArrayList<SimpleFeature>>())
+						.computeIfAbsent(singleZone, k -> new HashMap<>())
 						.computeIfAbsent(c, k -> new ArrayList<SimpleFeature>()).add(singleBuildingFeature));
 			}
 		}

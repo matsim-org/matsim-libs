@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
+import org.matsim.core.scenario.ProjectionUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
@@ -78,6 +80,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists;
+
 /**
  * Tool to generate small scale commercial traffic for a selected area. The needed input data are: employee information for the area and three shapes files (zones, buildings, landuse). These data should be available with OSM.
  *
@@ -95,8 +99,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// Option 3: Leerkamp (nur in RVR Modell).
 
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
-	private static final HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-	private static final HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 
 	private enum CreationOption {
 		useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution
@@ -152,10 +154,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--numberOfPlanVariantsPerAgent", description = "If an agent should have variant plans, you should set this parameter.", defaultValue = "1")
 	private int numberOfPlanVariantsPerAgent;
 
+	@CommandLine.Option(names = "--network", description = "Overwrite network file in config")
+	private String network;
+
 	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
 	private Path output;
 
 	private Random rnd;
+	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+	private final Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+
+	private Index indexZones;
+	private Index indexBuildings;
+	private Index indexLanduse;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
@@ -213,13 +224,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 				}
 				Path inputDataDirectory = Path.of(config.getContext().toURI()).getParent();
-				HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
-						usedLanduseConfiguration.toString(), shapeFileLandusePath, shapeFileZonePath,
-						shapeFileBuildingsPath, shapeCRS, buildingsPerZone);
+
 				ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
-				Map<String, HashMap<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, shpZones,
-					SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS), buildingsPerZone);
+
+				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS);
+
+				Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
+						usedLanduseConfiguration.toString(), shapeFileLandusePath, indexZones,
+						shapeFileBuildingsPath, shapeCRS, buildingsPerZone);
+
+
+				Map<String, Map<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, indexZones, buildingsPerZone);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
@@ -263,7 +279,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param originalScenario complete Scenario
 	 * @param regionLinksMap   list with Links for each region
 	 */
-	private void solveSeparatedVRPs(Scenario originalScenario, Map<String, HashMap<Id<Link>, Link>> regionLinksMap) throws Exception {
+	private void solveSeparatedVRPs(Scenario originalScenario, Map<String, Map<Id<Link>, Link>> regionLinksMap) throws Exception {
 
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
@@ -395,8 +411,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	private void createCarriersAndDemand(Path output, Scenario scenario, ShpOptions shpZones,
-										 HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
-										 Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+										 Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+										 Map<String, Map<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
 										 boolean includeExistingModels) throws Exception {
 
 		ArrayList<String> modesORvehTypes;
@@ -410,9 +426,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		TrafficVolumeGeneration.setInputParameters(smallScaleCommercialTrafficType);
 
-		HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 			.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
-		HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 			.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
@@ -438,14 +454,24 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				.toString());
 		else
 			config.controller().setOutputDirectory(output.toString());
+
+		// Force to use only one iteration
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(0);
+
+		// Overwrite network
+		if (network != null)
+			config.network().setInputFile(network);
+
+		config.controller().setOverwriteFileSetting(deleteDirectoryIfExists);
+
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		rnd = new Random(config.global().getRandomSeed());
+
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
-		if (config.network().getInputCRS() == null)
-			throw new Exception("No network CRS is set in config");
 		if (config.global().getCoordinateSystem() == null)
 			throw new Exception("No global CRS is set in config");
 		if (config.controller().getOutputDirectory() == null)
@@ -478,8 +504,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * TripDistributionMatrix.
 	 */
 	private void createCarriers(Scenario scenario, TripDistributionMatrix odMatrix,
-								HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
-								Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
+								Map<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
+								Map<String, Map<Id<Link>, Link>> regionLinksMap) {
 		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
 			* odMatrix.getListOfModesOrVehTypes().size();
 		int createdCarrier = 0;
@@ -662,7 +688,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createServices(Scenario scenario, ArrayList<String> noPossibleLinks,
 								String selectedStopCategory, String carrierName, int numberOfJobs, String[] serviceArea,
 								Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
-								Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
+								Map<String, Map<Id<Link>, Link>> regionLinksMap) {
 
 		String stopZone = serviceArea[0];
 
@@ -687,7 +713,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													String selectedStartCategory, String carrierName,
 													List<String> vehicleTypes, int numberOfDepots, FleetSize fleetSize,
 													int fixedNumberOfVehiclePerTypeAndLocation,
-													ArrayList<String> vehicleDepots, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
+													List<String> vehicleDepots, Map<String, Map<Id<Link>, Link>> regionLinksMap,
 													String smallScaleCommercialTrafficType,
 													ValueSelectorUnderGivenProbability tourStartTimeSelector,
 													ValueSelectorUnderGivenProbability tourDurationTimeSelector) {
@@ -799,10 +825,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Finds a possible link for a service or the vehicle location.
 	 */
-	private Id<Link> findPossibleLink(String zone, String selectedCategory, ArrayList<String> noPossibleLinks,
-									  Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String shapeCRS) {
-
-		Index indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS);
+	private Id<Link> findPossibleLink(String zone, String selectedCategory, List<String> noPossibleLinks,
+									  Map<String, Map<Id<Link>, Link>> regionLinksMap, String shapeCRS) {
 
 		if (buildingsPerZone.isEmpty()) {
 			ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, "EPSG:4326", StandardCharsets.UTF_8);
@@ -834,9 +858,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Filters links by used mode "car" and creates Map with all links in each zone
 	 */
-	static Map<String, HashMap<Id<Link>, Link>> filterLinksForZones(Scenario scenario, ShpOptions shpZones, Index indexZones,
-																	HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
+	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
+																	Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
+		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
 
@@ -849,31 +873,34 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Network networkToChange = NetworkUtils.readNetwork(networkPath);
 		NetworkUtils.runNetworkCleaner(networkToChange);
 
+		CoordinateTransformation ct = indexZones.getShp().createTransformation(ProjectionUtils.getCRS(scenario.getNetwork()));
+
 		links = networkToChange.getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car"))
 			.collect(Collectors.toList());
 		links.forEach(l -> l.getAttributes().putAttribute("newCoord",
-			shpZones.createTransformation(scenario.getConfig().network().getInputCRS()).transform(l.getCoord())));
+			ct.transform(l.getCoord())));
 		links.forEach(l -> l.getAttributes().putAttribute("zone",
 			indexZones.query((Coord) l.getAttributes().getAttribute("newCoord"))));
 		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).collect(Collectors.toList());
 		links.forEach(l -> regionLinksMap
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 			.put(l.getId(), l));
-		if (regionLinksMap.size() != shpZones.readFeatures().size())
-			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, shpZones, buildingsPerZone);
+		if (regionLinksMap.size() != indexZones.size())
+			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, indexZones, buildingsPerZone);
+
 		return regionLinksMap;
 	}
 
 	/**
 	 * Finds for areas without links the nearest Link, if the area contains any building.
 	 */
-	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
-															ShpOptions shpZones,
-															HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone) {
-		for (SimpleFeature singleArea : shpZones.readFeatures()) {
+	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+															Index shpZones,
+															Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) {
+		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
 			String zoneID = (String) singleArea.getAttribute("areaID");
 			if (!regionLinksMap.containsKey(zoneID) && buildingsPerZone.get(zoneID) != null) {
-				for (ArrayList<SimpleFeature> buildingList : buildingsPerZone.get(zoneID).values()) {
+				for (List<SimpleFeature> buildingList : buildingsPerZone.get(zoneID).values()) {
 					for (SimpleFeature building : buildingList) {
 						Link l = NetworkUtils.getNearestLink(networkToChange,
 							MGC.point2Coord(((Geometry) building.getDefaultGeometry()).getCentroid()));
@@ -891,9 +918,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Creates the number of trips between the zones for each mode and purpose.
 	 */
 	private TripDistributionMatrix createTripDistribution(
-		HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
-		HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop, ShpOptions shpZones,
-		String smallScaleCommercialTrafficType, Scenario scenario, Path output, Map<String, HashMap<Id<Link>, Link>> regionLinksMap)
+		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
+		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop, ShpOptions shpZones,
+		String smallScaleCommercialTrafficType, Scenario scenario, Path output, Map<String, Map<Id<Link>, Link>> regionLinksMap)
 		throws Exception {
 
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder

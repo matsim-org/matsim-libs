@@ -61,8 +61,8 @@ public class TripDistributionMatrix {
 	private final ArrayList<String> listOfModesORvehTypes = new ArrayList<>();
 	private final ArrayList<Integer> listOfPurposes = new ArrayList<>();
 	private final List<SimpleFeature> zonesFeatures;
-	private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
-	private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
+	private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
+	private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 	private final String smallScaleCommercialTrafficType;
 
 	private static class TripDistributionMatrixKey {
@@ -232,20 +232,20 @@ public class TripDistributionMatrix {
 	public static class Builder {
 
 		private final List<SimpleFeature> zonesFeatures;
-		private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
-		private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
+		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
+		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 		private final String smallScaleCommercialTrafficType;
 
 		public static Builder newInstance(ShpOptions shpZones,
-										  HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
-										  HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
+										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
+										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 										  String smallScaleCommercialTrafficType) {
 			return new Builder(shpZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType);
 		}
 
 		private Builder(ShpOptions shpZones,
-						HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
-						HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
+						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
+						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 						String smallScaleCommercialTrafficType) {
 			super();
 			this.zonesFeatures = shpZones.readFeatures();
@@ -285,7 +285,7 @@ public class TripDistributionMatrix {
 	 * @param regionLinksMap links in each zone
 	 */
 	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String smallScaleCommercialTrafficType, Network network,
-								  Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+								  Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
 		double volumeStart = trafficVolume_start.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).getDouble(purpose);
 		double volumeStop = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
 		int roundedVolume;
@@ -337,7 +337,7 @@ public class TripDistributionMatrix {
 	 * @param stopZone       stop zone
 	 * @param regionLinksMap links for each zone
 	 */
-	private Double getResistanceFunktionValue(String startZone, String stopZone, Network network, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+	private Double getResistanceFunktionValue(String startZone, String stopZone, Network network, Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
 
 		//if false the calculation is faster; e.g. for debugging
 		boolean useNetworkRoutesForResistanceFunction = true;
@@ -448,8 +448,8 @@ public class TripDistributionMatrix {
 	 * @return gravity constant
 	 */
 	private double getGravityConstant(String baseZone,
-									  HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume, String modeORvehType,
-									  Integer purpose, Network network, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+									  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume, String modeORvehType,
+									  Integer purpose, Network network, Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
 
 		GravityConstantKey gravityKey = makeGravityKey(baseZone, modeORvehType, purpose);
 		if (!gravityConstantACache.containsKey(gravityKey)) {
