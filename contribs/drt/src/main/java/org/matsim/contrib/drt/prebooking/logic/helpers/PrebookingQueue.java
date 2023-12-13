@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.prebooking.logic.helpers;
 
-import java.util.*;
-
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
@@ -11,8 +10,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
-import com.google.common.base.Preconditions;
-import org.matsim.core.utils.collections.Tuple;
+import java.util.*;
 
 /**
  * This service helps to define a PrebookingLogic where at some point in time
@@ -51,14 +49,14 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 			var item = queue.poll();
 			Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = groupIdentifier.getGroupId((MobsimPassengerAgent) item.agent);
 			if(groupId.isEmpty()) {
-				prebookingManager.prebook(List.of(new Tuple<>(item.agent(), item.leg())), item.departuretime());
+				prebookingManager.prebook(List.of(new PrebookingManager.PersonLeg(item.agent(), item.leg())), item.departureTime());
 			} else {
 				groups.computeIfAbsent(groupId.get(), k -> new ArrayList<>()).add(item);
 			}
 		}
 		for (List<ScheduledSubmission> group : groups.values()) {
-			List<Tuple<MobsimAgent, Leg>> personsLegs = group.stream().map(entry -> new Tuple<>(entry.agent, entry.leg)).toList();
-			prebookingManager.prebook(personsLegs, group.get(0).departuretime);
+			List<PrebookingManager.PersonLeg> personsLegs = group.stream().map(entry -> new PrebookingManager.PersonLeg(entry.agent, entry.leg)).toList();
+			prebookingManager.prebook(personsLegs, group.get(0).departureTime);
 		}
 	}
 
@@ -79,7 +77,7 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 		}
 	}
 
-	private record ScheduledSubmission(double submissionTime, MobsimAgent agent, Leg leg, double departuretime,
+	private record ScheduledSubmission(double submissionTime, MobsimAgent agent, Leg leg, double departureTime,
 			int sequence) implements Comparable<ScheduledSubmission> {
 		@Override
 		public int compareTo(ScheduledSubmission o) {

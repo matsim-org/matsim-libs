@@ -8,7 +8,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Optional;

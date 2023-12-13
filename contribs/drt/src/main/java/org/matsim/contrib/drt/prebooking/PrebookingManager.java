@@ -27,7 +27,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.utils.collections.Tuple;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -128,6 +127,8 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	private record RejectionItem(Id<Request> requestId, List<Id<Person>> personIds, String cause) {
 	}
 
+	public record PersonLeg(MobsimAgent agent, Leg leg){}
+
 	private final ConcurrentLinkedQueue<RejectionItem> rejections = new ConcurrentLinkedQueue<>();
 
 	private void processRejection(PassengerRequest request, String cause) {
@@ -151,29 +152,29 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	// collects new bookings that need to be submitted
 	private final ConcurrentLinkedQueue<PassengerRequest> bookingQueue = new ConcurrentLinkedQueue<>();
 
-	public void prebook(List<Tuple<MobsimAgent, Leg>> personsLegs, double earliestDepartureTime) {
-		for (Tuple<MobsimAgent, Leg> personLeg : personsLegs) {
-			Preconditions.checkArgument(personLeg.getSecond().getMode().equals(mode), "Invalid mode for this prebooking manager");
-			Preconditions.checkState(!personLeg.getFirst().getState().equals(State.ABORT), "Cannot prebook aborted agent");
+	public void prebook(List<PersonLeg> personsLegs, double earliestDepartureTime) {
+		for (PersonLeg personLeg : personsLegs) {
+			Preconditions.checkArgument(personLeg.leg().getMode().equals(mode), "Invalid mode for this prebooking manager");
+			Preconditions.checkState(!personLeg.agent().getState().equals(State.ABORT), "Cannot prebook aborted agent");
 		}
 
 		Id<Request> requestId = createRequestId();
 		double now = mobsimTimer.getTimeOfDay();
 
-		List<Id<Person>> personIds = personsLegs.stream().map(p -> p.getFirst().getId()).toList();
+		List<Id<Person>> personIds = personsLegs.stream().map(p -> p.agent().getId()).toList();
 		eventsManager.processEvent(new PassengerRequestBookedEvent(now, mode, requestId, personIds));
 
-		Leg representativeLeg = personsLegs.get(0).getSecond();
+		Leg representativeLeg = personsLegs.get(0).leg();
 		PassengerRequest request = requestCreator.createRequest(requestId, personIds, representativeLeg.getRoute(),
 				getLink(representativeLeg.getRoute().getStartLinkId()), getLink(representativeLeg.getRoute().getEndLinkId()), earliestDepartureTime,
 				now);
 
 		Set<String> violations = requestValidator.validateRequest(request);
 
-		for (Tuple<MobsimAgent, Leg> personLeg : personsLegs) {
-			Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.getFirst());
-			int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(personLeg.getFirst());
-			int prebookingLegIndex = plan.getPlanElements().indexOf(personLeg.getSecond());
+		for (PersonLeg personLeg : personsLegs) {
+			Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
+			int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(personLeg.agent());
+			int prebookingLegIndex = plan.getPlanElements().indexOf(personLeg.leg());
 
 			if (prebookingLegIndex <= currentLegIndex) {
 				violations = new HashSet<>(violations);
@@ -185,8 +186,8 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			String cause = String.join(", ", violations);
 			processRejection(request, cause);
 		} else {
-			for (Tuple<MobsimAgent, Leg> personLeg : personsLegs) {
-				personLeg.getSecond().getAttributes().putAttribute(requestAttribute, request.getId().toString());
+			for (PersonLeg personLeg : personsLegs) {
+				personLeg.leg().getAttributes().putAttribute(requestAttribute, request.getId().toString());
 			}
 			bookingQueue.add(request);
 		}
