@@ -52,7 +52,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunMelunPrebooking {
 	private final static Logger logger = LogManager.getLogger(RunMelunPrebooking.class);
 
-	private static class RunSettings {
+	public static class RunSettings {
 		String outputName = "unknown";
 
 		// scenario
@@ -79,7 +79,7 @@ public class RunMelunPrebooking {
 		boolean enableExclusivity = false;
 	}
 
-	private static void runSingle(File populationPath, File networkPath, File outputPath, RunSettings settings) {
+	public static void runSingle(File populationPath, File networkPath, File outputPath, RunSettings settings) {
 		// configuration
 		Config config = ConfigUtils.createConfig(new MultiModeDrtConfigGroup(), new DvrpConfigGroup());
 
@@ -192,7 +192,7 @@ public class RunMelunPrebooking {
 		if (Double.isFinite(settings.maximumVehicleRange)) {
 			insertionModule //
 					.withVehicleRange(settings.maximumVehicleRange) //
-					.withRangeEstimationFactor(settings.euclideanDistanceFactor);
+					.withEuclideanDistanceApproximator(settings.euclideanDistanceFactor);
 		}
 
 		if (settings.enableExclusivity) {
@@ -279,13 +279,13 @@ public class RunMelunPrebooking {
 		runExclusivityExperiments(populationPath, networkPath, outputPath);
 	}
 
-	static private final String DEFAULT_POPULATION_PATH = RunMelunPrebooking.class
+	static public final String DEFAULT_POPULATION_PATH = RunMelunPrebooking.class
 			.getResource("melun/melun_drt_population.xml.gz").toString();
 
-	static private final String DEFAULT_NETWORK_PATH = RunMelunPrebooking.class
+	static public final String DEFAULT_NETWORK_PATH = RunMelunPrebooking.class
 			.getResource("melun/melun_drt_network.xml.gz").toString();
 
-	static private final String DEFAULT_OUTPUT_PATH = "melun_prebooking_output";
+	static public final String DEFAULT_OUTPUT_PATH = "melun_prebooking_output";
 
 	static public void main(String[] args) throws ConfigurationException {
 		CommandLine cmd = new CommandLine.Builder(args) //
