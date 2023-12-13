@@ -455,9 +455,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		else
 			config.controller().setOutputDirectory(output.toString());
 
-		// Force to use only one iteration
+		// Reset some config values that are not needed
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);
+		config.plans().setInputFile(null);
+		config.transit().setTransitScheduleFile(null);
+		config.transit().setVehiclesFile(null);
 
 		// Overwrite network
 		if (network != null)
@@ -517,8 +520,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
-		additionalCarrierVehicleTypes.values().forEach(
-			vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
+
+		// Only vehicle with cost information will work properly
+		additionalCarrierVehicleTypes.values().stream()
+			.filter(vehicleType -> vehicleType.getCostInformation().getCostsPerSecond() != null)
+			.forEach(vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
 
 		for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {
 			CostInformation costInformation = vehicleType.getCostInformation();
