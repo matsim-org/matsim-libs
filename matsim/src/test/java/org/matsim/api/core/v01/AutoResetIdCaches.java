@@ -24,6 +24,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import org.junit.jupiter.api.extension.TestWatcher;
+
+import java.util.Optional;
 
 /**
  * Auto-resets Id caches before each test is started. This helps to keep every single unit test independent of others
@@ -39,11 +42,30 @@ import org.junit.jupiter.api.extension.TestInstancePostProcessor;
  *
  * @author Michal Maciejewski (michalm)
  */
-public class AutoResetIdCaches implements TestInstancePostProcessor {
+public class AutoResetIdCaches implements TestWatcher {
 	private static final Logger log = LogManager.getLogger(AutoResetIdCaches.class);
 
 	@Override
-	public void postProcessTestInstance(Object o, ExtensionContext extensionContext) throws Exception {
+	public void testDisabled(ExtensionContext context, Optional<String> reason) {
+		resetIdCaches();
+	}
+
+	@Override
+	public void testSuccessful(ExtensionContext context) {
+		resetIdCaches();
+	}
+
+	@Override
+	public void testAborted(ExtensionContext context, Throwable cause) {
+		resetIdCaches();
+	}
+
+	@Override
+	public void testFailed(ExtensionContext context, Throwable cause) {
+		resetIdCaches();
+	}
+
+	private void resetIdCaches() {
 		log.info("Resetting Id caches.");
 		Id.resetCaches();
 	}
