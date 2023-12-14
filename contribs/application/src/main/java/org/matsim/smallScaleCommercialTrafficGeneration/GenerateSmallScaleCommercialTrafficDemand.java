@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
+import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
@@ -268,10 +269,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
 				.write(
 					scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_CarrierDemandWithPlans.xml");
+
 		Controler controler = prepareControler(scenario);
+
+		// Creating inject always adds check for unmaterialized config groups.
+		controler.getInjector();
+
+		// Removes check after injector has been created
+		controler.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
+
 		controler.run();
+
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
 			usedSmallScaleCommercialTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
+
 		return 0;
 	}
 
@@ -461,6 +472,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		config.plans().setInputFile(null);
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
+
+		// Set flow and storage capacity to a high value
+		config.qsim().setFlowCapFactor(sample * 4);
+		config.qsim().setStorageCapFactor(sample * 4);
 
 		// Overwrite network
 		if (network != null)
