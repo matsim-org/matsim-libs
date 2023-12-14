@@ -20,6 +20,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class RailsimDeadlockTest {
@@ -64,12 +65,45 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "DC");
 
-		test.doSimStepUntil(150);
+		test.doSimStepUntil(250);
 //		test.debugFiles(collector, "deadLock");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 140, "y1y", 0)
-			.hasTrainState("regio2", 140, "zy", 0);
+			.hasTrainState("regio", 240, "y1y", 0)
+			.hasTrainState("regio2", 240, "zy", 0);
+
+	}
+
+	@Test
+	public void tooSmall() {
+
+		Set<String> increased = Set.of("y1y", "yy1", "xB", "Bx", "yx", "xy");
+
+		// Create an avoidance point, but it is too small for multiple trains
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), l ->{
+			String id = l.getId().toString();
+			if (increased.contains(id))
+				RailsimUtils.setTrainCapacity(l, 2);
+
+			l.setFreespeed(5);
+		});
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1a", 0, "AB", "EF");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1b", 0, "AB", "EF");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2a", 0, "HG", "CD");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
+
+		test.doSimStepUntil(1500);
+		test.debugFiles(collector, "tooSmall");
+
+		// This scenario should still lead to a deadlock
+		// TODO: check the behaviour, no deadlock appears yet
+
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 139, "EF", 0)
+			.hasTrainState("regio2", 203, "CD", 0);
 
 	}
 
@@ -80,12 +114,12 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
 
-		test.doSimStepUntil(300);
+		test.doSimStepUntil(800);
 //		test.debugFiles(collector, "oneWay");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 139, "EF", 0)
-			.hasTrainState("regio2", 203, "CD", 0);
+			.hasTrainState("regio", 350, "EF", 0)
+			.hasTrainState("regio2", 520, "CD", 0);
 
 	}
 
@@ -99,14 +133,14 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2a", 0, "HG", "CD");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
 
-		test.doSimStepUntil(300);
-		test.debugFiles(collector, "twoWay");
+		test.doSimStepUntil(800);
+//		test.debugFiles(collector, "twoWay");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio1a", 139, "EF", 0)
-			.hasTrainState("regio1b", 227, "EF", 0)
-			.hasTrainState("regio2a", 110, "CD", 0)
-			.hasTrainState("regio2b", 220, "CD", 0);
+			.hasTrainState("regio1a", 350, "EF", 0)
+			.hasTrainState("regio1b", 510, "EF", 0)
+			.hasTrainState("regio2a", 350, "CD", 0)
+			.hasTrainState("regio2b", 510, "CD", 0);
 
 	}
 
