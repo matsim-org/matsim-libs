@@ -453,6 +453,16 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+		<resources>
+			<resource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.pdf</exclude>
+					<exclude>**/*.gz</exclude>
+				</excludes>
+			</resource>
+		</resources>
     </build>
 
     <profiles>
