@@ -114,6 +114,27 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
 
 	@Parameter
+	@Comment(
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
+			+ "This is the ratio part")
+	@DecimalMin("1.0")
+	public double maxDetourAlpha = Double.POSITIVE_INFINITY;
+
+	@Parameter
+	@Comment(
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
+			+ "This is the constant part")
+	@PositiveOrZero
+	public double maxDetourBeta = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
+	@Comment(
+		"Defines the maximum delay allowed from the initial scheduled pick up time. Once a estimated pick up time is determined, the DRT optimizer"
+			+ "should try to keep this promise. By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
+	@PositiveOrZero
+	public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
 	@Comment("If true, the max travel and wait times of a submitted request"
 			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
 			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
@@ -250,7 +271,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
 				() -> drtRequestInsertionRetryParams,
 				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
-		
+
 		//prebooking (optional)
 		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
 				() -> prebookingParams,
