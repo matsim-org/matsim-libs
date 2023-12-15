@@ -28,13 +28,14 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Optional;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -91,9 +92,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
     @Override
     public Tuple<Double, Double> getTravelTime(Coord fromCoord, Coord toCoord, double departureTime, String tripId) {
-        long travelTime = 0;
-        long distance = 0;
-
         Coord from = transformation.transform(fromCoord);
         Coord to = transformation.transform(toCoord);
 
@@ -110,36 +108,48 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
         log.info(urlString);
 
+		Optional<Tuple<Double, Double>> result;
         try {
             URL url = new URL(urlString);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            JSONParser jp = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jp.parse(in);
-            JSONArray routes = (JSONArray) jsonObject.get("routes");
-
-            if (!routes.isEmpty()) {
-                JSONObject route = (JSONObject) routes.get(0);
-                JSONArray sections = (JSONArray) route.get("sections");
-                JSONObject section = (JSONObject) sections.get(0);
-                JSONObject summary = (JSONObject) section.get("summary");
-                travelTime = (long) summary.get("duration");
-                distance = (long) summary.get("length");
-                if (writeDetailedFiles) {
-                    String filename = outputPath + "/" + tripId + ".json.gz";
-                    BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-                    bw.write(jsonObject.toString());
-                    bw.flush();
-                    bw.close();
-                }
-            }
-
-            in.close();
+			result = readFromJson(in, tripId);
         } catch (MalformedURLException e) {
             log.error("URL is not working. Please check your API key", e);
-        } catch (IOException | ParseException e) {
+			result = Optional.empty();
+        } catch (IOException e) {
             log.error("Cannot read the content on the URL properly. Please manually check the URL", e);
+			result = Optional.empty();
         }
-        return new Tuple<Double, Double>((double) travelTime, (double) distance);
+		return result.orElse(new Tuple<>(0.0, 0.0));
     }
+
+	Optional<Tuple<Double, Double>> readFromJson(BufferedReader reader, String tripId) throws IOException {
+		JsonElement jsonElement = JsonParser.parseReader(reader);
+		if(!jsonElement.isJsonObject()){
+			return Optional.empty();
+		}
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		JsonArray routes = jsonObject.getAsJsonArray("routes");
+
+		if(routes.isEmpty()){
+			return Optional.empty();
+		}
+
+		JsonObject route = routes.get(0).getAsJsonObject();
+		JsonArray sections = route.get("sections").getAsJsonArray();
+		JsonObject section = sections.get(0).getAsJsonObject();
+		JsonObject summary = section.get("summary").getAsJsonObject();
+		double travelTime = summary.get("duration").getAsDouble();
+		double distance = summary.get("length").getAsDouble();
+		if (writeDetailedFiles) {
+			String filename = outputPath + "/" + tripId + ".json.gz";
+			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+			bw.write(jsonObject.toString());
+			bw.flush();
+			bw.close();
+		}
+		reader.close();
+		return Optional.of(new Tuple<>(travelTime, distance));
+	}
 
 }

@@ -23,8 +23,8 @@ package playground.vsp.analysis.modules.emissions;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdE
 public class TestColdEmissionHandler {
 
 	@Test
-	public final void testEmissionPerPersonColdEventHandler(){
+	final void testEmissionPerPersonColdEventHandler(){
 
 		//vehicle=person. this handler counts the cold emission events per vehicle id
 		EmissionsPerPersonColdEventHandler handler = new EmissionsPerPersonColdEventHandler();
@@ -112,20 +112,18 @@ public class TestColdEmissionHandler {
 			actualPM2 = cepp.get( Id.create("v2", Person.class ) ).get( Pollutant.PM );
 
 		// assert that values were set correctly
-		Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, new Double(17.1), actualCO1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NOx of vehicle 1 should be 44.1 but was "+actualNOx1, new Double(44.1), actualNOx1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("PM of vehicle 1 should be 0 but was " +actualPM1, new Double(0.0), actualPM1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("CO of vehicle 2 should be 23.9 but was " +actualCO2, new Double(23.9), actualCO2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NOx of vehicle 2 should be 0 but was " +actualNOx2 , new Double(0.0), actualNOx2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("PM of vehicle 2 should be 18.1 but was " +actualPM2, new Double(18.1), actualPM2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(new Double(17.1), actualCO1, MatsimTestUtils.EPSILON, "CO of vehicle 1 should be 17.1 but was "+actualCO1);
+		Assertions.assertEquals(new Double(44.1), actualNOx1, MatsimTestUtils.EPSILON, "NOx of vehicle 1 should be 44.1 but was "+actualNOx1);
+		Assertions.assertEquals(new Double(0.0), actualPM1, MatsimTestUtils.EPSILON, "PM of vehicle 1 should be 0 but was " +actualPM1);
+		Assertions.assertEquals(new Double(23.9), actualCO2, MatsimTestUtils.EPSILON, "CO of vehicle 2 should be 23.9 but was " +actualCO2);
+		Assertions.assertEquals(new Double(0.0), actualNOx2, MatsimTestUtils.EPSILON, "NOx of vehicle 2 should be 0 but was " +actualNOx2);
+		Assertions.assertEquals(new Double(18.1), actualPM2, MatsimTestUtils.EPSILON, "PM of vehicle 2 should be 18.1 but was " +actualPM2);
 
 		// nothing else in the map
-		Assert.assertEquals("There should be two types of emissions in this map but " +
-						"there were " + cepp.get(Id.create("v1", Person.class)).size()+".",
-				2, cepp.get(Id.create("v1", Person.class)).keySet().size());
-		Assert.assertEquals("There should be two types of emissions in this map but " +
-						"there were " + cepp.get(Id.create("v2", Person.class)).size()+".",
-				2, cepp.get(Id.create("v2", Person.class)).keySet().size());
+		Assertions.assertEquals(2, cepp.get(Id.create("v1", Person.class)).keySet().size(), "There should be two types of emissions in this map but " +
+						"there were " + cepp.get(Id.create("v1", Person.class)).size()+".");
+		Assertions.assertEquals(2, cepp.get(Id.create("v2", Person.class)).keySet().size(), "There should be two types of emissions in this map but " +
+						"there were " + cepp.get(Id.create("v2", Person.class)).size()+".");
 	}
 }
 	

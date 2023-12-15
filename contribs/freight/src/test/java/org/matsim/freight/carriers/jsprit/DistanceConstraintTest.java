@@ -23,9 +23,9 @@ package org.matsim.freight.carriers.jsprit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -64,8 +64,8 @@ import java.util.concurrent.ExecutionException;
  */
 public class DistanceConstraintTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	static final Logger log = LogManager.getLogger(DistanceConstraintTest.class);
 
@@ -78,7 +78,7 @@ public class DistanceConstraintTest {
 	 * @throws ExecutionException, InterruptedException
 	 */
 	@Test
-	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
+	final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
@@ -121,20 +121,23 @@ public class DistanceConstraintTest {
 
 		CarriersUtils.runJsprit(scenario);
 
-		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
-				carrierV1.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1,
+				carrierV1.getSelectedPlan().getScheduledTours().size(),
+				"Not the correct amout of scheduled tours");
 
-		Assert.assertEquals(vehicleType_SmallV1.getId(), ((Vehicle) carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
+		Assertions.assertEquals(vehicleType_SmallV1.getId(), ((Vehicle) carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle()).getType().getId());
 		double maxDistance_vehicleType_LargeV1 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV1.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV1.getEngineInformation());
 		double maxDistance_vehicleType_SmallV1 = VehicleUtils.getEnergyCapacity(vehicleType_SmallV1.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_SmallV1.getEngineInformation());
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_LargeV1,
-				MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV1,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_LargeV1,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
+		Assertions.assertEquals(30000, maxDistance_vehicleType_SmallV1,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
@@ -147,8 +150,9 @@ public class DistanceConstraintTest {
 							scenario.getNetwork());
 			}
 		}
-		Assert.assertEquals("The schedulded tour has a non expected distance", 24000, distanceTour,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(24000, distanceTour,
+				MatsimTestUtils.EPSILON,
+				"The schedulded tour has a non expected distance");
 	}
 
 	/**
@@ -157,7 +161,7 @@ public class DistanceConstraintTest {
 	 *
 	 */
 	@Test
-	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
+	final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -201,20 +205,23 @@ public class DistanceConstraintTest {
 		CarriersUtils.runJsprit(scenario);
 
 
-		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
-				carrierV2.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1,
+				carrierV2.getSelectedPlan().getScheduledTours().size(),
+				"Not the correct amout of scheduled tours");
 
-		Assert.assertEquals(vehicleType_LargeV2.getId(), carrierV2.getSelectedPlan().getScheduledTours().iterator().next()
+		Assertions.assertEquals(vehicleType_LargeV2.getId(), carrierV2.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
 		double maxDistance_vehicleType_LargeV2 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV2.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV2.getEngineInformation());
 		double maxDistance_vehicleType_SmallV2 = VehicleUtils.getEnergyCapacity(vehicleType_SmallV2.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_SmallV2.getEngineInformation());
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_LargeV2,
-				MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 15000, maxDistance_vehicleType_SmallV2,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_LargeV2,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
+		Assertions.assertEquals(15000, maxDistance_vehicleType_SmallV2,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
@@ -227,8 +234,9 @@ public class DistanceConstraintTest {
 							scenario.getNetwork());
 			}
 		}
-		Assert.assertEquals("The schedulded tour has a non expected distance", 24000, distanceTour,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(24000, distanceTour,
+				MatsimTestUtils.EPSILON,
+				"The schedulded tour has a non expected distance");
 
 	}
 
@@ -239,7 +247,7 @@ public class DistanceConstraintTest {
 	 */
 
 	@Test
-	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
+	final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -284,19 +292,22 @@ public class DistanceConstraintTest {
 
 		CarriersUtils.runJsprit(scenario);
 
-		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
-				carrierV3.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(2,
+				carrierV3.getSelectedPlan().getScheduledTours().size(),
+				"Not the correct amout of scheduled tours");
 
 		double maxDistance_vehicleType_LargeV3 =  VehicleUtils.getEnergyCapacity(vehicleType_LargeV3.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV3.getEngineInformation());
 		double maxDistance_vehicleType_SmallV3 = VehicleUtils.getEnergyCapacity(vehicleType_SmallV3.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_SmallV3.getEngineInformation());
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_LargeV3,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_LargeV3,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV3,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_SmallV3,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
 
 		for (ScheduledTour scheduledTour : carrierV3.getSelectedPlan().getScheduledTours()) {
@@ -311,13 +322,15 @@ public class DistanceConstraintTest {
 								0, scenario.getNetwork());
 				}
 			}
-			Assert.assertEquals(vehicleType_SmallV3.getId(), scheduledTour.getVehicle().getType().getId());
+			Assertions.assertEquals(vehicleType_SmallV3.getId(), scheduledTour.getVehicle().getType().getId());
 			if (distanceTour == 12000)
-				Assert.assertEquals("The schedulded tour has a non expected distance", 12000, distanceTour,
-						MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(12000, distanceTour,
+						MatsimTestUtils.EPSILON,
+						"The schedulded tour has a non expected distance");
 			else
-				Assert.assertEquals("The schedulded tour has a non expected distance", 20000, distanceTour,
-						MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(20000, distanceTour,
+						MatsimTestUtils.EPSILON,
+						"The schedulded tour has a non expected distance");
 		}
 	}
 
@@ -329,7 +342,7 @@ public class DistanceConstraintTest {
 	 */
 
 	@Test
-	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
+	final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -379,19 +392,22 @@ public class DistanceConstraintTest {
 
 		CarriersUtils.runJsprit(scenario);
 
-		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
-				carrierV4.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(2,
+				carrierV4.getSelectedPlan().getScheduledTours().size(),
+				"Not the correct amout of scheduled tours");
 
 		double maxDistance_vehicleType_Large4 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV4.getEngineInformation())
 				/ VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV4.getEngineInformation());
 		double maxDistance_vehicleType_SmallV4 = VehicleUtils.getEnergyCapacity(vehicleType_SmallV4.getEngineInformation())
 				/ VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_SmallV4.getEngineInformation());
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_Large4,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_Large4,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV4,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_SmallV4,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
@@ -407,13 +423,15 @@ public class DistanceConstraintTest {
 				}
 			}
 			if (thisTypeId.equals("SmallBattery_V4"))
-				Assert.assertEquals("The schedulded tour has a non expected distance", 24000, distanceTour,
-						MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(24000, distanceTour,
+						MatsimTestUtils.EPSILON,
+						"The schedulded tour has a non expected distance");
 			else if (thisTypeId.equals("DieselVehicle"))
-				Assert.assertEquals("The schedulded tour has a non expected distance", 36000, distanceTour,
-						MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(36000, distanceTour,
+						MatsimTestUtils.EPSILON,
+						"The schedulded tour has a non expected distance");
 			else
-				Assert.fail("Wrong vehicleType used");
+				Assertions.fail("Wrong vehicleType used");
 		}
 	}
 
@@ -428,7 +446,7 @@ public class DistanceConstraintTest {
 	 */
 
 	@Test
-	public final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws ExecutionException, InterruptedException {
+	final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -463,16 +481,18 @@ public class DistanceConstraintTest {
 		CarriersUtils.runJsprit(scenario);
 
 		//We need two tours, due to reloading both shipments must be transported one after the other
-		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
-				carrierV5.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(2,
+				carrierV5.getSelectedPlan().getScheduledTours().size(),
+				"Not the correct amout of scheduled tours");
 
-		Assert.assertEquals(vehicleType_MidSizeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
+		Assertions.assertEquals(vehicleType_MidSizeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
 		double maxDistance_vehicleType_LargeV5 = VehicleUtils.getEnergyCapacity(vehicleType_MidSizeV5.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_MidSizeV5.getEngineInformation());
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 20000, maxDistance_vehicleType_LargeV5,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(20000, maxDistance_vehicleType_LargeV5,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
 		ArrayList<Double> distancesOfTours = new ArrayList();
 		for (ScheduledTour scheduledTour: carrierV5.getSelectedPlan().getScheduledTours()) {
@@ -489,11 +509,11 @@ public class DistanceConstraintTest {
 			distancesOfTours.add(distanceTour);
 		}
 
-		Assert.assertEquals("There must be two entry for tour distances", 2, distancesOfTours.size());
+		Assertions.assertEquals(2, distancesOfTours.size(), "There must be two entry for tour distances");
 		//One tour has distance of 12000m
-		Assert.assertTrue("The schedulded tour has a non expected distance", distancesOfTours.contains(12000.0));
+		Assertions.assertTrue(distancesOfTours.contains(12000.0), "The schedulded tour has a non expected distance");
 		//The other tour has distance of 20000m
-		Assert.assertTrue("The schedulded tour has a non expected distance", distancesOfTours.contains(20000.0));
+		Assertions.assertTrue(distancesOfTours.contains(20000.0), "The schedulded tour has a non expected distance");
 	}
 
 	/**
@@ -507,7 +527,7 @@ public class DistanceConstraintTest {
 	 */
 
 	@Test
-	public final void CarrierWithShipmentsLargeBatteryTest_Version6() throws ExecutionException, InterruptedException {
+	final void CarrierWithShipmentsLargeBatteryTest_Version6() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -543,16 +563,18 @@ public class DistanceConstraintTest {
 
 
 		//We need two tours, due to reloading both shipments must be transported one after the other
-		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
-				carrierV5.getSelectedPlan().getScheduledTours().size());
+		Assertions.assertEquals(1,
+				carrierV5.getSelectedPlan().getScheduledTours().size(),
+				"Not the correct amout of scheduled tours");
 
-		Assert.assertEquals(vehicleType_LargeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
+		Assertions.assertEquals(vehicleType_LargeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
 		double maxDistance_vehicleType_LargeV5 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV5.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV5.getEngineInformation());
 
-		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_LargeV5,
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30000, maxDistance_vehicleType_LargeV5,
+				MatsimTestUtils.EPSILON,
+				"Wrong maximum distance of the tour of this vehicleType");
 
 		ArrayList<Double> distancesOfTours = new ArrayList();
 		for (ScheduledTour scheduledTour: carrierV5.getSelectedPlan().getScheduledTours()) {
@@ -569,9 +591,9 @@ public class DistanceConstraintTest {
 			distancesOfTours.add(distanceTour);
 		}
 
-		Assert.assertEquals("There must be one entry for tour distances", 1, distancesOfTours.size());
+		Assertions.assertEquals(1, distancesOfTours.size(), "There must be one entry for tour distances");
 		//This tour has distance of 24000m
-		Assert.assertTrue("The schedulded tour has a non expected distance", distancesOfTours.contains(24000.0));
+		Assertions.assertTrue(distancesOfTours.contains(24000.0), "The schedulded tour has a non expected distance");
 	}
 
 	/**

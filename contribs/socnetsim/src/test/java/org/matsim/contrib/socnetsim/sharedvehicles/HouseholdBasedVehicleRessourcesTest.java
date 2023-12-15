@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Household;
@@ -41,7 +41,7 @@ import org.matsim.vehicles.Vehicle;
 public class HouseholdBasedVehicleRessourcesTest {
 
 	@Test
-	public void testVehiclesIdsAreCorrect() throws Exception {
+	void testVehiclesIdsAreCorrect() throws Exception {
 		final Households households = createHouseholds();
 		final VehicleRessources testee = new HouseholdBasedVehicleRessources( households );
 
@@ -50,9 +50,9 @@ public class HouseholdBasedVehicleRessourcesTest {
 			for (Id<Person> person : household.getMemberIds()) {
 				final Set<Id<Vehicle>> actual = testee.identifyVehiclesUsableForAgent( person );
 				assertEquals(
-						"unexpected vehicles for agent "+person,
 						expected,
-						actual);
+						actual,
+						"unexpected vehicles for agent "+person);
 			}
 		}
 	}

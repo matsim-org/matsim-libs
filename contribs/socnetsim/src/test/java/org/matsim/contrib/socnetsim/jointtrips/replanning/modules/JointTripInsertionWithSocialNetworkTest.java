@@ -27,8 +27,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,7 +58,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 		LogManager.getLogger(JointTripInsertionWithSocialNetworkTest.class);
 
 	@Test
-	public void testJointTripsGeneratedOnlyAlongSocialTies() {
+	void testJointTripsGeneratedOnlyAlongSocialTies() {
 		final Random random = new Random( 123 );
 
 		for ( int i=0; i < 10; i++ ) {
@@ -90,9 +90,9 @@ public class JointTripInsertionWithSocialNetworkTest {
 				agentsToIgnore.add( actedUpon.getDriverId() );
 				agentsToIgnore.add( actedUpon.getPassengerId() );
 
-				Assert.assertTrue(
-						"passenger not alter of driver!",
-						sn.getAlters( actedUpon.getDriverId() ).contains( actedUpon.getPassengerId() ) );
+				Assertions.assertTrue(
+						sn.getAlters( actedUpon.getDriverId() ).contains( actedUpon.getPassengerId() ),
+						"passenger not alter of driver!" );
 			}
 
 			log.info( "there were "+agentsToIgnore.size()+" agents handled" );

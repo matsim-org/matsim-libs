@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.optimizer;
 import java.net.URL;
 import java.util.Optional;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -65,13 +65,13 @@ public class TaxiOptimizerTests {
 			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
 
 			boolean result = PopulationUtils.comparePopulations(expected, actual);
-			Assert.assertTrue(result);
+			Assertions.assertTrue(result);
 		}
 		{
 			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 			String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 			EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
-			Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 		}
 	}
 }

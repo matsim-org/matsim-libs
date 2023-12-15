@@ -20,10 +20,10 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
@@ -38,11 +38,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class CountsHtmlAndGraphsWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testGraphCreation() {
+	@Test
+	void testGraphCreation() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

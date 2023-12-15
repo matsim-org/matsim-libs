@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import static org.mockito.Mockito.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 
@@ -35,14 +35,14 @@ public class MobsimScopeEventHandlingTest {
 	private final MobsimScopeEventHandler handler = mock(MobsimScopeEventHandler.class);
 
 	@Test
-	public void test_addMobsimScopeHandler() {
+	void test_addMobsimScopeHandler() {
 		eventHandling.addMobsimScopeHandler(handler);
 
 		verify(eventsManager, times(1)).addHandler(argThat(arg -> arg == handler));
 	}
 
 	@Test
-	public void test_notifyAfterMobsim_oneHandler() {
+	void test_notifyAfterMobsim_oneHandler() {
 		eventHandling.addMobsimScopeHandler(handler);
 		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
@@ -51,7 +51,7 @@ public class MobsimScopeEventHandlingTest {
 	}
 
 	@Test
-	public void test_notifyAfterMobsim_noHandlersAfterRemoval() {
+	void test_notifyAfterMobsim_noHandlersAfterRemoval() {
 		eventHandling.addMobsimScopeHandler(handler);
 		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 

@@ -22,12 +22,13 @@
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
+import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -51,10 +52,10 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class MatrixBasedPtRouterIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
+	@TempDir
+	public File folder;
 
 	/**
 	 * This method tests the travel time computation with pseudo pt.
@@ -64,7 +65,7 @@ public class MatrixBasedPtRouterIT {
 	 * the travel time computed by the PtMatrix are compared (should be equal).
 	 */
 	@Test
-	public void testIntegration() throws IOException {
+	void testIntegration() throws IOException {
 
 		String path = utils.getOutputDirectory();
 
@@ -79,8 +80,8 @@ public class MatrixBasedPtRouterIT {
 		new PopulationWriter(population, network).write(path+"plans.xml");
 
 		//dummy csv files for pt stops, travel times and travel distances fitting into the dummy network are created
-		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));
-		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(folder.newFile("ptTravelInfo.csv"));
+		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile( new File(folder, "ptStops.csv"));
+		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(new File(folder, "ptTravelInfo.csv"));
 
 		//add stops, travel times and travel distances file to the pseudo pt config group
 		final MatrixBasedPtRouterConfigGroup matrixBasedPtRouterConfigGroup = new MatrixBasedPtRouterConfigGroup();
@@ -127,7 +128,7 @@ public class MatrixBasedPtRouterIT {
 		double actualTtime = ((Leg)person.getSelectedPlan().getPlanElements().get(1)).getTravelTime().seconds();
 
 		//compare computed and actual travel time
-		Assert.assertEquals(ttime, actualTtime, 0);
+		Assertions.assertEquals(ttime, actualTtime, 0);
 
 	}
 

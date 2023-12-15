@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,11 +13,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class OperationFacilitiesIOTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void test() {
+	@Test
+	void test() {
 
     	OperationFacilitiesSpecification operationFacilities = new OperationFacilitiesSpecificationImpl();
 
@@ -58,12 +58,12 @@ public class OperationFacilitiesIOTest {
             Id<Charger> charger = Id.create(i, Charger.class);
             Id<Charger> charger2 = Id.create(i+"_2", Charger.class);
             final OperationFacilitySpecification facility = copy.getOperationFacilitySpecifications().get(id);
-            Assert.assertEquals(linkId.toString(), facility.getLinkId().toString());
-            Assert.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
-            Assert.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
-            Assert.assertEquals(capacity, facility.getCapacity());
-            Assert.assertEquals(charger.toString(), facility.getChargers().get(0).toString());
-            Assert.assertEquals(charger2.toString(), facility.getChargers().get(1).toString());
+            Assertions.assertEquals(linkId.toString(), facility.getLinkId().toString());
+            Assertions.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
+            Assertions.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
+            Assertions.assertEquals(capacity, facility.getCapacity());
+            Assertions.assertEquals(charger.toString(), facility.getChargers().get(0).toString());
+            Assertions.assertEquals(charger2.toString(), facility.getChargers().get(1).toString());
         }
 
         for (int i = 10; i < 20; i++) {
@@ -73,11 +73,11 @@ public class OperationFacilitiesIOTest {
             int capacity = i;
             Id<Charger> charger = Id.create(i, Charger.class);
             final OperationFacilitySpecification facility = copy.getOperationFacilitySpecifications().get(id);
-            Assert.assertEquals(linkId.toString(), facility.getLinkId().toString());
-            Assert.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
-            Assert.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
-            Assert.assertEquals(capacity, facility.getCapacity());
-            Assert.assertEquals(charger.toString(), facility.getChargers().get(0).toString());
+            Assertions.assertEquals(linkId.toString(), facility.getLinkId().toString());
+            Assertions.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
+            Assertions.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
+            Assertions.assertEquals(capacity, facility.getCapacity());
+            Assertions.assertEquals(charger.toString(), facility.getChargers().get(0).toString());
         }
     }
 }

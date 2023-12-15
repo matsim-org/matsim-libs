@@ -23,8 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,7 +41,7 @@ import org.matsim.core.population.PopulationUtils;
 public class LexicographicRemoverTest {
 
 	@Test
-	public void testOnlyIndividualPlans() {
+	void testOnlyIndividualPlans() {
 		final Map<Id<Person>, Plan> toRemove = new LinkedHashMap< >();
 		final ReplanningGroup group = new ReplanningGroup();
 		final JointPlans jointPlans = new JointPlans();
@@ -67,7 +67,7 @@ public class LexicographicRemoverTest {
 	}
 
 	@Test
-	public void testOnlyOneComposition() {
+	void testOnlyOneComposition() {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
@@ -101,7 +101,7 @@ public class LexicographicRemoverTest {
 	}
 
 	@Test
-	public void testOneCompositionAndOneExcedentaryPlan() {
+	void testOneCompositionAndOneExcedentaryPlan() {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
@@ -173,13 +173,13 @@ public class LexicographicRemoverTest {
 
 		for ( Person p : f.group.getPersons() ) {
 			final Plan expectedRemoved = f.expectedRemovedPlans.get( p.getId() );
-			Assert.assertFalse(
-					expectedRemoved+" not removed for person "+p,
-					p.getPlans().contains( expectedRemoved ) );
+			Assertions.assertFalse(
+					p.getPlans().contains( expectedRemoved ),
+					expectedRemoved+" not removed for person "+p );
 
-			Assert.assertNull(
-					"MEMORY LEAK: There is still a joint plan associated to removed plan "+expectedRemoved,
-					f.jointPlans.getJointPlan( expectedRemoved ) );
+			Assertions.assertNull(
+					f.jointPlans.getJointPlan( expectedRemoved ),
+					"MEMORY LEAK: There is still a joint plan associated to removed plan "+expectedRemoved );
 		}
 	}
 

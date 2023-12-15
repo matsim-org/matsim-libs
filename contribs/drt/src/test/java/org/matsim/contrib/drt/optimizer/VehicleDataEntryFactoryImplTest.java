@@ -26,7 +26,7 @@ import static org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl.compu
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.Waypoint.Stop;
@@ -50,7 +50,7 @@ public class VehicleDataEntryFactoryImplTest {
 	private final Stop stop1 = stop(300, 340, 400, 430);
 
 	@Test
-	public void computeSlackTimes_withStops() {
+	void computeSlackTimes_withStops() {
 		final List<Double> precedingStayTimes = Arrays.asList(0.0, 0.0);
 		
 		//final stay task not started - vehicle slack time is 50
@@ -64,7 +64,7 @@ public class VehicleDataEntryFactoryImplTest {
 	}
 
 	@Test
-	public void computeSlackTimes_withoutStops() {
+	void computeSlackTimes_withoutStops() {
 		final List<Double> precedingStayTimes = Arrays.asList();
 		
 		//final stay task not started yet - vehicle slack time is 10
@@ -85,9 +85,9 @@ public class VehicleDataEntryFactoryImplTest {
 		//final stay task planned after vehicle end time - vehicle slack time is 0s
 		assertThat(computeSlackTimes(vehicle(500, 510), 300, new Stop[] {}, null, precedingStayTimes)).containsExactly(0, 0);
 	}
-	
+
 	@Test
-	public void computeSlackTimes_withStart() {
+	void computeSlackTimes_withStart() {
 		final List<Double> noPrecedingStayTimes = Arrays.asList();
 		final List<Double> onePrecedingStayTime = Arrays.asList(0.0);
 		
@@ -100,9 +100,9 @@ public class VehicleDataEntryFactoryImplTest {
 		//start with stop
 		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop1 }, stop0, onePrecedingStayTime)).containsExactly(30, 30, 50);
 	}
-	
+
 	@Test
-	public void computeSlackTimes_withPrecedingStayTimes() {
+	void computeSlackTimes_withPrecedingStayTimes() {
 		final List<Double> precedingStayTimes = Arrays.asList( //
 				0.0, //
 				33.0 // second stop is a prebooked pickup, so slack for insertion after first stop is longer

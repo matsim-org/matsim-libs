@@ -11,7 +11,7 @@ import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -23,8 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Utils {
 
@@ -196,13 +196,13 @@ public class Utils {
 	private static void testLinksAreEqual(Link expected, Link actual) {
 
 		expected.getAllowedModes().forEach(mode -> assertTrue(actual.getAllowedModes().contains(mode)));
-		Assert.assertEquals(expected.getCapacity(), actual.getCapacity(), 0.001);
-		Assert.assertEquals(expected.getFlowCapacityPerSec(), actual.getFlowCapacityPerSec(), 0.001);
-		Assert.assertEquals(expected.getFreespeed(), actual.getFreespeed(), 0.001);
-		Assert.assertEquals(expected.getLength(), actual.getLength(), 0.001);
-		Assert.assertEquals(expected.getNumberOfLanes(), actual.getNumberOfLanes(), 0.001);
-		Assert.assertEquals(expected.getFromNode().getId(), actual.getFromNode().getId());
-		Assert.assertEquals(expected.getToNode().getId(), actual.getToNode().getId());
+		Assertions.assertEquals(expected.getCapacity(), actual.getCapacity(), 0.001);
+		Assertions.assertEquals(expected.getFlowCapacityPerSec(), actual.getFlowCapacityPerSec(), 0.001);
+		Assertions.assertEquals(expected.getFreespeed(), actual.getFreespeed(), 0.001);
+		Assertions.assertEquals(expected.getLength(), actual.getLength(), 0.001);
+		Assertions.assertEquals(expected.getNumberOfLanes(), actual.getNumberOfLanes(), 0.001);
+		Assertions.assertEquals(expected.getFromNode().getId(), actual.getFromNode().getId());
+		Assertions.assertEquals(expected.getToNode().getId(), actual.getToNode().getId());
 	}
 
 	private static void testNodesAreEqual(org.matsim.api.core.v01.network.Node expected, org.matsim.api.core.v01.network.Node actual) {
@@ -210,10 +210,10 @@ public class Utils {
 		// test x and y separately, so that we can have a delta.
 		// In java version >=11 Assert.assertEquals(expected.getCoord(), actual.getCoord()) also works
 		// keep this in as long as we use java-8
-		Assert.assertEquals(expected.getCoord().getX(), actual.getCoord().getX(), 0.00000001);
-		Assert.assertEquals(expected.getCoord().getY(), actual.getCoord().getY(), 0.00000001);
-		expected.getOutLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getOutLinks().get(id).getId()));
-		expected.getInLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getInLinks().get(id).getId()));
+		Assertions.assertEquals(expected.getCoord().getX(), actual.getCoord().getX(), 0.00000001);
+		Assertions.assertEquals(expected.getCoord().getY(), actual.getCoord().getY(), 0.00000001);
+		expected.getOutLinks().forEach((id, link) -> Assertions.assertEquals(link.getId(), actual.getOutLinks().get(id).getId()));
+		expected.getInLinks().forEach((id, link) -> Assertions.assertEquals(link.getId(), actual.getInLinks().get(id).getId()));
 	}
 
 	static class OsmData {

@@ -19,26 +19,26 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mrieser
  */
 public class PlansDumpingIT {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testPlansDump_Interval() {
+	void testPlansDump_Interval() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(3);
@@ -62,7 +62,7 @@ public class PlansDumpingIT {
 	}
 
 	@Test
-	public void testPlansDump_Never() {
+	void testPlansDump_Never() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
@@ -86,7 +86,7 @@ public class PlansDumpingIT {
 	}
 
 	@Test
-	public void testPlansDump_Always() {
+	void testPlansDump_Always() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(1);

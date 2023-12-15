@@ -25,8 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -46,7 +45,7 @@ import com.google.common.collect.ImmutableList;
 public class KNearestInsertionsAtEndFilterTest {
 
 	@Test
-	public void k0_atEndInsertionsNotReturned() {
+	void k0_atEndInsertionsNotReturned() {
 		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
 		var insertion = insertion(vehicleEntry, 1, 10);
 		var filteredInsertions = KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(0, List.of(insertion));
@@ -54,13 +53,13 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@Test
-	public void noInsertions_emptyList() {
+	void noInsertions_emptyList() {
 		var filteredInsertions = filterOneInsertionAtEnd();
 		assertThat(filteredInsertions).isEmpty();
 	}
 
 	@Test
-	public void noAtEndInsertions_allReturned() {
+	void noAtEndInsertions_allReturned() {
 		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
 		var insertion1 = insertion(vehicleEntry, 0, 11);
 		var insertion2 = insertion(vehicleEntry, 0, 22);
@@ -70,7 +69,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@Test
-	public void onlyAtEndInsertions_theEarliestReturned() {
+	void onlyAtEndInsertions_theEarliestReturned() {
 		var vehicleEntry1 = vehicleEntry("v1", start(0), stop(100));
 		var insertion1 = insertion(vehicleEntry1, 1, 110);
 
@@ -83,7 +82,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@Test
-	public void onlyAtEndInsertions_equalArrivalTime_useVehicleIdAsTieBreaker() {
+	void onlyAtEndInsertions_equalArrivalTime_useVehicleIdAsTieBreaker() {
 		var vehicleEntry1 = vehicleEntry("v1", start(0), stop(100));
 		var insertion1 = insertion(vehicleEntry1, 1, 110);
 
@@ -96,7 +95,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@Test
-	public void mixedTypeInsertions_bothReturned() {
+	void mixedTypeInsertions_bothReturned() {
 		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
 		var insertionAfterStart = insertion(vehicleEntry, 0, 11);
 		var insertionAtEnd = insertion(vehicleEntry, 1, 10);

@@ -20,20 +20,20 @@
 
 package org.matsim.integration.always;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -90,11 +90,11 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class BetaTravelTest66IT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	/* This TestCase uses a custom Controler, named TestControler, to load
+	/*This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
 	 * TimeAllocationMutator, the TimeAllocationMutatorBottleneck.
 	 * LinkAnalyzer, an event handler, collects some statistics on the
@@ -130,7 +130,8 @@ public class BetaTravelTest66IT {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testBetaTravel_66() {
+	@Test
+	void testBetaTravel_66() {
 		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
 		config.controller().setWritePlansInterval(0);

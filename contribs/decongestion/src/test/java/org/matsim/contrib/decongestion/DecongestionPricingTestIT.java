@@ -22,9 +22,9 @@
  */
 package org.matsim.contrib.decongestion;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,15 +54,15 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class DecongestionPricingTestIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
 	 * Kp = 0.0123
 	 *
 	 */
 	@Test
-	public final void test0a() {
+	final void test0a() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -130,19 +130,19 @@ public class DecongestionPricingTestIT {
         double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
         double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(100.0, tt2, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -33.940316666666666, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-33.940316666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
-		Assert.assertEquals("Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5", 50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong toll.", 50.5 * 0.0123, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON, "Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5");
+		Assertions.assertEquals(50.5 * 0.0123, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON, "Wrong toll.");
 
 	}
 
@@ -151,7 +151,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0amodified() {
+	final void test0amodified() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -197,13 +197,13 @@ public class DecongestionPricingTestIT {
         double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
         double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(100.0, tt2, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -33.940316666666666, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-33.940316666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0b() {
+	final void test0b() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -279,19 +279,19 @@ public class DecongestionPricingTestIT {
         double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
         double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(100.0, tt2, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -134.31916666666666, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-134.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
-		Assert.assertEquals("Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5", 50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong toll.", 50.5 * 2, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON, "Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5");
+		Assertions.assertEquals(50.5 * 2, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON, "Wrong toll.");
 	}
 
 	/**
@@ -299,7 +299,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0bmodified() {
+	final void test0bmodified() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -345,13 +345,13 @@ public class DecongestionPricingTestIT {
         double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
         double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(100.0, tt2, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -134.31916666666666, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-134.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 	}
 
 	/**
@@ -359,7 +359,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test0c() {
+	final void test0c() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -419,19 +419,19 @@ public class DecongestionPricingTestIT {
         double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
         double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(100.0, tt2, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -33.31916666666666, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-33.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
-		Assert.assertEquals("Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5", 50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON);
-		Assert.assertNull("Wrong toll.", info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84));
+		Assertions.assertEquals(50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON, "Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5");
+		Assertions.assertNull(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), "Wrong toll.");
 
 	}
 
@@ -440,7 +440,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test1() {
+	final void test1() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -489,11 +489,11 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index) ;
-		Assert.assertEquals("Wrong average executed score. The run output seems to have changed.", -12036.177448472225, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-12036.177448472225, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-		Assert.assertEquals("Wrong toll in time bin 61.", 9.197000000000003, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong toll in time bin 73.", 12.963999999999984, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9.197000000000003, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");
+		Assertions.assertEquals(12.963999999999984, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON, "Wrong toll in time bin 73.");
 	}
 
 	/**
@@ -501,7 +501,7 @@ public class DecongestionPricingTestIT {
 	 *
 	 */
 	@Test
-	public final void test2() {
+	final void test2() {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
@@ -551,11 +551,11 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get( index ) ;
-		Assert.assertEquals("Wrong average executed score. The run output seems to have changed.", -55.215645833333184, avgScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-55.215645833333184, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-		Assert.assertEquals("Wrong toll in time bin 61.", 13., info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong toll in time bin 73.", 13., info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(13., info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");
+		Assertions.assertEquals(13., info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON, "Wrong toll in time bin 73.");
 	}
 
 }

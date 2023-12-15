@@ -22,9 +22,9 @@
  */
 package org.matsim.contrib.accessibility.logsumComputations;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -33,8 +33,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ComputeLogsumFormulas3Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * underlying network
@@ -48,7 +48,8 @@ public class ComputeLogsumFormulas3Test {
 	 */
 	@SuppressWarnings("static-method")
 
-	@Test public void testLogsumFormulas(){
+	@Test
+	void testLogsumFormulas(){
 		double betaWalkTT = -10. / 3600.0;	// [util/sec]
 		double betaWalkTD = -10.;			// [util/meter]
 
@@ -100,7 +101,7 @@ public class ComputeLogsumFormulas3Test {
 //		double expNewVhj= Math.exp( VhjNew );
 //		double expNewVhk= expNewVhj * sumExpVjk;
 
-		Assert.assertTrue(VhjOld == VhjNew);	// old accessibility computation == new accessibility computation
+		Assertions.assertTrue(VhjOld == VhjNew);	// old accessibility computation == new accessibility computation
 
 		///////
 		// NEW
@@ -112,7 +113,7 @@ public class ComputeLogsumFormulas3Test {
 		double dummyExp1 = Math.exp( dummyVijCar + dummyVhiWalk );
 		double dummyExp2 = Math.exp( dummyVijCar ) * Math.exp( dummyVhiWalk );
 
-		Assert.assertEquals(dummyExp1,dummyExp2,1.e-10);	// exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
+		Assertions.assertEquals(dummyExp1,dummyExp2,1.e-10);	// exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
 	}
 
 }

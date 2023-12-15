@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -49,8 +49,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class DemandGenerationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final String populationFile = "population.xml";
@@ -60,15 +60,16 @@ public class DemandGenerationTest {
 	private int personCount = 6;
 	private int linkCount = 6;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.sc = null;
 	}
 
-	@Test public void testDemandGeneration(){
+	@Test
+	void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
 

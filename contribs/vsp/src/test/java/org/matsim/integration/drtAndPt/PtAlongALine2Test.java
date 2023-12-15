@@ -9,10 +9,10 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -64,12 +64,11 @@ import com.google.inject.Singleton;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 
-//@RunWith(Parameterized.class)
 public class PtAlongALine2Test {
 	private static final Logger log = LogManager.getLogger(PtAlongALine2Test.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	enum DrtMode {none, teleportBeeline, teleportBasedOnNetworkRoute, full, withPrebooking}
 
@@ -96,7 +95,7 @@ public class PtAlongALine2Test {
 	// !! otfvis does not run within parameterized test :-( !!
 
 	@Test
-	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
+	void testPtAlongALineWithRaptorAndDrtServiceArea() {
 		// Towards some understanding of what is going on here:
 		// * In many situations, a good solution is that drt drives to some transit stop, and from there directly to the destination.  The swiss rail
 		// raptor will return a cost "infinity" of such a solution, in which case the calling method falls back onto transit_walk.
@@ -469,9 +468,9 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 1", planLegCase1.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 1", planLegCase1.get(1).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 1", planLegCase1.get(2).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase1.get(0).getMode().contains("walk"), "Incorrect Mode, case 1");
+		Assertions.assertTrue(planLegCase1.get(1).getMode().equals("pt"), "Incorrect Mode, case 1");
+		Assertions.assertTrue(planLegCase1.get(2).getMode().contains("walk"), "Incorrect Mode, case 1");
 
 		/**
 		 * Case 2a: Agent starts at Link "50-51". This is within the drt service area. Agent is expected use drt as
@@ -488,11 +487,11 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(1).getMode().equals("drt"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(2).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(3).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(4).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase2a.get(0).getMode().contains("walk"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(1).getMode().equals("drt"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(2).getMode().contains("walk"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(3).getMode().equals("pt"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(4).getMode().contains("walk"), "Incorrect Mode, case 2a");
 
 		/**
 		 * Case 2b: Agent starts at Link "300-301". This is within the drt service area. Agent is expected use drt as
@@ -508,11 +507,11 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(1).getMode().equals("drt"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(2).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(3).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(4).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase2b.get(0).getMode().contains("walk"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(1).getMode().equals("drt"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(2).getMode().contains("walk"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(3).getMode().equals("pt"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(4).getMode().contains("walk"), "Incorrect Mode, case 2b");
 
 		/**
 		 * Case 2c: Agent starts at Link "550-551". This is within the drt3 service area. Agent is expected use drt3 as
@@ -528,11 +527,11 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(1).getMode().equals("drt3"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(2).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(3).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(4).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase2c.get(0).getMode().contains("walk"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(1).getMode().equals("drt3"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(2).getMode().contains("walk"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(3).getMode().equals("pt"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(4).getMode().contains("walk"), "Incorrect Mode, case 2c");
 
 		/**
 		 * Case 3a: Agent starts at Link "690-691". This is not within any drt service areas. Agent is expected to use
@@ -548,7 +547,7 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 3a", planLegCase3a.get(0).getMode().equals("walk"));
+		Assertions.assertTrue(planLegCase3a.get(0).getMode().equals("walk"), "Incorrect Mode, case 3a");
 
 		/**
 		 * Case 3b: Agent starts at Link "800-801". This is within the drt2 service area. Agent is NOT expected to utilize
@@ -565,12 +564,12 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 3b", planLegCase3b.get(0).getMode().equals("walk"));
+		Assertions.assertTrue(planLegCase3b.get(0).getMode().equals("walk"), "Incorrect Mode, case 3b");
 
 	}
 
 	@Test
-	public void intermodalAccessEgressPicksWrongVariant() {
+	void intermodalAccessEgressPicksWrongVariant() {
 		// outdated comment:
 		// this test fails because it picks a
 		//    drt-nonNetworkWalk-nonNetworkWalk-drt
@@ -727,7 +726,7 @@ public class PtAlongALine2Test {
 									break;
 								}
 							}
-							Assert.assertFalse(problem);
+							Assertions.assertFalse(problem);
 
 						}
 					}
@@ -745,9 +744,10 @@ public class PtAlongALine2Test {
 		controler.run();
 	}
 
+	// this test is failing because raptor treats "walk" in a special way.  kai, jul'19
 	@Test
-	@Ignore // this test is failing because raptor treats "walk" in a special way.  kai, jul'19
-	public void networkWalkDoesNotWorkWithRaptor() {
+	@Disabled
+	void networkWalkDoesNotWorkWithRaptor() {
 		// test fails with null pointer exception
 
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());

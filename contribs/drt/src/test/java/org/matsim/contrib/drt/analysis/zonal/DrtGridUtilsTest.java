@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -18,7 +18,7 @@ import org.matsim.core.network.NetworkUtils;
 public class DrtGridUtilsTest {
 
 	@Test
-	public void test() {
+	void test() {
 		Network network = createNetwork();
 		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
 

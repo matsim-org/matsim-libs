@@ -18,20 +18,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.travelsummary.events2traveldiaries;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
  */
 public class RunEventsToTravelDiariesIT {
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @SuppressWarnings("static-method")
-    @Test
-    public final void test() {
+	@SuppressWarnings("static-method")
+	@Test
+	final void test() {
 
         String[] str = {"../../examples/scenarios/equil/config.xml", "../../examples/scenarios/equil/output_events.xml.gz", "_test", utils.getOutputDirectory()};
         // This goes through the file system (nothing to do with resource paths etc.)

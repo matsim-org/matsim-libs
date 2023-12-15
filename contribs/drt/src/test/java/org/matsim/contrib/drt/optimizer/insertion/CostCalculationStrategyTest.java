@@ -27,7 +27,7 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
@@ -36,20 +36,20 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  */
 public class CostCalculationStrategyTest {
 	@Test
-	public void RejectSoftConstraintViolations_tooLongWaitTime() {
+	void RejectSoftConstraintViolations_tooLongWaitTime() {
 		assertRejectSoftConstraintViolations(10, 9999,
 				new DetourTimeInfo(new PickupDetourInfo(11, 0), new DropoffDetourInfo(22, 0)),
 				INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
-	public void RejectSoftConstraintViolations_tooLongTravelTime() {
+	void RejectSoftConstraintViolations_tooLongTravelTime() {
 		assertRejectSoftConstraintViolations(9999, 10,
 				new DetourTimeInfo(new PickupDetourInfo(0, 0), new DropoffDetourInfo(11, 0)), INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
-	public void RejectSoftConstraintViolations_allConstraintSatisfied() {
+	void RejectSoftConstraintViolations_allConstraintSatisfied() {
 		assertRejectSoftConstraintViolations(9999, 9999,
 				new DetourTimeInfo(new PickupDetourInfo(11, 33), new DropoffDetourInfo(22, 44)), 33 + 44);
 	}
@@ -65,21 +65,21 @@ public class CostCalculationStrategyTest {
 	}
 
 	@Test
-	public void DiscourageSoftConstraintViolations_tooLongWaitTime() {
+	void DiscourageSoftConstraintViolations_tooLongWaitTime() {
 		assertDiscourageSoftConstraintViolations(10, 9999,
 				new DetourTimeInfo(new PickupDetourInfo(11, 0), new DropoffDetourInfo(22, 0)),
 				MAX_WAIT_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
-	public void DiscourageSoftConstraintViolations_tooLongTravelTime() {
+	void DiscourageSoftConstraintViolations_tooLongTravelTime() {
 		assertDiscourageSoftConstraintViolations(9999, 10,
 				new DetourTimeInfo(new PickupDetourInfo(0, 0), new DropoffDetourInfo(11, 0)),
 				MAX_TRAVEL_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
-	public void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
+	void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
 		assertDiscourageSoftConstraintViolations(9999, 9999,
 				new DetourTimeInfo(new PickupDetourInfo(11, 33), new DropoffDetourInfo(22, 44)), 33 + 44);
 	}

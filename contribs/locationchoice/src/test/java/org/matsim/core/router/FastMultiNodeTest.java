@@ -20,8 +20,8 @@
 
 package org.matsim.core.router;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +50,7 @@ import java.util.List;
 public class FastMultiNodeTest {
 
 	@Test
-	public void testFastMultiNodeDijkstra_OneToOne() {
+	void testFastMultiNodeDijkstra_OneToOne() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness( 0. );
@@ -73,42 +73,42 @@ public class FastMultiNodeTest {
 		 */
 		Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 3600.0, null, null);
 
-		Assert.assertEquals(1.0, path.travelCost, 0.0);
-		Assert.assertEquals(300.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.0, path.travelCost, 0.0);
+		Assertions.assertEquals(300.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation
 		 */
 		path = dijkstra.constructPath(fromNode, toNode, 3600.0);
 
-		Assert.assertEquals(1.0, path.travelCost, 0.0);
-		Assert.assertEquals(300.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.0, path.travelCost, 0.0);
+		Assertions.assertEquals(300.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
 	}
 
 	@Test
-	public void testFastMultiNodeDijkstra_OneToMany() {
+	void testFastMultiNodeDijkstra_OneToMany() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness( 0. );
@@ -138,68 +138,68 @@ public class FastMultiNodeTest {
 		 */
 		Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 3600.0, null, null);
 
-		Assert.assertEquals(1.0, path.travelCost, 0.0);
-		Assert.assertEquals(300.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.0, path.travelCost, 0.0);
+		Assertions.assertEquals(300.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation - toNode1
 		 */
 		path = dijkstra.constructPath(fromNode, toNode1, 3600.0);
 
-		Assert.assertEquals(1.0, path.travelCost, 0.0);
-		Assert.assertEquals(300.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.0, path.travelCost, 0.0);
+		Assertions.assertEquals(300.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation - toNode2
 		 */
 		path = dijkstra.constructPath(fromNode, toNode2, 3600.0);
 
-		Assert.assertEquals(1.333, path.travelCost, 0.001);
-		Assert.assertEquals(400.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.333, path.travelCost, 0.001);
+		Assertions.assertEquals(400.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n4", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n4", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l3", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l3", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation - toNode3
 		 */
 		path = dijkstra.constructPath(fromNode, toNode3, 3600.0);
 
-		Assert.assertNull(path);
+		Assertions.assertNull(path);
 	}
 
 	@Test
-	public void testFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
+	void testFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setRoutingRandomness( 0. );
@@ -229,78 +229,78 @@ public class FastMultiNodeTest {
 		 */
 		Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 3600.0, null, null);
 
-		Assert.assertEquals(1.0, path.travelCost, 0.0);
-		Assert.assertEquals(300.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.0, path.travelCost, 0.0);
+		Assertions.assertEquals(300.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation - toNode1
 		 */
 		path = dijkstra.constructPath(fromNode, toNode1, 3600.0);
 
-		Assert.assertEquals(1.0, path.travelCost, 0.0);
-		Assert.assertEquals(300.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.0, path.travelCost, 0.0);
+		Assertions.assertEquals(300.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n3", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l2", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation - toNode2
 		 */
 		path = dijkstra.constructPath(fromNode, toNode2, 3600.0);
 
-		Assert.assertEquals(1.333, path.travelCost, 0.001);
-		Assert.assertEquals(400.0, path.travelTime, 0.0);
+		Assertions.assertEquals(1.333, path.travelCost, 0.001);
+		Assertions.assertEquals(400.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(4, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n4", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(4, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n4", Node.class), path.nodes.get(3).getId());
 
-		Assert.assertEquals(3, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l3", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(3, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l3", Link.class), path.links.get(2).getId());
 
 		/*
 		 * test constructPath method which uses data from the previous routing operation - toNode3
 		 */
 		path = dijkstra.constructPath(fromNode, toNode3, 3600.0);
 
-		Assert.assertEquals(2.0, path.travelCost, 0.0);
-		Assert.assertEquals(600.0, path.travelTime, 0.0);
+		Assertions.assertEquals(2.0, path.travelCost, 0.0);
+		Assertions.assertEquals(600.0, path.travelTime, 0.0);
 
-		Assert.assertEquals(5, path.nodes.size());
-		Assert.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
-		Assert.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
-		Assert.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
-		Assert.assertEquals(Id.create("n4", Node.class), path.nodes.get(3).getId());
-		Assert.assertEquals(Id.create("n5", Node.class), path.nodes.get(4).getId());
+		Assertions.assertEquals(5, path.nodes.size());
+		Assertions.assertEquals(Id.create("n0", Node.class), path.nodes.get(0).getId());
+		Assertions.assertEquals(Id.create("n1", Node.class), path.nodes.get(1).getId());
+		Assertions.assertEquals(Id.create("n2", Node.class), path.nodes.get(2).getId());
+		Assertions.assertEquals(Id.create("n4", Node.class), path.nodes.get(3).getId());
+		Assertions.assertEquals(Id.create("n5", Node.class), path.nodes.get(4).getId());
 
-		Assert.assertEquals(4, path.links.size());
-		Assert.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
-		Assert.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
-		Assert.assertEquals(Id.create("l3", Link.class), path.links.get(2).getId());
-		Assert.assertEquals(Id.create("l4", Link.class), path.links.get(3).getId());
+		Assertions.assertEquals(4, path.links.size());
+		Assertions.assertEquals(Id.create("l0", Link.class), path.links.get(0).getId());
+		Assertions.assertEquals(Id.create("l1", Link.class), path.links.get(1).getId());
+		Assertions.assertEquals(Id.create("l3", Link.class), path.links.get(2).getId());
+		Assertions.assertEquals(Id.create("l4", Link.class), path.links.get(3).getId());
 	}
 
 	/*

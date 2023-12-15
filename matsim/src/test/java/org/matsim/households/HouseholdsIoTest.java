@@ -19,7 +19,7 @@
 
 package org.matsim.households;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Income.IncomePeriod;
@@ -41,8 +41,8 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HouseholdsIoTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final String TESTHOUSEHOLDSINPUT  = "testHouseholds.xml";
@@ -59,7 +59,8 @@ public class HouseholdsIoTest {
 	private final Id<Household> id24 = Id.create("24", Household.class);
 	private final Id<Household> id25 = Id.create("25", Household.class);
 
-	@Test public void testBasicReaderWriter() throws IOException {
+	@Test
+	void testBasicReaderWriter() throws IOException {
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
 		reader.readFile(utils.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
@@ -107,7 +108,7 @@ public class HouseholdsIoTest {
 		assertEquals(50000.0d, hh.getIncome().getIncome(), MatsimTestUtils.EPSILON);
 
 		Attributes currentAttributes = hh.getAttributes();
-		assertNotNull("Custom attributes from household with id 23 should not be empty.", currentAttributes);
+		assertNotNull(currentAttributes, "Custom attributes from household with id 23 should not be empty.");
 		String customAttributeName = "customAttribute1";
 		String customContent = (String)currentAttributes.getAttribute(customAttributeName);
 		assertEquals("customValue1", customContent);

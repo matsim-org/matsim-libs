@@ -23,9 +23,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,228 +49,228 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class TransportModeNetworkFilterTest {
 
 	@Test
-	public void testFilter_SingleMode() {
+	void testFilter_SingleMode() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car));
-		Assert.assertEquals("wrong number of nodes.", 13, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 14, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[2]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[3]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[10]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[11]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[12]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[13]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[15]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[1]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[11]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[12]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[3]));
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().get(f.linkIds[7]));
+		Assertions.assertEquals(13, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(14, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[3]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[10]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[11]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[12]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[13]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[15]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[12]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[3]));
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().get(f.linkIds[7]));
 
 		subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.bike));
-		Assert.assertEquals("wrong number of nodes.", 9, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 8, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[4]));
+		Assertions.assertEquals(9, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(8, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[4]));
 
 		subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.walk));
-		Assert.assertEquals("wrong number of nodes.", 5, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 4, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[15]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[1]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[4]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[7]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[10]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[13]));
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[15]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[14]));
+		Assertions.assertEquals(5, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(4, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[15]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[1]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[4]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[7]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[10]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[13]));
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[15]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[14]));
 	}
 
 	@Test
-	public void testFilter_MultipleModes() {
+	void testFilter_MultipleModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car, TransportMode.bike));
-		Assert.assertEquals("wrong number of nodes.", 13, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 15, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[2]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[3]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[10]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[11]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[12]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[15]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[1]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[3]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[11]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[12]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
-		Assert.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
-		Assert.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().get(f.linkIds[7]));
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[10]).getInLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[10]).getInLinks().get(f.linkIds[9]));
+		Assertions.assertEquals(13, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(15, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[3]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[10]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[11]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[12]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[15]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[12]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
+		Assertions.assertEquals(f.modesC, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
+		Assertions.assertEquals(f.modesCB, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().get(f.linkIds[7]));
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[10]).getInLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[10]).getInLinks().get(f.linkIds[9]));
 
 		subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.bike, TransportMode.walk));
-		Assert.assertEquals("wrong number of nodes.", 9, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 10, subNetwork.getLinks().size());
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[2]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[3]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[10]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[11]));
-		Assert.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[12]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[15]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
-		Assert.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
-		Assert.assertEquals(f.modesWB, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[15]).getAllowedModes());
-		Assert.assertEquals(f.modesWB, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[10]).getOutLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[10]).getOutLinks().get(f.linkIds[16]));
+		Assertions.assertEquals(9, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(10, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[3]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[4]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[5]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[6]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[7]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[8]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[9]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[10]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[11]));
+		Assertions.assertFalse(subNetwork.getLinks().containsKey(f.linkIds[12]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[15]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assertions.assertEquals(f.modesB, subNetwork.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assertions.assertEquals(f.modesWB, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[15]).getAllowedModes());
+		Assertions.assertEquals(f.modesWB, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[10]).getOutLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[10]).getOutLinks().get(f.linkIds[16]));
 	}
 
 	@Test
-	public void testFilter_NoModes() {
+	void testFilter_NoModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, new HashSet<String>());
-		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
+		Assertions.assertEquals(0, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(0, subNetwork.getLinks().size(), "wrong number of links");
 	}
 
 	@Test
-	public void testFilter_AdditionalModes() {
+	void testFilter_AdditionalModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.walk, TransportMode.pt, "motorbike"));
-		Assert.assertEquals("wrong number of nodes.", 5, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 4, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[15]));
-		Assert.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[1]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[4]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[7]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[10]));
-		Assert.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[13]));
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[15]).getAllowedModes());
-		Assert.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
-		Assert.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
-		Assert.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[14]));
+		Assertions.assertEquals(5, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(4, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[13]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[14]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[15]));
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(f.linkIds[16]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[1]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[4]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[7]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[10]));
+		Assertions.assertTrue(subNetwork.getNodes().containsKey(f.nodeIds[13]));
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[13]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[14]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[15]).getAllowedModes());
+		Assertions.assertEquals(f.modesW, subNetwork.getLinks().get(f.linkIds[16]).getAllowedModes());
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
+		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
+		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[14]));
 	}
 
 	@Test
-	public void testFilter_NoCommonModes() {
+	void testFilter_NoCommonModes() {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.pt, "motorbike"));
-		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
+		Assertions.assertEquals(0, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(0, subNetwork.getLinks().size(), "wrong number of links");
 	}
-	
+
 	/**
 	 * Tests the algorithm for the case the network contains direct loops, i.e.
 	 * links with the same from and to node.
@@ -284,7 +283,7 @@ public class TransportModeNetworkFilterTest {
 	 * scenario from scratch.
 	 */
 	@Test
-	public void testFilter_SingleMode_loop() {
+	void testFilter_SingleMode_loop() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		final NetworkFactory factory = network.getFactory();
@@ -299,16 +298,16 @@ public class TransportModeNetworkFilterTest {
 		
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car));
-		Assert.assertEquals("wrong number of nodes.", 1, subNetwork.getNodes().size());
-		Assert.assertEquals("wrong number of links", 1, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(Id.create(1, Link.class)));
+		Assertions.assertEquals(1, subNetwork.getNodes().size(), "wrong number of nodes.");
+		Assertions.assertEquals(1, subNetwork.getLinks().size(), "wrong number of links");
+		Assertions.assertTrue(subNetwork.getLinks().containsKey(Id.create(1, Link.class)));
 	}
-	
+
 	/**
 	 * Tests that tiem-varying information is converted
 	 */
 	@Test
-	public void testFilter_timeVariant() {
+	void testFilter_timeVariant() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		
@@ -328,18 +327,18 @@ public class TransportModeNetworkFilterTest {
 		changeEvent.addLink(sourceLink);
 		((TimeDependentNetwork) sourceNetwork).addNetworkChangeEvent(changeEvent);
 		
-		Assert.assertEquals(50.0, sourceLink.getFreespeed(), 1e-3);
-		Assert.assertEquals(50.0, sourceLink.getFreespeed(0.0), 1e-3);
-		Assert.assertEquals(100.0, sourceLink.getFreespeed(120.0), 1e-3);
+		Assertions.assertEquals(50.0, sourceLink.getFreespeed(), 1e-3);
+		Assertions.assertEquals(50.0, sourceLink.getFreespeed(0.0), 1e-3);
+		Assertions.assertEquals(100.0, sourceLink.getFreespeed(120.0), 1e-3);
 		
 		
 		Network targetNetwork = NetworkUtils.createNetwork(config);
 		new TransportModeNetworkFilter(sourceNetwork).filter(targetNetwork, Collections.singleton("car"));
 		Link targetLink = targetNetwork.getLinks().get(sourceLink.getId());
 
-		Assert.assertEquals(50.0, targetLink.getFreespeed(), 1e-3);
-		Assert.assertEquals(50.0, targetLink.getFreespeed(0.0), 1e-3);
-		Assert.assertEquals(100.0, targetLink.getFreespeed(120.0), 1e-3);
+		Assertions.assertEquals(50.0, targetLink.getFreespeed(), 1e-3);
+		Assertions.assertEquals(50.0, targetLink.getFreespeed(0.0), 1e-3);
+		Assertions.assertEquals(100.0, targetLink.getFreespeed(120.0), 1e-3);
 	}
 
 	/**

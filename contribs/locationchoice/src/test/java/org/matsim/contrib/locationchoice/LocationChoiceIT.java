@@ -20,12 +20,11 @@
 
 package org.matsim.contrib.locationchoice;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.inject.Provider;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -73,16 +72,16 @@ import com.google.inject.Inject;
 
 public class LocationChoiceIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**
 	 * This is, as far as I can see, testing the {@link LocationChoicePlanStrategy}.  It will use the algo from the config, which is "random".  It is thus not using the frozen
 	 * epsilon approach.  kai, mar'19
 	 */
-	@Test public void testLocationChoice() {
+	@Test
+	void testLocationChoice() {
 
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
 
@@ -134,7 +133,7 @@ public class LocationChoiceIT {
 		// Secondly, I need to give it two facilities to choose from, because a choice set of size 1 is treated specially
 		// (it is assumed that the one element is the one I'm already on, so nothing is done).
 		// I tricked it. :-)   michaz
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
 		if (!config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {

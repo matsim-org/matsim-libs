@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -38,7 +38,7 @@ public class RunEShiftDrtScenarioIT {
 	private static final double TEMPERATURE = 20;// oC
 
 	@Test
-	public void test() {
+	void test() {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
 

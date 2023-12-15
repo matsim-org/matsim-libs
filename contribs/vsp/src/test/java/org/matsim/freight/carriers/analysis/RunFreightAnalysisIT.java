@@ -21,7 +21,10 @@
 
 package org.matsim.freight.carriers.analysis;
 
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -38,10 +41,10 @@ import java.util.*;
 
 public class RunFreightAnalysisIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Before
+	@BeforeEach
 	public void runAnalysis(){
 		final String packageInputDirectory = testUtils.getClassInputDirectory();
 		final String outputDirectory = testUtils.getOutputDirectory();
@@ -50,7 +53,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void compareResults() {
+	void compareResults() {
 		//some generale stats
 		checkFile("carrierStats.tsv");
 		checkFile("freightVehicleStats.tsv");
@@ -73,7 +76,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void runVehicleTrackerTest(){
+	void runVehicleTrackerTest(){
 		final String inputPath = testUtils.getClassInputDirectory();
 		File networkFile = new File(inputPath + "/output_network.xml.gz");
 		File carrierFile = new File(inputPath + "/output_carriers.xml");
@@ -112,13 +115,13 @@ public class RunFreightAnalysisIT {
 			if(key.equals(lightVehicle_0)){
 				Id<VehicleType> vehicleType = Id.create( "light", VehicleType.class );
 				Id<Person> driverId_0 = Id.create( "freight_carrier1_veh_carrier_19_lightVehicle_0", Person.class );
-				Assert.assertEquals("Road time is not as expected ",Double.valueOf(6195.0),tracker.get(key).roadTime);
-				Assert.assertEquals("Cost is not as expected ",Double.valueOf(50.88999999999996),tracker.get(key).cost);
-				Assert.assertEquals("Travel distance is not as expected ",Double.valueOf(35000.0),tracker.get(key).travelDistance);
-				Assert.assertEquals("Usage time is not as expected ",Double.valueOf(6689.0),tracker.get(key).usageTime);
-				Assert.assertEquals("Driver Id is not as expected ",driverId_0,tracker.get(key).lastDriverId);
-				Assert.assertEquals("Vehicle type is not as expected ",vehicleType,tracker.get(key).vehicleType.getId());
-				Assert.assertEquals("No: of trips is not as expected ",6,tracker.get(key).tripHistory.size());
+				Assertions.assertEquals(Double.valueOf(6195.0),tracker.get(key).roadTime,"Road time is not as expected ");
+				Assertions.assertEquals(Double.valueOf(50.88999999999996),tracker.get(key).cost,"Cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(35000.0),tracker.get(key).travelDistance,"Travel distance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(6689.0),tracker.get(key).usageTime,"Usage time is not as expected ");
+				Assertions.assertEquals(driverId_0,tracker.get(key).lastDriverId,"Driver Id is not as expected ");
+				Assertions.assertEquals(vehicleType,tracker.get(key).vehicleType.getId(),"Vehicle type is not as expected ");
+				Assertions.assertEquals(6,tracker.get(key).tripHistory.size(),"No: of trips is not as expected ");
 
 				//trip history
 				LinkedHashSet<VehicleTracker.VehicleTrip> tripHistory = tracker.get(key).tripHistory;
@@ -129,46 +132,46 @@ public class RunFreightAnalysisIT {
 					history.put(i, tripHistoryItr.next());
 					i++;
 				}
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-6.0200000000000005),history.get(0).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(10000.0),history.get(0).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-1340.0),history.get(0).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(0).driverId);
+				Assertions.assertEquals(Double.valueOf(-6.0200000000000005),history.get(0).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(10000.0),history.get(0).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-1340.0),history.get(0).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_0,history.get(0).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-5.417999999999999),history.get(1).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(5000.0),history.get(1).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-971.0),history.get(1).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(1).driverId);
+				Assertions.assertEquals(Double.valueOf(-5.417999999999999),history.get(1).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(5000.0),history.get(1).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-971.0),history.get(1).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_0,history.get(1).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-4.214),history.get(2).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(3000.0),history.get(2).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-703.0),history.get(2).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(2).driverId);
+				Assertions.assertEquals(Double.valueOf(-4.214),history.get(2).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(3000.0),history.get(2).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-703.0),history.get(2).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_0,history.get(2).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-4.816),history.get(3).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(4000.0),history.get(3).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-837.0),history.get(3).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(3).driverId);
+				Assertions.assertEquals(Double.valueOf(-4.816),history.get(3).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(4000.0),history.get(3).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-837.0),history.get(3).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_0,history.get(3).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-4.816),history.get(4).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(4000.0),history.get(4).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-837.0),history.get(4).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(4).driverId);
+				Assertions.assertEquals(Double.valueOf(-4.816),history.get(4).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(4000.0),history.get(4).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-837.0),history.get(4).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_0,history.get(4).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-7.826000000000001),history.get(5).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(9000.0),history.get(5).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-1507.0),history.get(5).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(5).driverId);
+				Assertions.assertEquals(Double.valueOf(-7.826000000000001),history.get(5).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(9000.0),history.get(5).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-1507.0),history.get(5).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_0,history.get(5).driverId,"driverId is not as expected ");
 
 			} else if(key.equals(lightVehicle_1)){
 				Id<VehicleType> vehicleType = Id.create( "light", VehicleType.class );
 				Id<Person> driverId_1 = Id.create( "freight_carrier1_veh_carrier_19_lightVehicle_1", Person.class );
-				Assert.assertEquals("Road time is not as expected ",Double.valueOf(3684.0),tracker.get(key).roadTime);
-				Assert.assertEquals("Cost is not as expected ",Double.valueOf(65.33799999999991),tracker.get(key).cost);
-				Assert.assertEquals("Travel distance is not as expected ",Double.valueOf(23000.0),tracker.get(key).travelDistance);
-				Assert.assertEquals("Usage time is not as expected ",Double.valueOf(3818.0),tracker.get(key).usageTime);
-				Assert.assertEquals("Driver Id is not as expected ",driverId_1,tracker.get(key).lastDriverId);
-				Assert.assertEquals("Vehicle type is not as expected ",vehicleType,tracker.get(key).vehicleType.getId());
-				Assert.assertEquals("No: of trips is not as expected ",3,tracker.get(key).tripHistory.size());
+				Assertions.assertEquals(Double.valueOf(3684.0),tracker.get(key).roadTime,"Road time is not as expected ");
+				Assertions.assertEquals(Double.valueOf(65.33799999999991),tracker.get(key).cost,"Cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(23000.0),tracker.get(key).travelDistance,"Travel distance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(3818.0),tracker.get(key).usageTime,"Usage time is not as expected ");
+				Assertions.assertEquals(driverId_1,tracker.get(key).lastDriverId,"Driver Id is not as expected ");
+				Assertions.assertEquals(vehicleType,tracker.get(key).vehicleType.getId(),"Vehicle type is not as expected ");
+				Assertions.assertEquals(3,tracker.get(key).tripHistory.size(),"No: of trips is not as expected ");
 
 				//trip history
 				LinkedHashSet<VehicleTracker.VehicleTrip> tripHistory = tracker.get(key).tripHistory;
@@ -179,20 +182,20 @@ public class RunFreightAnalysisIT {
 					history.put(i, tripHistoryItr.next());
 					i++;
 				}
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-3.6120000000000005),history.get(0).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(6000.0),history.get(0).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-804.0),history.get(0).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_1,history.get(0).driverId);
+				Assertions.assertEquals(Double.valueOf(-3.6120000000000005),history.get(0).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(6000.0),history.get(0).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-804.0),history.get(0).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_1,history.get(0).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-6.622000000000001),history.get(1).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(7000.0),history.get(1).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-1239.0),history.get(1).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_1,history.get(1).driverId);
+				Assertions.assertEquals(Double.valueOf(-6.622000000000001),history.get(1).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(7000.0),history.get(1).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-1239.0),history.get(1).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_1,history.get(1).driverId,"driverId is not as expected ");
 
-				Assert.assertEquals("cost is not as expected ",Double.valueOf(-8.428),history.get(2).cost);
-				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(10000.0),history.get(2).travelDistance);
-				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-1641.0),history.get(2).travelTime);
-				Assert.assertEquals("driverId is not as expected ",driverId_1,history.get(2).driverId);
+				Assertions.assertEquals(Double.valueOf(-8.428),history.get(2).cost,"cost is not as expected ");
+				Assertions.assertEquals(Double.valueOf(10000.0),history.get(2).travelDistance,"travelDistance is not as expected ");
+				Assertions.assertEquals(Double.valueOf(-1641.0),history.get(2).travelTime,"travelTime is not as expected ");
+				Assertions.assertEquals(driverId_1,history.get(2).driverId,"driverId is not as expected ");
 
 			}
 		}
@@ -203,7 +206,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void runServiceTrackerTest(){
+	void runServiceTrackerTest(){
 
 		final String inputPath = testUtils.getClassInputDirectory();
 		File networkFile = new File(inputPath + "/output_network.xml.gz");
@@ -251,40 +254,40 @@ public class RunFreightAnalysisIT {
 			if(key.equals(carrierId)){
 				ServiceTracker.CarrierServiceTracker serviceTracker = carrierServiceTracker.get(key);
 				System.out.println(serviceTracker.serviceTrackers.get(carrierServiceId1).calculatedArrival);
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(24032.0),serviceTracker.serviceTrackers.get(carrierServiceId1).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(24405.0),serviceTracker.serviceTrackers.get(carrierServiceId1).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_0,serviceTracker.serviceTrackers.get(carrierServiceId1).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId1).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(24032.0),serviceTracker.serviceTrackers.get(carrierServiceId1).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(24405.0),serviceTracker.serviceTrackers.get(carrierServiceId1).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_0,serviceTracker.serviceTrackers.get(carrierServiceId1).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId1).expectedArrival), "serviceETA is not as expected ");
 
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(23766.0),serviceTracker.serviceTrackers.get(carrierServiceId11).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(23777.0),serviceTracker.serviceTrackers.get(carrierServiceId11).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_1,serviceTracker.serviceTrackers.get(carrierServiceId11).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId11).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(23766.0),serviceTracker.serviceTrackers.get(carrierServiceId11).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(23777.0),serviceTracker.serviceTrackers.get(carrierServiceId11).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_1,serviceTracker.serviceTrackers.get(carrierServiceId11).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId11).expectedArrival), "serviceETA is not as expected ");
 
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(25566.0),serviceTracker.serviceTrackers.get(carrierServiceId12).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(25945.0),serviceTracker.serviceTrackers.get(carrierServiceId12).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_0,serviceTracker.serviceTrackers.get(carrierServiceId12).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId12).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(25566.0),serviceTracker.serviceTrackers.get(carrierServiceId12).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(25945.0),serviceTracker.serviceTrackers.get(carrierServiceId12).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_0,serviceTracker.serviceTrackers.get(carrierServiceId12).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId12).expectedArrival), "serviceETA is not as expected ");
 
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(22533.0),serviceTracker.serviceTrackers.get(carrierServiceId13).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(22538.0),serviceTracker.serviceTrackers.get(carrierServiceId13).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_1,serviceTracker.serviceTrackers.get(carrierServiceId13).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId13).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(22533.0),serviceTracker.serviceTrackers.get(carrierServiceId13).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(22538.0),serviceTracker.serviceTrackers.get(carrierServiceId13).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_1,serviceTracker.serviceTrackers.get(carrierServiceId13).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId13).expectedArrival), "serviceETA is not as expected ");
 
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(23066.0),serviceTracker.serviceTrackers.get(carrierServiceId14).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(23434.0),serviceTracker.serviceTrackers.get(carrierServiceId14).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_0,serviceTracker.serviceTrackers.get(carrierServiceId14).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId14).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(23066.0),serviceTracker.serviceTrackers.get(carrierServiceId14).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(23434.0),serviceTracker.serviceTrackers.get(carrierServiceId14).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_0,serviceTracker.serviceTrackers.get(carrierServiceId14).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId14).expectedArrival), "serviceETA is not as expected ");
 
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(26399.0),serviceTracker.serviceTrackers.get(carrierServiceId15).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(26782.0),serviceTracker.serviceTrackers.get(carrierServiceId15).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_0,serviceTracker.serviceTrackers.get(carrierServiceId15).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId15).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(26399.0),serviceTracker.serviceTrackers.get(carrierServiceId15).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(26782.0),serviceTracker.serviceTrackers.get(carrierServiceId15).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_0,serviceTracker.serviceTrackers.get(carrierServiceId15).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId15).expectedArrival), "serviceETA is not as expected ");
 
-				Assert.assertEquals("tourETA is not as expected ",Double.valueOf(24732.0),serviceTracker.serviceTrackers.get(carrierServiceId16).calculatedArrival);
-				Assert.assertEquals("arrivalTime is not as expected ",Double.valueOf(25108.0),serviceTracker.serviceTrackers.get(carrierServiceId16).arrivalTimeGuess);
-				Assert.assertEquals("driverId is not as expected ",person_0,serviceTracker.serviceTrackers.get(carrierServiceId16).driverIdGuess);
-				Assert.assertEquals("serviceETA is not as expected ", Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId16).expectedArrival));
+				Assertions.assertEquals(Double.valueOf(24732.0),serviceTracker.serviceTrackers.get(carrierServiceId16).calculatedArrival,"tourETA is not as expected ");
+				Assertions.assertEquals(Double.valueOf(25108.0),serviceTracker.serviceTrackers.get(carrierServiceId16).arrivalTimeGuess,"arrivalTime is not as expected ");
+				Assertions.assertEquals(person_0,serviceTracker.serviceTrackers.get(carrierServiceId16).driverIdGuess,"driverId is not as expected ");
+				Assertions.assertEquals(Double.valueOf(0.0), Double.valueOf(serviceTracker.serviceTrackers.get(carrierServiceId16).expectedArrival), "serviceETA is not as expected ");
 			}
 		}
 	}

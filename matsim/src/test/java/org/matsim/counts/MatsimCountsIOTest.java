@@ -21,24 +21,24 @@
 
  package org.matsim.counts;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-/**
+	/**
  * @author mrieser / Simunto GmbH
  */
 public class MatsimCountsIOTest {
 
-	/**
-	 * Such a file with year 0 could be created by MATSim when the year was not explicitly set,
-	 * but it could not be read back in as "0" was not recognized as a valid year by the XML validator originally.
-	 */
-	@Test
-	public void testReading_year0() {
+	 /**
+	  * Such a file with year 0 could be created by MATSim when the year was not explicitly set,
+	  * but it could not be read back in as "0" was not recognized as a valid year by the XML validator originally.
+	  */
+	 @Test
+	 void testReading_year0() {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 				"<counts xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
 				"xsi:noNamespaceSchemaLocation=\"http://matsim.org/files/dtd/counts_v1.xsd\"\n" +
@@ -77,15 +77,15 @@ public class MatsimCountsIOTest {
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
 		ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		reader.parse(stream);
-		Assert.assertEquals(1, counts.getCounts().size());
+		Assertions.assertEquals(1, counts.getCounts().size());
 	}
 
-	/**
-	 * originally, year was defined of type "gYear" in the xml schema, which required 4-digit years.
-	 * This test checks that such years can still be read in now that it is defined as int.
-	 */
-	@Test
-	public void testReading_year1padded() {
+	 /**
+	  * originally, year was defined of type "gYear" in the xml schema, which required 4-digit years.
+	  * This test checks that such years can still be read in now that it is defined as int.
+	  */
+	 @Test
+	 void testReading_year1padded() {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 				"<counts xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
 				"xsi:noNamespaceSchemaLocation=\"http://matsim.org/files/dtd/counts_v1.xsd\"\n" +
@@ -124,11 +124,11 @@ public class MatsimCountsIOTest {
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
 		ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		reader.parse(stream);
-		Assert.assertEquals(1, counts.getCounts().size());
+		Assertions.assertEquals(1, counts.getCounts().size());
 	}
 
-	@Test
-	public void testDefaultYear_empty() {
+	 @Test
+	 void testDefaultYear_empty() {
 		Counts counts = new Counts();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		new CountsWriterV1(counts).write(out);

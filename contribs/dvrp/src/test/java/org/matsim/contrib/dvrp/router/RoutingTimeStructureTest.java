@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -49,7 +49,7 @@ import org.mockito.Mockito;
  */
 public class RoutingTimeStructureTest {
 	@Test
-	public void testTimingWithSimpleAccess() {
+	void testTimingWithSimpleAccess() {
 		TimeInterpretation timeInterpretation = TimeInterpretation.create(ConfigUtils.createConfig());
 
 		Facility fromFacility = mock(Facility.class);
@@ -109,7 +109,7 @@ public class RoutingTimeStructureTest {
 	}
 
 	@Test
-	public void testTimingWithComplexAccess() {
+	void testTimingWithComplexAccess() {
 		TimeInterpretation timeInterpretation = TimeInterpretation.create(ConfigUtils.createConfig());
 
 		Facility fromFacility = mock(Facility.class);

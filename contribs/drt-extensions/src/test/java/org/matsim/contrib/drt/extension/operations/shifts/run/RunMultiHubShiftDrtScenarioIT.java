@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts.run;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class RunMultiHubShiftDrtScenarioIT {
 	@Test
-	public void test() {
+	void test() {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
 

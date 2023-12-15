@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,7 +57,7 @@ import org.matsim.facilities.Facility;
 public class RandomizingTimeDistanceTravelDisutilityTest {
 
 	@Test
-	public void testRoutesForDifferentSigmas() {
+	void testRoutesForDifferentSigmas() {
 
 		{
 			Set<String> routes = new HashSet<>();
@@ -66,7 +66,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 				routes.add(route.getLinkIds().toString());
 			}
 			System.out.println("Route (sigma = 0.0): " + routes.toString());
-			Assert.assertEquals("There should only be a single route in the sigma = 0 case.", 1, routes.size());
+			Assertions.assertEquals(1, routes.size(), "There should only be a single route in the sigma = 0 case.");
 		}
 
 		{
@@ -76,7 +76,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 				routes.add(route.getLinkIds().toString());
 			}
 			System.out.println("Route (sigma = 3.0): " + routes.toString());
-			Assert.assertEquals("There should be two routes in the sigma = 3 case.", 2, routes.size());
+			Assertions.assertEquals(2, routes.size(), "There should be two routes in the sigma = 3 case.");
 		}
 	}
 
@@ -112,7 +112,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
 		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 7.0*3600, person)) ;
-		Assert.assertEquals(1, result.size() );
+		Assertions.assertEquals(1, result.size() );
 		Leg leg = (Leg) result.get(0) ;
 		return (NetworkRoute) leg.getRoute();
 	}

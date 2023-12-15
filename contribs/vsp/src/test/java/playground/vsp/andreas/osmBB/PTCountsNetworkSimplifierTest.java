@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,14 +38,15 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class PTCountsNetworkSimplifierTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Test simple network
 	 */
 
-	@Test public void testSimplifyEmptyNetwork(){
+	@Test
+	void testSimplifyEmptyNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -73,18 +74,19 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 
-		Assert.assertEquals(21, network.getLinks().size());
-		Assert.assertEquals(10, network.getNodes().size());
+		Assertions.assertEquals(21, network.getLinks().size());
+		Assertions.assertEquals(10, network.getNodes().size());
 
-		Assert.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
-		Assert.assertNull(network.getNodes().get(Id.create("1101", Node.class)));
+		Assertions.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assertions.assertNull(network.getNodes().get(Id.create("1101", Node.class)));
 	}
 
 	/**
 	 * Test pt link
 	 */
 
-	@Test public void testSimplifyPTNetwork(){
+	@Test
+	void testSimplifyPTNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -112,22 +114,23 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 
-		Assert.assertEquals(26, network.getLinks().size());
-		Assert.assertEquals(14, network.getNodes().size());
+		Assertions.assertEquals(26, network.getLinks().size());
+		Assertions.assertEquals(14, network.getNodes().size());
 
-		Assert.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
 
-		Assert.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
-		Assert.assertNull(network.getNodes().get(Id.create("1101", Node.class)));
+		Assertions.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assertions.assertNull(network.getNodes().get(Id.create("1101", Node.class)));
 	}
 
 	/**
 	 * Test links with count stations
 	 */
 
-	@Test public void testSimplifyCountsNetwork(){
+	@Test
+	void testSimplifyCountsNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -159,20 +162,21 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 
-		Assert.assertEquals(23, network.getLinks().size());
-		Assert.assertEquals(12, network.getNodes().size());
+		Assertions.assertEquals(23, network.getLinks().size());
+		Assertions.assertEquals(12, network.getNodes().size());
 
-		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
 
-		Assert.assertNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
-		Assert.assertNull(network.getNodes().get(Id.create("1103", Node.class)));
+		Assertions.assertNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assertions.assertNull(network.getNodes().get(Id.create("1103", Node.class)));
 	}
 
 	/**
 	 * Test PT and Counts at once
 	 */
 
-	@Test public void testSimplifyPTCountsNetwork(){
+	@Test
+	void testSimplifyPTCountsNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -204,23 +208,24 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 
-		Assert.assertEquals(28, network.getLinks().size());
-		Assert.assertEquals(16, network.getNodes().size());
+		Assertions.assertEquals(28, network.getLinks().size());
+		Assertions.assertEquals(16, network.getNodes().size());
 
-		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
 
-		Assert.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
-		Assert.assertNull(network.getNodes().get(Id.create("1201", Node.class)));
+		Assertions.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assertions.assertNull(network.getNodes().get(Id.create("1201", Node.class)));
 	}
 
 	/**
 	 * Test additional links marked as blocked
 	 */
 
-	@Test public void testSimplifyElseNetwork(){
+	@Test
+	void testSimplifyElseNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -254,17 +259,17 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 
-		Assert.assertEquals(29, network.getLinks().size());
-		Assert.assertEquals(16, network.getNodes().size());
+		Assertions.assertEquals(29, network.getLinks().size());
+		Assertions.assertEquals(16, network.getNodes().size());
 
-		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1301_1302", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1204_1203", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1314_1313", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1301_1302", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1204_1203", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1314_1313", Link.class)));
 
-		Assert.assertNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
-		Assert.assertNull(network.getNodes().get(Id.create("1103", Node.class)));
+		Assertions.assertNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assertions.assertNull(network.getNodes().get(Id.create("1103", Node.class)));
 	}
 
 
@@ -272,7 +277,8 @@ public class PTCountsNetworkSimplifierTest {
 	 * Test all at once
 	 */
 
-	@Test public void testSimplifyAllNetwork(){
+	@Test
+	void testSimplifyAllNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -309,21 +315,21 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 
-		Assert.assertEquals(32, network.getLinks().size());
-		Assert.assertEquals(18, network.getNodes().size());
+		Assertions.assertEquals(32, network.getLinks().size());
+		Assertions.assertEquals(18, network.getNodes().size());
 
-		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
 
-		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1301_1302", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1204_1203", Link.class)));
-		Assert.assertNotNull(network.getLinks().get(Id.create("1314_1313", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1301_1302", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1204_1203", Link.class)));
+		Assertions.assertNotNull(network.getLinks().get(Id.create("1314_1313", Link.class)));
 
-		Assert.assertNull(network.getLinks().get(Id.create("1202_1201", Link.class)));
+		Assertions.assertNull(network.getLinks().get(Id.create("1202_1201", Link.class)));
 	}
 
 }

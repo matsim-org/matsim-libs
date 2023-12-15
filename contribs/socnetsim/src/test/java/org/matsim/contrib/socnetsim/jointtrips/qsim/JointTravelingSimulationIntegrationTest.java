@@ -22,9 +22,9 @@ package org.matsim.contrib.socnetsim.jointtrips.qsim;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -79,7 +79,7 @@ public class JointTravelingSimulationIntegrationTest {
 	private static final Logger log =
 		LogManager.getLogger(JointTravelingSimulationIntegrationTest.class);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static enum RouteType {
@@ -87,7 +87,7 @@ public class JointTravelingSimulationIntegrationTest {
 		puAtDo,
 		puAtDoFullCycle,
 		everythingAtOrigin
-	}; 
+	};
 
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
@@ -110,7 +110,7 @@ public class JointTravelingSimulationIntegrationTest {
 	private static final String DESTINATION_ACT = "stress";
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
+	void testAgentsArriveTogetherWithoutDummies() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -118,7 +118,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummies() throws Exception {
+	void testAgentsArriveTogetherWithDummies() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -126,7 +126,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummiesAndDoAtPu() throws Exception {
+	void testAgentsArriveTogetherWithDummiesAndDoAtPu() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -134,7 +134,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPu() throws Exception {
+	void testAgentsArriveTogetherWithoutDummiesAndDoAtPu() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -142,7 +142,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummiesAndDoAtPuFullCycle() throws Exception {
+	void testAgentsArriveTogetherWithDummiesAndDoAtPuFullCycle() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -150,7 +150,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPuFullCycle() throws Exception {
+	void testAgentsArriveTogetherWithoutDummiesAndDoAtPuFullCycle() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -158,7 +158,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithDummiesAndEverythingAtOrigin() throws Exception {
+	void testAgentsArriveTogetherWithDummiesAndEverythingAtOrigin() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					true,
@@ -166,7 +166,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testAgentsArriveTogetherWithoutDummiesAndEverythingAtOrigin() throws Exception {
+	void testAgentsArriveTogetherWithoutDummiesAndEverythingAtOrigin() throws Exception {
 		testAgentsArriveTogether(
 				createFixture(
 					false,
@@ -214,16 +214,16 @@ public class JointTravelingSimulationIntegrationTest {
 						}
 
 						arrCount.incrementAndGet();
-						Assert.assertEquals(
-							"run "+scNr+": unexpected joint arrival time",
+						Assertions.assertEquals(
 							arrival,
 							event.getTime(),
-							MatsimTestUtils.EPSILON);
+							MatsimTestUtils.EPSILON,
+							"run "+scNr+": unexpected joint arrival time");
 
-						Assert.assertEquals(
-								"run "+scNr+": unexpected arrival location for mode "+mode,
+						Assertions.assertEquals(
 								fixture.doLink,
-								event.getLinkId() );
+								event.getLinkId(),
+								"run "+scNr+": unexpected arrival location for mode "+mode );
 					}
 				}
 			});
@@ -257,15 +257,15 @@ public class JointTravelingSimulationIntegrationTest {
 			// for easier tracking of test failures
 			logFinalQSimState( qsim );
 
-			Assert.assertEquals(
-					"run "+i+": unexpected number of joint arrivals",
+			Assertions.assertEquals(
 					N_LAPS * 3,
-					arrCount.get());
+					arrCount.get(),
+					"run "+i+": unexpected number of joint arrivals");
 
-			Assert.assertEquals(
-					"run "+i+": unexpected number of agents arriving at destination",
+			Assertions.assertEquals(
 					N_LAPS * sc.getPopulation().getPersons().size(),
-					atDestCount.get());
+					atDestCount.get(),
+					"run "+i+": unexpected number of agents arriving at destination");
 		}
 	}
 
@@ -276,22 +276,22 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehicle() {
+	void testNumberOfEnterLeaveVehicle() {
 		testNumberOfEnterLeaveVehicle( RouteType.normal );
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehicleEverythingAtOrigin() {
+	void testNumberOfEnterLeaveVehicleEverythingAtOrigin() {
 		testNumberOfEnterLeaveVehicle( RouteType.everythingAtOrigin );
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehiclePuAtDo() {
+	void testNumberOfEnterLeaveVehiclePuAtDo() {
 		testNumberOfEnterLeaveVehicle( RouteType.puAtDo );
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehiclePuAtDoFullCycle() {
+	void testNumberOfEnterLeaveVehiclePuAtDoFullCycle() {
 		testNumberOfEnterLeaveVehicle( RouteType.puAtDoFullCycle );
 	}
 
@@ -328,10 +328,10 @@ public class JointTravelingSimulationIntegrationTest {
 			final JointQSimFactory factory = new JointQSimFactory( );
 			factory.createMobsim( sc , events ).run();
 
-			Assert.assertEquals(
-					"not as many leave events as enter events",
+			Assertions.assertEquals(
 					enterCount.get(),
-					leaveCount.get());
+					leaveCount.get(),
+					"not as many leave events as enter events");
 		}
 	}
 
@@ -454,7 +454,7 @@ public class JointTravelingSimulationIntegrationTest {
 							fixture.puLink,
 							fixture.doLink );
 				dRoute.setLinkIds(
-						fixture.puLink , 
+						fixture.puLink ,
 						fixture.puToDoRoute,
 						fixture.doLink);
 				dRoute.addPassenger( passengerId1 );
@@ -489,7 +489,7 @@ public class JointTravelingSimulationIntegrationTest {
 			driverPlan.addActivity( act );
 		}
 
-		// passengers 
+		// passengers
 		for (Id passengerId : new Id[]{ passengerId1 , passengerId2 }) {
 			final Person p1 = factory.createPerson( passengerId );
 			final Plan p1Plan = factory.createPlan();

@@ -22,12 +22,12 @@ package org.matsim.contrib.analysis.kai;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,10 +55,10 @@ import org.matsim.testcases.MatsimTestUtils;
 public class KNAnalysisEventsHandlerTest {
 
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
+	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14
 
 	public static final String BASE_FILE_NAME = "stats_";
 	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
@@ -68,7 +68,7 @@ public class KNAnalysisEventsHandlerTest {
 	private Population population = null ;
 	private Network network = null ;
 
-    @Before
+    @BeforeEach
 	public void setUp() throws Exception {
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -101,15 +101,15 @@ public class KNAnalysisEventsHandlerTest {
 		this.network.addLink(link);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		this.population = null;
 		this.network = null;
 	}
 
-    @Test
-    @Ignore
-	public void testNoEvents() {
+	@Test
+	@Disabled
+	void testNoEvents() {
 
 		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
@@ -121,10 +121,10 @@ public class KNAnalysisEventsHandlerTest {
 		this.runTest(testee);
 	}
 
-    @Test
-    @Ignore
-	public void testAveraging() {
-		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
+	@Test
+	@Disabled
+	void testAveraging() {
+		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14
 
 		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
@@ -172,7 +172,7 @@ public class KNAnalysisEventsHandlerTest {
 			LogManager.getLogger(this.getClass()).info( "comparing " + str );
 			final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
 			final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
-			Assert.assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+			Assertions.assertEquals(expectedChecksum, actualChecksum, "Output files differ.");
 		}
 	}
 

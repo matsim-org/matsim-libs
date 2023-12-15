@@ -1,9 +1,8 @@
 package org.matsim.counts;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -22,15 +21,17 @@ import java.util.Set;
 import java.util.SplittableRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CountsV2Test {
 
 	private final SplittableRandom random = new SplittableRandom(1234);
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_general_handling() throws IOException {
+	void test_general_handling() throws IOException {
 
 		Counts<Link> counts = new Counts<>();
 		counts.setName("test");
@@ -49,7 +50,7 @@ public class CountsV2Test {
 	}
 
 	@Test
-	public void test_reader_writer() throws IOException {
+	void test_reader_writer() throws IOException {
 
 		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
@@ -62,13 +63,13 @@ public class CountsV2Test {
 		Counts<Link> counts = new Counts<>();
 		CountsReaderMatsimV2 reader = new CountsReaderMatsimV2(counts, Link.class);
 
-		Assertions.assertThatNoException().isThrownBy(() -> reader.readFile(filename));
+		Assertions.assertDoesNotThrow(() -> reader.readFile(filename));
 
 		Map<Id<Link>, MeasurementLocation<Link>> countMap = counts.getMeasureLocations();
-		Assert.assertEquals(21, countMap.size());
+		Assertions.assertEquals(21, countMap.size());
 
 		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurableForMode(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
-		Assert.assertFalse(onlyDailyValues);
+		Assertions.assertFalse(onlyDailyValues);
 
 		assertThat(dummyCounts.getMeasurableTypes())
 			.isEqualTo(counts.getMeasurableTypes());
@@ -88,21 +89,24 @@ public class CountsV2Test {
 	}
 
 
-	@Test(expected = IllegalArgumentException.class)
-	public void test_illegal() {
+	@Test
+	void test_illegal() {
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		Counts<Link> dummyCounts = new Counts<>();
+			Counts<Link> dummyCounts = new Counts<>();
 
-		MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
-		Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
+			MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
+			Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
 
-		volume.setAtHour(-1, 500);
+			volume.setAtHour(-1, 500);
+
+		});
 
 	}
 
 
 	@Test
-	public void aggregate() {
+	void aggregate() {
 
 		Counts<Link> counts = new Counts<>();
 

@@ -27,8 +27,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -56,9 +56,9 @@ public class MultiNodeDijkstraTest {
 			return (MultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
 		} else return (MultiNodeDijkstra) new MultiNodeDijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
-	
+
 	@Test
-	public void testMultipleStarts() {
+	void testMultipleStarts() {
 		testMultipleStarts(true);
 		testMultipleStarts(false);
 	}
@@ -88,35 +88,35 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("1", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("1", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 
 		// change costs
 		tc.setData(Id.create(1, Link.class), 2.0, 5.0);
 
 		p = createPath(dijkstra, fromNode, toNode);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 
 		// change costs again
 		tc.setData(Id.create(1, Link.class), 2.0, 1.0);
 
 		p = createPath(dijkstra, fromNode, toNode);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("1", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("1", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testMultipleEnds() {
+	void testMultipleEnds() {
 		testMultipleEnds(true);
 		testMultipleEnds(false);
 	}
@@ -146,35 +146,35 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 
 		// change costs
 		tc.setData(Id.create(4, Link.class), 3.0, 1.0);
 
 		p = createPath(dijkstra, fromNode, toNode);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("4", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("4", p.links.get(2).getId().toString());
 
 		// change costs again
 		tc.setData(Id.create(6, Link.class), 7.0, 3.0);
 
 		p = createPath(dijkstra, fromNode, toNode);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("6", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("6", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testMultipleStartsAndEnds() {
+	void testMultipleStartsAndEnds() {
 		testMultipleStartsAndEnds(true);
 		testMultipleStartsAndEnds(false);
 	}
@@ -205,37 +205,37 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 
 		// change costs
 		tc.setData(Id.create(3, Link.class), 3.0, 1.0);
 		tc.setData(Id.create(4, Link.class), 3.0, 1.0);
 
 		p = createPath(dijkstra, fromNode, toNode);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("3", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("4", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("3", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("4", p.links.get(2).getId().toString());
 
 		// change costs again
 		tc.setData(Id.create(3, Link.class), 3.0, 4.0);
 		tc.setData(Id.create(6, Link.class), 7.0, 3.0);
 
 		p = createPath(dijkstra, fromNode, toNode);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("6", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("6", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testStartViaFaster() {
+	void testStartViaFaster() {
 		testStartViaFaster(true);
 		testStartViaFaster(false);
 	}
@@ -270,15 +270,15 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("1", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("1", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testEndViaFaster() {
+	void testEndViaFaster() {
 		testEndViaFaster(true);
 		testEndViaFaster(false);
 	}
@@ -315,15 +315,15 @@ public class MultiNodeDijkstraTest {
 //		toNodes.put(f.network.getNodes().get(Id.create(5)), new InitialNode(1.0, 1.0));
 //
 //		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testOnlyFromToSameNode() {
+	void testOnlyFromToSameNode() {
 		testOnlyFromToSameNode(true);
 		testOnlyFromToSameNode(false);
 	}
@@ -351,14 +351,14 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(0, p.links.size());
-		Assert.assertEquals(1, p.nodes.size());
-		Assert.assertEquals("2", p.nodes.get(0).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(0, p.links.size());
+		Assertions.assertEquals(1, p.nodes.size());
+		Assertions.assertEquals("2", p.nodes.get(0).getId().toString());
 	}
 
 	@Test
-	public void testSameNodeInFromToSetCheapest() {
+	void testSameNodeInFromToSetCheapest() {
 		testSameNodeInFromToSetCheapest(true);
 		testSameNodeInFromToSetCheapest(false);
 	}
@@ -393,14 +393,14 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(0, p.links.size());
-		Assert.assertEquals(1, p.nodes.size());
-		Assert.assertEquals("4", p.nodes.get(0).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(0, p.links.size());
+		Assertions.assertEquals(1, p.nodes.size());
+		Assertions.assertEquals("4", p.nodes.get(0).getId().toString());
 	}
 
 	@Test
-	public void testSameNodeInFromToSetNotCheapest() {
+	void testSameNodeInFromToSetNotCheapest() {
 		testSameNodeInFromToSetNotCheapest(true);
 		testSameNodeInFromToSetNotCheapest(false);
 	}
@@ -435,15 +435,15 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("6", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("6", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testSomeEndNodesNotReachable() {
+	void testSomeEndNodesNotReachable() {
 		testSomeEndNodesNotReachable(true);
 		testSomeEndNodesNotReachable(false);
 	}
@@ -476,15 +476,15 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testSomeStartNodesNotUseable() {
+	void testSomeStartNodesNotUseable() {
 		testSomeStartNodesNotUseable(true);
 		testSomeStartNodesNotUseable(false);
 	}
@@ -517,15 +517,15 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull("no path found!", p);
-		Assert.assertEquals(3, p.links.size());
-		Assert.assertEquals("2", p.links.get(0).getId().toString());
-		Assert.assertEquals("7", p.links.get(1).getId().toString());
-		Assert.assertEquals("5", p.links.get(2).getId().toString());
+		Assertions.assertNotNull(p, "no path found!");
+		Assertions.assertEquals(3, p.links.size());
+		Assertions.assertEquals("2", p.links.get(0).getId().toString());
+		Assertions.assertEquals("7", p.links.get(1).getId().toString());
+		Assertions.assertEquals("5", p.links.get(2).getId().toString());
 	}
 
 	@Test
-	public void testImpossibleRoute() {
+	void testImpossibleRoute() {
 		testImpossibleRoute(true);
 		testImpossibleRoute(false);
 	}
@@ -553,7 +553,7 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNull("wow, impossible path found!", p);
+		Assertions.assertNull(p, "wow, impossible path found!");
 	}
 
 	/*
@@ -561,7 +561,7 @@ public class MultiNodeDijkstraTest {
 	 * account in the path.
 	 */
 	@Test
-	public void testInitialValuesCorrection() {
+	void testInitialValuesCorrection() {
 		testInitialValuesCorrection(true);
 		testInitialValuesCorrection(false);
 	}
@@ -589,9 +589,9 @@ public class MultiNodeDijkstraTest {
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
-		Assert.assertNotNull(p);
-		Assert.assertEquals(300.0, p.travelTime, 0.0);
-		Assert.assertEquals(600.0, p.travelCost, 0.0);
+		Assertions.assertNotNull(p);
+		Assertions.assertEquals(300.0, p.travelTime, 0.0);
+		Assertions.assertEquals(600.0, p.travelCost, 0.0);
 	}
 	
 	/*package*/ static Path createPath(Dijkstra dijsktra, Node fromNode, Node toNode) {

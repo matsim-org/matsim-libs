@@ -21,9 +21,9 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,16 +57,16 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 
 /**
  * Accounting for flow delays even if leaving agents list is empty.
- * 
+ *
  * @author amit
  */
 
 public class CombinedFlowAndStorageDelayTest {
-	
+
 	private final boolean usingOTFVis = false;
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
 	 * Basically agent first delay due to flow cap and then when agent can leave the link, it is delayed due to storage cap
@@ -75,42 +75,42 @@ public class CombinedFlowAndStorageDelayTest {
 	 * agents are stored to charge later if required.
 	 */
 	@Test
-	public final void implV4Test(){
+	final void implV4Test(){
 		/*
-		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
+		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on
 		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
 		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
 		 */
 		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v4");
-		
+
 		for(CongestionEvent e : congestionEvents){
 			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getCausingAgentId().equals(Id.createPersonId("1"))){
-				Assert.assertEquals("Delay caused by agent 2 is not correct.", 100, e.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(100, e.getDelay(), MatsimTestUtils.EPSILON, "Delay caused by agent 2 is not correct.");
 				// this is not captured by only leaving agents list.
-			} 
+			}
 		}
-		
-		Assert.assertEquals("Number of congestion events are not correct.", 4, congestionEvents.size(), MatsimTestUtils.EPSILON);
+
+		Assertions.assertEquals(4, congestionEvents.size(), MatsimTestUtils.EPSILON, "Number of congestion events are not correct.");
 	}
 
 //	@Test
 	public final void implV6Test(){
 		/*
-		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
+		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on
 		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
 		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
 		 */
 		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v6");
-		
+
 		for(CongestionEvent e : congestionEvents){
 			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getLinkId().equals(Id.createLinkId("2"))){
-				Assert.assertEquals("Wrong causing agent", Id.createPersonId("1"), e.getCausingAgentId());
+				Assertions.assertEquals(Id.createPersonId("1"), e.getCausingAgentId(), "Wrong causing agent");
 				// this is not captured by only leaving agents list.
-			} 
+			}
 		}
-		Assert.assertEquals("Number of congestion events are not correct.", 3, congestionEvents.size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, congestionEvents.size(), MatsimTestUtils.EPSILON, "Number of congestion events are not correct.");
 	}
-	
+
 	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
 
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
@@ -132,7 +132,7 @@ public class CombinedFlowAndStorageDelayTest {
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
@@ -190,7 +190,7 @@ public class CombinedFlowAndStorageDelayTest {
 			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 			final Node fromNode4 = node1;
 			final Node toNode4 = node3;
-			
+
 			link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 		}
 
