@@ -117,7 +117,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
 					+ "This is the ratio part")
 	@DecimalMin("1.0")
-	public double maxDetourAlpha = Double.POSITIVE_INFINITY;// [s]
+	public double maxDetourAlpha = Double.POSITIVE_INFINITY;
 
 	@Parameter
 	@Comment(
