@@ -35,14 +35,18 @@ public class MaxDetourConstraintTest {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 			new OTFVisConfigGroup());
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
-		DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
+		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		drtConfigGroup.maxDetourAlpha = 1.5;
 		drtConfigGroup.maxDetourBeta = 300;
 
-		drtConfigGroup.maxTravelTimeAlpha = 2;
-		drtConfigGroup.maxTravelTimeBeta = 600;
 		drtConfigGroup.maxWaitTime = 300;
+
+		drtConfigGroup.maxAllowedPickupDelay = 180;
+
+		// Make the max total travel time constraints very loose (i.e., similar to disabling it)
+		drtConfigGroup.maxTravelTimeAlpha = 10;
+		drtConfigGroup.maxTravelTimeBeta = 7200;
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
@@ -55,7 +59,7 @@ public class MaxDetourConstraintTest {
 				protected void configureQSim() {
 					bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
 						getter -> new MaxDetourInsertionCostCalculator((new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))))));
-					bindModal(DrtOfferAcceptor.class).toProvider(modalProvider(getter -> new MaxDetourOfferAcceptor(180)));
+					bindModal(DrtOfferAcceptor.class).toProvider(modalProvider(getter -> new MaxDetourOfferAcceptor(drtCfg.maxAllowedPickupDelay)));
 				}
 			});
 		}

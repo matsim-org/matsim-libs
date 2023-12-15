@@ -127,6 +127,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public double maxDetourBeta = Double.POSITIVE_INFINITY;// [s]
 
 	@Parameter
+	@Comment(
+			"Defines the maximum delay allowed from the initial scheduled pick up time. Once a estimated pick up time is determined, the DRT optimizer"
+					+ "should try to keep this promise. By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
+	@PositiveOrZero
+	public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
 	@Comment("If true, the max travel and wait times of a submitted request"
 			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
 			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
