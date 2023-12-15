@@ -77,7 +77,7 @@ public class RailsimDeadlockTest {
 	@Test
 	public void tooSmall() {
 
-		Set<String> increased = Set.of("y1y", "yy1", "xB", "Bx", "yx", "xy");
+		Set<String> increased = Set.of("y1y", "yy1", "xB", "Bx", "yx", "xy", "AB", "BA");
 
 		// Create an avoidance point, but it is too small for multiple trains
 		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), l ->{
@@ -97,9 +97,7 @@ public class RailsimDeadlockTest {
 		test.doSimStepUntil(1500);
 		test.debugFiles(collector, "tooSmall");
 
-		// This scenario should still lead to a deadlock
-		// TODO: check the behaviour, no deadlock appears yet
-
+		// TODO not correct yet
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 139, "EF", 0)
@@ -118,8 +116,8 @@ public class RailsimDeadlockTest {
 //		test.debugFiles(collector, "oneWay");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 350, "EF", 0)
-			.hasTrainState("regio2", 520, "CD", 0);
+			.hasTrainState("regio", 530, "EF", 0)
+			.hasTrainState("regio2", 350, "CD", 0);
 
 	}
 

@@ -80,7 +80,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void afterSim() {
-
+		engine.clearTrains(qsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override

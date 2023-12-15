@@ -32,11 +32,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -781,4 +777,15 @@ final class RailsimEngine implements Steppable {
 		return maxSpeed;
 	}
 
+	/**
+	 * Remove all trains from simulation and generate events at the end of the day.
+	 * @param now end of day time
+	 */
+	void clearTrains(double now) {
+
+		for (TrainState train : activeTrains) {
+			eventsManager.processEvent( new VehicleAbortsEvent(now, train.driver.getVehicle().getId(), train.headLink));
+			eventsManager.processEvent( new PersonStuckEvent(now, train.driver.getId(), train.headLink, train.driver.getMode()));
+		}
+	}
 }

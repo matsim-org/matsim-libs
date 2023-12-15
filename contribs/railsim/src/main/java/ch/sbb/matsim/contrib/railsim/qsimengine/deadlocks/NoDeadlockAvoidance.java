@@ -6,7 +6,6 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * Does not prevent deadlocks and permits every request.
@@ -18,10 +17,10 @@ public class NoDeadlockAvoidance implements DeadlockAvoidance {
 	public void onReserve(double time, RailResource resource, TrainPosition position) {
 	}
 
-	@Nullable
+
 	@Override
-	public RailLink checkSegment(double time, List<RailLink> segment, TrainPosition position) {
-		return null;
+	public boolean checkLink(double time, RailLink link, TrainPosition position) {
+		return true;
 	}
 
 	@Override

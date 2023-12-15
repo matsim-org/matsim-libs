@@ -108,9 +108,6 @@ public class SimpleDisposition implements TrainDisposition {
 		// remove already used distance
 		reserveDist -= position.getHeadPosition();
 
-		// link that would produce a deadlock
-		RailLink deadlock = resources.checkForDeadlocks(time, segment, position);
-
 		boolean stop = false;
 		// Iterate all links that need to be blocked
 		for (RailLink link : segment) {
@@ -118,11 +115,6 @@ public class SimpleDisposition implements TrainDisposition {
 			// first link does not need to be blocked again
 			if (link == currentLink)
 				continue;
-
-			if (link == deadlock) {
-				stop = true;
-				break;
-			}
 
 			dist = resources.tryBlockLink(time, link, RailResourceManager.ANY_TRACK_NON_BLOCKING, position);
 

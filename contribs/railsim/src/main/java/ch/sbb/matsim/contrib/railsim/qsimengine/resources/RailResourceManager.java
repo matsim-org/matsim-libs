@@ -139,13 +139,6 @@ public final class RailResourceManager {
 
 
 	/**
-	 * Run the configured deadlock avoidance strategy.
-	 */
-	public RailLink checkForDeadlocks(double time, List<RailLink> segment, TrainPosition position) {
-		return dla.checkSegment(time, segment, position);
-	}
-
-	/**
 	 * Try to block a track and the underlying resource and return the allowed distance.
 	 */
 	public double tryBlockLink(double time, RailLink link, int track, TrainPosition position) {
@@ -158,6 +151,12 @@ public final class RailResourceManager {
 		}
 
 		if (link.resource.hasCapacity(time, link, track, position)) {
+
+			if (!dla.checkLink(time, link, position)) {
+				assert reservedDist == RailResourceInternal.NO_RESERVATION : "Link should not be reserved already.";
+
+				return RailResourceInternal.NO_RESERVATION;
+			}
 
 			double dist = link.resource.reserve(time, link, track, position);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
@@ -195,6 +194,8 @@ public final class RailResourceManager {
 	public void releaseLink(double time, RailLink link, MobsimDriverAgent driver) {
 
 		boolean release = link.resource.release(link, driver);
+
+		dla.onReleaseLink(time, link, driver);
 
 		if (release) {
 			dla.onRelease(time, link.resource, driver);

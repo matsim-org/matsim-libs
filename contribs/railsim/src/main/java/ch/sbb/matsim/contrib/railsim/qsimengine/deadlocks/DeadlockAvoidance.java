@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,14 +27,20 @@ public interface DeadlockAvoidance {
 	void onReserve(double time, RailResource resource, TrainPosition position);
 
 	/**
-	 * Check if reserving a segment of links may produce a deadlock.
-	 * @return the first link that should not be reserved in order to avoid deadlock, or null if no deadlock is detected.
+	 * Check if reserving this link may produce a deadlock.
+	 * @return true if the link can be reserved, false otherwise.
 	 */
-	@Nullable
-	RailLink checkSegment(double time, List<RailLink> segment, TrainPosition position);
+	boolean checkLink(double time, RailLink link, TrainPosition position);
 
 	/**
 	 * Called when a resource was released.
 	 */
 	void onRelease(double time, RailResource resource, MobsimDriverAgent driver);
+
+	/**
+	 * Called when a link was released.
+	 */
+	default void onReleaseLink(double time, RailLink link, MobsimDriverAgent driver) {
+	}
+
 }
