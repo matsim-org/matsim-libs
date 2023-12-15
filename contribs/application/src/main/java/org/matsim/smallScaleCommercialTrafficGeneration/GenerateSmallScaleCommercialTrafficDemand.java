@@ -40,6 +40,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.scenario.ProjectionUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.*;
@@ -899,7 +900,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		links = networkToChange.getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car"))
 			.collect(Collectors.toList());
 		links.forEach(l -> l.getAttributes().putAttribute("newCoord",
-			ct.transform(l.getCoord())));
+			CoordUtils.round(ct.transform(l.getCoord()))));
 		links.forEach(l -> l.getAttributes().putAttribute("zone",
 			indexZones.query((Coord) l.getAttributes().getAttribute("newCoord"))));
 		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).collect(Collectors.toList());
@@ -946,7 +947,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
 			.newInstance(shpZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType).build();
-		ArrayList<String> listOfZones = new ArrayList<>();
+		List<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {
 			if (!listOfZones.contains(k.getZone()))
 				listOfZones.add(k.getZone());
