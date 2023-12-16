@@ -473,6 +473,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		config.plans().setInputFile(null);
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
+		config.counts().setInputFile(null);
 
 		// Set flow and storage capacity to a high value
 		config.qsim().setFlowCapFactor(sample * 4);
@@ -514,7 +515,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				bind(CarrierScoringFunctionFactory.class).toInstance(new MyCarrierScoringFunctionFactory());
 			}
 		});
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
+
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+
 		return controler;
 	}
 
