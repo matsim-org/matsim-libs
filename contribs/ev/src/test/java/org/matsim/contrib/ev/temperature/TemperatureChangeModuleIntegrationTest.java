@@ -20,10 +20,9 @@
 package org.matsim.contrib.ev.temperature;
 
 import jakarta.inject.Inject;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -41,11 +40,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * created by jbischoff, 16.08.2018
  */
 public class TemperatureChangeModuleIntegrationTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTemperatureChangeModule() {
+	void testTemperatureChangeModule() {
 
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new TemperatureChangeConfigGroup());
@@ -71,10 +70,10 @@ public class TemperatureChangeModuleIntegrationTest {
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
 			if (event.getLinkId().equals(Id.createLinkId("link1"))) {
-				Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), -10.0, 0.001);
+				Assertions.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), -10.0, 0.001);
 			}
 			if (event.getLinkId().equals(Id.createLinkId("link2"))) {
-				Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), 30.0, 0.001);
+				Assertions.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), 30.0, 0.001);
 			}
 		}
 	}

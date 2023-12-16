@@ -35,7 +35,9 @@ public class ShiftHistogramListener implements IterationEndsListener, IterationS
     public void notifyIterationEnds(final IterationEndsEvent event) {
         this.shiftHistogram.write(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), drtConfigGroup.getMode() + "_" + "shiftHistogram.txt"));
         this.printStats();
-		boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
+		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
+
 		if (createGraphs) {
             ShiftHistogramChart.writeGraphic(this.shiftHistogram, matsimServices.getControlerIO().getIterationFilename(event.getIteration(),drtConfigGroup.getMode() + "_" + "shiftHistogram.png"));
         }

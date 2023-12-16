@@ -20,11 +20,11 @@
 
 package org.matsim.integration.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -70,11 +70,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ChangeTripModeIntegrationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testStrategyManagerConfigLoaderIntegration() {
+	@Test
+	void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = utils.loadConfig((String)null);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
@@ -129,11 +130,11 @@ public class ChangeTripModeIntegrationTest {
 		manager.run(population, 0, injector.getInstance(ReplanningContext.class));
 
 		// test that everything worked as expected
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
 		assertEquals(TransportMode.walk, newLeg.getMode());
-		assertNotNull("the leg should now have a route.", newLeg.getRoute());
+		assertNotNull(newLeg.getRoute(), "the leg should now have a route.");
 	}
 
 }

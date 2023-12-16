@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -39,11 +39,11 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
  */
 public class CarrierReaderFromCSVTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void carrierCreation() throws IOException {
+	void carrierCreation() throws IOException {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(
 				"https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
@@ -61,157 +61,157 @@ public class CarrierReaderFromCSVTest {
 		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightCarriersConfigGroup, scenario, polygonsInShape, shapeCategory);
 		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightCarriersConfigGroup,
 				polygonsInShape, 1, null);
-		Assert.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
-		Assert.assertTrue(
+		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
+		Assertions.assertTrue(
 				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
-		Assert.assertTrue(
+		Assertions.assertTrue(
 				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier2", Carrier.class)));
-		Assert.assertTrue(
+		Assertions.assertTrue(
 				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier3", Carrier.class)));
 
 		// check carrier 1
 		Carrier testCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier1", Carrier.class));
-		Assert.assertEquals(FleetSize.INFINITE, testCarrier1.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(10, CarriersUtils.getJspritIterations(testCarrier1));
-		Assert.assertEquals(4, testCarrier1.getCarrierCapabilities().getCarrierVehicles().size());
+		Assertions.assertEquals(FleetSize.INFINITE, testCarrier1.getCarrierCapabilities().getFleetSize());
+		Assertions.assertEquals(10, CarriersUtils.getJspritIterations(testCarrier1));
+		Assertions.assertEquals(4, testCarrier1.getCarrierCapabilities().getCarrierVehicles().size());
 		Object2IntMap<String> depotSums = new Object2IntOpenHashMap<>();
 		Map<String, List<String>> typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier1.getCarrierCapabilities().getCarrierVehicles().values()) {
 			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
 			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
-			Assert.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
-			Assert.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
-		Assert.assertEquals(2, depotSums.size());
-		Assert.assertTrue(depotSums.containsKey("i(2,0)"));
-		Assert.assertEquals(2, depotSums.getInt("i(2,0)"));
-		Assert.assertTrue(depotSums.containsKey("j(2,4)R"));
-		Assert.assertEquals(2, depotSums.getInt("j(2,4)R"));
-		Assert.assertEquals(2, typesPerDepot.size());
-		Assert.assertTrue(typesPerDepot.containsKey("i(2,0)"));
-		Assert.assertEquals(2, typesPerDepot.get("i(2,0)").size());
-		Assert.assertTrue(typesPerDepot.get("i(2,0)").contains("testVehicle1"));
-		Assert.assertTrue(typesPerDepot.get("i(2,0)").contains("testVehicle2"));
-		Assert.assertTrue(typesPerDepot.containsKey("j(2,4)R"));
-		Assert.assertEquals(2, typesPerDepot.get("j(2,4)R").size());
-		Assert.assertTrue(typesPerDepot.get("j(2,4)R").contains("testVehicle1"));
-		Assert.assertTrue(typesPerDepot.get("j(2,4)R").contains("testVehicle2"));
+		Assertions.assertEquals(2, depotSums.size());
+		Assertions.assertTrue(depotSums.containsKey("i(2,0)"));
+		Assertions.assertEquals(2, depotSums.getInt("i(2,0)"));
+		Assertions.assertTrue(depotSums.containsKey("j(2,4)R"));
+		Assertions.assertEquals(2, depotSums.getInt("j(2,4)R"));
+		Assertions.assertEquals(2, typesPerDepot.size());
+		Assertions.assertTrue(typesPerDepot.containsKey("i(2,0)"));
+		Assertions.assertEquals(2, typesPerDepot.get("i(2,0)").size());
+		Assertions.assertTrue(typesPerDepot.get("i(2,0)").contains("testVehicle1"));
+		Assertions.assertTrue(typesPerDepot.get("i(2,0)").contains("testVehicle2"));
+		Assertions.assertTrue(typesPerDepot.containsKey("j(2,4)R"));
+		Assertions.assertEquals(2, typesPerDepot.get("j(2,4)R").size());
+		Assertions.assertTrue(typesPerDepot.get("j(2,4)R").contains("testVehicle1"));
+		Assertions.assertTrue(typesPerDepot.get("j(2,4)R").contains("testVehicle2"));
 
 		// check carrier 2
 		Carrier testCarrier2 = CarriersUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier2", Carrier.class));
-		Assert.assertEquals(FleetSize.FINITE, testCarrier2.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(15, CarriersUtils.getJspritIterations(testCarrier2));
-		Assert.assertEquals(9, testCarrier2.getCarrierCapabilities().getCarrierVehicles().size());
+		Assertions.assertEquals(FleetSize.FINITE, testCarrier2.getCarrierCapabilities().getFleetSize());
+		Assertions.assertEquals(15, CarriersUtils.getJspritIterations(testCarrier2));
+		Assertions.assertEquals(9, testCarrier2.getCarrierCapabilities().getCarrierVehicles().size());
 		depotSums = new Object2IntOpenHashMap<>();
 		typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier2.getCarrierCapabilities().getCarrierVehicles().values()) {
 			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
 			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
-			Assert.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
-			Assert.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
-		Assert.assertEquals(3, depotSums.size());
-		Assert.assertTrue(depotSums.containsKey("j(4,3)R"));
-		Assert.assertEquals(3, depotSums.getInt("j(4,3)R"));
-		Assert.assertEquals(3, typesPerDepot.size());
-		Assert.assertTrue(typesPerDepot.containsKey("j(4,3)R"));
-		Assert.assertEquals(3, typesPerDepot.get("j(4,3)R").size());
-		Assert.assertTrue(typesPerDepot.get("j(4,3)R").contains("testVehicle2"));
+		Assertions.assertEquals(3, depotSums.size());
+		Assertions.assertTrue(depotSums.containsKey("j(4,3)R"));
+		Assertions.assertEquals(3, depotSums.getInt("j(4,3)R"));
+		Assertions.assertEquals(3, typesPerDepot.size());
+		Assertions.assertTrue(typesPerDepot.containsKey("j(4,3)R"));
+		Assertions.assertEquals(3, typesPerDepot.get("j(4,3)R").size());
+		Assertions.assertTrue(typesPerDepot.get("j(4,3)R").contains("testVehicle2"));
 
 		// check carrier 3
 		Network network = NetworkUtils.readNetwork(
 				"https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
 		Carrier testCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier3", Carrier.class));
-		Assert.assertEquals(FleetSize.INFINITE, testCarrier3.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(1, CarriersUtils.getJspritIterations(testCarrier3));
-		Assert.assertEquals(2, testCarrier3.getCarrierCapabilities().getCarrierVehicles().size());
+		Assertions.assertEquals(FleetSize.INFINITE, testCarrier3.getCarrierCapabilities().getFleetSize());
+		Assertions.assertEquals(1, CarriersUtils.getJspritIterations(testCarrier3));
+		Assertions.assertEquals(2, testCarrier3.getCarrierCapabilities().getCarrierVehicles().size());
 		depotSums = new Object2IntOpenHashMap<>();
 		typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier3.getCarrierCapabilities().getCarrierVehicles().values()) {
 			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
 			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
-			Assert.assertEquals(50000, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
-			Assert.assertEquals(80000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(50000, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(80000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
-		Assert.assertEquals(2, depotSums.size());
-		Assert.assertTrue(depotSums.containsKey("j(2,6)R"));
-		Assert.assertEquals(1, depotSums.getInt("j(2,6)R"));
+		Assertions.assertEquals(2, depotSums.size());
+		Assertions.assertTrue(depotSums.containsKey("j(2,6)R"));
+		Assertions.assertEquals(1, depotSums.getInt("j(2,6)R"));
 		for (String depot : depotSums.keySet()) {
 			if (!depot.equals("j(2,6)R")) {
 				Link link = network.getLinks().get(Id.createLinkId(depot));
-				Assert.assertTrue(
+				Assertions.assertTrue(
 						FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, null, null));
-				Assert.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area1"}, null));
-				Assert.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area2"}, null));
+				Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area1"}, null));
+				Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area2"}, null));
 			}
 
 		}
-		Assert.assertEquals(2, typesPerDepot.size());
-		Assert.assertTrue(typesPerDepot.containsKey("j(2,6)R"));
-		Assert.assertEquals(1, typesPerDepot.get("j(2,6)R").size());
-		Assert.assertTrue(typesPerDepot.get("j(2,6)R").contains("testVehicle1"));
+		Assertions.assertEquals(2, typesPerDepot.size());
+		Assertions.assertTrue(typesPerDepot.containsKey("j(2,6)R"));
+		Assertions.assertEquals(1, typesPerDepot.get("j(2,6)R").size());
+		Assertions.assertTrue(typesPerDepot.get("j(2,6)R").contains("testVehicle1"));
 
 	}
 
 	@Test
-	public void csvCarrierReader() throws IOException {
+	void csvCarrierReader() throws IOException {
 
 		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
-		Assert.assertEquals(3, allNewCarrierInformation.size());
+		Assertions.assertEquals(3, allNewCarrierInformation.size());
 
 		for (CarrierInformationElement carrierInformationElement : allNewCarrierInformation) {
 			if (carrierInformationElement.getName().equals("testCarrier1")) {
-				Assert.assertNull(carrierInformationElement.getAreaOfAdditionalDepots());
-				Assert.assertEquals(0, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
-				Assert.assertEquals(FleetSize.INFINITE, carrierInformationElement.getFleetSize());
-				Assert.assertEquals(10, carrierInformationElement.getJspritIterations());
-				Assert.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
-				Assert.assertEquals(3600, carrierInformationElement.getVehicleStartTime());
-				Assert.assertEquals(50000, carrierInformationElement.getVehicleEndTime());
-				Assert.assertEquals(2, carrierInformationElement.getVehicleDepots().size());
-				Assert.assertTrue(carrierInformationElement.getVehicleDepots().contains("i(2,0)")
+				Assertions.assertNull(carrierInformationElement.getAreaOfAdditionalDepots());
+				Assertions.assertEquals(0, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
+				Assertions.assertEquals(FleetSize.INFINITE, carrierInformationElement.getFleetSize());
+				Assertions.assertEquals(10, carrierInformationElement.getJspritIterations());
+				Assertions.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
+				Assertions.assertEquals(3600, carrierInformationElement.getVehicleStartTime());
+				Assertions.assertEquals(50000, carrierInformationElement.getVehicleEndTime());
+				Assertions.assertEquals(2, carrierInformationElement.getVehicleDepots().size());
+				Assertions.assertTrue(carrierInformationElement.getVehicleDepots().contains("i(2,0)")
 						&& carrierInformationElement.getVehicleDepots().contains("j(2,4)R"));
-				Assert.assertEquals(2, carrierInformationElement.getVehicleTypes().length);
-				Assert.assertTrue(carrierInformationElement.getVehicleTypes()[0].equals("testVehicle1")
+				Assertions.assertEquals(2, carrierInformationElement.getVehicleTypes().length);
+				Assertions.assertTrue(carrierInformationElement.getVehicleTypes()[0].equals("testVehicle1")
 						|| carrierInformationElement.getVehicleTypes()[0].equals("testVehicle2"));
-				Assert.assertNotEquals(carrierInformationElement.getVehicleTypes()[0], carrierInformationElement.getVehicleTypes()[1]);
+				Assertions.assertNotEquals(carrierInformationElement.getVehicleTypes()[0], carrierInformationElement.getVehicleTypes()[1]);
 
 			} else if (carrierInformationElement.getName().equals("testCarrier3")) {
-				Assert.assertEquals(1, carrierInformationElement.getAreaOfAdditionalDepots().length);
-				Assert.assertEquals("area1", carrierInformationElement.getAreaOfAdditionalDepots()[0]);
-				Assert.assertEquals(0, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
-				Assert.assertEquals(FleetSize.INFINITE, carrierInformationElement.getFleetSize());
-				Assert.assertEquals(0, carrierInformationElement.getJspritIterations());
-				Assert.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
-				Assert.assertEquals(50000, carrierInformationElement.getVehicleStartTime());
-				Assert.assertEquals(80000, carrierInformationElement.getVehicleEndTime());
-				Assert.assertEquals(1, carrierInformationElement.getVehicleDepots().size());
-				Assert.assertEquals("j(2,6)R", carrierInformationElement.getVehicleDepots().get(0));
-				Assert.assertEquals(1, carrierInformationElement.getVehicleTypes().length);
-				Assert.assertEquals("testVehicle1", carrierInformationElement.getVehicleTypes()[0]);
+				Assertions.assertEquals(1, carrierInformationElement.getAreaOfAdditionalDepots().length);
+				Assertions.assertEquals("area1", carrierInformationElement.getAreaOfAdditionalDepots()[0]);
+				Assertions.assertEquals(0, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
+				Assertions.assertEquals(FleetSize.INFINITE, carrierInformationElement.getFleetSize());
+				Assertions.assertEquals(0, carrierInformationElement.getJspritIterations());
+				Assertions.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
+				Assertions.assertEquals(50000, carrierInformationElement.getVehicleStartTime());
+				Assertions.assertEquals(80000, carrierInformationElement.getVehicleEndTime());
+				Assertions.assertEquals(1, carrierInformationElement.getVehicleDepots().size());
+				Assertions.assertEquals("j(2,6)R", carrierInformationElement.getVehicleDepots().get(0));
+				Assertions.assertEquals(1, carrierInformationElement.getVehicleTypes().length);
+				Assertions.assertEquals("testVehicle1", carrierInformationElement.getVehicleTypes()[0]);
 
 			} else if (carrierInformationElement.getName().equals("testCarrier2")) {
-				Assert.assertNull(carrierInformationElement.getAreaOfAdditionalDepots());
-				Assert.assertEquals(3, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
-				Assert.assertEquals(FleetSize.FINITE, carrierInformationElement.getFleetSize());
-				Assert.assertEquals(15, carrierInformationElement.getJspritIterations());
-				Assert.assertEquals(3, carrierInformationElement.getNumberOfDepotsPerType());
-				Assert.assertEquals(3600, carrierInformationElement.getVehicleStartTime());
-				Assert.assertEquals(50000, carrierInformationElement.getVehicleEndTime());
-				Assert.assertEquals(1, carrierInformationElement.getVehicleDepots().size());
-				Assert.assertEquals("j(4,3)R", carrierInformationElement.getVehicleDepots().get(0));
-				Assert.assertEquals(1, carrierInformationElement.getVehicleTypes().length);
-				Assert.assertEquals("testVehicle2", carrierInformationElement.getVehicleTypes()[0]);
+				Assertions.assertNull(carrierInformationElement.getAreaOfAdditionalDepots());
+				Assertions.assertEquals(3, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
+				Assertions.assertEquals(FleetSize.FINITE, carrierInformationElement.getFleetSize());
+				Assertions.assertEquals(15, carrierInformationElement.getJspritIterations());
+				Assertions.assertEquals(3, carrierInformationElement.getNumberOfDepotsPerType());
+				Assertions.assertEquals(3600, carrierInformationElement.getVehicleStartTime());
+				Assertions.assertEquals(50000, carrierInformationElement.getVehicleEndTime());
+				Assertions.assertEquals(1, carrierInformationElement.getVehicleDepots().size());
+				Assertions.assertEquals("j(4,3)R", carrierInformationElement.getVehicleDepots().get(0));
+				Assertions.assertEquals(1, carrierInformationElement.getVehicleTypes().length);
+				Assertions.assertEquals("testVehicle2", carrierInformationElement.getVehicleTypes()[0]);
 			} else {
-				Assert.fail("No expected carrierInformationElement found");
+				Assertions.fail("No expected carrierInformationElement found");
 			}
 		}
 

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -81,7 +81,7 @@ public class DvrpEventsReadersTest {
 			new TaskEndedEvent(333, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, toLink));
 
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		dvrpEvents.forEach(writer::handleEvent);

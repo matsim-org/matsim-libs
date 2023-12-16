@@ -20,13 +20,13 @@
 
 package org.matsim.core.replanning.selectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,11 +44,11 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	private final static Logger log = LogManager.getLogger(ExpBetaPlanSelectorTest.class);
 	private Config config = null;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.config = null;
 	}
 
@@ -60,7 +60,8 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	/**
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
-	@Test public void testExpBeta2() {
+	@Test
+	void testExpBeta2() {
 		this.config.scoring().setBrainExpBeta(2.0);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
@@ -112,7 +113,8 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	/**
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
-	@Test public void testExpBeta1() {
+	@Test
+	void testExpBeta1() {
 		this.config.scoring().setBrainExpBeta(1.0);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
@@ -168,7 +170,8 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		assertEquals(6460, cnt5);
 	}
 
-	@Test public void testGetSelectionProbability() {
+	@Test
+	void testGetSelectionProbability() {
 
 		/*
 		 * the expected results were computed with R. The standard output of double precision numbers in R has 7 digits.

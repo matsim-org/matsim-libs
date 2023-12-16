@@ -2,8 +2,8 @@ package org.matsim.contrib.osm.networkReader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -17,11 +17,11 @@ public class SupersonicOsmNetworkReaderIT {
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 	private static final Logger log = LogManager.getLogger(SupersonicOsmNetworkReaderIT.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_andorra() {
+	void test_andorra() {
 
 		Network network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(coordinateTransformation)

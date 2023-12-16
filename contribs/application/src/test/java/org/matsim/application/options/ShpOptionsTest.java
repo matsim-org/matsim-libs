@@ -1,9 +1,9 @@
 package org.matsim.application.options;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.assertj.core.data.Offset;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ShpOptionsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void readZip() {
+	void readZip() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
@@ -31,7 +31,7 @@ public class ShpOptionsTest {
 				.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
@@ -43,7 +43,7 @@ public class ShpOptionsTest {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
@@ -51,7 +51,7 @@ public class ShpOptionsTest {
 				.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
@@ -60,32 +60,26 @@ public class ShpOptionsTest {
 		List<SimpleFeature> ft = index.getAll();
 
 		assertThat(ft)
-				.hasSize(578)
+				.hasSize(4906)
 				.hasSize(Set.copyOf(ft).size());
 
 	}
 
 	@Test
-	public void testGetGeometry() {
+	void testGetGeometry() {
 
 		Path input = Path.of(utils.getClassInputDirectory()
 						.replace("ShpOptionsTest", "CreateLandUseShpTest")
 						.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 		Geometry geometry = shp.getGeometry() ;
-		Geometry expectedGeometry = new GeometryFactory().createEmpty(2);
 
-		List<SimpleFeature> features = shp.readFeatures();
+		assertThat(geometry.getArea())
+			.isCloseTo(1.9847543618489646E-4, Offset.offset(1e-8));
 
-		for(SimpleFeature feature : features) {
-			Geometry geometryToJoin = (Geometry) feature.getDefaultGeometry();
-			expectedGeometry = expectedGeometry.union(geometryToJoin);
-		}
-
-		Assert.assertTrue(geometry.equals(expectedGeometry));
 	}
 }

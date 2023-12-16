@@ -21,9 +21,9 @@ package org.matsim.core.router;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,11 +57,11 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 		final Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
@@ -80,10 +80,10 @@ public class PseudoTransitRoutingModuleTest {
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(400.0, tt, 1e-8);
-			Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(400.0, tt, 1e-8);
+			Assertions.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(3.);
@@ -91,9 +91,9 @@ public class PseudoTransitRoutingModuleTest {
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(600.0, tt, 1e-8);
-			Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
-			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(600.0, tt, 1e-8);
+			Assertions.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
 			// above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that disutility.  But preferred to test in context.
@@ -124,9 +124,9 @@ public class PseudoTransitRoutingModuleTest {
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
 
-			Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
 	}
 

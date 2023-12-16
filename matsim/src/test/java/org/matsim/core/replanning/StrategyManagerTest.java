@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StrategyManagerTest {
 
@@ -51,7 +51,7 @@ public class StrategyManagerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testChangeRequests() {
+	void testChangeRequests() {
 		MatsimRandom.reset(4711);
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -126,12 +126,14 @@ public class StrategyManagerTest {
 		assertEquals(498, strategy4.getCounter());
 	}
 
-	@Test( expected=IllegalStateException.class )
-	public void testAddTwiceStrategy() {
-		final StrategyManager manager = new StrategyManager();
-		final PlanStrategy s = new PlanStrategyImpl.Builder( new RandomPlanSelector() ).build();
-		manager.addStrategy( s , null , 1 );
-		manager.addStrategy( s , null , 10 );
+	@Test
+	void testAddTwiceStrategy() {
+		assertThrows(IllegalStateException.class, () -> {
+			final StrategyManager manager = new StrategyManager();
+			final PlanStrategy s = new PlanStrategyImpl.Builder( new RandomPlanSelector() ).build();
+			manager.addStrategy(s, null, 1);
+			manager.addStrategy(s, null, 10);
+		});
 	}
 
 	/**
@@ -141,7 +143,7 @@ public class StrategyManagerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testRemoveStrategy() {
+	void testRemoveStrategy() {
 		MatsimRandom.reset(4711);
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -200,7 +202,7 @@ public class StrategyManagerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testOptimisticBehavior() {
+	void testOptimisticBehavior() {
 
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
@@ -233,7 +235,7 @@ public class StrategyManagerTest {
 		for (int i = 0; i < 4; i++) {
 			manager.run(population, i, null);
 			Plan plan = person.getSelectedPlan();
-			assertNull("plan has not undefined score in iteration " + i, plan.getScore());
+			assertNull(plan.getScore(), "plan has not undefined score in iteration " + i);
 			plan.setScore(Double.valueOf(i));
 		}
 
@@ -250,7 +252,7 @@ public class StrategyManagerTest {
 	}
 
 	@Test
-	public void testSetPlanSelectorForRemoval() {
+	void testSetPlanSelectorForRemoval() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		manager.addStrategy( new PlanStrategyImpl(new RandomPlanSelector()), null, 1.0 );
@@ -269,26 +271,26 @@ public class StrategyManagerTest {
 		manager.setMaxPlansPerAgent(plans.length - 2);
 		manager.run(pop, -1,null);
 
-		assertEquals("wrong number of plans.", 5, p.getPlans().size());
+		assertEquals(5, p.getPlans().size(), "wrong number of plans.");
 		// default of StrategyManager is to remove worst plans:
-		assertFalse("plan should have been removed.", p.getPlans().contains(plans[0]));
-		assertFalse("plan should have been removed.", p.getPlans().contains(plans[1]));
-		assertTrue("plan should not have been removed.", p.getPlans().contains(plans[2]));
+		assertFalse(p.getPlans().contains(plans[0]), "plan should have been removed.");
+		assertFalse(p.getPlans().contains(plans[1]), "plan should have been removed.");
+		assertTrue(p.getPlans().contains(plans[2]), "plan should not have been removed.");
 
 		// change plan selector for removal and run again
 		manager.setPlanSelectorForRemoval(new BestPlanSelector<Plan, Person>());
 		manager.setMaxPlansPerAgent(plans.length - 4);
 		manager.run(pop, -1,null);
 
-		assertEquals("wrong number of plans.", 3, p.getPlans().size());
+		assertEquals(3, p.getPlans().size(), "wrong number of plans.");
 		// default of StrategyManager is to remove worst plans:
-		assertFalse("plan should have been removed.", p.getPlans().contains(plans[plans.length - 1]));
-		assertFalse("plan should have been removed.", p.getPlans().contains(plans[plans.length - 2]));
-		assertTrue("plan should not have been removed.", p.getPlans().contains(plans[plans.length - 3]));
+		assertFalse(p.getPlans().contains(plans[plans.length - 1]), "plan should have been removed.");
+		assertFalse(p.getPlans().contains(plans[plans.length - 2]), "plan should have been removed.");
+		assertTrue(p.getPlans().contains(plans[plans.length - 3]), "plan should not have been removed.");
 	}
 
 	@Test
-	public void testGetStrategies() {
+	void testGetStrategies() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
@@ -300,15 +302,15 @@ public class StrategyManagerTest {
 		manager.addStrategy( str3, null, 0.5 );
 
 		List<GenericPlanStrategy<Plan, Person>> strategies = manager.getStrategies( null );
-		Assert.assertEquals(3, strategies.size());
+		Assertions.assertEquals(3, strategies.size());
 
-		Assert.assertEquals(str1, strategies.get(0));
-		Assert.assertEquals(str2, strategies.get(1));
-		Assert.assertEquals(str3, strategies.get(2));
+		Assertions.assertEquals(str1, strategies.get(0));
+		Assertions.assertEquals(str2, strategies.get(1));
+		Assertions.assertEquals(str3, strategies.get(2));
 	}
-	
+
 	@Test
-	public void testGetWeights() {
+	void testGetWeights() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
@@ -320,15 +322,15 @@ public class StrategyManagerTest {
 		manager.addStrategy( str3, null, 0.5 );
 
 		List<Double> weights = manager.getWeights( null );
-		Assert.assertEquals(3, weights.size());
+		Assertions.assertEquals(3, weights.size());
 
-		Assert.assertEquals(1.0, weights.get(0), 1e-8);
-		Assert.assertEquals(2.0, weights.get(1), 1e-8);
-		Assert.assertEquals(0.5, weights.get(2), 1e-8);
+		Assertions.assertEquals(1.0, weights.get(0), 1e-8);
+		Assertions.assertEquals(2.0, weights.get(1), 1e-8);
+		Assertions.assertEquals(0.5, weights.get(2), 1e-8);
 	}
-	
+
 	@Test
-	public void testGetWeights_ChangeRequests() {
+	void testGetWeights_ChangeRequests() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
@@ -347,29 +349,29 @@ public class StrategyManagerTest {
 		manager.run(pop, 1, null);
 
 		List<Double> weights = manager.getWeights( null );
-		Assert.assertEquals(3, weights.size());
+		Assertions.assertEquals(3, weights.size());
 		
-		Assert.assertEquals(1.0, weights.get(0), 1e-8);
-		Assert.assertEquals(2.0, weights.get(1), 1e-8);
-		Assert.assertEquals(0.5, weights.get(2), 1e-8);
+		Assertions.assertEquals(1.0, weights.get(0), 1e-8);
+		Assertions.assertEquals(2.0, weights.get(1), 1e-8);
+		Assertions.assertEquals(0.5, weights.get(2), 1e-8);
 
 		manager.run(pop, 5, null);
 
 		weights = manager.getWeights( null );
-		Assert.assertEquals(3, weights.size());
+		Assertions.assertEquals(3, weights.size());
 		
-		Assert.assertEquals(1.0, weights.get(0), 1e-8);
-		Assert.assertEquals(3.0, weights.get(1), 1e-8);
-		Assert.assertEquals(0.5, weights.get(2), 1e-8);
+		Assertions.assertEquals(1.0, weights.get(0), 1e-8);
+		Assertions.assertEquals(3.0, weights.get(1), 1e-8);
+		Assertions.assertEquals(0.5, weights.get(2), 1e-8);
 
 		manager.run(pop, 10, null);
 
 		weights = manager.getWeights( null );
-		Assert.assertEquals(3, weights.size());
+		Assertions.assertEquals(3, weights.size());
 		
-		Assert.assertEquals(1.0, weights.get(0), 1e-8);
-		Assert.assertEquals(3.0, weights.get(1), 1e-8);
-		Assert.assertEquals(1.0, weights.get(2), 1e-8);
+		Assertions.assertEquals(1.0, weights.get(0), 1e-8);
+		Assertions.assertEquals(3.0, weights.get(1), 1e-8);
+		Assertions.assertEquals(1.0, weights.get(2), 1e-8);
 	}
 	
 	/**

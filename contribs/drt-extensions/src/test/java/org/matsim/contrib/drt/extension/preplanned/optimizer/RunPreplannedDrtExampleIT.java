@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDrtOptimizer.PreplannedRequestKey;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDrtOptimizer.PreplannedSchedules;
@@ -43,7 +43,7 @@ import org.matsim.examples.ExamplesUtils;
  */
 public class RunPreplannedDrtExampleIT {
 	@Test
-	public void testRun() {
+	void testRun() {
 		// scenario with 1 shared taxi (max 2 pax) and 10 requests
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_shared_taxi_config.xml");
 

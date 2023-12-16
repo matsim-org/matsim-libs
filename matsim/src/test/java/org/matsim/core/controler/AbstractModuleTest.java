@@ -5,8 +5,8 @@ import com.google.inject.Module;
 import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -22,10 +22,10 @@ import java.util.Map;
 public class AbstractModuleTest{
 	private static final Logger log = LogManager.getLogger( AbstractModuleTest.class );
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void test1() {
+	void test1() {
 
 		Config config = ConfigUtils.createConfig() ;
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );

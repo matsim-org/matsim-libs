@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -66,7 +66,7 @@ import org.matsim.vehicles.Vehicle;
 public class JavaRoundingErrorInQsimTest {
 
 	@Test
-	public void printDecimalSum(){
+	void printDecimalSum(){
 		double a = 0.1;
 		double sum =0;
 		double counter = 0;
@@ -77,9 +77,9 @@ public class JavaRoundingErrorInQsimTest {
 			System.out.println("Sum at counter "+counter+" is "+sum);	
 		}
 	}
-	
+
 	@Test
-	public void testToCheckTravelTime () {
+	void testToCheckTravelTime() {
 		// 2 cars depart on same time, central (bottleneck) link allow only 1 agent / 10 sec.
 		PseudoInputs net = new PseudoInputs();
 		net.createNetwork(360);
@@ -97,10 +97,10 @@ public class JavaRoundingErrorInQsimTest {
 			.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
-		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 2" , 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON);
+		Assertions.assertEquals( 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 2");
 
 		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one. 
-		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 1" , 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON);
+		Assertions.assertEquals( 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 1");
 		LogManager.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for vehicle 1. This is done intentionally in order to keep this in mind for future.");
 	}
 

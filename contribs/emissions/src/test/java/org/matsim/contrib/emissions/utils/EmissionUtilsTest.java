@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +43,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.matsim.contrib.emissions.Pollutant.*;
 
 
@@ -80,7 +81,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSumUpEmissions() {
+	final void testSumUpEmissions() {
 		// test the method EmissionUtils.sumUpEmissions for a complete list of pollutants
 		// missing data is not tested here
 
@@ -123,19 +124,19 @@ public class EmissionUtilsTest {
 		Double pmv = sum.get( PM );
 		Double sov = sum.get(SO2);
 
-		Assert.assertEquals("Value of CO should be " + (wcov + ccov), cov, wcov + ccov, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of CO2_TOTAL should be " + wc2v, c2v, wc2v, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of FC should be " + (wfcv + cfcv), fcv, wfcv + cfcv, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of HC should be " + (whcv + chcv), hcv, whcv + chcv, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of NMHC should be " + (wnmv + cnmv), nmv, wnmv + cnmv, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of NO2 should be " + (wn2v + cn2v), n2v, wn2v + cn2v, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of NOx should be " + (wnxv + cnxv), nxv, wnxv + cnxv, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of PM should be ." + (wpmv + cpmv), pmv, wpmv + cpmv, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Value of SO2 should be " + wsov, sov, wsov, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(cov, wcov + ccov, MatsimTestUtils.EPSILON, "Value of CO should be " + (wcov + ccov));
+		Assertions.assertEquals(c2v, wc2v, MatsimTestUtils.EPSILON, "Value of CO2_TOTAL should be " + wc2v);
+		Assertions.assertEquals(fcv, wfcv + cfcv, MatsimTestUtils.EPSILON, "Value of FC should be " + (wfcv + cfcv));
+		Assertions.assertEquals(hcv, whcv + chcv, MatsimTestUtils.EPSILON, "Value of HC should be " + (whcv + chcv));
+		Assertions.assertEquals(nmv, wnmv + cnmv, MatsimTestUtils.EPSILON, "Value of NMHC should be " + (wnmv + cnmv));
+		Assertions.assertEquals(n2v, wn2v + cn2v, MatsimTestUtils.EPSILON, "Value of NO2 should be " + (wn2v + cn2v));
+		Assertions.assertEquals(nxv, wnxv + cnxv, MatsimTestUtils.EPSILON, "Value of NOx should be " + (wnxv + cnxv));
+		Assertions.assertEquals(pmv, wpmv + cpmv, MatsimTestUtils.EPSILON, "Value of PM should be ." + (wpmv + cpmv));
+		Assertions.assertEquals(sov, wsov, MatsimTestUtils.EPSILON, "Value of SO2 should be " + wsov);
 	}
 
 	@Test
-	public final void testSumUpEmissionsPerId() {
+	final void testSumUpEmissionsPerId() {
 		Map<Id<Person>, Map<Pollutant, Double>> warmEmissions = new HashMap<>();
 		Map<Id<Person>, Map<Pollutant, Double>> coldEmissions = new HashMap<>();
 
@@ -234,39 +235,42 @@ public class EmissionUtilsTest {
 		double a2so = sums.get(Id.create("id2", Person.class)).get(SO2);
 
 		//assures simultaneously that persons/ids are distinguished correctly
-		Assert.assertEquals("CO value of person 1 should be" +e1co +"but is ", e1co, a1co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("CO2 value of person 1 should be" + e1c2 + "but is ", e1c2, a1c2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("FC value of person 1 should be" + e1fc + "but is ", e1fc, a1fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("HC value of person 1 should be" + e1hc + "but is ", e1hc, a1hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NMHC value of person 1 should be" + e1nm + "but is ", e1nm, a1nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NO2 value of person 1 should be" + e1n2 + "but is ", e1n2, a1n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NOx value of person 1 should be" + e1nx + "but is ", e1nx, a1nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("PM value of person 1 should be" + e1pm + "but is ", e1pm, a1pm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("SO value of person 1 should be" + e1so + "but is ", e1so, a1so, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(e1co, a1co, MatsimTestUtils.EPSILON, "CO value of person 1 should be" +e1co +"but is ");
+		Assertions.assertEquals(e1c2, a1c2, MatsimTestUtils.EPSILON, "CO2 value of person 1 should be" + e1c2 + "but is ");
+		Assertions.assertEquals(e1fc, a1fc, MatsimTestUtils.EPSILON, "FC value of person 1 should be" + e1fc + "but is ");
+		Assertions.assertEquals(e1hc, a1hc, MatsimTestUtils.EPSILON, "HC value of person 1 should be" + e1hc + "but is ");
+		Assertions.assertEquals(e1nm, a1nm, MatsimTestUtils.EPSILON, "NMHC value of person 1 should be" + e1nm + "but is ");
+		Assertions.assertEquals(e1n2, a1n2, MatsimTestUtils.EPSILON, "NO2 value of person 1 should be" + e1n2 + "but is ");
+		Assertions.assertEquals(e1nx, a1nx, MatsimTestUtils.EPSILON, "NOx value of person 1 should be" + e1nx + "but is ");
+		Assertions.assertEquals(e1pm, a1pm, MatsimTestUtils.EPSILON, "PM value of person 1 should be" + e1pm + "but is ");
+		Assertions.assertEquals(e1so, a1so, MatsimTestUtils.EPSILON, "SO value of person 1 should be" + e1so + "but is ");
 
-		Assert.assertEquals("CO value of person 2 should be" + e2co + "but is ", e2co, a2co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("CO2 value of person 2 should be" + e2c2 + "but is ", e2c2, a2c2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("FC value of person 2 should be" + e2fc + "but is ", e2fc, a2fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("HC value of person 2 should be" + e2hc + "but is ", e2hc, a2hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NMHC value of person 2 should be" + e2nm + "but is ", e2nm, a2nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NO2 value of person 2 should be" + e2n2 + "but is ", e2n2, a2n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("NOx value of person 2 should be" + e2nx + "but is ", e2nx, a2nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("PM value of person 2 should be" + e2pm + "but is ", e2pm, a2pm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("SO value of person 2 should be" + e2so + "but is ", e2so, a2so, MatsimTestUtils.EPSILON);
-
-	}
-
-	@Test(expected = NullPointerException.class)
-	public final void testGetTotalEmissions_nullInput() {
-
-		@SuppressWarnings("ConstantConditions")
-		SortedMap<Pollutant, Double> totalEmissions = EmissionUtils.getTotalEmissions(null);
-		Assert.fail("Expected NullPointerException, got none.");
+		Assertions.assertEquals(e2co, a2co, MatsimTestUtils.EPSILON, "CO value of person 2 should be" + e2co + "but is ");
+		Assertions.assertEquals(e2c2, a2c2, MatsimTestUtils.EPSILON, "CO2 value of person 2 should be" + e2c2 + "but is ");
+		Assertions.assertEquals(e2fc, a2fc, MatsimTestUtils.EPSILON, "FC value of person 2 should be" + e2fc + "but is ");
+		Assertions.assertEquals(e2hc, a2hc, MatsimTestUtils.EPSILON, "HC value of person 2 should be" + e2hc + "but is ");
+		Assertions.assertEquals(e2nm, a2nm, MatsimTestUtils.EPSILON, "NMHC value of person 2 should be" + e2nm + "but is ");
+		Assertions.assertEquals(e2n2, a2n2, MatsimTestUtils.EPSILON, "NO2 value of person 2 should be" + e2n2 + "but is ");
+		Assertions.assertEquals(e2nx, a2nx, MatsimTestUtils.EPSILON, "NOx value of person 2 should be" + e2nx + "but is ");
+		Assertions.assertEquals(e2pm, a2pm, MatsimTestUtils.EPSILON, "PM value of person 2 should be" + e2pm + "but is ");
+		Assertions.assertEquals(e2so, a2so, MatsimTestUtils.EPSILON, "SO value of person 2 should be" + e2so + "but is ");
 
 	}
 
 	@Test
-	public final void testGetTotalEmissions_emptyList() {
+	final void testGetTotalEmissions_nullInput() {
+		assertThrows(NullPointerException.class, () -> {
+
+			@SuppressWarnings("ConstantConditions")
+			SortedMap<Pollutant, Double> totalEmissions = EmissionUtils.getTotalEmissions(null);
+			Assertions.fail("Expected NullPointerException, got none.");
+
+		});
+
+	}
+
+	@Test
+	final void testGetTotalEmissions_emptyList() {
 		//test an empty list as input
 
 		SortedMap<Pollutant, Double> totalEmissions;
@@ -274,11 +278,11 @@ public class EmissionUtilsTest {
 
 		//test empty list as input
 		totalEmissions = EmissionUtils.getTotalEmissions(persons2emissions);
-		Assert.assertEquals("this map should be empty", 0, totalEmissions.size());
+		Assertions.assertEquals(0, totalEmissions.size(), "this map should be empty");
 	}
 
 	@Test
-	public final void testGetTotalEmissions_completeData() {
+	final void testGetTotalEmissions_completeData() {
 		//test getTotalEmissions for complete data
 		Set<Pollutant> pollsFromEU = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2));
 
@@ -338,27 +342,27 @@ public class EmissionUtilsTest {
 		persons2emissions.put(p3Id, allEmissionsp3);
 		totalEmissions = EmissionUtils.getTotalEmissions(persons2emissions);
 
-		Assert.assertEquals(CO + " values are not correct", p1co + p2co + p3co, totalEmissions.get(CO), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(CO2_TOTAL + " values are not correct", p1c2 + p2c2 + p3c2, totalEmissions.get(CO2_TOTAL), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(FC + " values are not correct", p1fc + p2fc + p3fc, totalEmissions.get(FC), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(HC + " values are not correct", p1hc + p2hc + p3hc, totalEmissions.get(HC), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(NMHC + " values are not correct", p1nm + p2nm + p3nm, totalEmissions.get(NMHC), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(NO2 + " values are not correct", p1n2 + p2n2 + p3n2, totalEmissions.get(NO2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(NOx + " values are not correct", p1nx + p2nx + p3nx, totalEmissions.get(NOx), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(PM + " values are not correct", p1pm + p2pm + p3pm, totalEmissions.get(PM), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(SO2 + " values are not correct", p1so + p2so + p3so, totalEmissions.get(SO2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(p1co + p2co + p3co, totalEmissions.get(CO), MatsimTestUtils.EPSILON, CO + " values are not correct");
+		Assertions.assertEquals(p1c2 + p2c2 + p3c2, totalEmissions.get(CO2_TOTAL), MatsimTestUtils.EPSILON, CO2_TOTAL + " values are not correct");
+		Assertions.assertEquals(p1fc + p2fc + p3fc, totalEmissions.get(FC), MatsimTestUtils.EPSILON, FC + " values are not correct");
+		Assertions.assertEquals(p1hc + p2hc + p3hc, totalEmissions.get(HC), MatsimTestUtils.EPSILON, HC + " values are not correct");
+		Assertions.assertEquals(p1nm + p2nm + p3nm, totalEmissions.get(NMHC), MatsimTestUtils.EPSILON, NMHC + " values are not correct");
+		Assertions.assertEquals(p1n2 + p2n2 + p3n2, totalEmissions.get(NO2), MatsimTestUtils.EPSILON, NO2 + " values are not correct");
+		Assertions.assertEquals(p1nx + p2nx + p3nx, totalEmissions.get(NOx), MatsimTestUtils.EPSILON, NOx + " values are not correct");
+		Assertions.assertEquals(p1pm + p2pm + p3pm, totalEmissions.get(PM), MatsimTestUtils.EPSILON, PM + " values are not correct");
+		Assertions.assertEquals(p1so + p2so + p3so, totalEmissions.get(SO2), MatsimTestUtils.EPSILON, SO2 + " values are not correct");
 
 		// assume that all maps are complete
 		for (Pollutant emission : pollsFromEU) {
-			Assert.assertTrue(totalEmissions.containsKey(emission));
+			Assertions.assertTrue(totalEmissions.containsKey(emission));
 		}
 		// nothing else in the list
-		Assert.assertEquals("this list should be as long as number of pollutants", totalEmissions.keySet().size(), pollsFromEU.size());
+		Assertions.assertEquals(totalEmissions.keySet().size(), pollsFromEU.size(), "this list should be as long as number of pollutants");
 
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_completeData(){
+	final void testSetNonCalculatedEmissionsForPopulation_completeData(){
 		//test setNonCalculatedEmissionsForPopulation for three persons with complete lists of emissions
 		//check values
 
@@ -417,57 +421,56 @@ public class EmissionUtilsTest {
 		Map<Id<Person>, SortedMap<Pollutant, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU);
 
 		//check: all persons added to the population are contained in the finalMap
-		Assert.assertTrue("the calculated map should contain person 1", finalMap.containsKey(idp1));
-		Assert.assertTrue("the calculated map should contain person 2", finalMap.containsKey(idp2));
+		Assertions.assertTrue(finalMap.containsKey(idp1), "the calculated map should contain person 1");
+		Assertions.assertTrue(finalMap.containsKey(idp2), "the calculated map should contain person 2");
 		//nothing else in the finalMap
-		Assert.assertEquals("the calculated map should contain two persons but contains "+
-		finalMap.size() + "persons." ,pop.getPersons().keySet().size(), finalMap.size());
+		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.size(), "the calculated map should contain two persons but contains "+
+		finalMap.size() + "persons.");
 
 		//check: all values for person 1 and 2 are not null or zero
 		// and of type double
 		for(Object id : finalMap.keySet()) {
-			Assert.assertTrue(id instanceof Id);
+			Assertions.assertTrue(id instanceof Id);
 			for (Object pollutant : finalMap.get(id).values()) {
-				Assert.assertSame(pollutant.getClass(), Double.class);
-				Assert.assertNotSame(0.0, pollutant);
-				Assert.assertNotNull(pollutant);
+				Assertions.assertSame(pollutant.getClass(), Double.class);
+				Assertions.assertNotSame(0.0, pollutant);
+				Assertions.assertNotNull(pollutant);
 			}
 			//check: all emission types appear
 			for (Pollutant emission : pollsFromEU) {
-				Assert.assertTrue(finalMap.get(id).containsKey(emission));
+				Assertions.assertTrue(finalMap.get(id).containsKey(emission));
 			}
 			//nothing else in the list
 			int numOfPolls = pollsFromEU.size();
-			Assert.assertEquals("the number of pullutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls,
-					numOfPolls, finalMap.get(id).keySet().size());
+			Assertions.assertEquals(numOfPolls, finalMap.get(id).keySet().size(), "the number of pullutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls);
 		}
 
 		//check: values for all emissions are correct -person 1
-		Assert.assertEquals("CO value for person 1 is not correct", cov1, finalMap.get(idp1).get( CO ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("CO2 value for person 1 is not correct", c2v1, finalMap.get(idp1).get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("FC value for person 1 is not correct", fcv1, finalMap.get(idp1).get( FC ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("HC value for person 1 is not correct", hcv1, finalMap.get(idp1).get( HC ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("NMHC value for person 1 is not correct", nmv1, finalMap.get(idp1).get( NMHC ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("NO2 value for person 1 is not correct", n2v1, finalMap.get(idp1).get( NO2 ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("NOx value for person 1 is not correct", nxv1, finalMap.get(idp1).get( NOx ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("PM value for person 1 is not correct", pmv1, finalMap.get(idp1).get( PM ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("SO value for person 1 is not correct", sov1, finalMap.get(idp1).get( SO2 ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(cov1, finalMap.get(idp1).get( CO ), MatsimTestUtils.EPSILON, "CO value for person 1 is not correct" );
+		Assertions.assertEquals(c2v1, finalMap.get(idp1).get( CO2_TOTAL ), MatsimTestUtils.EPSILON, "CO2 value for person 1 is not correct" );
+		Assertions.assertEquals(fcv1, finalMap.get(idp1).get( FC ), MatsimTestUtils.EPSILON, "FC value for person 1 is not correct" );
+		Assertions.assertEquals(hcv1, finalMap.get(idp1).get( HC ), MatsimTestUtils.EPSILON, "HC value for person 1 is not correct" );
+		Assertions.assertEquals(nmv1, finalMap.get(idp1).get( NMHC ), MatsimTestUtils.EPSILON, "NMHC value for person 1 is not correct" );
+		Assertions.assertEquals(n2v1, finalMap.get(idp1).get( NO2 ), MatsimTestUtils.EPSILON, "NO2 value for person 1 is not correct" );
+		Assertions.assertEquals(nxv1, finalMap.get(idp1).get( NOx ), MatsimTestUtils.EPSILON, "NOx value for person 1 is not correct" );
+		Assertions.assertEquals(pmv1, finalMap.get(idp1).get( PM ), MatsimTestUtils.EPSILON, "PM value for person 1 is not correct" );
+		Assertions.assertEquals(sov1, finalMap.get(idp1).get( SO2 ), MatsimTestUtils.EPSILON, "SO value for person 1 is not correct" );
 
 		//check: values for all emissions are correct -person 2
-		Assert.assertEquals("CO value for person 2 is not correct", cov2, finalMap.get(idp2).get( CO ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("CO2 value for person 2 is not correct", c2v2, finalMap.get(idp2).get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("FC value for person 2 is not correct", fcv2, finalMap.get(idp2).get( FC ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("HC value for person 2 is not correct", hcv2, finalMap.get(idp2).get( HC ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("NMHC value for person 2 is not correct", nmv2, finalMap.get(idp2).get( NMHC ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("NO2 value for person 2 is not correct", n2v2, finalMap.get(idp2).get( NO2 ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("NOx value for person 2 is not correct", nxv2, finalMap.get(idp2).get( NOx ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("PM value for person 2 is not correct", pmv2, finalMap.get(idp2).get( PM ), MatsimTestUtils.EPSILON );
-		Assert.assertEquals("SO value for person 2 is not correct", sov2, finalMap.get(idp2).get( SO2 ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(cov2, finalMap.get(idp2).get( CO ), MatsimTestUtils.EPSILON, "CO value for person 2 is not correct" );
+		Assertions.assertEquals(c2v2, finalMap.get(idp2).get( CO2_TOTAL ), MatsimTestUtils.EPSILON, "CO2 value for person 2 is not correct" );
+		Assertions.assertEquals(fcv2, finalMap.get(idp2).get( FC ), MatsimTestUtils.EPSILON, "FC value for person 2 is not correct" );
+		Assertions.assertEquals(hcv2, finalMap.get(idp2).get( HC ), MatsimTestUtils.EPSILON, "HC value for person 2 is not correct" );
+		Assertions.assertEquals(nmv2, finalMap.get(idp2).get( NMHC ), MatsimTestUtils.EPSILON, "NMHC value for person 2 is not correct" );
+		Assertions.assertEquals(n2v2, finalMap.get(idp2).get( NO2 ), MatsimTestUtils.EPSILON, "NO2 value for person 2 is not correct" );
+		Assertions.assertEquals(nxv2, finalMap.get(idp2).get( NOx ), MatsimTestUtils.EPSILON, "NOx value for person 2 is not correct" );
+		Assertions.assertEquals(pmv2, finalMap.get(idp2).get( PM ), MatsimTestUtils.EPSILON, "PM value for person 2 is not correct" );
+		Assertions.assertEquals(sov2, finalMap.get(idp2).get( SO2 ), MatsimTestUtils.EPSILON, "SO value for person 2 is not correct" );
 
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_missingMap() {
+	final void testSetNonCalculatedEmissionsForPopulation_missingMap() {
 
 		setUpForNonCaculatedEmissions();
 
@@ -478,25 +481,25 @@ public class EmissionUtilsTest {
 		Map<Id<Person>, SortedMap<Pollutant, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU);
 
 		//check: person 3 is contained in the finalMap
-		Assert.assertTrue("the calculated map should contain person 3", finalMap.containsKey(idp3));
+		Assertions.assertTrue(finalMap.containsKey(idp3), "the calculated map should contain person 3");
 		//nothing else in the finalMap
 		message = "the calculated map should contain " + pop.getPersons().size() + " person(s) but contains " + finalMap.keySet().size() + "person(s).";
-		Assert.assertEquals(message, pop.getPersons().keySet().size(), finalMap.keySet().size());
+		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
 		//check: all values for the this person are zero and of type double
 		for (Object pollutant : finalMap.get(idp3).values()) {
-			Assert.assertSame(pollutant.getClass(), Double.class);
-			Assert.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON);
-			Assert.assertNotNull(pollutant);
+			Assertions.assertSame(pollutant.getClass(), Double.class);
+			Assertions.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON);
+			Assertions.assertNotNull(pollutant);
 		}
 		//check: all types of emissions appear
 		for (Pollutant emission : pollsFromEU) {
-			Assert.assertTrue(finalMap.get(idp3).containsKey(emission));
+			Assertions.assertTrue(finalMap.get(idp3).containsKey(emission));
 		}
 		//nothing else in the list
 		int numOfPolls = pollsFromEU.size();
 		message = "the number of pullutants is " + finalMap.get(idp3).keySet().size() + " but should be" + numOfPolls;
-		Assert.assertEquals(message, numOfPolls, finalMap.get(idp3).keySet().size());
+		Assertions.assertEquals(numOfPolls, finalMap.get(idp3).keySet().size(), message);
 
 	}
 
@@ -512,7 +515,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_missingPerson() {
+	final void testSetNonCalculatedEmissionsForPopulation_missingPerson() {
 
 		setUpForNonCaculatedEmissions();
 
@@ -538,15 +541,15 @@ public class EmissionUtilsTest {
 		Map<Id<Person>, SortedMap<Pollutant, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU);
 
 		//check: all persons added to the population are contained in the finalMap
-		Assert.assertFalse("the calculated map should not contain person 4", finalMap.containsKey(idp4));
+		Assertions.assertFalse(finalMap.containsKey(idp4), "the calculated map should not contain person 4");
 		//nothing else in the finalMap
 		message = "the calculated map should contain " + pop.getPersons().size() + " person(s) but contains " + finalMap.keySet().size() + "person(s).";
-		Assert.assertEquals(message, pop.getPersons().keySet().size(), finalMap.keySet().size());
+		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_nullEmissions(){
+	final void testSetNonCalculatedEmissionsForPopulation_nullEmissions(){
 		//test setNonCalculatedEmissionsForPopulation with 'null'
 		// throw nullpointer exception
 		setUpForNonCaculatedEmissions();
@@ -564,11 +567,11 @@ public class EmissionUtilsTest {
 		} catch (NullPointerException e) {
 			nullPointerEx = true;
 		}
-		Assert.assertTrue(nullPointerEx);
+		Assertions.assertTrue(nullPointerEx);
 	}
-	
+
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_emptyPopulation(){
+	final void testSetNonCalculatedEmissionsForPopulation_emptyPopulation(){
 		// test setNonCalculatedEmissionsForPopulation with an empty population
 		// empty list should be returned
 		setUpForNonCaculatedEmissions();
@@ -594,12 +597,12 @@ public class EmissionUtilsTest {
 
 		//nothing in the finalMap
 		message = "the calculated map should contain " + pop.getPersons().size() + " person(s) but contains " + finalMap.keySet().size() + "person(s).";
-		Assert.assertEquals(message, pop.getPersons().keySet().size(), finalMap.keySet().size());
+		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
 	}
 
 	@Test
-	public final void testSetNonCalculatedEmissionsForPopulation_emptyEmissionMap() {
+	final void testSetNonCalculatedEmissionsForPopulation_emptyEmissionMap() {
 		//test setNonCalculatedEmissionsForPopulation with an empty emission map
 		setUpForNonCaculatedEmissions();
 
@@ -614,28 +617,26 @@ public class EmissionUtilsTest {
 		Map<Id<Person>, SortedMap<Pollutant, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU);
 
 		//check: all persons added to the population are contained in the finalMap
-		Assert.assertTrue("the calculated map should contain person 5", finalMap.containsKey(idp5));
-		Assert.assertTrue("the calculated map should contain person 6", finalMap.containsKey(idp6));
+		Assertions.assertTrue(finalMap.containsKey(idp5), "the calculated map should contain person 5");
+		Assertions.assertTrue(finalMap.containsKey(idp6), "the calculated map should contain person 6");
 		//nothing else in the finalMap
 		message = "the calculated map should contain " + pop.getPersons().size() + " person(s) but contains " + finalMap.keySet().size() + "person(s).";
-		Assert.assertEquals(message, pop.getPersons().keySet().size(), finalMap.keySet().size());
+		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
 		//check: all values for all persons are zero and of type double
 		for (Id<Person> id : finalMap.keySet()) {
 			for (Object pollutant : finalMap.get(id).values()) {
-				Assert.assertSame(pollutant.getClass(), Double.class);
-				Assert.assertEquals("map of pollutants was missing. Therefore all values should be set to zero.",
-						0.0, (Double) pollutant, MatsimTestUtils.EPSILON);
-				Assert.assertNotNull(pollutant);
+				Assertions.assertSame(pollutant.getClass(), Double.class);
+				Assertions.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON, "map of pollutants was missing. Therefore all values should be set to zero.");
+				Assertions.assertNotNull(pollutant);
 			}
 			//check: alle types of emissions appear
 			for (Pollutant emission : pollsFromEU) {
-				Assert.assertTrue(finalMap.get(id).containsKey(emission));
+				Assertions.assertTrue(finalMap.get(id).containsKey(emission));
 			}
 			//nothing else in the list
 			int numOfPolls = pollsFromEU.size();
-			Assert.assertEquals("the number of pullutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls,
-					numOfPolls, finalMap.get(id).keySet().size());
+			Assertions.assertEquals(numOfPolls, finalMap.get(id).keySet().size(), "the number of pullutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls);
 
 
 		}
@@ -643,7 +644,7 @@ public class EmissionUtilsTest {
 	}
 
 	@Test
-	public final void testSetNonCalculatedEmissionsForNetwork() {
+	final void testSetNonCalculatedEmissionsForNetwork() {
 		//test setNonCalculatedEmissionsForNetwork
 		// network consists of four nodes 1,2,3,4
 		// and six links 12, 13, 14, 23, 24, 34
@@ -728,64 +729,64 @@ public class EmissionUtilsTest {
 
 			Id<Link> linkId = link.getId();
 
-			Assert.assertTrue(totalEmissionsFilled.containsKey(linkId));
+			Assertions.assertTrue(totalEmissionsFilled.containsKey(linkId));
 			SortedMap<Pollutant, Double> emissionMapForLink = totalEmissionsFilled.get(linkId);
 			for (Pollutant pollutant : pollsFromEU) {
 				System.out.println("pollutant: " + pollutant + "; linkId: " + linkId);
-				Assert.assertTrue(pollutant + "not found for link " + linkId.toString(),
-						emissionMapForLink.containsKey(pollutant));
-				Assert.assertEquals(Double.class, emissionMapForLink.get(pollutant).getClass());
+				Assertions.assertTrue(emissionMapForLink.containsKey(pollutant),
+						pollutant + "not found for link " + linkId.toString());
+				Assertions.assertEquals(Double.class, emissionMapForLink.get(pollutant).getClass());
 
 			}
 		}
 		//check values
 		//link 12 and 13
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( CO2_TOTAL ), c2link12v, MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( CO ), colink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( FC ), fclink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( HC ), hclink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( NMHC ), nmlink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( NO2 ), n2link12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( NOx ), nxlink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( PM ), pmlink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link12id).get( SO2 ), solink12v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( CO2_TOTAL ), c2link13v, MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( CO ), colink13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( FC ), fclink13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( HC ), hclink13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( NMHC ), nmlink13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( NO2 ), n2link13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( NOx ), nxlink13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( PM ), pmlink13v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link13id).get( SO2 ), solink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( CO2_TOTAL ), c2link12v, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( CO ), colink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( FC ), fclink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( HC ), hclink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( NMHC ), nmlink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( NO2 ), n2link12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( NOx ), nxlink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( PM ), pmlink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link12id).get( SO2 ), solink12v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( CO2_TOTAL ), c2link13v, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( CO ), colink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( FC ), fclink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( HC ), hclink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( NMHC ), nmlink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( NO2 ), n2link13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( NOx ), nxlink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( PM ), pmlink13v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link13id).get( SO2 ), solink13v,  MatsimTestUtils.EPSILON );
 
 		//link 14 and 34
 		for(Pollutant pollutant: pollsFromEU){
-			Assert.assertEquals(totalEmissionsFilled.get(link14id).get(pollutant), .0, MatsimTestUtils.EPSILON);
-			Assert.assertEquals(totalEmissionsFilled.get(link34id).get(pollutant), .0, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(totalEmissionsFilled.get(link14id).get(pollutant), .0, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(totalEmissionsFilled.get(link34id).get(pollutant), .0, MatsimTestUtils.EPSILON);
 		}
 
 		//link 23 - partial
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( CO2_TOTAL ), .0, MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( CO ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( FC ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( HC ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( NMHC ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( NO2 ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( NOx ), nxlink23v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( PM ), pmlink23v,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link23id).get( SO2 ), solink23v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( CO2_TOTAL ), .0, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( CO ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( FC ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( HC ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( NMHC ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( NO2 ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( NOx ), nxlink23v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( PM ), pmlink23v,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link23id).get( SO2 ), solink23v,  MatsimTestUtils.EPSILON );
 
 		//link 24 - empty
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( CO2_TOTAL ), .0, MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( CO ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( FC ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( HC ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( NMHC ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( NO2 ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( NOx ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( PM ), .0,  MatsimTestUtils.EPSILON );
-		Assert.assertEquals(totalEmissionsFilled.get(link24id).get( SO2 ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( CO2_TOTAL ), .0, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( CO ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( FC ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( HC ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( NMHC ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( NO2 ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( NOx ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( PM ), .0,  MatsimTestUtils.EPSILON );
+		Assertions.assertEquals(totalEmissionsFilled.get(link24id).get( SO2 ), .0,  MatsimTestUtils.EPSILON );
 
 	}
 	public static Map<Pollutant,Double> createEmissions() {

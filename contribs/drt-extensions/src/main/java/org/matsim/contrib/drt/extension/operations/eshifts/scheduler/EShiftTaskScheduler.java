@@ -74,7 +74,6 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 		this.shiftsParams = shiftsParams;
 		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 		this.chargingInfrastructure = chargingInfrastructure;
-		ShiftSchedules.initSchedules(operationFacilities, fleet, taskFactory);
 	}
 
     public void relocateForBreak(ShiftDvrpVehicle vehicle, OperationFacility breakFacility, DrtShift shift) {

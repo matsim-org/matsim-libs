@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -46,11 +46,11 @@ import java.util.Map;
  */
 public class SmallScaleCommercialTrafficUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void findZoneOfLinksTest() throws IOException, URISyntaxException {
+	void findZoneOfLinksTest() throws IOException, URISyntaxException {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
@@ -67,14 +67,14 @@ public class SmallScaleCommercialTrafficUtilsTest {
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		Assert.assertEquals(3, regionLinksMap.size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(60, regionLinksMap.get("testArea1_area1").size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(41, regionLinksMap.get("testArea1_area2").size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(28, regionLinksMap.get("testArea2_area3").size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, regionLinksMap.size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(60, regionLinksMap.get("testArea1_area1").size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(41, regionLinksMap.get("testArea1_area2").size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(28, regionLinksMap.get("testArea2_area3").size(), MatsimTestUtils.EPSILON);
 
-		Assert.assertNull(SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(5,4)"), regionLinksMap));
-		Assert.assertEquals("testArea1_area1", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(6,5)R"), regionLinksMap));
-		Assert.assertEquals("testArea1_area2", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,7)R"), regionLinksMap));
-		Assert.assertEquals("testArea2_area3", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,2)R"), regionLinksMap));
+		Assertions.assertNull(SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(5,4)"), regionLinksMap));
+		Assertions.assertEquals("testArea1_area1", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(6,5)R"), regionLinksMap));
+		Assertions.assertEquals("testArea1_area2", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,7)R"), regionLinksMap));
+		Assertions.assertEquals("testArea2_area3", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,2)R"), regionLinksMap));
 	}
 }

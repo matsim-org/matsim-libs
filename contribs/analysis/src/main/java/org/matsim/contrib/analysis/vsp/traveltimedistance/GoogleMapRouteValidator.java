@@ -1,11 +1,11 @@
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+import java.util.Optional;
 
 public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
     private static final Logger log = LogManager.getLogger(GoogleMapRouteValidator.class);
@@ -51,9 +52,6 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
 
     @Override
     public Tuple<Double, Double> getTravelTime(Coord fromCoord, Coord toCoord, double departureTime, String tripId) {
-        long travelTime = 0;
-        long distance = 0;
-
         double adjustedDepartureTime = calculateGoogleDepartureTime(departureTime);
         Coord from = ct.transform(fromCoord);
         Coord to = ct.transform(toCoord);
@@ -71,31 +69,45 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
                 "&origins=" + df.format(from.getY()) + "%2C" + df.format(from.getX()) +
                 "&key=" + apiAccessKey;
 
+		log.info(urlString);
+
+		Optional<Tuple<Double, Double>> result;
         try {
-            log.info(urlString);
             URL url = new URL(urlString);
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                JSONParser jp = new JSONParser();
-                JSONObject jsonObject = (JSONObject) jp.parse(in);
-                JSONArray rows = (JSONArray) jsonObject.get("rows");
-                if (!rows.isEmpty()) {
-                    JSONArray elements = (JSONArray) ((JSONObject) rows.get(0)).get("elements");
-                    JSONObject results = (JSONObject) elements.get(0);
-                    if (results.containsKey("distance")) {
-                        JSONObject distanceResults = (JSONObject) results.get("distance");
-                        distance = (long) distanceResults.get("value");
-                    }
-                    if (results.containsKey("duration_in_traffic")) {
-                        JSONObject timeResults = (JSONObject) results.get("duration_in_traffic");
-                        travelTime = (long) timeResults.get("value");
-                    }
-                }
-            }
-        } catch (IOException | ParseException e) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+			result = readFromJson(in);
+        } catch (IOException e) {
             log.error("The contents on the URL cannot be read properly. Please check your API or check the contents on URL manually", e);
+			result = Optional.empty();
         }
-        return new Tuple<>((double) travelTime, (double) distance);
+        return result.orElse(new Tuple<>(0.0, 0.0));
     }
+
+	Optional<Tuple<Double, Double>> readFromJson(BufferedReader reader) throws IOException {
+		JsonElement jsonElement = JsonParser.parseReader(reader);
+		if(!jsonElement.isJsonObject()){
+			return Optional.empty();
+		}
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		JsonArray rows = jsonObject.getAsJsonArray("rows");
+
+		if (rows.isEmpty()) {
+			return Optional.empty();
+		}
+
+		JsonObject results = rows.get(0).getAsJsonObject().get("elements").getAsJsonArray().get(0).getAsJsonObject();
+
+		if (!results.has("distance") && !results.has("duration_in_traffic")) {
+			return Optional.empty();
+		}
+
+		JsonObject distanceResults = results.get("distance").getAsJsonObject();
+		double distance = distanceResults.get("value").getAsDouble();
+		JsonObject timeResults = results.get("duration_in_traffic").getAsJsonObject();
+		double travelTime = timeResults.get("value").getAsDouble();
+
+		return Optional.of(new Tuple<>(travelTime, distance));
+	}
 
     private double calculateGoogleDepartureTime(double departureTime) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

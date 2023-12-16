@@ -22,9 +22,9 @@
 
 package org.matsim.core.router.old;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -55,11 +55,11 @@ import java.util.List;
 
 public class PlanRouterTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void passesVehicleFromOldPlan() {
+	@Test
+	void passesVehicleFromOldPlan() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -81,15 +81,15 @@ public class PlanRouterTest {
         testee.run(plan);
 
         if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-      	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
+      	  Assertions.assertEquals(vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId(), "Vehicle Id transferred to new Plan");
         } else {
-      	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
+      	  Assertions.assertEquals(vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId(), "Vehicle Id transferred to new Plan");
       	  // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
         }
     }
 
-    @Test
-    public void keepsVehicleIfTripRouterUsesOneAlready() {
+	@Test
+	void keepsVehicleIfTripRouterUsesOneAlready() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -139,9 +139,9 @@ public class PlanRouterTest {
         PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
         testee.run(plan);
         if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-              Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
+              Assertions.assertEquals(newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId(), "Vehicle Id from TripRouter used");
         } else {
-              Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
+              Assertions.assertEquals(newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId(), "Vehicle Id from TripRouter used");
               // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
         }
 

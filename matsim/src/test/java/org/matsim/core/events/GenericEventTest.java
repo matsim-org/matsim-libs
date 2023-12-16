@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.events;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -32,11 +32,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class GenericEventTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteReadXml() {
+	@Test
+	void testWriteReadXml() {
 		final String TYPE = "GenericEvent";
 		final String KEY1 = "k1";
 		final String VALUE1 = "v1";

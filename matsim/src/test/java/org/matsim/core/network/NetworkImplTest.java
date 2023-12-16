@@ -22,8 +22,8 @@ package org.matsim.core.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
@@ -44,16 +44,16 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	public Network getEmptyTestNetwork() {
 		return new NetworkImpl(new LinkFactoryImpl());
 	}
-	
+
 	/**
 	 * Tests if the default values of a network instance are the same as the defaults specified in the network_v1.dtd
 	 */
 	@Test
-	public void testDefaultValues(){
+	void testDefaultValues(){
 		Network net = new NetworkImpl(new LinkFactoryImpl());
-		Assert.assertEquals(7.5, net.getEffectiveCellSize(), 0.0);
-		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
-		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
+		Assertions.assertEquals(7.5, net.getEffectiveCellSize(), 0.0);
+		Assertions.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
+		Assertions.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
 
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -62,8 +62,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		final NetworkFactory nf = net.getFactory();
 		Gbl.assertNotNull(nf);
 		Link link = nf.createLink(Id.create(1, Link.class), node1, node2);
-		Assert.assertEquals(1, link.getAllowedModes().size());
-		Assert.assertEquals("car", link.getAllowedModes().iterator().next());
+		Assertions.assertEquals(1, link.getAllowedModes().size());
+		Assertions.assertEquals("car", link.getAllowedModes().iterator().next());
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 * second time.
 	 */
 	@Test
-	public void testAddLink_existingId() {
+	void testAddLink_existingId() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -88,28 +88,28 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Link link1b = NetworkUtils.createLink(Id.create(1, Link.class), node2, node3, network, 1000, 100.0, 2000.0, 1.0);
 		Link link2 = NetworkUtils.createLink(Id.create(2, Link.class), node2, node4, network, 1000, 100.0, 2000.0, 1.0);
 		network.addLink(link1);
-		Assert.assertEquals(1, network.getLinks().size());
+		Assertions.assertEquals(1, network.getLinks().size());
 		try {
 			network.addLink(link1b);
-			Assert.fail("missing exception. Should not be able to add different link with existing id.");
+			Assertions.fail("missing exception. Should not be able to add different link with existing id.");
 		}
 		catch (IllegalArgumentException e) {
 			log.info("catched expected exception.", e);
 		}
-		Assert.assertEquals(1, network.getLinks().size());
+		Assertions.assertEquals(1, network.getLinks().size());
 		network.addLink(link2);
-		Assert.assertEquals(2, network.getLinks().size());
+		Assertions.assertEquals(2, network.getLinks().size());
 		network.addLink(link2); // adding the same link again should just be ignored
-		Assert.assertEquals(2, network.getLinks().size());
+		Assertions.assertEquals(2, network.getLinks().size());
 	}
-	
+
 	/**
 	 * Tests that if a link is added when its associated nodes are not in the network,
 	 * an exception is thrown. If the node is already in the network, no exception 
 	 * should be thrown. 
 	 */
 	@Test
-	public void testAddLink_noNodes(){
+	void testAddLink_noNodes(){
 		Network n = NetworkUtils.createNetwork();
         Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
 		Node b = n.getFactory().createNode(Id.create("b", Node.class), new Coord(1000.0, 0.0));
@@ -118,7 +118,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Link ab = n.getFactory().createLink(Id.create("ab", Link.class), a, b);
 		try{
 			n.addLink(ab);
-			Assert.fail("Should have thrown exception as fromNode was not in network.");
+			Assertions.fail("Should have thrown exception as fromNode was not in network.");
 		} catch (IllegalArgumentException e){
 			log.info("Caught expected exception: fromNode not in network.", e);
 		}
@@ -126,7 +126,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		n.addNode(a);
 		try{
 			n.addLink(ab);
-			Assert.fail("Should have thrown exception as toNode was not in network.");
+			Assertions.fail("Should have thrown exception as toNode was not in network.");
 		} catch (IllegalArgumentException e){
 			log.info("Caught expected exception: toNode not in network.", e);
 		}
@@ -136,13 +136,13 @@ public class NetworkImplTest extends AbstractNetworkTest {
 			n.addLink(ab);
 			log.info("Link added correctly. Both nodes in the network.");
 		} catch (IllegalArgumentException e){
-			Assert.fail("Should not have thrown exception as both nodes are in network.");
+			Assertions.fail("Should not have thrown exception as both nodes are in network.");
 		}
 		
 		Link ac = n.getFactory().createLink(Id.create("ac", Link.class), a, c);
 		try{
 			n.addLink(ac);
-			Assert.fail("Should have thrown exception as toNode was not in network.");
+			Assertions.fail("Should have thrown exception as toNode was not in network.");
 		} catch (IllegalArgumentException e){
 			log.info("Caught expected exception: toNode not in network.", e);
 		}
@@ -152,13 +152,13 @@ public class NetworkImplTest extends AbstractNetworkTest {
 			n.addLink(ac);
 			log.info("Link added correctly. Both nodes in the network.");
 		} catch (IllegalArgumentException e){
-			Assert.fail("Should not have thrown exception as both nodes are in network.");
+			Assertions.fail("Should not have thrown exception as both nodes are in network.");
 		}
 	}
 
-	
+
 	@Test
-	public void testAddNode_existingId() {
+	void testAddNode_existingId() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -166,42 +166,42 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Node node1b = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 2000, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
-		Assert.assertEquals(2, network.getNodes().size());
+		Assertions.assertEquals(2, network.getNodes().size());
 		try {
 			network.addNode(node1b);
-			Assert.fail("missing exception. Should not be able to add different node with existing id.");
+			Assertions.fail("missing exception. Should not be able to add different node with existing id.");
 		}
 		catch (IllegalArgumentException e) {
 			log.info("catched expected exception.", e);
 		}
-		Assert.assertEquals(2, network.getNodes().size());
+		Assertions.assertEquals(2, network.getNodes().size());
 		network.addNode(node1); // adding the same node again should just be ignored
-		Assert.assertEquals(2, network.getNodes().size());
+		Assertions.assertEquals(2, network.getNodes().size());
 		network.addNode(node3);
-		Assert.assertEquals(3, network.getNodes().size());
+		Assertions.assertEquals(3, network.getNodes().size());
 	}
-	
+
 	/**
 	 * MATSIM-278, 10jun2015: adding a node if quadtree only contained one node
 	 * 
 	 * @author mrieser / Senozon AG
 	 */
 	@Test
-	public void testAddNode_singleNodeFirstOnly() {
+	void testAddNode_singleNodeFirstOnly() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
 		network.addNode(node1);
-		Assert.assertEquals(1, network.getNodes().size());
+		Assertions.assertEquals(1, network.getNodes().size());
 		Node n = NetworkUtils.getNearestNode(network,new Coord((double) 550, (double) 450));
-		Assert.assertEquals(node1, n);
+		Assertions.assertEquals(node1, n);
 		
 		network.addNode(node2);
-		Assert.assertEquals(2, network.getNodes().size());
+		Assertions.assertEquals(2, network.getNodes().size());
 
 		n = NetworkUtils.getNearestNode(network,new Coord((double) 590, (double) 490));
-		Assert.assertEquals(node2, n);
+		Assertions.assertEquals(node2, n);
 	}
 
 	/**
@@ -210,28 +210,28 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 * @author droeder / Senozon Deutschland GmbH
 	 */
 	@Test
-	public void testAddTwoNodes_initializedEmptyQuadtree() {
+	void testAddTwoNodes_initializedEmptyQuadtree() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
 		Node n = NetworkUtils.getNearestNode(network,new Coord((double) 550, (double) 450));
-		Assert.assertNull(n);
+		Assertions.assertNull(n);
 		
 		network.addNode(node1);
-		Assert.assertEquals(1, network.getNodes().size());
+		Assertions.assertEquals(1, network.getNodes().size());
 		n = NetworkUtils.getNearestNode(network,new Coord((double) 550, (double) 450));
-		Assert.assertEquals(node1, n);
+		Assertions.assertEquals(node1, n);
 		
 		network.addNode(node2);
-		Assert.assertEquals(2, network.getNodes().size());
+		Assertions.assertEquals(2, network.getNodes().size());
 
 		n = NetworkUtils.getNearestNode(network,new Coord((double) 590, (double) 490));
-		Assert.assertEquals(node2, n);
+		Assertions.assertEquals(node2, n);
 	}
 
 	@Test
-	public void testRemoveLink_alsoInQuadTrees() {
+	void testRemoveLink_alsoInQuadTrees() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
@@ -246,30 +246,30 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addLink(link2);
 		network.addLink(link3);
 
-		Assert.assertEquals(3, network.getLinks().size());
-		Assert.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
-		Assert.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+		Assertions.assertEquals(3, network.getLinks().size());
+		Assertions.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assertions.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
 
 		network.removeLink(link1.getId());
 
-		Assert.assertEquals(2, network.getLinks().size());
-		Assert.assertEquals(link3, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
-		Assert.assertEquals(link3, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+		Assertions.assertEquals(2, network.getLinks().size());
+		Assertions.assertEquals(link3, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assertions.assertEquals(link3, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
 
 		network.removeLink(link3.getId());
 
-		Assert.assertEquals(1, network.getLinks().size());
-		Assert.assertEquals(link2, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+		Assertions.assertEquals(1, network.getLinks().size());
+		Assertions.assertEquals(link2, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
 
 		network.removeLink(link2.getId());
 
-		Assert.assertEquals(0, network.getLinks().size());
-		Assert.assertNull(NetworkUtils.getNearestLink(network, new Coord(300, 200)));
-		Assert.assertNull(NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+		Assertions.assertEquals(0, network.getLinks().size());
+		Assertions.assertNull(NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assertions.assertNull(NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
 	}
 
 	@Test
-	public void testAddLink_alsoInQuadTrees() {
+	void testAddLink_alsoInQuadTrees() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
@@ -284,24 +284,24 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addLink(link2);
 		network.addLink(link3);
 
-		Assert.assertEquals(2, network.getLinks().size());
-		Assert.assertEquals(link3, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
-		Assert.assertEquals(link3, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
+		Assertions.assertEquals(2, network.getLinks().size());
+		Assertions.assertEquals(link3, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assertions.assertEquals(link3, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
 
 		network.addLink(link1);
-		Assert.assertEquals(3, network.getLinks().size());
+		Assertions.assertEquals(3, network.getLinks().size());
 		// check that the quad trees were correctly updated with the new link
-		Assert.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
-		Assert.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
+		Assertions.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assertions.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
 	}
 
 	@Test
-	public void testAddLink_intoEmptyQuadTree() {
+	void testAddLink_intoEmptyQuadTree() {
 		Network network = new NetworkImpl(new LinkFactoryImpl());
 
-		Assert.assertEquals(0, network.getLinks().size());
-		Assert.assertNull(NetworkUtils.getNearestLink(network, new Coord(300, 200))); // this will force the node QuadTree to be built
-		Assert.assertNull(NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
+		Assertions.assertEquals(0, network.getLinks().size());
+		Assertions.assertNull(NetworkUtils.getNearestLink(network, new Coord(300, 200))); // this will force the node QuadTree to be built
+		Assertions.assertNull(NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
 
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
@@ -317,8 +317,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addLink(link2);
 		network.addLink(link3);
 
-		Assert.assertEquals(3, network.getLinks().size());
-		Assert.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
-		Assert.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
+		Assertions.assertEquals(3, network.getLinks().size());
+		Assertions.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assertions.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200))); // this will force the LinkQuadTree to be built
 	}
 }

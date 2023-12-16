@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
@@ -38,7 +38,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunIT {
 
 	@Test
-	public final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
+	final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 
@@ -157,30 +157,30 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assert.assertEquals(82629, (long) data.counts.get("car"));
-		Assert.assertEquals(29739, (long) data.counts.get("walk"));
-		Assert.assertEquals(31, (long) data.counts.get("bike"));
-		Assert.assertEquals(19029, (long) data.counts.get("pt"));
+		Assertions.assertEquals(82629, (long) data.counts.get("car"));
+		Assertions.assertEquals(29739, (long) data.counts.get("walk"));
+		Assertions.assertEquals(31, (long) data.counts.get("bike"));
+		Assertions.assertEquals(19029, (long) data.counts.get("pt"));
 
-		Assert.assertEquals(21, (long) data.pickupCounts.get("wheels"));
-		Assert.assertEquals(2, (long) data.pickupCounts.get("mobility"));
-		Assert.assertEquals(10, (long) data.pickupCounts.get("velib"));
+		Assertions.assertEquals(21, (long) data.pickupCounts.get("wheels"));
+		Assertions.assertEquals(2, (long) data.pickupCounts.get("mobility"));
+		Assertions.assertEquals(10, (long) data.pickupCounts.get("velib"));
 
-		Assert.assertEquals(21, (long) data.dropoffCounts.get("wheels"));
-		Assert.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
-		Assert.assertEquals(10, (long) data.dropoffCounts.get("velib"));
+		Assertions.assertEquals(21, (long) data.dropoffCounts.get("wheels"));
+		Assertions.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
+		Assertions.assertEquals(10, (long) data.dropoffCounts.get("velib"));
 
-		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels",0L));
-		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility",0L));
-		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib",0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels",0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility",0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib",0L));
 
-		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
-		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));
-		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("velib", 0L));
+		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
+		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));
+		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("velib", 0L));
 
-		Assert.assertEquals(2, (long) data.vehicleCounts.get("wheels"));
-		Assert.assertEquals(2, (long) data.vehicleCounts.get("mobility"));
-		Assert.assertEquals(2, (long) data.vehicleCounts.get("velib"));
+		Assertions.assertEquals(2, (long) data.vehicleCounts.get("wheels"));
+		Assertions.assertEquals(2, (long) data.vehicleCounts.get("mobility"));
+		Assertions.assertEquals(2, (long) data.vehicleCounts.get("velib"));
 	}
 
 	static class OutputData {

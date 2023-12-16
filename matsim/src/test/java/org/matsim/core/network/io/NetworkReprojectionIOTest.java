@@ -21,9 +21,9 @@
 
  package org.matsim.core.network.io;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,7 +40,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+	/**
  * @author thibautd
  */
 public class NetworkReprojectionIOTest {
@@ -51,11 +51,11 @@ public class NetworkReprojectionIOTest {
 					INITIAL_CRS,
 					TARGET_CRS);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testInput() {
+	 @Test
+	 void testInput() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -67,22 +67,22 @@ public class NetworkReprojectionIOTest {
 				INITIAL_CRS, TARGET_CRS,
 				readNetwork ).readFile( networkFile );
 
-		Assert.assertEquals(
-				"unexpected network size",
+		Assertions.assertEquals(
 				2,
-				readNetwork.getNodes().size() );
+				readNetwork.getNodes().size(),
+				"unexpected network size" );
 
 		for ( Node n : readNetwork.getNodes().values() ) {
 			Node initialNode = initialNetwork.getNodes().get(n.getId());
 
-			Assert.assertEquals( "Unexpected coordinate",
-					transformation.transform(initialNode.getCoord()),
-					n.getCoord() );
+			Assertions.assertEquals( transformation.transform(initialNode.getCoord()),
+					n.getCoord(),
+					"Unexpected coordinate" );
 		}
 	}
 
-	@Test
-	public void testOutput() {
+	 @Test
+	 void testOutput() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -95,22 +95,22 @@ public class NetworkReprojectionIOTest {
 		new MatsimNetworkReader(
 				readNetwork ).readFile( networkFile );
 
-		Assert.assertEquals(
-				"unexpected network size",
+		Assertions.assertEquals(
 				2,
-				readNetwork.getNodes().size() );
+				readNetwork.getNodes().size(),
+				"unexpected network size" );
 
 		for ( Node n : readNetwork.getNodes().values() ) {
 			Node initialNode = initialNetwork.getNodes().get(n.getId());
-			Assert.assertEquals(
-					"Unexpected coordinate",
+			Assertions.assertEquals(
 					transformation.transform(initialNode.getCoord()),
-					n.getCoord() );
+					n.getCoord(),
+					"Unexpected coordinate" );
 		}
 	}
 
-	@Test
-	public void testWithControlerAndAttributes() {
+	 @Test
+	 void testWithControlerAndAttributes() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -132,16 +132,16 @@ public class NetworkReprojectionIOTest {
 			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
 			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"No coordinates transform performed!",
+			Assertions.assertEquals(
 					transformation.transform(originalCoord),
-					internalCoord);
+					internalCoord,
+					"No coordinates transform performed!");
 		}
 
-		Assert.assertEquals(
-				"wrong CRS information after loading",
+		Assertions.assertEquals(
 				TARGET_CRS,
-				ProjectionUtils.getCRS(scenario.getNetwork()));
+				ProjectionUtils.getCRS(scenario.getNetwork()),
+				"wrong CRS information after loading");
 
 		config.controller().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
@@ -156,15 +156,15 @@ public class NetworkReprojectionIOTest {
 			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedNetwork.getNodes().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"coordinates were reprojected for dump",
+			Assertions.assertEquals(
 					internalCoord,
-					dumpedCoord);
+					dumpedCoord,
+					"coordinates were reprojected for dump");
 		}
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
@@ -185,16 +185,16 @@ public class NetworkReprojectionIOTest {
 			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
 			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
 
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
+			Assertions.assertNotEquals(
 					originalCoord.getX(),
 					internalCoord.getX(),
-					MatsimTestUtils.EPSILON );
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
+					MatsimTestUtils.EPSILON,
+					"No coordinates transform performed!" );
+			Assertions.assertNotEquals(
 					originalCoord.getY(),
 					internalCoord.getY(),
-					MatsimTestUtils.EPSILON );
+					MatsimTestUtils.EPSILON,
+					"No coordinates transform performed!" );
 		}
 
 		config.controller().setLastIteration( 0 );
@@ -210,16 +210,16 @@ public class NetworkReprojectionIOTest {
 			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedNetwork.getNodes().get( id ).getCoord();
 
-			Assert.assertNotEquals(
-					"coordinates were reprojected for dump",
+			Assertions.assertNotEquals(
 					originalCoord.getX(),
 					dumpedCoord.getX(),
-					MatsimTestUtils.EPSILON );
-			Assert.assertNotEquals(
-					"coordinates were reprojected for dump",
+					MatsimTestUtils.EPSILON,
+					"coordinates were reprojected for dump" );
+			Assertions.assertNotEquals(
 					originalCoord.getY(),
 					dumpedCoord.getY(),
-					MatsimTestUtils.EPSILON );
+					MatsimTestUtils.EPSILON,
+					"coordinates were reprojected for dump" );
 		}
 	}
 

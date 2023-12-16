@@ -20,10 +20,10 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -55,19 +55,19 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class WithinDayTravelTimeTest {
 
-	@Rule
-	public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils helper = new MatsimTestUtils();
 
 	private Link link22;
 	private double originalFreeSpeed22;
 
 	@Test
-	public void testGetLinkTravelTime_fastCapacityUpdate() {
+	void testGetLinkTravelTime_fastCapacityUpdate() {
 		testGetLinkTravelTime(true);
 	}
 
 	@Test
-	public void testGetLinkTravelTime_noFastCapacityUpdate() {
+	void testGetLinkTravelTime_noFastCapacityUpdate() {
 		testGetLinkTravelTime(false);
 	}
 

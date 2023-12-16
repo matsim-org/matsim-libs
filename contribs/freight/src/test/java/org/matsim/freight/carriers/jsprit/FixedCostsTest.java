@@ -29,10 +29,10 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -56,7 +56,7 @@ import java.util.Collection;
  */
 public class FixedCostsTest  {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final static Logger log = LogManager.getLogger(FixedCostsTest.class);
@@ -64,7 +64,7 @@ public class FixedCostsTest  {
 	private final Carriers carriers = new Carriers();
 	private final Carriers carriersPlannedAndRouted = new Carriers();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		// Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
 		CarrierService service1 = createMatsimService("Service1", "i(3,0)", 1);
@@ -186,17 +186,17 @@ public class FixedCostsTest  {
 	 * nearby service1: 8km -> 8 EUR; service2: 36km -> 36 EUR  --> total 44EUR -> score = -44
 	 */
 	@Test
-	public final void test_carrier1CostsAreCorrectly() {
+	final void test_carrier1CostsAreCorrectly() {
 
-		Assert.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	/*
 	 * carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 	 */
 	@Test
-	public final void test_carrier2CostsAreCorrectly() {
-		Assert.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
+	final void test_carrier2CostsAreCorrectly() {
+		Assertions.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	/*
@@ -204,8 +204,8 @@ public class FixedCostsTest  {
 	 * should use A for short trip (8 EUR) and B for the long trip (10.36 EUR)
 	*/
 	@Test
-	public final void test_carrier3CostsAreCorrectly() {
-		Assert.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
+	final void test_carrier3CostsAreCorrectly() {
+		Assertions.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	private static CarrierService createMatsimService(String id, String to, int size) {

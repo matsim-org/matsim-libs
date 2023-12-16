@@ -24,9 +24,9 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -41,8 +41,8 @@ import org.xml.sax.SAXException;
  */
 public class TransitScheduleWriterTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+
 	/**
 	 * Tests that the default format written is in v2 format.
 	 *
@@ -51,7 +51,7 @@ public class TransitScheduleWriterTest {
 	 * @throws ParserConfigurationException
 	 */
 	@Test
-	public void testDefaultV2() throws IOException, SAXException, ParserConfigurationException {
+	void testDefaultV2() throws IOException, SAXException, ParserConfigurationException {
 		String filename = this.utils.getOutputDirectory() + "schedule.xml";
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -65,26 +65,26 @@ public class TransitScheduleWriterTest {
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV2(schedule2, new RouteFactories()).readFile(filename);
-		Assert.assertEquals(1, schedule2.getTransitLines().size());
+		Assertions.assertEquals(1, schedule2.getTransitLines().size());
 	}
-	
+
 	@Test
-	public void testTransitLineName() {
+	void testTransitLineName() {
 		String filename = this.utils.getOutputDirectory() + "schedule.xml";
-		
+
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		TransitLine line = builder.createTransitLine(Id.create(1, TransitLine.class));
 		line.setName("Blue line");
 		schedule.addTransitLine(line);
-		
+
 		TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
 		writer.writeFile(filename);
-		
+
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule2, new RouteFactories()).readFile(filename);
-		Assert.assertEquals(1, schedule2.getTransitLines().size());
-		Assert.assertEquals("Blue line", schedule2.getTransitLines().get(Id.create(1, TransitLine.class)).getName());
+		Assertions.assertEquals(1, schedule2.getTransitLines().size());
+		Assertions.assertEquals("Blue line", schedule2.getTransitLines().get(Id.create(1, TransitLine.class)).getName());
 	}
 }

@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.mobsim;
 
 import jakarta.inject.Inject;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashSet;
 import java.util.Set;
 
-@Ignore
+@Disabled
 public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{

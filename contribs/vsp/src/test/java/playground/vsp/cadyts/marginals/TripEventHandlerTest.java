@@ -1,7 +1,7 @@
 package playground.vsp.cadyts.marginals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -23,13 +23,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TripEventHandlerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * This test takes the pt-tutorial from the scenarios module and performs one iteration. Afterwards it is tested
@@ -40,7 +40,7 @@ public class TripEventHandlerTest {
 	 * @throws MalformedURLException another stupid api
 	 */
 	@Test
-	public void test() throws MalformedURLException {
+	void test() throws MalformedURLException {
 
 		// url is such a weird api
 		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "0.config.xml").toURL();

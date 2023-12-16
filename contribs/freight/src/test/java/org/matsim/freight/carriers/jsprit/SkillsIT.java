@@ -26,9 +26,9 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -41,12 +41,12 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 public class SkillsIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 	private final Id<Link> carrierLocation = Id.createLinkId("i(1,0)");
 
 	@Test
-	public void testJspritWithDifferentSkillsRequired() {
+	void testJspritWithDifferentSkillsRequired() {
 		/* First test with different skills. */
 		Scenario scenario = setupTestScenario();
 		addShipmentsRequiringDifferentSkills(scenario);
@@ -55,14 +55,14 @@ public class SkillsIT {
 			solutionWithDifferentSkills = generateCarrierPlans(scenario);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Should run integration test without exception.");
+			Assertions.fail("Should run integration test without exception.");
 		}
-		Assert.assertEquals("Wrong number of vehicles.", 2L, solutionWithDifferentSkills.getRoutes().size());
-		Assert.assertEquals("Wrong carrier score.", 2086.9971014492755, solutionWithDifferentSkills.getCost(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2L, solutionWithDifferentSkills.getRoutes().size(), "Wrong number of vehicles.");
+		Assertions.assertEquals(2086.9971014492755, solutionWithDifferentSkills.getCost(), MatsimTestUtils.EPSILON, "Wrong carrier score.");
 	}
 
 	@Test
-	public void testJspritWithSameSkillsRequired(){
+	void testJspritWithSameSkillsRequired(){
 		/* Test with same skills. */
 		Scenario scenario = setupTestScenario();
 		addShipmentsRequiringSameSkills(scenario);
@@ -71,10 +71,10 @@ public class SkillsIT {
 			solutionWithSameSkills = generateCarrierPlans(scenario);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Should run integration test without exception.");
+			Assertions.fail("Should run integration test without exception.");
 		}
-		Assert.assertEquals("Wrong number of vehicles.", 1L, solutionWithSameSkills.getRoutes().size());
-		Assert.assertEquals("Wrong carrier score.", 1044.0985507246377, solutionWithSameSkills.getCost(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1L, solutionWithSameSkills.getRoutes().size(), "Wrong number of vehicles.");
+		Assertions.assertEquals(1044.0985507246377, solutionWithSameSkills.getCost(), MatsimTestUtils.EPSILON, "Wrong carrier score.");
 	}
 
 	private VehicleRoutingProblemSolution generateCarrierPlans(Scenario scenario) {

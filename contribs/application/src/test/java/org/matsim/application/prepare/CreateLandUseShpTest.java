@@ -1,8 +1,8 @@
 package org.matsim.application.prepare;
 
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Files;
@@ -12,15 +12,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateLandUseShpTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void convert() {
+	void convert() {
 
 		Path input = Path.of(utils.getClassInputDirectory(), "andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		Path output = Path.of(utils.getOutputDirectory(), "output.shp");
 

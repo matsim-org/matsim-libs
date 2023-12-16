@@ -23,9 +23,9 @@ import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -35,18 +35,18 @@ public class CreateFullConfigTest {
 
 	private final static Logger log = LogManager.getLogger(CreateFullConfigTest.class);
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
-	public void testMain() {
+	void testMain() {
 		String[] args = new String[1];
 		args[0] = helper.getOutputDirectory() + "newConfig.xml";
 
 		File configFile = new File(args[0]);
-		Assert.assertFalse(configFile.exists());
+		Assertions.assertFalse(configFile.exists());
 
 		CreateFullConfig.main(args);
 
-		Assert.assertTrue(configFile.exists());
+		Assertions.assertTrue(configFile.exists());
 	}
 }

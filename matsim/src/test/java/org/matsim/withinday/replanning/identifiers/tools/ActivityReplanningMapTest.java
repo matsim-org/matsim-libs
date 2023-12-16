@@ -20,15 +20,14 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jakarta.inject.Inject;
 
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -54,11 +53,12 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 
 public class ActivityReplanningMapTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testGetTimeBin() {
+	@Test
+	void testGetTimeBin() {
 		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager());
 
 		// test default setting with start time = 0.0 and time step size = 1.0
@@ -97,7 +97,8 @@ public class ActivityReplanningMapTest {
 		assertEquals(2, arp.getTimeBin(12.1));
 	}
 
-	@Test public void testScenarioRun() {
+	@Test
+	void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");

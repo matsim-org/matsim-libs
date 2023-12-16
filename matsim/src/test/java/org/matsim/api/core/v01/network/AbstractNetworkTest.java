@@ -21,8 +21,8 @@ package org.matsim.api.core.v01.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
@@ -38,60 +38,60 @@ public abstract class AbstractNetworkTest {
 	public abstract Network getEmptyTestNetwork();
 
 	@Test
-	public void removeLink() {
+	void removeLink() {
 		Fixture f = new Fixture(getEmptyTestNetwork());
 
-		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
+		Assertions.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertEquals(1, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
 		f.network.removeLink(f.linkIds[1]);
-		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
-		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
+		Assertions.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
+		Assertions.assertEquals(1, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
 
-		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertTrue(f.network.getLinks().containsKey(f.linkIds[2]));
 		f.network.removeLink(f.linkIds[2]);
-		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
 
-		Assert.assertTrue(f.network.getNodes().containsKey(f.nodeIds[1]));
-		Assert.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
+		Assertions.assertTrue(f.network.getNodes().containsKey(f.nodeIds[1]));
+		Assertions.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
 
-		Assert.assertEquals(2, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());
-		Assert.assertEquals(2, f.network.getNodes().get(f.nodeIds[8]).getInLinks().size());
+		Assertions.assertEquals(2, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());
+		Assertions.assertEquals(2, f.network.getNodes().get(f.nodeIds[8]).getInLinks().size());
 		f.network.removeLink(f.linkIds[10]);
-		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());
-		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[8]).getInLinks().size());
+		Assertions.assertEquals(1, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());
+		Assertions.assertEquals(1, f.network.getNodes().get(f.nodeIds[8]).getInLinks().size());
 	}
 
 	@Test
-	public void removeNode() {
+	void removeNode() {
 		Fixture f = new Fixture(getEmptyTestNetwork());
 
-		Assert.assertEquals(8, f.network.getNodes().size());
-		Assert.assertEquals(12, f.network.getLinks().size());
-		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[2]));
-		Assert.assertTrue(f.network.getNodes().containsKey(f.nodeIds[1]));
+		Assertions.assertEquals(8, f.network.getNodes().size());
+		Assertions.assertEquals(12, f.network.getLinks().size());
+		Assertions.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertTrue(f.network.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertTrue(f.network.getNodes().containsKey(f.nodeIds[1]));
 		f.network.removeNode(f.nodeIds[1]);
-		Assert.assertEquals(7, f.network.getNodes().size());
-		Assert.assertEquals(10, f.network.getLinks().size());
-		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
-		Assert.assertFalse(f.network.getNodes().containsKey(f.nodeIds[1]));
-		Assert.assertFalse(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[1]));
-		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[5]));
-		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[7]));
+		Assertions.assertEquals(7, f.network.getNodes().size());
+		Assertions.assertEquals(10, f.network.getLinks().size());
+		Assertions.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assertions.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
+		Assertions.assertFalse(f.network.getNodes().containsKey(f.nodeIds[1]));
+		Assertions.assertFalse(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[1]));
+		Assertions.assertTrue(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[5]));
+		Assertions.assertTrue(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[7]));
 
 		f.network.removeNode(f.nodeIds[8]);
-		Assert.assertEquals(6, f.network.getNodes().size());
-		Assert.assertEquals(6, f.network.getLinks().size());
-		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[8]));
-		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[9]));
-		Assert.assertFalse(f.network.getNodes().containsKey(f.nodeIds[10]));
-		Assert.assertFalse(f.network.getNodes().containsKey(f.nodeIds[11]));
-		Assert.assertFalse(f.network.getNodes().get(f.nodeIds[5]).getOutLinks().containsKey(f.linkIds[10]));
-		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[5]).getOutLinks().containsKey(f.linkIds[6]));
-		Assert.assertFalse(f.network.getNodes().get(f.nodeIds[5]).getInLinks().containsKey(f.linkIds[9]));
-		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[5]).getInLinks().containsKey(f.linkIds[3]));
+		Assertions.assertEquals(6, f.network.getNodes().size());
+		Assertions.assertEquals(6, f.network.getLinks().size());
+		Assertions.assertFalse(f.network.getLinks().containsKey(f.linkIds[8]));
+		Assertions.assertFalse(f.network.getLinks().containsKey(f.linkIds[9]));
+		Assertions.assertFalse(f.network.getNodes().containsKey(f.nodeIds[10]));
+		Assertions.assertFalse(f.network.getNodes().containsKey(f.nodeIds[11]));
+		Assertions.assertFalse(f.network.getNodes().get(f.nodeIds[5]).getOutLinks().containsKey(f.linkIds[10]));
+		Assertions.assertTrue(f.network.getNodes().get(f.nodeIds[5]).getOutLinks().containsKey(f.linkIds[6]));
+		Assertions.assertFalse(f.network.getNodes().get(f.nodeIds[5]).getInLinks().containsKey(f.linkIds[9]));
+		Assertions.assertTrue(f.network.getNodes().get(f.nodeIds[5]).getInLinks().containsKey(f.linkIds[3]));
 	}
 
 	/**

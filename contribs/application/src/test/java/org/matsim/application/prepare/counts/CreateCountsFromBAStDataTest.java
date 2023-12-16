@@ -1,8 +1,8 @@
 package org.matsim.application.prepare.counts;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateCountsFromBAStDataTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	String countsOutput = "test-counts.xml.gz";
 
@@ -36,7 +36,7 @@ public class CreateCountsFromBAStDataTest {
 	String shpCrs = "EPSG:3857";
 
 	@Test
-	public void testCreateCountsFromBAStData() {
+	void testCreateCountsFromBAStData() {
 
 		String version = "normal-";
 		String out = utils.getOutputDirectory() + version + countsOutput;
@@ -74,7 +74,7 @@ public class CreateCountsFromBAStDataTest {
 	}
 
 	@Test
-	public void testWithIgnoredStations() {
+	void testWithIgnoredStations() {
 
 		String version = "with-ignored-";
 		String out1 = utils.getOutputDirectory() + version + countsOutput;
@@ -123,7 +123,7 @@ public class CreateCountsFromBAStDataTest {
 	}
 
 	@Test
-	public void testManualMatchedCounts() {
+	void testManualMatchedCounts() {
 
 		String out = utils.getOutputDirectory() + "manual-matched-" + countsOutput;
 
@@ -159,12 +159,12 @@ public class CreateCountsFromBAStDataTest {
 			MeasurementLocation<Link> actual = map.get(supposed);
 			String actualStation = actual.getStationName();
 
-			Assert.assertEquals(station, actualStation);
+			Assertions.assertEquals(station, actualStation);
 		}
 	}
 
 	@Test
-	public void testManualMatchingWithWrongInput() {
+	void testManualMatchingWithWrongInput() {
 
 		String out = utils.getOutputDirectory() + "manual-matched-" + countsOutput;
 
@@ -181,6 +181,6 @@ public class CreateCountsFromBAStDataTest {
 			"--manual-matched-counts=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
 		};
 
-		Assert.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
+		Assertions.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
 	}
 }

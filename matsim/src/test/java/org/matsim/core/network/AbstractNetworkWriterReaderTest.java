@@ -20,7 +20,7 @@
 
 package org.matsim.core.network;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,9 +33,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,8 +57,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public abstract class AbstractNetworkWriterReaderTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**
@@ -93,19 +93,23 @@ public abstract class AbstractNetworkWriterReaderTest {
 	 */
 	protected abstract void readNetwork(final Scenario scenario, final InputStream stream);
 
-	@Test public void testAllowedModes_multipleModes() {
+	@Test
+	void testAllowedModes_multipleModes() {
 		doTestAllowedModes(createHashSet("bus", "train"), utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testAllowedModes_singleMode() {
+	@Test
+	void testAllowedModes_singleMode() {
 		doTestAllowedModes(createHashSet("miv"), utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testAllowedModes_noMode() {
+	@Test
+	void testAllowedModes_noMode() {
 		doTestAllowedModes(new HashSet<String>(), utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_withoutElevation(){
+	@Test
+	void testNodes_withoutElevation(){
 		List<Node> nodes = new ArrayList<>(2);
 		Node n1 = NetworkUtils.createNode(
 				Id.create("1", Node.class),
@@ -118,7 +122,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_withElevation(){
+	@Test
+	void testNodes_withElevation(){
 		List<Node> nodes = new ArrayList<>(2);
 		Node n1 = NetworkUtils.createNode(
 				Id.create("1", Node.class),
@@ -131,7 +136,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_withAndWithoutElevation(){
+	@Test
+	void testNodes_withAndWithoutElevation(){
 		List<Node> nodes = new ArrayList<>(2);
 		Node n1 = NetworkUtils.createNode(
 				Id.create("1", Node.class),
@@ -144,7 +150,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
-	@Test public void testNodes_IdSpecialCharacters() {
+	@Test
+	void testNodes_IdSpecialCharacters() {
 		Network network1 = NetworkUtils.createNetwork();
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
@@ -156,13 +163,14 @@ public abstract class AbstractNetworkWriterReaderTest {
 		Node nodeA2 = network2.getNodes().get(nodeA1.getId());
 		Node nodeB2 = network2.getNodes().get(nodeB1.getId());
 
-		Assert.assertNotNull(nodeA2);
-		Assert.assertNotNull(nodeB2);
-		Assert.assertNotSame(nodeA1, nodeA2);
-		Assert.assertNotSame(nodeB1, nodeB2);
+		Assertions.assertNotNull(nodeA2);
+		Assertions.assertNotNull(nodeB2);
+		Assertions.assertNotSame(nodeA1, nodeA2);
+		Assertions.assertNotSame(nodeB1, nodeB2);
 	}
 
-	@Test public void testLinks_IdSpecialCharacters() {
+	@Test
+	void testLinks_IdSpecialCharacters() {
 		Network network1 = NetworkUtils.createNetwork();
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
@@ -182,15 +190,16 @@ public abstract class AbstractNetworkWriterReaderTest {
 		Link linkA2 = network2.getLinks().get(linkA1.getId());
 		Link linkB2 = network2.getLinks().get(linkB1.getId());
 
-		Assert.assertNotNull(linkA2);
-		Assert.assertNotNull(linkB2);
-		Assert.assertNotSame(linkA1, linkA2);
-		Assert.assertNotSame(linkB1, linkB2);
+		Assertions.assertNotNull(linkA2);
+		Assertions.assertNotNull(linkB2);
+		Assertions.assertNotSame(linkA1, linkA2);
+		Assertions.assertNotSame(linkB1, linkB2);
 //		Assert.assertEquals(NetworkUtils.getType(linkA1), NetworkUtils.getType(linkA2)); // type is not supported anymore in v2
 //		Assert.assertEquals(NetworkUtils.getOrigId(linkB1), NetworkUtils.getOrigId(linkB2)); // origId is not supported anymore in v2
 	}
 
-	@Test public void testNetwork_NameSpecialCharacters() {
+	@Test
+	void testNetwork_NameSpecialCharacters() {
 		Network network1 = NetworkUtils.createNetwork();
 		network1.setName("Special & characters < are > in \" this ' name.");
 		NetworkFactory nf = network1.getFactory();
@@ -207,8 +216,8 @@ public abstract class AbstractNetworkWriterReaderTest {
 
 		Network network2 = doIOTest(network1);
 
-		Assert.assertNotSame(network1, network2);
-		Assert.assertEquals(network1.getName(), network2.getName());
+		Assertions.assertNotSame(network1, network2);
+		Assertions.assertEquals(network1.getName(), network2.getName());
 	}
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
@@ -223,19 +232,19 @@ public abstract class AbstractNetworkWriterReaderTest {
 		writeNetwork(network1, filename);
 
 		File networkFile = new File(filename);
-		assertTrue("written network file doesn't exist.", networkFile.exists());
-		assertTrue("written network file seems to be empty.", networkFile.length() > 0);
+		assertTrue(networkFile.exists(), "written network file doesn't exist.");
+		assertTrue(networkFile.length() > 0, "written network file seems to be empty.");
 
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network2 = scenario2.getNetwork();
 		readNetwork(scenario2, filename);
 
 		Link link1 = network2.getLinks().get(Id.create("1", Link.class));
-		assertNotNull("link not found in read-in network.", link1);
+		assertNotNull(link1, "link not found in read-in network.");
 
 		Set<String> modes2 = link1.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", modes.size(), modes2.size());
-		assertTrue("wrong mode.", modes2.containsAll(modes));
+		assertEquals(modes.size(), modes2.size(), "wrong number of allowed modes.");
+		assertTrue(modes2.containsAll(modes), "wrong mode.");
 	}
 
 	private static <T> Set<T> createHashSet(T... mode) {
@@ -253,15 +262,15 @@ public abstract class AbstractNetworkWriterReaderTest {
 		writeNetwork(network1, filename);
 
 		File networkFile = new File(filename);
-		assertTrue("written network file doesn't exist.", networkFile.exists());
-		assertTrue("written network file seems to be empty.", networkFile.length() > 0);
+		assertTrue(networkFile.exists(), "written network file doesn't exist.");
+		assertTrue(networkFile.length() > 0, "written network file seems to be empty.");
 
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network2 = scenario2.getNetwork();
 		readNetwork(scenario2, filename);
 
 		for(Node n : nodes){
-			assertEquals("Coordinates are not equal.", n.getCoord(), network2.getNodes().get(n.getId()).getCoord());
+			assertEquals(n.getCoord(), network2.getNodes().get(n.getId()).getCoord(), "Coordinates are not equal.");
 		}
 	}
 

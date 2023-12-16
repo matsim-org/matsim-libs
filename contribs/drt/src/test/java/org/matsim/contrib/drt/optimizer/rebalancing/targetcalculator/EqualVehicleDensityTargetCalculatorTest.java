@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
@@ -57,21 +57,21 @@ public class EqualVehicleDensityTargetCalculatorTest {
 			DrtGridUtils.createGridFromNetwork(network, 500.));
 
 	@Test
-	public void calculate_oneVehiclePerZone() {
+	void calculate_oneVehiclePerZone() {
 		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
 				createFleetSpecification(8)).calculate(0, Map.of());
 		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 1));
 	}
 
 	@Test
-	public void calculate_lessVehiclesThanZones() {
+	void calculate_lessVehiclesThanZones() {
 		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
 				createFleetSpecification(7)).calculate(0, Map.of());
 		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 7. / 8));
 	}
 
 	@Test
-	public void calculate_moreVehiclesThanZones() {
+	void calculate_moreVehiclesThanZones() {
 		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
 				createFleetSpecification(9)).calculate(0, Map.of());
 		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 9. / 8));

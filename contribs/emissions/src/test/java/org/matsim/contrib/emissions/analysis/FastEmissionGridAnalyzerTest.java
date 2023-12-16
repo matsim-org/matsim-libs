@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.Pollutant;
@@ -15,16 +15,16 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FastEmissionGridAnalyzerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void rasterNetwork_singleLink() {
+	@Test
+	void rasterNetwork_singleLink() {
 
         final var cellSize = 10.;
         final var cellArea = cellSize * cellSize;
@@ -50,8 +50,8 @@ public class FastEmissionGridAnalyzerTest {
         raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber / cellArea, value, 0.00000001));
     }
 
-    @Test
-    public void rasterNetwork_singleLinkWithBackwardsOrientation() {
+	@Test
+	void rasterNetwork_singleLinkWithBackwardsOrientation() {
 
         final var cellSize = 10.;
         final var cellArea = cellSize * cellSize;
@@ -77,8 +77,8 @@ public class FastEmissionGridAnalyzerTest {
         raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber / cellArea, value, 0.00000001));
     }
 
-    @Test
-    public void rasterNetwork_twoLinks() {
+	@Test
+	void rasterNetwork_twoLinks() {
 
         final var cellSize = 10.;
         final var cellArea = cellSize * cellSize;
@@ -121,8 +121,8 @@ public class FastEmissionGridAnalyzerTest {
 
     }
 
-    @Test
-    public void blur_rasterWithSingleValue() {
+	@Test
+	void blur_rasterWithSingleValue() {
 
         final var initialValue = 10.;
         final var EPSILON = 0.000000001;
@@ -150,8 +150,8 @@ public class FastEmissionGridAnalyzerTest {
         });
     }
 
-    @Test
-    public void processLinkEmissions_twoLinks() {
+	@Test
+	void processLinkEmissions_twoLinks() {
 
         var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 49));
@@ -182,8 +182,8 @@ public class FastEmissionGridAnalyzerTest {
         });
     }
 
-    @Test
-    public void processEventsFile() {
+	@Test
+	void processEventsFile() {
 
         final var networkUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml");
         final var emissionEvents = Paths.get(utils.getOutputDirectory()).resolve("emission.events.xml.gz");

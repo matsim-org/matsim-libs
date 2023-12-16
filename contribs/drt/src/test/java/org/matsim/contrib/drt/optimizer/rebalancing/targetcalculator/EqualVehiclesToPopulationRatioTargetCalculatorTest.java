@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -66,7 +66,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	private final PopulationFactory factory = population.getFactory();
 
 	@Test
-	public void testCalculate_oneVehiclePerZone() {
+	void testCalculate_oneVehiclePerZone() {
 		initPopulation(Map.of("2", 1, "4", 1, "8", 1));
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(8)).calculate(0, Map.of());
@@ -82,7 +82,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	}
 
 	@Test
-	public void testCalculate_twoVehiclesPerZone() {
+	void testCalculate_twoVehiclesPerZone() {
 		initPopulation(Map.of("2", 1, "4", 1, "8", 1));
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());
@@ -98,7 +98,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	}
 
 	@Test
-	public void testCalculate_noPopulation() {
+	void testCalculate_noPopulation() {
 		initPopulation(Map.of());
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());
@@ -114,7 +114,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	}
 
 	@Test
-	public void testCalculate_unevenDistributionOfActivitiesInPopulatedZones() {
+	void testCalculate_unevenDistributionOfActivitiesInPopulatedZones() {
 		initPopulation(Map.of("2", 2, "4", 4, "8", 8));
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());

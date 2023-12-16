@@ -21,16 +21,16 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class FifoTaxiOptimizerIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testFifo() {
+	void testFifo() {
 		runBenchmark(true, new FifoTaxiOptimizerParams(), utils);
 	}
 }

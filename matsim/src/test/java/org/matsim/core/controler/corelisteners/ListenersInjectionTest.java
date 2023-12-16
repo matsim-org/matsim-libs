@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.controler.corelisteners;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,31 +42,31 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class ListenersInjectionTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDumpDataAtEndIsSingleton() {
+	void testDumpDataAtEndIsSingleton() {
 		testIsSingleton( DumpDataAtEnd.class );
 	}
 
 	@Test
-	public void testEvensHandlingIsSingleton() {
+	void testEvensHandlingIsSingleton() {
 		testIsSingleton( EventsHandling.class );
 	}
 
 	@Test
-	public void testPlansDumpingIsSingleton() {
+	void testPlansDumpingIsSingleton() {
 		testIsSingleton( PlansDumping.class );
 	}
 
 	@Test
-	public void testPlansReplanningIsSingleton() {
+	void testPlansReplanningIsSingleton() {
 		testIsSingleton( PlansReplanning.class );
 	}
 
 	@Test
-	public void testPlansScoringIsSingleton() {
+	void testPlansScoringIsSingleton() {
 		testIsSingleton( PlansScoring.class );
 	}
 
@@ -98,10 +98,10 @@ public class ListenersInjectionTest {
 		final ControlerListener o1 = injector.getInstance( klass );
 		final ControlerListener o2 = injector.getInstance( klass );
 
-		Assert.assertSame(
-				"Two different instances of "+klass.getName()+" returned by injector!",
+		Assertions.assertSame(
 				o1,
-				o2 );
+				o2,
+				"Two different instances of "+klass.getName()+" returned by injector!" );
 	}
 }
 

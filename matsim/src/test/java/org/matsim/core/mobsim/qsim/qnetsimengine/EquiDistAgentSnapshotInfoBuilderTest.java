@@ -1,6 +1,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,12 +28,12 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EquiDistAgentSnapshotInfoBuilderTest {
 
-    @Test
-    public void positionVehiclesAlongLine_singleVehicleFreeFlow(){
+	@Test
+	void positionVehiclesAlongLine_singleVehicleFreeFlow(){
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
@@ -64,8 +64,8 @@ public class EquiDistAgentSnapshotInfoBuilderTest {
         assertEquals(setUp.linkLength / 2, firstEntry.getEasting(), 0.00001);
     }
 
-    @Test
-    public void positionVehiclesAlongLine_congestedAboveCapacityLimit() {
+	@Test
+	void positionVehiclesAlongLine_congestedAboveCapacityLimit() {
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();

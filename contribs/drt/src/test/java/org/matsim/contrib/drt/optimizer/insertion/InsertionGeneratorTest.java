@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Sets;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -94,7 +94,7 @@ public class InsertionGeneratorTest {
 	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, depotLink);
 
 	@Test
-	public void startEmpty_noStops() {
+	void startEmpty_noStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //no stops => must be empty
 		VehicleEntry entry = entry(start);
 
@@ -110,7 +110,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startNotFull_oneStop() {
+	void startNotFull_oneStop() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax aboard
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 0);//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0);
@@ -143,7 +143,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startFull_oneStop() {
+	void startFull_oneStop() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 0);//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0);
@@ -160,7 +160,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_twoStops_notFullBetweenStops() {
+	void startEmpty_twoStops_notFullBetweenStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 1);//pick up 1 pax
 		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), 0);//drop off 1 pax
@@ -218,7 +218,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_twoStops_notFullBetweenStops_tightSlackTimes() {
+	void startEmpty_twoStops_notFullBetweenStops_tightSlackTimes() {
 		//same as startEmpty_twoStops_notFullBetweenStops() but with different slack times
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 1);//pick up 1 pax
@@ -252,7 +252,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_twoStops_fullBetweenStops() {
+	void startEmpty_twoStops_fullBetweenStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
 		Waypoint.Stop stop0 = stop(0, link("stop0"), CAPACITY);//pick up 4 pax (full)
 		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//drop off 4 pax
@@ -266,7 +266,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startFull_twoStops_notFullBetweenStops() {
+	void startFull_twoStops_notFullBetweenStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
 		Waypoint.Stop stop0 = stop(0, link("stop0"), 2);//drop off 2 pax
 		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//drop off 2 pax
@@ -281,7 +281,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startFull_twoStops_fullBetweenStops() {
+	void startFull_twoStops_fullBetweenStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
 		Waypoint.Stop stop0 = stop(0, link("stop0"), CAPACITY);//drop off 1 pax, pickup 1 pax (full)
 		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//drop off 4 pax
@@ -294,7 +294,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startNotFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
+	void startNotFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); //empty
 		Waypoint.Stop stop0 = stop(0, link("stop0"), 0);// dropoff 1 pax
 		Waypoint.Stop stop1 = stop(0, link("stop1"), CAPACITY);// pickup 4 pax
@@ -312,7 +312,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
+	void startFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
 		Waypoint.Stop stop0 = stop(0, link("stop0"), 0);// dropoff 4 pax
 		Waypoint.Stop stop1 = stop(0, link("stop1"), CAPACITY);// pickup 4 pax
@@ -328,7 +328,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void noDetourForPickup_noDuplicatedInsertions() {
+	void noDetourForPickup_noDuplicatedInsertions() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
 		Waypoint.Stop stop0 = stop(0, fromLink, 0);//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0);
@@ -339,7 +339,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void noDetourForDropoff_noDuplicatedInsertions() {
+	void noDetourForDropoff_noDuplicatedInsertions() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
 		Waypoint.Stop stop0 = stop(0, toLink, 0);//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0);
@@ -351,7 +351,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void noDetourForDropoff_vehicleOutgoingFullAfterDropoff_insertionPossible() {
+	void noDetourForDropoff_vehicleOutgoingFullAfterDropoff_insertionPossible() {
 		// a special case where we allow inserting the dropoff after a stop despite outgoingOccupancy == maxCapacity
 		// this is only because the the dropoff happens exactly at (not after) the stop
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
@@ -366,7 +366,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_prebookedRequest() {
+	void startEmpty_prebookedRequest() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(prebookedRequest, entry,
@@ -374,7 +374,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_onlineRequest_beforeAlreadyPrebookedOtherRequest() {
+	void startEmpty_onlineRequest_beforeAlreadyPrebookedOtherRequest() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
 		Waypoint.Stop stop0 = stop(200, fromLink, 1);
 		Waypoint.Stop stop1 = stop(400, link("stop"), 0);
@@ -390,7 +390,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_prebookedRequest_inMiddleOfAlreadyPrebookedOtherRequest() {
+	void startEmpty_prebookedRequest_inMiddleOfAlreadyPrebookedOtherRequest() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
 		Waypoint.Stop stop0 = stop(50, fromLink, 1);
 		Waypoint.Stop stop1 = stop(300, link("stop"), 0);
@@ -402,7 +402,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_prebookedRequest_afterAlreadyPrebookedOtherRequest() {
+	void startEmpty_prebookedRequest_afterAlreadyPrebookedOtherRequest() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
 		Waypoint.Stop stop0 = stop(20, fromLink, 1);
 		Waypoint.Stop stop1 = stop(70, link("stop"), 0);
@@ -413,7 +413,7 @@ public class InsertionGeneratorTest {
 
 
 	@Test
-	public void startEmpty_smallGroup() {
+	void startEmpty_smallGroup() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(drtRequest2Pax, entry,
@@ -422,7 +422,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_groupExceedsCapacity() {
+	void startEmpty_groupExceedsCapacity() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(drtRequest5Pax, entry
@@ -431,7 +431,7 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void startEmpty_twoStops_groupExceedsCapacityAtFirstStop() {
+	void startEmpty_twoStops_groupExceedsCapacityAtFirstStop() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
 		Waypoint.Stop stop0 = stop(0, toLink, 3);//dropoff 1 pax
 		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//dropoff 1 pax

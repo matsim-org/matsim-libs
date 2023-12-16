@@ -22,9 +22,9 @@
 
 package org.matsim.core.router;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,11 +38,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class TripRouterModuleTest {
 
-    @Rule
-    public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-    @Test
-    public void testRouterCreation() {
+	@Test
+	void testRouterCreation() {
         for (ControllerConfigGroup.RoutingAlgorithmType routingAlgorithmType : ControllerConfigGroup.RoutingAlgorithmType.values()) {
             Config config = ConfigUtils.createConfig();
             config.controller().setRoutingAlgorithmType(routingAlgorithmType);
@@ -52,7 +52,7 @@ public class TripRouterModuleTest {
                     scenario.getNetwork(),
                     ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(new FreeSpeedTravelTime()),
                     new FreeSpeedTravelTime());
-            Assert.assertNotNull(pathCalculator);
+            Assertions.assertNotNull(pathCalculator);
         }
     }
 

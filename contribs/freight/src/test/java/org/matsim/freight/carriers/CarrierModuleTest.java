@@ -21,9 +21,9 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,10 +47,10 @@ public class CarrierModuleTest {
 
     FreightCarriersConfigGroup freightCarriersConfigGroup;
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Before
+    @BeforeEach
     public void setUp(){
         Config config = ConfigUtils.createConfig() ;
         ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("w");
@@ -80,10 +80,10 @@ public class CarrierModuleTest {
     }
 
 
+	//using this constructor does not work at the moment, as the module would need to derive the carriers out of the scenario.
+	// to me, it is currently not clear how to do that, tschlenther oct 10 '19
 	@Test
-    //using this constructor does not work at the moment, as the module would need to derive the carriers out of the scenario.
-    // to me, it is currently not clear how to do that, tschlenther oct 10 '19
-    public void test_ConstructorWOParameters(){
+	void test_ConstructorWOParameters(){
 		// note setUp method!
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {
@@ -96,8 +96,8 @@ public class CarrierModuleTest {
         controler.run();
     }
 
-    @Test
-    public void test_ConstructorWithOneParameter(){
+	@Test
+	void test_ConstructorWithOneParameter(){
 	    // note setUp method!
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {

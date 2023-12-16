@@ -25,8 +25,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 public class QSimIntegrationTest {
 
 	@Test
-	public void test_twoStopsOnFirstLink() throws SAXException, ParserConfigurationException, IOException {
+	void test_twoStopsOnFirstLink() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 				"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -107,21 +107,21 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 10, events.size());
-		Assert.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
-		Assert.assertTrue(events.get(1) instanceof PersonDepartureEvent);
-		Assert.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(6) instanceof LinkEnterEvent);
-		Assert.assertTrue(events.get(7) instanceof VehicleArrivesAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(8) instanceof VehicleDepartsAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(9) instanceof PersonArrivalEvent);
+		Assertions.assertEquals(10, events.size(), "wrong number of events");
+		Assertions.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
+		Assertions.assertTrue(events.get(1) instanceof PersonDepartureEvent);
+		Assertions.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(6) instanceof LinkEnterEvent);
+		Assertions.assertTrue(events.get(7) instanceof VehicleArrivesAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(8) instanceof VehicleDepartsAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(9) instanceof PersonArrivalEvent);
 	}
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
+	void test_multipleStopsOnFirstLink_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -169,22 +169,22 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 11, events.size());
-		Assert.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
-		Assert.assertTrue(events.get(1) instanceof PersonDepartureEvent);
-		Assert.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(6) instanceof VehicleArrivesAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(7) instanceof VehicleDepartsAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(8) instanceof VehicleArrivesAtFacilityEvent); // stop 4
-		Assert.assertTrue(events.get(9) instanceof VehicleDepartsAtFacilityEvent); // stop 4
-		Assert.assertTrue(events.get(10) instanceof PersonArrivalEvent);
+		Assertions.assertEquals(11, events.size(), "wrong number of events");
+		Assertions.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
+		Assertions.assertTrue(events.get(1) instanceof PersonDepartureEvent);
+		Assertions.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(6) instanceof VehicleArrivesAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(7) instanceof VehicleDepartsAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(8) instanceof VehicleArrivesAtFacilityEvent); // stop 4
+		Assertions.assertTrue(events.get(9) instanceof VehicleDepartsAtFacilityEvent); // stop 4
+		Assertions.assertTrue(events.get(10) instanceof PersonArrivalEvent);
 	}
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtFirstStop() throws SAXException, ParserConfigurationException, IOException {
+	void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtFirstStop() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 				"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -247,29 +247,29 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 17, events.size());
+		Assertions.assertEquals(17, events.size(), "wrong number of events");
 		int idx = 0;
-		Assert.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // passenger
-		Assert.assertTrue(events.get(idx++) instanceof TransitDriverStartsEvent);
-		Assert.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // pt-driver
-		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent); // pt-driver
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent);
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent);
-		Assert.assertTrue(events.get(idx++) instanceof PersonArrivalEvent); // passenger
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 4
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 4
-		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent); // pt-driver
-		Assert.assertTrue(events.get(idx++) instanceof PersonArrivalEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // passenger
+		Assertions.assertTrue(events.get(idx++) instanceof TransitDriverStartsEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // pt-driver
+		Assertions.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent); // pt-driver
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof PersonArrivalEvent); // passenger
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 4
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 4
+		Assertions.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent); // pt-driver
+		Assertions.assertTrue(events.get(idx++) instanceof PersonArrivalEvent);
 	}
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtSecondStop() throws SAXException, ParserConfigurationException, IOException {
+	void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtSecondStop() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -332,25 +332,25 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 17, events.size());
+		Assertions.assertEquals(17, events.size(), "wrong number of events");
 		int idx = 0;
-		Assert.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // passenger
-		Assert.assertTrue(events.get(idx++) instanceof TransitDriverStartsEvent);
-		Assert.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // pt-driver
-		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent); // pt-driver
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent);
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 2
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 3
-		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 4
-		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent);
-		Assert.assertTrue(events.get(idx++) instanceof PersonArrivalEvent); // passenger
-		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 4
-		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent); // pt-driver
-		Assert.assertTrue(events.get(idx++) instanceof PersonArrivalEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // passenger
+		Assertions.assertTrue(events.get(idx++) instanceof TransitDriverStartsEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof PersonDepartureEvent); // pt-driver
+		Assertions.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent); // pt-driver
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 2
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 3
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 4
+		Assertions.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent);
+		Assertions.assertTrue(events.get(idx++) instanceof PersonArrivalEvent); // passenger
+		Assertions.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 4
+		Assertions.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent); // pt-driver
+		Assertions.assertTrue(events.get(idx++) instanceof PersonArrivalEvent);
 	}
 
 	/**
@@ -366,7 +366,7 @@ public class QSimIntegrationTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void test_circularEmptyRoute_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
+	void test_circularEmptyRoute_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
@@ -409,14 +409,14 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 7, events.size());
-		Assert.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
-		Assert.assertTrue(events.get(1) instanceof PersonDepartureEvent);
-		Assert.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 1
-		Assert.assertTrue(events.get(6) instanceof PersonArrivalEvent);
+		Assertions.assertEquals(7, events.size(), "wrong number of events");
+		Assertions.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
+		Assertions.assertTrue(events.get(1) instanceof PersonDepartureEvent);
+		Assertions.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assertions.assertTrue(events.get(6) instanceof PersonArrivalEvent);
 	}
 
 

@@ -20,12 +20,12 @@
 
 package org.matsim.core.gbl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.awt.Image;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -33,11 +33,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class MatsimResourceTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public final void testGetAsImage() {
+	@Test
+	final void testGetAsImage() {
 		final Image logo = MatsimResource.getAsImage("matsim_logo_transparent.png");
 
 		// verify that the correct image was correctly loaded by testing its dimension
