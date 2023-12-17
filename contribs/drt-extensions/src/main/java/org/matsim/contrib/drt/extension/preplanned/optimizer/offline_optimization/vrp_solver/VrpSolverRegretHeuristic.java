@@ -87,7 +87,7 @@ public class VrpSolverRegretHeuristic implements VrpSolver {
 
             if (bestInsertionData.cost() < InsertionCalculator.NOT_FEASIBLE_COST) {
                 // Formally insert the request to the timetable
-                previousSchedules.requestIdToVehicleMap().put(requestWithLargestRegret.getPassengerId(), bestInsertionData.vehicleInfo().vehicle().getId());
+                previousSchedules.requestIdToVehicleMap().put(requestWithLargestRegret.getPassengerIds(), bestInsertionData.vehicleInfo().vehicle().getId());
                 previousSchedules.vehicleToTimetableMap().put(bestInsertionData.vehicleInfo().vehicle().getId(), bestInsertionData.candidateTimetable());
 
                 // Remove the request from the insertion matrix
@@ -100,7 +100,7 @@ public class VrpSolverRegretHeuristic implements VrpSolver {
                 }
             } else {
                 // The best insertion is already infeasible. Reject this request
-                previousSchedules.pendingRequests().put(requestWithLargestRegret.getPassengerId(), requestWithLargestRegret);
+                previousSchedules.pendingRequests().put(requestWithLargestRegret.getPassengerIds(), requestWithLargestRegret);
                 // Remove the request from the insertion matrix
                 insertionMatrix.remove(requestWithLargestRegret);
             }

@@ -62,10 +62,10 @@ public class VrpSolverSeqInsertion implements VrpSolver {
             }
 
             if (selectedVehicleId == null) {
-                previousSchedules.pendingRequests().put(request.getPassengerId(), request);
+                previousSchedules.pendingRequests().put(request.getPassengerIds(), request);
             } else {
                 previousSchedules.vehicleToTimetableMap().put(selectedVehicleId, updatedTimetable);
-                previousSchedules.requestIdToVehicleMap().put(request.getPassengerId(), selectedVehicleId);
+                previousSchedules.requestIdToVehicleMap().put(request.getPassengerIds(), selectedVehicleId);
             }
         }
         return previousSchedules;

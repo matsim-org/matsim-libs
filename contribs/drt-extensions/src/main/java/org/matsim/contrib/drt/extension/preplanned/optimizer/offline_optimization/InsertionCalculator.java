@@ -172,7 +172,7 @@ public record InsertionCalculator(Network network, double stopDuration, LinkToLi
 
     public void removeRequestFromSchedule(OnlineVehicleInfo vehicleInfo, GeneralRequest requestToRemove,
                                           FleetSchedules previousSchedule) {
-        Id<DvrpVehicle> vehicleId = previousSchedule.requestIdToVehicleMap().get(requestToRemove.getPassengerId());
+        Id<DvrpVehicle> vehicleId = previousSchedule.requestIdToVehicleMap().get(requestToRemove.getPassengerIds());
         List<TimetableEntry> timetable = previousSchedule.vehicleToTimetableMap().get(vehicleId);
 
         // remove the request from the timetable
@@ -181,7 +181,7 @@ public record InsertionCalculator(Network network, double stopDuration, LinkToLi
         int dropOffIdx = timetable.size();
         for (int i = 0; i < timetable.size(); i++) {
             TimetableEntry stop = timetable.get(i);
-            if (stop.getRequest().getPassengerId().toString().equals(requestToRemove.getPassengerId().toString())) {
+            if (stop.getRequest().getPassengerIds().toString().equals(requestToRemove.getPassengerIds().toString())) {
                 if (stop.getStopType() == TimetableEntry.StopType.PICKUP) {
                     pickUpIdx = i;
                 } else {
@@ -219,8 +219,8 @@ public record InsertionCalculator(Network network, double stopDuration, LinkToLi
         }
 
         // put the request in the rejection list
-        previousSchedule.requestIdToVehicleMap().remove(requestToRemove.getPassengerId());
-        previousSchedule.pendingRequests().put(requestToRemove.getPassengerId(), requestToRemove);
+        previousSchedule.requestIdToVehicleMap().remove(requestToRemove.getPassengerIds());
+        previousSchedule.pendingRequests().put(requestToRemove.getPassengerIds(), requestToRemove);
     }
 
     // Nested classes / Records

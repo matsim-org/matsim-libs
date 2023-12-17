@@ -1,17 +1,21 @@
 package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
-import java.util.*;
-
 public record FleetSchedules(
         Map<Id<DvrpVehicle>, List<TimetableEntry>> vehicleToTimetableMap,
-        Map<Id<Person>, Id<DvrpVehicle>> requestIdToVehicleMap,
-        Map<Id<Person>, GeneralRequest> pendingRequests) {
+        Map<List<Id<Person>>, Id<DvrpVehicle>> requestIdToVehicleMap,
+        Map<List<Id<Person>>, GeneralRequest> pendingRequests) {
 
     public static List<TimetableEntry> copyTimetable(List<TimetableEntry> timetable) {
         List<TimetableEntry> timetableCopy = new ArrayList<>();
@@ -26,8 +30,8 @@ public record FleetSchedules(
         for (OnlineVehicleInfo vehicleInfo : onlineVehicleInfoMap.values()) {
             vehicleToTimetableMap.put(vehicleInfo.vehicle().getId(), new ArrayList<>());
         }
-        Map<Id<Person>, Id<DvrpVehicle>> requestIdToVehicleMap = new HashMap<>();
-        Map<Id<Person>, GeneralRequest> rejectedRequests = new LinkedHashMap<>();
+        Map<List<Id<Person>>, Id<DvrpVehicle>> requestIdToVehicleMap = new HashMap<>();
+        Map<List<Id<Person>>, GeneralRequest> rejectedRequests = new LinkedHashMap<>();
         return new FleetSchedules(vehicleToTimetableMap, requestIdToVehicleMap, rejectedRequests);
     }
 
@@ -36,8 +40,8 @@ public record FleetSchedules(
         for (Id<DvrpVehicle> vehicleId : this.vehicleToTimetableMap().keySet()) {
             vehicleToTimetableMapCopy.put(vehicleId, copyTimetable(this.vehicleToTimetableMap.get(vehicleId)));
         }
-        Map<Id<Person>, Id<DvrpVehicle>> requestIdToVehicleMapCopy = new HashMap<>(this.requestIdToVehicleMap);
-        Map<Id<Person>, GeneralRequest> rejectedRequestsCopy = new LinkedHashMap<>(this.pendingRequests);
+        var requestIdToVehicleMapCopy = new HashMap<>(this.requestIdToVehicleMap);
+        var rejectedRequestsCopy = new LinkedHashMap<>(this.pendingRequests);
 
         return new FleetSchedules(vehicleToTimetableMapCopy, requestIdToVehicleMapCopy, rejectedRequestsCopy);
     }

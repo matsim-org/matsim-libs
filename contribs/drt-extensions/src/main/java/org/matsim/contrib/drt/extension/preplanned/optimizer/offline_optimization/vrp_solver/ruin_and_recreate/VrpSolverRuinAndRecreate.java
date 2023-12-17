@@ -81,7 +81,7 @@ public record VrpSolverRuinAndRecreate(int maxIterations, Network network, Trave
                 break;
             }
             for (GeneralRequest request : requestsToRemove) {
-                Id<DvrpVehicle> vehicleId = newSolution.requestIdToVehicleMap().get(request.getPassengerId());
+                Id<DvrpVehicle> vehicleId = newSolution.requestIdToVehicleMap().get(request.getPassengerIds());
                 insertionCalculator.removeRequestFromSchedule(onlineVehicleInfoMap.get(vehicleId), request, newSolution);
             }
 

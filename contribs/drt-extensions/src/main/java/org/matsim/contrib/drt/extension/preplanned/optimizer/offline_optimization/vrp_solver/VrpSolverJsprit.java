@@ -157,7 +157,7 @@ public class VrpSolverJsprit implements VrpSolver {
                         if (!requestPickUpTimeMap.containsKey(request)) {
                             // The request is already onboard
                             requestsOnboardThisVehicle.add(request);
-                            var shipmentId = request.getPassengerId().toString() + "_dummy_" + vehicleStartTime;
+                            var shipmentId = request.getPassengerIds().toString() + "_dummy_" + vehicleStartTime;
                             var shipment = Shipment.Builder.newInstance(shipmentId).
                                     setPickupLocation(collectLocationIfAbsent(vehicleStartLink)).
                                     setDeliveryLocation(collectLocationIfAbsent(network.getLinks().get(request.getToLinkId()))).
@@ -177,7 +177,7 @@ public class VrpSolverJsprit implements VrpSolver {
                             // The request is waiting to be picked up: retrieve the earliestLatestPickUpTime
                             double earliestLatestPickUpTime = requestPickUpTimeMap.get(request);
 
-                            var shipmentId = request.getPassengerId().toString() + "_repeat_" + vehicleStartTime;
+                            var shipmentId = request.getPassengerIds().toString() + "_repeat_" + vehicleStartTime;
                             var shipment = Shipment.Builder.newInstance(shipmentId).
                                     setPickupLocation(collectLocationIfAbsent(network.getLinks().get(request.getFromLinkId()))).
                                     setDeliveryLocation(collectLocationIfAbsent(network.getLinks().get(request.getToLinkId()))).
@@ -203,7 +203,7 @@ public class VrpSolverJsprit implements VrpSolver {
 
         // 2.2 New requests
         for (GeneralRequest newRequest : newRequests) {
-            var shipmentId = newRequest.getPassengerId().toString();
+            var shipmentId = newRequest.getPassengerIds().toString();
             var shipment = Shipment.Builder.newInstance(shipmentId).
                     setPickupLocation(collectLocationIfAbsent(network.getLinks().get(newRequest.getFromLinkId()))).
                     setDeliveryLocation(collectLocationIfAbsent(network.getLinks().get(newRequest.getToLinkId()))).
@@ -269,10 +269,10 @@ public class VrpSolverJsprit implements VrpSolver {
         var bestSolution = Solutions.bestOf(solutions);
 
         // Collect results
-        Set<Id<Person>> personsOnboard = new HashSet<>();
-        requestsOnboardEachVehicles.values().forEach(l -> l.forEach(r -> personsOnboard.add(r.getPassengerId())));
+        Set<List<Id<Person>>> personsOnboard = new HashSet<>();
+        requestsOnboardEachVehicles.values().forEach(l -> l.forEach(r -> personsOnboard.add(r.getPassengerIds())));
 
-        Map<Id<Person>, Id<DvrpVehicle>> assignedPassengerToVehicleMap = new HashMap<>();
+        Map<List<Id<Person>>, Id<DvrpVehicle>> assignedPassengerToVehicleMap = new HashMap<>();
         Map<Id<DvrpVehicle>, List<TimetableEntry>> vehicleToPreplannedStops = problem.getVehicles()
                 .stream()
                 .collect(Collectors.toMap(v -> Id.create(v.getId(), DvrpVehicle.class), v -> new LinkedList<>()));
@@ -285,13 +285,13 @@ public class VrpSolverJsprit implements VrpSolver {
                 var preplannedRequest = preplannedRequestByShipmentId.get(((TourActivity.JobActivity) activity).getJob().getId());
                 boolean isPickup = activity instanceof PickupShipment;
                 if (isPickup) {
-                    if (!personsOnboard.contains(preplannedRequest.getPassengerId())) {
+                    if (!personsOnboard.contains(preplannedRequest.getPassengerIds())) {
                         // Add pick up stop if passenger is not yet onboard
                         var preplannedStop = new TimetableEntry(preplannedRequest, TimetableEntry.StopType.PICKUP,
                                 activity.getArrTime(), activity.getEndTime(), occupancy, drtCfg.stopDuration, vehicle);
                         vehicleToPreplannedStops.get(vehicleId).add(preplannedStop);
                     }
-                    assignedPassengerToVehicleMap.put(preplannedRequest.getPassengerId(), vehicleId);
+                    assignedPassengerToVehicleMap.put(preplannedRequest.getPassengerIds(), vehicleId);
                     occupancy++;
                 } else {
                     // Add drop off stop
@@ -303,10 +303,10 @@ public class VrpSolverJsprit implements VrpSolver {
             }
         }
 
-        Map<Id<Person>, GeneralRequest> rejectedRequests = new HashMap<>();
+        Map<List<Id<Person>>, GeneralRequest> rejectedRequests = new HashMap<>();
         for (Job job : bestSolution.getUnassignedJobs()) {
             GeneralRequest rejectedRequest = preplannedRequestByShipmentId.get(job.getId());
-            rejectedRequests.put(rejectedRequest.getPassengerId(), rejectedRequest);
+            rejectedRequests.put(rejectedRequest.getPassengerIds(), rejectedRequest);
         }
 
         if (previousSchedules != null) {

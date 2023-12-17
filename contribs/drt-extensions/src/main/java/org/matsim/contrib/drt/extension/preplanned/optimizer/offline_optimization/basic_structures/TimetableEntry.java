@@ -143,7 +143,7 @@ public class TimetableEntry {
     @Override
     public String toString() {
         return "TimetableEntry{" +
-                "request=" + request.getPassengerId().toString() +
+                "request=" + request.getPassengerIds().toString() +
                 ", stopType=" + stopType +
                 ", arrivalTime=" + arrivalTime +
                 ", departureTime=" + departureTime +

@@ -1,11 +1,13 @@
 package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
 public class GeneralRequest {
-    private final Id<Person> passengerId;
+    private final List<Id<Person>> passengerIds;
     private final Id<Link> fromLinkId;
     private final Id<Link> toLinkId;
     private final double earliestDepartureTime;
@@ -15,9 +17,9 @@ public class GeneralRequest {
     // latest arrival time (flexibility is needed to account for traffic uncertainty)
     private double latestArrivalTime;
 
-    public GeneralRequest(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId, double earliestDepartureTime,
+    public GeneralRequest(List<Id<Person>> passengerIds, Id<Link> fromLinkId, Id<Link> toLinkId, double earliestDepartureTime,
                           double latestStartTime, double latestArrivalTime) {
-        this.passengerId = passengerId;
+        this.passengerIds = passengerIds;
         this.fromLinkId = fromLinkId;
         this.toLinkId = toLinkId;
         this.earliestDepartureTime = earliestDepartureTime;
@@ -25,11 +27,11 @@ public class GeneralRequest {
         this.latestArrivalTime = latestArrivalTime;
     }
 
-    public Id<Person> getPassengerId() {
-        return passengerId;
-    }
+	public List<Id<Person>> getPassengerIds() {
+		return passengerIds;
+	}
 
-    public double getEarliestDepartureTime() {
+	public double getEarliestDepartureTime() {
         return earliestDepartureTime;
     }
 

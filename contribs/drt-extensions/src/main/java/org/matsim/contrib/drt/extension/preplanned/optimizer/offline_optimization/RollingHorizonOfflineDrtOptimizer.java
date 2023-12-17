@@ -65,7 +65,7 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 	private final ForkJoinPool forkJoinPool;
 	private final VehicleEntry.EntryFactory vehicleEntryFactory;
 
-	private final Map<Id<Person>, DrtRequest> openRequests = new HashMap<>();
+	private final Map<List<Id<Person>>, DrtRequest> openRequests = new HashMap<>();
 	private final VrpSolver solver;
 
 	private final double horizon;
@@ -123,33 +123,33 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 		assert timer.getTimeOfDay() != 0 : "Currently, we cannot deal with request submitted at t = 0. Please remove such requests!";
 
 		DrtRequest drtRequest = (DrtRequest) request;
-		Id<Person> passengerId = drtRequest.getPassengerId();
+		var passengerIds = drtRequest.getPassengerIds();
 
 		if (fleetSchedules == null) {
 			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), mode, request.getId(),
-				passengerId, "DRT fleet not yet starts its service"));
+				passengerIds, "DRT fleet not yet starts its service"));
 			return;
 		}
 
-		openRequests.put(((DrtRequest) request).getPassengerId(), drtRequest);
+		openRequests.put(((DrtRequest) request).getPassengerIds(), drtRequest);
 
-		if (fleetSchedules.requestIdToVehicleMap().containsKey(passengerId)
-			|| fleetSchedules.pendingRequests().containsKey(passengerId)) {
+		if (fleetSchedules.requestIdToVehicleMap().containsKey(passengerIds)
+			|| fleetSchedules.pendingRequests().containsKey(passengerIds)) {
 			// This is a pre-booked request
-			Id<DvrpVehicle> vehicleId = fleetSchedules.requestIdToVehicleMap().get(passengerId);
+			Id<DvrpVehicle> vehicleId = fleetSchedules.requestIdToVehicleMap().get(passengerIds);
 			if (vehicleId == null) {
-				Preconditions.checkState(fleetSchedules.pendingRequests().containsKey(passengerId),
+				Preconditions.checkState(fleetSchedules.pendingRequests().containsKey(passengerIds),
 					"Pre-planned request (%s) not assigned to any vehicle and not marked as unassigned.",
-					passengerId);
+					passengerIds);
 				eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), mode, request.getId(),
-					passengerId, "Marked as unassigned"));
-				fleetSchedules.pendingRequests().remove(passengerId);
+					passengerIds, "Marked as unassigned"));
+				fleetSchedules.pendingRequests().remove(passengerIds);
 				return;
 			}
 
 			eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), drtRequest.getMode(), drtRequest.getId(),
-					drtRequest.getPassengerId(), vehicleId, Double.NaN, Double.NaN));
+					drtRequest.getPassengerIds(), vehicleId, Double.NaN, Double.NaN));
 			// Currently, we don't provide the expected pickup / drop off time. Maybe update this in the future.
 
 		} else {
@@ -203,14 +203,14 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 				// We are ready for the stop task! --> Add stop task to the schedule
 				var stopTask = taskFactory.createStopTask(vehicle, currentTime, currentTime + stopDuration, currentLink);
 				if (nextStop.getStopType() == TimetableEntry.StopType.PICKUP) {
-					var request = Preconditions.checkNotNull(openRequests.get(nextStop.getRequest().getPassengerId()),
+					var request = Preconditions.checkNotNull(openRequests.get(nextStop.getRequest().getPassengerIds()),
 						"Request (%s) has not been yet submitted", nextStop.getRequest());
 					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
 				} else {
-					var request = Preconditions.checkNotNull(openRequests.remove(nextStop.getRequest().getPassengerId()),
+					var request = Preconditions.checkNotNull(openRequests.remove(nextStop.getRequest().getPassengerIds()),
 						"Request (%s) has not been yet submitted", nextStop.getRequest());
 					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
-					fleetSchedules.requestIdToVehicleMap().remove(request.getPassengerId());
+					fleetSchedules.requestIdToVehicleMap().remove(request.getPassengerIds());
 				}
 				schedule.addTask(stopTask);
 				stopsToVisit.remove(0); //remove the first entry in the stops to visit list
@@ -247,7 +247,7 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 
 	// Static functions
 	static GeneralRequest createFromDrtRequest(DrtRequest drtRequest) {
-		return new GeneralRequest(drtRequest.getPassengerId(), drtRequest.getFromLink().getId(),
+		return new GeneralRequest(drtRequest.getPassengerIds(), drtRequest.getFromLink().getId(),
 			drtRequest.getToLink().getId(), drtRequest.getEarliestStartTime(), drtRequest.getLatestStartTime(),
 			drtRequest.getLatestArrivalTime());
 	}
@@ -289,7 +289,7 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 					.earliestStartTime(earliestPickupTime)
 					.latestStartTime(latestPickupTime)
 					.latestArrivalTime(latestArrivalTime)
-					.passengerId(person.getId())
+					.passengerIds(List.of(person.getId()))
 					.mode(mode)
 					.fromLink(startLink)
 					.toLink(endLink)
