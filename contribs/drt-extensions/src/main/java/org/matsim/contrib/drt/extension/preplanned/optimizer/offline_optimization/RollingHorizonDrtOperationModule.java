@@ -80,7 +80,7 @@ public class RollingHorizonDrtOperationModule extends AbstractDvrpModeQSimModule
 
         addModalComponent(QSimScopeForkJoinPoolHolder.class,
                 () -> new QSimScopeForkJoinPoolHolder(drtConfigGroup.numberOfThreads));
-        bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtConfigGroup));
+        bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl());
 
     }
 }
