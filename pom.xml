@@ -37,6 +37,7 @@
         <guice.version>7.0.0</guice.version>
         <jackson.version>2.16.0</jackson.version>
         <jogl.version>2.5.0</jogl.version>
+		<junit.version>5.10.1</junit.version>
     </properties>
 
     <scm>
@@ -215,12 +216,18 @@
                 <version>4.2.2</version>
             </dependency>
 
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
-            </dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -279,7 +286,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.41.0</version>
+                <version>3.42.0</version>
             </dependency>
 
 			<dependency>
@@ -307,6 +314,18 @@
                 <version>5.8.0</version>
                 <scope>test</scope>
             </dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>5.8.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest</artifactId>
+				<version>2.2</version>
+				<scope>test</scope>
+			</dependency>
 
 			<dependency>
 				<groupId>tech.tablesaw</groupId>
@@ -369,26 +388,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.matsim.api.core.v01.AutoResetIdCaches</value>
-                        </property>
-                    </properties>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.matsim.api.core.v01.AutoResetIdCaches</value>
-                        </property>
-                    </properties>
-                </configuration>
             </plugin>
         </plugins>
 
@@ -397,12 +400,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

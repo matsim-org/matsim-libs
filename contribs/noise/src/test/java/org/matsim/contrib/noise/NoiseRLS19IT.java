@@ -22,9 +22,9 @@
  */
 package org.matsim.contrib.noise;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -50,16 +50,16 @@ import java.util.HashSet;
  */
 public class NoiseRLS19IT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testShielding() {
+	void testShielding() {
         final RLS19ShieldingCorrection shieldingCorrection = new RLS19ShieldingCorrection();
 
 
-        Assert.assertEquals("Wrong shielding value z!", 34.463933081239965,
-                shieldingCorrection.calculateShieldingCorrection(10,15,15,15), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(34.463933081239965,
+                shieldingCorrection.calculateShieldingCorrection(10,15,15,15), MatsimTestUtils.EPSILON, "Wrong shielding value z!");
 
         Config config = ConfigUtils.createConfig();
         NoiseConfigGroup noiseConfigGroup = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
@@ -89,13 +89,13 @@ public class NoiseRLS19IT {
                 link.getFromNode().getCoord(), link.getToNode().getCoord(), rp.getCoord());
         final double v = context.determineShieldingValue(rp, link, coord);
 
-        Assert.assertEquals("Wrong shielding correction!", 30.78517993490919,
-                v, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(30.78517993490919,
+                v, MatsimTestUtils.EPSILON, "Wrong shielding correction!");
 
     }
 
-    @Test
-    public void testEmission() {
+	@Test
+	void testEmission() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Network network = scenario.getNetwork();
         Node from = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
@@ -107,28 +107,28 @@ public class NoiseRLS19IT {
         RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network), new DEMContextImpl(scenario.getConfig()));
 
         final double basePkwEmission = emission.calculateBaseVehicleTypeEmission(RLS19VehicleType.pkw, 40);
-        Assert.assertEquals("Wrong base pkw emission!", 97.70334139531323, basePkwEmission, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(97.70334139531323, basePkwEmission, MatsimTestUtils.EPSILON, "Wrong base pkw emission!");
 
         double singleVehicleEmission =
                 emission.calculateSingleVehicleEmission(noiseLink, RLS19VehicleType.pkw, 40);
-        Assert.assertEquals("Wrong single pkw emission!", 97.70334139531323, singleVehicleEmission, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(97.70334139531323, singleVehicleEmission, MatsimTestUtils.EPSILON, "Wrong single pkw emission!");
 
         final double vehicleTypePart = emission.calculateVehicleTypeNoise(1, 40, singleVehicleEmission);
-        Assert.assertEquals("Wrong pkw emission sum part!", 1.4732421924637252E8, vehicleTypePart, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(1.4732421924637252E8, vehicleTypePart, MatsimTestUtils.EPSILON, "Wrong pkw emission sum part!");
 
         final double noiseLinkEmission = emission.calculateEmission(noiseLink, 40, 40, 40, 1800, 0, 0);
-        Assert.assertEquals("Wrong noise link emission!", 84.23546653306667, noiseLinkEmission, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(84.23546653306667, noiseLinkEmission, MatsimTestUtils.EPSILON, "Wrong noise link emission!");
 
         for (int i = 0; i < 1800; i++) {
             noiseLink.addEnteringAgent(RLS19VehicleType.pkw);
         }
 
         emission.calculateEmission(noiseLink);
-        Assert.assertEquals("Wrong final noise link emission!", 84.23546653306667, noiseLink.getEmission(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(84.23546653306667, noiseLink.getEmission(), MatsimTestUtils.EPSILON, "Wrong final noise link emission!");
     }
 
-    @Test
-    public void testImmission() {
+	@Test
+	void testImmission() {
 
         final RLS19ShieldingCorrection shieldingCorrection = new RLS19ShieldingCorrection();
 
@@ -177,7 +177,7 @@ public class NoiseRLS19IT {
 
         emission.calculateEmission(noiseLink);
         emission.calculateEmission(noiseLink2);
-        Assert.assertEquals("Wrong final noise link emission!", 84.23546653306667, noiseLink.getEmission(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(84.23546653306667, noiseLink.getEmission(), MatsimTestUtils.EPSILON, "Wrong final noise link emission!");
 
         NoiseReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
 
@@ -193,7 +193,7 @@ public class NoiseRLS19IT {
         immission.calculateImmission(rp, 8*3600);
         final double currentImmission = rp.getCurrentImmission();
 
-        Assert.assertEquals("Wrong immission!", 73.77467715144601,
-                currentImmission, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(73.77467715144601,
+                currentImmission, MatsimTestUtils.EPSILON, "Wrong immission!");
     }
 }

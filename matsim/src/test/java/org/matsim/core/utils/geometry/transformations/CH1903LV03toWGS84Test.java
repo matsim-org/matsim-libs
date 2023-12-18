@@ -19,9 +19,8 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -34,14 +33,14 @@ public class CH1903LV03toWGS84Test {
 	 * http://www.swisstopo.ch/pub/down/basics/geo/system/ch1903_wgs84_de.pdf
 	 */
 	@Test
-	public void testTransform() {
+	void testTransform() {
 		double xx = 8.0 + 43.0/60 + 49.80/3600;
 		double yy = 46.0 + 02.0/60 + 38.86/3600;
 		double epsilon = 1e-6;
 
 		CH1903LV03toWGS84 converter = new CH1903LV03toWGS84();
 		Coord n = converter.transform(new Coord((double) 700000, (double) 100000));
-		Assert.assertEquals(xx, n.getX(), epsilon);
-		Assert.assertEquals(yy, n.getY(), epsilon);
+		Assertions.assertEquals(xx, n.getX(), epsilon);
+		Assertions.assertEquals(yy, n.getY(), epsilon);
 	}
 }

@@ -21,8 +21,8 @@
 
  package org.matsim.utils.objectattributes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Month;
 import java.util.Arrays;
@@ -30,33 +30,33 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-/**
+	/**
  * @author thibautd
  */
 public class ObjectAttributesConverterTest {
 
-	@Test
-	public void testEnumToString() {
+	 @Test
+	 void testEnumToString() {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		// cannot use an enum type defined here, because test classes are not on classpath for classes outside of test...
 		// And is thus unavailable to the ObjectAttributesConverter
 		// So use something from the standard library, as there is no way this goes away
 		String converted = converter.convertToString(Month.JANUARY);
-		Assert.assertEquals("unexpected string converted from enum value", "JANUARY", converted);
+		Assertions.assertEquals("JANUARY", converted, "unexpected string converted from enum value");
 	}
 
-	@Test
-	public void testStringToEnum() {
+	 @Test
+	 void testStringToEnum() {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
-		Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
+		Assertions.assertEquals(Month.JANUARY, converted, "unexpected enum converted from String value");
 	}
 
-	@Test
-	public void testHashMap() {
+	 @Test
+	 void testHashMap() {
 
 		var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
 		final var converter = new ObjectAttributesConverter();
@@ -67,8 +67,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testEmptyHashMap() {
+	 @Test
+	 void testEmptyHashMap() {
 
 		var expectedString = "{}";
 		final var converter = new ObjectAttributesConverter();
@@ -79,8 +79,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testCollection() {
+	 @Test
+	 void testCollection() {
 
 		var expectedString = "[\"a\",\"b\"]";
 		final var converter = new ObjectAttributesConverter();
@@ -91,8 +91,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testEmptyCollection() {
+	 @Test
+	 void testEmptyCollection() {
 
 		var expectedString = "[]";
 		final var converter = new ObjectAttributesConverter();
@@ -103,8 +103,8 @@ public class ObjectAttributesConverterTest {
 		assertEquals(expectedString, serialized);
 	}
 
-	@Test
-	public void testUnsupported() {
+	 @Test
+	 void testUnsupported() {
 
 		final var converter = new ObjectAttributesConverter();
 		var serialized = converter.convertToString(new UnsupportedType());

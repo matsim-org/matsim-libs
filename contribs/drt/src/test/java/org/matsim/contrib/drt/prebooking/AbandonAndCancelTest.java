@@ -1,10 +1,10 @@
 package org.matsim.contrib.drt.prebooking;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
@@ -21,11 +21,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
  */
 public class AbandonAndCancelTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
-	public void noAbandonTest() {
+	void noAbandonTest() {
 		/*
 		 * One person requests to depart at 2000 and also is there at 2000. Another
 		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
@@ -59,12 +59,12 @@ public class AbandonAndCancelTest {
 	}
 
 	@Test
-	public void abandonTest() {
+	void abandonTest() {
 		/*
 		 * One person requests to depart at 2000 and also is there at 2000. Another
 		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
 		 * has 1000s delay.
-		 * 
+		 *
 		 * We configure that the vehicle should leave without the passenger if it waits
 		 * longer than 500s. The late request will be rejected!
 		 */
@@ -98,12 +98,12 @@ public class AbandonAndCancelTest {
 	}
 
 	@Test
-	public void abandonThenImmediateTest() {
+	void abandonThenImmediateTest() {
 		/*
 		 * One person requests to depart at 2000 and also is there at 2000. Another
 		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
 		 * has 1000s delay.
-		 * 
+		 *
 		 * We configure that the vehicle should leave without the passenger if it waits
 		 * longer than 500s. The person will, however, send a new request when arriving
 		 * at the departure point and get an immediate vehicle.
@@ -141,12 +141,12 @@ public class AbandonAndCancelTest {
 	}
 
 	@Test
-	public void cancelEarlyTest() {
+	void cancelEarlyTest() {
 		/*
 		 * One person requests to depart at 2000 and also is there at 2000. Another
 		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
 		 * has 1000s delay.
-		 * 
+		 *
 		 * In this test we manually cancel the second request at 500.0 (so before
 		 * departure of any agent).
 		 */
@@ -174,9 +174,9 @@ public class AbandonAndCancelTest {
 							if (e.getSimulationTime() == 500.0) {
 								PlanAgent planAgent = (PlanAgent) qsim.getAgents()
 										.get(Id.createPersonId("personLate"));
-								
+
 								Leg leg = TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
-								
+
 								prebookingManager.cancel(leg);
 							}
 						}
@@ -202,14 +202,14 @@ public class AbandonAndCancelTest {
 			assertTrue(requestInfo.rejected);
 		}
 	}
-	
+
 	@Test
-	public void cancelLateTest() {
+	void cancelLateTest() {
 		/*
 		 * One person requests to depart at 2000 and also is there at 2000. Another
 		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
 		 * has 1000s delay.
-		 * 
+		 *
 		 * In this test we manually cancel the second request at 3000.0 (so after
 		 * departure of the first agent).
 		 */
@@ -237,9 +237,9 @@ public class AbandonAndCancelTest {
 							if (e.getSimulationTime() == 3000.0) {
 								PlanAgent planAgent = (PlanAgent) qsim.getAgents()
 										.get(Id.createPersonId("personLate"));
-								
+
 								Leg leg = TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
-								
+
 								prebookingManager.cancel(leg);
 							}
 						}

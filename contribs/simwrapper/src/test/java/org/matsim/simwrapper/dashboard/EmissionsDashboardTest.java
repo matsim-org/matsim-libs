@@ -2,9 +2,9 @@ package org.matsim.simwrapper.dashboard;
 
 import com.google.common.collect.Iterables;
 import org.assertj.core.api.Assertions;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.MATSimApplication;
@@ -33,14 +33,14 @@ public class EmissionsDashboardTest {
 	private static final String HBEFA_FILE_COLD_AVERAGE = HBEFA_2020_PATH + "r9230ru2n209r30u2fn0c9rn20n2rujkhkjhoewt84202.enc";
 	private static final String HBEFA_FILE_WARM_AVERAGE = HBEFA_2020_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void generate() {
+	void generate() {
 
 		// This test can only run if the password is set
-		Assume.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
+		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "emissions");
 

@@ -1,9 +1,9 @@
 package playground.vsp.cadyts.marginals;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,32 +38,18 @@ import org.matsim.vehicles.VehicleType;
 
 import jakarta.inject.Inject;
 import java.util.*;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(Parameterized.class)
 public class ModalDistanceAndCountsCadytsIT {
-
-	@Parameterized.Parameters(name = "{index}: countsWeight == {0}; modalDistanceWeight == {1};")
-	public static Collection<Object[]> parameterObjects() {
-		return Arrays.asList(new Object[][]{
-				{150.0, 0.0},
-				{0.0, 150.0},
-				{150.0, 150.0}
-		});
+	public static Stream<Arguments> arguments() {
+		return Stream.of(Arguments.of(0.0, 150.0), Arguments.of(150.0, 0.0), Arguments.of(150.0, 150.0));
 	}
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	private double countsWeight;
-	private double modalDistanceWeight;
-
-	public ModalDistanceAndCountsCadytsIT(double countsWeight, double modalDistanceWeight) {
-		this.modalDistanceWeight = modalDistanceWeight;
-		this.countsWeight = countsWeight;
-	}
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static DistanceDistribution createDistanceDistribution() {
 
@@ -253,8 +239,9 @@ public class ModalDistanceAndCountsCadytsIT {
 	 * One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
-	@Test
-	public void test() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void test(double countsWeight, double modalDistanceWeight) {
 
 		Config config = createConfig();
 		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
@@ -343,16 +330,16 @@ public class ModalDistanceAndCountsCadytsIT {
 			modalDistanceCount.merge(mode + "_" + distance, 1, Integer::sum);
 		}
 
-		if (this.modalDistanceWeight > 0 && this.countsWeight == 0) {
+		if (modalDistanceWeight > 0 && countsWeight == 0) {
 			// don't know how to get a better accuracy than 8%
 			assertEquals(100, modalDistanceCount.get("car_2050.0"), 80);
 			assertEquals(100, modalDistanceCount.get("car_2150.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2050.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
-		} else if (this.modalDistanceWeight == 0 && this.countsWeight > 0) {
-			assertTrue("expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0"),
-					modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
-		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
+		} else if (modalDistanceWeight == 0 && countsWeight > 0) {
+			assertTrue(modalDistanceCount.get("car_2250.0") > 500,
+					"expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0")); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
+		} else if (modalDistanceWeight > 0 && countsWeight > 0) {
 			/* This assumes that counts have a higher impact than distance distributions
 			 * (because counts request 1000 on car_2250 and the distance distribution requests 100 on car_2050 and car_2150 but 0 on car_2250).
 			 * Probably this should rather depend on the weight that is set for counts and distance distributions...

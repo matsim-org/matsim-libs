@@ -25,8 +25,7 @@ import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -80,7 +79,7 @@ public class DefaultPassengerEngineTest {
 	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
 
 	@Test
-	public void test_valid_served() {
+	void test_valid_served() {
 		double departureTime = 0;
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
@@ -114,7 +113,7 @@ public class DefaultPassengerEngineTest {
 	}
 
 	@Test
-	public void test_invalid_rejected() {
+	void test_invalid_rejected() {
 		double departureTime = 0;
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
@@ -132,7 +131,7 @@ public class DefaultPassengerEngineTest {
 	}
 
 	@Test
-	public void test_valid_rejected() {
+	void test_valid_rejected() {
 		double departureTime = 0;
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 

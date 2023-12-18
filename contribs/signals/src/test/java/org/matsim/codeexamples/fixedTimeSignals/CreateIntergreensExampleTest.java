@@ -23,9 +23,9 @@ package org.matsim.codeexamples.fixedTimeSignals;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -37,21 +37,21 @@ public class CreateIntergreensExampleTest {
 
 	private static final String DIR_TO_COMPARE_WITH = "./examples/tutorial/example90TrafficLights/useSignalInput/";
 
-	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	@Test
-	public void testIntergreenExample(){
+	void testIntergreenExample(){
 		try {
 			String[] args = {testUtils.getOutputDirectory()};
 			CreateIntergreensExample.main(args);
 		} catch (IOException e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong") ;
+			Assertions.fail("something went wrong") ;
 		}
 		// compare intergreen output
-		Assert.assertEquals("different intergreen files", 
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "intergreens.xml"), 
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "intergreens.xml"));
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "intergreens.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "intergreens.xml"),
+				"different intergreen files");
 	}
-	
+
 }

@@ -25,7 +25,7 @@ import static org.matsim.contrib.zone.SquareGrid.EPSILON;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -36,20 +36,20 @@ import org.matsim.core.network.NetworkUtils;
  */
 public class SquareGridTest {
 	@Test
-	public void emptyNodes_fail() {
+	void emptyNodes_fail() {
 		assertThatThrownBy(() -> new SquareGrid(List.of(), 100)).isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Cannot create SquareGrid if no nodes");
 	}
 
 	@Test
-	public void outsideBoundaries_withinEpsilon_success() {
+	void outsideBoundaries_withinEpsilon_success() {
 		Node node_0_0 = node(0, 0);
 		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
 		assertThatCode(() -> grid.getZone(new Coord(-EPSILON, EPSILON))).doesNotThrowAnyException();
 	}
 
 	@Test
-	public void outsideBoundaries_outsideEpsilon_fail() {
+	void outsideBoundaries_outsideEpsilon_fail() {
 		Node node_0_0 = node(0, 0);
 		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
 		assertThatThrownBy(() -> grid.getZone(new Coord(-2 * EPSILON, 0))).isExactlyInstanceOf(
@@ -57,7 +57,7 @@ public class SquareGridTest {
 	}
 
 	@Test
-	public void testLazyZoneCreation() {
+	void testLazyZoneCreation() {
 		Node node_0_0 = node(0, 0);
 		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
 
@@ -69,7 +69,7 @@ public class SquareGridTest {
 	}
 
 	@Test
-	public void testGrid() {
+	void testGrid() {
 		Node node_0_0 = node(0, 0);
 		Node node_150_150 = node(150, 150);
 		SquareGrid grid = new SquareGrid(List.of(node_0_0, node_150_150), 100);

@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,11 +34,12 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ManageSubchainsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testPrimarySecondaryActivityFound() {
+	@Test
+	void testPrimarySecondaryActivityFound() {
 		Initializer initializer = new Initializer();
 		initializer.init(utils);
 		ManageSubchains manager = new ManageSubchains();

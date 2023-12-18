@@ -3,9 +3,9 @@ package org.matsim.integration.drtAndPt;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -48,12 +48,12 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class PtAlongALineTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testPtAlongALine() {
+	void testPtAlongALine() {
 
 		Config config = createConfig(utils.getOutputDirectory());
 
@@ -68,9 +68,9 @@ public class PtAlongALineTest {
 	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
 	 * only the middle stop is accessible by bike.
 	 */
-	@Ignore
+	@Disabled
 	@Test
-	public void testPtAlongALineWithRaptorAndBike() {
+	void testPtAlongALineWithRaptorAndBike() {
 
 		Config config = createConfig(utils.getOutputDirectory());
 
@@ -91,9 +91,9 @@ public class PtAlongALineTest {
 	 * Test of Drt. 200 drt Vehicles are generated on Link 499-500, and all Agents rely on these
 	 * drts to get to their destination
 	 */
-	@Ignore
+	@Disabled
 	@Test
-	public void testDrtAlongALine() {
+	void testDrtAlongALine() {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -202,9 +202,9 @@ public class PtAlongALineTest {
 	 * drt, which is set by a StopFilterAttribute
 	 */
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
+	void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);

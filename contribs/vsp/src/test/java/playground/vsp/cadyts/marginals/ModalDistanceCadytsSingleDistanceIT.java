@@ -18,9 +18,8 @@
  * *********************************************************************** */
 
 package playground.vsp.cadyts.marginals;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,25 +48,25 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-
 public class ModalDistanceCadytsSingleDistanceIT {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    /**
-     * This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
-     * One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
-     * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
-     */
-    @Test
-    public void test() {
+	/**
+	* This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
+	* One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
+	* is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
+	*/
+	@Test
+	void test() {
 
         Config config = createConfig();
         CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();

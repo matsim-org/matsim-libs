@@ -1,9 +1,9 @@
 package org.matsim.modechoice;
 
 import com.google.inject.Injector;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -24,10 +24,10 @@ public class EstimateRouterTest {
 	private InformedModeChoiceConfigGroup group;
 	private Controler controler;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		Config config = TestScenario.loadConfig(utils);
@@ -42,7 +42,7 @@ public class EstimateRouterTest {
 	}
 
 	@Test
-	public void routing() {
+	void routing() {
 
 
 		Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();

@@ -3,9 +3,9 @@ package org.matsim.contrib.signals.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,80 +36,80 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * 
+ *
  * @author tschlenther
  * this class tests the functionality of TtTotalDelay in playground.dgrether.koehlerstrehlersignal.analysis
- * which calculates the total delay of all agents in a network 
- * 
+ * which calculates the total delay of all agents in a network
+ *
  * having only one agent in a network, the total delay should be 0 (testGetTotalDelayOnePerson)
  * calculation of the delay of all persons in a network should be made in awareness of matsim's step logic
  *
  * the network generated in this tests basically consists of 4 links of 1000m with a free speed of 201 m/s
  * output is optionally written to outputDirectory of this testClass
  * -> set field writeOutput to do so
- * 
+ *
  * the number of persons to be set in the network for the test can be modified
  * they will get an insertion delay due to the capacity of the first link
  */
 
 
 public class DelayAnalysisToolTest {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+
 	private final Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
 	private final Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
 	private final Id<Link> LINK_ID3 = Id.create("Link3", Link.class);
 	private final Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
-	
+
 	//optionally to be modified
 	private static final boolean WRITE_OUTPUT = false;
 	private static final int NUMBER_OF_PERSONS = 5;
-	
+
 	@Test
-	public void testGetTotalDelayOnePerson(){
+	void testGetTotalDelayOnePerson(){
 		Scenario scenario = prepareTest(1);
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
 		DelayAnalysisTool handler = new DelayAnalysisTool(scenario.getNetwork(), events);
-		
+
 		final List<Event> eventslist = new ArrayList<Event>();
 		events.addHandler(new BasicEventHandler(){
 			@Override
 			public void reset(int iteration) {
-				eventslist.clear();				
+				eventslist.clear();
 			}
 			@Override
 			public void handleEvent(Event event) {
-				eventslist.add(event);			
+				eventslist.add(event);
 			}
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()).useDefaults().build(scenario, events).run();
 
-		Assert.assertEquals("Total Delay of one agent is not correct", 0.0, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, handler.getTotalDelay(), MatsimTestUtils.EPSILON, "Total Delay of one agent is not correct");
 		if(WRITE_OUTPUT){
 			generateOutput(scenario, eventslist);
 		}
 	}
 
 	@Test
-	public void testGetTotalDelaySeveralPerson(){
+	void testGetTotalDelaySeveralPerson(){
 		Scenario scenario = prepareTest(NUMBER_OF_PERSONS);
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
 		DelayAnalysisTool handler = new DelayAnalysisTool(scenario.getNetwork(), events);
-		
+
 		final List<Event> eventslist = new ArrayList<Event>();
 		events.addHandler(new BasicEventHandler(){
 			@Override
 			public void reset(int iteration) {
-				eventslist.clear();				
+				eventslist.clear();
 			}
 			@Override
 			public void handleEvent(Event event) {
-				eventslist.add(event);			
+				eventslist.add(event);
 			}
 		});
 
@@ -119,16 +119,16 @@ public class DelayAnalysisToolTest {
 		if(WRITE_OUTPUT){
 			generateOutput(scenario, eventslist);
 		}
-		
+
 		//expectedDelay = inserting delay as a result of capacity of first link being 3600 vh/h
 		int expectedDelay = 0;
 		for(int i=0; i<NUMBER_OF_PERSONS; i++){
 			expectedDelay +=  i;
 		}
-		Assert.assertEquals("Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.", expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON, "Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.");
 	}
 
-	private void generateOutput(Scenario scenario, final List<Event> eventslist) {		
+	private void generateOutput(Scenario scenario, final List<Event> eventslist) {
 			EventWriterXML eventWriter = new EventWriterXML(utils.getOutputDirectory() + "events.xml");
 			for (Event e : eventslist) {
 				eventWriter.handleEvent(e);
@@ -145,7 +145,7 @@ public class DelayAnalysisToolTest {
 		createPopulation(scenario, numberOfPersons);
 		return scenario;
 	}
-	
+
 	void createNetwork(Scenario scenario){
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
@@ -167,26 +167,26 @@ public class DelayAnalysisToolTest {
 		link1.setLength(1000);
 		link1.setFreespeed(201);
 		network.addLink(link1);
-		
-		Link link2 = factory.createLink((LINK_ID2), node2, node3);		
+
+		Link link2 = factory.createLink((LINK_ID2), node2, node3);
 		link2.setCapacity(3600);
 		link2.setLength(1000);
 		link2.setFreespeed(201);
-		network.addLink(link2);	
-		
+		network.addLink(link2);
+
 		Link link3 = factory.createLink((LINK_ID3), node3 , node4);
 		link3.setCapacity(3600);
 		link3.setLength(1000);
 		link3.setFreespeed(201);
 		network.addLink(link3);
-		
-		Link link4 = factory.createLink((LINK_ID4), node4, node5);		
+
+		Link link4 = factory.createLink((LINK_ID4), node4, node5);
 		link4.setCapacity(3600);
 		link4.setLength(1000);
 		link4.setFreespeed(201);
-		network.addLink(link4);	
+		network.addLink(link4);
 	}
-	
+
 	private void createPopulation(Scenario scenario, int numberOfPersons) {
 		Population population = scenario.getPopulation();
         PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();

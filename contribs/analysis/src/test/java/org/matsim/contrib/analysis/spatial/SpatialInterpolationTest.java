@@ -1,15 +1,14 @@
 package org.matsim.contrib.analysis.spatial;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 
 public class SpatialInterpolationTest {
 
-    @Test
-    public void calculateWeightFromLine() {
+	@Test
+	void calculateWeightFromLine() {
 
         final Coordinate from = new Coordinate(1, 1);
         final Coordinate to = new Coordinate(4, 5);
@@ -22,33 +21,37 @@ public class SpatialInterpolationTest {
         assertEquals(0.0011109434390476694, weight, 0.001);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void calculateWeightFromLine_invalidSmoothingRadius() {
+	@Test
+	void calculateWeightFromLine_invalidSmoothingRadius() {
+		assertThrows(IllegalArgumentException.class, () -> {
 
-        final Coordinate from = new Coordinate(0, 1);
-        final Coordinate to = new Coordinate(10, 1);
-        final Coordinate cellCentroid = new Coordinate(5, 1);
-        final double smoothingRadius = 0;
+			final Coordinate from = new Coordinate(0, 1);
+			final Coordinate to = new Coordinate(10, 1);
+			final Coordinate cellCentroid = new Coordinate(5, 1);
+			final double smoothingRadius = 0;
 
-        double weight = SpatialInterpolation.calculateWeightFromLine(from, to, cellCentroid, smoothingRadius);
+			double weight = SpatialInterpolation.calculateWeightFromLine(from, to, cellCentroid, smoothingRadius);
 
-        fail("smoothing radius <= 0 should cause exception");
-    }
+			fail("smoothing radius <= 0 should cause exception");
+		});
+	}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void calculateWeightFromPoint_invalidSmoothingRadius() {
+	@Test
+	void calculateWeightFromPoint_invalidSmoothingRadius() {
+		assertThrows(IllegalArgumentException.class, () -> {
 
-        final Coordinate source = new Coordinate(10, 10);
-        final Coordinate centroid = new Coordinate(10, 10);
-        final double smoothingRadius = 0;
+			final Coordinate source = new Coordinate(10, 10);
+			final Coordinate centroid = new Coordinate(10, 10);
+			final double smoothingRadius = 0;
 
-        double weight = SpatialInterpolation.calculateWeightFromPoint(source, centroid, smoothingRadius);
+			double weight = SpatialInterpolation.calculateWeightFromPoint(source, centroid, smoothingRadius);
 
-        fail("smoothing radius <= 0 should cause exception");
-    }
+			fail("smoothing radius <= 0 should cause exception");
+		});
+	}
 
-    @Test
-    public void calculateWeightFromPoint() {
+	@Test
+	void calculateWeightFromPoint() {
 
         final Coordinate point = new Coordinate(5, 5);
         final Coordinate cell = new Coordinate (9, 5);

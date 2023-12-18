@@ -21,8 +21,8 @@
 
 package org.matsim.contrib.emissions.events;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
@@ -55,7 +55,7 @@ public class TestColdEmissionEventImpl {
 	private final Set<Pollutant> coldPollutants = new HashSet<>(Arrays.asList(CO, FC, HC, NMHC, NOx, NO2,PM));
 
 	@Test
-	public final void testGetAttributesForCompleteEmissionMaps(){
+	final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 
 		//create a normal event impl
@@ -64,20 +64,13 @@ public class TestColdEmissionEventImpl {
 		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		
 		Map<String, String> ceg = ce.getAttributes();
-		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get(CO.name()))+ "but should have been "+ co,
-				Double.parseDouble(ceg.get(CO.name())), co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the FC value of this cold emission event was "+ Double.parseDouble(ceg.get(FC.name()))+ "but should have been "+ fc,
-				Double.parseDouble(ceg.get(FC.name())), fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get(HC.name()))+ "but should have been "+ hc,
-				Double.parseDouble(ceg.get(HC.name())), hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get(NMHC.name()))+ "but should have been "+ nm,
-				Double.parseDouble(ceg.get(NMHC.name())), nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get(NO2.name()))+ "but should have been "+ n2,
-				Double.parseDouble(ceg.get(NO2.name())), n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get(NOx.name()))+ "but should have been "+ nx,
-				Double.parseDouble(ceg.get(NOx.name())), nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get(PM.name()))+ "but should have been "+ pm,
-				Double.parseDouble(ceg.get(PM.name())), pm, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(CO.name())), co, MatsimTestUtils.EPSILON, "the CO value of this cold emission event was "+ Double.parseDouble(ceg.get(CO.name()))+ "but should have been "+ co);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(FC.name())), fc, MatsimTestUtils.EPSILON, "the FC value of this cold emission event was "+ Double.parseDouble(ceg.get(FC.name()))+ "but should have been "+ fc);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(HC.name())), hc, MatsimTestUtils.EPSILON, "the HC value of this cold emission event was "+ Double.parseDouble(ceg.get(HC.name()))+ "but should have been "+ hc);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(NMHC.name())), nm, MatsimTestUtils.EPSILON, "the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get(NMHC.name()))+ "but should have been "+ nm);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(NO2.name())), n2, MatsimTestUtils.EPSILON, "the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get(NO2.name()))+ "but should have been "+ n2);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(NOx.name())), nx, MatsimTestUtils.EPSILON, "the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get(NOx.name()))+ "but should have been "+ nx);
+		Assertions.assertEquals(Double.parseDouble(ceg.get(PM.name())), pm, MatsimTestUtils.EPSILON, "the PM value of this cold emission event was "+ Double.parseDouble(ceg.get(PM.name()))+ "but should have been "+ pm);
 		
 	}
 
@@ -91,9 +84,9 @@ public class TestColdEmissionEventImpl {
 		coldEmissionsMap.put(PM, pm);
 
 	}
-	
+
 	@Test
-	public final void testGetAttributesForIncompleteMaps(){
+	final void testGetAttributesForIncompleteMaps(){
 		//the getAttributesMethod should
 		// - return null if the emission map is empty
 		// - throw NullPointerExceptions if the emission values are not set
@@ -124,7 +117,7 @@ public class TestColdEmissionEventImpl {
 		for(Pollutant cp : coldPollutants){
 
 			//empty map
-			Assert.assertNull(emptyMapEvent.getAttributes().get(cp));
+			Assertions.assertNull(emptyMapEvent.getAttributes().get(cp));
 			
 			//values not set
 			try{
@@ -142,8 +135,8 @@ public class TestColdEmissionEventImpl {
 				noMapNullPointers++;
 			}
 		}
-		Assert.assertEquals(numberOfColdPollutants, valNullPointers);
-		Assert.assertEquals(numberOfColdPollutants, noMapNullPointers);
+		Assertions.assertEquals(numberOfColdPollutants, valNullPointers);
+		Assertions.assertEquals(numberOfColdPollutants, noMapNullPointers);
 	}
 	
 }

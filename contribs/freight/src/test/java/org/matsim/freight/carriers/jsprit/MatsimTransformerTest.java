@@ -31,8 +31,8 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,17 +48,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MatsimTransformerTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void whenTransforming_jSpritType2matsimType_itIsMadeCorrectly() {
+	void whenTransforming_jSpritType2matsimType_itIsMadeCorrectly() {
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder
 				.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0)
 				.setFixedCost(100.0).build();
@@ -72,16 +70,16 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_jSpritType2matsimType_withCaching_itIsNotCached() {
+	void whenTransforming_jSpritType2matsimType_withCaching_itIsNotCached() {
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder
 				.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0)
 				.setFixedCost(100.0).build();
 		VehicleType matsimType = MatsimJspritFactory.createMatsimVehicleType(jspritType);
-		assertThat(matsimType, is(not(MatsimJspritFactory.createMatsimVehicleType(jspritType))));
+		assertNotEquals(matsimType, MatsimJspritFactory.createMatsimVehicleType(jspritType));
 	}
 
 	@Test
-	public void whenTransforming_matsimType2jSpritType_itIsMadeCorrectly() {
+	void whenTransforming_matsimType2jSpritType_itIsMadeCorrectly() {
 		VehicleType matsimType = getMatsimVehicleType();
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = MatsimJspritFactory
 				.createJspritVehicleType(matsimType);
@@ -93,7 +91,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_jspritVehicle2matsimVehicle_itIsMadeCorrectly() {
+	void whenTransforming_jspritVehicle2matsimVehicle_itIsMadeCorrectly() {
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder
 				.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0)
 				.setFixedCost(100.0).build();
@@ -109,7 +107,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimVehicle2jspritVehicle_itIsMadeCorrectly() {
+	void whenTransforming_matsimVehicle2jspritVehicle_itIsMadeCorrectly() {
 		VehicleType matsimType = getMatsimVehicleType();
 		CarrierVehicle matsimVehicle = getMatsimVehicle("matsimVehicle", "loc", matsimType);
 		Vehicle jspritVehicle = MatsimJspritFactory.createJspritVehicle(matsimVehicle, null);
@@ -122,7 +120,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimService2jspritService_isMadeCorrectly() {
+	void whenTransforming_matsimService2jspritService_isMadeCorrectly() {
 		CarrierService carrierService = CarrierService.Builder
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("locationId", Link.class))
 				.setCapacityDemand(50).setServiceDuration(30.0)
@@ -140,7 +138,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_jspritService2matsimService_isMadeCorrectly() {
+	void whenTransforming_jspritService2matsimService_isMadeCorrectly() {
 		Service carrierService = Service.Builder.newInstance("serviceId").addSizeDimension(0, 50)
 				.setLocation(Location.newInstance("locationId")).setServiceTime(30.0)
 				.setTimeWindow(
@@ -160,7 +158,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimShipment2jspritShipment_isMadeCorrectly() {
+	void whenTransforming_matsimShipment2jspritShipment_isMadeCorrectly() {
 		CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create("ShipmentId", CarrierShipment.class), Id.createLinkId("PickupLocationId"),
 						Id.createLinkId("DeliveryLocationId"), 50)
@@ -184,7 +182,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_jspritShipment2matsimShipment_isMadeCorrectly() {
+	void whenTransforming_jspritShipment2matsimShipment_isMadeCorrectly() {
 		Shipment shipment = Shipment.Builder.newInstance("shipmentId").addSizeDimension(0, 50)
 				.setPickupLocation(Location.newInstance("PickupLocationId")).setPickupServiceTime(30.0)
 				.setPickupTimeWindow(
@@ -212,7 +210,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeStartMustBe15() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeStartMustBe15() {
 		ScheduledTour sTour = getMatsimServiceTour();
 
 		VehicleRoutingProblem vrp = getVehicleRoutingProblem(sTour);
@@ -252,7 +250,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeAndVehicleMustNotBeNull() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeAndVehicleMustNotBeNull() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -261,7 +259,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_vehicleMustHaveTheCorrectId() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_vehicleMustHaveTheCorrectId() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -269,7 +267,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_earliestStartMustBe10() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_earliestStartMustBe10() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -277,7 +275,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_latestEndMustBe20() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_latestEndMustBe20() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -285,7 +283,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_sizeOfTourMustBe2() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_sizeOfTourMustBe2() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -293,7 +291,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_firstActIdMustBeCorrect() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_firstActIdMustBeCorrect() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -301,7 +299,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_secondActIdMustBeCorrect() {
+	void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_secondActIdMustBeCorrect() {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
@@ -309,7 +307,7 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void whenTransforming_matsimPlan2vehicleRouteSolution_itIsMadeCorrectly() {
+	void whenTransforming_matsimPlan2vehicleRouteSolution_itIsMadeCorrectly() {
 		List<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
 		ScheduledTour matsimTour = getMatsimTour("matsimVehicle");
 		sTours.add(matsimTour);
@@ -404,12 +402,12 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void createVehicleRoutingProblemWithServices_isMadeCorrectly() {
+	void createVehicleRoutingProblemWithServices_isMadeCorrectly() {
 		// TODO create
 	}
 
 	@Test
-	public void createVehicleRoutingProblemBuilderWithServices_isMadeCorrectly() {
+	void createVehicleRoutingProblemBuilderWithServices_isMadeCorrectly() {
 		Carrier carrier = createCarrierWithServices();
         Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml");
@@ -456,13 +454,13 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	public void createVehicleRoutingProblemWithShipments_isMadeCorrectly() {
+	void createVehicleRoutingProblemWithShipments_isMadeCorrectly() {
 		// TODO create
 	}
 
+	//	@Disabled		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
 	@Test
-//	@Ignore		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
-	public void createVehicleRoutingProblemBuilderWithShipments_isMadeCorrectly() {
+	void createVehicleRoutingProblemBuilderWithShipments_isMadeCorrectly() {
         Carrier carrier = createCarrierWithShipments();
         Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml");

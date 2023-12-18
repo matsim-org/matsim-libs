@@ -1,11 +1,11 @@
 package org.matsim.contrib.cadyts.car;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -22,8 +22,9 @@ import org.matsim.examples.ExamplesUtils;
 
 public class CadytsCarWithPtScenarioIT {
 
-    @Test @Ignore
-    public void testCadytsWithPtVehicles() {
+	@Test
+	@Disabled
+	void testCadytsWithPtVehicles() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml"));
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         config.controller().setLastIteration(0);
@@ -43,8 +44,8 @@ public class CadytsCarWithPtScenarioIT {
             }
         });
         controler.run();
-        assertTrue("There's at least one bus on the test link", bussesSeenOnLink.get() > 0);
-        assertTrue("This test runs to the end, meaning cadyts doesn't throw an exception with pt", true);
+        assertTrue(bussesSeenOnLink.get() > 0, "There's at least one bus on the test link");
+        assertTrue(true, "This test runs to the end, meaning cadyts doesn't throw an exception with pt");
     }
 
 }

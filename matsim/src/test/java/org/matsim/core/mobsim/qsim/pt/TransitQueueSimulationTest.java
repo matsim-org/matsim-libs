@@ -20,8 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +29,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -102,11 +101,11 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class TransitQueueSimulationTest {
 
-    /**
-     * Ensure that for each departure an agent is created and departs
-     */
-    @Test
-    public void testCreateAgents() {
+	/**
+	* Ensure that for each departure an agent is created and departs
+	*/
+	@Test
+	void testCreateAgents() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
@@ -236,11 +235,11 @@ public class TransitQueueSimulationTest {
         assertEquals(9.0*3600, agents.get(4).getActivityEndTime(), MatsimTestUtils.EPSILON);
     }
 
-    /**
-     * Tests that the simulation is adding an agent correctly to the transit stop
-     */
-    @Test
-    public void testAddAgentToStop() {
+	/**
+	* Tests that the simulation is adding an agent correctly to the transit stop
+	*/
+	@Test
+	void testAddAgentToStop() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
@@ -301,83 +300,85 @@ public class TransitQueueSimulationTest {
         assertEquals(1, transitEngine.getAgentTracker().getAgentsAtFacility(stop1.getId()).size());
     }
 
-    /**
-     * Tests that the simulation refuses to let an agent teleport herself by starting a transit
-     * leg on a link where she isn't.
-     *
-     */
-    @Test(expected = TransitAgentTriesToTeleportException.class)
-    public void testAddAgentToStopWrongLink() {
-        // setup: config
-        final Config config = ConfigUtils.createConfig();
-        config.transit().setUseTransit(true);
+	/**
+	* Tests that the simulation refuses to let an agent teleport herself by starting a transit
+	* leg on a link where she isn't.
+	*
+	*/
+	@Test
+	void testAddAgentToStopWrongLink() {
+		assertThrows(TransitAgentTriesToTeleportException.class, () -> {
+			// setup: config
+			final Config config = ConfigUtils.createConfig();
+			config.transit().setUseTransit(true);
 
-        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
-        // setup: network
-        Network network = scenario.getNetwork();
-        Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-        Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-        Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-        network.addNode(node1);
-        network.addNode(node2);
-        network.addNode(node3);
-        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
-        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
-        setDefaultLinkAttributes(link1);
-        network.addLink(link1);
-        setDefaultLinkAttributes(link2);
-        network.addLink(link2);
+			// setup: network
+			Network network = scenario.getNetwork();
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+			network.addNode(node1);
+			network.addNode(node2);
+			network.addNode(node3);
+			Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+			Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
+			setDefaultLinkAttributes(link1);
+			network.addLink(link1);
+			setDefaultLinkAttributes(link2);
+			network.addLink(link2);
 
-        // setup: transit schedule
-        TransitSchedule schedule = scenario.getTransitSchedule();
-        TransitScheduleFactory builder = schedule.getFactory();
-        TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
+			// setup: transit schedule
+			TransitSchedule schedule = scenario.getTransitSchedule();
+			TransitScheduleFactory builder = schedule.getFactory();
+			TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        stop1.setLinkId(link1.getId());
-        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        stop2.setLinkId(link2.getId());
-        schedule.addStopFacility(stop1);
-        schedule.addStopFacility(stop2);
+			TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+			stop1.setLinkId(link1.getId());
+			TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+			stop2.setLinkId(link2.getId());
+			schedule.addStopFacility(stop1);
+			schedule.addStopFacility(stop2);
 
-        // setup: population
-        Population population = scenario.getPopulation();
-        PopulationFactory pb = population.getFactory();
-        Person person = pb.createPerson(Id.create("1", Person.class));
-        Plan plan = pb.createPlan();
-        person.addPlan(plan);
-        Activity homeAct = pb.createActivityFromLinkId("home", Id.create("2", Link.class));
+			// setup: population
+			Population population = scenario.getPopulation();
+			PopulationFactory pb = population.getFactory();
+			Person person = pb.createPerson(Id.create("1", Person.class));
+			Plan plan = pb.createPlan();
+			person.addPlan(plan);
+			Activity homeAct = pb.createActivityFromLinkId("home", Id.create("2", Link.class));
 
-        homeAct.setEndTime(7.0*3600 - 10.0);
-        // as no transit line runs, make sure to stop the simulation manually.
-        scenario.getConfig().qsim().setEndTime(7.0*3600);
+			homeAct.setEndTime(7.0 * 3600 - 10.0);
+			// as no transit line runs, make sure to stop the simulation manually.
+			scenario.getConfig().qsim().setEndTime(7.0 * 3600);
 
-        Leg leg = pb.createLeg(TransportMode.pt);
-        leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
-        Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
-        plan.addActivity(homeAct);
-        plan.addLeg(leg);
-        plan.addActivity(workAct);
-        population.addPerson(person);
+			Leg leg = pb.createLeg(TransportMode.pt);
+			leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
+			Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
+			plan.addActivity(homeAct);
+			plan.addLeg(leg);
+			plan.addActivity(workAct);
+			population.addPerson(person);
 
-        // run simulation
-        EventsManager events = EventsUtils.createEventsManager();
-        PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.build(scenario, events) //
-				.run();
-    }
+			// run simulation
+			EventsManager events = EventsUtils.createEventsManager();
+			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+			new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, events) //
+					.run();
+		});
+	}
 
-    /**
-     * Tests that a vehicle's handleStop() method is correctly called, e.g.
-     * it is re-called again when returning a delay > 0, and that is is correctly
-     * called when the stop is located on the first link of the network route, on the last
-     * link of the network route, or any intermediary link.
-     */
-    @Test
-    public void testHandleStop() {
+	/**
+	* Tests that a vehicle's handleStop() method is correctly called, e.g.
+	* it is re-called again when returning a delay > 0, and that is is correctly
+	* called when the stop is located on the first link of the network route, on the last
+	* link of the network route, or any intermediary link.
+	*/
+	@Test
+	void testHandleStop() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
@@ -627,8 +628,8 @@ public class TransitQueueSimulationTest {
         }
     }
 
-    @Test
-    public void testStartAndEndTime() {
+	@Test
+	void testStartAndEndTime() {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
 
@@ -724,8 +725,8 @@ public class TransitQueueSimulationTest {
         }
     }
 
-    @Test
-    public void testEvents() {
+	@Test
+	void testEvents() {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
 

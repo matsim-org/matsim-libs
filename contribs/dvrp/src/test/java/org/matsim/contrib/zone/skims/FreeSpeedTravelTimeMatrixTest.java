@@ -22,7 +22,7 @@ package org.matsim.contrib.zone.skims;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -47,7 +47,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 	}
 
 	@Test
-	public void matrix() {
+	void matrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
 		params.cellSize = 100;
 		params.maxNeighborDistance = 0;
@@ -67,7 +67,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 	}
 
 	@Test
-	public void sparseMatrix() {
+	void sparseMatrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
 		params.cellSize = 100;
 		params.maxNeighborDistance = 9999;

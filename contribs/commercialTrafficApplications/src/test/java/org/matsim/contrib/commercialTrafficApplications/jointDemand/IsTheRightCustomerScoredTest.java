@@ -18,9 +18,9 @@
 
 package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -41,7 +41,7 @@ public class IsTheRightCustomerScoredTest {
 
     Scenario scenario;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");
@@ -98,8 +98,8 @@ public class IsTheRightCustomerScoredTest {
     }
 
 
-    @Test
-    public void testIfTheRightPersonIsScoredForReceivingAJob() {
+	@Test
+	void testIfTheRightPersonIsScoredForReceivingAJob() {
         Plan partyPizzaPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("customerOrderingForParty")).getSelectedPlan();
         Plan lonelyPizzaPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("customerOrderingJustForItself")).getSelectedPlan();
         Plan nonCustomerPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("nonCustomer")).getSelectedPlan();
@@ -113,14 +113,14 @@ public class IsTheRightCustomerScoredTest {
                 .map(carrierService -> carrierService.getId())
                 .findFirst().orElseThrow(() -> new RuntimeException("no service activity found in scheduledTours"));
 
-        Assert.assertEquals("the person that is delivered pizza should be customerOrderingForParty", partyPizzaPlan.getPerson().getId().toString(), serviceActivity.toString().split("_")[0]);
+        Assertions.assertEquals(partyPizzaPlan.getPerson().getId().toString(), serviceActivity.toString().split("_")[0], "the person that is delivered pizza should be customerOrderingForParty");
 
         //compare scores
-        Assert.assertTrue("the plan of the customer receiving a job should get a higher score than the plan of the non customer ", partyPizzaPlan.getScore() > nonCustomerPlan.getScore());
-        Assert.assertTrue("the plan of the customer receiving a job should get a higher score than the plan of the customer not receiving one ", partyPizzaPlan.getScore() > lonelyPizzaPlan.getScore());
-        Assert.assertTrue("the difference of receiving a job in time and not receiving it at all should be the maxJobScore=" + MAX_JOB_SCORE + " as job is performed in time", partyPizzaPlan.getScore() - lonelyPizzaPlan.getScore() == MAX_JOB_SCORE);
-        Assert.assertEquals("not receiving a job at all should be scored with zero", lonelyPizzaPlan.getScore(), 0.0, MatsimTestUtils.EPSILON);
-        Assert.assertTrue(lonelyPizzaPlan.getScore() - nonCustomerPlan.getScore() == 0);
+        Assertions.assertTrue(partyPizzaPlan.getScore() > nonCustomerPlan.getScore(), "the plan of the customer receiving a job should get a higher score than the plan of the non customer ");
+        Assertions.assertTrue(partyPizzaPlan.getScore() > lonelyPizzaPlan.getScore(), "the plan of the customer receiving a job should get a higher score than the plan of the customer not receiving one ");
+        Assertions.assertTrue(partyPizzaPlan.getScore() - lonelyPizzaPlan.getScore() == MAX_JOB_SCORE, "the difference of receiving a job in time and not receiving it at all should be the maxJobScore=" + MAX_JOB_SCORE + " as job is performed in time");
+        Assertions.assertEquals(lonelyPizzaPlan.getScore(), 0.0, MatsimTestUtils.EPSILON, "not receiving a job at all should be scored with zero");
+        Assertions.assertTrue(lonelyPizzaPlan.getScore() - nonCustomerPlan.getScore() == 0);
     }
 
 

@@ -21,9 +21,8 @@
  */
 
 package org.matsim.core.controler;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -31,13 +30,15 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import jakarta.inject.Singleton;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class MobsimListenerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void testRunMobsim_listenerTransient() {
+	@Test
+	void testRunMobsim_listenerTransient() {
         Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
         cfg.controller().setLastIteration(1);
         cfg.controller().setWritePlansInterval(0);
@@ -54,23 +55,25 @@ public class MobsimListenerTest {
         c.run();
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRunMobsim_listenerSingleton() {
-        Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-        cfg.controller().setLastIteration(1);
-        cfg.controller().setWritePlansInterval(0);
-        final Controler c = new Controler(cfg);
-        c.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addMobsimListenerBinding().to(SingletonCountingMobsimListener.class);
-            }
-        });
-        c.getConfig().controller().setCreateGraphs(false);
-        c.getConfig().controller().setDumpDataAtEnd(false);
-        c.getConfig().controller().setWriteEventsInterval(0);
-        c.run();
-    }
+	@Test
+	void testRunMobsim_listenerSingleton() {
+		assertThrows(RuntimeException.class, () -> {
+			Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+			cfg.controller().setLastIteration(1);
+			cfg.controller().setWritePlansInterval(0);
+			final Controler c = new Controler(cfg);
+			c.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addMobsimListenerBinding().to(SingletonCountingMobsimListener.class);
+				}
+			});
+			c.getConfig().controller().setCreateGraphs(false);
+			c.getConfig().controller().setDumpDataAtEnd(false);
+			c.getConfig().controller().setWriteEventsInterval(0);
+			c.run();
+		});
+	}
 
     private static class CountingMobsimListener implements MobsimInitializedListener {
 

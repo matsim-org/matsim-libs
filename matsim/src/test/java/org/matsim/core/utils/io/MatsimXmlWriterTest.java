@@ -1,11 +1,11 @@
 package org.matsim.core.utils.io;
 
-import org.junit.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser / Simunto
@@ -18,7 +18,7 @@ public class MatsimXmlWriterTest {
 	 * special values like infinity and not-a-number must be written as "INF", "-INF" and "NaN".
 	 */
 	@Test
-	public void testWriteInfiniteValuesInAttributes() {
+	void testWriteInfiniteValuesInAttributes() {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DummyXmlWriter writer = new DummyXmlWriter();

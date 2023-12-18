@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.fiss;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class RunFissDrtScenarioIT {
 
 	@Test
-	public void test() {
+	void test() {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
 
@@ -173,7 +173,7 @@ public class RunFissDrtScenarioIT {
 		}
 
 		run.run();
-		Assert.assertEquals(23817, linkCounter.getLinkLeaveCount());
+		Assertions.assertEquals(23817, linkCounter.getLinkLeaveCount());
 	}
 
 	static class LinkCounter implements LinkLeaveEventHandler {

@@ -1,8 +1,8 @@
 package org.matsim.simwrapper;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.matsim.simwrapper.viz.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -14,11 +14,11 @@ import java.util.List;
 
 public class SimWrapperTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void vizElementsTest() throws IOException {
+	void vizElementsTest() throws IOException {
 
 		SimWrapper simWrapper = SimWrapper.create();
 

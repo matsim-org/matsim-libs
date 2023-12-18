@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.testcases.fakes.FakeLink;
@@ -37,14 +37,14 @@ import org.matsim.testcases.fakes.FakeNode;
 public class DetourTimeEstimatorTest {
 
 	@Test
-	public void freeSpeedZonalTimeEstimator_fromLinkToLinkSame() {
+	void freeSpeedZonalTimeEstimator_fromLinkToLinkSame() {
 		var link = new FakeLink(null);
 		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1, null, null);
 		Assertions.assertThat(estimator.estimateTime(link, link, 345)).isZero();
 	}
 
 	@Test
-	public void freeSpeedZonalTimeEstimator_fromLinkToLinkDifferent() {
+	void freeSpeedZonalTimeEstimator_fromLinkToLinkDifferent() {
 		var linkA = new FakeLink(null, null, new FakeNode(null));
 		var linkB = new FakeLink(null, new FakeNode(null), null);
 

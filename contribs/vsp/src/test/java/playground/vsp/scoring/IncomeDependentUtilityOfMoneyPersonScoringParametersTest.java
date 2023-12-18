@@ -1,6 +1,9 @@
 package playground.vsp.scoring;
 
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -25,12 +28,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 
-	@Rule
-	public MatsimTestUtils utils;
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 	private IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
 	private Population population;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
 		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
@@ -94,7 +97,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	}
 
 	@Test
-	public void testPersonWithNegativeIncome(){
+	void testPersonWithNegativeIncome(){
 		Id<Person> id = Id.createPersonId("negativeIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		//person's attribute says it has negative income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
@@ -102,7 +105,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	}
 
 	@Test
-	public void testPersonWithNoIncome(){
+	void testPersonWithNoIncome(){
 		Id<Person> id = Id.createPersonId("zeroIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		//person's attribute says it has 0 income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
@@ -110,28 +113,28 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	}
 
 	@Test
-	public void testPersonWithLowIncome(){
+	void testPersonWithLowIncome(){
 		Id<Person> id = Id.createPersonId("lowIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssert(params, 0.5d, 0.5d);
 	}
 
 	@Test
-	public void testPersonWithHighIncome(){
+	void testPersonWithHighIncome(){
 		Id<Person> id = Id.createPersonId("highIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssert(params, 1.5d, 0.5d);
 	}
 
 	@Test
-	public void testPersonWithMediumIncome(){
+	void testPersonWithMediumIncome(){
 		Id<Person> id = Id.createPersonId("mediumIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssert(params, 1d, 0.5d);
 	}
 
 	@Test
-	public void testPersonFreight(){
+	void testPersonFreight(){
 		Id<Person> id = Id.createPersonId("freight");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		//freight agent has no income attribute set, so it should use the marginal utility of money that is set in it's subpopulation scoring parameters!
@@ -139,7 +142,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	}
 
 	@Test
-	public void testFreightWithIncome(){
+	void testFreightWithIncome(){
 		Id<Person> id = Id.createPersonId("freightWithIncome1");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssert(params, 1.5/444d, 1d);
@@ -149,23 +152,23 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	}
 
 	@Test
-	public void testMoneyScore(){
+	void testMoneyScore(){
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncome")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
-		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of 66.66", 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON, "for the rich person, 100 money units should be equal to a score of 66.66");
 
 		ScoringParameters paramsPoor = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("lowIncome")));
 		CharyparNagelMoneyScoring moneyScoringPoor = new CharyparNagelMoneyScoring(paramsPoor);
 		moneyScoringPoor.addMoney(100);
-		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of 200.00", 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON, "for the poor person, 100 money units should be equal to a score of 200.00");
 
-		Assert.assertTrue("100 money units should worth more for a poor person than for a rich person", moneyScoringPoor.getScore() > moneyScoringRich.getScore());
+		Assertions.assertTrue(moneyScoringPoor.getScore() > moneyScoringRich.getScore(), "100 money units should worth more for a poor person than for a rich person");
 	}
 
 	private void makeAssert(ScoringParameters params, double income, double marginalUtilityOfWaitingPt_s){
-		Assert.assertEquals("marginalUtilityOfMoney is wrong", 1 / income , params.marginalUtilityOfMoney, 0.);
-		Assert.assertEquals("marginalUtilityOfWaitingPt_s is wrong", marginalUtilityOfWaitingPt_s , params.marginalUtilityOfWaitingPt_s, 0.);
+		Assertions.assertEquals(1 / income , params.marginalUtilityOfMoney, 0., "marginalUtilityOfMoney is wrong");
+		Assertions.assertEquals(marginalUtilityOfWaitingPt_s , params.marginalUtilityOfWaitingPt_s, 0., "marginalUtilityOfWaitingPt_s is wrong");
 	}
 
 

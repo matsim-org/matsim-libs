@@ -1,8 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,11 +28,11 @@ import java.util.SplittableRandom;
 
 public class TrafficCountsDashboardTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void generate() {
+	void generate() {
 
 		Config config = TestScenario.loadConfig(utils);
 

@@ -18,11 +18,11 @@
 
 package org.matsim.contrib.drt.extension.edrt.run;
 
-import static org.junit.Assert.assertEquals;
-
 import java.net.URL;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -46,13 +46,13 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunEDrtScenarioIT {
 	@Test
-	public void test() {
+	void test() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
 		RunEDrtScenario.run(configUrl, false);
 	}
-	
+
 	@Test
-	public void testWithPrebooking() {
+	void testWithPrebooking() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
 		
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),

@@ -21,19 +21,19 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunPassengerAlongWithCarriersIT {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils() ;
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-    @Test
-    public void runChessboard() {
+	@Test
+	void runChessboard() {
         try{
         	RunPassengerAlongWithCarriers abc = new RunPassengerAlongWithCarriers();
             // ---
@@ -44,7 +44,7 @@ public class RunPassengerAlongWithCarriersIT {
             abc.run();
         } catch (Exception ee ) {
             ee.printStackTrace();
-            Assert.fail("something went wrong: " + ee.getMessage());
+            Assertions.fail("something went wrong: " + ee.getMessage());
         }
     }
 

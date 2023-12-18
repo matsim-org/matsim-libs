@@ -23,6 +23,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.evrp.VrpPathEnergyConsumptions;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -50,6 +51,11 @@ public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 	@Override
 	public EDrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
 		return new EDrtStayTask(beginTime, endTime, link, 0);// no energy consumption during STAY
+	}
+
+	@Override
+	public DefaultStayTask createInitialTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
+		return createStayTask(vehicle, beginTime, endTime, link);
 	}
 
 	public EDrtChargingTask createChargingTask(DvrpVehicle vehicle, double beginTime, double endTime, Charger charger,

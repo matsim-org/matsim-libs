@@ -21,19 +21,18 @@
 package org.matsim.core.mobsim.qsim;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -95,28 +94,16 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-@RunWith(Parameterized.class)
 public class QSimTest {
 
 	private final static Logger log = LogManager.getLogger(QSimTest.class);
 
-	private final boolean isUsingFastCapacityUpdate;
-	private final int numberOfThreads;
-
-	public QSimTest(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-		this.numberOfThreads = numberOfThreads;
-	}
-//
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}; numberOfThreads == {1};")
-	public static Collection<Object[]> parameterObjects () {
-		Object[][] capacityUpdates = new Object [][] {
-			new Object[] {true, 1},
-			new Object[] {false, 1},
-			new Object[] {true, 2},
-			new Object[] {false, 2}
-		};
-		return Arrays.asList(capacityUpdates);
+	public static Stream<Arguments> arguments () {
+		return Stream.of(
+			Arguments.of(true, 1),
+			Arguments.of(false, 1),
+			Arguments.of(true, 2),
+			Arguments.of(false, 2));
 	}
 
 	private static QSim createQSim(MutableScenario scenario, EventsManager events) {
@@ -143,8 +130,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testSingleAgent() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgent(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -170,9 +158,9 @@ public class QSimTest {
 		sim.run();
 
 		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, collector.events.size(), "wrong number of link enter events.");
+		Assertions.assertEquals(6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 
@@ -183,8 +171,9 @@ public class QSimTest {
 	 * @author mrieser
 	 * @author Kai Nagel
 	 */
-	@Test
-	public void testSingleAgentWithEndOnLeg() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgentWithEndOnLeg(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -238,9 +227,9 @@ public class QSimTest {
 		 }
 //
 //		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, collector.events.size(), "wrong number of link enter events.");
+		Assertions.assertEquals(6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 	/**
@@ -249,8 +238,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testTwoAgent() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testTwoAgent(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
@@ -278,11 +268,11 @@ public class QSimTest {
 		sim.run();
 
 		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 4, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in first event.", 7.0*3600 + 1, collector.events.get(2).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 7.0*3600 + 12, collector.events.get(3).getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(4, collector.events.size(), "wrong number of link enter events.");
+		Assertions.assertEquals(6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
+		Assertions.assertEquals(7.0*3600 + 1, collector.events.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(7.0*3600 + 12, collector.events.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 	/**
@@ -290,8 +280,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testTeleportationSingleAgent() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testTeleportationSingleAgent(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -317,16 +308,16 @@ public class QSimTest {
 		sim.run();
 
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 5, collector.getEvents().size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5, collector.getEvents().size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of event.");
+		Assertions.assertEquals(TeleportationArrivalEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(4).getClass(), "wrong type of event.");
+		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in event.");
+		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in event.");
+		Assertions.assertEquals(6.0*3600 + 15, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in event.");
+		Assertions.assertEquals(6.0*3600 + 15, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in event.");
 	}
 
 	/**
@@ -337,8 +328,9 @@ public class QSimTest {
 	 *
 	 * @author cdobler
 	 */
-	@Test
-	public void testSingleAgentImmediateDeparture() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgentImmediateDeparture(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
@@ -365,9 +357,9 @@ public class QSimTest {
 		sim.run();
 
 		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 0.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 0.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, collector.events.size(), "wrong number of link enter events.");
+		Assertions.assertEquals(0.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(0.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 	/**
@@ -382,8 +374,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testSingleAgent_EmptyRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgent_EmptyRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link1
@@ -413,40 +406,44 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 8, allEvents.size());
+		Assertions.assertEquals(8, allEvents.size(), "wrong number of events.");
 
 
-		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of 3rd event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of 4th event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of 5th event.", VehicleLeavesTrafficEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of 6th event.", PersonLeavesVehicleEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of 7th event.", PersonArrivalEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of 8th event.", ActivityStartEvent.class, allEvents.get(7).getClass());
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of 1st event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of 2nd event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(2).getClass(), "wrong type of 3rd event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(3).getClass(), "wrong type of 4th event.");
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(4).getClass(), "wrong type of 5th event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(5).getClass(), "wrong type of 6th event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(6).getClass(), "wrong type of 7th event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(7).getClass(), "wrong type of 8th event.");
 
 
-		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in 1st event.");
+		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in 2nd event.");
+		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in 3rd event.");
+		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in 4th event.");
 
-		Assert.assertEquals("wrong time in 5th event.", 6.0 * 3600 + 0, allEvents.get(4).getTime(),
-				MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in 6th event.", 6.0 * 3600 + 0, allEvents.get(5).getTime(),
-				MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in 7th event.", 6.0 * 3600 + 0, allEvents.get(6).getTime(),
-				MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong time in 8th event.", 6.0 * 3600 + 0, allEvents.get(7).getTime(),
-				MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(4).getTime(),
+				MatsimTestUtils.EPSILON,
+				"wrong time in 5th event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(5).getTime(),
+				MatsimTestUtils.EPSILON,
+				"wrong time in 6th event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(6).getTime(),
+				MatsimTestUtils.EPSILON,
+				"wrong time in 7th event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(7).getTime(),
+				MatsimTestUtils.EPSILON,
+				"wrong time in 8th event.");
 
 
-		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
-		Assert.assertEquals("wrong link in 2nd event.", f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId() );
-		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((VehicleEntersTrafficEvent) allEvents.get(3)).getLinkId() );
-		Assert.assertEquals("wrong link in 5th event.", f.link1.getId(), ((VehicleLeavesTrafficEvent) allEvents.get(4)).getLinkId() );
-		Assert.assertEquals("wrong link in 7th event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(6)).getLinkId() );
-		Assert.assertEquals("wrong link in 8th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(7)).getLinkId() );
+		Assertions.assertEquals(f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId(), "wrong link in 1st event." );
+		Assertions.assertEquals(f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId(), "wrong link in 2nd event." );
+		Assertions.assertEquals(f.link1.getId(), ((VehicleEntersTrafficEvent) allEvents.get(3)).getLinkId(), "wrong link in 4th event." );
+		Assertions.assertEquals(f.link1.getId(), ((VehicleLeavesTrafficEvent) allEvents.get(4)).getLinkId(), "wrong link in 5th event." );
+		Assertions.assertEquals(f.link1.getId(), ((PersonArrivalEvent) allEvents.get(6)).getLinkId(), "wrong link in 7th event." );
+		Assertions.assertEquals(f.link1.getId(), ((ActivityStartEvent) allEvents.get(7)).getLinkId(), "wrong link in 8th event." );
 	}
 
 	/**
@@ -455,8 +452,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testSingleAgent_LastLinkIsLoop() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSingleAgent_LastLinkIsLoop(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
 
@@ -491,21 +489,21 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 14, allEvents.size());
-		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link 1
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link 2
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link 3
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // loop link
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of 11th event.", PersonArrivalEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of 12th event.", ActivityStartEvent.class, allEvents.get(13).getClass());
+		Assertions.assertEquals(14, allEvents.size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of 1st event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of 2nd event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(4).getClass(), "wrong type of event."); // link 1
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(5).getClass(), "wrong type of event."); // link 2
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(6).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(7).getClass(), "wrong type of event."); // link 3
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(8).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(9).getClass(), "wrong type of event."); // loop link
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(10).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(11).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(12).getClass(), "wrong type of 11th event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(13).getClass(), "wrong type of 12th event.");
 	}
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
@@ -525,8 +523,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testAgentWithoutLeg() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAgentWithoutLeg(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -544,7 +543,7 @@ public class QSimTest {
 		sim.run();
 
 		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 0, collector.events.size());
+		Assertions.assertEquals(0, collector.events.size(), "wrong number of link enter events.");
 	}
 
 	/**
@@ -552,8 +551,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testAgentWithoutLegWithEndtime() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAgentWithoutLegWithEndtime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -572,7 +572,7 @@ public class QSimTest {
 		sim.run();
 
 		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 0, collector.events.size());
+		Assertions.assertEquals(0, collector.events.size(), "wrong number of link enter events.");
 	}
 
 	/**
@@ -580,8 +580,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testAgentWithLastActWithEndtime() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAgentWithLastActWithEndtime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -606,7 +607,7 @@ public class QSimTest {
 		sim.run();
 
 		/* finish */
-		Assert.assertEquals("wrong number of link enter events.", 0, collector.events.size());
+		Assertions.assertEquals(0, collector.events.size(), "wrong number of link enter events.");
 	}
 
 	/**
@@ -615,8 +616,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testFlowCapacityDriving() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDriving(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
@@ -663,9 +665,9 @@ public class QSimTest {
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
 		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
+		Assertions.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
+		Assertions.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+		Assertions.assertEquals(999, volume[8]); // all the rest
 		//		} else {
 		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
@@ -680,8 +682,9 @@ public class QSimTest {
 	 *
 	 * @author michaz
 	 */
-	@Test
-	public void testFlowCapacityDrivingFraction() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingFraction(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
@@ -722,9 +725,9 @@ public class QSimTest {
 		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
 
-		Assert.assertEquals(1, volume[7*3600 - 1800]); // First vehicle
-		Assert.assertEquals(1, volume[7*3600 - 1800 + 4]); // Second vehicle
-		Assert.assertEquals(1, volume[7*3600 - 1800 + 8]); // Third vehicle
+		Assertions.assertEquals(1, volume[7*3600 - 1800]); // First vehicle
+		Assertions.assertEquals(1, volume[7*3600 - 1800 + 4]); // Second vehicle
+		Assertions.assertEquals(1, volume[7*3600 - 1800 + 8]); // Third vehicle
 	}
 
 	/**
@@ -735,8 +738,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testFlowCapacityStarting() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityStarting(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
@@ -773,9 +777,9 @@ public class QSimTest {
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
 		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
+		Assertions.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
+		Assertions.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+		Assertions.assertEquals(999, volume[8]); // all the rest
 		//		} else {
 		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
@@ -790,8 +794,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testFlowCapacityMixed() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityMixed(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
@@ -842,9 +847,9 @@ public class QSimTest {
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
 		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
+		Assertions.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
+		Assertions.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+		Assertions.assertEquals(999, volume[8]); // all the rest
 		//		} else {
 		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
@@ -858,8 +863,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testVehicleTeleportationTrue() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testVehicleTeleportationTrue(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -889,22 +895,22 @@ public class QSimTest {
 		sim.run();
 
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 15, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(7).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(14).getClass());
+		Assertions.assertEquals(15, allEvents.size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of event.");
+		Assertions.assertEquals(TeleportationArrivalEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(4).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(5).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(6).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(7).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(8).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(9).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(10).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(11).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(12).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(13).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(14).getClass(), "wrong type of event.");
 	}
 
 
@@ -913,8 +919,9 @@ public class QSimTest {
 	 *
 	 * @author michaz
 	 */
-	@Test
-	public void testWaitingForCar() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testWaitingForCar(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
@@ -970,37 +977,37 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 30, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(7).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(9).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(14).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(15).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(18).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(19).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(20).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(21).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(22).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(23).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(24).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(25).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(26).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(27).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(28).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(29).getClass());
+		Assertions.assertEquals(30, allEvents.size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of event.");
+		Assertions.assertEquals(TeleportationArrivalEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(4).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(5).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(6).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(7).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(8).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(9).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(10).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(11).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(12).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(13).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(14).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(15).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(16).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(17).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(18).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(19).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(20).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(21).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(22).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(23).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(24).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(25).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(26).getClass(), "wrong type of event.");
+		Assertions.assertEquals(TeleportationArrivalEvent.class, allEvents.get(27).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(28).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(29).getClass(), "wrong type of event.");
 	}
 
 	/**
@@ -1008,8 +1015,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testVehicleTeleportationFalse() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testVehicleTeleportationFalse(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -1039,20 +1047,20 @@ public class QSimTest {
 		QSim sim = createQSim(f, events);
 		try {
 			sim.run();
-			Assert.fail("expected RuntimeException, but there was none.");
+			Assertions.fail("expected RuntimeException, but there was none.");
 		} catch (RuntimeException e) {
 			log.info("catched expected RuntimeException: " + e.getMessage());
 		}
 
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 7, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(6).getClass());
+		Assertions.assertEquals(7, allEvents.size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of event.");
+		Assertions.assertEquals(TeleportationArrivalEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(4).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(5).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(6).getClass(), "wrong type of event.");
 	}
 
 	/**
@@ -1061,8 +1069,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testAssignedVehicles() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testAssignedVehicles(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -1104,12 +1113,12 @@ public class QSimTest {
 		events.finishProcessing();
 
 		Collection<MobsimVehicle> vehicles = qlink3.getAllVehicles();
-		Assert.assertEquals(1, vehicles.size());
-		Assert.assertEquals(Id.create(2, Vehicle.class), vehicles.toArray(new MobsimVehicle[1])[0].getVehicle().getId());
+		Assertions.assertEquals(1, vehicles.size());
+		Assertions.assertEquals(Id.create(2, Vehicle.class), vehicles.toArray(new MobsimVehicle[1])[0].getVehicle().getId());
 		// vehicle 1 should still stay on qlink2
 		vehicles = qlink2.getAllVehicles();
-		Assert.assertEquals(1, vehicles.size());
-		Assert.assertEquals(Id.create(1, Vehicle.class), vehicles.toArray(new MobsimVehicle[1])[0].getVehicle().getId());
+		Assertions.assertEquals(1, vehicles.size());
+		Assertions.assertEquals(Id.create(1, Vehicle.class), vehicles.toArray(new MobsimVehicle[1])[0].getVehicle().getId());
 	}
 
 	/**
@@ -1117,8 +1126,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testCircleAsRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCircleAsRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
@@ -1149,23 +1159,23 @@ public class QSimTest {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 16, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link1
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link2
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link3
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(14).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(15).getClass());
+		Assertions.assertEquals(16, allEvents.size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(4).getClass(), "wrong type of event."); // link1
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(5).getClass(), "wrong type of event."); // link2
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(6).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(7).getClass(), "wrong type of event."); // link3
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(8).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(9).getClass(), "wrong type of event."); // link4
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(10).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(11).getClass(), "wrong type of event."); // link1 again
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(13).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(14).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(15).getClass(), "wrong type of event.");
 	}
 
 	/**
@@ -1175,8 +1185,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testRouteWithEndLinkTwice() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testRouteWithEndLinkTwice(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
@@ -1207,27 +1218,27 @@ public class QSimTest {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 20, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link1
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link2
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link3
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(13).getClass()); // link2 again
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(14).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(15).getClass()); // link3 again
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(16).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(18).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(19).getClass());
+		Assertions.assertEquals(20, allEvents.size(), "wrong number of events.");
+		Assertions.assertEquals(ActivityEndEvent.class, allEvents.get(0).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonDepartureEvent.class, allEvents.get(1).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonEntersVehicleEvent.class, allEvents.get(2).getClass(), "wrong type of event.");
+		Assertions.assertEquals(VehicleEntersTrafficEvent.class, allEvents.get(3).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(4).getClass(), "wrong type of event."); // link1
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(5).getClass(), "wrong type of event."); // link2
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(6).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(7).getClass(), "wrong type of event."); // link3
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(8).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(9).getClass(), "wrong type of event."); // link4
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(10).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(11).getClass(), "wrong type of event."); // link1 again
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(12).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(13).getClass(), "wrong type of event."); // link2 again
+		Assertions.assertEquals(LinkLeaveEvent.class, allEvents.get(14).getClass(), "wrong type of event.");
+		Assertions.assertEquals(LinkEnterEvent.class, allEvents.get(15).getClass(), "wrong type of event."); // link3 again
+		Assertions.assertEquals(VehicleLeavesTrafficEvent.class, allEvents.get(16).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonLeavesVehicleEvent.class, allEvents.get(17).getClass(), "wrong type of event.");
+		Assertions.assertEquals(PersonArrivalEvent.class, allEvents.get(18).getClass(), "wrong type of event.");
+		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(19).getClass(), "wrong type of event.");
 	}
 
 	/**
@@ -1236,14 +1247,15 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testConsistentRoutes_WrongRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_WrongRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events, isUsingFastCapacityUpdate, numberOfThreads); // route should continue on link 4
+		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
 	/**
@@ -1252,14 +1264,15 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testConsistentRoutes_WrongStartLink() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_WrongStartLink(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events, isUsingFastCapacityUpdate, numberOfThreads); // first act is on link 1, not 2
+		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
 	/**
@@ -1268,14 +1281,15 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testConsistentRoutes_WrongEndLink() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_WrongEndLink(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events, isUsingFastCapacityUpdate, numberOfThreads); // second act is on link 5, not 4
+		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
 	/**
@@ -1285,14 +1299,15 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testConsistentRoutes_ImpossibleRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_ImpossibleRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events,isUsingFastCapacityUpdate, numberOfThreads); // link 3 is missing
+		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
 	/**
@@ -1301,29 +1316,32 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testConsistentRoutes_MissingRoute() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testConsistentRoutes_MissingRoute(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events, isUsingFastCapacityUpdate, numberOfThreads); // no links at all
+		Assertions.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		Assertions.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
-	/** Prepares miscellaneous data for the testConsistentRoutes() tests:
+	/**
+	 * Prepares miscellaneous data for the testConsistentRoutes() tests:
 	 * Creates a network of 6 links, and a population of one person driving from
 	 * link 1 to link 5, and then from link 5 to link 6.
 	 *
-	 * @param startLinkId the start link of the route for the first leg
-	 * @param linkIds the links the agent should travel along on the first leg
-	 * @param endLinkId the end link of the route for the first leg
-	 * @param events the Events object to be used by the simulation.
+	 * @param startLinkId               the start link of the route for the first leg
+	 * @param linkIds                   the links the agent should travel along on the first leg
+	 * @param endLinkId                 the end link of the route for the first leg
+	 * @param events                    the Events object to be used by the simulation.
+	 * @param isUsingFastCapacityUpdate
+	 * @param numberOfThreads
 	 * @return A QueueSimulation which can be started immediately.
-	 *
 	 * @author mrieser
 	 **/
-	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events) {
+	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events, boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		/* enhance network */
@@ -1370,8 +1388,9 @@ public class QSimTest {
 		return logger;
 	}
 
-	@Test
-	public void testStartAndEndTime() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testStartAndEndTime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 
 		final Config config = ConfigUtils.createConfig();
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -1417,8 +1436,8 @@ public class QSimTest {
 		// first test without special settings
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime().seconds(), collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime().seconds(), collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 		collector.reset(0);
 
 		// second test with special start/end times
@@ -1426,8 +1445,8 @@ public class QSimTest {
 		config.qsim().setEndTime(11.0*3600);
 		sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -1436,8 +1455,9 @@ public class QSimTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testCleanupSim_EarlyEnd() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testCleanupSim_EarlyEnd(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
@@ -1523,7 +1543,7 @@ public class QSimTest {
 		config.qsim().setEndTime(simEndTime);
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test
 	}
 
@@ -1534,8 +1554,9 @@ public class QSimTest {
 	 *
 	 * @author ikaddoura based on mrieser
 	 */
-	@Test
-	public void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG);
@@ -1583,8 +1604,8 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assert.assertEquals(1920, volume[6]); // because of the kinematic waves and the 'reduce flow capacity behavior' we should have much less than half of the maximum flow in this hour
-		Assert.assertEquals(3840, volume[7]); // because of the kinematic waves and the 'reduce flow capacity behavior' we should have much less than the maximum flow in this hour
+		Assertions.assertEquals(1920, volume[6]); // because of the kinematic waves and the 'reduce flow capacity behavior' we should have much less than half of the maximum flow in this hour
+		Assertions.assertEquals(3840, volume[7]); // because of the kinematic waves and the 'reduce flow capacity behavior' we should have much less than the maximum flow in this hour
 	}
 
 	/**
@@ -1594,8 +1615,9 @@ public class QSimTest {
 	 *
 	 * @author ikaddoura based on mrieser
 	 */
-	@Test
-	public void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG);
@@ -1643,8 +1665,8 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assert.assertEquals(2979, volume[6]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than half of the maximum flow in this hour
-		Assert.assertEquals(5958, volume[7]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than the maximum flow in this hour
+		Assertions.assertEquals(2979, volume[6]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than half of the maximum flow in this hour
+		Assertions.assertEquals(5958, volume[7]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than the maximum flow in this hour
 	}
 
 	/**
@@ -1654,8 +1676,9 @@ public class QSimTest {
 	 *
 	 * @author tschlenther based on ikaddoura based on mrieser
 	 */
-	@Test
-	public void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
 		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE);
@@ -1703,8 +1726,8 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assert.assertEquals(961, volume[6]); // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than a quarter of the maximum flow in this hour
-		Assert.assertEquals(1920, volume[7]);  // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than half of the maximum flow in this hour
+		Assertions.assertEquals(961, volume[6]); // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than a quarter of the maximum flow in this hour
+		Assertions.assertEquals(1920, volume[7]);  // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than half of the maximum flow in this hour
 	}
 
 	/**

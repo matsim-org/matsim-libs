@@ -3,11 +3,11 @@ package org.matsim.contrib.pseudosimulation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
@@ -31,10 +31,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class RunPSimTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final Logger logger = LogManager.getLogger(RunPSimTest.class );
 
@@ -44,7 +44,7 @@ public class RunPSimTest {
 	 * Run 1 normal qsim iteration, a couple of psim iterations and a final 2nd qsim iteration.
 	 */
 	@Test
-	public void testA() {
+	void testA() {
 		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
@@ -103,7 +103,7 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.86084460860525, psimScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(138.86084460860525, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
 
 	}
 
@@ -115,7 +115,7 @@ public class RunPSimTest {
 	 * in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
 	@Test
-	public void testB() {
+	void testB() {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);
@@ -129,7 +129,7 @@ public class RunPSimTest {
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.8303325803256, qsimScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(131.8303325803256, qsimScore, MatsimTestUtils.EPSILON, "Default controler score changed.");
 	}
 
 	class ExecScoreTracker implements ShutdownListener {

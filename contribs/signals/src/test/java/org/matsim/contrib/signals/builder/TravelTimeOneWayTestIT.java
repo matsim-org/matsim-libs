@@ -23,9 +23,9 @@ import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -66,26 +66,26 @@ public class TravelTimeOneWayTestIT {
 
 	private static final Logger log = LogManager.getLogger(TravelTimeOneWayTestIT.class);
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testSignalOutflow_withLanes() {
+	void testSignalOutflow_withLanes() {
 		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(true));
 	}
 
 	@Test
-	public void testSignalOutflow_woLanes() {
+	void testSignalOutflow_woLanes() {
 		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(false));
 	}
 
 	@Test
-	public void testAllGreenSignalVsNoSignal_withLanes() {
+	void testAllGreenSignalVsNoSignal_withLanes() {
 		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(true));
 	}
 
 	@Test
-	public void testAllGreenSignalVsNoSignal_woLanes() {
+	void testAllGreenSignalVsNoSignal_woLanes() {
 		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(false));
 	}
 
@@ -138,14 +138,14 @@ public class TravelTimeOneWayTestIT {
 			log.debug("tF = 60s, " + resultsWoSignals.numberOfVehPassedDuringTimeToMeasure + ", " + resultsWoSignals.numberOfVehPassed + ", "
 					+ resultsWoSignals.firstVehPassTime_s + ", " + resultsWoSignals.lastVehPassTime_s);
 		} else {
-			Assert.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
+			Assertions.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
 		}
 
 		// compare values
-		Assert.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.firstVehPassTime_s, resultsWoSignals.firstVehPassTime_s, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.numberOfVehPassed, resultsWoSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.numberOfVehPassedDuringTimeToMeasure, resultsWoSignals.numberOfVehPassedDuringTimeToMeasure, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(resultsWithSignals.firstVehPassTime_s, resultsWoSignals.firstVehPassTime_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(resultsWithSignals.numberOfVehPassed, resultsWoSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(resultsWithSignals.numberOfVehPassedDuringTimeToMeasure, resultsWoSignals.numberOfVehPassedDuringTimeToMeasure, MatsimTestUtils.EPSILON);
 	}
 
 	private static void runAndTestDifferentGreensplitSignals(final Scenario scenario) {
@@ -167,8 +167,8 @@ public class TravelTimeOneWayTestIT {
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
-			Assert.assertEquals((dropping * linkCapacity / circulationTime), stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
-			Assert.assertEquals(5000.0, stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassed, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals((dropping * linkCapacity / circulationTime), stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
+			Assertions.assertEquals(5000.0, stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassed, MatsimTestUtils.EPSILON);
 		}
 	}
 

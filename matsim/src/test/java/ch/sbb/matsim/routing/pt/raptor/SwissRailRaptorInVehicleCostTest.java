@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +72,7 @@ import java.util.List;
  */
 public class SwissRailRaptorInVehicleCostTest {
 
-	/* fastRoute takes 14min30sec. (==> 870 sec)
+	/*fastRoute takes 14min30sec. (==> 870 sec)
 	 * slowRoute takes 20min30sec (==> 1230 sec) and departs 1 min later.
 	 * slowRoute arrives 7 minutes later ==> 420 sec
 	 *
@@ -82,19 +82,19 @@ public class SwissRailRaptorInVehicleCostTest {
 	 */
 
 	@Test
-	public void testBaseline_defaultInVehicleCostCalculator_uses_fastRoute() {
+	void testBaseline_defaultInVehicleCostCalculator_uses_fastRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new DefaultRaptorInVehicleCostCalculator(), f.fastLineId);
 	}
 
 	@Test
-	public void testBaseline_capacityDependentInVehicleCost_indifferent_uses_fastRoute() {
+	void testBaseline_capacityDependentInVehicleCost_indifferent_uses_fastRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 1.8), f.fastLineId);
 	}
 
 	@Test
-	public void test_capacityDependentInVehicleCost_prefersLowOccupancy_uses_slowRoute() {
+	void test_capacityDependentInVehicleCost_prefersLowOccupancy_uses_slowRoute() {
 		Fixture f = new Fixture();
 
 		// from the note above:
@@ -114,13 +114,13 @@ public class SwissRailRaptorInVehicleCostTest {
 	}
 
 	@Test
-	public void test_capacityDependentInVehicleCost_minorHighOccupancyAvoidance_uses_fastRoute() {
+	void test_capacityDependentInVehicleCost_minorHighOccupancyAvoidance_uses_fastRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 1.2), f.fastLineId);
 	}
 
 	@Test
-	public void test_capacityDependentInVehicleCost_majorHighOccupancyAvoidance_uses_slowRoute() {
+	void test_capacityDependentInVehicleCost_majorHighOccupancyAvoidance_uses_slowRoute() {
 		Fixture f = new Fixture();
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 2.0), f.slowLineId);
 	}
@@ -142,25 +142,25 @@ public class SwissRailRaptorInVehicleCostTest {
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
 		List<? extends PlanElement> route1 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
-		Assert.assertNotNull(route1);
+		Assertions.assertNotNull(route1);
 
 		System.out.println("calculated route:");
 		for (PlanElement leg : route1) {
 			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
 		}
 
-		Assert.assertEquals(3, route1.size());
+		Assertions.assertEquals(3, route1.size());
 
 		Leg leg1 = (Leg) route1.get(0);
-		Assert.assertEquals("walk", leg1.getMode());
+		Assertions.assertEquals("walk", leg1.getMode());
 
 		Leg leg2 = (Leg) route1.get(1);
-		Assert.assertEquals("pt", leg2.getMode());
+		Assertions.assertEquals("pt", leg2.getMode());
 		TransitPassengerRoute paxRoute1 = (TransitPassengerRoute) leg2.getRoute();
-		Assert.assertEquals(expectedTransitLine, paxRoute1.getLineId());
+		Assertions.assertEquals(expectedTransitLine, paxRoute1.getLineId());
 
 		Leg leg3 = (Leg) route1.get(2);
-		Assert.assertEquals("walk", leg3.getMode());
+		Assertions.assertEquals("walk", leg3.getMode());
 	}
 
 	private void fillExecutionTracker(Fixture f, OccupancyTracker tracker) {

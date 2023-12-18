@@ -19,9 +19,8 @@
 
 package org.matsim.pt.router;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -34,7 +33,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
 public class TransitRouterConfigTest {
 
 	@Test
-	public void testConstructor() {
+	void testConstructor() {
 		ScoringConfigGroup planScoring = new ScoringConfigGroup();
 		RoutingConfigGroup planRouting = new RoutingConfigGroup();
 		TransitRouterConfigGroup transitRouting = new TransitRouterConfigGroup();
@@ -72,33 +71,33 @@ public class TransitRouterConfigTest {
 		// a number of changes related to the fact that the opportunity cost of time is now
 		// included in the pt routing.  Either the test here or some scoring
 		// test needs to be adapted; this seems the better place. kai/benjamin, oct'12
-		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
-		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
+		Assertions.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assertions.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assertions.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
 
-		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
-		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
+		Assertions.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
+		Assertions.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 
-		Assert.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
-		Assert.assertEquals(987.6, config.getSearchRadius(), 1e-8);
-		Assert.assertEquals(123.4, config.getExtensionRadius(), 1e-8);
-		Assert.assertEquals(23.4, config.getBeelineWalkConnectionDistance(), 1e-8);
+		Assertions.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
+		Assertions.assertEquals(987.6, config.getSearchRadius(), 1e-8);
+		Assertions.assertEquals(123.4, config.getExtensionRadius(), 1e-8);
+		Assertions.assertEquals(23.4, config.getBeelineWalkConnectionDistance(), 1e-8);
 		}
 
 		// test with marginal utl of time:
 		{
 		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting, vspConfig );
 
-		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
-		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
-		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
-		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
+		Assertions.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assertions.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assertions.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
+		Assertions.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
+		Assertions.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 
-		Assert.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
-		Assert.assertEquals(987.6, config.getSearchRadius(), 1e-8);
-		Assert.assertEquals(123.4, config.getExtensionRadius(), 1e-8);
-		Assert.assertEquals(23.4, config.getBeelineWalkConnectionDistance(), 1e-8);
+		Assertions.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
+		Assertions.assertEquals(987.6, config.getSearchRadius(), 1e-8);
+		Assertions.assertEquals(123.4, config.getExtensionRadius(), 1e-8);
+		Assertions.assertEquals(23.4, config.getBeelineWalkConnectionDistance(), 1e-8);
 		}
 	}
 }

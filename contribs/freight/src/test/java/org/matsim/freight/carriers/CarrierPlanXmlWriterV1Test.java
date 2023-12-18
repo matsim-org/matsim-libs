@@ -21,8 +21,8 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -33,11 +33,11 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class CarrierPlanXmlWriterV1Test {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testCarrierPlanWriterWrites() {
+	void testCarrierPlanWriterWrites() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );

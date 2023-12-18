@@ -25,9 +25,9 @@ package org.matsim.contrib.noise;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -54,11 +54,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NoiseOnlineExampleIT {
 	private static final Logger log = LogManager.getLogger( NoiseOnlineExampleIT.class ) ;
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void test0(){
+	final void test0(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
@@ -80,7 +80,7 @@ public class NoiseOnlineExampleIT {
 	}
 
 	@Test
-	public final void testOnTheFlyAggregationTerms() {
+	final void testOnTheFlyAggregationTerms() {
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controller().setLastIteration(1);
@@ -169,18 +169,18 @@ public class NoiseOnlineExampleIT {
 
 		//check whether on the fly caluclation equals file based aggregation terms
 		for(Map.Entry<Id<ReceiverPoint>, Double> entry: ldenByRp.entrySet()) {
-			Assert.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getLden(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getLden(), MatsimTestUtils.EPSILON);
 		}
 		for(Map.Entry<Id<ReceiverPoint>, Double> entry: l69ByRp.entrySet()) {
-			Assert.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL69(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL69(), MatsimTestUtils.EPSILON);
 		}
 		for(Map.Entry<Id<ReceiverPoint>, Double> entry: l1619ByRp.entrySet()) {
-			Assert.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL1619(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(entry.getValue(), nrps.get(entry.getKey()).getL1619(), MatsimTestUtils.EPSILON);
 		}
 	}
 
 	@Test
-	public final void testNoiseListener(){
+	final void testNoiseListener(){
 
 		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "config.xml", new NoiseConfigGroup() );
 		config.controller().setLastIteration(1);

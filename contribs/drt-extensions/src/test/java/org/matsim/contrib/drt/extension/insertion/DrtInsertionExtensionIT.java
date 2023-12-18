@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.insertion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
@@ -52,8 +52,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class DrtInsertionExtensionIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Controler createController() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
@@ -68,7 +68,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testExclusivityContraint() {
+	void testExclusivityContraint() {
 		IdSet<Request> exclusiveRequestIds = new IdSet<>(Request.class);
 
 		for (int i = 100; i <= 200; i++) {
@@ -173,7 +173,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testSkillsConstraint() {
+	void testSkillsConstraint() {
 		IdSet<Request> restrictedRequestIds = new IdSet<>(Request.class);
 		for (int i = 100; i <= 200; i++) {
 			restrictedRequestIds.add(Id.create("drt_" + i, Request.class));
@@ -239,7 +239,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testRangeConstraint() {
+	void testRangeConstraint() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -259,7 +259,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testRangeConstraintWithCustomInstances() {
+	void testRangeConstraintWithCustomInstances() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -287,7 +287,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testRangeConstraintWithCustomInjection() {
+	void testRangeConstraintWithCustomInjection() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -365,7 +365,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testCustomConstraint() {
+	void testCustomConstraint() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -409,7 +409,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testDefaults() {
+	void testDefaults() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -428,7 +428,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testVehicleActiveTimeObjective() {
+	void testVehicleActiveTimeObjective() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -449,7 +449,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testVehicleDistanceObjective() {
+	void testVehicleDistanceObjective() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 
@@ -470,7 +470,7 @@ public class DrtInsertionExtensionIT {
 	}
 
 	@Test
-	public void testPassengerPassengerDelayObjective() {
+	void testPassengerPassengerDelayObjective() {
 		Controler controller = createController();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 

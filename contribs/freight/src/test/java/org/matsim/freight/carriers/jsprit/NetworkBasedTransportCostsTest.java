@@ -24,9 +24,9 @@ package org.matsim.freight.carriers.jsprit;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -47,11 +47,11 @@ import static org.mockito.Mockito.when;
 public class NetworkBasedTransportCostsTest {
 
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
+	void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -78,14 +78,14 @@ public class NetworkBasedTransportCostsTest {
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 
-		Assert.assertEquals(20000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
-		Assert.assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
-		Assert.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
-		Assert.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		Assertions.assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
 	}
 
 	@Test
-	public void test_whenVehicleTypeNotKnow_throwException(){
+	void test_whenVehicleTypeNotKnow_throwException(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -108,12 +108,12 @@ public class NetworkBasedTransportCostsTest {
 		try{
 			c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2);
 		}
-		catch(IllegalStateException e){ Assert.assertTrue(true); }
+		catch(IllegalStateException e){ Assertions.assertTrue(true); }
 
 	}
 
 	@Test
-	public void test_whenAddingTwoVehicleTypesViaConstructor_itMustAccountForThat(){
+	void test_whenAddingTwoVehicleTypesViaConstructor_itMustAccountForThat(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -153,10 +153,10 @@ public class NetworkBasedTransportCostsTest {
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 
-		Assert.assertEquals(20000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
-		Assert.assertEquals(40000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
-		Assert.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
-		Assert.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		Assertions.assertEquals(40000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
+		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
 	}
 
 }
