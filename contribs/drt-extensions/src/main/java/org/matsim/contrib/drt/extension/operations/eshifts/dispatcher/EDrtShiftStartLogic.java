@@ -27,7 +27,7 @@ public class EDrtShiftStartLogic implements ShiftStartLogic {
 
 	@Override
 	public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry shiftEntry) {
-		Schedule schedule = shiftEntry.vehicle.getSchedule();
+		Schedule schedule = shiftEntry.vehicle().getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		if (currentTask instanceof EDrtWaitForShiftStayTask) {
 			//check whether vehicle still needs to complete charging task
