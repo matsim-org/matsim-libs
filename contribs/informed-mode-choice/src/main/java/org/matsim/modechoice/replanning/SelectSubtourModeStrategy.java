@@ -177,6 +177,9 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 					if (!Double.isNaN(threshold) && threshold > 0) {
 						candidates.removeIf(c -> c.getUtility() < singleModeCandidates.get(0).getUtility() - threshold);
 					}
+
+					// Only applied at the end
+					ctx.pruner.pruneCandidates(model, candidates, rnd);
 				}
 
 				if (!candidates.isEmpty()) {
