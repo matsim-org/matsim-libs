@@ -53,7 +53,7 @@
 		</link>
 		<link id="BA" from="B" to="A" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
-				<attribute name="railsimResourceId" class="java.lang.String">BA</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
 			</attributes>
 		</link>
 		<link id="Bx" from="B" to="x" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">

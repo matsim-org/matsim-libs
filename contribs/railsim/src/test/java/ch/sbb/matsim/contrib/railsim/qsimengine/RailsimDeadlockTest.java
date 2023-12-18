@@ -79,7 +79,7 @@ public class RailsimDeadlockTest {
 
 		Set<String> increased = Set.of("y1y", "yy1", "xB", "Bx", "yx", "xy", "AB", "BA");
 
-		// Create an avoidance point, but it is too small for multiple trains
+		// Increase some capacity, but one of the segment is too small for multiple trains
 		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), l ->{
 			String id = l.getId().toString();
 			if (increased.contains(id))
@@ -95,13 +95,14 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
 
 		test.doSimStepUntil(1500);
-		test.debugFiles(collector, "tooSmall");
+//		test.debugFiles(collector, "tooSmall");
 
-		// TODO not correct yet
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 139, "EF", 0)
-			.hasTrainState("regio2", 203, "CD", 0);
+			.hasTrainState("regio1a", 760, "EF", 0)
+			.hasTrainState("regio1b", 1180, "EF", 0)
+			.hasTrainState("regio2a", 670, "CD", 0)
+			.hasTrainState("regio2b", 1090, "CD", 0);
 
 	}
 
@@ -116,8 +117,8 @@ public class RailsimDeadlockTest {
 //		test.debugFiles(collector, "oneWay");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 530, "EF", 0)
-			.hasTrainState("regio2", 350, "CD", 0);
+			.hasTrainState("regio", 350, "EF", 0)
+			.hasTrainState("regio2", 520, "CD", 0);
 
 	}
 

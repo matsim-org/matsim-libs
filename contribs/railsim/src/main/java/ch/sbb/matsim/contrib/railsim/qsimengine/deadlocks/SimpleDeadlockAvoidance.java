@@ -33,31 +33,38 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 	}
 
 	@Override
-	public void initResources(Map<Id<RailResource>, RailResource> resources) {
-	}
-
-	@Override
 	public void onReserve(double time, RailResource resource, TrainPosition position) {
 
 		boolean resourceFound = false;
 
-		for (int i = position.getRouteIndex(); i < position.getRouteSize(); i++) {
+		int idx = Math.max(0, position.getRouteIndex() - 1);
+		for (int i = idx; i < position.getRouteSize(); i++) {
 
 			RailLink link = position.getRoute(i);
-
+			RailResource r = link.getResource();
 //			// Iterate through route until requested resource is present
-//			if (link.getResource() == resource) {
-//				resourceFound = true;
-//			}
-//
-//			if (!resourceFound)
-//				continue;
 
-			// After any non-conflict point, no route needs to be stored
-			if (isConflictPoint(link.getResource()))
-				conflictPoints.put(link.getResource(), position.getDriver());
-			else
+			if (r == resource) {
+				resourceFound = true;
+			}
+
+			if (!resourceFound)
+				continue;
+
+			if (isConflictPoint(r)) {
+
+				MobsimDriverAgent other = conflictPoints.get(r);
+
+				// Reserve non occupied conflict points
+				// If reserved by other, stop reserving more
+				if (other != null && other != position.getDriver())
+					break;
+
+				conflictPoints.put(r, position.getDriver());
+
+			} else
 				break;
+
 		}
 	}
 
@@ -71,8 +78,8 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 		MobsimDriverAgent other = conflictPoints.get(link.getResource());
 
 		// Not reserved, or reserved by same driver
-        return other == null || other == position.getDriver();
-    }
+		return other == null || other == position.getDriver();
+	}
 
 	@Override
 	public void onRelease(double time, RailResource resource, MobsimDriverAgent driver) {
