@@ -478,6 +478,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// Set flow and storage capacity to a high value
 		config.qsim().setFlowCapFactor(sample * 4);
 		config.qsim().setStorageCapFactor(sample * 4);
+		config.qsim().setUsePersonIdForMissingVehicleId(true);
 
 		// Overwrite network
 		if (network != null)
