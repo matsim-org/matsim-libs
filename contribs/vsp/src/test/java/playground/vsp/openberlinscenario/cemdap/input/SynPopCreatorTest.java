@@ -1,8 +1,8 @@
 package playground.vsp.openberlinscenario.cemdap.input;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.testcases.MatsimTestUtils;
@@ -19,11 +19,11 @@ import java.util.Objects;
  */
 public class SynPopCreatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void TestGenerateDemand() {
+	void TestGenerateDemand() {
 
 		// Input and output files
 		String commuterFileOutgoingTest = utils.getInputDirectory() + "Teil1BR2009Ga_Test_kurz.txt";
@@ -39,13 +39,13 @@ public class SynPopCreatorTest {
 
 		SynPopCreator demandGeneratorCensus = new SynPopCreator(commuterFilesOutgoing, censusFile, utils.getOutputDirectory(),
 				numberOfPlansPerPerson, idsOfFederalStatesIncluded, defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
-		
+
 		demandGeneratorCensus.setShapeFileForSpatialRefinement(utils.getInputDirectory() + "Bezirksregion_EPSG_25833.shp");
 		demandGeneratorCensus.setIdsOfMunicipalitiesForSpatialRefinement(Arrays.asList("11000000"));
 		demandGeneratorCensus.setRefinementFeatureKeyInShapefile("SCHLUESSEL");
 
 		demandGeneratorCensus.generateDemand();
-		
+
 
 		String municipal = "Breydin";
 		ArrayList<String> possibleLocationsOfWork = readPossibleLocationsOfWork(commuterFileOutgoingTest, municipal);
@@ -93,9 +93,9 @@ public class SynPopCreatorTest {
 			//assert
 //			Assert.assertEquals("Wrong municipality", "12060034", householdId.toString().substring(0,8));
 			if (!employed) {
-				Assert.assertEquals("Wrong locationOfWork", "-99", locationOfWork);
+				Assertions.assertEquals("-99", locationOfWork, "Wrong locationOfWork");
 			} else if (locationOfWork.length() != 6) {
-				Assert.assertTrue("Wrong locationOfWork", possibleLocationsOfWork.contains(locationOfWork));
+				Assertions.assertTrue(possibleLocationsOfWork.contains(locationOfWork), "Wrong locationOfWork");
 			}
 			if (gender == Gender.male) {
 				if (isBetween(age, 18, 24)) male18_24++;
@@ -113,27 +113,27 @@ public class SynPopCreatorTest {
 				if (isBetween(age, 50, 64)) female50_64++;
 				if (isBetween(age, 65, 74)) female65_74++;
 				if (age > 74) female75Plus++;
-			} else Assert.fail("Wrong gender");
+			} else Assertions.fail("Wrong gender");
 		}
 
 		//System.out.println("Persons size: " + pop.getPersons().values().size());
 
-		Assert.assertEquals("Wrong male18_24 count", male18_24Ref, male18_24);
-		Assert.assertEquals("Wrong male25_29 count", male25_29Ref, male25_29);
-		Assert.assertEquals("Wrong male30_39 count", male30_39Ref, male30_39);
-		Assert.assertEquals("Wrong male40_49 count", male40_49Ref, male40_49);
-		Assert.assertEquals("Wrong male50_64 count", male50_64Ref, male50_64);
-		Assert.assertEquals("Wrong male75Plus count", male75PlusRef, male75Plus);
-		Assert.assertEquals("Wrong female18_24 count", female18_24Ref, female18_24);
-		Assert.assertEquals("Wrong female25_29 count", female25_29Ref, female25_29);
-		Assert.assertEquals("Wrong female30_39 count", female30_39Ref, female30_39);
-		Assert.assertEquals("Wrong female40_49 count", female40_49Ref, female40_49);
-		Assert.assertEquals("Wrong female50_64 count", female50_64Ref, female50_64);
-		Assert.assertEquals("Wrong female65_74 count", female65_74Ref, female65_74);
-		Assert.assertEquals("Wrong female75Plus count", female75PlusRef, female75Plus);
-		Assert.assertEquals("Wrong male65_74 count", male65_74Ref, male65_74);
+		Assertions.assertEquals(male18_24Ref, male18_24, "Wrong male18_24 count");
+		Assertions.assertEquals(male25_29Ref, male25_29, "Wrong male25_29 count");
+		Assertions.assertEquals(male30_39Ref, male30_39, "Wrong male30_39 count");
+		Assertions.assertEquals(male40_49Ref, male40_49, "Wrong male40_49 count");
+		Assertions.assertEquals(male50_64Ref, male50_64, "Wrong male50_64 count");
+		Assertions.assertEquals(male75PlusRef, male75Plus, "Wrong male75Plus count");
+		Assertions.assertEquals(female18_24Ref, female18_24, "Wrong female18_24 count");
+		Assertions.assertEquals(female25_29Ref, female25_29, "Wrong female25_29 count");
+		Assertions.assertEquals(female30_39Ref, female30_39, "Wrong female30_39 count");
+		Assertions.assertEquals(female40_49Ref, female40_49, "Wrong female40_49 count");
+		Assertions.assertEquals(female50_64Ref, female50_64, "Wrong female50_64 count");
+		Assertions.assertEquals(female65_74Ref, female65_74, "Wrong female65_74 count");
+		Assertions.assertEquals(female75PlusRef, female75Plus, "Wrong female75Plus count");
+		Assertions.assertEquals(male65_74Ref, male65_74, "Wrong male65_74 count");
 
-		Assert.assertTrue("", new File(utils.getOutputDirectory() + "persons1.dat.gz").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory() + "persons1.dat.gz").exists(), "");
 
 	}
 

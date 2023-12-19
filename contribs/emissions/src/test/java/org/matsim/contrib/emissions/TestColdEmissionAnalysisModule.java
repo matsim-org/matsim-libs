@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -70,11 +70,11 @@ public class TestColdEmissionAnalysisModule {
 	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private final int numberOfColdEmissions = pollutants.size();
 	// strings for test cases
-	
+
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
 	// size classes, and "<1,4L" or ">=2L" for the emissions concept.  Tried to make it consistent,
 	// but I don't know if it is still testing the original functionality.  kai, jul'18
-	
+
 	// first case: complete data - corresponding entry in average table
 	private static final String petrol_technology = "petrol";
 	private static final String none_sizeClass = "average";
@@ -95,7 +95,7 @@ public class TestColdEmissionAnalysisModule {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double fakeFactor = -1.;
-	
+
 	private boolean excep = false;
 
 
@@ -104,7 +104,7 @@ public class TestColdEmissionAnalysisModule {
 	 * all of them should throw exceptions
 	 */
 	@Test
-	public void calculateColdEmissionsAndThrowEventTest_Exceptions() {
+	void calculateColdEmissionsAndThrowEventTest_Exceptions() {
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 		List<Id<VehicleType>> testCasesExceptions = new ArrayList<>();
@@ -116,7 +116,7 @@ public class TestColdEmissionAnalysisModule {
 		testCasesExceptions.add( Id.create( "", VehicleType.class ) );
 		//case: null id
 		testCasesExceptions.add( null );
-		
+
 		for ( Id<VehicleType> vehicleTypeId : testCasesExceptions ) {
 			String message = "'" + vehicleTypeId + "'" + " was used to calculate cold emissions and generate an emissions event."
 					+ "It should instead throw an exception because it is not a valid vehicle information string.";
@@ -128,18 +128,18 @@ public class TestColdEmissionAnalysisModule {
 			} catch (Exception e) {
 				excep = true;
 			}
-			Assert.assertTrue(message, excep);
+			Assertions.assertTrue(excep, message);
 			excep = false;
 		}
 
 	}
 
 	@Test
-	public void calculateColdEmissionsAndThrowEventTest_minimalVehicleInformation() {
+	void calculateColdEmissionsAndThrowEventTest_minimalVehicleInformation() {
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 		excep = false;
-		
+
 		// case: no specifications for technology, size, class, em concept
 		// string has no semicolons as separators - use average values
 		Id<VehicleType> vehInfo11 = Id.create("PASSENGER_CAR", VehicleType.class );
@@ -154,17 +154,17 @@ public class TestColdEmissionAnalysisModule {
 
 		String message = "The expected emissions for an emissions event with vehicle information string '" + vehInfo11 + "' are " +
 						     numberOfColdEmissions * averageAverageFactor + " but were " + sumOfEmissions;
-		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, sumOfEmissions, MatsimTestUtils.EPSILON );
-		
+		Assertions.assertEquals( numberOfColdEmissions * averageAverageFactor, sumOfEmissions, MatsimTestUtils.EPSILON, message );
+
 	}
-	
+
 	private static ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
-		
+
 		fillAveragesTable( avgHbefaColdTable );
 		fillDetailedTable( detailedHbefaColdTable );
-		
+
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -172,7 +172,7 @@ public class TestColdEmissionAnalysisModule {
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		return new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
-		
+
 	}
 
 
@@ -196,36 +196,36 @@ public class TestColdEmissionAnalysisModule {
 		}
 
 	}
-	
+
 	private static void fillAveragesTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable ) {
 		// create all needed and one unneeded entry for the average table
 		{
 			// add passenger car entry "average;average;average":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( "average", "average", "average" ) ;
-			
+
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(averageAverageFactor), PASSENGER_CAR );
 		}
 		{
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
+
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( averagePetrolFactor ), PASSENGER_CAR );
 		}
 		{
 			// duplicate from detailed table, but with different emission factor.
 			// this should not be used but is needed to assure that the detailed table is tried before the average table
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
+
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), PASSENGER_CAR );
 		}
 		{
 			// add HGV entry "petrol;none;none".
 			// (pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
 			final HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
+
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
 	}
-	
+
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
@@ -237,5 +237,5 @@ public class TestColdEmissionAnalysisModule {
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
-	
+
 }

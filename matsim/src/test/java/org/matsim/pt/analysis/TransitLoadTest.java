@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -47,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
 public class TransitLoadTest {
 
 	@Test
-	public void testTransitLoad_singleLine() {
+	void testTransitLoad_singleLine() {
 		TransitScheduleFactory factory = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = factory.createTransitSchedule();
 		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create(0, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
@@ -114,48 +114,48 @@ public class TransitLoadTest {
 		tl.handleEvent(new PersonLeavesVehicleEvent(7.45*3600-20, Id.create("ptDriver1", Person.class), vehicleIdDep1));
 
 
-		Assert.assertEquals(1, tl.getLoadAtDeparture(line1, route1, stop1, dep1));
-		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop2, dep1));
-		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop3, dep1));
-		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop4, dep1));
+		Assertions.assertEquals(1, tl.getLoadAtDeparture(line1, route1, stop1, dep1));
+		Assertions.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop2, dep1));
+		Assertions.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop3, dep1));
+		Assertions.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop4, dep1));
 		
-		Assert.assertEquals(1, tl.getLoadAtDeparture(line1, route1, 0, dep1));
-		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 1, dep1));
-		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 2, dep1));
-		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 3, dep1));
-		Assert.assertEquals(0, tl.getLoadAtDeparture(line1, route1, 4, dep1));
+		Assertions.assertEquals(1, tl.getLoadAtDeparture(line1, route1, 0, dep1));
+		Assertions.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 1, dep1));
+		Assertions.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 2, dep1));
+		Assertions.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 3, dep1));
+		Assertions.assertEquals(0, tl.getLoadAtDeparture(line1, route1, 4, dep1));
 
 		TransitLoad.StopInformation si = tl.getDepartureStopInformation(line1, route1, stop1, dep1).get(0);
-		Assert.assertEquals(7.0*3600-10, si.arrivalTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(7.0*3600+10, si.departureTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, si.nOfEntering);
-		Assert.assertEquals(0, si.nOfLeaving);
+		Assertions.assertEquals(7.0*3600-10, si.arrivalTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7.0*3600+10, si.departureTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, si.nOfEntering);
+		Assertions.assertEquals(0, si.nOfLeaving);
 
 		si = tl.getDepartureStopInformation(line1, route1, stop2, dep1).get(0);
-		Assert.assertEquals(7.1*3600-25, si.arrivalTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(7.1*3600+25, si.departureTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, si.nOfEntering);
-		Assert.assertEquals(1, si.nOfLeaving);
+		Assertions.assertEquals(7.1*3600-25, si.arrivalTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7.1*3600+25, si.departureTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, si.nOfEntering);
+		Assertions.assertEquals(1, si.nOfLeaving);
 
 		si = tl.getDepartureStopInformation(line1, route1, stop3, dep1).get(0);
-		Assert.assertEquals(7.2*3600-15, si.arrivalTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(7.2*3600+20, si.departureTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, si.nOfEntering);
-		Assert.assertEquals(1, si.nOfLeaving);
+		Assertions.assertEquals(7.2*3600-15, si.arrivalTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7.2*3600+20, si.departureTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, si.nOfEntering);
+		Assertions.assertEquals(1, si.nOfLeaving);
 
 		si = tl.getDepartureStopInformation(line1, route1, stop4, dep1).get(0);
-		Assert.assertEquals(7.3*3600-20, si.arrivalTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(7.3*3600+5, si.departureTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(0, si.nOfEntering);
-		Assert.assertEquals(0, si.nOfLeaving);
+		Assertions.assertEquals(7.3*3600-20, si.arrivalTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7.3*3600+5, si.departureTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0, si.nOfEntering);
+		Assertions.assertEquals(0, si.nOfLeaving);
 		
 		si = tl.getDepartureStopInformation(line1, route1, stop1, dep1).get(1);
-		Assert.assertEquals(7.4*3600-20, si.arrivalTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(7.4*3600+5, si.departureTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(0, si.nOfEntering);
-		Assert.assertEquals(2, si.nOfLeaving);
+		Assertions.assertEquals(7.4*3600-20, si.arrivalTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7.4*3600+5, si.departureTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0, si.nOfEntering);
+		Assertions.assertEquals(2, si.nOfLeaving);
 
 		List<TransitLoad.StopInformation> siList = tl.getDepartureStopInformation(line1, route1, stop1, dep2);
-		Assert.assertNull(siList);
+		Assertions.assertNull(siList);
 	}
 }

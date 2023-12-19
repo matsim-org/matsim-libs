@@ -20,14 +20,14 @@
 
 package org.matsim.integration.timevariantnetworks;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -75,11 +75,12 @@ import org.matsim.vehicles.Vehicle;
  */
 public class QSimIntegrationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testFreespeed() {
+	@Test
+	void testFreespeed() {
 		Config config = utils.loadConfig((String)null);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -115,8 +116,8 @@ public class QSimIntegrationTest {
 			.run();
 
 		// check that we get the expected result
-		assertEquals("Person 1 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, MatsimTestUtils.EPSILON);
-		assertEquals("Person 2 should travel for 6 seconds.", 5.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, MatsimTestUtils.EPSILON);
+		assertEquals(10.0 + 1.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, MatsimTestUtils.EPSILON, "Person 1 should travel for 11 seconds.");
+		assertEquals(5.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, MatsimTestUtils.EPSILON, "Person 2 should travel for 6 seconds.");
 	}
 
 	/**
@@ -125,7 +126,8 @@ public class QSimIntegrationTest {
 	 *
 	 * @author illenberger
 	 */
-	@Test public void testCapacity() {
+	@Test
+	void testCapacity() {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
@@ -185,8 +187,8 @@ public class QSimIntegrationTest {
 		 * link 3 (because of the spill-back). The last person of the second
 		 * wave should have free-flow travel time.
 		 */
-		assertEquals("Person 1 should travel for 20 seconds.", 20.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, MatsimTestUtils.EPSILON);
-		assertEquals("Person 2 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, MatsimTestUtils.EPSILON);
+		assertEquals(20.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, MatsimTestUtils.EPSILON, "Person 1 should travel for 20 seconds.");
+		assertEquals(10.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, MatsimTestUtils.EPSILON, "Person 2 should travel for 11 seconds.");
 
 	}
 
@@ -196,7 +198,8 @@ public class QSimIntegrationTest {
 	 *
 	 * @author dgrether
 	 */
-	@Test public void testZeroCapacity() {
+	@Test
+	void testZeroCapacity() {
 		final double capacityFactor = 0.0;
 
 		Config config = utils.loadConfig((String)null);
@@ -246,9 +249,9 @@ public class QSimIntegrationTest {
 			@Override
 			public void handleEvent(LinkEnterEvent event) {
 				if (id2.equals(event.getLinkId()))
-					Assert.assertEquals(1.0, event.getTime(), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(1.0, event.getTime(), MatsimTestUtils.EPSILON);
 				if (id3.equals(event.getLinkId()))
-					Assert.fail("Link 3 should never be reached as capacity of link 2 is set to 0");
+					Assertions.fail("Link 3 should never be reached as capacity of link 2 is set to 0");
 			}
 		});
 
@@ -258,9 +261,9 @@ public class QSimIntegrationTest {
 
 			@Override
 			public void handleEvent(PersonStuckEvent event) {
-				Assert.assertEquals(id2, event.getLinkId());
-				Assert.assertEquals(simEndTime, event.getTime(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals(personId, event.getPersonId());
+				Assertions.assertEquals(id2, event.getLinkId());
+				Assertions.assertEquals(simEndTime, event.getTime(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(personId, event.getPersonId());
 			}
 		});
 

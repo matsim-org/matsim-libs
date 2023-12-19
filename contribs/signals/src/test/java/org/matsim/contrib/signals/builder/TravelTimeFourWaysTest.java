@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.signals.builder;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -49,11 +49,11 @@ public class TravelTimeFourWaysTest {
 
 	private static final String EVENTSFILE = "events.xml.gz";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testTrafficLightIntersection4arms() {
+	void testTrafficLightIntersection4arms() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
@@ -62,7 +62,7 @@ public class TravelTimeFourWaysTest {
 	}
 
 	@Test
-	public void testTrafficLightIntersection4armsWithUTurn() {
+	void testTrafficLightIntersection4armsWithUTurn() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans_uturn.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
@@ -125,7 +125,7 @@ public class TravelTimeFourWaysTest {
 
 		eventsXmlWriter.closeFile();
 //	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
 	}
 
 }

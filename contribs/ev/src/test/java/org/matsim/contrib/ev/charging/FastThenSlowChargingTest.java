@@ -22,7 +22,7 @@ package org.matsim.contrib.ev.charging;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
@@ -41,7 +41,7 @@ import com.google.common.collect.ImmutableList;
 public class FastThenSlowChargingTest {
 
 	@Test
-	public void calcChargingPower() {
+	void calcChargingPower() {
 		//fast charger (2 c)
 		assertCalcChargingPower(100, 0, 200, 175);
 		assertCalcChargingPower(100, 50, 200, 175);
@@ -76,7 +76,7 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcChargingTime_singleSection() {
+	void calcChargingTime_singleSection() {
 		//fast charger (2 c)
 		assertCalcChargingTime(100, 0, 0, 200, 0);
 		assertCalcChargingTime(100, 0, 17.5, 200, 360);
@@ -106,7 +106,7 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcChargingTime_crossSection() {
+	void calcChargingTime_crossSection() {
 		//fast charger (2 c)
 		assertCalcChargingTime(100, 32.5, 17.5 + 12.5, 200, 2 * 360);
 		assertCalcChargingTime(100, 62.5, 12.5 + 5, 200, 2 * 360);
@@ -124,7 +124,7 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcChargingTime_exceptions() {
+	void calcChargingTime_exceptions() {
 		Assertions.assertThatThrownBy(() -> assertCalcChargingTime(100, 0, -1, 200, 2 * 360))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("Energy is negative: ");
@@ -168,7 +168,7 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcEnergyCharge() {
+	void calcEnergyCharge() {
 		assertCalcEnergyCharge(100, 100, 200, 10, 0);
 		assertCalcEnergyCharge(100, 76, 200, 10, 500000);
 		assertCalcEnergyCharge(100, 51, 200, 10, 1250000);
@@ -186,14 +186,14 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcEnergyCharged_exceptions() {
+	void calcEnergyCharged_exceptions() {
 		Assertions.assertThatThrownBy(() -> assertCalcEnergyCharge(100, 100, 10, -1, 0))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("Charging period is negative: ");
 	}
 
 	@Test
-	public void calcEnergyChargeAndVerifyWithDuration() {
+	void calcEnergyChargeAndVerifyWithDuration() {
 		assertEnergyAndDurationCalcCompliance(100, 76, 200, 100);
 		assertEnergyAndDurationCalcCompliance(100, 51, 200, 100);
 		assertEnergyAndDurationCalcCompliance(100, 50, 200, 100);

@@ -1,6 +1,6 @@
 package org.matsim.lanes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,8 +55,8 @@ public class LanesUtilsTest {
         return laneLinkAssignment;
     }
 
-    @Test
-    public void correctOrder() {
+	@Test
+	void correctOrder() {
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         NetworkFactory f = scenario.getNetwork().getFactory();

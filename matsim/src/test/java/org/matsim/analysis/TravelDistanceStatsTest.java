@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,11 +51,11 @@ public class TravelDistanceStatsTest {
 	Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTravelDistanceStats() {
+	void testTravelDistanceStats() {
 
 		final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 
@@ -386,16 +386,18 @@ public class TravelDistanceStatsTest {
 					double avgLegvalue = (avglegdis > 0) ? Double.parseDouble(column[avglegdis]) : 0;
 					double avgTripvalue = (avgtripdis > 0) ? Double.parseDouble(column[avgtripdis]) : 0;
 
-					Assert.assertEquals("avg. Average Trip distance does not match", (legSum / totalTrip), avgTripvalue,
-							0);
-					Assert.assertEquals("avg. Average Leg distance does not match", (legSum / totalLeg), avgLegvalue,
-							0);
+					Assertions.assertEquals((legSum / totalTrip), avgTripvalue,
+							0,
+							"avg. Average Trip distance does not match");
+					Assertions.assertEquals((legSum / totalLeg), avgLegvalue,
+							0,
+							"avg. Average Leg distance does not match");
 
 					break;
 				}
 				iteration++;
 			}
-			Assert.assertEquals("There are too less entries.", itr, iteration);
+			Assertions.assertEquals(itr, iteration, "There are too less entries.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

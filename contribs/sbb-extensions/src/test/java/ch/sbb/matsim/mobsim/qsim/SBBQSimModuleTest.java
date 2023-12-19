@@ -24,10 +24,10 @@ import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import com.google.inject.Provides;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -44,16 +44,16 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SBBQSimModuleTest {
 
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         System.setProperty("matsim.preferLocalDtds", "true");
     }
 
-    // https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
-    @Test
-    public void testIntegration() {
+	// https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
+	@Test
+	void testIntegration() {
         String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
                 "<config>\n" +
@@ -95,7 +95,7 @@ public class SBBQSimModuleTest {
 
         // this test mostly checks that no exception occurred
 
-        Assert.assertTrue(config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
+        Assertions.assertTrue(config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
     }
 
 }

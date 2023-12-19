@@ -21,13 +21,13 @@ package org.matsim.contrib.taxi.run.examples;
 
 import java.net.URL;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunTaxiExampleTestIT {
 	@Test
-	public void testRun() {
+	void testRun() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
 		RunTaxiExample.run(configUrl, false, 0);
 	}

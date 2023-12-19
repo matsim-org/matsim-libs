@@ -23,9 +23,9 @@
  */
 package org.matsim.contrib.otfvis;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -48,11 +48,11 @@ import static org.matsim.core.config.groups.ControllerConfigGroup.*;
  */
 public class OTFVisIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testConvert() {
+	void testConvert() {
 		String networkFilename = "test/scenarios/equil/network.xml";
 		String eventsFilename = "test/scenarios/equil/events.xml";
 		String mviFilename = testUtils.getOutputDirectory()+"/events.mvi";
@@ -61,11 +61,11 @@ public class OTFVisIT {
 		OTFVis.main(args);
 
 		File f = new File(mviFilename);
-		Assert.assertTrue("No mvi file written!", f.exists());
+		Assertions.assertTrue(f.exists(), "No mvi file written!");
 	}
 
 	@Test
-	public void testOTFVisSnapshotWriterOnQSim() {
+	void testOTFVisSnapshotWriterOnQSim() {
 		final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(2);
 		config.controller().setWriteEventsInterval(0);
@@ -83,9 +83,9 @@ public class OTFVisIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
 	}
 
 }

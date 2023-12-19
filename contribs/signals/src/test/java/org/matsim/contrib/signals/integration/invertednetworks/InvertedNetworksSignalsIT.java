@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.integration.invertednetworks;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.builder.Signals;
@@ -43,11 +43,11 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class InvertedNetworksSignalsIT {
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void testSignalsInvertedNetworkRouting() {
+	final void testSignalsInvertedNetworkRouting() {
 		InvertedNetworkRoutingSignalsFixture f = new InvertedNetworkRoutingSignalsFixture(false, false, true);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
@@ -63,11 +63,11 @@ public class InvertedNetworksSignalsIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 
 	@Test
-	public final void testSignalsInvertedNetworkRoutingIterations() {
+	final void testSignalsInvertedNetworkRoutingIterations() {
 		InvertedNetworkRoutingSignalsFixture f = new InvertedNetworkRoutingSignalsFixture(false, false, true);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().controller().setLastIteration(1);
@@ -91,7 +91,7 @@ public class InvertedNetworksSignalsIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 
 

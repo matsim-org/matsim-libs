@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -37,8 +37,8 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -49,8 +49,7 @@ import com.google.inject.Inject;
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
 public final class DriveDischargingHandler
-	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler,
-	MobsimAfterSimStepListener {
+	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
 
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
@@ -73,8 +72,8 @@ public final class DriveDischargingHandler
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 
-	private final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
-	private final List<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ArrayList<>();
+	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
+	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
 
 	@Inject
 	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
@@ -104,27 +103,53 @@ public final class DriveDischargingHandler
 	}
 
 	@Override
-	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+	public void onPrepareSim() {
+	}
+
+	@Override
+	public void afterSim() {
+		// process remaining events
+		doSimStep(Double.POSITIVE_INFINITY);
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+	}
+
+	@Override
+	public void doSimStep(double time) {
 		// We want to process events in the main thread (instead of the event handling threads).
 		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
-		for (var event : linkLeaveEvents) {
-			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+		var linkLeaveIterator = linkLeaveEvents.iterator();
+		while (linkLeaveIterator.hasNext()) {
+			var event = linkLeaveIterator.next();
+			if (event.getTime() == time) {
+				break;
+			}
+
+			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
 			if (evDrive != null) {
 				evDrive.movedOverNodeTime = event.getTime();
 			}
+			linkLeaveIterator.remove();
 		}
-		linkLeaveEvents.clear();
 
-		for (var event : trafficLeaveEvents) {
-			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+		var trafficLeaveIterator = trafficLeaveEvents.iterator();
+		while (trafficLeaveIterator.hasNext()) {
+			var event = trafficLeaveIterator.next();
+			if (event.getTime() == time) {
+				break;
+			}
+
+			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
 			if (evDrive != null) {
 				evDrives.remove(evDrive.vehicleId);
 			}
+			trafficLeaveIterator.remove();
 		}
-		trafficLeaveEvents.clear();
 	}
 
-	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
+	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime, double now) {
 		EvDrive evDrive = evDrives.get(vehicleId);
 		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
 			Link link = network.getLinks().get(linkId);
@@ -135,8 +160,8 @@ public final class DriveDischargingHandler
 			//Energy consumption may be negative on links with negative slope
 			ev.getBattery()
 				.dischargeEnergy(energy,
-					missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
-			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
+					missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(now, ev.getId(), link.getId(), missingEnergy)));
+			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(now, vehicleId, linkId, energy, ev.getBattery().getCharge()));
 		}
 		return evDrive;
 	}

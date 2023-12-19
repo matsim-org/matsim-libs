@@ -20,14 +20,14 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RailsimCalcTest {
 
 	@Test
-	public void testCalcAndSolveTraveledDist() {
+	void testCalcAndSolveTraveledDist() {
 
 		assertThat(RailsimCalc.calcTraveledDist(5, 2, 0))
 			.isEqualTo(10);
@@ -47,7 +47,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void testCalcAndSolveTraveledDistNegative() {
+	void testCalcAndSolveTraveledDistNegative() {
 
 		double d = RailsimCalc.calcTraveledDist(5, 5, -1);
 
@@ -64,7 +64,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void testMaxSpeed() {
+	void testMaxSpeed() {
 
 		double dist = 1000;
 
@@ -86,7 +86,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void testCalcTargetDecel() {
+	void testCalcTargetDecel() {
 
 		double d = RailsimCalc.calcTargetDecel(1000, 0, 10);
 
@@ -101,7 +101,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void testCalcTargetSpeed() {
+	void testCalcTargetSpeed() {
 
 		RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(100, 0.5, 0.5, 0, 23, 0);
 
@@ -134,7 +134,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void testCalcTargetSpeedForStop() {
+	void testCalcTargetSpeedForStop() {
 
 		double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
 

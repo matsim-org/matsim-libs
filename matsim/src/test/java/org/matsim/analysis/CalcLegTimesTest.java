@@ -23,11 +23,11 @@ package org.matsim.analysis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -56,8 +56,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CalcLegTimesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	public static final String BASE_FILE_NAME = "legdurations.txt";
@@ -67,7 +67,7 @@ public class CalcLegTimesTest {
 	private Population population = null;
 	private Network network = null;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		utils.loadConfig((String)null);
 
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -97,12 +97,13 @@ public class CalcLegTimesTest {
 		this.network.addLink(link);
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.population = null;
 		this.network = null;
 	}
 
-	@Test public void testNoEvents() throws IOException {
+	@Test
+	void testNoEvents() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -114,7 +115,8 @@ public class CalcLegTimesTest {
 		this.runTest(testee);
 	}
 
-	@Test public void testAveraging() throws IOException {
+	@Test
+	void testAveraging() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -165,7 +167,7 @@ public class CalcLegTimesTest {
 
 		calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
-		Assert.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
+		Assertions.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
 				readResult(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
 
 	}

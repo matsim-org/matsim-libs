@@ -30,8 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -72,7 +71,7 @@ public class DrtSpeedUpTest {
 	private final ControllerConfigGroup controlerConfig = new ControllerConfigGroup();
 
 	@Test
-	public final void test_computeMovingAverage() {
+	final void test_computeMovingAverage() {
 		List<Double> list = List.of(2., 5., 22.);
 		assertThat(computeMovingAverage(2, list)).isEqualTo(27. / 2);
 		assertThat(computeMovingAverage(3, list)).isEqualTo(29. / 3);
@@ -80,7 +79,7 @@ public class DrtSpeedUpTest {
 	}
 
 	@Test
-	public void test_isTeleportDrtUsers() {
+	void test_isTeleportDrtUsers() {
 		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.1;
 		drtSpeedUpParams.fractionOfIterationsSwitchOff = 0.9;
 		drtSpeedUpParams.intervalDetailedIteration = 10;
@@ -124,7 +123,7 @@ public class DrtSpeedUpTest {
 	private final DrtEventSequenceCollector requestAnalyzer = mock(DrtEventSequenceCollector.class);
 
 	@Test
-	public void test_useOnlyInitialEstimates_noRegression() {
+	void test_useOnlyInitialEstimates_noRegression() {
 		//iters 0 & 100 - simulated, iters 1...99 - teleported
 		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.0;
 		drtSpeedUpParams.fractionOfIterationsSwitchOff = 1.0;
@@ -161,7 +160,7 @@ public class DrtSpeedUpTest {
 	}
 
 	@Test
-	public void test_useAveragesFromLastTwoSimulations_noRegression() {
+	void test_useAveragesFromLastTwoSimulations_noRegression() {
 		//iters 0, 2, 4 - simulated, iters 1, 3 - teleported
 		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.0;
 		drtSpeedUpParams.fractionOfIterationsSwitchOff = 1.0;
@@ -209,7 +208,7 @@ public class DrtSpeedUpTest {
 	}
 
 	@Test
-	public void test_linearRegression() {
+	void test_linearRegression() {
 		//iters 0, 2, 4 - simulated, iters 1, 3 - teleported
 		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.0;
 		drtSpeedUpParams.fractionOfIterationsSwitchOff = 1.0;

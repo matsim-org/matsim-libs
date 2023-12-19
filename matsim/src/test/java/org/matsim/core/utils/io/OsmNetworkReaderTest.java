@@ -19,9 +19,9 @@
 
 package org.matsim.core.utils.io;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -41,10 +41,10 @@ import java.io.ByteArrayInputStream;
  */
 public class OsmNetworkReaderTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testConversion() {
+	void testConversion() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -54,16 +54,16 @@ public class OsmNetworkReaderTest {
 
 		new OsmNetworkReader(net,ct).parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 399, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 872, net.getLinks().size());
+		Assertions.assertEquals(399, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(872, net.getLinks().size(), "number of links is wrong.");
 
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 344, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 794, net.getLinks().size());
+		Assertions.assertEquals(344, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(794, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
-	public void testConversionWithDetails() {
+	void testConversionWithDetails() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -75,16 +75,16 @@ public class OsmNetworkReaderTest {
 		reader.setKeepPaths(true);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3535, net.getLinks().size());
+		Assertions.assertEquals(1844, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3535, net.getLinks().size(), "number of links is wrong.");
 
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3168, net.getLinks().size());
+		Assertions.assertEquals(1561, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3168, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
-	public void testConversionWithDetails_witMemoryOptimized() {
+	void testConversionWithDetails_witMemoryOptimized() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -97,16 +97,16 @@ public class OsmNetworkReaderTest {
 		reader.setMemoryOptimization(true);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3535, net.getLinks().size());
+		Assertions.assertEquals(1844, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3535, net.getLinks().size(), "number of links is wrong.");
 
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3168, net.getLinks().size());
+		Assertions.assertEquals(1561, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(3168, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
-	public void testConversionWithSettings() {
+	void testConversionWithSettings() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -119,15 +119,15 @@ public class OsmNetworkReaderTest {
 		reader.setMemoryOptimization(false);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 67, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 122, net.getLinks().size());
+		Assertions.assertEquals(67, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(122, net.getLinks().size(), "number of links is wrong.");
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 57, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 114, net.getLinks().size());
+		Assertions.assertEquals(57, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(114, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
-	public void testConversionWithSettings_withMemoryOptimization() {
+	void testConversionWithSettings_withMemoryOptimization() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -140,15 +140,15 @@ public class OsmNetworkReaderTest {
 		reader.setMemoryOptimization(true);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 67, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 122, net.getLinks().size());
+		Assertions.assertEquals(67, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(122, net.getLinks().size(), "number of links is wrong.");
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 57, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 114, net.getLinks().size());
+		Assertions.assertEquals(57, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(114, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
-	public void testConversionWithSettingsAndDetails() {
+	void testConversionWithSettingsAndDetails() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -161,15 +161,15 @@ public class OsmNetworkReaderTest {
 		reader.setHierarchyLayer(47.4, 8.5, 47.2, 8.6, 5);
 		reader.parse(filename);
 
-		Assert.assertEquals("number of nodes is wrong.", 769, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 1016, net.getLinks().size());
+		Assertions.assertEquals(769, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(1016, net.getLinks().size(), "number of links is wrong.");
 		new NetworkCleaner().run(net);
-		Assert.assertEquals("number of nodes is wrong.", 441, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 841, net.getLinks().size());
+		Assertions.assertEquals(441, net.getNodes().size(), "number of nodes is wrong.");
+		Assertions.assertEquals(841, net.getLinks().size(), "number of links is wrong.");
 	}
 
 	@Test
-	public void testConversion_MissingNodeRef() {
+	void testConversion_MissingNodeRef() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
@@ -195,16 +195,16 @@ public class OsmNetworkReaderTest {
 				"  </way>\n" +
 				"</osm>";
 		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
-		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getNodes().size());
-		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getLinks().size());
+		Assertions.assertEquals(0, net.getNodes().size(), "incomplete ways should not be converted.");
+		Assertions.assertEquals(0, net.getLinks().size(), "incomplete ways should not be converted.");
 	}
-	
+
 	@Test
-	public void testConversion_maxspeeds() {
+	void testConversion_maxspeeds() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
-		
+
 		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
 		reader.setKeepPaths(true);
 		reader.setHighwayDefaults(1, "motorway", 1, 50.0/3.6, 1.0, 2000.0);
@@ -242,34 +242,34 @@ public class OsmNetworkReaderTest {
 		 * - links 3 & 4: for way 2, in both directions
 		 * - links 5 & 6: for way 3, in both directions
 		 */
-		
+
 		Link link1 = net.getLinks().get(Id.create("1", Link.class));
 		Link link3 = net.getLinks().get(Id.create("3", Link.class));
 		Link link5 = net.getLinks().get(Id.create("5", Link.class));
-		Assert.assertNotNull("Could not find converted link 1.", link1);
-		Assert.assertNotNull("Could not find converted link 3", link3);
-		Assert.assertNotNull("Could not find converted link 5", link5);
-		Assert.assertEquals(50.0/3.6, link1.getFreespeed(), 1e-8);
-		Assert.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
-		Assert.assertEquals(60.0/3.6, link5.getFreespeed(), 1e-8);
+		Assertions.assertNotNull(link1, "Could not find converted link 1.");
+		Assertions.assertNotNull(link3, "Could not find converted link 3");
+		Assertions.assertNotNull(link5, "Could not find converted link 5");
+		Assertions.assertEquals(50.0/3.6, link1.getFreespeed(), 1e-8);
+		Assertions.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
+		Assertions.assertEquals(60.0/3.6, link5.getFreespeed(), 1e-8);
 	}
 
 	/**
 	 * Tests that the conversion does not fail if a way does not contain any node. This might
-	 * happen if the osm-file was edited, e.g. with JOSM, and a link was deleted. Then, the way 
+	 * happen if the osm-file was edited, e.g. with JOSM, and a link was deleted. Then, the way
 	 * still exists, but marked as deleted, and all nodes removed from it.
-	 * Reported by jjoubert,15nov2012. 
+	 * Reported by jjoubert,15nov2012.
 	 */
 	@Test
-	public void testConversion_emptyWay() {
+	void testConversion_emptyWay() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
-		
+
 		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
 		reader.setKeepPaths(true);
 		reader.setHighwayDefaults(1, "motorway", 1, 50.0/3.6, 1.0, 2000.0);
-		
+
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<osm version=\"0.6\" generator=\"Osmosis 0.36\">\n" +
 				"  <bound box=\"0,0,90,180\" origin=\"0.37-SNAPSHOT\"/>\n" +
@@ -293,16 +293,16 @@ public class OsmNetworkReaderTest {
 				"  </way>\n" +
 				"</osm>";
 		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
-		
+
 		/* this creates 4 links:
 		 * - links 1 & 2: for way 1, in both directions
 		 * - links 3 & 4: for way 2, in both directions
 		 */
-		
+
 		Link link1 = net.getLinks().get(Id.create("1", Link.class));
 		Link link3 = net.getLinks().get(Id.create("3", Link.class));
-		Assert.assertNotNull("Could not find converted link 1.", link1);
-		Assert.assertNotNull("Could not find converted link 3", link3);
-		Assert.assertNull(net.getLinks().get(Id.create("5", Link.class)));
+		Assertions.assertNotNull(link1, "Could not find converted link 1.");
+		Assertions.assertNotNull(link3, "Could not find converted link 3");
+		Assertions.assertNull(net.getLinks().get(Id.create("5", Link.class)));
 	}
 }

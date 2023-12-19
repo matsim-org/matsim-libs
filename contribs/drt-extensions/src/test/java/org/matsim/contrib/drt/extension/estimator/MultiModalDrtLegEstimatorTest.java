@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.estimator;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
@@ -26,12 +26,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MultiModalDrtLegEstimatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Controler controler;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		Config config = DrtTestScenario.loadConfig(utils);
@@ -75,7 +75,7 @@ public class MultiModalDrtLegEstimatorTest {
 	}
 
 	@Test
-	public void run() {
+	void run() {
 
 		String out = utils.getOutputDirectory();
 

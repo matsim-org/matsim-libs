@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package org.matsim.population.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -62,7 +62,7 @@ public class TripsToLegsAlgorithmTest {
 	private static final String DUMMY_2 = "dummy_2 interaction";
 
 	@Test
-	public void testMonoLegPlan() throws Exception {
+	void testMonoLegPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -93,7 +93,7 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	@Test
-	public void testMultiLegPlan() throws Exception {
+	void testMultiLegPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -134,7 +134,7 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	@Test
-	public void testDummyActsPlan() throws Exception {
+	void testDummyActsPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -182,7 +182,7 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	@Test
-	public void testPtPlan() throws Exception {
+	void testPtPlan() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
@@ -239,9 +239,9 @@ public class TripsToLegsAlgorithmTest {
 		algorithm.run( fixture.plan );
 
 		assertEquals(
-				"wrong structure size for fixture <<"+fixture.name+">>",
 				fixture.expectedPlanStructure.size(),
-				fixture.plan.getPlanElements().size());
+				fixture.plan.getPlanElements().size(),
+				"wrong structure size for fixture <<"+fixture.name+">>");
 
 		final Iterator<PlanElement> expIter = fixture.expectedPlanStructure.iterator();
 		final Iterator<PlanElement> actualIter = fixture.plan.getPlanElements().iterator();
@@ -252,23 +252,23 @@ public class TripsToLegsAlgorithmTest {
 
 			if ( actual instanceof Activity ) {
 				assertTrue(
-						"incompatible Activity/Leg sequence in fixture <<"+fixture.name+">>",
-						expected instanceof Activity );
+						expected instanceof Activity,
+						"incompatible Activity/Leg sequence in fixture <<"+fixture.name+">>" );
 
 				assertEquals(
-						"incompatible activity types in fixture <<"+fixture.name+">>",
 						((Activity) expected).getType(),
-						((Activity) actual).getType());
+						((Activity) actual).getType(),
+						"incompatible activity types in fixture <<"+fixture.name+">>");
 			}
 			else if ( actual instanceof Leg ) {
 				assertTrue(
-						"incompatible types sequence in fixture <<"+fixture.name+">>",
-						expected instanceof Leg );
+						expected instanceof Leg,
+						"incompatible types sequence in fixture <<"+fixture.name+">>" );
 
 				assertEquals(
-						"incompatible leg modes in fixture <<"+fixture.name+">>",
 						((Leg) expected).getMode(),
-						((Leg) actual).getMode());
+						((Leg) actual).getMode(),
+						"incompatible leg modes in fixture <<"+fixture.name+">>");
 			}
 			else {
 				throw new RuntimeException( actual.getClass().getName() );

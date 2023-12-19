@@ -3,8 +3,8 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -17,7 +17,7 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 	TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> leave = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 
 	@Test
-	public void testVehId2PersonEnterLeaveVehicleMap() {
+	void testVehId2PersonEnterLeaveVehicleMap() {
 
 //	    assign Ids to routes, vehicles and agents to be used in Test
 
@@ -59,17 +59,17 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 //	    test
 
 //	    Assert.assertEquals(enter.get(vehId1).get(0), test.getVehId2PersonEnterEventMap().get(vehId1).get(0));
-	    Assert.assertEquals(event1.getTime(), test.getVehId2PersonEnterEventMap().get(vehId1).get(0).getTime(), 0.);
+	    Assertions.assertEquals(event1.getTime(), test.getVehId2PersonEnterEventMap().get(vehId1).get(0).getTime(), 0.);
 
 //	    Assert.assertEquals(enter.get(vehId1).get(1), test.getVehId2PersonEnterEventMap().get(vehId1).get(1));
-	    Assert.assertEquals(event2.getTime(), test.getVehId2PersonEnterEventMap().get(vehId1).get(1).getTime(), 0.);
+	    Assertions.assertEquals(event2.getTime(), test.getVehId2PersonEnterEventMap().get(vehId1).get(1).getTime(), 0.);
 
 
 //	    Assert.assertEquals(leave.get(vehId2).get(0), test.getVehId2PersonLeaveEventMap().get(vehId2).get(0));
-	    Assert.assertEquals(event3.getTime(), test.getVehId2PersonLeaveEventMap().get(vehId2).get(0).getTime(), 0.);
+	    Assertions.assertEquals(event3.getTime(), test.getVehId2PersonLeaveEventMap().get(vehId2).get(0).getTime(), 0.);
 
 //	    Assert.assertEquals(leave.get(vehId2).get(1), test.getVehId2PersonLeaveEventMap().get(vehId2).get(1));
-	    Assert.assertEquals(event4.getTime(), test.getVehId2PersonLeaveEventMap().get(vehId2).get(1).getTime(), 0.);
+	    Assertions.assertEquals(event4.getTime(), test.getVehId2PersonLeaveEventMap().get(vehId2).get(1).getTime(), 0.);
 
 
 

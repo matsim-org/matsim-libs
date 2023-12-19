@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +35,7 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class JointPlanFactoryTest {
 	@Test
-	public void testAddAtIndividualLevel() throws Exception {
+	void testAddAtIndividualLevel() throws Exception {
 		final Id<Person> id1 = Id.createPersonId( 1 );
 		final Person person1 = PopulationUtils.getFactory().createPerson(id1);
 
@@ -53,18 +53,18 @@ public class JointPlanFactoryTest {
 		new JointPlanFactory().createJointPlan( jp , true );
 
 		assertEquals(
-				"unexpected number of plans for first person",
 				1,
-				person1.getPlans().size());
+				person1.getPlans().size(),
+				"unexpected number of plans for first person");
 
 		assertEquals(
-				"unexpected number of plans for second person",
 				1,
-				person2.getPlans().size());
+				person2.getPlans().size(),
+				"unexpected number of plans for second person");
 	}
 
 	@Test
-	public void testDoNotAddAtIndividualLevel() throws Exception {
+	void testDoNotAddAtIndividualLevel() throws Exception {
 		final Id id1 = Id.createPersonId( 1 );
 		final Person person1 = PopulationUtils.getFactory().createPerson((Id<Person>) id1);
 
@@ -82,14 +82,14 @@ public class JointPlanFactoryTest {
 		new JointPlanFactory().createJointPlan( jp , false );
 
 		assertEquals(
-				"unexpected number of plans for first person",
 				0,
-				person1.getPlans().size());
+				person1.getPlans().size(),
+				"unexpected number of plans for first person");
 
 		assertEquals(
-				"unexpected number of plans for second person",
 				0,
-				person2.getPlans().size());
+				person2.getPlans().size(),
+				"unexpected number of plans for second person");
 	}
 }
 

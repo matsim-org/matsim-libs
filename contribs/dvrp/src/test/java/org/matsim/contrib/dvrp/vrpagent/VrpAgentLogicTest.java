@@ -26,7 +26,7 @@ import static org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.AFTER_SCHEDULE_ACTI
 import static org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE;
 import static org.mockito.Mockito.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -86,7 +86,7 @@ public class VrpAgentLogicTest {
 			null, dynAgentLogic);
 
 	@Test
-	public void testInitialActivity_unplanned() {
+	void testInitialActivity_unplanned() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		assertThat(initialActivity.getActivityType()).isEqualTo(BEFORE_SCHEDULE_ACTIVITY_TYPE);
@@ -95,7 +95,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testInitialActivity_planned() {
+	void testInitialActivity_planned() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, 90, startLink);
@@ -107,7 +107,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testInitialActivity_started_failure() {
+	void testInitialActivity_started_failure() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, 90, startLink);
@@ -121,7 +121,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_unplanned_completed() {
+	void testNextAction_unplanned_completed() {
 		IdleDynActivity nextAction = (IdleDynActivity)dynAgentLogic.computeNextAction(null,
 				vehicle.getServiceEndTime());
 
@@ -131,7 +131,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_planned_started() {
+	void testNextAction_planned_started() {
 		double time = 10;
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, time, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
@@ -142,7 +142,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_started_started() {
+	void testNextAction_started_started() {
 		double time = 50;
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);
@@ -156,7 +156,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_started_completed() {
+	void testNextAction_started_completed() {
 		double time = 90;
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);

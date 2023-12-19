@@ -24,9 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,15 +64,15 @@ import org.matsim.testcases.MatsimTestUtils;
 */
 public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Id<Link> link01 = Id.createLinkId("link_0_1");
 	private Id<Link> link12 = Id.createLinkId("link_1_2");
 	private Id<Link> link23 = Id.createLinkId("link_2_3");
 
 	@Test
-	public final void testTTviaMobSimAfterSimStepListener() {
+	final void testTTviaMobSimAfterSimStepListener() {
 
 		String outputDirectory = testUtils.getOutputDirectory() + "output_TTviaMobsimAfterSimStepListener/";
 
@@ -130,8 +130,8 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
 		controler.run();
 
-		Assert.assertEquals(true, ttmobsimListener.isCase1());
-		Assert.assertEquals(true, ttmobsimListener.isCase2());
+		Assertions.assertEquals(true, ttmobsimListener.isCase1());
+		Assertions.assertEquals(true, ttmobsimListener.isCase2());
 
 	}
 

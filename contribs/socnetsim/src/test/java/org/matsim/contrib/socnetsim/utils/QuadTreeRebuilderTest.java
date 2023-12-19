@@ -1,42 +1,42 @@
 package org.matsim.contrib.socnetsim.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class QuadTreeRebuilderTest {
 	@Test
-	public void testGrowingQuadTree() {
+	void testGrowingQuadTree() {
 		final QuadTreeRebuilder<Object> rebuilder = new QuadTreeRebuilder<>();
 
-		Assert.assertEquals(
-				"unexpected quadtree size",
+		Assertions.assertEquals(
 				0,
-				rebuilder.getQuadTree().size());
+				rebuilder.getQuadTree().size(),
+				"unexpected quadtree size");
 
 		rebuilder.put(new Coord(0, 0), new Object());
 
-		Assert.assertEquals(
-				"unexpected quadtree size",
+		Assertions.assertEquals(
 				1,
-				rebuilder.getQuadTree().size());
+				rebuilder.getQuadTree().size(),
+				"unexpected quadtree size");
 
 		rebuilder.put(new Coord(100, 100), new Object());
 
-		Assert.assertEquals(
-				"unexpected quadtree size",
+		Assertions.assertEquals(
 				2,
-				rebuilder.getQuadTree().size());
+				rebuilder.getQuadTree().size(),
+				"unexpected quadtree size");
 
-		Assert.assertEquals(
-				"unexpected number of elements around origin",
+		Assertions.assertEquals(
 				1,
-				rebuilder.getQuadTree().getDisk(0, 0, 1).size());
+				rebuilder.getQuadTree().getDisk(0, 0, 1).size(),
+				"unexpected number of elements around origin");
 
-		Assert.assertEquals(
-				"unexpected number of elements far from origin",
+		Assertions.assertEquals(
 				2,
-				rebuilder.getQuadTree().getDisk(0, 0, 1000).size());
+				rebuilder.getQuadTree().getDisk(0, 0, 1000).size(),
+				"unexpected number of elements far from origin");
 	}
 }

@@ -18,11 +18,13 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,46 +40,44 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author nagel
  *
  */
 public class NetworkUtilsTest {
 	private static final Logger log = LogManager.getLogger( NetworkUtilsTest.class ) ;
-	
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link org.matsim.core.network.NetworkUtils#isMultimodal(org.matsim.api.core.v01.network.Network)}.
 	 */
 	@Test
-	public final void testIsMultimodal() {
+	final void testIsMultimodal() {
 
 		Config config = utils.createConfigWithInputResourcePathAsContext();
 		config.network().setInputFile("network.xml" );
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
+
 		Network network = scenario.getNetwork() ;
-		
-		Assert.assertTrue( NetworkUtils.isMultimodal( network ) );
-		
+
+		Assertions.assertTrue( NetworkUtils.isMultimodal( network ) );
+
 	}
 
 
 	@SuppressWarnings("static-method")
 	@Test
-	public final void getOutLinksSortedByAngleTest() {
+	final void getOutLinksSortedByAngleTest() {
 		final Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		// (we need the network to properly connect the links)
-		
+
 		NetworkFactory nf = network.getFactory() ;
-		
+
 		// a number of potentially outgoing links:
-		
+
 		Node nd0 = nf.createNode(Id.createNodeId("0"), new Coord(0.,0.) ) ;
 		Node ndN = nf.createNode(Id.createNodeId("N"), new Coord(0.,100.) ) ;
 		Node ndNE = nf.createNode(Id.createNodeId("NE"), new Coord(100.,100.) ) ;
@@ -87,7 +87,7 @@ public class NetworkUtilsTest {
 		Node ndSW = nf.createNode(Id.createNodeId("SW"), new Coord(-100.,-100.) ) ;
 		Node ndW = nf.createNode(Id.createNodeId("W"), new Coord(-100.,0.) ) ;
 		Node ndNW = nf.createNode(Id.createNodeId("NW"), new Coord(-100.,+100.) ) ;
-		
+
 		network.addNode( nd0 );
 		network.addNode( ndN );
 		network.addNode( ndNE );
@@ -97,7 +97,7 @@ public class NetworkUtilsTest {
 		network.addNode( ndSW );
 		network.addNode( ndW );
 		network.addNode( ndNW );
-		
+
 		Link liN = nf.createLink( Id.createLinkId("N"), nd0, ndN ) ;
 		Link liNE = nf.createLink( Id.createLinkId("NE"), nd0, ndNE ) ;
 		Link liE = nf.createLink( Id.createLinkId("E"), nd0, ndE ) ;
@@ -106,7 +106,7 @@ public class NetworkUtilsTest {
 		Link liSW = nf.createLink( Id.createLinkId("SW"), nd0, ndSW ) ;
 		Link liW = nf.createLink( Id.createLinkId("W"), nd0, ndW ) ;
 		Link liNW = nf.createLink( Id.createLinkId("NW"), nd0, ndNW ) ;
-		
+
 		network.addLink( liN );
 		network.addLink( liNE );
 		network.addLink( liE );
@@ -115,7 +115,7 @@ public class NetworkUtilsTest {
 		network.addLink( liSW );
 		network.addLink( liW );
 		network.addLink( liNW );
-		
+
 		log.info("===");
 		// a link coming north to south:
 		{
@@ -124,11 +124,11 @@ public class NetworkUtilsTest {
 			for ( Link outLink : result.values() ) {
 				log.info( outLink );
 			}
-			
+
 			Link[] actuals = result.values().toArray( new Link[result.size()] ) ;
 			Link[] expecteds = {liNE,liE,liSE,liS,liSW,liW,liNW} ;
-			Assert.assertArrayEquals(expecteds, actuals);
-			
+			Assertions.assertArrayEquals(expecteds, actuals);
+
 		}
 		log.info("===");
 		// a link coming south to north:
@@ -140,13 +140,13 @@ public class NetworkUtilsTest {
 			}
 			Link[] actuals = result.values().toArray( new Link[result.size()] ) ;
 			Link[] expecteds = {liSW,liW,liNW,liN,liNE,liE,liSE} ;
-			Assert.assertArrayEquals(expecteds, actuals);
+			Assertions.assertArrayEquals(expecteds, actuals);
 		}
 		log.info("===");
 	}
 
 	@Test
-	public void testfindNearestPointOnLink(){
+	void testfindNearestPointOnLink(){
 		Network network = NetworkUtils.createNetwork();
         Coord n1 = new Coord(1, 1);
 		Coord n2 = new Coord(100,100);
@@ -204,7 +204,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void getOriginalGeometry() {
+	void getOriginalGeometry() {
 
         var network = NetworkUtils.createNetwork();
         var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
@@ -235,7 +235,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void getOriginalGeometry_noGeometryStored() {
+	void getOriginalGeometry_noGeometryStored() {
 
         var network = NetworkUtils.createNetwork();
         var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
@@ -263,7 +263,7 @@ public class NetworkUtilsTest {
 	 * splits an empty string ("") into string[""]...
 	 */
 	@Test
-	public void getOriginalGeometry_emptyGeometryStored() {
+	void getOriginalGeometry_emptyGeometryStored() {
 
         var network = NetworkUtils.createNetwork();
         var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));

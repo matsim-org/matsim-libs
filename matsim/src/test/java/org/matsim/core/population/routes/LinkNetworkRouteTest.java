@@ -22,8 +22,8 @@ package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +40,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testClone() {
+	void testClone() {
 		Id<Link> id1 = Id.create(1, Link.class);
 		Id<Link> id2 = Id.create(2, Link.class);
 		Id<Link> id3 = Id.create(3, Link.class);
@@ -56,15 +56,15 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		srcRoute.add(link3.getId());
 		srcRoute.add(link4.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
-		Assert.assertEquals(2, route1.getLinkIds().size());
+		Assertions.assertEquals(2, route1.getLinkIds().size());
 
 		NetworkRoute route2 = (NetworkRoute) route1.clone();
 
 		srcRoute.add(link5.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 
-		Assert.assertEquals(3, route1.getLinkIds().size());
-		Assert.assertEquals(2, route2.getLinkIds().size());
+		Assertions.assertEquals(3, route1.getLinkIds().size());
+		Assertions.assertEquals(2, route2.getLinkIds().size());
 	}
 
 }

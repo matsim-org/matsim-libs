@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaVehicleDescriptionSource;
@@ -39,10 +39,10 @@ import java.net.URL;
  *
  */
 public class RunAverageEmissionToolOfflineExampleIT{
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void testAverage_vehTypeV1() {
+	final void testAverage_vehTypeV1() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_average.xml");
@@ -59,11 +59,11 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
 
 	@Test
-	public final void testAverage_vehTypeV2() {
+	final void testAverage_vehTypeV2() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
@@ -81,7 +81,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 	 * where this is used, has no way to know which file format was originally read.  See some discussion there.  :-(
 	 */
 	@Test
-	public final void testAverage_vehTypeV2b() {
+	final void testAverage_vehTypeV2b() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
@@ -107,12 +107,12 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 
 	}
 
 	@Test
-	public final void testAverage_vehTypeV2_HBEFA4() {
+	final void testAverage_vehTypeV2_HBEFA4() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
@@ -131,6 +131,6 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+		Assertions.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
 }

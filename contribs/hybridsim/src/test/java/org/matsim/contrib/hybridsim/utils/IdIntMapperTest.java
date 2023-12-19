@@ -13,9 +13,9 @@ package org.matsim.contrib.hybridsim.utils;
 //
 /****************************************************************************/
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -33,18 +33,18 @@ public class IdIntMapperTest {
 
     private IdIntMapper mapper;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.mapper = new IdIntMapper();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         this.mapper = null;
     }
 
-    @Test
-    public void testLinkIdIntMapper() {
+	@Test
+	void testLinkIdIntMapper() {
         int id1 = mapper.getIntLink(Id.createLinkId("l1"));
         assertThat(id1, is(0));
         mapper.getIntLink(Id.createLinkId("l2"));
@@ -55,8 +55,8 @@ public class IdIntMapperTest {
         assertThat(id3, is(2));
     }
 
-    @Test
-    public void testIntLinkIdMapper() {
+	@Test
+	void testIntLinkIdMapper() {
         Id<Link> linkId1 = mapper.getLinkId(10);
         assertThat(linkId1, is(nullValue()));
         mapper.getIntLink(Id.createLinkId("l1"));
@@ -65,8 +65,8 @@ public class IdIntMapperTest {
 
     }
 
-    @Test
-    public void testNodeIdIntMapper() {
+	@Test
+	void testNodeIdIntMapper() {
         int id1 = mapper.getIntNode(Id.createNodeId("l1"));
         assertThat(id1, is(0));
         mapper.getIntNode(Id.createNodeId("l2"));
@@ -77,8 +77,8 @@ public class IdIntMapperTest {
         assertThat(id3, is(2));
     }
 
-    @Test
-    public void testIntNodeIdMapper() {
+	@Test
+	void testIntNodeIdMapper() {
         Id<Node> nodeId1 = mapper.getNodeId(10);
         assertThat(nodeId1, is(nullValue()));
         mapper.getIntNode(Id.createNodeId("l1"));
@@ -88,8 +88,8 @@ public class IdIntMapperTest {
     }
 
 
-    @Test
-    public void testPersonIdIntMapper() throws Exception {
+	@Test
+	void testPersonIdIntMapper() throws Exception {
         int id1 = mapper.getIntPerson(Id.createPersonId("l1"));
         assertThat(id1, is(0));
         mapper.getIntPerson(Id.createPersonId("l2"));
@@ -100,8 +100,8 @@ public class IdIntMapperTest {
         assertThat(id3, is(2));
     }
 
-    @Test
-    public void testIntPersonIdMapper() throws Exception {
+	@Test
+	void testIntPersonIdMapper() throws Exception {
         Id<Person> personId1 = mapper.getPersonId(10);
         assertThat(personId1, is(nullValue()));
         mapper.getIntPerson(Id.createPersonId("l1"));

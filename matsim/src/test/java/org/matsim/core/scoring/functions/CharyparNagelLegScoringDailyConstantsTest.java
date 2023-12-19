@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,7 +53,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 	 * Tests whether daily constants are considered in the scoring.
 	 */
 	@Test
-	public void test1() throws Exception {
+	void test1() throws Exception {
 		final Network network = createNetwork();
 		final CharyparNagelLegScoring scoring1 = createScoringOnlyConstants( network );
 		final CharyparNagelLegScoring scoring2 = createDefaultPlusConstants( network );
@@ -173,19 +173,19 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			scoring2.finish();
 		}
 
-		Assert.assertEquals(
-				"wrong score; daily constants are not accounted for in the scoring.",
+		Assertions.assertEquals(
 				-12345.678,
 				scoring1.getScore(),
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"wrong score; daily constants are not accounted for in the scoring." );
 
 		double defaultScore = (legTravelTime1 + legTravelTime2) * new ScoringConfigGroup().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.
 				+ legTravelTime3 * new ScoringConfigGroup().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() / 3600.;
-		Assert.assertEquals(
-				"wrong score; daily constants are not accounted for in the scoring.",
+		Assertions.assertEquals(
 				-12345.678 + defaultScore,
 				scoring2.getScore(),
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"wrong score; daily constants are not accounted for in the scoring." );
 	}
 
 	private CharyparNagelLegScoring createDefaultPlusConstants(Network network) {

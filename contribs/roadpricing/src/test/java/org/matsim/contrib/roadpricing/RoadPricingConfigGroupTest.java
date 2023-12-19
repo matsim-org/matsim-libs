@@ -1,46 +1,46 @@
 package org.matsim.contrib.roadpricing;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 
 public class RoadPricingConfigGroupTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void getTollLinksFile() {
+	void getTollLinksFile() {
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
-		Assert.assertNull("Default roadpricing file is not set.", cg.getTollLinksFile());
+		Assertions.assertNull(cg.getTollLinksFile(), "Default roadpricing file is not set.");
 	}
 
 	@Test
-	public void setTollLinksFile() {
+	void setTollLinksFile() {
 		String file = "./test.xml.gz";
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
 		cg.setTollLinksFile(file);
-		Assert.assertEquals("Wrong input file.", file, cg.getTollLinksFile());
+		Assertions.assertEquals(file, cg.getTollLinksFile(), "Wrong input file.");
 	}
 
 	@Test
-	public void getEnforcementProbability() {
+	void getEnforcementProbability() {
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
-		Assert.assertEquals("Default probability should be 1.0", 1.0, cg.getEnforcementProbability(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1.0, cg.getEnforcementProbability(), MatsimTestUtils.EPSILON, "Default probability should be 1.0");
 
 		double prob = 0.9;
 		cg.setEnforcementProbability(prob);
-		Assert.assertEquals("Didn't get the adjusted probability.", prob, cg.getEnforcementProbability(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(prob, cg.getEnforcementProbability(), MatsimTestUtils.EPSILON, "Didn't get the adjusted probability.");
 	}
 
 	@Test
-	public void setEnforcementProbability() {
+	void setEnforcementProbability() {
 		RoadPricingConfigGroup cg = new RoadPricingConfigGroup();
 		try{
 			cg.setEnforcementProbability(1.2);
-			Assert.fail("Should not accept probability > 1.0");
+			Assertions.fail("Should not accept probability > 1.0");
 		} catch (Exception e){
 			e.printStackTrace();
 		}

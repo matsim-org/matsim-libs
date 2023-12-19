@@ -32,7 +32,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -44,17 +44,17 @@ import org.matsim.core.utils.collections.Tuple;
 public class BeanValidationConfigConsistencyCheckerTest {
 
 	@Test
-	public void emptyConfig_valid() {
+	void emptyConfig_valid() {
 		assertThat(getViolationTuples(new Config())).isEmpty();
 	}
 
 	@Test
-	public void defaultConfig_valid() {
+	void defaultConfig_valid() {
 		assertThat(getViolationTuples(ConfigUtils.createConfig())).isEmpty();
 	}
 
 	@Test
-	public void invalidConfigGroup_violationsReturned() {
+	void invalidConfigGroup_violationsReturned() {
 		{
 			Config config = ConfigUtils.createConfig();
 			config.qsim().setFlowCapFactor(0);
@@ -75,7 +75,7 @@ public class BeanValidationConfigConsistencyCheckerTest {
 	}
 
 	@Test
-	public void invalidParameterSet_violationsReturned() {
+	void invalidParameterSet_violationsReturned() {
 		ConfigGroup configGroup = new ConfigGroup("config_group");
 		configGroup.addParameterSet(new ConfigGroup("invalid_param_set") {
 			@PositiveOrZero
@@ -88,7 +88,7 @@ public class BeanValidationConfigConsistencyCheckerTest {
 	}
 
 	@Test
-	public void manyConfigGroupsInvalid_violationsReturned() {
+	void manyConfigGroupsInvalid_violationsReturned() {
 		{
 			Config config = ConfigUtils.createConfig();
 			config.qsim().setFlowCapFactor(0);

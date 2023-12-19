@@ -1,6 +1,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,12 +30,10 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-
 public class QueueAgentSnapshotInfoBuilderTest {
 
-    @Test
-    public void positionVehiclesAlongLine_singleVehicleFreeFlow() {
+	@Test
+	void positionVehiclesAlongLine_singleVehicleFreeFlow() {
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
@@ -73,8 +73,8 @@ public class QueueAgentSnapshotInfoBuilderTest {
         assertEquals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, firstEntry.getAgentState());
     }
 
-    @Test
-    public void positionVehiclesAlongLine_congestedAboveCapacityLimit() {
+	@Test
+	void positionVehiclesAlongLine_congestedAboveCapacityLimit() {
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
@@ -111,8 +111,8 @@ public class QueueAgentSnapshotInfoBuilderTest {
         }
     }
 
-    @Test
-    public void positionVehiclesAlongLine_queueAtEnd() {
+	@Test
+	void positionVehiclesAlongLine_queueAtEnd() {
 
         var setUp = new SimpleTestSetUp();
         // use other vehicle list than in simple set up
@@ -180,8 +180,8 @@ public class QueueAgentSnapshotInfoBuilderTest {
         }
     }
 
-    @Test
-    public void positionAgentsInActivities() {
+	@Test
+	void positionAgentsInActivities() {
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
@@ -197,8 +197,8 @@ public class QueueAgentSnapshotInfoBuilderTest {
 
     }
 
-    @Test
-    public void positionVehiclesFromWaitingList() {
+	@Test
+	void positionVehiclesFromWaitingList() {
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
@@ -218,8 +218,8 @@ public class QueueAgentSnapshotInfoBuilderTest {
         outCollection.forEach(position -> assertEquals(Id.createVehicleId(1), position.getVehicleId()));
     }
 
-    @Test
-    public void positionVehiclesFromTransitStop() {
+	@Test
+	void positionVehiclesFromTransitStop() {
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
