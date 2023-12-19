@@ -80,13 +80,6 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
-	private String testParameterSetIndex = null;
-
-	//captures the method name (group 1) and optionally the index of the parameter set (group 2; only if the test is parametrised)
-	//The matching may fail if the parameter set name does not start with {index} (at least one digit is required at the beginning)
-	private static final Pattern METHOD_PARAMETERS_WITH_INDEX_PATTERN = Pattern.compile(
-		"([\\S]*)(?:\\[(\\d+)[\\s\\S]*\\])?");
-
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
@@ -95,13 +88,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	@Override
 	public void beforeEach(ExtensionContext extensionContext) {
 		this.testClass = extensionContext.getTestClass().orElseThrow();
-
-		Matcher matcher = METHOD_PARAMETERS_WITH_INDEX_PATTERN.matcher(extensionContext.getTestMethod().orElseThrow().getName());
-		if (!matcher.matches()) {
-			throw new RuntimeException("The name of the test parameter set must start with {index}");
-		}
-		this.testMethodName = matcher.group(1);
-		this.testParameterSetIndex = matcher.group(2); // null for non-parametrised tests
+		this.testMethodName = extensionContext.getRequiredTestMethod().getName();
 	}
 
 	@Override
@@ -232,10 +219,12 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	 * @return path to the output directory for this test
 	 */
 	public String getOutputDirectory() {
+		return getOutputDirectory("");
+	}
+
+	public String getOutputDirectory(String subDir) {
 		if (this.outputDirectory == null) {
-			String subDirectoryForParametrisedTests = testParameterSetIndex == null ? "" : testParameterSetIndex + "/";
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/"
-					+ subDirectoryForParametrisedTests;
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/" + subDir;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;

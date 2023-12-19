@@ -104,7 +104,9 @@ public class VehicleSourceTest {
 		config.qsim().setVehiclesSource(vehiclesSource );
 		config.qsim().setUsePersonIdForMissingVehicleId(usingPersonIdForMissingVehicleId );
 
-		config.controller().setOutputDirectory(helper.getOutputDirectory());
+		config.controller()
+			.setOutputDirectory(
+				helper.getOutputDirectory(vehiclesSource.name() + "_" + usingPersonIdForMissingVehicleId + "_" + providingVehiclesInPerson));
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(1);
 		config.controller().setCreateGraphs(false);
