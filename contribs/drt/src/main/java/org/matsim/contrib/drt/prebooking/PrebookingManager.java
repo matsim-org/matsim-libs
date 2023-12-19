@@ -152,6 +152,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	// collects new bookings that need to be submitted
 	private final ConcurrentLinkedQueue<PassengerRequest> bookingQueue = new ConcurrentLinkedQueue<>();
 
+	public void prebook(MobsimAgent agent, Leg leg, double earliestDepartureTime) {
+		prebook(List.of(new PersonLeg(agent, leg)), earliestDepartureTime);
+	}
+
 	public void prebook(List<PersonLeg> personsLegs, double earliestDepartureTime) {
 		for (PersonLeg personLeg : personsLegs) {
 			Preconditions.checkArgument(personLeg.leg().getMode().equals(mode), "Invalid mode for this prebooking manager");
