@@ -35,7 +35,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		super(config);
 	}
 
-	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
+	public List<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
 
 		CandidatePruner p = pruner.get();
 		double threshold = -1;
@@ -54,7 +54,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	 * @param diffThreshold allowed difference to the best solution (if positive)
 	 * @param absThreshold  minimal required estimate score (use NaN or negative infinity if not needed)
 	 */
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask,
+	public List<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask,
 	                                          int topK, double diffThreshold, double absThreshold) {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
@@ -88,7 +88,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 
-	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double diffThreshold, double absThreshold,
+	private List<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double diffThreshold, double absThreshold,
 	                                                    Set<String> consideredModes, Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());

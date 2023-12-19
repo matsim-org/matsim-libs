@@ -10,7 +10,7 @@ import jakarta.inject.Provider;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -48,7 +48,7 @@ public class SimplePlanSelectionStrategy extends AbstractMultithreadedModule {
 		public void run(Plan plan) {
 
 			PlanModel planModel = PlanModel.newInstance(plan);
-			Collection<PlanCandidate> candidates = ctx.generator.generate(planModel);
+			List<PlanCandidate> candidates = ctx.generator.generate(planModel);
 
 			if (ctx.pruner != null) {
 				ctx.pruner.pruneCandidates(planModel, candidates, rnd);
@@ -59,7 +59,6 @@ public class SimplePlanSelectionStrategy extends AbstractMultithreadedModule {
 			if (candidate != null) {
 				candidate.applyTo(plan);
 			}
-
 		}
 	}
 

@@ -156,16 +156,19 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 					continue;
 				}
 
-				Set<PlanCandidate> candidates = new HashSet<>();
+				Set<PlanCandidate> candidateSet = new LinkedHashSet<>();
 
 				// Single modes are also added
-				candidates.addAll(singleModeCandidates);
+				candidateSet.addAll(singleModeCandidates);
 
 				// one could either allow all modes here or only non chain based
 				// config switch might be useful to investigate which option is better
 
 				// execute best k modes
-				candidates.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
+				candidateSet.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
+
+				// candidates are unique after this
+				List<PlanCandidate> candidates = new ArrayList<>(candidateSet);
 
 				if (config.isRequireDifferentModes())
 					candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModesMutable()));

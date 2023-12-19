@@ -3,7 +3,7 @@ package org.matsim.modechoice.pruning;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -16,7 +16,7 @@ public interface CandidatePruner {
 	 * This method of pruning can be used for more complex strategies, but requires that the necesarry amount of candidates is generated first.
 	 * The threshold based pruning {@link #planThreshold(PlanModel)} is usually more efficient.
 	 */
-	default void pruneCandidates(PlanModel model, Collection<PlanCandidate> candidates, Random rnd) {
+	default void pruneCandidates(PlanModel model, List<PlanCandidate> candidates, Random rnd) {
 	}
 
 	/**
