@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -72,7 +72,7 @@ public class DrtEventsReadersTest {
 			taskEnded(70, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, 3, link2));
 
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		drtEvents.forEach(writer::handleEvent);

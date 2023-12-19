@@ -23,9 +23,9 @@ package org.matsim.contrib.cadyts.car;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -78,11 +78,11 @@ import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.
  */
 public class CadytsCarIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void testInitialization() {
+	final void testInitialization() {
 		final String CADYTS_STRATEGY_NAME = "ccc";
 
 		String inputDir = this.utils.getClassInputDirectory();
@@ -141,20 +141,20 @@ public class CadytsCarIT {
 		CadytsContext context = injector.getInstance(CadytsContext.class);
 
 		//test calibration settings
-		Assert.assertEquals(true, context.getCalibrator().getBruteForce());
-		Assert.assertEquals(false, context.getCalibrator().getCenterRegression());
-		Assert.assertEquals(Integer.MAX_VALUE, context.getCalibrator().getFreezeIteration());
-		Assert.assertEquals(8.0, context.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, context.getCalibrator().getPreparatoryIterations());
-		Assert.assertEquals(0.95, context.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1.0, context.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(3600.0, context.getCalibrator().getTimeBinSize_s(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(true, context.getCalibrator().getBruteForce());
+		Assertions.assertEquals(false, context.getCalibrator().getCenterRegression());
+		Assertions.assertEquals(Integer.MAX_VALUE, context.getCalibrator().getFreezeIteration());
+		Assertions.assertEquals(8.0, context.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, context.getCalibrator().getPreparatoryIterations());
+		Assertions.assertEquals(0.95, context.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1.0, context.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3600.0, context.getCalibrator().getTimeBinSize_s(), MatsimTestUtils.EPSILON);
 	}
 
 
 	//--------------------------------------------------------------
 	@Test
-	public final void testCalibrationAsScoring() throws IOException {
+	final void testCalibrationAsScoring() throws IOException {
 
 		final double beta=30. ;
 		final int lastIteration = 20 ;
@@ -212,26 +212,26 @@ public class CadytsCarIT {
 
 		//scenario data  test
 		Scenario scenario = injector.getInstance(Scenario.class);
-		Assert.assertEquals("Different number of links in network.", scenario.getNetwork().getLinks().size() , 23 );
-		Assert.assertEquals("Different number of nodes in network.", scenario.getNetwork().getNodes().size() , 15 );
+		Assertions.assertEquals(scenario.getNetwork().getLinks().size() , 23, "Different number of links in network." );
+		Assertions.assertEquals(scenario.getNetwork().getNodes().size() , 15, "Different number of nodes in network." );
 
-		Assert.assertNotNull("Population is null.", scenario.getPopulation());
+		Assertions.assertNotNull(scenario.getPopulation(), "Population is null.");
 
-		Assert.assertEquals("Num. of persons in population is wrong.", scenario.getPopulation().getPersons().size(), 5);
-		Assert.assertEquals("Scale factor is wrong.", scenario.getConfig().counts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(scenario.getPopulation().getPersons().size(), 5, "Num. of persons in population is wrong.");
+		Assertions.assertEquals(scenario.getConfig().counts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON, "Scale factor is wrong.");
 
 		//counts
-		Assert.assertEquals("Count file is wrong.", scenario.getConfig().counts().getCountsFileName(), inputDir + "counts5.xml");
+		Assertions.assertEquals(scenario.getConfig().counts().getCountsFileName(), inputDir + "counts5.xml", "Count file is wrong.");
 
 
 		Counts<Link> occupCounts = new Counts<>();
 		new MatsimCountsReader(occupCounts).readFile(scenario.getConfig().counts().getCountsFileName());
 
 		Count<Link> count =  occupCounts.getCount(Id.create(19, Link.class));
-		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "link_19");
-		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(occupCounts.getDescription(), "counts values for equil net", "Occupancy counts description is wrong");
+		Assertions.assertEquals(count.getCsLabel() , "link_19", "CsId is wrong.");
+		Assertions.assertEquals(count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
+		Assertions.assertEquals(count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON, "Max count volume is wrong.");
 
 		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".countscompare.txt";
 		AdHocCountsReaderCar reader = new AdHocCountsReaderCar(outCounts);
@@ -240,29 +240,29 @@ public class CadytsCarIT {
 		{
 			double[] simValues = reader.getSimulatedValues( locId11 );
 			double[] realValues = reader.getRealValues( locId11 );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON );
+			Assertions.assertEquals( 0.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			Assertions.assertEquals( 0.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
 		}
 		{
 			Id<Link> locId12 = Id.create( "12", Link.class );
 			double[] simValues = reader.getSimulatedValues( locId12 );
 			double[] realValues = reader.getRealValues( locId12 );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON );
+			Assertions.assertEquals( 0.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			Assertions.assertEquals( 0.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
 		}
 		Id<Link> locId19 = Id.create( "19", Link.class );
 		{
 			double[] simValues = reader.getSimulatedValues( locId19 );
 			double[] realValues = reader.getRealValues( locId19 );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON );
+			Assertions.assertEquals( 5.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			Assertions.assertEquals( 5.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
 		}
 		{
 			Id<Link> locId21 = Id.create( "21", Link.class );
 			double[] simValues = reader.getSimulatedValues( locId21 );
 			double[] realValues = reader.getRealValues( locId21 );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON );
-			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON );
+			Assertions.assertEquals( 5.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			Assertions.assertEquals( 5.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
 		}
 		// test calibration statistics
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
@@ -273,7 +273,7 @@ public class CadytsCarIT {
 		// Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
 		// Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
 //			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
-		Assert.assertEquals("different Link_lambda_avg", "3.2261421242498865E-5", outStatData.getLink_lambda_avg() );
+		Assertions.assertEquals("3.2261421242498865E-5", outStatData.getLink_lambda_avg(), "different Link_lambda_avg" );
 //			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
 //			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
 //			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9", outStatData.getLink_lambda_stddev());
@@ -283,7 +283,7 @@ public class CadytsCarIT {
 //			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
 //			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
 		// Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
-		Assert.assertEquals("different Total_ll", "0.0", outStatData.getTotal_ll() );
+		Assertions.assertEquals("0.0", outStatData.getTotal_ll(), "different Total_ll" );
 
 		//test link offsets
 		final Network network = scenario.getNetwork();
@@ -304,10 +304,10 @@ public class CadytsCarIT {
 			isZero = (Math.abs(linkOffsets.getBinValue(link19 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
 		}while (isZero && binIndex<86400);
 
-		Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
+		Assertions.assertEquals(6, binIndex, "Wrong bin index for first link offset");
 
-		Assert.assertEquals("Wrong link offset of link 11", 0.0, linkOffsets.getBinValue(link11 , binIndex), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong link offset of link 19", 0.0014707121641471912, linkOffsets.getBinValue(link19 , binIndex), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, linkOffsets.getBinValue(link11 , binIndex), MatsimTestUtils.EPSILON, "Wrong link offset of link 11");
+		Assertions.assertEquals(0.0014707121641471912, linkOffsets.getBinValue(link19 , binIndex), MatsimTestUtils.EPSILON, "Wrong link offset of link 19");
 	}
 
 

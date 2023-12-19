@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions.analysis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.matsim.contrib.emissions.Pollutant.CO;
 import static org.matsim.contrib.emissions.Pollutant.NO2;
 
@@ -9,19 +9,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
 
 public class EmissionsByPollutantTest {
 
-    // The EmissionsByPollutant potentially adds up the same emissions coming from cold and warm.  Thus, this cannot be combined into the enum approach
-    // without some thinking.  kai, jan'20
-    // Quite possibly, should just combine them into an enum "pollutant"?!  There is, anyways, the JM map of those emissions that are actually present in the
-    // input file.  kai, jan'20
+	// The EmissionsByPollutant potentially adds up the same emissions coming from cold and warm.  Thus, this cannot be combined into the enum approach
+	// without some thinking.  kai, jan'20
+	// Quite possibly, should just combine them into an enum "pollutant"?!  There is, anyways, the JM map of those emissions that are actually present in the
+	// input file.  kai, jan'20
 
-    @Test
-    public void initialize() {
+	@Test
+	void initialize() {
 
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
@@ -38,8 +38,8 @@ public class EmissionsByPollutantTest {
         });
     }
 
-    @Test
-    public void addEmission() {
+	@Test
+	void addEmission() {
 
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
         final double valueToAdd = 5;
@@ -58,8 +58,8 @@ public class EmissionsByPollutantTest {
         assertEquals(expectedValue, retrievedResult, 0);
     }
 
-    @Test
-    public void addEmission_PollutantNotPresentYet() {
+	@Test
+	void addEmission_PollutantNotPresentYet() {
 
         Map<Pollutant, Double> initialPollutants = new HashMap<>();
         initialPollutants.put(CO, Math.random());
@@ -74,8 +74,8 @@ public class EmissionsByPollutantTest {
         assertEquals(valueToAdd, retrievedResult, 0);
     }
 
-    @Test
-    public void addEmissions() {
+	@Test
+	void addEmissions() {
 
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 

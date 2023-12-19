@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.run;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,13 +30,13 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class RunParkingChoiceExampleIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample#run(org.matsim.core.config.Config)}.
 	 */
 	@Test
-	public final void testRun() {
+	final void testRun() {
 		Config config = ConfigUtils.loadConfig("./src/main/resources/parkingchoice/config.xml");
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.controller().setLastIteration(0);

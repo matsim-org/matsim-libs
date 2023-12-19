@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
@@ -29,20 +31,18 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author nagel
  *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
 	 */
 	@Test
-	public final void testDetailed_vehTypeV2_FallbackToAverage() {
+	final void testDetailed_vehTypeV2_FallbackToAverage() {
 		try {
 //			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
 

@@ -1,9 +1,9 @@
 package org.matsim.application;
 
-import org.junit.Assume;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.options.SampleOptions;
 import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
@@ -24,23 +24,23 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MATSimApplicationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void help() {
+	void help() {
 
 		int ret = MATSimApplication.execute(TestScenario.class, "--help");
 
-		assertEquals("Return code should be 0", 0, ret);
+		assertEquals(0, ret, "Return code should be 0");
 	}
 
 	@Test
-	public void config() {
+	void config() {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
 				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4", "--config:plans.inputCRS", "EPSG:1234");
@@ -54,7 +54,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void yaml() {
+	void yaml() {
 
 		Path yml = Path.of(utils.getClassInputDirectory(), "specs.yml");
 
@@ -76,7 +76,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void sample() {
+	void sample() {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
 				"--10pct");
@@ -92,7 +92,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void population() throws MalformedURLException {
+	void population() throws MalformedURLException {
 
 		Path input = Path.of(utils.getClassInputDirectory());
 		Path output = Path.of(utils.getOutputDirectory());
@@ -127,13 +127,13 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	@Ignore("Class is deprecated")
-	public void freight() {
+	@Disabled("Class is deprecated")
+	void freight() {
 
 		Path input = Path.of("..", "..", "..", "..",
 				"shared-svn", "komodnext", "data", "freight", "original_data").toAbsolutePath().normalize();
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		Path output = Path.of(utils.getOutputDirectory());
 
@@ -161,7 +161,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void run() {
+	void run() {
 
 		Config config = ConfigUtils.createConfig();
 		Path out = Path.of(utils.getOutputDirectory()).resolve("out");

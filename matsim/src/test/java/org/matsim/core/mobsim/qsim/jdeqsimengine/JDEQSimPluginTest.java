@@ -21,8 +21,8 @@
 
  package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -33,13 +33,13 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+ /**
  * Created by michaelzilske on 19/03/14.
  */
 public class JDEQSimPluginTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
         return new QSimBuilder(scenario.getConfig()) //
@@ -50,7 +50,8 @@ public class JDEQSimPluginTest {
         	.build(scenario, eventsManager);
 	}
 
-    @Test public void testRunsAtAll() {
+	 @Test
+	 void testRunsAtAll() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
@@ -60,7 +61,8 @@ public class JDEQSimPluginTest {
         qsim.run();
     }
 
-    @Test public void testRunsEquil() {
+	 @Test
+	 void testRunsEquil() {
 		Scenario scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();

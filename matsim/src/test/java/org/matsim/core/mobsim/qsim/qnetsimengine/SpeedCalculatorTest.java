@@ -1,8 +1,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Singleton;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -26,18 +26,19 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SpeedCalculatorTest{
     // This originally comes from the bicycle contrib.  One now needs access to AbstractQLink to properly test this functionality. In contrast, the
     // specific bicycle material should not be necessary. kai, jun'23
 
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
     private final Config config = ConfigUtils.createConfig();
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 
-    @Test public void limitedByVehicleSpeed() {
+	@Test
+	void limitedByVehicleSpeed() {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
@@ -48,7 +49,9 @@ public class SpeedCalculatorTest{
 
         assertEquals( type.getMaximumVelocity(), getSpeedOnLink( link, vehicle ), 0.0 );
     }
-    @Test public void limitedByLinkSpeed() {
+
+	@Test
+	void limitedByLinkSpeed() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 
@@ -61,7 +64,9 @@ public class SpeedCalculatorTest{
 
         assertEquals( link.getFreespeed(), getSpeedOnLink( link, vehicle ), 0.0 );
     }
-    @Test public void bikeWithSpecificLinkSpeedCalculator() {
+
+	@Test
+	void bikeWithSpecificLinkSpeedCalculator() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 
@@ -76,7 +81,9 @@ public class SpeedCalculatorTest{
         assertEquals( type.getMaximumVelocity()*1.5, getSpeedOnLink( link, vehicle ), 0.0 );
         // (specific link speed calculator uses speed that is larger than maximum vehicle speed)
     }
-    @Test public void bikeLimitedByLinkFreespeed() {
+
+	@Test
+	void bikeLimitedByLinkFreespeed() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 

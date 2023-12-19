@@ -3,8 +3,8 @@ package org.matsim.contrib.drt.routing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -21,7 +21,7 @@ import org.matsim.core.router.TripRouter;
 public class MultiModeDrtMainModeIdentifierTest {
 
 	@Test
-	public void test() {
+	void test() {
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		String drtMode = "drt";
 		drtConfigGroup.mode = drtMode;
@@ -34,13 +34,13 @@ public class MultiModeDrtMainModeIdentifierTest {
 			List<PlanElement> testElements = new ArrayList<>();
 			Leg l1 = PopulationUtils.createLeg(TransportMode.car);
 			testElements.add(l1);
-			Assert.assertEquals(TransportMode.car, mmi.identifyMainMode(testElements));
+			Assertions.assertEquals(TransportMode.car, mmi.identifyMainMode(testElements));
 		}
 		{
 			List<PlanElement> testElements = new ArrayList<>();
 			Leg l1 = PopulationUtils.createLeg(drtMode);
 			testElements.add(l1);
-			Assert.assertEquals(drtMode, mmi.identifyMainMode(testElements));
+			Assertions.assertEquals(drtMode, mmi.identifyMainMode(testElements));
 		}
 		{
 			String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtMode);
@@ -58,7 +58,7 @@ public class MultiModeDrtMainModeIdentifierTest {
 			testElements.add(l2);
 			testElements.add(a3);
 			testElements.add(l3);
-			Assert.assertEquals(drtMode, mmi.identifyMainMode(testElements));
+			Assertions.assertEquals(drtMode, mmi.identifyMainMode(testElements));
 		}
 	}
 }

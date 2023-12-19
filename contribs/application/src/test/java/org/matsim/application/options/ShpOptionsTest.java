@@ -1,9 +1,9 @@
 package org.matsim.application.options;
 
 import org.assertj.core.data.Offset;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ShpOptionsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void readZip() {
+	void readZip() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
@@ -31,7 +31,7 @@ public class ShpOptionsTest {
 				.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
@@ -43,7 +43,7 @@ public class ShpOptionsTest {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
@@ -51,7 +51,7 @@ public class ShpOptionsTest {
 				.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
@@ -66,14 +66,14 @@ public class ShpOptionsTest {
 	}
 
 	@Test
-	public void testGetGeometry() {
+	void testGetGeometry() {
 
 		Path input = Path.of(utils.getClassInputDirectory()
 						.replace("ShpOptionsTest", "CreateLandUseShpTest")
 						.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 		Geometry geometry = shp.getGeometry() ;

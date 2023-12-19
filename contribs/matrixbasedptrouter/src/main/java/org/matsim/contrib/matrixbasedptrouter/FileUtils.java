@@ -27,9 +27,7 @@ final class FileUtils {
 
 		QuadTree<PtStop> qTree = new QuadTree<PtStop>(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax() );
 
-		try {
-			BufferedReader bwPtStops = IOUtils.getBufferedReader(ptStopInputFile);
-
+		try (BufferedReader bwPtStops = IOUtils.getBufferedReader(ptStopInputFile)) {
 			String separator = ",";
 
 			// read header
@@ -63,9 +61,9 @@ final class FileUtils {
 				// create pt stop coordinate
 				Coord ptStopCoord = new Coord(Double.parseDouble(parts[xCoordIDX]), Double.parseDouble(parts[yCoordIDX]));
 
-				boolean isInBoundary = qTree.getMaxEasting() >= ptStopCoord.getX() && 
-						qTree.getMinEasting() <= ptStopCoord.getX() && 
-						qTree.getMaxNorthing() >= ptStopCoord.getY() && 
+				boolean isInBoundary = qTree.getMaxEasting() >= ptStopCoord.getX() &&
+						qTree.getMinEasting() <= ptStopCoord.getX() &&
+						qTree.getMaxNorthing() >= ptStopCoord.getY() &&
 						qTree.getMinNorthing() <= ptStopCoord.getY();
 						if(!isInBoundary){
 							if(wrnCntSkip < 20)
@@ -100,7 +98,7 @@ final class FileUtils {
 		int valueIDX 				= 2;		// column index for travel time or distance value
 
 		final double EMPTY_ENTRY 	= 999999.;	// indicates that a value is not set (VISUM specific)
-		final String SEPARATOR 		= ";";		// 
+		final String SEPARATOR 		= ";";		//
 
 		String line 				= null;		// line from input file
 		String parts[] 				= null;		// values accessible via array
@@ -141,7 +139,7 @@ final class FileUtils {
 					Id<PtStop> destinationPtStopID 		= Id.create(parts[destinationPtStopIDX], PtStop.class);
 
 					// check if a pt stop with the given id exists
-					if( ptStopHashMap.containsKey(originPtStopID) && 
+					if( ptStopHashMap.containsKey(originPtStopID) &&
 							ptStopHashMap.containsKey(destinationPtStopID)){
 
 						// add to od matrix
@@ -152,7 +150,7 @@ final class FileUtils {
 						//					if(wrnCntId == 20){
 						//						log.error( "Found " + wrnCntId + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check. Reasons for this error may be:");
 						//						log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
-						//					} else 
+						//					} else
 						if(! ptStopHashMap.containsKey(originPtStopID) && wrnCntId < 20)
 							log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + originPtStopID);
 						else if(! ptStopHashMap.containsKey(destinationPtStopID) && wrnCntId < 20)

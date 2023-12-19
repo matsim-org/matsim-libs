@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
@@ -50,7 +50,7 @@ public class TeleportingPassengerEngineTest {
 	private final PassengerEngineTestFixture fixture = new PassengerEngineTestFixture();
 
 	@Test
-	public void test_valid_teleported() {
+	void test_valid_teleported() {
 		double departureTime = 0;
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
@@ -81,7 +81,7 @@ public class TeleportingPassengerEngineTest {
 	}
 
 	@Test
-	public void test_invalid_rejected() {
+	void test_invalid_rejected() {
 		double departureTime = 0;
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 

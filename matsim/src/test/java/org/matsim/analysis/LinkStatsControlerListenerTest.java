@@ -20,9 +20,9 @@
 package org.matsim.analysis;
 
 import com.google.inject.*;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,11 +57,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class LinkStatsControlerListenerTest {
 
-	@Rule
-	public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testlinksOutputCSV() throws IOException {
+	void testlinksOutputCSV() throws IOException {
 		String outputDirectory = util.getOutputDirectory();
 
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -82,7 +82,7 @@ public class LinkStatsControlerListenerTest {
 	}
 
 	@Test
-	public void testUseVolumesOfIteration() {
+	void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(util.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -102,214 +102,214 @@ public class LinkStatsControlerListenerTest {
 		config.linkStats().setWriteLinkStatsInterval(10);
 
 		// test defaults
-		Assert.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
-		Assert.assertEquals(5, config.linkStats().getAverageLinkStatsOverIterations());
+		Assertions.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
+		Assertions.assertEquals(5, config.linkStats().getAverageLinkStatsOverIterations());
 
 		// now the real tests
-		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values
 		config.linkStats().setWriteLinkStatsInterval(8);
 		config.linkStats().setAverageLinkStatsOverIterations(2);
-		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging = 1
 		config.linkStats().setWriteLinkStatsInterval(5);
 		config.linkStats().setAverageLinkStatsOverIterations(1);
-		Assert.assertTrue(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging = 0
 		config.linkStats().setWriteLinkStatsInterval(5);
 		config.linkStats().setAverageLinkStatsOverIterations(0);
-		Assert.assertTrue(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: interval = 0
 		config.linkStats().setWriteLinkStatsInterval(0);
 		config.linkStats().setAverageLinkStatsOverIterations(2);
-		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: interval equal averaging
 		config.linkStats().setWriteLinkStatsInterval(5);
 		config.linkStats().setAverageLinkStatsOverIterations(5);
-		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging > interval
 		config.linkStats().setWriteLinkStatsInterval(5);
 		config.linkStats().setAverageLinkStatsOverIterations(6);
-		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(1, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(2, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(3, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(5, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(8, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(10, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(11, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(12, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(13, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(16, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(17, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(18, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
-		Assert.assertTrue(lscl.useVolumesOfIteration(21, 0));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(0, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(1, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(2, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(3, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(4, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(5, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(6, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(7, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(8, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(9, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(10, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(11, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(12, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(13, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(14, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(15, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(16, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(17, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(18, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(19, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(20, 0));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: different firstIteration
 		config.linkStats().setWriteLinkStatsInterval(5);
 		config.linkStats().setAverageLinkStatsOverIterations(3);
-		Assert.assertFalse(lscl.useVolumesOfIteration(4, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(5, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(6, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(7, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(8, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(9, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(10, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(11, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(12, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(13, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(14, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(15, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(16, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(17, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(18, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(19, 4));
-		Assert.assertTrue(lscl.useVolumesOfIteration(20, 4));
-		Assert.assertFalse(lscl.useVolumesOfIteration(21, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(4, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(5, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(6, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(7, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(8, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(9, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(10, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(11, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(12, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(13, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(14, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(15, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(16, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(17, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(18, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(19, 4));
+		Assertions.assertTrue(lscl.useVolumesOfIteration(20, 4));
+		Assertions.assertFalse(lscl.useVolumesOfIteration(21, 4));
 	}
 
 	@Test
-	public void test_writeLinkStatsInterval() {
+	void test_writeLinkStatsInterval() {
 		Config config = this.util.loadConfig((String) null);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 
@@ -335,18 +335,18 @@ public class LinkStatsControlerListenerTest {
 		config.controller().setWritePlansInterval(0);
 		controler.run();
 
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
 	}
 
 	@Test
-	public void testReset_CorrectlyExecuted() throws IOException {
+	void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.loadConfig((String) null);
 		config.controller().setMobsim("dummy");
 		config.controller().setFirstIteration(0);
@@ -378,23 +378,23 @@ public class LinkStatsControlerListenerTest {
 		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.run();
 
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
 
 		double[] volumes = getVolumes(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt");
-		Assert.assertEquals(3, volumes[0], 1e-8);
-		Assert.assertEquals(3.5, volumes[1], 1e-8);
-		Assert.assertEquals(4, volumes[2], 1e-8);
+		Assertions.assertEquals(3, volumes[0], 1e-8);
+		Assertions.assertEquals(3.5, volumes[1], 1e-8);
+		Assertions.assertEquals(4, volumes[2], 1e-8);
 		volumes = getVolumes(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt");
-		Assert.assertEquals(6, volumes[0], 1e-8);
-		Assert.assertEquals(6.5, volumes[1], 1e-8);
-		Assert.assertEquals(7, volumes[2], 1e-8);
+		Assertions.assertEquals(6, volumes[0], 1e-8);
+		Assertions.assertEquals(6.5, volumes[1], 1e-8);
+		Assertions.assertEquals(7, volumes[2], 1e-8);
 	}
 
 	private double[] getVolumes(final String filename) throws IOException {

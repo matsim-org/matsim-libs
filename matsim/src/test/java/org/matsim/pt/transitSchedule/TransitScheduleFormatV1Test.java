@@ -20,7 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -61,11 +61,12 @@ import org.xml.sax.SAXException;
  */
 public class TransitScheduleFormatV1Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
+	@Test
+	void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
         Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -157,60 +158,60 @@ public class TransitScheduleFormatV1Test {
 
 	private static void assertEqualSchedules(final TransitSchedule expected, final TransitSchedule actual) {
 
-		assertEquals("different number of stopFacilities.", expected.getFacilities().size(), actual.getFacilities().size());
+		assertEquals(expected.getFacilities().size(), actual.getFacilities().size(), "different number of stopFacilities.");
 		for (TransitStopFacility stopE : expected.getFacilities().values()) {
 			TransitStopFacility stopA = actual.getFacilities().get(stopE.getId());
-			assertNotNull("stopFacility not found: " + stopE.getId().toString(), stopA);
-			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), MatsimTestUtils.EPSILON);
-			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), MatsimTestUtils.EPSILON);
-			assertEquals("different link information.", stopE.getLinkId(), stopA.getLinkId());
-			assertEquals("different isBlocking.", stopE.getIsBlockingLane(), stopA.getIsBlockingLane());
-			assertEquals("different names.", stopE.getName(), stopA.getName());
+			assertNotNull(stopA, "stopFacility not found: " + stopE.getId().toString());
+			assertEquals(stopE.getCoord().getX(), stopA.getCoord().getX(), MatsimTestUtils.EPSILON, "different x coordinates.");
+			assertEquals(stopE.getCoord().getY(), stopA.getCoord().getY(), MatsimTestUtils.EPSILON, "different y coordinates.");
+			assertEquals(stopE.getLinkId(), stopA.getLinkId(), "different link information.");
+			assertEquals(stopE.getIsBlockingLane(), stopA.getIsBlockingLane(), "different isBlocking.");
+			assertEquals(stopE.getName(), stopA.getName(), "different names.");
 		}
 
-		assertEquals("different number of transitLines.", expected.getTransitLines().size(), actual.getTransitLines().size());
+		assertEquals(expected.getTransitLines().size(), actual.getTransitLines().size(), "different number of transitLines.");
 		for (TransitLine lineE : expected.getTransitLines().values()) {
 			// *E = expected, *A = actual
 			TransitLine lineA = actual.getTransitLines().get(lineE.getId());
-			assertNotNull("transit line not found: " + lineE.getId().toString(), lineA);
-			assertEquals("different number of routes in line.", lineE.getRoutes().size(), lineA.getRoutes().size());
+			assertNotNull(lineA, "transit line not found: " + lineE.getId().toString());
+			assertEquals(lineE.getRoutes().size(), lineA.getRoutes().size(), "different number of routes in line.");
 			for (TransitRoute routeE : lineE.getRoutes().values()) {
 				TransitRoute routeA = lineA.getRoutes().get(routeE.getId());
-				assertNotNull("transit route not found: " + routeE.getId().toString(), routeA);
-				assertEquals("different route descriptions.", routeE.getDescription(), routeA.getDescription());
+				assertNotNull(routeA, "transit route not found: " + routeE.getId().toString());
+				assertEquals(routeE.getDescription(), routeA.getDescription(), "different route descriptions.");
 
-				assertEquals("different number of stops.", routeE.getStops().size(), routeA.getStops().size());
+				assertEquals(routeE.getStops().size(), routeA.getStops().size(), "different number of stops.");
 				for (int i = 0, n = routeE.getStops().size(); i < n; i++) {
 					TransitRouteStop stopE = routeE.getStops().get(i);
 					TransitRouteStop stopA = routeA.getStops().get(i);
-					assertNotNull("stop not found", stopA);
-					assertEquals("different stop facilities.", stopE.getStopFacility().getId(), stopA.getStopFacility().getId());
-					assertEquals("different arrival delay.", stopE.getArrivalOffset(), stopA.getArrivalOffset());
-					assertEquals("different departure delay.", stopE.getDepartureOffset(), stopA.getDepartureOffset());
-					assertEquals("different awaitDepartureTime.", stopE.isAwaitDepartureTime(), stopA.isAwaitDepartureTime());
+					assertNotNull(stopA, "stop not found");
+					assertEquals(stopE.getStopFacility().getId(), stopA.getStopFacility().getId(), "different stop facilities.");
+					assertEquals(stopE.getArrivalOffset(), stopA.getArrivalOffset(), "different arrival delay.");
+					assertEquals(stopE.getDepartureOffset(), stopA.getDepartureOffset(), "different departure delay.");
+					assertEquals(stopE.isAwaitDepartureTime(), stopA.isAwaitDepartureTime(), "different awaitDepartureTime.");
 				}
 
 				NetworkRoute netRouteE = routeE.getRoute();
 				if (netRouteE == null) {
-					assertNull("bad network route, must be null.", routeA.getRoute());
+					assertNull(routeA.getRoute(), "bad network route, must be null.");
 				} else {
 					NetworkRoute netRouteA = routeA.getRoute();
-					assertNotNull("bad network route, must not be null.", netRouteA);
-					assertEquals("wrong start link.", netRouteE.getStartLinkId(), netRouteA.getStartLinkId());
-					assertEquals("wrong end link.", netRouteE.getEndLinkId(), netRouteA.getEndLinkId());
+					assertNotNull(netRouteA, "bad network route, must not be null.");
+					assertEquals(netRouteE.getStartLinkId(), netRouteA.getStartLinkId(), "wrong start link.");
+					assertEquals(netRouteE.getEndLinkId(), netRouteA.getEndLinkId(), "wrong end link.");
 					List<Id<Link>> linkIdsE = netRouteE.getLinkIds();
 					List<Id<Link>> linkIdsA = netRouteA.getLinkIds();
 					for (int i = 0, n = linkIdsE.size(); i < n; i++) {
-						assertEquals("wrong link in network route", linkIdsE.get(i), linkIdsA.get(i));
+						assertEquals(linkIdsE.get(i), linkIdsA.get(i), "wrong link in network route");
 					}
 				}
 
-				assertEquals("different number of departures in route.", routeE.getDepartures().size(), routeA.getDepartures().size());
+				assertEquals(routeE.getDepartures().size(), routeA.getDepartures().size(), "different number of departures in route.");
 				for (Departure departureE : routeE.getDepartures().values()) {
 					Departure departureA = routeA.getDepartures().get(departureE.getId());
-					assertNotNull("departure not found: " + departureE.getId().toString(), departureA);
-					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), MatsimTestUtils.EPSILON);
-					assertEquals("different vehicle ids.", departureE.getVehicleId(), departureA.getVehicleId());
+					assertNotNull(departureA, "departure not found: " + departureE.getId().toString());
+					assertEquals(departureE.getDepartureTime(), departureA.getDepartureTime(), MatsimTestUtils.EPSILON, "different departure times.");
+					assertEquals(departureE.getVehicleId(), departureA.getVehicleId(), "different vehicle ids.");
 				}
 			}
 		}

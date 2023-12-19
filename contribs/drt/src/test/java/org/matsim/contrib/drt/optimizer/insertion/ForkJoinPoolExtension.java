@@ -22,27 +22,17 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.concurrent.ForkJoinPool;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ForkJoinPoolTestRule implements TestRule {
+public class ForkJoinPoolExtension implements AfterEachCallback {
 	public final ForkJoinPool forkJoinPool = new ForkJoinPool(1);
 
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				try {
-					base.evaluate();
-				} finally {
-					forkJoinPool.shutdown();
-				}
-			}
-		};
+	public void afterEach(ExtensionContext extensionContext) throws Exception {
+		forkJoinPool.shutdown();
 	}
 }

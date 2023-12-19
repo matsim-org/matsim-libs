@@ -23,7 +23,7 @@ package org.matsim.freight.carriers.mobsim;
 
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
-@Ignore
+@Disabled
 public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyManager>{
 
     @Inject Network network;

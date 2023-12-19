@@ -20,9 +20,9 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,11 +49,11 @@ import java.util.*;
  */
 public class TrafficVolumeGenerationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
+	void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -84,52 +84,52 @@ public class TrafficVolumeGenerationTest {
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Assert.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
-		Assert.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
+		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
+		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
 
 		for (String zone : resultingDataPerZone.keySet()) {
 			TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, modesORvehTypes.get(0));
-			Assert.assertTrue(trafficVolumePerTypeAndZone_start.containsKey(trafficVolumeKey));
-			Assert.assertTrue(trafficVolumePerTypeAndZone_stop.containsKey(trafficVolumeKey));
+			Assertions.assertTrue(trafficVolumePerTypeAndZone_start.containsKey(trafficVolumeKey));
+			Assertions.assertTrue(trafficVolumePerTypeAndZone_stop.containsKey(trafficVolumeKey));
 		}
 		TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea1_area1", modesORvehTypes.get(0));
-		Assert.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(124, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(277, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(175, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(250, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(124, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(277, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(175, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(250, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(105, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(426, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(121, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(65, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(105, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(426, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(121, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(65, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea1_area2", modesORvehTypes.get(0));
-		Assert.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(211, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(514, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(441, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(630, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(211, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(514, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(441, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(630, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(202, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(859, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(246, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(102, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(202, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(859, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(246, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(102, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea2_area3", modesORvehTypes.get(0));
-		Assert.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(34, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(79, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(62, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(88, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(34, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(79, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(62, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(88, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(31, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(128, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(37, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(31, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(128, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(37, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 
 		//test with different sample
@@ -139,51 +139,51 @@ public class TrafficVolumeGenerationTest {
 		trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Assert.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
-		Assert.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
+		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
+		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea1_area1", modesORvehTypes.get(0));
-		Assert.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(31, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(69, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(44, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(63, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(31, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(69, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(44, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(63, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(26, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(106, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(30, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(16, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(26, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(106, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(16, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea1_area2", modesORvehTypes.get(0));
-		Assert.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(53, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(129, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(110, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(158, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(53, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(129, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(110, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(158, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(50, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(215, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(61, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(25, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(50, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(215, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(61, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(25, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea2_area3", modesORvehTypes.get(0));
-		Assert.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(8, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(20, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(15, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(22, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(8, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(20, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(22, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(32, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(9, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(32, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
+	void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -214,14 +214,14 @@ public class TrafficVolumeGenerationTest {
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Assert.assertEquals(15, trafficVolumePerTypeAndZone_start.size());
-		Assert.assertEquals(15, trafficVolumePerTypeAndZone_stop.size());
+		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_start.size());
+		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_stop.size());
 
 		for (String zone : resultingDataPerZone.keySet()) {
 			for (String modesORvehType : modesORvehTypes) {
 				TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, modesORvehType);
-				Assert.assertTrue(trafficVolumePerTypeAndZone_start.containsKey(trafficVolumeKey));
-				Assert.assertTrue(trafficVolumePerTypeAndZone_stop.containsKey(trafficVolumeKey));
+				Assertions.assertTrue(trafficVolumePerTypeAndZone_start.containsKey(trafficVolumeKey));
+				Assertions.assertTrue(trafficVolumePerTypeAndZone_stop.containsKey(trafficVolumeKey));
 			}
 		}
 
@@ -249,83 +249,83 @@ public class TrafficVolumeGenerationTest {
 				sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 				sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 				if (modeORvehType.equals("vehTyp1")) {
-					Assert.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(16, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(101, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(36, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(33, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(16, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(101, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(36, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(33, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-					Assert.assertEquals(5, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(73, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(54, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(0, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(5, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(73, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(54, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 				}
 				if (modeORvehType.equals("vehTyp2")) {
-					Assert.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(21, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(11, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(23, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(10, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(21, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(11, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(23, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(10, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-					Assert.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(13, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(20, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(7, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(11, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(13, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(20, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(7, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(11, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 				}
 				if (modeORvehType.equals("vehTyp3")) {
-					Assert.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(44, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(42, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(28, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(23, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(44, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(42, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(28, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(23, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-					Assert.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(28, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(73, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(15, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(28, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(73, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(15, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 				}
 				if (modeORvehType.equals("vehTyp4")) {
-					Assert.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(10, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(13, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(2, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(10, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(13, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(2, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-					Assert.assertEquals(0, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(5, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(20, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(5, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(5, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(20, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(5, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 				}
 				if (modeORvehType.equals("vehTyp5")) {
-					Assert.assertEquals(2, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(4, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(29, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(72, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(31, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(2, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(4, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(29, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(72, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(31, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-					Assert.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(20, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(133, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-					Assert.assertEquals(0, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(20, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(133, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 				}
 			}
-			Assert.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
-			Assert.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
 		}
 
 		// test for "testArea1_area2"
@@ -352,8 +352,8 @@ public class TrafficVolumeGenerationTest {
 				sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 				sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 			}
-			Assert.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
-			Assert.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
 		}
 
 		// test for "testArea2_area3"
@@ -380,13 +380,13 @@ public class TrafficVolumeGenerationTest {
 				sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 				sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 			}
-			Assert.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
-			Assert.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
 		}
 	}
 
 	@Test
-	public void testAddingExistingScenarios() throws Exception {
+	void testAddingExistingScenarios() throws Exception {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
@@ -406,53 +406,53 @@ public class TrafficVolumeGenerationTest {
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
-		Assert.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
-		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier2", Carrier.class)));
-		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
+		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
+		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier2", Carrier.class)));
+		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
 
 		Carrier addedCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier1", Carrier.class));
-		Assert.assertNotNull(addedCarrier1.getSelectedPlan());
-		Assert.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(3, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(30, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
-		Assert.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
-		Assert.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
-		Assert.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
-		Assert.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
-		Assert.assertEquals("testArea2_area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
+		Assertions.assertNotNull(addedCarrier1.getSelectedPlan());
+		Assertions.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier1.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier1.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
+		Assertions.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
+		Assertions.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
+		Assertions.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
+		Assertions.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
+		Assertions.assertEquals("testArea2_area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
 
 		Carrier addedCarrier2 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier2", Carrier.class));
-		Assert.assertNotNull(addedCarrier2.getSelectedPlan());
-		Assert.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier2.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier2.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, addedCarrier2.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(20, addedCarrier2.getServices().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("commercialPersonTraffic", addedCarrier2.getAttributes().getAttribute("subpopulation"));
-		Assert.assertEquals(2, (int) addedCarrier2.getAttributes().getAttribute("purpose"));
-		Assert.assertEquals("exampleServiceCarrier", addedCarrier2.getAttributes().getAttribute("existingModel"));
-		Assert.assertEquals("car", addedCarrier2.getAttributes().getAttribute("networkMode"));
-		Assert.assertNull(addedCarrier2.getAttributes().getAttribute("vehicleType"));
-		Assert.assertEquals("testArea2_area3", addedCarrier2.getAttributes().getAttribute("tourStartArea"));
+		Assertions.assertNotNull(addedCarrier2.getSelectedPlan());
+		Assertions.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier2.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier2.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, addedCarrier2.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(20, addedCarrier2.getServices().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals("commercialPersonTraffic", addedCarrier2.getAttributes().getAttribute("subpopulation"));
+		Assertions.assertEquals(2, (int) addedCarrier2.getAttributes().getAttribute("purpose"));
+		Assertions.assertEquals("exampleServiceCarrier", addedCarrier2.getAttributes().getAttribute("existingModel"));
+		Assertions.assertEquals("car", addedCarrier2.getAttributes().getAttribute("networkMode"));
+		Assertions.assertNull(addedCarrier2.getAttributes().getAttribute("vehicleType"));
+		Assertions.assertEquals("testArea2_area3", addedCarrier2.getAttributes().getAttribute("tourStartArea"));
 
 		Carrier addedCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
-		Assert.assertNull(addedCarrier3.getSelectedPlan());
-		Assert.assertEquals(50, CarriersUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(FleetSize.INFINITE, addedCarrier3.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(0, addedCarrier3.getServices().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(5, addedCarrier3.getShipments().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertNull(addedCarrier3.getSelectedPlan());
+		Assertions.assertEquals(50, CarriersUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier3.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier3.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(FleetSize.INFINITE, addedCarrier3.getCarrierCapabilities().getFleetSize());
+		Assertions.assertEquals(0, addedCarrier3.getServices().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5, addedCarrier3.getShipments().size(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testAddingExistingScenariosWithSample() throws Exception {
+	void testAddingExistingScenariosWithSample() throws Exception {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
@@ -472,38 +472,38 @@ public class TrafficVolumeGenerationTest {
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
-		Assert.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
-		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
+		Assertions.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
+		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
 
 		Carrier addedCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier1", Carrier.class));
-		Assert.assertNotNull(addedCarrier1.getSelectedPlan());
-		Assert.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(10, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
-		Assert.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
-		Assert.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
-		Assert.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
-		Assert.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
-		Assert.assertEquals("testArea2_area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
+		Assertions.assertNotNull(addedCarrier1.getSelectedPlan());
+		Assertions.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier1.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier1.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(10, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
+		Assertions.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
+		Assertions.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
+		Assertions.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
+		Assertions.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
+		Assertions.assertEquals("testArea2_area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
 
 		Carrier addedCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
-		Assert.assertNull(addedCarrier3.getSelectedPlan());
-		Assert.assertEquals(50, CarriersUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(FleetSize.INFINITE, addedCarrier3.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(0, addedCarrier3.getServices().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, addedCarrier3.getShipments().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertNull(addedCarrier3.getSelectedPlan());
+		Assertions.assertEquals(50, CarriersUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier3.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier3.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(FleetSize.INFINITE, addedCarrier3.getCarrierCapabilities().getFleetSize());
+		Assertions.assertEquals(0, addedCarrier3.getServices().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, addedCarrier3.getShipments().size(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
+	void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
@@ -571,23 +571,23 @@ public class TrafficVolumeGenerationTest {
 						sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 						sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 						if (modeORvehType.equals("vehTyp3")) {
-							Assert.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(44, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(42, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(28, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(23, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(44, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(42, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(28, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(23, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-							Assert.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(26, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(73, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(15, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(4, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(8, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(26, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(73, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(15, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 						}
 					}
-					Assert.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
-					Assert.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
 				}
 
 				// test for "testArea1_area2"
@@ -614,8 +614,8 @@ public class TrafficVolumeGenerationTest {
 						sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 						sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 					}
-					Assert.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
-					Assert.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
 				}
 
 				// test for "testArea2_area3"
@@ -642,28 +642,28 @@ public class TrafficVolumeGenerationTest {
 						sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 						sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 						if (modeORvehType.equals("vehTyp3")) {
-							Assert.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(17, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(11, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(17, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(11, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 
-							Assert.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(14, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
-							Assert.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(14, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
 						}
 					}
-					Assert.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
-					Assert.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(estimatesStart.get(i), sumStart, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(estimatesStop.get(i), sumStop, MatsimTestUtils.EPSILON);
 				}
 	}
 
 	@Test
-	public void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
+	void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
@@ -711,58 +711,57 @@ public class TrafficVolumeGenerationTest {
 		double sumOfStartOtherAreas = 0;
 
 		TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea1_area1", modesORvehTypes.get(0));
-		Assert.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		sumOfStartOtherAreas += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2);
-		Assert.assertEquals(277, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(175, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(250, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(277, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(175, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(250, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(85, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(426, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(121, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(65, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(85, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(426, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(121, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(65, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea1_area2", modesORvehTypes.get(0));
-		Assert.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		sumOfStartOtherAreas += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2);
-		Assert.assertEquals(514, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(441, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(630, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(514, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(441, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(630, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(187, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(859, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(246, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(102, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(187, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(859, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(246, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(102, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
 		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("testArea2_area3", modesORvehTypes.get(0));
-		Assert.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		sumOfStartOtherAreas += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2);
-		Assert.assertEquals(79, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(62, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(88, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(79, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(62, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(88, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(27, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(128, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(37, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(27, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(128, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(37, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(330, sumOfStartOtherAreas, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(330, sumOfStartOtherAreas, MatsimTestUtils.EPSILON);
 	}
 
 
-
 	@Test
-	public void testTrafficVolumeKeyGeneration() {
+	void testTrafficVolumeKeyGeneration() {
 		String zone = "zone1";
 		String mode = "modeA";
 
 		TrafficVolumeKey newKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, mode);
 
-		Assert.assertEquals(newKey.getZone(), zone);
-		Assert.assertEquals(newKey.getModeORvehType(), mode);
+		Assertions.assertEquals(newKey.getZone(), zone);
+		Assertions.assertEquals(newKey.getModeORvehType(), mode);
 	}
 }

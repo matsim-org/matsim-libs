@@ -1,7 +1,8 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
+import org.apache.commons.compress.utils.Sets;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
@@ -52,7 +53,7 @@ public class PassengerGroupTest {
 	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
 
 	@Test
-	public void test_group() {
+	void test_group() {
 		double departureTime = 0;
 		Id<Person> person1 = Id.createPersonId("1");
 		Id<Person> person2 = Id.createPersonId("2");

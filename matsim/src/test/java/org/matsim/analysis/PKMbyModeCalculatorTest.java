@@ -8,9 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,11 +41,11 @@ public class PKMbyModeCalculatorTest {
 	Person person3 = PopulationUtils.getFactory().createPerson(Id.create(3, Person.class));
 	Person person4 = PopulationUtils.getFactory().createPerson(Id.create(4, Person.class));
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testPKMbyModeCalculator() {
+	void testPKMbyModeCalculator() {
 
 		final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 		Plans plans = new Plans();
@@ -217,9 +218,9 @@ public class PKMbyModeCalculatorTest {
 					double ptStat = (pt > 0) ? Double.parseDouble(column[pt]) : 0;
 					double walkStat = (walk > 0) ? Double.parseDouble(column[walk]) : 0;
 
-					Assert.assertEquals("Car stats score does not match", Math.round((totalCar / 1000)), carStat, 0);
-					Assert.assertEquals("PT stats score does not match", Math.round((totalPt / 1000)), ptStat, 0);
-					Assert.assertEquals("Walk stats score does not match", Math.round((totalWalk / 1000)), walkStat, 0);
+					Assertions.assertEquals(Math.round((totalCar / 1000)), carStat, 0, "Car stats score does not match");
+					Assertions.assertEquals(Math.round((totalPt / 1000)), ptStat, 0, "PT stats score does not match");
+					Assertions.assertEquals(Math.round((totalWalk / 1000)), walkStat, 0, "Walk stats score does not match");
 					break;
 				}
 				iteration++;

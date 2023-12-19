@@ -20,12 +20,12 @@
 
 package org.matsim.pt.config;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 
 /**
@@ -41,7 +41,8 @@ public class TransitConfigGroupTest {
 	 * {@link TransitConfigGroup#getParams()} for setting and getting
 	 * the transit schedule input file.
 	 */
-	@Test public void testTransitScheduleFile() {
+	@Test
+	void testTransitScheduleFile() {
 		TransitConfigGroup cg = new TransitConfigGroup();
 		// test initial value
 		assertNull(cg.getTransitScheduleFile());
@@ -71,7 +72,8 @@ public class TransitConfigGroupTest {
 		assertEquals(filename, cg.getParams().get(TransitConfigGroup.TRANSIT_SCHEDULE_FILE));
 	}
 
-	@Test public void testVehiclesFile() {
+	@Test
+	void testVehiclesFile() {
 		TransitConfigGroup cg = new TransitConfigGroup();
 		// test initial value
 		assertNull(cg.getVehiclesFile());
@@ -101,7 +103,8 @@ public class TransitConfigGroupTest {
 		assertEquals(filename, cg.getParams().get(TransitConfigGroup.VEHICLES_FILE));
 	}
 
-	@Test public void testTransitModes() {
+	@Test
+	void testTransitModes() {
 		TransitConfigGroup cg = new TransitConfigGroup();
 		Set<String> modes;
 		// test initial value

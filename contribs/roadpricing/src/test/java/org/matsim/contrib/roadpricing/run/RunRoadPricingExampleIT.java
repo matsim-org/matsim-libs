@@ -1,17 +1,17 @@
 package org.matsim.contrib.roadpricing.run;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunRoadPricingExampleIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final String TEST_CONFIG = "./test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
 
 	@Test
-	public void testRunToadPricingExample() {
+	void testRunToadPricingExample() {
 		String[] args = new String[]{TEST_CONFIG
 				, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 		};
@@ -19,7 +19,7 @@ public class RunRoadPricingExampleIT {
 			RunRoadPricingExample.main(args);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Example should run without exceptions.");
+			Assertions.fail("Example should run without exceptions.");
 		}
 	}
 }

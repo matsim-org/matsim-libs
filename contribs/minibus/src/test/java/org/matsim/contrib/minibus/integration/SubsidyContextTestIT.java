@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
@@ -51,14 +51,14 @@ import org.matsim.testcases.MatsimTestUtils;
 public class SubsidyContextTestIT implements TabularFileHandler {
 
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 	private String gridScenarioDirectory ="../../example-scenario/input/";
 
-	@Ignore
+	@Disabled
 	@Test
-	public final void testDefaultPControler() {
+	final void testDefaultPControler() {
 
 		Config config1 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 
@@ -91,7 +91,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 
 		for (String filename : filesToCheckFor) {
 			File f = new File(filename);
-			Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
+			Assertions.assertEquals(true, f.exists() && !f.isDirectory(), filename + " does not exist");
 		}
 
 		// Check pStats
@@ -103,21 +103,21 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
 		// Check final iteration
-		Assert.assertEquals("Number of coops (final iteration)", "10", this.pStatsResults.get(31)[1]);
-		Assert.assertEquals("Number of routes (final iteration)", "13", this.pStatsResults.get(31)[3]);
-		Assert.assertEquals("Number of pax (final iteration)", "17163", this.pStatsResults.get(31)[5]);
-		Assert.assertEquals("Number of veh (final iteration)", "583", this.pStatsResults.get(31)[7]);
-		Assert.assertEquals("Number of budget (final iteration)", "-7123.2705000000", this.pStatsResults.get(31)[9]);
+		Assertions.assertEquals("10", this.pStatsResults.get(31)[1], "Number of coops (final iteration)");
+		Assertions.assertEquals("13", this.pStatsResults.get(31)[3], "Number of routes (final iteration)");
+		Assertions.assertEquals("17163", this.pStatsResults.get(31)[5], "Number of pax (final iteration)");
+		Assertions.assertEquals("583", this.pStatsResults.get(31)[7], "Number of veh (final iteration)");
+		Assertions.assertEquals("-7123.2705000000", this.pStatsResults.get(31)[9], "Number of budget (final iteration)");
 
-		Assert.assertEquals("Number of +coops (final iteration)", "4", this.pStatsResults.get(31)[2]);
-		Assert.assertEquals("Number of +routes (final iteration)", "6", this.pStatsResults.get(31)[4]);
-		Assert.assertEquals("Number of +pax (final iteration)", "3610", this.pStatsResults.get(31)[6]);
-		Assert.assertEquals("Number of +veh (final iteration)", "16", this.pStatsResults.get(31)[8]);
+		Assertions.assertEquals("4", this.pStatsResults.get(31)[2], "Number of +coops (final iteration)");
+		Assertions.assertEquals("6", this.pStatsResults.get(31)[4], "Number of +routes (final iteration)");
+		Assertions.assertEquals("3610", this.pStatsResults.get(31)[6], "Number of +pax (final iteration)");
+		Assertions.assertEquals("16", this.pStatsResults.get(31)[8], "Number of +veh (final iteration)");
 	}
 
-	@Ignore
+	@Disabled
 	@Test
-	public final void testSubsidyPControler() {
+	final void testSubsidyPControler() {
 
 		Config config2 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 
@@ -153,7 +153,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 
 		for (String filename : filesToCheckFor) {
 			File f = new File(filename);
-			Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
+			Assertions.assertEquals(true, f.exists() && !f.isDirectory(), filename + " does not exist");
 		}
 
 
@@ -166,16 +166,16 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
 		// Check final iteration
-		Assert.assertEquals("Number of coops (final iteration)", "10", this.pStatsResults.get(31)[1]);
-		Assert.assertEquals("Number of routes (final iteration)", "62", this.pStatsResults.get(31)[3]);
-		Assert.assertEquals("Number of pax (final iteration)", "17210", this.pStatsResults.get(31)[5]);
-		Assert.assertEquals("Number of veh (final iteration)", "761", this.pStatsResults.get(31)[7]);
-		Assert.assertEquals("Number of budget (final iteration)", "-1876.5780555555", this.pStatsResults.get(31)[9]);
+		Assertions.assertEquals("10", this.pStatsResults.get(31)[1], "Number of coops (final iteration)");
+		Assertions.assertEquals("62", this.pStatsResults.get(31)[3], "Number of routes (final iteration)");
+		Assertions.assertEquals("17210", this.pStatsResults.get(31)[5], "Number of pax (final iteration)");
+		Assertions.assertEquals("761", this.pStatsResults.get(31)[7], "Number of veh (final iteration)");
+		Assertions.assertEquals("-1876.5780555555", this.pStatsResults.get(31)[9], "Number of budget (final iteration)");
 
-		Assert.assertEquals("Number of +coops (final iteration)", "4", this.pStatsResults.get(31)[2]);
-		Assert.assertEquals("Number of +routes (final iteration)", "51", this.pStatsResults.get(31)[4]);
-		Assert.assertEquals("Number of +pax (final iteration)", "9951", this.pStatsResults.get(31)[6]);
-		Assert.assertEquals("Number of +veh (final iteration)", "260", this.pStatsResults.get(31)[8]);
+		Assertions.assertEquals("4", this.pStatsResults.get(31)[2], "Number of +coops (final iteration)");
+		Assertions.assertEquals("51", this.pStatsResults.get(31)[4], "Number of +routes (final iteration)");
+		Assertions.assertEquals("9951", this.pStatsResults.get(31)[6], "Number of +pax (final iteration)");
+		Assertions.assertEquals("260", this.pStatsResults.get(31)[8], "Number of +veh (final iteration)");
 	}
 
 	@Override

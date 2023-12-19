@@ -20,14 +20,14 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -35,15 +35,16 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ByteBufferUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**
 	 * Tests {@link ByteBufferUtils#putString(java.nio.ByteBuffer, String)} and
 	 * {@link ByteBufferUtils#getString(java.nio.ByteBuffer)}.
 	 */
-	@Test public void testPutGetString() {
+	@Test
+	void testPutGetString() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		buffer.putInt(5);
 		ByteBufferUtils.putString(buffer, "foo bar");
@@ -65,7 +66,8 @@ public class ByteBufferUtilsTest {
 	 * Tests {@link ByteBufferUtils#putObject(java.nio.ByteBuffer, Serializable)} and
 	 * {@link ByteBufferUtils#getObject(java.nio.ByteBuffer)}.
 	 */
-	@Test public void testPutGetObject() {
+	@Test
+	void testPutGetObject() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		buffer.putInt(5);
 		ByteBufferUtils.putObject(buffer, "foo bar");

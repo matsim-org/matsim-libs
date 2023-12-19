@@ -20,9 +20,9 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigReader;
@@ -38,13 +38,13 @@ import java.io.OutputStreamWriter;
  */
 public class RaptorUtilsTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         System.setProperty("matsim.preferLocalDtds", "true");
     }
 
-    @Test
-    public void testConfigLoading() {
+	@Test
+	void testConfigLoading() {
         // prepare config
         SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
         Config config1 = ConfigUtils.createConfig(srrConfig);
@@ -63,24 +63,24 @@ public class RaptorUtilsTest {
 
         // first checks
         ConfigGroup srrConfig2 = config2.getModules().get(SwissRailRaptorConfigGroup.GROUP);
-        Assert.assertNotNull(srrConfig2);
-        Assert.assertEquals(ConfigGroup.class, srrConfig2.getClass());
+        Assertions.assertNotNull(srrConfig2);
+        Assertions.assertEquals(ConfigGroup.class, srrConfig2.getClass());
 
         // create RaptorConfig, test if SwissRailRaptorConfigGroup got created
         RaptorParameters raptorParams = RaptorUtils.createParameters(config2);
         srrConfig2 = config2.getModules().get(SwissRailRaptorConfigGroup.GROUP);
-        Assert.assertNotNull(srrConfig2);
-        Assert.assertEquals(SwissRailRaptorConfigGroup.class, srrConfig2.getClass());
+        Assertions.assertNotNull(srrConfig2);
+        Assertions.assertEquals(SwissRailRaptorConfigGroup.class, srrConfig2.getClass());
 
-        Assert.assertNotNull(raptorParams.getConfig());
-        Assert.assertEquals(srrConfig2, raptorParams.getConfig());
+        Assertions.assertNotNull(raptorParams.getConfig());
+        Assertions.assertEquals(srrConfig2, raptorParams.getConfig());
 
         RaptorParameters raptorParams2 = RaptorUtils.createParameters(config2);
-        Assert.assertEquals("the same config object should be returned in subsequent calls.", srrConfig2, raptorParams2.getConfig());
+        Assertions.assertEquals(srrConfig2, raptorParams2.getConfig(), "the same config object should be returned in subsequent calls.");
 
         // check that the config is actually what we configured
-        Assert.assertTrue(raptorParams2.getConfig().isUseRangeQuery());
-        Assert.assertTrue(raptorParams2.getConfig().isUseIntermodalAccessEgress());
-        Assert.assertFalse(raptorParams2.getConfig().isUseModeMappingForPassengers());
+        Assertions.assertTrue(raptorParams2.getConfig().isUseRangeQuery());
+        Assertions.assertTrue(raptorParams2.getConfig().isUseIntermodalAccessEgress());
+        Assertions.assertFalse(raptorParams2.getConfig().isUseModeMappingForPassengers());
     }
 }

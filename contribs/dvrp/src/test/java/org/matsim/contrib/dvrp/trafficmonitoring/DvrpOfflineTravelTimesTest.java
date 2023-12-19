@@ -34,8 +34,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
@@ -52,7 +51,7 @@ public class DvrpOfflineTravelTimesTest {
 	private final Id<Link> linkIdB = Id.createLinkId("B");
 
 	@Test
-	public void saveLinkTravelTimes() throws IOException {
+	void saveLinkTravelTimes() throws IOException {
 		//the matrix may have more than 2 rows (depends on how many link ids are cached)
 		var linkTTs = new double[Id.getNumberOfIds(Link.class)][];
 
@@ -70,7 +69,7 @@ public class DvrpOfflineTravelTimesTest {
 	}
 
 	@Test
-	public void loadLinkTravelTimes() throws IOException {
+	void loadLinkTravelTimes() throws IOException {
 		var line0 = String.join(";", "linkId", "0.0", "900.0", "1800.0", "2700.0", "3600.0");
 		var line1 = String.join(";", "A", 0.1 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
 		var line2 = String.join(";", "B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "", 9.9 + "");
@@ -89,7 +88,7 @@ public class DvrpOfflineTravelTimesTest {
 	}
 
 	@Test
-	public void convertToLinkTravelTimes() {
+	void convertToLinkTravelTimes() {
 		var link = new FakeLink(Id.createLinkId("link_A"));
 		var timeDiscretizer = new TimeDiscretizer(100, 100);
 
@@ -105,7 +104,7 @@ public class DvrpOfflineTravelTimesTest {
 	}
 
 	@Test
-	public void asTravelTime() {
+	void asTravelTime() {
 		var linkA = new FakeLink(Id.createLinkId("link_A"));
 		var linkB = new FakeLink(Id.createLinkId("link_B"));
 		var timeDiscretizer = new TimeDiscretizer(100, 100);

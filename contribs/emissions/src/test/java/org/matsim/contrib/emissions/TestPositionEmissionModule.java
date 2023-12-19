@@ -1,8 +1,8 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,24 +43,24 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import jakarta.inject.Singleton;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestPositionEmissionModule {
 
     private static final String configFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" ), "config_detailed.xml" ).toString();
     // (I changed the above from veh v1 to veh v2 since veh v1 is deprecated, especially for emissions.  kai, apr'21)
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Test
-    @Ignore
-    public void simpleTest() {
+	@Test
+	@Disabled
+	void simpleTest() {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
@@ -81,8 +81,8 @@ public class TestPositionEmissionModule {
         controler.run();
     }
 
-    @Test
-    public void compareToOtherModule_singleVehicleSingleLink() {
+	@Test
+	void compareToOtherModule_singleVehicleSingleLink() {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);

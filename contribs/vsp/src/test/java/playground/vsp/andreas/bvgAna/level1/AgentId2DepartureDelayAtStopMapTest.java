@@ -3,8 +3,8 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -16,7 +16,7 @@ import org.matsim.vehicles.Vehicle;
 public class AgentId2DepartureDelayAtStopMapTest {
 
 	@Test
-	public void testAgentId2DepartureDelayAtStopMap() {
+	void testAgentId2DepartureDelayAtStopMap() {
 
 		Set<Id<Person>> idSet = new TreeSet<>();
 		for (int ii=0; ii<15; ii++){
@@ -49,11 +49,11 @@ public class AgentId2DepartureDelayAtStopMapTest {
 
 //        run tests
 
-        Assert.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId1));
-		Assert.assertEquals(event3.getTime(), handler.getStopId2DelayAtStopMap().get(persId1).getAgentEntersVehicle().get(0), 0);
+        Assertions.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId1));
+		Assertions.assertEquals(event3.getTime(), handler.getStopId2DelayAtStopMap().get(persId1).getAgentEntersVehicle().get(0), 0);
 
-		Assert.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId2));
-		Assert.assertEquals(event4.getTime(), handler.getStopId2DelayAtStopMap().get(persId2).getAgentEntersVehicle().get(0), 0);
+		Assertions.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId2));
+		Assertions.assertEquals(event4.getTime(), handler.getStopId2DelayAtStopMap().get(persId2).getAgentEntersVehicle().get(0), 0);
 
 
 	}

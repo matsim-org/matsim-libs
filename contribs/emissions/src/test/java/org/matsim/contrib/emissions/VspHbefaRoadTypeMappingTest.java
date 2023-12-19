@@ -1,17 +1,17 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VspHbefaRoadTypeMappingTest {
 
-    @Test
-    public void testSimpleMapping() {
+	@Test
+	void testSimpleMapping() {
 
         var mapper = new VspHbefaRoadTypeMapping();
         var link = getTestLink("", 70 / 3.6);

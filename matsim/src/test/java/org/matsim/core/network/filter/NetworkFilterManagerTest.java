@@ -21,9 +21,9 @@
 
 package org.matsim.core.network.filter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +54,7 @@ public class NetworkFilterManagerTest {
 
 	private Network filterNetwork;
 
-	@Before
+	@BeforeEach
 	public void prepareTestAllowedModes() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
@@ -88,7 +88,7 @@ public class NetworkFilterManagerTest {
 	}
 
 	@Test
-	public void filterTest() {
+	void filterTest() {
 		NetworkFilterManager networkFilterManager = new NetworkFilterManager(filterNetwork, new NetworkConfigGroup());
 		networkFilterManager.addNodeFilter(new NetworkNodeFilter() {
 			@Override
@@ -109,19 +109,19 @@ public class NetworkFilterManagerTest {
 
 		Network filteredNetwork = networkFilterManager.applyFilters();
 
-		Assert.assertEquals(2, filteredNetwork.getNodes().size());
-		Assert.assertTrue("must be added by nodefilter", filteredNetwork.getNodes().containsKey(Id.createNodeId("a")));
-		Assert.assertTrue("must be added for ab link", filteredNetwork.getNodes().containsKey(Id.createNodeId("b")));
+		Assertions.assertEquals(2, filteredNetwork.getNodes().size());
+		Assertions.assertTrue(filteredNetwork.getNodes().containsKey(Id.createNodeId("a")), "must be added by nodefilter");
+		Assertions.assertTrue(filteredNetwork.getNodes().containsKey(Id.createNodeId("b")), "must be added for ab link");
 
-		Assert.assertEquals(1, filteredNetwork.getLinks().size());
+		Assertions.assertEquals(1, filteredNetwork.getLinks().size());
 
 		Link ab = filteredNetwork.getLinks().get(Id.createLinkId("ab"));
-		Assert.assertEquals(CAPACITY, ab.getCapacity(), DELTA);
-		Assert.assertEquals(FREESPEED, ab.getFreespeed(), DELTA);
-		Assert.assertEquals(LENGTH, ab.getLength(), DELTA);
-		Assert.assertEquals(NR_OF_LANES, ab.getNumberOfLanes(), DELTA);
-		Assert.assertEquals(ATTRIBUTE_VALUE, ab.getAttributes().getAttribute(ATTRIBUTE_KEY));
-		Assert.assertEquals(ATTRIBUTE_VALUE2, ab.getAttributes().getAttribute(ATTRIBUTE_KEY2));
+		Assertions.assertEquals(CAPACITY, ab.getCapacity(), DELTA);
+		Assertions.assertEquals(FREESPEED, ab.getFreespeed(), DELTA);
+		Assertions.assertEquals(LENGTH, ab.getLength(), DELTA);
+		Assertions.assertEquals(NR_OF_LANES, ab.getNumberOfLanes(), DELTA);
+		Assertions.assertEquals(ATTRIBUTE_VALUE, ab.getAttributes().getAttribute(ATTRIBUTE_KEY));
+		Assertions.assertEquals(ATTRIBUTE_VALUE2, ab.getAttributes().getAttribute(ATTRIBUTE_KEY2));
 	}
 
 }

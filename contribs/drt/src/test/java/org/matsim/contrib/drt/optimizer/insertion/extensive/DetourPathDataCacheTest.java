@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -86,32 +85,32 @@ public class DetourPathDataCacheTest {
 			pathToDropoffMap, pathFromDropoffMap, ZERO_DETOUR);
 
 	@Test
-	public void insertion_0_0() {
+	void insertion_0_0() {
 		assertInsertion(0, 0, start_pickup, pickup_dropoff, null, dropoff_stop0);
 	}
 
 	@Test
-	public void insertion_0_1() {
+	void insertion_0_1() {
 		assertInsertion(0, 1, start_pickup, pickup_stop0, stop0_dropoff, dropoff_stop1);
 	}
 
 	@Test
-	public void insertion_0_2() {
+	void insertion_0_2() {
 		assertInsertion(0, 2, start_pickup, pickup_stop0, stop1_dropoff, ZERO_DETOUR);
 	}
 
 	@Test
-	public void insertion_1_1() {
+	void insertion_1_1() {
 		assertInsertion(1, 1, stop0_pickup, pickup_dropoff, null, dropoff_stop1);
 	}
 
 	@Test
-	public void insertion_1_2() {
+	void insertion_1_2() {
 		assertInsertion(1, 2, stop0_pickup, pickup_stop1, stop1_dropoff, ZERO_DETOUR);
 	}
 
 	@Test
-	public void insertion_2_2() {
+	void insertion_2_2() {
 		assertInsertion(2, 2, stop1_pickup, pickup_dropoff, null, ZERO_DETOUR);
 	}
 

@@ -19,9 +19,9 @@
 
 package org.matsim.pt.analysis;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -41,10 +41,10 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TransitLoadIntegrationTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testIntegration() {
+	void testIntegration() {
 		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
 		cfg.controller().setLastIteration(0);
 		cfg.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
@@ -71,6 +71,6 @@ public class TransitLoadIntegrationTest {
 		Departure departure = route.getDepartures().get(Id.create("07", Departure.class));
 		int load = transitload.getLoadAtDeparture(line, route, stopFacility, departure);
 
-		Assert.assertEquals("wrong number of passengers.", 4, load);
+		Assertions.assertEquals(4, load, "wrong number of passengers.");
 	}
 }

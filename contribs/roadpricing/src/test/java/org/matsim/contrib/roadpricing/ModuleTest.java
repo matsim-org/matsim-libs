@@ -22,8 +22,10 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -32,20 +34,24 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ModuleTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test(expected = RuntimeException.class)
-    public void testControlerWithoutRoadPricingDoesntWork() {
-        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        Controler controler = new Controler(config);
-        controler.run();
-        // config has a roadpricing config group, but controler does not know about
-        // road pricing.
-    }
+	@Test
+	void testControlerWithoutRoadPricingDoesntWork() {
+		assertThrows(RuntimeException.class, () -> {
+			Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+			Controler controler = new Controler(config);
+			controler.run();
+			// config has a roadpricing config group, but controler does not know about
+			// road pricing.
+		});
+		// config has a roadpricing config group, but controler does not know about
+		// road pricing.
+	}
 
-    @Test
-    public void testControlerWithRoadPricingWorks() {
+	@Test
+	void testControlerWithRoadPricingWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Controler controler = new Controler(config);
 //        controler.setModules(new RoadPricingModuleDefaults());
@@ -53,8 +59,8 @@ public class ModuleTest {
         controler.run();
     }
 
-    @Test
-    public void testControlerWithRoadPricingByScenarioWorks() {
+	@Test
+	void testControlerWithRoadPricingByScenarioWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(scenario);
@@ -64,8 +70,8 @@ public class ModuleTest {
     }
 
 
-    @Test
-    public void testControlerWithRoadPricingByScenarioWorksTwice() {
+	@Test
+	void testControlerWithRoadPricingByScenarioWorksTwice() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         config.controller().setOutputDirectory(utils.getOutputDirectory()+"/1");
         Scenario scenario = ScenarioUtils.loadScenario(config);

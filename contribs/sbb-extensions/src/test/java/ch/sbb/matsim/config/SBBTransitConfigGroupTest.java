@@ -23,8 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collections;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -35,8 +35,8 @@ import org.matsim.core.config.ConfigWriter;
  */
 public class SBBTransitConfigGroupTest {
 
-    @Test
-    public void testConfigIO() {
+	@Test
+	void testConfigIO() {
         System.setProperty("matsim.preferLocalDtds", "true");
 
         SBBTransitConfigGroup ptConfig1 = new SBBTransitConfigGroup();
@@ -55,8 +55,8 @@ public class SBBTransitConfigGroupTest {
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
         new ConfigReader(config2).parse(input);
 
-        Assert.assertEquals(1, ptConfig2.getDeterministicServiceModes().size());
-        Assert.assertTrue(ptConfig2.getDeterministicServiceModes().contains("schienenfahrzeug"));
-        Assert.assertEquals(4, ptConfig2.getCreateLinkEventsInterval());
+        Assertions.assertEquals(1, ptConfig2.getDeterministicServiceModes().size());
+        Assertions.assertTrue(ptConfig2.getDeterministicServiceModes().contains("schienenfahrzeug"));
+        Assertions.assertEquals(4, ptConfig2.getCreateLinkEventsInterval());
     }
 }

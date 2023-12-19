@@ -5,10 +5,10 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,7 +31,7 @@ import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.testcases.MatsimTestUtils;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collection;
@@ -44,11 +44,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TopKMinMaxTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private TopKChoicesGenerator generator;
 	private Injector injector;
@@ -62,7 +62,7 @@ public class TopKMinMaxTest {
 	@Mock
 	private EventsManager em;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		TestModule testModule = new TestModule();
@@ -78,7 +78,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void minmax() {
+	void minmax() {
 
 		Person person = create();
 
@@ -115,7 +115,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void subset() {
+	void subset() {
 
 		Person person = create();
 

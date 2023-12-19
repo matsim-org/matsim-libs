@@ -20,8 +20,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,23 +59,23 @@ import java.util.*;
  * @author amit
  */
 public class FlowCapacityVariationTest {
-	
+
 	@Test
-	public void twoCarsLeavingTimes () {
+	void twoCarsLeavingTimes() {
 		vehiclesLeavingSameTime(TransportMode.car,3601);
 	}
 
-	@Test 
-	public void twoMotorbikesTravelTime(){
+	@Test
+	void twoMotorbikesTravelTime(){
 		/* linkCapacity higher than 1PCU/sec*/
 		vehiclesLeavingSameTime("motorbike",3601);
 		
 		/*link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
 		vehiclesLeavingSameTime("motorbike",1800);
 	}
-	
-	@Test 
-	public void twoBikesTravelTime(){
+
+	@Test
+	void twoBikesTravelTime(){
 		/* linkCapacity higher than 1PCU/sec */
 		vehiclesLeavingSameTime(TransportMode.bike,3601);
 				
@@ -108,8 +108,8 @@ public class FlowCapacityVariationTest {
 		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1]; 
 		int linkLeaveTime2 = (int)times2.get(Id.create("2", Link.class))[1];
 
-		Assert.assertEquals(travelMode+ " entered at different time", 0, linkEnterTime1-linkEnterTime2);
-		Assert.assertEquals(travelMode +" entered at same time but not leaving the link at the same time.", 0, linkLeaveTime1-linkLeaveTime2);
+		Assertions.assertEquals(0, linkEnterTime1-linkEnterTime2, travelMode+ " entered at different time");
+		Assertions.assertEquals(0, linkLeaveTime1-linkLeaveTime2, travelMode +" entered at same time but not leaving the link at the same time.");
 	}
 	
 	private static final class PseudoInputs{

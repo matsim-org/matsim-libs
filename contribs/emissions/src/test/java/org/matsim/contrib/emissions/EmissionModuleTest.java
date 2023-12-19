@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.TestUtils;
@@ -15,52 +15,55 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Most of the other test implicitly test the EmissionModule as well. Still, I guess it makes sense to have this here
  */
 public class EmissionModuleTest {
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Test(expected = RuntimeException.class)
-    public void testWithIncorrectNetwork() {
+	@Test
+	void testWithIncorrectNetwork() {
+		assertThrows(RuntimeException.class, () -> {
 
-        var scenarioURL = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario");
+			var scenarioURL = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario");
 
-        var emissionConfig = new EmissionsConfigGroup();
-        emissionConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
-        emissionConfig.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_ColdStart_SubSegm_2020detailed.csv").toString());
-        emissionConfig.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_HOT_vehcat_2020average.csv").toString());
-        emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable);
+			var emissionConfig = new EmissionsConfigGroup();
+			emissionConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
+			emissionConfig.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_ColdStart_SubSegm_2020detailed.csv").toString());
+			emissionConfig.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_HOT_vehcat_2020average.csv").toString());
+			emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable);
 
-        var config = ConfigUtils.createConfig(emissionConfig);
+			var config = ConfigUtils.createConfig(emissionConfig);
 
-        // create a scenario with a random network where every link has a hbefa road type except one link.
-        var scenario = ScenarioUtils.createMutableScenario(config);
-        var network = TestUtils.createRandomNetwork(1000, 10000, 10000);
-        new VspHbefaRoadTypeMapping().addHbefaMappings(network);
-        network.getLinks().values().iterator().next().getAttributes().removeAttribute(EmissionUtils.HBEFA_ROAD_TYPE);
-        scenario.setNetwork(network);
+			// create a scenario with a random network where every link has a hbefa road type except one link.
+			var scenario = ScenarioUtils.createMutableScenario(config);
+			var network = TestUtils.createRandomNetwork(1000, 10000, 10000);
+			new VspHbefaRoadTypeMapping().addHbefaMappings(network);
+			network.getLinks().values().iterator().next().getAttributes().removeAttribute(EmissionUtils.HBEFA_ROAD_TYPE);
+			scenario.setNetwork(network);
 
-        var eventsManager = EventsUtils.createEventsManager();
+			var eventsManager = EventsUtils.createEventsManager();
 
 
-        var module = new AbstractModule() {
-            @Override
-            public void install() {
-                bind(Scenario.class).toInstance(scenario);
-                bind(EventsManager.class).toInstance(eventsManager);
-                bind(EmissionModule.class);
-            }
-        };
+			var module = new AbstractModule() {
+				@Override
+				public void install() {
+					bind(Scenario.class).toInstance(scenario);
+					bind(EventsManager.class).toInstance(eventsManager);
+					bind(EmissionModule.class);
+				}
+			};
 
-        com.google.inject.Injector injector = Injector.createInjector(config, module);
-        // this call should cause an exception when the consistency check in the constructor of the emission module fails
-        injector.getInstance(EmissionModule.class);
+			com.google.inject.Injector injector = Injector.createInjector(config, module);
+			// this call should cause an exception when the consistency check in the constructor of the emission module fails
+			injector.getInstance(EmissionModule.class);
 
-        fail("Was expecting exception");
-    }
+			fail("Was expecting exception");
+		});
+	}
 }

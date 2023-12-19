@@ -1,8 +1,8 @@
 package org.matsim.application.analysis;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimApplication;
 import org.matsim.application.MATSimApplicationTest;
@@ -16,11 +16,11 @@ import java.nio.file.Path;
 
 public class LogFileAnalysisTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void output() throws IOException {
+	void output() throws IOException {
 
 		Config config = ConfigUtils.createConfig();
 

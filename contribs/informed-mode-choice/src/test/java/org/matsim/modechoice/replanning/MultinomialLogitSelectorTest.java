@@ -1,8 +1,8 @@
 package org.matsim.modechoice.replanning;
 
 import org.assertj.core.data.Offset;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.modechoice.PlanCandidate;
 
 import java.util.List;
@@ -16,13 +16,13 @@ public class MultinomialLogitSelectorTest {
 
 	private static final int N = 500_000;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		selector = new MultinomialLogitSelector(1, new Random(0));
 	}
 
 	@Test
-	public void selection() {
+	void selection() {
 
 		List<PlanCandidate> candidates = List.of(
 				new PlanCandidate(new String[]{"car"}, -1),
@@ -62,7 +62,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void invariance() {
+	void invariance() {
 
 		List<PlanCandidate> candidates = List.of(
 				new PlanCandidate(new String[]{"car"}, -1),
@@ -99,7 +99,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void best() {
+	void best() {
 
 		selector = new MultinomialLogitSelector(0, new Random(0));
 
@@ -116,7 +116,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void sameScore() {
+	void sameScore() {
 
 		selector = new MultinomialLogitSelector(0.01, new Random(0));
 
@@ -132,7 +132,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void single() {
+	void single() {
 
 
 		selector = new MultinomialLogitSelector(1, new Random(0));
@@ -148,7 +148,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void precision() {
+	void precision() {
 
 		selector = new MultinomialLogitSelector(0.01, new Random(0));
 
@@ -165,7 +165,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void inf() {
+	void inf() {
 
 		selector = new MultinomialLogitSelector(10000, new Random(0));
 
@@ -184,7 +184,7 @@ public class MultinomialLogitSelectorTest {
 	}
 
 	@Test
-	public void random() {
+	void random() {
 
 		selector = new MultinomialLogitSelector(Double.POSITIVE_INFINITY, new Random(0));
 

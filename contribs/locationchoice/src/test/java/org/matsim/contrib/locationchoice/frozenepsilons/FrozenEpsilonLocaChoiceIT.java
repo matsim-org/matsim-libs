@@ -1,6 +1,6 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
@@ -14,9 +14,9 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +72,7 @@ import com.google.inject.Singleton;
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = LogManager.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * This one <em>is</em>, I think, testing the frozen epsilon location choice. kai, mar'19
@@ -91,7 +91,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	 * Confirmed: This tests fails when called AFTER BestReplyIT, michalm/mar'20
 	 */
 	@Test
-	public void testLocationChoiceJan2013() {
+	void testLocationChoiceJan2013() {
 		//	CONFIG:
 		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "../config2.xml");
 
@@ -153,7 +153,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		// run:
 		controler.run();
 
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
@@ -169,7 +169,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	}
 
 	@Test
-	public void testLocationChoiceFeb2013NegativeScores() {
+	void testLocationChoiceFeb2013NegativeScores() {
 		// config:
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "../config2.xml");
 
@@ -218,7 +218,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		controler.run();
 
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
@@ -231,7 +231,8 @@ public class FrozenEpsilonLocaChoiceIT{
 
 	enum RunType { shortRun, medRun, longRun }
 
-	@Test public void testFacilitiesAlongALine() {
+	@Test
+	void testFacilitiesAlongALine() {
 		RunType runType = RunType.shortRun ;
 		Config config = ConfigUtils.createConfig() ;
 		switch( runType ) {
@@ -428,7 +429,7 @@ public class FrozenEpsilonLocaChoiceIT{
 					}
 
 					void check( double val, double actual ){
-						Assert.assertEquals( val, actual, 2.*Math.max( 5, Math.sqrt( val ) ) );
+						Assertions.assertEquals( val, actual, 2.*Math.max( 5, Math.sqrt( val ) ) );
 					}
 
 				} );

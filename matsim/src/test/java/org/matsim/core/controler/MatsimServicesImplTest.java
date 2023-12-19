@@ -21,24 +21,24 @@
 
  package org.matsim.core.controler;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class MatsimServicesImplTest {
+	public class MatsimServicesImplTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Ignore
-    @Test
-    public void testIterationInServicesEqualsIterationInEvent() {
+	 @Disabled
+	 @Test
+	 void testIterationInServicesEqualsIterationInEvent() {
 
     	Config config = ConfigUtils.createConfig();
 		config.controller().setLastIteration(1);
@@ -53,7 +53,7 @@ public class MatsimServicesImplTest {
 
 					@Override
 					public void notifyIterationStarts(IterationStartsEvent event) {
-						Assert.assertSame(event.getIteration(), event.getServices().getIterationNumber());
+						Assertions.assertSame(event.getIteration(), event.getServices().getIterationNumber());
 
 					}
 
