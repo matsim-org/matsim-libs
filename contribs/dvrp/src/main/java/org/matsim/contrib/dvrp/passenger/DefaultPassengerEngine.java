@@ -24,9 +24,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -73,8 +75,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	//accessed in doSimStep() and handleEvent() (potential data races)
 	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
 
+	private final PassengerGroupIdentifier passengerGroupIdentifier;
+	private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<MobsimPassengerAgent>> groupDepartureStage = new LinkedHashMap<>();
+
+
 	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator,
-		VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator, AdvanceRequestProvider advanceRequestProvider) {
+						   VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator, AdvanceRequestProvider advanceRequestProvider, PassengerGroupIdentifier passengerGroupIdentifier) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.requestCreator = requestCreator;
@@ -83,6 +89,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		this.requestValidator = requestValidator;
 		this.eventsManager = eventsManager;
 		this.advanceRequestProvider = advanceRequestProvider;
+		this.passengerGroupIdentifier = passengerGroupIdentifier;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
@@ -99,6 +106,9 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public void doSimStep(double time) {
+
+		handleGroupDepartures(time);
+
 		// If prebooked requests are rejected (by the optimizer, through an
 		// event) after submission, but before departure, the PassengerEngine does not
 		// know this agent yet. Hence, we wait with setting the state to abort until the
@@ -128,6 +138,59 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		}
 	}
 
+	private void handleGroupDepartures(double now) {
+
+		groupDepartureStage.values().forEach(g -> g.sort(Comparator.comparing(Identifiable::getId)));
+		for (List<MobsimPassengerAgent> group : groupDepartureStage.values()) {
+			handleDepartureImpl(now, group);
+		}
+		groupDepartureStage.clear();
+	}
+
+	private void handleDepartureImpl(double now, List<MobsimPassengerAgent> group) {
+		List<Id<Person>> groupIds = group.stream().map(Identifiable::getId).toList();
+
+		MobsimPassengerAgent representative = group.get(0);
+
+		Id<Link> fromLinkId = representative.getCurrentLinkId();
+		Id<Link> toLinkId = representative.getDestinationLinkId();
+
+		Preconditions.checkArgument(group.stream().allMatch(a -> a.getCurrentLinkId().equals(fromLinkId)));
+		Preconditions.checkArgument(group.stream().allMatch(a -> a.getDestinationLinkId().equals(toLinkId)));
+
+		// try to find a prebooked requests that is associated to this leg
+		Leg leg = (Leg)((PlanAgent)representative).getCurrentPlanElement();
+		PassengerRequest request = advanceRequestProvider.retrieveRequest(representative, leg);
+
+		if (request == null) { // immediate request
+			Route route = leg.getRoute();
+			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+					groupIds, route, getLink(fromLinkId), getLink(toLinkId), now, now);
+
+			// must come before validateAndSubmitRequest (to come before rejection event)
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), groupIds));
+			activePassengers.put(request.getId(), group);
+
+			validateAndSubmitRequest(group, request, now);
+		} else { // advance request
+
+			Preconditions.checkArgument(request.getPassengerIds().size() == group.size());
+			Preconditions.checkArgument(request.getPassengerIds().containsAll(groupIds));
+
+			for (MobsimPassengerAgent agent : group) {
+				eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(agent.getId())));
+			}
+
+			activePassengers.put(request.getId(), group);
+
+			PassengerPickupActivity pickupActivity = waitingForPassenger.remove(request.getId());
+			if (pickupActivity != null) {
+				// the vehicle is already waiting for the request, notify it
+				pickupActivity.notifyPassengersAreReadyForDeparture(group, now);
+			}
+		}
+	}
+
 	@Override
 	public void afterSim() {
 	}
@@ -141,32 +204,15 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
-		Id<Link> toLinkId = passenger.getDestinationLinkId();
+		Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = passengerGroupIdentifier.getGroupId(passenger);
 
-		// try to find a prebooked requests that is associated to this leg
-		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
-		PassengerRequest request = advanceRequestProvider.retrieveRequest(agent, leg);
-
-		if (request == null) { // immediate request
-			Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
-			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-					List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
-
-			// must come before validateAndSubmitRequest (to come before rejection event)
-			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(passenger.getId())));
-			activePassengers.put(request.getId(), List.of(passenger));
-
-			validateAndSubmitRequest(List.of(passenger), request, now);
-		} else { // advance request
-			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(passenger.getId())));
-			activePassengers.put(request.getId(), List.of(passenger));
-
-			PassengerPickupActivity pickupActivity = waitingForPassenger.remove(request.getId());
-			if (pickupActivity != null) {
-				// the vehicle is already waiting for the request, notify it
-				pickupActivity.notifyPassengersAreReadyForDeparture(List.of(passenger), now);
-			}
+		if(groupId.isPresent()) {
+			groupDepartureStage.computeIfAbsent(groupId.get(), k -> new ArrayList<>()).add(passenger);
+			//terminate early as more group members may depart later
+			return true;
 		}
+
+		handleDepartureImpl(now, List.of(passenger));
 
 		return true;
 	}
@@ -252,7 +298,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			public DefaultPassengerEngine get() {
 				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class),
 					getModalInstance(VrpOptimizer.class), getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
-					getModalInstance(AdvanceRequestProvider.class));
+					getModalInstance(AdvanceRequestProvider.class), getModalInstance(PassengerGroupIdentifier.class));
 			}
 		};
 	}

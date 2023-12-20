@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.prebooking;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -15,10 +16,7 @@ import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -26,8 +24,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Singleton;
 
 public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final PrebookingParams prebookingParams;
@@ -65,7 +61,7 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 		addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
 
 		bindModal(PrebookingQueue.class).toProvider(modalProvider(getter -> {
-			return new PrebookingQueue(getter.getModal(PrebookingManager.class));
+			return new PrebookingQueue(getter.getModal(PrebookingManager.class), getter.getModal(PassengerGroupIdentifier.class));
 		})).in(Singleton.class);
 		addModalQSimComponentBinding().to(modalKey(PrebookingQueue.class));
 
