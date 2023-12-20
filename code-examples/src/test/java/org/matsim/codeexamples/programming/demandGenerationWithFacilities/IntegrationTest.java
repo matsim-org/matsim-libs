@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.programming.demandGenerationWithFacilities;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 

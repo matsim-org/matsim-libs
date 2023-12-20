@@ -3,7 +3,6 @@ package org.matsim.codeexamples;
 import com.jogamp.common.util.SyncedRingbuffer;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
