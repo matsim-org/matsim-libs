@@ -1,7 +1,8 @@
 package org.matsim.contrib.drt.prebooking;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -12,11 +13,10 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 
 public class PrebookingGroupTest {
 
-	@Rule
+	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 
@@ -58,17 +58,17 @@ public class PrebookingGroupTest {
 		controller.run();
 
 		PrebookingTestEnvironment.RequestInfo requestInfoA = environment.getRequestInfo().get("personA");
-		assertEquals(0.0, requestInfoA.submissionTime, 1e-3);
-		assertEquals(2060.0, requestInfoA.pickupTime, 1e-3);
-		assertEquals(2271.0, requestInfoA.dropoffTime, 1e-3);
+		Assertions.assertEquals(0.0, requestInfoA.submissionTime, 1e-3);
+		Assertions.assertEquals(2060.0, requestInfoA.pickupTime, 1e-3);
+		Assertions.assertEquals(2271.0, requestInfoA.dropoffTime, 1e-3);
 
 		PrebookingTestEnvironment.RequestInfo requestInfoB = environment.getRequestInfo().get("personB");
-		assertEquals(0.0, requestInfoB.submissionTime, 1e-3);
-		assertEquals(2060.0, requestInfoB.pickupTime, 1e-3);
-		assertEquals(2271.0, requestInfoB.dropoffTime, 1e-3);
+		Assertions.assertEquals(0.0, requestInfoB.submissionTime, 1e-3);
+		Assertions.assertEquals(2060.0, requestInfoB.pickupTime, 1e-3);
+		Assertions.assertEquals(2271.0, requestInfoB.dropoffTime, 1e-3);
 
 		// assert both persons are part of same drt request
-		assertEquals(requestInfoA.drtRequestId, requestInfoB.drtRequestId);
+		Assertions.assertEquals(requestInfoA.drtRequestId, requestInfoB.drtRequestId);
 	}
 }
 
