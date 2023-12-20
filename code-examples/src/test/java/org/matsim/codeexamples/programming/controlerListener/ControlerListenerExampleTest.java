@@ -18,12 +18,12 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.programming.controlerListener;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.UncheckedIOException;
 
 import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 import org.matsim.codeexamples.programming.controlerListener.RunControlerListenerExample;
 import org.matsim.core.utils.io.IOUtils;
 

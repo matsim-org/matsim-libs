@@ -19,7 +19,7 @@
 package org.matsim.codeexamples.programming.demandGenerationWithFacilities;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 
 import org.matsim.codeexamples.population.demandGenerationWithFacilities.RunCreateFacilities;
@@ -32,7 +32,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class IntegrationTest {
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public final void test() {

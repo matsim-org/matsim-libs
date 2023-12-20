@@ -20,8 +20,8 @@ package org.matsim.codeexamples.facilities.facilitiesAndOpenTimes;
 
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -43,7 +43,7 @@ public class RunWithFacilitiesExampleTest {
 		example.run();
 		Scenario scenario = example.getScenario() ;
 		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
-		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
-		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
+		Assertions.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
+		Assertions.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
 	}
 }

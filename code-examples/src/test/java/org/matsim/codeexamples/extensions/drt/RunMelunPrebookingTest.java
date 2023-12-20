@@ -2,12 +2,12 @@ package org.matsim.codeexamples.extensions.drt;
 
 import java.io.File;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunMelunPrebookingTest {
-	@Rule
+	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

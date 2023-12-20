@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.extensions.minibus;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.contrib.minibus.RunMinibus;
 import org.matsim.core.config.Config;
@@ -27,7 +27,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class RunMinibusTest {
 
-    @Rule
+    @RegisterExtension
     public MatsimTestUtils utils = new MatsimTestUtils() ;
 
     /**

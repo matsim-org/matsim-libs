@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode.MyPlanStrategyProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -27,6 +27,6 @@ public class MyPlanStrategyProviderTest {
 		PlanStrategy strategy = strategyFactory.get();
 		
 		//assert
-		Assert.assertNotNull("strategy was null", strategy);
+		Assertions.assertNotNull(strategy, "strategy was null");
 	}
 }

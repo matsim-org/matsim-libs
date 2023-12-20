@@ -3,8 +3,8 @@ package org.matsim.codeexamples.population.demandGenerationFromShapefile;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CreateDemandTest {
 

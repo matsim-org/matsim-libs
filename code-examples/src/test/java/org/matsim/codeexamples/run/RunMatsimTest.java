@@ -1,14 +1,13 @@
 package org.matsim.codeexamples.run;
-
-import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RunMatsimTest{
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public void main(){
@@ -22,7 +21,7 @@ public class RunMatsimTest{
 			RunMatsim.main( args );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail();
+			Assertions.fail();
 		}
 
 	}

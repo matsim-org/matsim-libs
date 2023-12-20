@@ -3,7 +3,7 @@ package org.matsim.codeexamples.programming.scenario;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
@@ -22,7 +22,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ScenarioElementAndInjection{
 	private static final Logger log = LogManager.getLogger( ScenarioElementAndInjection.class ) ;
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * This is testing at what phase a scenario element would be available.

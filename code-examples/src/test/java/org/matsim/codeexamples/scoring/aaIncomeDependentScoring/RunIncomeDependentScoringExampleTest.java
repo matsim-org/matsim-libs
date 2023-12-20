@@ -2,13 +2,12 @@ package org.matsim.codeexamples.scoring.aaIncomeDependentScoring;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.codeexamples.RunAbcSimpleExample;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -16,11 +15,12 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class RunIncomeDependentScoringExampleTest{
 	private static final Logger log = LogManager.getLogger( RunIncomeDependentScoringExampleTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testMain(){
@@ -43,7 +43,7 @@ public class RunIncomeDependentScoringExampleTest{
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assert.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
 				}
 			}
 

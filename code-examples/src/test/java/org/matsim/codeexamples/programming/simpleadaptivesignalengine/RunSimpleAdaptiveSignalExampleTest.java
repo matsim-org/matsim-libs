@@ -21,7 +21,7 @@
  */
 package org.matsim.codeexamples.programming.simpleadaptivesignalengine;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 
 import org.matsim.codeexamples.mobsim.simpleAdaptiveSignalEngine.RunSimpleAdaptiveSignalExample;
@@ -34,7 +34,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  */
 public class RunSimpleAdaptiveSignalExampleTest {
 	
-	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
 	public void testRunSimpleAdaptiveSignalExample(){

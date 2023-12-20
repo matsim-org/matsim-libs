@@ -1,9 +1,8 @@
 package org.matsim.codeexamples.mobsim.mobsimPassingVehicleQ;
 
 import java.io.File;
-
-import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -12,7 +11,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunMobsimWithMultipleModeVehiclesExampleTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public void test() {
@@ -27,7 +26,7 @@ public class RunMobsimWithMultipleModeVehiclesExampleTest {
 			RunMobsimWithMultipleModeVehiclesExample.main( args );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail();
+			Assertions.fail();
 		}
 
 	}

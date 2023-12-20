@@ -23,9 +23,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,7 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 @RunWith(Parameterized.class)
 public class ExamplesByConfigfileTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	private String configFile;
 
@@ -111,7 +110,7 @@ public class ExamplesByConfigfileTest {
 			}
 		} catch( Exception ee  ){
 			ee.printStackTrace();
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 

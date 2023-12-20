@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
 import org.junit.Test;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -25,6 +25,6 @@ public class MyPlanSelectorTest {
 		Plan resultPlan = selector.selectPlan(person);
 		
 		//assert
-		Assert.assertEquals(plan0, resultPlan);		
+		Assertions.assertEquals(plan0, resultPlan);		
 	}
 }

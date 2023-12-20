@@ -1,10 +1,10 @@
 package org.matsim.codeexamples.programming.eventsHandler;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 
 import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 import org.matsim.codeexamples.events.eventsHandling.RunEventsHandlingWithControlerExample;
 import org.matsim.core.utils.io.IOUtils;
 
