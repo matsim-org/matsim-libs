@@ -70,7 +70,8 @@ public class PassengerRequestRejectedEvent extends AbstractPassengerRequestEvent
 		List<Id<Person>> personIds = new ArrayList<>();
 		for (String person : personIdsAttribute) {
 			personIds.add(Id.create(person, Person.class));
-		}		String cause = Objects.requireNonNull(attributes.get(ATTRIBUTE_CAUSE));
+		}
+		String cause = Objects.requireNonNull(attributes.get(ATTRIBUTE_CAUSE));
 		return new PassengerRequestRejectedEvent(time, mode, requestId, personIds, cause);
 	}
 }
