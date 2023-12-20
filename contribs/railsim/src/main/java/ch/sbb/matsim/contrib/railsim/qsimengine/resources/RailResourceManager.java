@@ -204,4 +204,12 @@ public final class RailResourceManager {
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),
 			link.resource.getState(link)));
 	}
+
+	/**
+	 * Check if a re-route is allowed.
+	 * @see DeadlockAvoidance#checkReroute(double, RailLink, RailLink, List, List, TrainPosition)
+	 */
+	public boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position) {
+		return dla.checkReroute(time, start, end, subRoute, detour, position);
+	}
 }

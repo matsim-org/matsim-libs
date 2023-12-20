@@ -150,7 +150,7 @@ public class SimpleDisposition implements TrainDisposition {
 				List<RailLink> newRoute = reroute(time, subRoute, position, entry, exit);
 
 				if (newRoute != null)
-					return new Detour(start, end, newRoute);
+					return new Detour(start + 1, end, entry.getLinkId(), exit.getLinkId(), newRoute);
 			}
 		}
 
@@ -167,6 +167,9 @@ public class SimpleDisposition implements TrainDisposition {
 				List<RailLink> detour = router.calcRoute(position, entry, exit);
 
 				if (subRoute.equals(detour))
+					return null;
+
+				if (!resources.checkReroute(time, entry, exit, subRoute, detour, position))
 					return null;
 
 				return detour;

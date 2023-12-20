@@ -82,6 +82,17 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 	}
 
 	@Override
+	public boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position) {
+
+		// rerouting is always allowed, but reservations needs to be removed
+		for (RailLink link : subRoute) {
+			onRelease(time, link.getResource(), position.getDriver());
+		}
+
+		return true;
+	}
+
+	@Override
 	public void onRelease(double time, RailResource resource, MobsimDriverAgent driver) {
 
 		Reservation reservation = conflictPoints.get(resource);

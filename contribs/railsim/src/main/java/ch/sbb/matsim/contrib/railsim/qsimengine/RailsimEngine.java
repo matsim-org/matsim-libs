@@ -310,10 +310,6 @@ final class RailsimEngine implements Steppable {
 		// Disposition assigned a detour
 		if (state.pt != null && response.detour() != null) {
 
-			RailLink startDetour = state.route.get(response.detour().startIdx());
-			RailLink endDetour = state.route.get(response.detour().endIdx());
-
-			// check if this route is different
 			List<RailLink> subRoute = state.route.subList(response.detour().startIdx(), response.detour().endIdx());
 
 			TransitStopFacility newStop = state.pt.addDetour(subRoute, response.detour().newRoute());
@@ -327,7 +323,7 @@ final class RailsimEngine implements Steppable {
 
 			createEvent(new RailsimDetourEvent(
 				time, state.driver.getVehicle().getId(),
-				startDetour.getLinkId(), endDetour.getLinkId(),
+				response.detour().startLink(), response.detour().endLink(),
 				response.detour().newRoute().stream().map(RailLink::getLinkId).toList(),
 				newStop != null ? newStop.getId() : null
 			));

@@ -6,7 +6,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +31,14 @@ public interface DeadlockAvoidance {
 	 * @return true if the link can be reserved, false otherwise.
 	 */
 	boolean checkLink(double time, RailLink link, TrainPosition position);
+
+	/**
+	 * Check if performing this re-route may produce a deadlock.
+	 * @param subRoute the original route to be changed
+	 * @param detour new detour route
+	 * @return true if the rerouting can be performed, false otherwise.
+	 */
+	boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position);
 
 	/**
 	 * Called when a resource was released.
