@@ -180,6 +180,12 @@ final class TrainState implements TrainPosition {
 	}
 
 	@Override
+	@Nullable
+	public RailsimTransitDriverAgent getPt() {
+		return pt;
+	}
+
+	@Override
 	public TrainInfo getTrain() {
 		return train;
 	}

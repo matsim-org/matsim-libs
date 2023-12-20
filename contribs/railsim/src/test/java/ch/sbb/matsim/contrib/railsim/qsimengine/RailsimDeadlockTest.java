@@ -7,6 +7,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,7 +62,7 @@ public class RailsimDeadlockTest {
 	@Test
 	public void deadlock() {
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new NoDeadlockAvoidance(), null);
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new NoDeadlockAvoidance(), null);
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "DC");
 
@@ -77,10 +78,10 @@ public class RailsimDeadlockTest {
 	@Test
 	public void tooSmall() {
 
-		Set<String> increased = Set.of("y1y", "yy1", "xB", "Bx", "yx", "xy", "AB", "BA");
+		Set<String> increased = Set.of("xB", "Bx", "yx", "xy", "AB", "BA");
 
 		// Increase some capacity, but one of the segment is too small for multiple trains
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), l ->{
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l ->{
 			String id = l.getId().toString();
 			if (increased.contains(id))
 				RailsimUtils.setTrainCapacity(l, 2);
@@ -99,17 +100,17 @@ public class RailsimDeadlockTest {
 
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio1a", 760, "EF", 0)
-			.hasTrainState("regio1b", 1180, "EF", 0)
+			.hasTrainState("regio1a", 1110, "EF", 0)
+			.hasTrainState("regio1b", 1360, "EF", 0)
 			.hasTrainState("regio2a", 670, "CD", 0)
-			.hasTrainState("regio2b", 1090, "CD", 0);
+			.hasTrainState("regio2b", 980, "CD", 0);
 
 	}
 
 	@Test
 	public void oneWay() {
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), null);
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), null);
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
 
@@ -125,7 +126,7 @@ public class RailsimDeadlockTest {
 	@Test
 	public void twoWay() {
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), l -> RailsimUtils.setTrainCapacity(l, 2));
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l -> RailsimUtils.setTrainCapacity(l, 2));
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1a", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1b", 0, "AB", "EF");
 
@@ -143,4 +144,35 @@ public class RailsimDeadlockTest {
 
 	}
 
+	@Test
+	public void movingBlock() {
+
+		// Keep start and end as fixed block
+		Set<String> fixed = Set.of("AB", "BA", "CD", "DC", "EF", "FE", "HG", "GH");
+
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l ->{
+			String id = l.getId().toString();
+			if (!fixed.contains(id)) {
+				RailsimUtils.setResourceType(l, ResourceType.movingBlock);
+			}
+
+			l.setFreespeed(5);
+		});
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1a", 0, "AB", "EF");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1b", 0, "AB", "EF");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2a", 0, "HG", "CD");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
+
+		test.doSimStepUntil(1500);
+//		test.debugFiles(collector, "movingBlock");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio1a", 670, "EF", 0)
+			.hasTrainState("regio1b", 790, "EF", 0)
+			.hasTrainState("regio2a", 1120, "CD", 0)
+			.hasTrainState("regio2b", 1243, "CD", 0);
+
+	}
 }

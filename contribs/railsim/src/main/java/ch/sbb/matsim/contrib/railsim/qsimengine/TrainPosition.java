@@ -19,6 +19,12 @@ public interface TrainPosition {
 	MobsimDriverAgent getDriver();
 
 	/**
+	 * Get transit driver agent, if this is a pt transit.
+	 */
+	@Nullable
+	RailsimTransitDriverAgent getPt();
+
+	/**
 	 * The train type.
 	 */
 	TrainInfo getTrain();

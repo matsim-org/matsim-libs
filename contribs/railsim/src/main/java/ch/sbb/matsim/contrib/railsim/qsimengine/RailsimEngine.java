@@ -310,6 +310,9 @@ final class RailsimEngine implements Steppable {
 		// Disposition assigned a detour
 		if (state.pt != null && response.detour() != null) {
 
+			RailLink startDetour = state.route.get(response.detour().startIdx());
+			RailLink endDetour = state.route.get(response.detour().endIdx());
+
 			// check if this route is different
 			List<RailLink> subRoute = state.route.subList(response.detour().startIdx(), response.detour().endIdx());
 
@@ -324,12 +327,13 @@ final class RailsimEngine implements Steppable {
 
 			createEvent(new RailsimDetourEvent(
 				time, state.driver.getVehicle().getId(),
-				state.route.get(response.detour().startIdx()).getLinkId(),
-				state.route.get(response.detour().endIdx()).getLinkId(),
+				startDetour.getLinkId(), endDetour.getLinkId(),
 				response.detour().newRoute().stream().map(RailLink::getLinkId).toList(),
 				newStop != null ? newStop.getId() : null
 			));
 
+			// reserve the assigned links from the detour
+			response = disposition.requestNextSegment(time, state, reserveDist);
 		}
 
 		state.approvedDist = response.approvedDist();
@@ -779,13 +783,14 @@ final class RailsimEngine implements Steppable {
 
 	/**
 	 * Remove all trains from simulation and generate events at the end of the day.
+	 *
 	 * @param now end of day time
 	 */
 	void clearTrains(double now) {
 
 		for (TrainState train : activeTrains) {
-			eventsManager.processEvent( new VehicleAbortsEvent(now, train.driver.getVehicle().getId(), train.headLink));
-			eventsManager.processEvent( new PersonStuckEvent(now, train.driver.getId(), train.headLink, train.driver.getMode()));
+			eventsManager.processEvent(new VehicleAbortsEvent(now, train.driver.getVehicle().getId(), train.headLink));
+			eventsManager.processEvent(new PersonStuckEvent(now, train.driver.getId(), train.headLink, train.driver.getMode()));
 		}
 	}
 }

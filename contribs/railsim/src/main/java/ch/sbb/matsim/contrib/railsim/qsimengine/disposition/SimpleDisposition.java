@@ -38,6 +38,15 @@ public class SimpleDisposition implements TrainDisposition {
 	private final RailResourceManager resources;
 	private final TrainRouter router;
 
+	/**
+	 * Whether re-routing should be tried.
+	 *
+	 * @param upcoming the upcoming links the train tried to block.
+	 */
+	static boolean considerReRouting(List<RailLink> upcoming, RailLink currentLink) {
+		return currentLink.isEntryLink() || upcoming.stream().anyMatch(RailLink::isEntryLink);
+	}
+
 	@Inject
 	public SimpleDisposition(RailResourceManager resources, TrainRouter router) {
 		this.resources = resources;
@@ -55,45 +64,13 @@ public class SimpleDisposition implements TrainDisposition {
 		RailLink currentLink = resources.getLink(position.getHeadLink());
 		List<RailLink> segment = RailsimCalc.calcLinksToBlock(position, currentLink, dist);
 
-		// Only re-routes if the link segment is occupied
-//		for (RailLink link : segment) {
-//			if (!resources.isBlockedBy(link, driver) && !resources.hasCapacity(link.getLinkId()))
-//				return router.calcRoute(entry, exit);
-//		}
+		// Check for re routing
+		Detour detour = checkDetour(time, segment, position);
 
-		// This code was in rail engine, now needs to be part of disposition
-		/*
-			if (state.pt != null && RailsimCalc.considerReRouting(links, resources.getLink(state.headLink))) {
-
-			int start = -1;
-			int end = -1;
-			RailLink entry = null;
-			RailLink exit = null;
-
-			for (int i = Math.max(0, state.routeIdx - 1); i < state.route.size(); i++) {
-				RailLink l = state.route.get(i);
-
-				if (l.isEntryLink()) {
-					entry = l;
-					start = i;
-				} else if (start > -1 && l.isBlockedBy(state.driver)) {
-					// check if any link beyond entry is already blocked
-					// if that is the case re-route is not possible anymore
-					break;
-				} else if (start > -1 && l.isExitLink()) {
-					exit = l;
-					end = i;
-					break;
-				}
-			}
-
-			// there might be no exit link if this is the end of the route
-			// exit will be set to null if re-route is too late
-			// network could be wrong as well, but hard to verify
-			if (exit != null) {
-				....
-			}
-		 */
+		if (detour != null) {
+			// train needs to integrate the detour and request a new route
+			return new DispositionResponse(0, 0, detour);
+		}
 
 		double reserveDist = resources.tryBlockLink(time, currentLink, RailResourceManager.ANY_TRACK, position);
 
@@ -134,8 +111,71 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		}
 
-		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, null);
+		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, detour);
 	}
+
+	private Detour checkDetour(double time, List<RailLink> segment, TrainPosition position) {
+
+		if (position.getPt() != null && considerReRouting(segment, resources.getLink(position.getHeadLink()))) {
+
+			int start = -1;
+			int end = -1;
+			RailLink entry = null;
+			RailLink exit = null;
+
+			for (int i = Math.max(0, position.getRouteIndex() - 1); i < position.getRouteSize(); i++) {
+				RailLink l = position.getRoute(i);
+
+				if (l.isEntryLink()) {
+					entry = l;
+					start = i;
+				} else if (start > -1 && resources.isBlockedBy(l, position)) {
+					// check if any link beyond entry is already blocked
+					// if that is the case re-route is not possible anymore
+					break;
+				} else if (start > -1 && l.isExitLink()) {
+					exit = l;
+					end = i;
+					break;
+				}
+			}
+
+			// there might be no exit link if this is the end of the route
+			// exit will be set to null if re-route is too late
+			// network could be wrong as well, but hard to verify
+			if (exit != null) {
+
+				List<RailLink> subRoute = position.getRoute(start + 1, end);
+
+				List<RailLink> newRoute = reroute(time, subRoute, position, entry, exit);
+
+				if (newRoute != null)
+					return new Detour(start, end, newRoute);
+			}
+		}
+
+		return null;
+	}
+
+	private List<RailLink> reroute(double time, List<RailLink> subRoute, TrainPosition position, RailLink entry, RailLink exit) {
+
+		// Only re-routes if the link segment is occupied
+		for (RailLink link : subRoute) {
+			if (!resources.isBlockedBy(link, position) &&
+				!resources.hasCapacity(time, link.getLinkId(), RailResourceManager.ANY_TRACK_NON_BLOCKING, position)) {
+
+				List<RailLink> detour = router.calcRoute(position, entry, exit);
+
+				if (subRoute.equals(detour))
+					return null;
+
+				return detour;
+			}
+		}
+
+		return null;
+	}
+
 
 	@Override
 	public void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link) {

@@ -19,7 +19,7 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 	/**
 	 * Stores conflict points of trains.
 	 */
-	private final Map<RailResource, MobsimDriverAgent> conflictPoints = new HashMap<>();
+	private final Map<RailResource, Reservation> conflictPoints = new HashMap<>();
 
 	@Inject
 	public SimpleDeadlockAvoidance() {
@@ -53,14 +53,14 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 
 			if (isConflictPoint(r)) {
 
-				MobsimDriverAgent other = conflictPoints.get(r);
+				Reservation reservation = conflictPoints.computeIfAbsent(r, k -> new Reservation());
 
-				// Reserve non occupied conflict points
-				// If reserved by other, stop reserving more
-				if (other != null && other != position.getDriver())
+				// Reserve non conflict points, otherwise stop
+				if (reservation.direction != null && reservation.direction != link)
 					break;
 
-				conflictPoints.put(r, position.getDriver());
+				reservation.direction = link;
+				reservation.trains.add(position.getDriver());
 
 			} else
 				break;
@@ -75,19 +75,32 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 		if (!isConflictPoint(link.getResource()))
 			return true;
 
-		MobsimDriverAgent other = conflictPoints.get(link.getResource());
+		Reservation other = conflictPoints.get(link.getResource());
 
-		// Not reserved, or reserved by same driver
-		return other == null || other == position.getDriver();
+		// not reserved or reserved by same direction
+		return other == null || other.direction == null || other.direction == link;
 	}
 
 	@Override
 	public void onRelease(double time, RailResource resource, MobsimDriverAgent driver) {
 
-		if (conflictPoints.get(resource) == driver)
-			conflictPoints.remove(resource);
+		Reservation reservation = conflictPoints.get(resource);
+		if (reservation != null) {
+			reservation.trains.remove(driver);
 
-//		MobsimDriverAgent removed = conflictPoints.remove(resource);
-//		assert removed == driver : "Released resource was not reserved by driver.";
+			// this direction is free again
+			if (reservation.trains.isEmpty())
+				reservation.direction = null;
+		}
+	}
+
+	/**
+	 * Holds current direction and drivers holding a reservation.
+	 */
+	private static final class Reservation {
+
+		private RailLink direction;
+		private final Set<MobsimDriverAgent> trains = new LinkedHashSet<>();
+
 	}
 }
