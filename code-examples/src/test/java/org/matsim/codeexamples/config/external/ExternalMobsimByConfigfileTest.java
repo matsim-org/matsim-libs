@@ -21,7 +21,7 @@ package org.matsim.codeexamples.config.external;
 import java.io.File;
 import java.io.UncheckedIOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -29,13 +29,13 @@ import org.matsim.core.utils.io.IOUtils;
  *
  */
 public class ExternalMobsimByConfigfileTest {
-	
+
 	/**
 	 * Test method for {@link RunExternalMobsimExample#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		try {
 			IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
 		} catch ( UncheckedIOException ee ) {

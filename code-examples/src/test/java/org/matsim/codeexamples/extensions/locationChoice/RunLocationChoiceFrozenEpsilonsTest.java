@@ -2,8 +2,8 @@ package org.matsim.codeexamples.extensions.locationChoice;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -22,7 +22,8 @@ public class RunLocationChoiceFrozenEpsilonsTest{
 
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	@Test public void testMain(){
+	@Test
+	void testMain(){
 		// I don't know if this is overall doing something reasonable, thus commenting out the regression check.  kai, jun'23
 
 		try{

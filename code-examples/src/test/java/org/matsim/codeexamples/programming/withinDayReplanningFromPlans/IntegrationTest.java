@@ -21,8 +21,8 @@ package org.matsim.codeexamples.programming.withinDayReplanningFromPlans;
 import java.io.File;
 import java.io.UncheckedIOException;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.codeexamples.withinday.withinDayReplanningFromPlans.RunWithinDayReplanningFromPlansExample;
@@ -39,7 +39,7 @@ public class IntegrationTest {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		final String pathname = "./output/within-day";
 		try {
 			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());

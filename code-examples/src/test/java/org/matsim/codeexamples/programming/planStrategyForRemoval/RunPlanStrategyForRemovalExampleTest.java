@@ -19,8 +19,8 @@
 
 package org.matsim.codeexamples.programming.planStrategyForRemoval;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.codeexamples.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -33,7 +33,7 @@ public class RunPlanStrategyForRemovalExampleTest {
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		
 		try {
 			RunPlanSelectorForRemovalExample.main(null);

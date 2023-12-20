@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.extensions.minibus;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.contrib.minibus.RunMinibus;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -30,12 +30,12 @@ public class RunMinibusTest {
     @RegisterExtension
     public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-    /**
-     * Test method for {@link RunMinibus#main(java.lang.String[])}.
-     */
-    @SuppressWarnings("static-method")
-    @Test
-    public final void testMain() {
+	/**
+	* Test method for {@link RunMinibus#main(java.lang.String[])}.
+	*/
+	@SuppressWarnings("static-method")
+	@Test
+	final void testMain() {
         RunMinibus runner = new RunMinibus( new String[]{"https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/config.xml"} );
 
         Config config = runner.getConfig();

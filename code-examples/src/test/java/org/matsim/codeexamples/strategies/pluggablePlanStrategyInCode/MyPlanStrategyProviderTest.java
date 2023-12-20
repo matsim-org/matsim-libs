@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode.MyPlanStrategyProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -15,7 +15,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MyPlanStrategyProviderTest {
 
 	@Test
-	public final void testGet()
+	final void testGet()
 	{
 		//set up
 		EventsManager manager = EventsUtils.createEventsManager();

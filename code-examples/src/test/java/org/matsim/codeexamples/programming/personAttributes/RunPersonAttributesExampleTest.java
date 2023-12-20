@@ -23,8 +23,8 @@
  */
 package org.matsim.codeexamples.programming.personAttributes;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.codeexamples.population.personAttributes.RunPersonAttributesExample;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -33,7 +33,7 @@ public class RunPersonAttributesExampleTest {
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void test(){
+	void test(){
 		RunPersonAttributesExample.main(null);
 	}
 	

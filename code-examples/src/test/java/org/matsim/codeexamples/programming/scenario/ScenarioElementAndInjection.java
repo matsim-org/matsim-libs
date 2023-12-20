@@ -2,9 +2,9 @@ package org.matsim.codeexamples.programming.scenario;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
@@ -28,7 +28,7 @@ public class ScenarioElementAndInjection{
 	 * This is testing at what phase a scenario element would be available.
 	 */
 	@Test
-	public void test1() {
+	void test1() {
 		// not really a test in its current form!
 
 		Config config = ConfigUtils.createConfig() ;

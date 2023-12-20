@@ -1,9 +1,9 @@
 package org.matsim.codeexamples.extensions.dvrp;
 
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -17,7 +17,7 @@ public class RunDrtExampleTest{
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMain(){
+	void testMain(){
 		try{
 			RunDrtExample.run(false,
 					"scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml"

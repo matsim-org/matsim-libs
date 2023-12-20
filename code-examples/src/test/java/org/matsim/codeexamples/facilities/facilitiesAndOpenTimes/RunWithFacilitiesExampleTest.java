@@ -20,8 +20,8 @@ package org.matsim.codeexamples.facilities.facilitiesAndOpenTimes;
 
 import java.util.Map;
 
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -36,9 +36,9 @@ public class RunWithFacilitiesExampleTest {
 	/**
 	 * Test method for {@link RunWithFacilitiesExample#run()}.
 	 */
-	@SuppressWarnings({ "static-method", "javadoc" })
+	@SuppressWarnings({"static-method", "javadoc"})
 	@Test
-	public final void testRun() {
+	final void testRun() {
 		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
 		example.run();
 		Scenario scenario = example.getScenario() ;

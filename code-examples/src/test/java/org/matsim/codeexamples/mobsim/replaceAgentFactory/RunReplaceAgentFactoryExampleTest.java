@@ -2,8 +2,8 @@ package org.matsim.codeexamples.mobsim.replaceAgentFactory;
 
 import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.config.Config;
@@ -18,8 +18,9 @@ import jakarta.inject.Inject;
 
 public class RunReplaceAgentFactoryExampleTest {
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
-	
-	@Test public void testMain() {
+
+	@Test
+	void testMain() {
 		try {
 			final RunReplaceAgentFactoryExample main = new RunReplaceAgentFactoryExample();;
 			final Config config = main.prepareConfig();

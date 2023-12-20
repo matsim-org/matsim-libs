@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.integration;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -13,7 +13,7 @@ public class RunMultipleModesExampleTest{
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRun() {
+	void testRun() {
 		try{
 			Config config = RunMultipleModesExample.prepareConfig() ;
 

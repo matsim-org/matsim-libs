@@ -24,8 +24,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -86,7 +86,7 @@ public class ExamplesByConfigfileTest {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		if ( outputDir==null ) {
 			outputDir = utils.getOutputDirectory() ; // removes output dir every time this is run so run it only once
 		}

@@ -21,8 +21,8 @@ package org.matsim.codeexamples.programming.multipleSubpopulations;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -49,7 +49,7 @@ public class SubpopulationsExampleTest {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		try {
 //			RunSubpopulationsExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil-extended" ), "config-with-subpopulation.xml" ).toString()
 //					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()

@@ -2,8 +2,8 @@ package org.matsim.codeexamples.extensions.drt;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunMelunPrebookingTest {
@@ -11,7 +11,7 @@ public class RunMelunPrebookingTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void runExample() {
+	void runExample() {
 		RunMelunPrebooking.RunSettings settings = new RunMelunPrebooking.RunSettings();
 
 		settings.prebookingShare = 0.5;

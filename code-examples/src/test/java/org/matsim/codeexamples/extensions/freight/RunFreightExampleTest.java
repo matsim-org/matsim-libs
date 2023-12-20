@@ -3,8 +3,8 @@ package org.matsim.codeexamples.extensions.freight;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -19,7 +19,7 @@ public class RunFreightExampleTest{
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMain(){
+	void testMain(){
 		try{
 			String[] args = { IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ).toString() ,
 					"--config:controller.outputDirectory", utils.getOutputDirectory(),
