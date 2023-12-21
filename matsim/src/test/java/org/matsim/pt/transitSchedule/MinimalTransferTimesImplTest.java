@@ -32,11 +32,10 @@ import java.util.NoSuchElementException;
  */
 public class MinimalTransferTimesImplTest {
 
-	private Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId5 = Id.create(5, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
 
 	@Test
 	void testSetGet() {
@@ -53,6 +52,19 @@ public class MinimalTransferTimesImplTest {
 		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId2), 0.0);
 
 		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId4), 0.0);
+	}
+
+	@Test
+	void testGetNonSetConnection() {
+		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
+		mtt.set(this.stopId1, this.stopId1, 300.0);
+		mtt.set(this.stopId3, this.stopId3, 240.0);
+
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId1), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId3, this.stopId3), 0.0);
+
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+
 	}
 
 	@Test
