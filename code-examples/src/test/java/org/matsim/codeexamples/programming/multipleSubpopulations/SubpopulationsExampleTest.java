@@ -18,11 +18,11 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.programming.multipleSubpopulations;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -42,14 +42,14 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  */
 public class SubpopulationsExampleTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link RunSubpopulationsExample#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		try {
 //			RunSubpopulationsExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil-extended" ), "config-with-subpopulation.xml" ).toString()
 //					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
@@ -74,11 +74,11 @@ public class SubpopulationsExampleTest {
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 				boolean result = PopulationUtils.equalPopulation( expected, actual );
-				Assert.assertTrue( "populations are different", result );
+				Assertions.assertTrue( result, "populations are different" );
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assert.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
 				}
 			}
 

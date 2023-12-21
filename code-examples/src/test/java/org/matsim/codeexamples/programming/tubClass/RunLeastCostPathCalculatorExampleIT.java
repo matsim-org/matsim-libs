@@ -21,7 +21,7 @@ package org.matsim.codeexamples.programming.tubClass;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.codeexamples.programming.leastCostPath.RunLeastCostPathCalculatorExample;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -32,7 +32,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class RunLeastCostPathCalculatorExampleIT {
 
 	@Test
-	public void test() {
+	void test() {
 		try {
 			IOUtils.deleteDirectoryRecursively(new File( RunLeastCostPathCalculatorExample.outputDirectory ).toPath());
 		} catch ( Exception ee ) {
