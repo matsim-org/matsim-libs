@@ -70,7 +70,7 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 
 	private double getInnerStopTransferTime(Id<TransitStopFacility> stopId, double defaultSeconds){
 		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.get(stopId);
-		return innerMap.getOrDefault(stopId,defaultSeconds);
+		return innerMap!=null?innerMap.getOrDefault(stopId,defaultSeconds):defaultSeconds;
 
 	}
 
