@@ -32,11 +32,10 @@ import java.util.NoSuchElementException;
  */
 public class MinimalTransferTimesImplTest {
 
-	private Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId5 = Id.create(5, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
 
 	@Test
 	void testSetGet() {
