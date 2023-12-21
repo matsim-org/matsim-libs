@@ -76,9 +76,6 @@ public final class RunAverageEmissionToolOfflineExample{
 
 			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.directlyTryAverageTable );
 
-//		emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2005average.csv" );
-//		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_EFA_HOT_vehcat_2005average.csv" );
-
 			emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2020_average_withHGVetc.csv" );
 			emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
 
@@ -110,21 +107,17 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		// we do not want to run the full Controler.  In consequence, we plug together the infrastructure one needs in order to run the emissions contrib:
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-
 		AbstractModule module = new AbstractModule(){
 			@Override
 			public void install(){
 				bind( Scenario.class ).toInstance( scenario );
-				bind( EventsManager.class ).toInstance( eventsManager ) ;
-				bind( EmissionModule.class ) ;
+				bind( EventsManager.class ).toInstance( EventsUtils.createEventsManager() ) ;
+				bind( EmissionModule.class ).asEagerSingleton(); // eager singleton necessary to force instantiation!
 			}
 		};
 
 		com.google.inject.Injector injector = Injector.createInjector( config, module );
-
-		// the EmissionModule must be instantiated, otherwise it does not work:
-		injector.getInstance(EmissionModule.class);
+		EventsManager eventsManager = injector.getInstance( EventsManager.class );
 
 		// ---
 
@@ -139,7 +132,7 @@ public final class RunAverageEmissionToolOfflineExample{
 		eventWriterXML.closeFile();
 
 		// also write vehicles and network and config as a service so we have all out files in one directory:
-		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( config.controler().getOutputDirectory() + "/output_vehicles.xml.gz" );
+		VehicleUtils.writeVehicles( scenario.getVehicles() , config.controler().getOutputDirectory() + "/output_vehicles.xml.gz" );
 		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "/output_network.xml.gz" );
 		ConfigUtils.writeConfig( config, config.controler().getOutputDirectory() + "/output_config.xml" );
 		ConfigUtils.writeMinimalConfig( config, config.controler().getOutputDirectory() + "/output_config_reduced.xml" );

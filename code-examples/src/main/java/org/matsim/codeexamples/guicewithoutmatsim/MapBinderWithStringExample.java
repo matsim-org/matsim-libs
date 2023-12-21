@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class MapBinderWithStringExample{
 	private static final Logger log = LogManager.getLogger( MapBinderWithStringExample.class ) ;
@@ -25,6 +26,8 @@ public final class MapBinderWithStringExample{
 		modules.add(  new AbstractModule(){
 			@Override
 			protected void configure(){
+				bind( MyRunner.class );
+
 				MapBinder<String, MyInterface> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, MyInterface.class );
 //				mapBinder.permitDuplicates() ;
 				mapBinder.addBinding("abc" ).to( MyImpl1.class ).in( Singleton.class );
@@ -45,29 +48,39 @@ public final class MapBinderWithStringExample{
 		}
 		log.info("") ;
 
-		Map<String, Provider<MyInterface>> map = injector.getInstance( Key.get( new TypeLiteral<Map<String, Provider<MyInterface>>>(){} ) );;
-		Provider<MyInterface> provider = map.get( "abc" );;
+		injector.getInstance( MyRunner.class ).run() ;
 
-//		for( Provider<MyInterface> provider : set ){
-			provider.get() ;
-//		}
+//		Map<String, Provider<MyInterface>> map = injector.getInstance( Key.get( new TypeLiteral<Map<String, Provider<MyInterface>>>(){} ) );;
+//		Provider<MyInterface> provider = map.get( "abc" );;
+//
+////		for( Provider<MyInterface> provider : set ){
+//			provider.get() ;
+////		}
 
 	}
 
-	private interface MyInterface{
+	private static class MyRunner {
+		@Inject private Map<String, MyInterface> myInterfaceMap;
+		void run() {
+			myInterfaceMap.get("egh").doSomething();
+		}
+	}
 
+
+	private interface MyInterface{
+		void doSomething();
 	}
 
 	@Singleton
 	private static class MyImpl1 implements MyInterface{
-		@Inject MyImpl1() {
-			log.info( "ctor 1 called" );
+		public void doSomething() {
+			log.warn("doSomething in MyImpl1");
 		}
 	}
 
 	private static class MyImpl2 implements MyInterface{
-		@Inject MyImpl2() {
-			log.info( "ctor 2 called" );
+		public void doSomething() {
+			log.warn("doSomething in MyImpl2");
 		}
 	}
 }

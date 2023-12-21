@@ -1,10 +1,8 @@
 package org.matsim.codeexamples.guicewithoutmatsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -32,15 +30,28 @@ public final class MultiBinderExample{
 		modules.add(  new AbstractModule(){
 			@Override
 			protected void configure(){
+				bind( MyRunner.class );
 
-				Multibinder<MyInterface> multiBinder = Multibinder.newSetBinder( this.binder(), MyInterface.class, Names.named( "someAnnotation" ) );;
-//				Multibinder<MyInterface> multiBinder = Multibinder.newSetBinder( this.binder(), MyInterface.class );;
-				multiBinder.permitDuplicates() ;
+				Multibinder<MyInterface> multiBinder = Multibinder.newSetBinder( this.binder(), MyInterface.class );;
+//				Multibinder<MyInterface> multiBinder = Multibinder.newSetBinder( this.binder(), MyInterface.class, Names.named( "someAnnotation" ) );;
 				multiBinder.addBinding().to( MyImpl1.class ) ;
 				multiBinder.addBinding().to( MyImpl2.class ) ;
 
+//				multiBinder.addBinding().to( MyImpl2.class ) ;
+
+//				multiBinder.permitDuplicates() ;
+
 			}
 		} ) ;
+
+
+		modules.add( new AbstractModule(){
+			@Override protected void configure(){
+				Multibinder<MyInterface> multibinder = Multibinder.newSetBinder( this.binder(), MyInterface.class );
+				multibinder.addBinding().to( MyImpl3.class );
+			}
+		} );
+
 		Injector injector = Guice.createInjector( modules );
 
 		Map<Key<?>, Binding<?>> bindings = injector.getAllBindings();
@@ -52,27 +63,45 @@ public final class MultiBinderExample{
 		}
 		log.info("") ;
 
-		Collection<Provider<MyInterface>> set = injector.getInstance( Key.get( new TypeLiteral<Collection<Provider<MyInterface>>>(){} , Names.named( "someAnnotation" )) );
+		MyRunner myRunner = injector.getInstance( MyRunner.class );
+		myRunner.run();
 
-		for( Provider<MyInterface> provider : set ){
-			provider.get() ;
+//		Collection<Provider<MyInterface>> set = injector.getInstance( Key.get( new TypeLiteral<Collection<Provider<MyInterface>>>(){} , Names.named( "someAnnotation" )) );
+//		for( Provider<MyInterface> provider : set ){
+//			provider.get() ;
+//		}
+
+	}
+
+	private static class MyRunner {
+		@Inject
+//		@Named("someAnnotation")
+		private Set<MyInterface> myInterfaces;
+		void run() {
+			for( MyInterface myInterface : myInterfaces ){
+				myInterface.doSomething();
+			}
 		}
-
 	}
 
 	private interface MyInterface{
-
+		void doSomething();
 	}
 
 	private static class MyImpl1 implements MyInterface{
-		@Inject MyImpl1() {
-			log.info( "ctor 1 called" );
+		public void doSomething() {
+			log.warn("calling doSomething method of MyImpl1");
 		}
 	}
 
 	private static class MyImpl2 implements MyInterface{
-		@Inject MyImpl2() {
-			log.info( "ctor 2 called" );
+		public void doSomething() {
+			log.warn("calling doSomething method of MyImpl2");
+		}
+	}
+	private static class MyImpl3 implements MyInterface{
+		public void doSomething() {
+			log.warn("calling doSomething method of MyImpl3");
 		}
 	}
 }

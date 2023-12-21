@@ -44,28 +44,39 @@ public final class MapBinderWithAnnotationExample{
 		}
 		log.info("") ;
 
-		Map<Annotation, Set<Provider<MyInterface>>> map = injector.getInstance( Key.get( new TypeLiteral<Map<Annotation, Set<Provider<MyInterface>>>>(){} ) );;
-		Set<Provider<MyInterface>> set = map.get( Names.named("abc" ) ) ;
+		injector.getInstance( MyRunner.class ).run();
 
-		for( Provider<MyInterface> provider : set ){
-			provider.get() ;
-		}
+//		Map<Annotation, Set<Provider<MyInterface>>> map = injector.getInstance( Key.get( new TypeLiteral<Map<Annotation, Set<Provider<MyInterface>>>>(){} ) );;
+//		Set<Provider<MyInterface>> set = map.get( Names.named("abc" ) ) ;
+//
+//		for( Provider<MyInterface> provider : set ){
+//			provider.get() ;
+//		}
 
 	}
 
-	private interface MyInterface{
+	private static class MyRunner {
+		@Inject private Map<Annotation, MyInterface> myInterfaceMap;
+		void run() {
+			myInterfaceMap.get(Names.named("egh")).doSomething();
+		}
+	}
 
+
+
+	private interface MyInterface{
+		void doSomething();
 	}
 
 	private static class MyImpl1 implements MyInterface{
-		@Inject MyImpl1() {
-			log.info( "ctor 1 called" );
+		public void doSomething() {
+			log.warn("doSomething of MyImpl1");
 		}
 	}
 
 	private static class MyImpl2 implements MyInterface{
-		@Inject MyImpl2() {
-			log.info( "ctor 2 called" );
+		public void doSomething() {
+			log.warn("doSomething of MyImpl1");
 		}
 	}
 }
