@@ -56,6 +56,19 @@ public class MinimalTransferTimesImplTest {
 	}
 
 	@Test
+	void testGetNonSetConnection() {
+		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
+		mtt.set(this.stopId1, this.stopId1, 300.0);
+		mtt.set(this.stopId3, this.stopId3, 240.0);
+
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId1), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId3, this.stopId3), 0.0);
+
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+
+	}
+
+	@Test
 	void testGetWithDefault() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		double defaultSeconds = 60.0;
