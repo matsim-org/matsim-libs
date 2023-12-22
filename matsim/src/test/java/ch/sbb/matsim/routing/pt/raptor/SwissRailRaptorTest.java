@@ -68,8 +68,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -343,6 +342,25 @@ public class SwissRailRaptorTest {
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
         assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
+	@Test
+	void testLineChangeWithDifferentUtils() {
+        Fixture f = new Fixture();
+        f.init();
+		f.blueLine.getRoutes().values().forEach(transitRoute -> transitRoute.setTransportMode(TransportMode.ship));
+		SwissRailRaptorConfigGroup swissRailRaptorConfigGroup = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty trainToShip = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty("train",TransportMode.ship,1000000.0);
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty shipToTrain = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty(TransportMode.ship,"train",1000000.0);
+		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(trainToShip);
+		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(shipToTrain);
+		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
+		Coord fromCoord = new Coord(3800, 5100);
+		Coord toCoord = new Coord(16100, 10050);
+		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null));
+		//changing from train to ship is so expensive that direct walk is cheaper
+		assertNull(legs);
+	}
 
 	@Test
 	void testFasterAlternative() {
@@ -868,21 +886,18 @@ public class SwissRailRaptorTest {
         int[] transferCount = new int[] { 0 };
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        SwissRailRaptor router = new Builder(data, f.config).with(new RaptorTransferCostCalculator() {
-            @Override
-            public double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double now) {
-                transferCount[0]++;
-                Transfer t = transfer.get();
+        SwissRailRaptor router = new Builder(data, f.config).with((transfer, staticConfig, raptorParams, totalTravelTime, totalTransferCount, existingTransferCosts, now) -> {
+            transferCount[0]++;
+            Transfer t = transfer.get();
 
-                assertEquals(f.stop1, t.getFromStop());
-                assertEquals(f.stop2, t.getToStop());
-                assertEquals(Id.create("0to1", TransitLine.class), t.getFromTransitLine().getId());
-                assertEquals(Id.create("2to3", TransitLine.class), t.getToTransitLine().getId());
-                assertEquals(Id.create("0to1", TransitRoute.class), t.getFromTransitRoute().getId());
-                assertEquals(Id.create("2to3", TransitRoute.class), t.getToTransitRoute().getId());
+            assertEquals(f.stop1, t.getFromStop());
+            assertEquals(f.stop2, t.getToStop());
+            assertEquals(Id.create("0to1", TransitLine.class), t.getFromTransitLine().getId());
+            assertEquals(Id.create("2to3", TransitLine.class), t.getToTransitLine().getId());
+            assertEquals(Id.create("0to1", TransitRoute.class), t.getFromTransitRoute().getId());
+            assertEquals(Id.create("2to3", TransitRoute.class), t.getToTransitRoute().getId());
 
-                return 0.5;
-            }
+            return 0.5;
         }).build();
 
         Coord fromCoord = f.fromFacility.getCoord();

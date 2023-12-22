@@ -81,6 +81,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private final Map<String, RangeQuerySettingsParameterSet> rangeQuerySettingsPerSubpop = new HashMap<>();
     private final Map<String, RouteSelectorParameterSet> routeSelectorPerSubpop = new HashMap<>();
     private final List<IntermodalAccessEgressParameterSet> intermodalAccessEgressSettings = new ArrayList<>();
+    private final List<ModeToModeTransferPenalty> modeToModeTransferPenaltyParameterSets = new ArrayList<>();
     private final Map<String, ModeMappingForPassengersParameterSet> modeMappingForPassengersByRouteMode = new HashMap<>();
 
 
@@ -243,19 +244,19 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         this.transferPenaltyHourlyCost = hourlyCost;
     }
 
-    @Override
+
+	@Override
     public ConfigGroup createParameterSet(String type) {
-        if (RangeQuerySettingsParameterSet.TYPE.equals(type)) {
-            return new RangeQuerySettingsParameterSet();
-        } else if (RouteSelectorParameterSet.TYPE.equals(type)) {
-            return new RouteSelectorParameterSet();
-        } else if (IntermodalAccessEgressParameterSet.TYPE.equals(type)) {
-            return new IntermodalAccessEgressParameterSet();
-        } else if (ModeMappingForPassengersParameterSet.TYPE.equals(type)) {
-            return new ModeMappingForPassengersParameterSet();
-        } else {
-            throw new IllegalArgumentException("Unsupported parameterset-type: " + type);
-        }
+        return switch (type){
+			case RangeQuerySettingsParameterSet.TYPE -> new RangeQuerySettingsParameterSet();
+			case RouteSelectorParameterSet.TYPE -> new RouteSelectorParameterSet();
+			case IntermodalAccessEgressParameterSet.TYPE -> new IntermodalAccessEgressParameterSet();
+			case ModeMappingForPassengersParameterSet.TYPE -> new ModeMappingForPassengersParameterSet();
+			case ModeToModeTransferPenalty.TYPE -> new ModeToModeTransferPenalty();
+			default -> throw new IllegalArgumentException("Unsupported parameterset-type: " + type);
+
+		};
+
     }
 
     @Override
@@ -267,13 +268,25 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         } else if (set instanceof IntermodalAccessEgressParameterSet) {
             addIntermodalAccessEgress((IntermodalAccessEgressParameterSet) set);
         } else if (set instanceof ModeMappingForPassengersParameterSet) {
-            addModeMappingForPassengers((ModeMappingForPassengersParameterSet) set);
+            addModeMappingForPassengers((ModeMappingForPassengersParameterSet) set);}
+		else if (set instanceof ModeToModeTransferPenalty) {
+			addModeToModeTransferPenalty((ModeToModeTransferPenalty) set);
         } else {
             throw new IllegalArgumentException("Unsupported parameterset: " + set.getClass().getName());
         }
     }
 
-    public void addRangeQuerySettings(RangeQuerySettingsParameterSet settings) {
+	public void addModeToModeTransferPenalty(ModeToModeTransferPenalty set) {
+		this.modeToModeTransferPenaltyParameterSets.add(set);
+		super.addParameterSet(set);
+
+	}
+
+	public List<ModeToModeTransferPenalty> getModeToModeTransferPenaltyParameterSets() {
+		return modeToModeTransferPenaltyParameterSets;
+	}
+
+	public void addRangeQuerySettings(RangeQuerySettingsParameterSet settings) {
         Set<String> subpops = settings.getSubpopulations();
         if (subpops.isEmpty()) {
             this.rangeQuerySettingsPerSubpop.put(null, settings);
@@ -662,7 +675,33 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
     }
 
-    @Override
+	public static class ModeToModeTransferPenalty extends ReflectiveConfigGroup{
+		private static final String TYPE = "modeToModeTransferPenalty";
+		@Parameter
+		@Comment("from Transfer PT Sub-Mode")
+		public String fromMode;
+		@Parameter
+		@Comment("to Transfer PT Sub-Mode")
+		public String toMode;
+		@Parameter
+		@Comment("Transfer Penalty per Transfer between modes")
+		public double transferPenalty = 0.0;
+
+		public ModeToModeTransferPenalty() {
+			super(TYPE);
+		}
+
+		public ModeToModeTransferPenalty(String fromMode, String toMode, double transferPenalty) {
+			super(TYPE);
+			this.fromMode = fromMode;
+			this.toMode = toMode;
+			this.transferPenalty = transferPenalty;
+		}
+	}
+
+
+
+	@Override
     public Map<String, String> getComments() {
         Map<String, String> comments = super.getComments();
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
