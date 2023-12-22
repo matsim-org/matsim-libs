@@ -40,7 +40,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
-	private static final Logger log = LogManager.getLogger(SwissRailRaptorConfigGroup.class);
     public static final String GROUP = "swissRailRaptor";
 
     private static final String PARAM_USE_RANGE_QUERY = "useRangeQuery";
@@ -707,6 +706,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
         comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
         comments.put(PARAM_TRANSFER_WALK_MARGIN, PARAM_TRANSFER_WALK_MARGIN_DESC);
+		comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION,PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
         return comments;
     }
 
@@ -718,7 +718,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
             Verify.verify(config.plans().getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.reject), "Using intermodal access and egress in "
                     + "combination with plans without a routing mode is not supported.");
-            Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress "
+            Verify.verify(!intermodalAccessEgressSettings.isEmpty(), "Using intermodal routing, but there are no access/egress "
                     + "modes defined. Add at least one parameterset with an access/egress mode and ensure "
                     + "SwissRailRaptorConfigGroup is loaded correctly.");
 

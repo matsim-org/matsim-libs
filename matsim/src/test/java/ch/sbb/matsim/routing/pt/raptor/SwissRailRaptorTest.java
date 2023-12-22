@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -53,20 +53,13 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -499,7 +492,7 @@ public class SwissRailRaptorTest {
         Fixture f = new Fixture();
         f.init();
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
-        double x = +42000;
+        double x = 42000;
         double x1 = -2000;
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(x1, 0)), new FakeFacility(new Coord(x, 0)), 5.5*3600, null)); // should map to stops A and I
         assertEquals(3, legs.size());
