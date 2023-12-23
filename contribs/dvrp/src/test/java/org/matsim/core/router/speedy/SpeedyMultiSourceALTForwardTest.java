@@ -72,7 +72,7 @@ public class SpeedyMultiSourceALTForwardTest {
 
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	private final TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-	private final SpeedyGraph speedyGraph = new SpeedyGraph(network);
+	private final SpeedyGraph speedyGraph = SpeedyGraphBuilder.build(network);
 	private final SpeedyALTData landmarks = new SpeedyALTData(speedyGraph, 3, travelDisutility);
 	private final SpeedyMultiSourceALT multiSourceALT = new SpeedyMultiSourceALT(landmarks, travelTime,
 			travelDisutility);

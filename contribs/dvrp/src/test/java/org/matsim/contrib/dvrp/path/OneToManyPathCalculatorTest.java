@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.speedy.LeastCostPathTree;
 import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -65,7 +66,7 @@ public class OneToManyPathCalculatorTest {
 	private final IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
-	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(new SpeedyGraph(network), travelTime,
+	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(SpeedyGraphBuilder.build(network), travelTime,
 			new TimeAsTravelDisutility(travelTime));
 
 	@BeforeEach
