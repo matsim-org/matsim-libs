@@ -94,12 +94,16 @@ public final class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		linkLeaveEvents.add(event);
+		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+			linkLeaveEvents.add(event);
+		}
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		trafficLeaveEvents.add(event);
+		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+			trafficLeaveEvents.add(event);
+		}
 	}
 
 	@Override
@@ -128,9 +132,7 @@ public final class DriveDischargingHandler
 			}
 
 			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
-			if (evDrive != null) {
-				evDrive.movedOverNodeTime = event.getTime();
-			}
+			evDrive.movedOverNodeTime = event.getTime();
 			linkLeaveIterator.remove();
 		}
 
@@ -142,16 +144,14 @@ public final class DriveDischargingHandler
 			}
 
 			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
-			if (evDrive != null) {
-				evDrives.remove(evDrive.vehicleId);
-			}
+			evDrives.remove(evDrive.vehicleId);
 			trafficLeaveIterator.remove();
 		}
 	}
 
 	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime, double now) {
 		EvDrive evDrive = evDrives.get(vehicleId);
-		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
+		if (!evDrive.isOnFirstLink()) {// skip the first link
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
