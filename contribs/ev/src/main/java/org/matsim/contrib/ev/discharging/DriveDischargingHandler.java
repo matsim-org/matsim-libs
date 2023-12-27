@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.core.v01.Id;
@@ -80,7 +80,7 @@ public final class DriveDischargingHandler
 		this.network = network;
 		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
-		evDrives = new HashMap<>(eVehicles.size() / 10);
+		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
 	}
 
 	@Override
