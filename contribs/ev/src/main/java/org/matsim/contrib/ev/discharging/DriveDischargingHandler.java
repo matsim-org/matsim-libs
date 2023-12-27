@@ -124,28 +124,26 @@ public final class DriveDischargingHandler
 	public void doSimStep(double time) {
 		// We want to process events in the main thread (instead of the event handling threads).
 		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
-		var linkLeaveIterator = linkLeaveEvents.iterator();
-		while (linkLeaveIterator.hasNext()) {
-			var event = linkLeaveIterator.next();
+		while (!linkLeaveEvents.isEmpty()) {
+			var event = linkLeaveEvents.peek();
 			if (event.getTime() == time) {
 				break;
 			}
 
 			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
 			evDrive.movedOverNodeTime = event.getTime();
-			linkLeaveIterator.remove();
+			linkLeaveEvents.remove();
 		}
 
-		var trafficLeaveIterator = trafficLeaveEvents.iterator();
-		while (trafficLeaveIterator.hasNext()) {
-			var event = trafficLeaveIterator.next();
+		while (!trafficLeaveEvents.isEmpty()) {
+			var event = trafficLeaveEvents.peek();
 			if (event.getTime() == time) {
 				break;
 			}
 
 			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
 			evDrives.remove(evDrive.vehicleId);
-			trafficLeaveIterator.remove();
+			trafficLeaveEvents.remove();
 		}
 	}
 
