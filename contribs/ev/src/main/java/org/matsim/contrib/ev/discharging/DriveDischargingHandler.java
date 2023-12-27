@@ -25,6 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -122,28 +125,28 @@ public final class DriveDischargingHandler
 
 	@Override
 	public void doSimStep(double time) {
+		handleQueuedEvents(linkLeaveEvents, time, false);
+		handleQueuedEvents(trafficLeaveEvents, time, true);
+	}
+
+	private <E extends Event & HasVehicleId & HasLinkId> void handleQueuedEvents(Queue<E> queue, double time, boolean leftTraffic) {
 		// We want to process events in the main thread (instead of the event handling threads).
 		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
-		while (!linkLeaveEvents.isEmpty()) {
-			var event = linkLeaveEvents.peek();
+		while (!queue.isEmpty()) {
+			var event = queue.peek();
 			if (event.getTime() == time) {
+				// There is a potential race condition wrt processing events between doSimStep() and handleEvent().
+				// To ensure a deterministic behaviour, we only process events from the previous time step.
 				break;
 			}
 
-			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
-			evDrive.movedOverNodeTime = event.getTime();
-			linkLeaveEvents.remove();
-		}
-
-		while (!trafficLeaveEvents.isEmpty()) {
-			var event = trafficLeaveEvents.peek();
-			if (event.getTime() == time) {
-				break;
+			var evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
+			if (leftTraffic) {
+				evDrives.remove(evDrive.vehicleId);
+			} else {
+				evDrive.movedOverNodeTime = event.getTime();
 			}
-
-			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
-			evDrives.remove(evDrive.vehicleId);
-			trafficLeaveEvents.remove();
+			queue.remove();
 		}
 	}
 
