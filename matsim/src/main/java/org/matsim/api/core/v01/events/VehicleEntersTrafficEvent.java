@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class VehicleEntersTrafficEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId{
+public class VehicleEntersTrafficEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId {
 
 	public static final String EVENT_TYPE = "vehicle enters traffic";
 	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
