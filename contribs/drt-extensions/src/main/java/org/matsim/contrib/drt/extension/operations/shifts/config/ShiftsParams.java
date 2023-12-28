@@ -13,7 +13,6 @@ import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSet
 import org.matsim.core.config.ConfigGroup;
 
 import java.net.URL;
-import java.util.Map;
 
 /**
  * @author nkuehnel / MOIA
@@ -31,8 +30,8 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	public double changeoverDuration = 900;
 
 	@Parameter
-	@Comment("maximum delay of shifts start in [seconds]")
-	public double maxShiftStartDelay = 0;
+	@Comment("maximum delay of shift assignment after start time has passed in [seconds]")
+	public double maxUnscheduledShiftDelay = 0;
 
 	@Parameter
 	@Comment("Time of shift assignment (i.e. which vehicle carries out a specific shift) before start of shift in [seconds]")
