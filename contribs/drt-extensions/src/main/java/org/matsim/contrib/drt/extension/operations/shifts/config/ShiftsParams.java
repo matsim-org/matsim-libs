@@ -30,7 +30,7 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	public double changeoverDuration = 900;
 
 	@Parameter
-	@Comment("maximum delay of shift assignment after start time has passed in [seconds]")
+	@Comment("maximum delay of shift assignment after start time has passed in [seconds]. If a shift can not be assigned to a vehicle until the planned start of the shift plus the defined max delay, the shift is discarded. Defaults to 0")
 	public double maxUnscheduledShiftDelay = 0;
 
 	@Parameter
