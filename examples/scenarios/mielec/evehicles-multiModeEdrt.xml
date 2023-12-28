@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="EV_20.0kWh">
+
+		<capacity seats="0" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="chargerTypes" class="java.util.Collections$UnmodifiableCollection">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">20.0</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="drt_veh_1_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.8</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_1_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.7</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_2_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.775</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_2_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.675</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_3_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.75</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_3_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.65</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_4_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.725</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_4_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.625</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_5_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.7</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_veh_5_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.6</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_1_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.8</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_1_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.7</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_2_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.775</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_2_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.675</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_3_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.75</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_3_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.65</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_4_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.725</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_4_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.625</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_5_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.7</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt2_veh_5_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.6</attribute>
+		</attributes>
+	</vehicle>
+
+
+</vehicleDefinitions>
