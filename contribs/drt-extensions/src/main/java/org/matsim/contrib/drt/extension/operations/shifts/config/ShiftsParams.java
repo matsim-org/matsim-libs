@@ -31,6 +31,10 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	public double changeoverDuration = 900;
 
 	@Parameter
+	@Comment("maximum delay of shifts start in [seconds]")
+	public double maxShiftStartDelay = 0;
+
+	@Parameter
 	@Comment("Time of shift assignment (i.e. which vehicle carries out a specific shift) before start of shift in [seconds]")
 	public double shiftScheduleLookAhead = 1800;
 
