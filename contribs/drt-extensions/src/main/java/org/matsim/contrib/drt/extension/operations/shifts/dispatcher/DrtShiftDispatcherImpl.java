@@ -179,7 +179,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         // Remove elapsed shifts
         unscheduledShifts.removeIf(shift -> {
 			if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
-				logger.warn("Shift with ID " + shift.getId() + " is being removed as start time is longer in the past than defined by maxShiftStartDelay.");
+				logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
 				return true;
 			}
 		return false;
