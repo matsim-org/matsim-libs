@@ -53,6 +53,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is an events based approach to trigger vehicle charging. Vehicles will be charged as soon as a person begins a charging activity.
@@ -71,7 +72,7 @@ public class VehicleChargingHandler
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> lastDriver = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
-	private final Set<Id<Person>> agentsInChargerQueue = new HashSet<>();
+	private final Set<Id<Person>> agentsInChargerQueue = ConcurrentHashMap.newKeySet();
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet electricFleet;
