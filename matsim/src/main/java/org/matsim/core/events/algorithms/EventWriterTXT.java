@@ -178,7 +178,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	}
 
 	public enum Number{ /*0:*/ PersonArrival, dummy, LinkLeave, PersonStuck, /*4:*/ VehicleEntersTraffic,
-		/*5:*/ LinkEnter, PersonDeparture, ActivityStart, ActivityEnd, /*9:*/ PersonMoney } ;
+		/*5:*/ LinkEnter, PersonDeparture, ActivityStart, ActivityEnd, /*9:*/ PersonMoney }
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {

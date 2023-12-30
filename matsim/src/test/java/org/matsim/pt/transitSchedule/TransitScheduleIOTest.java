@@ -68,7 +68,6 @@ public class TransitScheduleIOTest {
 
 			schedule.getMinimalTransferTimes().set(stop1.getId(), stop2.getId(), 300.0);
 			schedule.getMinimalTransferTimes().set(stop2.getId(), stop1.getId(), 360.0);
-;
 			TransitLine line1 = f.createTransitLine(Id.create("blue", TransitLine.class));
 			line1.getAttributes().putAttribute("color", "like the sky");
 			line1.getAttributes().putAttribute("operator", "higher being");

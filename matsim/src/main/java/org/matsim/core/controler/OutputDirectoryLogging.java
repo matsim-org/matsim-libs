@@ -23,7 +23,6 @@ package org.matsim.core.controler;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

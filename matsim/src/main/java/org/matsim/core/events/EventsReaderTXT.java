@@ -31,7 +31,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import static org.matsim.core.events.algorithms.EventWriterTXT.Number.*;
-import static org.matsim.core.events.algorithms.EventWriterTXT.Number.ActivityEnd;
 
 /**
  * Created by laemmel on 16/11/15.

@@ -548,7 +548,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		super.addParameterSet( params );
 	}
 
-	public static enum TypicalDurationScoreComputation { uniform, relative } ;
+	public static enum TypicalDurationScoreComputation { uniform, relative }
 
 	/* complex classes */
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {

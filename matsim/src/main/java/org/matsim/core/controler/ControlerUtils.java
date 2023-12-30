@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 /**

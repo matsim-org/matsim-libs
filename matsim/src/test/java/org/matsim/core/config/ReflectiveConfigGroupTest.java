@@ -34,7 +34,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -409,7 +408,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	private enum MyEnum {
-		VALUE1, VALUE2;
+		VALUE1, VALUE2
 	}
 
 	/**

@@ -292,12 +292,7 @@ public class DeterministicMultithreadedReplanningIT {
 					bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
                         @Override
                         public StrategyManager get() {
-                            return new Provider<StrategyManager>() {
-                                    @Override
-                                    public StrategyManager get() {
-                                        return myLoadStrategyManager();
-                                    }
-                                }.get();
+                            return myLoadStrategyManager();
                         }
                     }).in(Singleton.class);
 				}

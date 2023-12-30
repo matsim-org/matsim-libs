@@ -80,7 +80,7 @@ public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends Has
 
 	public enum Permute {
 		yes,
-		no;
+		no
 	}
 
 }
