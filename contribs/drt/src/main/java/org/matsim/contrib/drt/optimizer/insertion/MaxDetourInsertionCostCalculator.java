@@ -5,7 +5,10 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 /**
  * This insertion cost calculator performs additional check on the maximum ride duration, on top of the original InsertionCostCalculator
  * @author: Nico Kühnel (nkuehnel), Chengqi Lu (luchengqi7)
+ *
+ * The function is now implemented in the DefaultInsertionCostCalculator
  * */
+@Deprecated
 public class MaxDetourInsertionCostCalculator implements InsertionCostCalculator {
 	private final InsertionCostCalculator delegate;
 

@@ -56,8 +56,8 @@ public class MaxDetourConstraintTest {
 			controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtCfg.mode) {
 				@Override
 				protected void configureQSim() {
-					bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-						getter -> new MaxDetourInsertionCostCalculator((new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))))));
+//					bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
+//						getter -> new MaxDetourInsertionCostCalculator((new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))))));
 					bindModal(DrtOfferAcceptor.class).toProvider(modalProvider(getter -> new MaxDetourOfferAcceptor(drtCfg.maxAllowedPickupDelay)));
 				}
 			});
