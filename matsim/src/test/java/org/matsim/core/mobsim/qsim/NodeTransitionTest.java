@@ -739,7 +739,7 @@ public class NodeTransitionTest {
 
 	}
 
-	private final class ThroughputAnalyzer implements LinkLeaveEventHandler {
+	private static final class ThroughputAnalyzer implements LinkLeaveEventHandler {
 
 		private final List<Id<Link>> linksOfInterest;
 		private Map<Id<Link>, Map<Double, Double>> absoluteThroughputPerTimeStep_veh = new HashMap<>();

@@ -125,7 +125,7 @@ public class PassingTest {
 
 	}
 
-	private class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
+	private static class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 		VehicleLinkTravelTimeEventHandler hand;
