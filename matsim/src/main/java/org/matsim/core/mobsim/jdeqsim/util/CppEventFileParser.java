@@ -39,25 +39,12 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * This parser can read the event output files of the C++ DEQSim.
- * 
+ *
  * @author rashid_waraich
  */
 public class CppEventFileParser {
 
 //	private static ArrayList<EventLog> eventLog = null;
-
-	public static void main(final String[] args) {
-		String eventFileName = args[0];
-		CppEventFileParser eventFileParser = new CppEventFileParser();
-		eventFileParser.parse(eventFileName);
-	}
-
-	public void parse(final String eventFileName) {
-//		CppEventFileParser.eventLog = CppEventFileParser.parseFile(eventFileName);
-		// for (int i = 0; i < eventLog.size(); i++) {
-		// eventLog.get(i).print();
-		// }
-	}
 
 	public static ArrayList<EventLog> parseFile(final String filePath) {
 		int counter = 0;
