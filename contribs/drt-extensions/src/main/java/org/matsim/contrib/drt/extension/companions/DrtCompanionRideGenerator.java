@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -123,7 +122,7 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	private Person createCompanionAgent(String drtMode, Person originalPerson, TripStructureUtils.Trip trip,
 										Activity fromActivity, Activity toActivity, int groupPart, int groupSize) {
 		String prefix = getCompanionPrefix(drtMode);
-		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + UUID.randomUUID();
+		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + groupPart;
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(companionId));
 		DrtCompanionUtils.setDRTCompanionType(person, DRT_COMPANION_TYPE);
 
