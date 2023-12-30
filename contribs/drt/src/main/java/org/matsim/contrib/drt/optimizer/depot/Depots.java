@@ -69,9 +69,9 @@ public class Depots {
 			null /* already at a depot*/ :
 			links.stream().map(l -> new DepotCandidates(l, DistanceUtils.calculateSquaredDistance(currentLink.getToNode().getCoord(),
 					l.getFromNode().getCoord())))
-				.sorted(Comparator.comparing(DepotCandidates::distance)
+				.min(Comparator.comparing(DepotCandidates::distance)
 					.thenComparing(h -> h.link.getId()))
-				.findFirst().get().link();
+				.get().link();
 	}
 
 	record DepotCandidates(Link link, double distance) {}
