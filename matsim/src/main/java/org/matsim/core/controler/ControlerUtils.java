@@ -78,7 +78,7 @@ public final class ControlerUtils {
 	public static final void checkConfigConsistencyAndWriteToLog(Config config,
 	                                                                final String message) {
 	    log.info(message);
-	    String newline = System.getProperty("line.separator");// use native line endings for logfile
+	    String newline = System.lineSeparator();// use native line endings for logfile
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
 	    log.info(newline + newline + writer.getBuffer().toString());

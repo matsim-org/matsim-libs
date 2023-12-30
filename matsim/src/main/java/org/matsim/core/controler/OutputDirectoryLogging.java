@@ -21,6 +21,7 @@
 package org.matsim.core.controler;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -118,8 +119,8 @@ public final class OutputDirectoryLogging {
 			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
 			ctx.updateLoggers();
 		}
-		String logfilename = outputDirectory + System.getProperty("file.separator") + LOGFILE;
-		String warnlogfilename = outputDirectory + System.getProperty("file.separator") + WARNLOGFILE;
+		String logfilename = outputDirectory + FileSystems.getDefault().getSeparator() + LOGFILE;
+		String warnlogfilename = outputDirectory + FileSystems.getDefault().getSeparator() + WARNLOGFILE;
 		initLogging(logfilename, warnlogfilename);
 	}
 
