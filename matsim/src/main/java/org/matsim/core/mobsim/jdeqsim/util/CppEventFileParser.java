@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -44,14 +46,12 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CppEventFileParser {
 
-//	private static ArrayList<EventLog> eventLog = null;
+	private static final Logger LOG = LogManager.getLogger(CppEventFileParser.class);
 
 	public static ArrayList<EventLog> parseFile(final String filePath) {
 		int counter = 0;
-		ArrayList<EventLog> rows = new ArrayList<EventLog>();
-		BufferedReader br = null;
-		try {
-			br = IOUtils.getBufferedReader(filePath);
+		ArrayList<EventLog> rows = new ArrayList<>();
+		try (BufferedReader br = IOUtils.getBufferedReader(filePath)) {
 			String line = null;
 			StringTokenizer tokenizer = null;
 			line = br.readLine();
@@ -105,15 +105,7 @@ public class CppEventFileParser {
 				line = br.readLine();
 			}
 		} catch (IOException ex) {
-			System.out.println(ex);
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
+			LOG.error("error reading events", ex);
 		}
 
 		return rows;
