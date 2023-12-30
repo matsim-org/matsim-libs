@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import java.util.ArrayList;

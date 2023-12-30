@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- *
- */
 package org.matsim.withinday.utils;
 
 import java.util.ArrayList;
