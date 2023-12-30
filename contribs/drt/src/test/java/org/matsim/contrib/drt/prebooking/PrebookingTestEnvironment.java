@@ -1,11 +1,5 @@
 package org.matsim.contrib.drt.prebooking;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -14,12 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -35,12 +24,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -60,6 +44,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class PrebookingTestEnvironment {
 	private final MatsimTestUtils utils;
@@ -361,6 +350,7 @@ public class PrebookingTestEnvironment {
 		public double dropoffTime = Double.NaN;
 
 		public List<Double> submissionTimes = new LinkedList<>();
+		public Id<org.matsim.contrib.dvrp.optimizer.Request> drtRequestId = null;
 	}
 
 	private Map<String, RequestInfo> requestInfo = new HashMap<>();
@@ -382,17 +372,21 @@ public class PrebookingTestEnvironment {
 			PassengerDroppedOffEventHandler, PassengerRequestRejectedEventHandler {
 		@Override
 		public void handleEvent(DrtRequestSubmittedEvent event) {
-			String ids = event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-"));
-			requestInfo.computeIfAbsent(ids, id -> new RequestInfo()).submissionTime = event
-					.getTime();
-			requestInfo.computeIfAbsent(ids, id -> new RequestInfo()).submissionTimes
-					.add(event.getTime());
-
+			for (Id<Person> personId : event.getPersonIds()) {
+				requestInfo.computeIfAbsent(personId.toString(), id -> new RequestInfo()).submissionTime = event
+						.getTime();
+				requestInfo.computeIfAbsent(personId.toString(), id -> new RequestInfo()).drtRequestId = event
+						.getRequestId();
+				requestInfo.computeIfAbsent(personId.toString(), id -> new RequestInfo()).submissionTimes
+						.add(event.getTime());
+			}
 		}
 
 		@Override
 		public void handleEvent(PassengerRequestRejectedEvent event) {
-			requestInfo.computeIfAbsent(event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")), id -> new RequestInfo()).rejected = true;
+			for (Id<Person> personId : event.getPersonIds()) {
+				requestInfo.computeIfAbsent(personId.toString(), id -> new RequestInfo()).rejected = true;
+			}
 		}
 
 		@Override

@@ -110,6 +110,10 @@ public class AcceptedDrtRequest {
 		return request.getPassengerIds();
 	}
 
+	public int getPassengerCount() {
+		return request.getPassengerCount();
+	}
+
 	public String getMode() {
 		return request.getMode();
 	}
