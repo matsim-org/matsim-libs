@@ -105,6 +105,7 @@ public class ByteBufferUtils {
 			return oin.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 
