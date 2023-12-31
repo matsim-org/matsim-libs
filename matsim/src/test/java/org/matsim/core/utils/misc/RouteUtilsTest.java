@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -50,7 +49,7 @@ public class RouteUtilsTest {
 		f.network.getLinks().get(f.linkIds[3]).setLength(400.0);
 		f.network.getLinks().get(f.linkIds[4]).setLength(500.0);
 		f.network.getLinks().get(f.linkIds[5]).setLength(600.0);
-		
+
 		NetworkRoute route, route2, route3 ;
 		{
 			Link startLink = f.network.getLinks().get(f.linkIds[0]);
@@ -77,11 +76,11 @@ public class RouteUtilsTest {
 			route3 = RouteUtils.createLinkNetworkRouteImpl(startLink.getId(), endLink.getId());
 			route3.setLinkIds(startLink.getId(), linkIds, endLink.getId());
 		}
-		
+
 		Assertions.assertEquals( 1. , RouteUtils.calculateCoverage( route, route2, f.network ), 0.0001 );
 		Assertions.assertEquals( (200.+400.+500.)/(200.+300.+400.+500.) , RouteUtils.calculateCoverage( route, route3, f.network ), 0.0001 );
 		Assertions.assertEquals( 1. , RouteUtils.calculateCoverage( route3, route, f.network ), 0.0001 );
-		
+
 	}
 
 	@Test

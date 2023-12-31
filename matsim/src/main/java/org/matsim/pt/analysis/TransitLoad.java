@@ -59,16 +59,16 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	public TransitLoad() {
 	}
 
-	@Deprecated
 	/**
 	 * Always returns first occurence of the TransitStopFacility in the route.
-	 * 
+	 *
 	 * @param line
 	 * @param route
 	 * @param stopFacility
 	 * @param departure
 	 * @return
 	 */
+	@Deprecated
 	public int getLoadAtDeparture(final TransitLine line, final TransitRoute route, final TransitStopFacility stopFacility, final Departure departure) {
 		for (int i = 0; i < route.getStops().size(); i++) {
 			if (route.getStops().get(i).getStopFacility().getId().equals(stopFacility.getId())) {
@@ -77,10 +77,10 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 		}
 		return -1;
 	}
-	
+
 	public int getLoadAtDeparture(final TransitLine line, final TransitRoute route, final int transitRouteStopIndex, final Departure departure) {
 		int nOfPassengers = 0;
-		
+
 		/*
 		 * count how often a stop was visited while following the route in
 		 * route.getStops() to differentiate multiple servings of the same

@@ -81,7 +81,7 @@ public class IdAnnotationsTest {
 			@JsonId Id<Person> personId,
 			@JsonId Id<Link> linkId,
 			@JsonId Id<Node> nodeId) {
-	};
+	}
 
 	@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 	private static class ClassWithIds {
@@ -117,6 +117,6 @@ public class IdAnnotationsTest {
 			return false;
 		}
 
-	};
+	}
 
 }

@@ -294,7 +294,7 @@ import org.matsim.vehicles.VehicleUtils;
 			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
 		}
 
-		class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {
+		static class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 			public double departureTime = Double.NaN;
 			public double arrivalTime = Double.NaN;
 

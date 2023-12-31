@@ -341,7 +341,6 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 *
 	 * @throws UncheckedIOException
 	 */
-	@SuppressWarnings("resource")
 	public static OutputStream getOutputStream(URL url, boolean append) throws UncheckedIOException {
 		try {
 			if (!url.getProtocol().equals("file")) {

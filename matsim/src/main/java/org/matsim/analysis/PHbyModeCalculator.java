@@ -36,7 +36,6 @@ import org.apache.logging.log4j.LogManager;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.StageActivityTypeIdentifier;

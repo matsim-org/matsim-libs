@@ -126,12 +126,12 @@ public class VehicleHandlerTest {
 		return result;
 	}
 
-	private class Result {
+	private static class Result {
 		double latestArrivalTime;
 		long initialCount;
 	}
 
-	private class BlockingVehicleHandler implements VehicleHandler {
+	private static class BlockingVehicleHandler implements VehicleHandler {
 		private final long capacity;
 
 		long initialCount = 0;
@@ -171,7 +171,7 @@ public class VehicleHandlerTest {
 		}
 	}
 
-	private class LatestArrivalHandler implements PersonArrivalEventHandler {
+	private static class LatestArrivalHandler implements PersonArrivalEventHandler {
 		Double latestArrivalTime = null;
 
 		@Override
