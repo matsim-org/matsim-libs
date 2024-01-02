@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.SCTUtils.*;
+
 /**
  * @author Ricardo Ewert
  *
@@ -55,16 +57,12 @@ public class TripDistributionMatrixTest {
 		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
-		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		Network network = NetworkUtils.readNetwork(networkLocation);
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, SCTUtils.getZoneIndex(inputDataDirectory), shapeFileBuildingsPath, null, buildingsPerZone);
+					inputDataDirectory, usedLanduseConfiguration,
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
@@ -144,16 +142,12 @@ public class TripDistributionMatrixTest {
 		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
-		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		Network network = NetworkUtils.readNetwork(networkLocation);
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, SCTUtils.getZoneIndex(inputDataDirectory), shapeFileBuildingsPath, null, buildingsPerZone);
+					inputDataDirectory, usedLanduseConfiguration,
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
