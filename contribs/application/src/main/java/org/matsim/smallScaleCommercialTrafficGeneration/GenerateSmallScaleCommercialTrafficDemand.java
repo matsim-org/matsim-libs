@@ -454,7 +454,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/**
-	 * Reads and checks config if all necessary parameter are set.
+	 * Reads and checks config if all necessary parameters are set.
 	 */
 	private Config readAndCheckConfig(Path configPath, String modelName, String sampleName, Path output) throws Exception {
 
