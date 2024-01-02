@@ -1,7 +1,6 @@
 package org.matsim.utils.objectattributes.attributeconverters;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 

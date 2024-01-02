@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.core.replanning.strategies;
 
 import com.google.inject.*;

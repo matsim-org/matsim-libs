@@ -20,7 +20,6 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -97,7 +96,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 		// material is known.  Could put all of this in the "global" config consistency checker, but if it conceptually belongs into the
 		// ConfigGroup, I think it is easier to have it more local.  Wasn't a big problem, since this method is _only_ called from the global config
 		// itself, which obviously can just pass on a "this" pointer.  kai, jan'17)
-		
+
 		// default: just call this method on parameter sets
 		for ( Collection<? extends ConfigGroup> sets : getParameterSets().values() ) {
 			for ( ConfigGroup set : sets ) set.checkConsistency(config);
@@ -189,12 +188,12 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	 * Can be extended if there are consistency checks to makes,
 	 * for instance if parameter sets of a given type should be
 	 * instances of a particular class.
-	 * @param set 
+	 * @param set
 	 */
 	protected void checkParameterSet(final ConfigGroup set) {
 		// empty for inheritance
 	}
-	
+
 	/**
 	 * Useful for instance if default values are provided but should be cleared if
 	 * user provides values.
@@ -213,9 +212,9 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	public final Map<String, ? extends Collection<? extends ConfigGroup>> getParameterSets() {
 		// TODO: immutabilize (including lists)
 		// maybe done with what I did below?  kai, sep'16
-		
+
 		//		return parameterSetsPerType;
-		
+
 		Map<String, Collection<ConfigGroup>> parameterSetsPerType2 = new TreeMap<>() ;
 		for ( Entry<String, Collection<ConfigGroup>> entry : parameterSetsPerType.entrySet() ) {
 			parameterSetsPerType2.put( entry.getKey(), Collections.unmodifiableCollection(entry.getValue()) ) ;
@@ -232,11 +231,11 @@ public class ConfigGroup implements MatsimExtensionPoint {
 		this.locked = true ;
 		for ( Collection<ConfigGroup> parameterSets : this.parameterSetsPerType.values() ) {
 			for ( ConfigGroup parameterSet : parameterSets ) {
-				parameterSet.setLocked(); 
+				parameterSet.setLocked();
 			}
 		}
 	}
-	
+
 	public final void testForLocked() {
 		if ( locked ) {
 			throw new RuntimeException( "Too late to change this ...") ;

@@ -69,7 +69,6 @@ public final class Tuple<A, B> implements Serializable {
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof Tuple)) return false;

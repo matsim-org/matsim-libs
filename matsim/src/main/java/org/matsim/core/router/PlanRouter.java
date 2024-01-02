@@ -22,12 +22,10 @@ package org.matsim.core.router;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -92,7 +90,7 @@ public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
 			timeTracker.addActivity(oldTrip.getOriginActivity());
-			
+
 			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
 			final List<? extends PlanElement> newTripElements = tripRouter.calcRoute( //
 					routingMode, //
@@ -102,11 +100,11 @@ public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 					plan.getPerson(), //
 					oldTrip.getTripAttributes() //
 			);
-			
+
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTripElements);
 
 			TripRouter.insertTrip( plan, oldTrip.getOriginActivity(), newTripElements, oldTrip.getDestinationActivity());
-			
+
 			timeTracker.addElements(newTripElements);
 		}
 	}

@@ -8,7 +8,6 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 
 public class StringCollectionConverter implements AttributeConverter<Collection<String>> {
 

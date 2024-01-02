@@ -20,6 +20,8 @@
 
 package org.matsim.core.events.algorithms;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -33,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class EventWriterXML implements EventWriter, BasicEventHandler {
+
+	private static final Logger LOG = LogManager.getLogger(EventWriterXML.class);
 	private final BufferedWriter out;
 
 	public EventWriterXML(final String outfilename) {
@@ -89,7 +93,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 			}
 			this.out.append(" />\n");
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 	}
 

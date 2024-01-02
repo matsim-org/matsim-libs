@@ -185,7 +185,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 
 		@Override
 		public InputSource resolveEntity(final String publicId, final String systemId) {
-			/**
+			/*
 			 * As the xml schema of interest may be derived from other schema instances we
 			 * are only interested in the first entity resolved.
 			 */

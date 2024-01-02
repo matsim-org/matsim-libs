@@ -26,8 +26,6 @@ import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 
@@ -895,7 +893,7 @@ public class ControlerIT {
 		config.controller().setWriteEventsInterval(0);
 		config.controller().setWritePlansInterval(0);
 		config.qsim().setSnapshotPeriod(10);
-		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;;
+		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controller().setCreateGraphs(false);
@@ -915,7 +913,7 @@ public class ControlerIT {
 		config.controller().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setSnapshotPeriod(600);
-		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
+		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setCreateGraphs(false);
