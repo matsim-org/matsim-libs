@@ -75,7 +75,7 @@ public class SmallScaleCommercialTrafficUtils {
 	private static final Joiner JOIN = Joiner.on("\t");
 
 	/**
-	 * Creates and return the Index of the zones shape.
+	 * Creates and return the Index of the zone shape.
 	 *
 	 * @return indexZones
 	 */
@@ -97,7 +97,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Writes a csv file with result of the distribution per zone of the input data.
+	 * Writes a csv file with the result of the distribution per zone of the input data.
 	 */
 	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
 											  Path outputFileInOutputFolder, Map<String, String> zoneIdNameConnection)

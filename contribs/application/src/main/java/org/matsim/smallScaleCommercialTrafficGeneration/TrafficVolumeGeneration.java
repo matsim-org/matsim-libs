@@ -321,7 +321,7 @@ public class TrafficVolumeGeneration {
 					}
 				}
 			} else {
-				if (carrier.getServices().size() != 0) {
+				if (!carrier.getServices().isEmpty()) {
 					List<String> possibleStartAreas = new ArrayList<>();
 					for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 						possibleStartAreas
@@ -341,7 +341,7 @@ public class TrafficVolumeGeneration {
 									+ " is not part of the zones. That's why the traffic volume was not reduces by this service.");
 						}
 					}
-				} else if (carrier.getShipments().size() != 0) {
+				} else if (!carrier.getShipments().isEmpty()) {
 					for (CarrierShipment shipment : carrier.getShipments().values()) {
 						String startZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(shipment.getFrom(),
 								regionLinksMap);

@@ -919,7 +919,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/**
-	 * Finds for areas without links the nearest Link, if the area contains any building.
+	 * Finds for areas without links the nearest Link if the area contains any building.
 	 */
 	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
 															Index shpZones,
