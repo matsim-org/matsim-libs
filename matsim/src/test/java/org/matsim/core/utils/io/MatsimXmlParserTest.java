@@ -21,7 +21,6 @@ package org.matsim.core.utils.io;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;

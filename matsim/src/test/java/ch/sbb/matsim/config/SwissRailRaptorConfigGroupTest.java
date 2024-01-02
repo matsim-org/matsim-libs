@@ -23,7 +23,6 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressPar
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.ModeMappingForPassengersParameterSet;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.RangeQuerySettingsParameterSet;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.RouteSelectorParameterSet;
-import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;

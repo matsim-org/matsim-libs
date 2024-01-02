@@ -19,9 +19,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
 package org.matsim.withinday.controller;
 
 import java.util.Map;
@@ -38,23 +35,23 @@ public final class WithinDayConfigGroup extends ReflectiveConfigGroup {
 	public WithinDayConfigGroup() {
 		super(GROUP_NAME);
 	}
-	
-	// --- 
+
+	// ---
 	// ---
 
-	// yyyy I cannot say yet if this should restrict to "TravelTimePrediction".  Probably yes.  Needs to be decided before escalated to xml config.  kai, may'17 
-	
-	public enum ShortTermPredictionMethod { currentSpeeds } 
-	
+	// yyyy I cannot say yet if this should restrict to "TravelTimePrediction".  Probably yes.  Needs to be decided before escalated to xml config.  kai, may'17
+
+	public enum ShortTermPredictionMethod { currentSpeeds }
+
 	ShortTermPredictionMethod predictionMethod = ShortTermPredictionMethod.currentSpeeds ;
 	// I think this is what the original code does: use "current" travel times (whatever that means; I still need to find out). kai, may'17
-	
+
 	@SuppressWarnings("unused")
 	private static final String SHORT_TERM_PREDICTION_METHOD_CMT="method to predict travel times for the future" ;
 
 	/**
 	 * {@value #SHORT_TERM_PREDICTION_METHOD_CMT}
-	 * 
+	 *
 	 * @return the predictionMethod
 	 */
 	public ShortTermPredictionMethod getPredictionMethod() {
@@ -62,7 +59,7 @@ public final class WithinDayConfigGroup extends ReflectiveConfigGroup {
 	}
 	/**
 	 * {@value #SHORT_TERM_PREDICTION_METHOD_CMT}
-	 * 
+	 *
 	 * @param predictionMethod the predictionMethod to set
 	 */
 	public void setPredictionMethod(ShortTermPredictionMethod predictionMethod) {
@@ -71,7 +68,7 @@ public final class WithinDayConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 	// ---
-	
+
 	@Override public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		return comments ;

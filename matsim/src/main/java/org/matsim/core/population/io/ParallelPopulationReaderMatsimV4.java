@@ -330,21 +330,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 		Stack<String> context = null;	// not used by the PopulationReader
 	}
 
-	public final class StartTag extends Tag {
+	public static final class StartTag extends Tag {
 		Attributes atts;
 	}
 
-	public final class PersonTag extends Tag {
+	public static final class PersonTag extends Tag {
 		Person person;
 	}
 
-	public final class EndTag extends Tag {
+	public static final class EndTag extends Tag {
 		String content;
 	}
 
 	/*
 	 * Marker Tag to inform the threads that no further data has to be parsed.
 	 */
-	public final class EndProcessingTag extends Tag {
+	public static final class EndProcessingTag extends Tag {
 	}
 }

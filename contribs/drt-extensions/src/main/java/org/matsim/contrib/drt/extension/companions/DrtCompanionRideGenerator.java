@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,6 +87,7 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	}
 
 	void addCompanionAgents() {
+		int identifier = 0;
 		HashMap<String, Integer> drtCompanionAgents = new HashMap<>();
 		Collection<Person> companions = new ArrayList<>();
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
@@ -105,7 +105,8 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 						int groupPart = i;
 
 						companions.add(createCompanionAgent(mainMode, person, trip, trip.getOriginActivity(),
-								trip.getDestinationActivity(), groupPart, groupSize));
+								trip.getDestinationActivity(), groupPart, groupSize, identifier));
+						identifier++;
 					}
 				}
 			}
@@ -121,9 +122,9 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	}
 
 	private Person createCompanionAgent(String drtMode, Person originalPerson, TripStructureUtils.Trip trip,
-										Activity fromActivity, Activity toActivity, int groupPart, int groupSize) {
+										Activity fromActivity, Activity toActivity, int groupPart, int groupSize, int identifier) {
 		String prefix = getCompanionPrefix(drtMode);
-		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + UUID.randomUUID();
+		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + identifier;
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(companionId));
 		DrtCompanionUtils.setDRTCompanionType(person, DRT_COMPANION_TYPE);
 

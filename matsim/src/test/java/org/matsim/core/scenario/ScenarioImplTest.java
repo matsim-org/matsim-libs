@@ -22,9 +22,6 @@ package org.matsim.core.scenario;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.households.Households;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.Vehicles;
 
 /**
  * @author thibautd
