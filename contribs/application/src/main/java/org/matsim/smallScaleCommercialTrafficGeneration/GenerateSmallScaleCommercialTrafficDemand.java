@@ -484,6 +484,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (network != null)
 			config.network().setInputFile(network);
 
+		// Some files are written before the controller is created, deleting the directory is not an option
 		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
 
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
