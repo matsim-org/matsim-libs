@@ -32,13 +32,13 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.application.options.ShpOptions;
-import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
+import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.opengis.feature.simple.SimpleFeature;
-import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -46,7 +46,10 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -236,19 +239,19 @@ public class TripDistributionMatrix {
 		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 		private final String smallScaleCommercialTrafficType;
 
-		public static Builder newInstance(ShpOptions shpZones,
+		public static Builder newInstance(Index indexZones,
 										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 										  String smallScaleCommercialTrafficType) {
-			return new Builder(shpZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType);
+			return new Builder(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType);
 		}
 
-		private Builder(ShpOptions shpZones,
+		private Builder(Index indexZones,
 						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 						String smallScaleCommercialTrafficType) {
 			super();
-			this.zonesFeatures = shpZones.readFeatures();
+			this.zonesFeatures = indexZones.getAllFeatures();
 			this.trafficVolume_start = trafficVolume_start;
 			this.trafficVolume_stop = trafficVolume_stop;
 			this.smallScaleCommercialTrafficType = smallScaleCommercialTrafficType;

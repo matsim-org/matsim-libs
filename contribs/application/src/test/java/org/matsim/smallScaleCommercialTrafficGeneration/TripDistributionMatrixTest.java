@@ -26,14 +26,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
-import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -79,7 +78,7 @@ public class TripDistributionMatrixTest {
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());
@@ -169,7 +168,7 @@ public class TripDistributionMatrixTest {
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());

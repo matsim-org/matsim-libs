@@ -951,7 +951,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		throws Exception {
 
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-			.newInstance(shpZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType).build();
+			.newInstance(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType).build();
 		List<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {
 			if (!listOfZones.contains(k.getZone()))
