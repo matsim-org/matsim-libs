@@ -50,10 +50,10 @@ public class TrafficVolumeGeneration {
 	private static final Logger log = LogManager.getLogger(TrafficVolumeGeneration.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
-	private static HashMap<Integer, HashMap<String, Double>> generationRatesStart = new HashMap<>();
-	private static HashMap<Integer, HashMap<String, Double>> generationRatesStop = new HashMap<>();
-	private static HashMap<String, HashMap<String, Double>> commitmentRatesStart = new HashMap<>();
-	private static HashMap<String, HashMap<String, Double>> commitmentRatesStop = new HashMap<>();
+	private static Map<Integer, Map<String, Double>> generationRatesStart = new HashMap<>();
+	private static Map<Integer, Map<String, Double>> generationRatesStop = new HashMap<>();
+	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
+	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
 
 	static class TrafficVolumeKey {
 		private final String zone;
@@ -144,7 +144,7 @@ public class TrafficVolumeGeneration {
 			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
 			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, resultingDataPerZone, "stop", sample, modesORvehTypes);
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 		Path outputFileStop = output.resolve("calculatedData")
@@ -168,8 +168,8 @@ public class TrafficVolumeGeneration {
 			Map<String, Object2DoubleMap<String>> resultingDataPerZone, String volumeType, double sample,
 			List<String> modesORvehTypes) {
 
-		HashMap<Integer, HashMap<String, Double>> generationRates;
-		HashMap<String, HashMap<String, Double>> commitmentRates;
+		Map<Integer, Map<String, Double>> generationRates;
+		Map<String, Map<String, Double>> commitmentRates;
 
 		if (volumeType.equals("start")) {
 			generationRates = generationRatesStart;
@@ -425,16 +425,16 @@ public class TrafficVolumeGeneration {
 	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param generationType start or stop rates
 	 */
-	private static HashMap<Integer, HashMap<String, Double>> setGenerationRates(String smallScaleCommercialTrafficType,
+	private static Map<Integer, Map<String, Double>> setGenerationRates(String smallScaleCommercialTrafficType,
 			String generationType) {
 
-		HashMap<Integer, HashMap<String, Double>> generationRates = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose1 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose2 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose3 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose4 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose5 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose6 = new HashMap<>();
+		Map<Integer, Map<String, Double>> generationRates = new HashMap<>();
+		Map<String, Double> ratesPerPurpose1 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose2 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose3 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose4 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose5 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose6 = new HashMap<>();
 		if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 			if (generationType.equals("start")) {
 				ratesPerPurpose1.put("Inhabitants", 0.0);
@@ -657,43 +657,43 @@ public class TrafficVolumeGeneration {
 	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param commitmentType start or stop parameter
 	 */
-	private static HashMap<String, HashMap<String, Double>> setCommitmentRates(String smallScaleCommercialTrafficType,
+	private static Map<String, Map<String, Double>> setCommitmentRates(String smallScaleCommercialTrafficType,
 			String commitmentType) {
-		HashMap<String, HashMap<String, Double>> commitmentRates = new HashMap<>();
+		Map<String, Map<String, Double>> commitmentRates = new HashMap<>();
 
 		if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 
 			// the first number is the purpose; second number the vehicle type
-			HashMap<String, Double> ratesPerPurpose1_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_5 = new HashMap<>();
 			if (commitmentType.equals("start")) {
 				ratesPerPurpose1_1.put("Inhabitants", 0.0);
 				ratesPerPurpose1_1.put("Employee", 0.8);

@@ -110,12 +110,12 @@ public class LanduseBuildingAnalysis {
 
 			log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
 
-			HashMap<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
+			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
 			createLanduseDistribution(landuseCategoriesPerZone, shapeFileLandusePath, zonesIndex,
 					usedLanduseConfiguration, shapeFileBuildingsPath, landuseCategoriesAndDataConnection,
 					buildingsPerZone, zoneIdNameConnection, shapeCRS);
 
-			HashMap<String, HashMap<String, Integer>> investigationAreaData = new HashMap<>();
+			Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
 			readAreaData(investigationAreaData, inputDataDirectory);
 
 			createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
@@ -134,7 +134,7 @@ public class LanduseBuildingAnalysis {
 	 */
 	private static void createResultingDataForLanduseInZones(
 			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-			Map<String, HashMap<String, Integer>> investigationAreaData,
+			Map<String, Map<String, Integer>> investigationAreaData,
 			Map<String, Object2DoubleMap<String>> resultingDataPerZone,
 			Map<String, List<String>> landuseCategoriesAndDataConnection) {
 
@@ -173,7 +173,7 @@ public class LanduseBuildingAnalysis {
 		 * creates the percentages of each category and zones based on the sum in this
 		 * category
 		 */
-		HashMap<String, Object2DoubleOpenHashMap<String>> checkPercentages = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> checkPercentages = new HashMap<String, Object2DoubleOpenHashMap<String>>();
 		investigationAreaData.keySet()
 				.forEach(c -> checkPercentages.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
 		for (String zoneId : resultingDataPerZone.keySet())
@@ -284,7 +284,7 @@ public class LanduseBuildingAnalysis {
 	/**
 	 * Reads the input data for certain areas from the csv file.
 	 */
-	private static void readAreaData(HashMap<String, HashMap<String, Integer>> areaData, Path inputDataDirectory)
+	private static void readAreaData(Map<String, Map<String, Integer>> areaData, Path inputDataDirectory)
 			throws IOException {
 
 		Path areaDataPath = inputDataDirectory.resolve("investigationAreaData.csv");
@@ -295,7 +295,7 @@ public class LanduseBuildingAnalysis {
 				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build())) {
 
 			for (CSVRecord record : parser) {
-				HashMap<String, Integer> lookUpTable = new HashMap<>();
+				Map<String, Integer> lookUpTable = new HashMap<>();
 				for (String csvRecord : parser.getHeaderMap().keySet()) {
 					if (parser.getHeaderMap().get(csvRecord) > 0)
 						lookUpTable.put(csvRecord, Integer.valueOf(record.get(csvRecord)));
