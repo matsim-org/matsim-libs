@@ -97,6 +97,17 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
+	 * Creates and return the Index of the building shape.
+	 *
+	 * @return indexBuildings
+	 */
+	static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS) {
+
+		ShpOptions shpLanduse = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
+		return shpLanduse.createIndex(shapeCRS, "type");
+	}
+
+	/**
 	 * Writes a csv file with the result of the distribution per zone of the input data.
 	 */
 	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
