@@ -82,7 +82,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists;
+import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
 
 /**
  * Tool to generate small scale commercial traffic for a selected area. The needed input data are: employee information for the area and three shapes files (zones, buildings, landuse). These data should be available with OSM.
@@ -484,7 +484,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (network != null)
 			config.network().setInputFile(network);
 
-		config.controller().setOverwriteFileSetting(deleteDirectoryIfExists);
+		// Some files are written before the controller is created, deleting the directory is not an option
+		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
 
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
