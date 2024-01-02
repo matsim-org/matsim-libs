@@ -239,7 +239,7 @@ public class TrafficVolumeGeneration {
 			writer.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Problem writing traffic volume file.", e);
 		}
 	}
 
