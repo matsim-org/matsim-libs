@@ -230,12 +230,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS);
+				indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS);
+				indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS);
 
 				Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
-						usedLanduseConfiguration.toString(), shapeFileLandusePath, indexZones,
-						shapeFileBuildingsPath, shapeCRS, buildingsPerZone);
-
+						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
+						indexBuildings, buildingsPerZone);
 
 				Map<String, Map<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, indexZones, buildingsPerZone);
 
@@ -721,7 +722,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (int i = 0; i < numberOfJobs; i++) {
 
-			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, regionLinksMap, shapeCRS);
+			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, regionLinksMap);
 			Id<CarrierService> idNewService = Id.create(carrierName + "_" + linkId + "_" + rnd.nextInt(10000),
 				CarrierService.class);
 
@@ -764,7 +765,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		carriers.addCarrier(thisCarrier);
 
 		while (vehicleDepots.size() < numberOfDepots) {
-			Id<Link> link = findPossibleLink(startZone, selectedStartCategory, null, regionLinksMap, shapeCRS);
+			Id<Link> link = findPossibleLink(startZone, selectedStartCategory, null, regionLinksMap);
 			vehicleDepots.add(link.toString());
 		}
 
@@ -853,13 +854,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Finds a possible link for a service or the vehicle location.
 	 */
 	private Id<Link> findPossibleLink(String zone, String selectedCategory, List<String> noPossibleLinks,
-									  Map<String, Map<Id<Link>, Link>> regionLinksMap, String shapeCRS) {
+									  Map<String, Map<Id<Link>, Link>> regionLinksMap) {
 
 		if (buildingsPerZone.isEmpty()) {
-			ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, "EPSG:4326", StandardCharsets.UTF_8);
-			List<SimpleFeature> buildingsFeatures = shpBuildings.readFeatures();
+			List<SimpleFeature> buildingsFeatures = indexBuildings.getAllFeatures();
 			LanduseBuildingAnalysis.analyzeBuildingType(buildingsFeatures, buildingsPerZone,
-				landuseCategoriesAndDataConnection, shapeFileLandusePath, indexZones, shapeCRS);
+				landuseCategoriesAndDataConnection, indexLanduse, indexZones);
 		}
 		Id<Link> newLink = null;
 		for (int a = 0; newLink == null && a < buildingsPerZone.get(zone).get(selectedCategory).size() * 2; a++) {

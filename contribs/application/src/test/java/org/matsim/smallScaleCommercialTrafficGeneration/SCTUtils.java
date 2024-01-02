@@ -14,4 +14,14 @@ public class SCTUtils {
 		return new ShpOptions(shapeFileZonePath, null, null).createIndex("areaID");
 	}
 
+	static ShpOptions.Index getIndexLanduse(Path inputDataDirectory) {
+		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
+		return new ShpOptions(shapeFileLandusePath, null, null).createIndex("fclass");
+	}
+
+	static ShpOptions.Index getIndexBuildings(Path inputDataDirectory) {
+		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
+		return new ShpOptions(shapeFileBuildingsPath, null, null).createIndex("type");
+	}
+
 }

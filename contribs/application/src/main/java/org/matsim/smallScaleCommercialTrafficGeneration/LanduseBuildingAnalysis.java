@@ -57,8 +57,8 @@ public class LanduseBuildingAnalysis {
 	 */
 	static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
 																			 Map<String, List<String>> landuseCategoriesAndDataConnection, Path inputDataDirectory,
-																			 String usedLanduseConfiguration, Path shapeFileLandusePath, ShpOptions.Index zonesIndex,
-																			 Path shapeFileBuildingsPath, String shapeCRS, Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone)
+																			 String usedLanduseConfiguration, Index indexLanduse, Index indexZones,
+																			 Index indexBuildings, Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone)
 			throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
@@ -111,9 +111,9 @@ public class LanduseBuildingAnalysis {
 			log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
 
 			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
-			createLanduseDistribution(landuseCategoriesPerZone, shapeFileLandusePath, zonesIndex,
-					usedLanduseConfiguration, shapeFileBuildingsPath, landuseCategoriesAndDataConnection,
-					buildingsPerZone, zoneIdNameConnection, shapeCRS);
+			createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones,
+					usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
+					buildingsPerZone, zoneIdNameConnection);
 
 			Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
 			readAreaData(investigationAreaData, inputDataDirectory);
@@ -218,17 +218,15 @@ public class LanduseBuildingAnalysis {
 	 * the sum of this category in all zones of the zone shape file
 	 */
 	private static void createLanduseDistribution(Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-												  Path shapeFileLandusePath, Index indexZones, String usedLanduseConfiguration,
-												  Path shapeFileBuildingsPath, Map<String, List<String>> landuseCategoriesAndDataConnection,
+												  Index indexLanduse, Index indexZones, String usedLanduseConfiguration,
+												  Index indexBuildings, Map<String, List<String>> landuseCategoriesAndDataConnection,
 												  Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-												  Map<String, String> zoneIdNameConnection, String shapeCRS) {
+												  Map<String, String> zoneIdNameConnection) {
 
 		List<String> neededLanduseCategories = List.of("residential", "industrial", "commercial", "retail", "farmyard",
 				"farmland", "construction");
 
-		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
-
-		List<SimpleFeature> landuseFeatures = shpLanduse.readFeatures();
+		List<SimpleFeature> landuseFeatures = indexLanduse.getAllFeatures();
 		List<SimpleFeature> zonesFeatures = indexZones.getAllFeatures();
 
 
@@ -241,10 +239,9 @@ public class LanduseBuildingAnalysis {
 
 		if (usedLanduseConfiguration.equals("useOSMBuildingsAndLanduse")) {
 
-			ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
-			List<SimpleFeature> buildingsFeatures = shpBuildings.readFeatures();
+			List<SimpleFeature> buildingsFeatures = indexBuildings.getAllFeatures();
 			analyzeBuildingType(buildingsFeatures, buildingsPerZone, landuseCategoriesAndDataConnection,
-					shapeFileLandusePath, indexZones, shpLanduse.getShapeCrs());
+				indexLanduse, indexZones);
 
 			for (String zone : buildingsPerZone.keySet())
 				for (String category : buildingsPerZone.get(zone).keySet())
@@ -309,11 +306,9 @@ public class LanduseBuildingAnalysis {
 	 * Analysis the building types so that you have the buildings per zone and type.
 	 */
 	static void analyzeBuildingType(List<SimpleFeature> buildingsFeatures,
-			Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-			Map<String, List<String>> landuseCategoriesAndDataConnection, Path shapeFileLandusePath,
-			Index indexZones, String crsLanduse) {
-
-		Index indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, crsLanduse);
+									Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+									Map<String, List<String>> landuseCategoriesAndDataConnection, Index indexLanduse,
+									Index indexZones) {
 
 		int countOSMObjects = 0;
 		log.info("Analyzing buildings types. This may take some time...");
