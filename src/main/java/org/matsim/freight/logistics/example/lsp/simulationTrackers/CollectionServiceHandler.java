@@ -20,6 +20,8 @@
 
 package org.matsim.freight.logistics.example.lsp.simulationTrackers;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.CarrierService;
@@ -31,83 +33,78 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.util.ArrayList;
-import java.util.Collection;
+/*package-private*/ class CollectionServiceHandler
+    implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
 
+  private final Collection<ServiceTuple> tuples;
+  private final Vehicles allVehicles;
+  private double totalLoadingCosts;
+  private int totalNumberOfShipments;
+  private int totalWeightOfShipments;
 
-/*package-private*/ class CollectionServiceHandler implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
+  public CollectionServiceHandler(Scenario scenario) {
+    this.allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
+    this.tuples = new ArrayList<>();
+  }
 
-	private final Collection<ServiceTuple> tuples;
-	private final Vehicles allVehicles;
-	private double totalLoadingCosts;
-	private int totalNumberOfShipments;
-	private int totalWeightOfShipments;
+  @Override
+  public void reset(int iteration) {
+    tuples.clear();
+    totalNumberOfShipments = 0;
+    totalWeightOfShipments = 0;
+  }
 
-	public CollectionServiceHandler(Scenario scenario) {
-		this.allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
-		this.tuples = new ArrayList<>();
-	}
+  @Override
+  public void handleEvent(CarrierServiceEndEvent event) {
+    System.out.println("Service Ends");
+    double loadingCosts;
+    for (ServiceTuple tuple : tuples) {
+      if (tuple.getServiceId() == event.getServiceId()) {
+        double serviceDuration = event.getTime() - tuple.getStartTime();
 
-	@Override
-	public void reset(int iteration) {
-		tuples.clear();
-		totalNumberOfShipments = 0;
-		totalWeightOfShipments = 0;
-	}
+        final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId());
+        loadingCosts = serviceDuration * vehicle.getType().getCostInformation().getCostsPerSecond();
+        totalLoadingCosts = totalLoadingCosts + loadingCosts;
+        tuples.remove(tuple);
+        break;
+      }
+    }
+  }
 
-	@Override
-	public void handleEvent(CarrierServiceEndEvent event) {
-		System.out.println("Service Ends");
-		double loadingCosts;
-		for (ServiceTuple tuple : tuples) {
-			if (tuple.getServiceId() == event.getServiceId()) {
-				double serviceDuration = event.getTime() - tuple.getStartTime();
+  @Override
+  public void handleEvent(CarrierServiceStartEvent event) {
+    totalNumberOfShipments++;
+    totalWeightOfShipments = totalWeightOfShipments + event.getCapacityDemand();
+    tuples.add(new ServiceTuple(event.getServiceId(), event.getTime()));
+  }
 
-				final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId());
-				loadingCosts = serviceDuration * vehicle.getType().getCostInformation().getCostsPerSecond();
-				totalLoadingCosts = totalLoadingCosts + loadingCosts;
-				tuples.remove(tuple);
-				break;
-			}
-		}
-	}
+  public double getTotalLoadingCosts() {
+    return totalLoadingCosts;
+  }
 
-	@Override
-	public void handleEvent(CarrierServiceStartEvent event) {
-		totalNumberOfShipments++;
-		totalWeightOfShipments = totalWeightOfShipments + event.getCapacityDemand();
-		tuples.add(new ServiceTuple(event.getServiceId(), event.getTime()));
-	}
+  public int getTotalNumberOfShipments() {
+    return totalNumberOfShipments;
+  }
 
-	public double getTotalLoadingCosts() {
-		return totalLoadingCosts;
-	}
+  public int getTotalWeightOfShipments() {
+    return totalWeightOfShipments;
+  }
 
-	public int getTotalNumberOfShipments() {
-		return totalNumberOfShipments;
-	}
+  private static class ServiceTuple {
+    private final Id<CarrierService> serviceId;
+    private final double startTime;
 
-	public int getTotalWeightOfShipments() {
-		return totalWeightOfShipments;
-	}
+    public ServiceTuple(Id<CarrierService> serviceId, double startTime) {
+      this.serviceId = serviceId;
+      this.startTime = startTime;
+    }
 
-	private static class ServiceTuple {
-		private final Id<CarrierService> serviceId;
-		private final double startTime;
+    public Id<CarrierService> getServiceId() {
+      return serviceId;
+    }
 
-		public ServiceTuple(Id<CarrierService> serviceId, double startTime) {
-			this.serviceId = serviceId;
-			this.startTime = startTime;
-		}
-
-		public Id<CarrierService> getServiceId() {
-			return serviceId;
-		}
-
-		public double getStartTime() {
-			return startTime;
-		}
-
-	}
-
+    public double getStartTime() {
+      return startTime;
+    }
+  }
 }

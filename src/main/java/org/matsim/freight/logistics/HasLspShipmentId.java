@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.freight.logistics;
 
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
@@ -27,7 +26,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  */
 public interface HasLspShipmentId {
 
-	String ATTRIBUTE_LSP_SHIPMENT_ID = "lspShipmentId";
-	Id<LSPShipment> getLspShipmentId();
+  String ATTRIBUTE_LSP_SHIPMENT_ID = "lspShipmentId";
 
+  Id<LSPShipment> getLspShipmentId();
 }

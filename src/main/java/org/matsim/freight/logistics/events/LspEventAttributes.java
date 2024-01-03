@@ -22,12 +22,11 @@
 package org.matsim.freight.logistics.events;
 
 /**
- *  Some constants, that are used for the Attributes of different logistic events.
+ * Some constants, that are used for the Attributes of different logistic events.
  *
- *  @author Kai Martins-Turner (kturner)
+ * @author Kai Martins-Turner (kturner)
  */
 public class LspEventAttributes {
-	public static final String ATTRIBUTE_HUB_ID = "hubId";
-	public static final String ATTRIBUTE_EXP_HANDLING_DURATION = "expHandlingDuration";
-
+  public static final String ATTRIBUTE_HUB_ID = "hubId";
+  public static final String ATTRIBUTE_EXP_HANDLING_DURATION = "expHandlingDuration";
 }

@@ -20,37 +20,38 @@
 
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
+import java.util.Random;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
-
-import java.util.Random;
 
 /*package-private*/ class MaybeTodayAssigner implements ShipmentAssigner {
 
-	private final Random random;
-	private LSP lsp;
+  private final Random random;
+  private LSP lsp;
 
-	public MaybeTodayAssigner() {
-		this.random = new Random(1);
-	}
+  public MaybeTodayAssigner() {
+    this.random = new Random(1);
+  }
 
-	@Override
-	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-		boolean assignToday = random.nextBoolean();
-		if (assignToday) {
-			Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
-			lspPlan.getLogisticChains().iterator().next().addShipmentToChain(shipment);
-		}
-	}
+  @Override
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+    boolean assignToday = random.nextBoolean();
+    if (assignToday) {
+      Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
+      lspPlan.getLogisticChains().iterator().next().addShipmentToChain(shipment);
+    }
+  }
 
-	@Override public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
-	@Override public LSP getLSP(){
-		throw new RuntimeException( "not implemented" );
-	}
+  @Override
+  public LSP getLSP() {
+    throw new RuntimeException("not implemented");
+  }
 
+  @Override
+  public void setLSP(LSP lsp) {
+    this.lsp = lsp;
+  }
 }

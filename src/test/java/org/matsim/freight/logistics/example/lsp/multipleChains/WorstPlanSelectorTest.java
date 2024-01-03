@@ -1,10 +1,8 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import static org.junit.Assert.assertTrue;
+
+import java.util.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,26 +25,21 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.*;
-
-import static org.junit.Assert.assertTrue;
-
 public class WorstPlanSelectorTest {
-
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
-
-	private LSP lsp;
 
 	private static final Id<Link> DEPOT_SOUTH_LINK_ID = Id.createLinkId("i(1,0)");
 	private static final Id<Link> DEPOT_NORTH_LINK_ID = Id.createLinkId("i(1,8)");
-
 	private static final VehicleType VEH_TYPE_CHEAP = CarrierVehicleType.Builder.newInstance(Id.create("cheap", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
@@ -54,7 +47,6 @@ public class WorstPlanSelectorTest {
 			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.001)
 			.build();
-
 	private static final VehicleType VEH_TYPE_EXPENSIVE = CarrierVehicleType.Builder.newInstance(Id.create("expensive", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
@@ -62,66 +54,9 @@ public class WorstPlanSelectorTest {
 			.setCostPerDistanceUnit(0.01)
 			.setCostPerTimeUnit(0.01)
 			.build();
-
-	@Before
-	public void initialize() {
-
-		Config config = prepareConfig();
-
-		Scenario scenario = prepareScenario(config);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
-			}
-		});
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
-
-				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
-				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
-				bind(CarrierStrategyManager.class).toProvider(() -> {
-					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-					return strategyManager;
-				});
-				bind(LSPStrategyManager.class).toProvider(() -> {
-					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-					strategyManager.addStrategy( RandomDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
-					strategyManager.setMaxPlansPerAgent(2);
-					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
-					return strategyManager;
-				});
-			}
-		});
-
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-		controler.run();
-
-		this.lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
-	}
-
-	private Config prepareConfig() {
-		Config config = ConfigUtils.createConfig();
-
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(10);
-
-		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setWriteEventsInterval(1);
-
-		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
-
-		return config;
-	}
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+	private LSP lsp;
 
 	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -281,6 +216,66 @@ public class WorstPlanSelectorTest {
 			}
 		}
 		return resourceList;
+	}
+
+	@Before
+	public void initialize() {
+
+		Config config = prepareConfig();
+
+		Scenario scenario = prepareScenario(config);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
+			}
+		});
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
+
+				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
+				bind(CarrierStrategyManager.class).toProvider(() -> {
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
+				bind(LSPStrategyManager.class).toProvider(() -> {
+					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
+					strategyManager.addStrategy( RandomDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
+					strategyManager.setMaxPlansPerAgent(2);
+					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
+					return strategyManager;
+				});
+			}
+		});
+
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controler.run();
+
+		this.lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
+	}
+
+	private Config prepareConfig() {
+		Config config = ConfigUtils.createConfig();
+
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(10);
+
+		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
+
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
+
+		return config;
 	}
 
 	@Test

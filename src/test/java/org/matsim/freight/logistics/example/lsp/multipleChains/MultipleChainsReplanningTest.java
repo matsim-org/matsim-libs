@@ -1,15 +1,11 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.example.lsp.multipleChains.EventBasedCarrierScorer_MultipleChains;
-import org.matsim.freight.logistics.example.lsp.multipleChains.MultipleChainsUtils;
-import org.matsim.freight.logistics.example.lsp.multipleChains.MyLSPScorer;
-import org.matsim.freight.logistics.example.lsp.multipleChains.RandomShiftingStrategyFactory;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlan;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,23 +28,18 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlan;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.*;
-
 public class MultipleChainsReplanningTest {
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
-
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
-
 	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
@@ -56,7 +47,8 @@ public class MultipleChainsReplanningTest {
 			.setCostPerDistanceUnit(0.01)
 			.setCostPerTimeUnit(0.01)
 			.build();
-
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 	int initialPlanCount;
 	int initialPlanShipmentPlanCount;
 
@@ -64,78 +56,6 @@ public class MultipleChainsReplanningTest {
 	int innovatedPlanShipmentPlanCount;
 	int innovatedPlanFirstLogisticChainShipmentCount;
 	boolean innovatedPlanHasEmptyShipmentPlanElements = false;
-
-	@Before
-	public void initialize() {
-
-		Config config = prepareConfig();
-
-		Scenario scenario = prepareScenario(config);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					install(new LSPModule());
-				}
-			});
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
-				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
-				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
-				bind(CarrierStrategyManager.class).toProvider(() -> {
-					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-					return strategyManager;
-				});
-				bind(LSPStrategyManager.class).toProvider(() -> {
-					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy( RandomShiftingStrategyFactory.createStrategy(), null, 1);
-					return strategyManager;
-				});
-			}
-		});
-
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-
-		LSP lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
-
-		initialPlanCount = lsp.getPlans().size();
-		initialPlanShipmentPlanCount = lsp.getPlans().get(0).getShipmentPlans().size();
-
-		controler.run();
-
-		updatedPlanCount = lsp.getPlans().size();
-		innovatedPlanShipmentPlanCount = lsp.getPlans().get(1).getShipmentPlans().size();
-
-		innovatedPlanFirstLogisticChainShipmentCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
-		for (ShipmentPlan shipmentPlan : lsp.getPlans().get(1).getShipmentPlans()) {
-			if (shipmentPlan.getPlanElements().isEmpty()) {
-				innovatedPlanHasEmptyShipmentPlanElements = true;
-			}
-		}
-
-
-	}
-
-	private Config prepareConfig() {
-		Config config = ConfigUtils.createConfig();
-
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(1);
-
-		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setWriteEventsInterval(1);
-
-		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
-
-		return config;
-	}
 
 	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -270,6 +190,77 @@ public class MultipleChainsReplanningTest {
 		return resourceList;
 	}
 
+	@Before
+	public void initialize() {
+
+		Config config = prepareConfig();
+
+		Scenario scenario = prepareScenario(config);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					install(new LSPModule());
+				}
+			});
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
+				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
+				bind(CarrierStrategyManager.class).toProvider(() -> {
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
+				bind(LSPStrategyManager.class).toProvider(() -> {
+					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy( RandomShiftingStrategyFactory.createStrategy(), null, 1);
+					return strategyManager;
+				});
+			}
+		});
+
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+
+		LSP lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
+
+		initialPlanCount = lsp.getPlans().size();
+		initialPlanShipmentPlanCount = lsp.getPlans().get(0).getShipmentPlans().size();
+
+		controler.run();
+
+		updatedPlanCount = lsp.getPlans().size();
+		innovatedPlanShipmentPlanCount = lsp.getPlans().get(1).getShipmentPlans().size();
+
+		innovatedPlanFirstLogisticChainShipmentCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
+		for (ShipmentPlan shipmentPlan : lsp.getPlans().get(1).getShipmentPlans()) {
+			if (shipmentPlan.getPlanElements().isEmpty()) {
+				innovatedPlanHasEmptyShipmentPlanElements = true;
+			}
+		}
+
+
+	}
+
+	private Config prepareConfig() {
+		Config config = ConfigUtils.createConfig();
+
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(1);
+
+		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
+
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
+
+		return config;
+	}
 
 	@Test
 	public void testGeneratedInnovatedPlan() {

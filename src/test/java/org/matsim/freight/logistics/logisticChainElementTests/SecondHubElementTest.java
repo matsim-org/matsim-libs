@@ -20,15 +20,15 @@
 
 package org.matsim.freight.logistics.logisticChainElementTests;
 
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-
-import static org.junit.Assert.*;
 
 public class SecondHubElementTest {
 

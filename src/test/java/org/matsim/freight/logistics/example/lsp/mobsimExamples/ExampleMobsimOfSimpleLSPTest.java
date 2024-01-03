@@ -1,22 +1,20 @@
 package org.matsim.freight.logistics.example.lsp.mobsimExamples;
 
+import static org.junit.Assert.fail;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author Kai Martins-Turner (kturner)
  */
 public class ExampleMobsimOfSimpleLSPTest {
+	private static final Logger log = LogManager.getLogger(ExampleMobsimOfSimpleLSPTest.class);
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
-
-	private static final Logger log = LogManager.getLogger(ExampleMobsimOfSimpleLSPTest.class);
-
 
 	@Test
 	public void testForRuntimeExceptionsAndCompareEvents() {

@@ -10,28 +10,31 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
  */
 class MyCarrierScorer implements CarrierScoringFunctionFactory {
 
-	public ScoringFunction createScoringFunction(Carrier carrier) {
-		SumScoringFunction sf = new SumScoringFunction();
-		TakeJspritScore takeJspritScore = new TakeJspritScore( carrier);
-		sf.addScoringFunction(takeJspritScore);
-		return sf;
-	}
+  public ScoringFunction createScoringFunction(Carrier carrier) {
+    SumScoringFunction sf = new SumScoringFunction();
+    TakeJspritScore takeJspritScore = new TakeJspritScore(carrier);
+    sf.addScoringFunction(takeJspritScore);
+    return sf;
+  }
 
-	private class TakeJspritScore implements SumScoringFunction.BasicScoring {
+  private class TakeJspritScore implements SumScoringFunction.BasicScoring {
 
-		private final Carrier carrier;
-		public TakeJspritScore(Carrier carrier) {
-			super();
-			this.carrier = carrier;
-		}
+    private final Carrier carrier;
 
-		@Override public void finish() {}
+    public TakeJspritScore(Carrier carrier) {
+      super();
+      this.carrier = carrier;
+    }
 
-		@Override public double getScore() {
-			if (carrier.getSelectedPlan().getScore() != null){
-				return carrier.getSelectedPlan().getScore();
-			}
-			return Double.NEGATIVE_INFINITY;
-		}
-	}
+    @Override
+    public void finish() {}
+
+    @Override
+    public double getScore() {
+      if (carrier.getSelectedPlan().getScore() != null) {
+        return carrier.getSelectedPlan().getScore();
+      }
+      return Double.NEGATIVE_INFINITY;
+    }
+  }
 }
