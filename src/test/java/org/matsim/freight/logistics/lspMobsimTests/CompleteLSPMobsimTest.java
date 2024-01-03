@@ -23,8 +23,8 @@ package org.matsim.freight.logistics.lspMobsimTests;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,11 +55,11 @@ import org.matsim.vehicles.VehicleType;
 
 public class CompleteLSPMobsimTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 	private LSP completeLSP;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Config config = new Config();
 		config.addCoreModules();

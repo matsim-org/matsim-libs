@@ -26,8 +26,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,14 +59,14 @@ import org.matsim.vehicles.VehicleType;
 
 public class CollectionTrackerTest {
 	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 	private Network network;
 	private Carrier carrier;
 	private LogisticChain logisticChain;
 	private double shareOfFixedCosts;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 
 		Config config = new Config();

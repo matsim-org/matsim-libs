@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,7 +44,7 @@ public class DistributionShipmentBuilderTest {
 	private ArrayList<LSPShipment> shipments;
 
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Config config = new Config();
 		config.addCoreModules();

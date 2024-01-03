@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,7 +49,7 @@ public class AssignerRequirementsTest {
 	private LogisticChain blueChain;
 	private LogisticChain redChain;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 
 		Config config = new Config();

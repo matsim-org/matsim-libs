@@ -28,8 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -67,11 +67,11 @@ import org.matsim.vehicles.VehicleType;
 public class MultipleShipmentsCompleteLSPMobsimTest {
 	
 	private static final Logger log = LogManager.getLogger(MultipleShipmentsCompleteLSPMobsimTest.class);
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 	private LSP completeLSP;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Config config = new Config();
 		config.addCoreModules();

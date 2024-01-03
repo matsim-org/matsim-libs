@@ -22,7 +22,7 @@ package org.matsim.freight.logistics.resourceImplementations;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +36,7 @@ public class FirstReloadResourceTest {
 	private static final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");
 	private TransshipmentHubResource transshipmentHubResource;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 
 

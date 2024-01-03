@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,12 +59,12 @@ import org.matsim.vehicles.VehicleType;
 
 public class MultipleIterationsCollectionLSPMobsimTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private LSP collectionLSP;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 
 		Config config = new Config();

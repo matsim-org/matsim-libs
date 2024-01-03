@@ -22,7 +22,7 @@ package org.matsim.freight.logistics.logisticChainElementTests;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
@@ -35,7 +35,7 @@ public class SecondHubElementTest {
 	private LSPResource point;
 	private LogisticChainElement hubElement;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);

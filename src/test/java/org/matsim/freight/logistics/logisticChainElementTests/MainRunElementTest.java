@@ -22,7 +22,7 @@ package org.matsim.freight.logistics.logisticChainElementTests;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +45,7 @@ public class MainRunElementTest {
 	private LSPResource mainRunResource;
 	private LogisticChainElement mainRunElement;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Config config = new Config();
 		config.addCoreModules();

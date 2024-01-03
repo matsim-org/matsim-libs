@@ -23,7 +23,7 @@ package org.matsim.freight.logistics.logisticChainTests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +54,7 @@ public class CompleteLogisticChainTest {
 	private LogisticChainElement distributionElement;
 	private LogisticChain logisticChain;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 
 		Config config = new Config();

@@ -24,14 +24,14 @@ import static org.junit.Assert.fail;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.freight.logistics.example.lsp.initialPlans.ExampleSchedulingOfTransportChainHubsVsDirect.SolutionType;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleSchedulingOfTransportChainHubsVsDirectTest {
 	private static final Logger log = LogManager.getLogger(ExampleSchedulingOfTransportChainHubsVsDirectTest.class);
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

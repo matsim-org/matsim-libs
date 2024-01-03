@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -66,7 +66,7 @@ public class SecondReloadLSPSchedulingTest {
 	private LogisticChainElement secondHubElement;
 	private Id<Link> toLinkId;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Config config = new Config();
 		config.addCoreModules();
