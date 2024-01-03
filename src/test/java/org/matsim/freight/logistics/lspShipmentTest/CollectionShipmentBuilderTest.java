@@ -20,8 +20,10 @@
 
 package org.matsim.freight.logistics.lspShipmentTest;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,11 +35,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.TimeWindow;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
-import static org.junit.Assert.*;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 public class CollectionShipmentBuilderTest {
 

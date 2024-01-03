@@ -20,73 +20,72 @@
 
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.Collection;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-
-import java.util.Collection;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 @Deprecated
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
 
-	private final ShipmentAssigner assigner;
+  private final ShipmentAssigner assigner;
 
-	/*package-private*/ TomorrowShipmentAssignerStrategyFactory(ShipmentAssigner assigner) {
-		this.assigner = assigner;
-	}
+  /*package-private*/ TomorrowShipmentAssignerStrategyFactory(ShipmentAssigner assigner) {
+    this.assigner = assigner;
+  }
 
-	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
+  /*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+    GenericPlanStrategyImpl<LSPPlan, LSP> strategy =
+        new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
 
-		GenericPlanStrategyModule<LSPPlan> tomorrowModule = new GenericPlanStrategyModule<>() {
+    GenericPlanStrategyModule<LSPPlan> tomorrowModule =
+        new GenericPlanStrategyModule<>() {
 
-			@Override
-			public void prepareReplanning(ReplanningContext replanningContext) {
-				// TODO Auto-generated method stub
+          @Override
+          public void prepareReplanning(ReplanningContext replanningContext) {
+            // TODO Auto-generated method stub
 
-			}
+          }
 
-			@Override
-			public void handlePlan(LSPPlan plan) {
-				plan.getLogisticChains().iterator().next().getShipmentIds().clear();
-				plan.setAssigner(assigner);
-//				LSP lsp = assigner.getLSP();
-				LSP lsp = plan.getLSP();
-				Collection<LSPShipment> shipments = lsp.getShipments();
-				for (LSPShipment shipment : shipments) {
-					assigner.assignToPlan(plan ,shipment);
-				}
+          @Override
+          public void handlePlan(LSPPlan plan) {
+            plan.getLogisticChains().iterator().next().getShipmentIds().clear();
+            plan.setAssigner(assigner);
+            //				LSP lsp = assigner.getLSP();
+            LSP lsp = plan.getLSP();
+            Collection<LSPShipment> shipments = lsp.getShipments();
+            for (LSPShipment shipment : shipments) {
+              assigner.assignToPlan(plan, shipment);
+            }
 
-				for (LogisticChain solution : plan.getLogisticChains()) {
-					solution.getShipmentIds().clear();
-					for (LogisticChainElement element : solution.getLogisticChainElements()) {
-						element.getIncomingShipments().clear();
-						element.getOutgoingShipments().clear();
-					}
-				}
+            for (LogisticChain solution : plan.getLogisticChains()) {
+              solution.getShipmentIds().clear();
+              for (LogisticChainElement element : solution.getLogisticChainElements()) {
+                element.getIncomingShipments().clear();
+                element.getOutgoingShipments().clear();
+              }
+            }
 
-				for (LSPShipment shipment : plan.getLSP().getShipments()) {
-					ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).clear();
-					shipment.getShipmentLog().clear();
-					plan.getAssigner().assignToPlan(plan, shipment);
-				}
-			}
+            for (LSPShipment shipment : plan.getLSP().getShipments()) {
+              ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).clear();
+              shipment.getShipmentLog().clear();
+              plan.getAssigner().assignToPlan(plan, shipment);
+            }
+          }
 
-			@Override
-			public void finishReplanning() {
-				// TODO Auto-generated method stub
+          @Override
+          public void finishReplanning() {
+            // TODO Auto-generated method stub
 
-			}
+          }
+        };
 
-		};
-
-		strategy.addStrategyModule(tomorrowModule);
-		return strategy;
-	}
-
+    strategy.addStrategyModule(tomorrowModule);
+    return strategy;
+  }
 }

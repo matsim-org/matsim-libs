@@ -7,5 +7,5 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public interface HandlingInHubStartedEventHandler extends EventHandler {
 
-	void handleEvent (HandlingInHubStartsEvent event);
+  void handleEvent(HandlingInHubStartsEvent event);
 }

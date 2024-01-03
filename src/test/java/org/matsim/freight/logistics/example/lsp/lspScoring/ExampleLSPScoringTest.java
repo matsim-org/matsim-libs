@@ -1,7 +1,5 @@
 package org.matsim.freight.logistics.example.lsp.lspScoring;
 
-import org.matsim.freight.logistics.LSP;
-import org.matsim.freight.logistics.LSPUtils;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,7 +7,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.freight.logistics.example.lsp.lspScoring.ExampleLSPScoring;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleLSPScoringTest {

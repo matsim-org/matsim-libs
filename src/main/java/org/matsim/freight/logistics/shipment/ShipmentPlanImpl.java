@@ -20,78 +20,79 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.api.core.v01.Id;
-
 import java.util.*;
+import org.matsim.api.core.v01.Id;
 
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 
-	private final Id<LSPShipment> lspShipmentId;
-	private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements;
+  private final Id<LSPShipment> lspShipmentId;
+  private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements;
 
-	ShipmentPlanImpl(Id<LSPShipment> lspShipmentId) {
-		this.lspShipmentId = lspShipmentId;
-		this.planElements = new LinkedHashMap<>();
-	}
+  ShipmentPlanImpl(Id<LSPShipment> lspShipmentId) {
+    this.lspShipmentId = lspShipmentId;
+    this.planElements = new LinkedHashMap<>();
+  }
 
-	//TODO: Ist kein embedding container!
-	@Override
-	public void setEmbeddingContainer(Id<LSPShipment> pointer) {
-		throw new RuntimeException("not implemented");
-	}
+  // TODO: Ist kein embedding container!
+  @Override
+  public void setEmbeddingContainer(Id<LSPShipment> pointer) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public Id<LSPShipment> getLspShipmentId() {
-		return lspShipmentId;
-	}
+  @Override
+  public Id<LSPShipment> getLspShipmentId() {
+    return lspShipmentId;
+  }
 
-	@Override
-	public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
-		planElements.put(id, element);
-	}
+  @Override
+  public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
+    planElements.put(id, element);
+  }
 
-	@Override
-	public Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements() {
-		return Collections.unmodifiableMap(planElements);
-	}
+  @Override
+  public Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements() {
+    return Collections.unmodifiableMap(planElements);
+  }
 
-	@Override
-	public ShipmentPlanElement getMostRecentEntry() {
+  @Override
+  public ShipmentPlanElement getMostRecentEntry() {
 
-		// there is no method to remove entries.  in consequence, the only way to change the result of this method is to "add" additional material into the plan.  Possibly,
-		// the method here is indeed there to find the plan element that was added most recently, to figure out how the next one can be added.  However, this then
-		// should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
+    // there is no method to remove entries.  in consequence, the only way to change the result of
+    // this method is to "add" additional material into the plan.  Possibly,
+    // the method here is indeed there to find the plan element that was added most recently, to
+    // figure out how the next one can be added.  However, this then
+    // should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
 
-		ArrayList<ShipmentPlanElement> logList = new ArrayList<>(planElements.values());
-		logList.sort(new LogElementComparator());
-		Collections.reverse(logList);
-		return logList.get(0);
-	}
+    ArrayList<ShipmentPlanElement> logList = new ArrayList<>(planElements.values());
+    logList.sort(new LogElementComparator());
+    Collections.reverse(logList);
+    return logList.get(0);
+  }
 
-	@Override
-	public void clear() {
-		planElements.clear();
-	}
+  @Override
+  public void clear() {
+    planElements.clear();
+  }
 
-	static class LogElementComparator implements Comparator<ShipmentPlanElement> {
+  static class LogElementComparator implements Comparator<ShipmentPlanElement> {
 
-		@Override
-		public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
-			if (o1.getStartTime() > o2.getStartTime()) {
-				return 1;
-			}
-			if (o1.getStartTime() < o2.getStartTime()) {
-				return -1;
-			}
-			if (o1.getStartTime() == o2.getStartTime()) {
-				if (o1.getEndTime() > o2.getEndTime()) {
-					return 1;
-				}
-				if (o1.getEndTime() < o2.getEndTime()) {
-					return -1;
-				}
-			}
-			return 0;
-		}
-	}
+    @Override
+    public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
+      if (o1.getStartTime() > o2.getStartTime()) {
+        return 1;
+      }
+      if (o1.getStartTime() < o2.getStartTime()) {
+        return -1;
+      }
+      if (o1.getStartTime() == o2.getStartTime()) {
+        if (o1.getEndTime() > o2.getEndTime()) {
+          return 1;
+        }
+        if (o1.getEndTime() < o2.getEndTime()) {
+          return -1;
+        }
+      }
+      return 0;
+    }
+  }
 }

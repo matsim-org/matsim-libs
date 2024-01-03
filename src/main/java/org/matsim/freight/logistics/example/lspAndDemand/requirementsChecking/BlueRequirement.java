@@ -20,18 +20,17 @@
 
 package org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking;
 
+import static org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
+
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.Requirement;
 
-import static org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
-
 /*package-private*/ class BlueRequirement implements Requirement {
 
-	static final String BLUE = "blue";
+  static final String BLUE = "blue";
 
-	@Override
-	public boolean checkRequirement(LogisticChain solution) {
-		return solution.getAttributes().getAttribute(ATTRIBUTE_COLOR).equals(BLUE);
-	}
-
+  @Override
+  public boolean checkRequirement(LogisticChain solution) {
+    return solution.getAttributes().getAttribute(ATTRIBUTE_COLOR).equals(BLUE);
+  }
 }

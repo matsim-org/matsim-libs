@@ -20,16 +20,13 @@
 
 package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.events.HandlingInHubStartsEvent;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.freight.carriers.*;
@@ -37,224 +34,253 @@ import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LSPSimulationTracker;
+import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.events.HandlingInHubStartsEvent;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.shipment.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+public class TransshipmentHubTourEndEventHandler
+    implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, CarrierTourEndEventHandler {
+  // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
+  // to do the junit testing. kmt jun'23
 
-public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, CarrierTourEndEventHandler {
-// Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
+  private final Scenario scenario;
+  private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
+  private final TransshipmentHubResource transshipmentHubResource;
+  private final Id<LSPResource> resourceId;
+  private final Id<Link> linkId;
+  private EventsManager eventsManager;
 
-	private final Scenario scenario;
-	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
-	private final TransshipmentHubResource transshipmentHubResource;
-	private final Id<LSPResource> resourceId;
-	private final Id<Link> linkId;
-	private EventsManager eventsManager;
+  /**
+   * This is a TourEndEvent-Handler, doing some stuff regarding the {@link
+   * TransshipmentHubResource}.
+   *
+   * @param transshipmentHubResource hub
+   * @param scenario The scenario. Is used to get the Carrier(s).
+   */
+  TransshipmentHubTourEndEventHandler(
+      TransshipmentHubResource transshipmentHubResource, Scenario scenario) {
+    this.transshipmentHubResource = transshipmentHubResource;
+    this.linkId = transshipmentHubResource.getEndLinkId();
+    this.resourceId = transshipmentHubResource.getId();
+    this.scenario = scenario;
+    this.servicesWaitedFor = new HashMap<>();
+    this.transshipmentHubResource.addSimulationTracker(this);
+  }
 
-	/**
-	 * This is a TourEndEvent-Handler, doing some stuff regarding the {@link TransshipmentHubResource}.
-	 *
-	 * @param transshipmentHubResource hub
-	 * @param scenario The scenario. Is used to get the Carrier(s).
-	 */
-	TransshipmentHubTourEndEventHandler(TransshipmentHubResource transshipmentHubResource, Scenario scenario) {
-		this.transshipmentHubResource = transshipmentHubResource;
-		this.linkId = transshipmentHubResource.getEndLinkId();
-		this.resourceId = transshipmentHubResource.getId();
-		this.scenario = scenario;
-		this.servicesWaitedFor = new HashMap<>();
-		this.transshipmentHubResource.addSimulationTracker(this);
-	}
+  @Override
+  public void setEmbeddingContainer(LSPResource pointer) {}
 
-	@Override
-	public void setEmbeddingContainer(LSPResource pointer) {
-	}
+  @Override
+  public void setEventsManager(EventsManager eventsManager) {
+    this.eventsManager = eventsManager;
+  }
 
-	@Override public void setEventsManager( EventsManager eventsManager ) {
-		this.eventsManager = eventsManager;
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    servicesWaitedFor
+        .clear(); // cleanup after Mobsim ends (instead of doing it in reset() = before Mobsim
+                  // starts.) kmt oct'22
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		servicesWaitedFor.clear(); // cleanup after Mobsim ends (instead of doing it in reset() = before Mobsim starts.) kmt oct'22
-	}
+  @Override
+  public void reset(int iteration) {
+    // not implemented; cleanup is done after Mobsim ends, because the internal state is (re)set
+    // before Mobsim starts.
+    // --> cleaning up here is too late.
+    // This is maybe not ideal, but works; kmt oct'22
+  }
 
-	@Override
-	public void reset(int iteration) {
-		// not implemented; cleanup is done after Mobsim ends, because the internal state is (re)set before Mobsim starts.
-		// --> cleaning up here is too late.
-		// This is maybe not ideal, but works; kmt oct'22
-	}
+  public void addShipment(
+      LSPShipment shipment, LogisticChainElement logisticChainElement, ShipmentPlan shipmentPlan) {
+    TransshipmentHubEventHandlerPair pair =
+        new TransshipmentHubEventHandlerPair(shipment, logisticChainElement);
 
-	public void addShipment(LSPShipment shipment, LogisticChainElement logisticChainElement, ShipmentPlan shipmentPlan) {
-		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, logisticChainElement);
+    for (ShipmentPlanElement planElement : shipmentPlan.getPlanElements().values()) {
+      if (planElement instanceof ShipmentLeg transport) {
+        if (transport.getLogisticChainElement().getNextElement() == logisticChainElement) {
+          servicesWaitedFor.put(transport.getCarrierService(), pair);
+        }
+      }
+    }
+  }
 
-		for (ShipmentPlanElement planElement : shipmentPlan.getPlanElements().values()) {
-			if (planElement instanceof ShipmentLeg transport) {
-				if (transport.getLogisticChainElement().getNextElement() == logisticChainElement) {
-					servicesWaitedFor.put(transport.getCarrierService(), pair);
-				}
-			}
-		}
-	}
+  @Override
+  public void handleEvent(CarrierTourEndEvent event) {
+    Tour tour = null;
+    Carrier carrier = CarriersUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+    Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+    for (ScheduledTour scheduledTour : scheduledTours) {
+      if (scheduledTour.getTour().getId() == event.getTourId()) {
+        tour = scheduledTour.getTour();
+        break;
+      }
+    }
+    if ((event.getLinkId() == this.linkId)) {
+      assert tour != null;
 
-	@Override
-	public void handleEvent(CarrierTourEndEvent event) {
-		Tour tour = null;
-		Carrier carrier = CarriersUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getTour().getId() == event.getTourId()) {
-				tour = scheduledTour.getTour();
-				break;
-			}
-		}
-		if ((event.getLinkId() == this.linkId)) {
-			assert tour != null;
+      if (ResourceImplementationUtils.getCarrierType(carrier)
+          == ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier) {
+        if (allShipmentsOfTourEndInOnePoint(tour)) {
+          for (TourElement tourElement : tour.getTourElements()) {
+            if (tourElement instanceof ServiceActivity serviceActivity) {
+              if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
+                  && allServicesAreInOnePoint(tour)
+                  && (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
 
-			if (ResourceImplementationUtils.getCarrierType(carrier) == ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier) {
-				if (allShipmentsOfTourEndInOnePoint(tour)) {
-					for (TourElement tourElement : tour.getTourElements()) {
-						if (tourElement instanceof ServiceActivity serviceActivity) {
-							if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
-									&& allServicesAreInOnePoint(tour)
-									&& (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
+                final CarrierService carrierService = serviceActivity.getService();
+                final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
+                // NOTE: Do NOT add time vor unloading all goods, because they are included for the
+                // main run (Service activity at end of tour)
+                final double expHandlingDuration =
+                    transshipmentHubResource.getCapacityNeedFixed()
+                        + (transshipmentHubResource.getCapacityNeedLinear()
+                            * lspShipment.getSize());
+                final double startTime = event.getTime();
+                final double endTime = startTime + expHandlingDuration;
 
-								final CarrierService carrierService = serviceActivity.getService();
-								final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
-								// NOTE: Do NOT add time vor unloading all goods, because they are included for the main run (Service activity at end of tour)
-								final double expHandlingDuration = transshipmentHubResource.getCapacityNeedFixed() + (transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize());
-								final double startTime = event.getTime() ;
-								final double endTime = startTime + expHandlingDuration;
+                logHandlingInHub(serviceActivity.getService(), event, startTime, endTime);
+                throwHandlingEvent(event, lspShipment, expHandlingDuration);
+              }
+            }
+          }
+        }
+      } else if ((ResourceImplementationUtils.getCarrierType(carrier)
+          == ResourceImplementationUtils.CARRIER_TYPE.collectionCarrier)) {
+        for (TourElement tourElement : tour.getTourElements()) {
+          if (tourElement instanceof ServiceActivity serviceActivity) {
+            if (tour.getEndLinkId() == transshipmentHubResource.getStartLinkId()) {
 
-								logHandlingInHub(serviceActivity.getService(), event, startTime, endTime);
-								throwHandlingEvent(event, lspShipment, expHandlingDuration);
-							}
-						}
-					}
-				}
-			} else if ((ResourceImplementationUtils.getCarrierType(carrier) == ResourceImplementationUtils.CARRIER_TYPE.collectionCarrier)) {
-				for (TourElement tourElement : tour.getTourElements()) {
-					if (tourElement instanceof ServiceActivity serviceActivity ) {
-						if (tour.getEndLinkId() == transshipmentHubResource.getStartLinkId()) {
+              final CarrierService carrierService = serviceActivity.getService();
+              final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 
-							final CarrierService carrierService = serviceActivity.getService();
-							final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
+              // TODO: Adding this here to be more in line with the schedule and have the shipment
+              // log fitting to it.
+              // This does NOT mean, that it really makes sense, because we decided for some
+              // reasons, that the handlingEvent start once the vehicle has arrived.
+              // It may change again, once we have unloading events available.
+              final double expUnloadingTime = getTotalUnloadingTime(tour);
+              final double expHandlingDuration =
+                  transshipmentHubResource.getCapacityNeedFixed()
+                      + (transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize());
+              final double startTime = event.getTime() + expUnloadingTime;
+              final double endTime = startTime + expHandlingDuration;
 
-							//TODO: Adding this here to be more in line with the schedule and have the shipment log fitting to it.
-							// This does NOT mean, that it really makes sense, because we decided for some reasons, that the handlingEvent start once the vehicle has arrived.
-							// It may change again, once we have unloading events available.
-							final double expUnloadingTime = getTotalUnloadingTime(tour);
-							final double expHandlingDuration = transshipmentHubResource.getCapacityNeedFixed() + (transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize());
-							final double startTime = event.getTime() + expUnloadingTime;
-							final double endTime = startTime + expHandlingDuration;
+              logHandlingInHub(carrierService, event, startTime, endTime);
+              throwHandlingEvent(event, lspShipment, expHandlingDuration);
+            }
+          }
+        }
+      }
+    }
+  }
 
-							logHandlingInHub(carrierService, event, startTime, endTime);
-							throwHandlingEvent(event, lspShipment, expHandlingDuration);
-						}
-					}
-				}
-			}
-		}
-	}
+  private boolean allShipmentsOfTourEndInOnePoint(Tour tour) {
+    boolean allShipmentsOfTourEndInOnePoint = true;
+    for (TourElement tourElement : tour.getTourElements()) {
+      if (tourElement instanceof ServiceActivity serviceActivity) {
+        if (!servicesWaitedFor.containsKey(serviceActivity.getService())) {
+          return false;
+        }
+      }
+    }
+    return allShipmentsOfTourEndInOnePoint;
+  }
 
-	private boolean allShipmentsOfTourEndInOnePoint(Tour tour) {
-		boolean allShipmentsOfTourEndInOnePoint = true;
-		for (TourElement tourElement : tour.getTourElements()) {
-			if (tourElement instanceof ServiceActivity serviceActivity) {
-				if (!servicesWaitedFor.containsKey(serviceActivity.getService())) {
-					return false;
-				}
-			}
-		}
-		return allShipmentsOfTourEndInOnePoint;
-	}
+  private double getTotalUnloadingTime(Tour tour) {
+    double totalTime = 0;
+    for (TourElement element : tour.getTourElements()) {
+      if (element instanceof ServiceActivity serviceActivity) {
+        totalTime = totalTime + serviceActivity.getDuration();
+      }
+    }
+    return totalTime;
+  }
 
-	private double getTotalUnloadingTime(Tour tour) {
-		double totalTime = 0;
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity serviceActivity) {
-				totalTime = totalTime + serviceActivity.getDuration();
-			}
-		}
-		return totalTime;
-	}
+  private void logHandlingInHub(
+      CarrierService carrierService, CarrierTourEndEvent event, double startTime, double endTime) {
 
-	private void logHandlingInHub(CarrierService carrierService, CarrierTourEndEvent event, double startTime, double endTime) {
+    LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 
-		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
+    { // Old logging approach - will be removed at some point in time
+      ShipmentPlanElement handle =
+          ShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
+              .setLinkId(linkId)
+              .setResourceId(resourceId)
+              .setStartTime(startTime)
+              .setEndTime(endTime)
+              .setLogisticsChainElement(servicesWaitedFor.get(carrierService).element)
+              .build();
+      Id<ShipmentPlanElement> loadId =
+          Id.create(
+              handle.getResourceId()
+                  + String.valueOf(handle.getLogisticChainElement().getId())
+                  + handle.getElementType(),
+              ShipmentPlanElement.class);
+      if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
+        lspShipment.getShipmentLog().addPlanElement(loadId, handle);
+      }
+    }
+  }
 
-		{ //Old logging approach - will be removed at some point in time
-			ShipmentPlanElement handle = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
-					.setLinkId(linkId)
-					.setResourceId(resourceId)
-					.setStartTime(startTime)
-					.setEndTime(endTime)
-					.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element)
-					.build();
-			Id<ShipmentPlanElement> loadId = Id.create(handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType(), ShipmentPlanElement.class);
-			if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
-				lspShipment.getShipmentLog().addPlanElement(loadId, handle);
-			}
-		}
+  private void throwHandlingEvent(
+      CarrierTourEndEvent event, LSPShipment lspShipment, double expHandlingDuration) {
+    // New event-based approach
+    // Todo: We need to decide what we write into the exp. handling duration: See #175 for
+    // discussion.
+    // The start time, must start at the same time as the triggering event. -> keep events stream
+    // ordered.
+    eventsManager.processEvent(
+        new HandlingInHubStartsEvent(
+            event.getTime(), linkId, lspShipment.getId(), resourceId, expHandlingDuration));
+  }
 
+  private double getUnloadEndTime(Tour tour) {
+    double unloadEndTime = 0;
+    for (TourElement element : tour.getTourElements()) {
+      if (element instanceof ServiceActivity serviceActivity) {
+        unloadEndTime = unloadEndTime + serviceActivity.getDuration();
+      }
+    }
+    return unloadEndTime;
+  }
 
-	}
+  private boolean allServicesAreInOnePoint(Tour tour) {
+    for (TourElement element : tour.getTourElements()) {
+      if (element instanceof ServiceActivity activity) {
+        if (activity.getLocation() != tour.getEndLinkId()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
-	private void throwHandlingEvent(CarrierTourEndEvent event, LSPShipment lspShipment, double expHandlingDuration) {
-		// New event-based approach
-		//Todo: We need to decide what we write into the exp. handling duration: See #175 for discussion.
-		// The start time, must start at the same time as the triggering event. -> keep events stream ordered.
-		eventsManager.processEvent(new HandlingInHubStartsEvent(event.getTime(), linkId, lspShipment.getId(), resourceId, expHandlingDuration));
-	}
+  public Map<CarrierService, TransshipmentHubEventHandlerPair> getServicesWaitedFor() {
+    return servicesWaitedFor;
+  }
 
-	private double getUnloadEndTime(Tour tour) {
-		double unloadEndTime = 0;
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity serviceActivity) {
-				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
-			}
-		}
-		return unloadEndTime;
-	}
+  public TransshipmentHubResource getTranshipmentHub() {
+    return transshipmentHubResource;
+  }
 
-	private boolean allServicesAreInOnePoint(Tour tour) {
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity activity) {
-				if (activity.getLocation() != tour.getEndLinkId()) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
-	public Map<CarrierService, TransshipmentHubEventHandlerPair> getServicesWaitedFor() {
-		return servicesWaitedFor;
-	}
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
 
-	public TransshipmentHubResource getTranshipmentHub() {
-		return transshipmentHubResource;
-	}
+  public static class TransshipmentHubEventHandlerPair {
+    public final LSPShipment shipment;
+    public final LogisticChainElement element;
 
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
-
-	public static class TransshipmentHubEventHandlerPair {
-		public final LSPShipment shipment;
-		public final LogisticChainElement element;
-
-		public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticChainElement element) {
-			this.shipment = shipment;
-			this.element = element;
-		}
-	}
-
-
+    public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticChainElement element) {
+      this.shipment = shipment;
+      this.element = element;
+    }
+  }
 }

@@ -20,57 +20,53 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
-	private final List<LspShipmentWithTime> shipments;
+  private final List<LspShipmentWithTime> shipments;
 
-	WaitingShipmentsImpl() {
-		this.shipments = new ArrayList<>();
-	}
+  WaitingShipmentsImpl() {
+    this.shipments = new ArrayList<>();
+  }
 
+  @Override
+  public void addShipment(double time, LSPShipment shipment) {
+    LspShipmentWithTime tuple = new LspShipmentWithTime(time, shipment);
+    this.shipments.add(tuple);
+    shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
+  }
 
-	@Override
-	public void addShipment(double time, LSPShipment shipment) {
-		LspShipmentWithTime tuple = new LspShipmentWithTime(time, shipment);
-		this.shipments.add(tuple);
-		shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
-	}
+  @Override
+  public Collection<LspShipmentWithTime> getSortedShipments() {
+    shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
+    return shipments;
+  }
 
-	@Override
-	public Collection<LspShipmentWithTime> getSortedShipments() {
-		shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
-		return shipments;
-	}
+  public void clear() {
+    shipments.clear();
+  }
 
-	public void clear() {
-		shipments.clear();
-	}
+  @Override
+  public Collection<LspShipmentWithTime> getShipments() {
+    return shipments;
+  }
 
-	@Override
-	public Collection<LspShipmentWithTime> getShipments() {
-		return shipments;
-	}
-
-	@Override public String toString() {
-		StringBuilder strb = new StringBuilder();
-		strb.append("WaitingShipmentsImpl{")
-				.append("No of Shipments= ").append(shipments.size());
-		if (shipments.size() >0 ){
-			strb.append("; ShipmentIds=");
-			for (LspShipmentWithTime shipment : getSortedShipments()) {
-				strb.append("[")
-						.append(shipment.getShipment().getId())
-						.append("]");
-			}
-		}
-		strb.append('}');
-		return strb.toString();
-	}
+  @Override
+  public String toString() {
+    StringBuilder strb = new StringBuilder();
+    strb.append("WaitingShipmentsImpl{").append("No of Shipments= ").append(shipments.size());
+    if (shipments.size() > 0) {
+      strb.append("; ShipmentIds=");
+      for (LspShipmentWithTime shipment : getSortedShipments()) {
+        strb.append("[").append(shipment.getShipment().getId()).append("]");
+      }
+    }
+    strb.append('}');
+    return strb.toString();
+  }
 }

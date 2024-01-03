@@ -20,64 +20,60 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
 class ScheduledShipmentUnload implements ShipmentPlanElement {
 
-	private final double startTime;
-	private final double endTime;
-	private final LogisticChainElement element;
-	private final Id<LSPResource> resourceId;
-	private final Id<Carrier> carrierId;
-	private final CarrierService carrierService;
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
+  private final Id<Carrier> carrierId;
+  private final CarrierService carrierService;
 
-	ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
-		this.startTime = builder.startTime;
-		this.endTime = builder.endTime;
-		this.element = builder.element;
-		this.resourceId = builder.resourceId;
-		this.carrierId = builder.carrierId;
-		this.carrierService = builder.carrierService;
-	}
+  ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+    this.carrierId = builder.carrierId;
+    this.carrierService = builder.carrierService;
+  }
 
+  @Override
+  public String getElementType() {
+    return "UNLOAD";
+  }
 
-	@Override
-	public String getElementType() {
-		return "UNLOAD";
-	}
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
 
-	@Override
-	public double getStartTime() {
-		return startTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
-	@Override
-	public LogisticChainElement getLogisticChainElement() {
-		return element;
-	}
+  public Id<Carrier> getCarrierId() {
+    return carrierId;
+  }
 
-	@Override
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
-
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	public CarrierService getCarrierService() {
-		return carrierService;
-	}
-
+  public CarrierService getCarrierService() {
+    return carrierService;
+  }
 }
-

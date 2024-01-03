@@ -24,6 +24,5 @@ import org.matsim.freight.logistics.LogisticChain;
 
 public interface Requirement {
 
-	boolean checkRequirement(LogisticChain solution);
-
+  boolean checkRequirement(LogisticChain solution);
 }

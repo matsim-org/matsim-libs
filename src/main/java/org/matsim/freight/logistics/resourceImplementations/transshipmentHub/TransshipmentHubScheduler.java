@@ -20,6 +20,10 @@
 
 package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
 
+import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
@@ -27,90 +31,91 @@ import org.matsim.freight.logistics.LspShipmentWithTime;
 import org.matsim.freight.logistics.shipment.ShipmentPlan;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-
-import java.util.ArrayList;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 
-	final Logger log = LogManager.getLogger(TransshipmentHubScheduler.class);
-	private final double capacityNeedLinear;
-	private final double capacityNeedFixed;
-	private TransshipmentHubResource transshipmentHubResource;
-	private TransshipmentHubTourEndEventHandler eventHandler;
+  final Logger log = LogManager.getLogger(TransshipmentHubScheduler.class);
+  private final double capacityNeedLinear;
+  private final double capacityNeedFixed;
+  private TransshipmentHubResource transshipmentHubResource;
+  private TransshipmentHubTourEndEventHandler eventHandler;
 
-	TransshipmentHubScheduler(TranshipmentHubUtils.TranshipmentHubSchedulerBuilder builder) {
-		this.lspShipmentsWithTime = new ArrayList<>();
-		this.capacityNeedLinear = builder.getCapacityNeedLinear();
-		this.capacityNeedFixed = builder.getCapacityNeedFixed();
+  TransshipmentHubScheduler(TranshipmentHubUtils.TranshipmentHubSchedulerBuilder builder) {
+    this.lspShipmentsWithTime = new ArrayList<>();
+    this.capacityNeedLinear = builder.getCapacityNeedLinear();
+    this.capacityNeedFixed = builder.getCapacityNeedFixed();
+  }
 
-	}
-	
-	@Override protected void initializeValues( LSPResource resource ) {
-		this.transshipmentHubResource = (TransshipmentHubResource) resource;
-	}
-	
-	@Override protected void scheduleResource() {
-		for( LspShipmentWithTime tupleToBeAssigned: lspShipmentsWithTime){
-			updateSchedule(tupleToBeAssigned);
-		}
-	}
+  @Override
+  protected void initializeValues(LSPResource resource) {
+    this.transshipmentHubResource = (TransshipmentHubResource) resource;
+  }
 
-	@Override @Deprecated
-	protected void updateShipments() {
-		log.error("This method is not implemented. Nothing will happen here. ");
-	}
+  @Override
+  protected void scheduleResource() {
+    for (LspShipmentWithTime tupleToBeAssigned : lspShipmentsWithTime) {
+      updateSchedule(tupleToBeAssigned);
+    }
+  }
 
+  @Override
+  @Deprecated
+  protected void updateShipments() {
+    log.error("This method is not implemented. Nothing will happen here. ");
+  }
 
-	private void updateSchedule(LspShipmentWithTime tuple) {
-		addShipmentHandleElement(tuple);
-		addShipmentToEventHandler(tuple);
-	}
+  private void updateSchedule(LspShipmentWithTime tuple) {
+    addShipmentHandleElement(tuple);
+    addShipmentToEventHandler(tuple);
+  }
 
-	private void addShipmentHandleElement(LspShipmentWithTime tuple) {
-		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
-		builder.setStartTime(tuple.getTime());
-		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize());
-		builder.setResourceId(transshipmentHubResource.getId());
-		for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
-			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				builder.setLogisticsChainElement(element);
-			}
-		}
-		ShipmentPlanElement handle = builder.build();
-		String idString = handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType();
-		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, handle);
-	}
+  private void addShipmentHandleElement(LspShipmentWithTime tuple) {
+    ShipmentUtils.ScheduledShipmentHandleBuilder builder =
+        ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
+    builder.setStartTime(tuple.getTime());
+    builder.setEndTime(
+        tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize());
+    builder.setResourceId(transshipmentHubResource.getId());
+    for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
+      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+        builder.setLogisticsChainElement(element);
+      }
+    }
+    ShipmentPlanElement handle = builder.build();
+    String idString =
+        handle.getResourceId()
+            + String.valueOf(handle.getLogisticChainElement().getId())
+            + handle.getElementType();
+    Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
+    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId())
+        .addPlanElement(id, handle);
+  }
 
-	private void addShipmentToEventHandler(LspShipmentWithTime tuple) {
-		for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
-			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				ShipmentPlan shipmentPlan = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getShipment().getId());
-				eventHandler.addShipment(tuple.getShipment(), element, shipmentPlan);
-				break;
-			}
-		}
-	}
+  private void addShipmentToEventHandler(LspShipmentWithTime tuple) {
+    for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
+      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+        ShipmentPlan shipmentPlan =
+            ShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getShipment().getId());
+        eventHandler.addShipment(tuple.getShipment(), element, shipmentPlan);
+        break;
+      }
+    }
+  }
 
-	public double getCapacityNeedLinear() {
-		return capacityNeedLinear;
-	}
+  public double getCapacityNeedLinear() {
+    return capacityNeedLinear;
+  }
 
+  public double getCapacityNeedFixed() {
+    return capacityNeedFixed;
+  }
 
-	public double getCapacityNeedFixed() {
-		return capacityNeedFixed;
-	}
+  public void setTranshipmentHub(TransshipmentHubResource transshipmentHubResource) {
+    this.transshipmentHubResource = transshipmentHubResource;
+  }
 
-
-	public void setTranshipmentHub(TransshipmentHubResource transshipmentHubResource) {
-		this.transshipmentHubResource = transshipmentHubResource;
-	}
-
-	public void setTransshipmentHubTourEndEventHandler( TransshipmentHubTourEndEventHandler eventHandler ) {
-		this.eventHandler = eventHandler;
-	}
-
+  public void setTransshipmentHubTourEndEventHandler(
+      TransshipmentHubTourEndEventHandler eventHandler) {
+    this.eventHandler = eventHandler;
+  }
 }

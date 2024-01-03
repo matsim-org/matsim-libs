@@ -20,28 +20,28 @@
 
 package org.matsim.freight.logistics;
 
-
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 public class LspShipmentWithTime {
-	// yyyyyy find better solution for this.  It is not so good to define an interface, and then immediately define a class that goes beyond it.
-	// Maybe the time should be added to the interface?  However, I don't even know what that time means (delivery time?  current time?).  kai,
-	// jun'22
+  // yyyyyy find better solution for this.  It is not so good to define an interface, and then
+  // immediately define a class that goes beyond it.
+  // Maybe the time should be added to the interface?  However, I don't even know what that time
+  // means (delivery time?  current time?).  kai,
+  // jun'22
 
-	private final LSPShipment shipment;
-	private final double time;
+  private final LSPShipment shipment;
+  private final double time;
 
-	public LspShipmentWithTime(double time, LSPShipment shipment) {
-		this.shipment = shipment;
-		this.time = time;
-	}
+  public LspShipmentWithTime(double time, LSPShipment shipment) {
+    this.shipment = shipment;
+    this.time = time;
+  }
 
-	public LSPShipment getShipment() {
-		return shipment;
-	}
+  public LSPShipment getShipment() {
+    return shipment;
+  }
 
-	public double getTime() {
-		return time;
-	}
-
+  public double getTime() {
+    return time;
+  }
 }

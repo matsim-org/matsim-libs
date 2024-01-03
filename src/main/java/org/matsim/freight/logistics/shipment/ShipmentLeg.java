@@ -6,15 +6,15 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 
 public interface ShipmentLeg extends ShipmentPlanElement {
-	Id<Link> getToLinkId();
+  Id<Link> getToLinkId();
 
-	void setToLinkId(Id<Link> endLinkId);
+  void setToLinkId(Id<Link> endLinkId);
 
-	Id<Carrier> getCarrierId();
+  Id<Carrier> getCarrierId();
 
-	Id<Link> getFromLinkId();
+  Id<Link> getFromLinkId();
 
-	CarrierService getCarrierService();
+  CarrierService getCarrierService();
 
-	void setEndTime(double time);
+  void setEndTime(double time);
 }

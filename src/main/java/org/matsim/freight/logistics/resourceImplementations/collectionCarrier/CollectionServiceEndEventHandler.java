@@ -20,6 +20,12 @@
 
 package org.matsim.freight.logistics.resourceImplementations.collectionCarrier;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
@@ -28,97 +34,103 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
-import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 
-public class CollectionServiceEndEventHandler implements AfterMobsimListener, CarrierServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
-// Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
+public class CollectionServiceEndEventHandler
+    implements AfterMobsimListener,
+        CarrierServiceEndEventHandler,
+        LSPSimulationTracker<LSPShipment> {
+  // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
+  // to do the junit testing. kmt jun'23
 
-	private final CarrierService carrierService;
-	private final LogisticChainElement logisticChainElement;
-	private final LSPCarrierResource resource;
-	private LSPShipment lspShipment;
+  private final CarrierService carrierService;
+  private final LogisticChainElement logisticChainElement;
+  private final LSPCarrierResource resource;
+  private LSPShipment lspShipment;
 
-	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {
-		this.carrierService = carrierService;
-		this.lspShipment = lspShipment;
-		this.logisticChainElement = element;
-		this.resource = resource;
-	}
+  public CollectionServiceEndEventHandler(
+      CarrierService carrierService,
+      LSPShipment lspShipment,
+      LogisticChainElement element,
+      LSPCarrierResource resource) {
+    this.carrierService = carrierService;
+    this.lspShipment = lspShipment;
+    this.logisticChainElement = element;
+    this.resource = resource;
+  }
 
+  @Override
+  public void reset(int iteration) {
+    // TODO Auto-generated method stub
 
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+  }
 
-	}
+  @Override
+  public void handleEvent(CarrierServiceEndEvent event) {
+    if (event.getServiceId() == carrierService.getId()
+        && event.getCarrierId() == resource.getCarrier().getId()) {
+      logLoad(event);
+      logTransport(event);
+    }
+  }
 
-	@Override
-	public void handleEvent(CarrierServiceEndEvent event) {
-		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-			logLoad(event);
-			logTransport(event);
-		}
-	}
+  private void logLoad(CarrierServiceEndEvent event) {
+    ShipmentUtils.LoggedShipmentLoadBuilder builder =
+        ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
+    builder.setStartTime(event.getTime() - event.getServiceDuration());
+    builder.setEndTime(event.getTime());
+    builder.setLogisticsChainElement(logisticChainElement);
+    builder.setResourceId(resource.getId());
+    builder.setLinkId(event.getLinkId());
+    builder.setCarrierId(event.getCarrierId());
+    ShipmentPlanElement loggedShipmentLoad = builder.build();
+    String idString =
+        loggedShipmentLoad.getResourceId()
+            + ""
+            + loggedShipmentLoad.getLogisticChainElement().getId()
+            + loggedShipmentLoad.getElementType();
+    Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
+    lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
+  }
 
-	private void logLoad(CarrierServiceEndEvent event) {
-		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
-		builder.setStartTime(event.getTime() - event.getServiceDuration());
-		builder.setEndTime(event.getTime());
-		builder.setLogisticsChainElement(logisticChainElement);
-		builder.setResourceId(resource.getId());
-		builder.setLinkId(event.getLinkId());
-		builder.setCarrierId(event.getCarrierId());
-		ShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
-		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
-	}
+  private void logTransport(CarrierServiceEndEvent event) {
+    ShipmentUtils.LoggedShipmentTransportBuilder builder =
+        ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
+    builder.setStartTime(event.getTime());
+    builder.setLogisticChainElement(logisticChainElement);
+    builder.setResourceId(resource.getId());
+    builder.setFromLinkId(event.getLinkId());
+    builder.setCarrierId(event.getCarrierId());
+    ShipmentLeg transport = builder.build();
+    String idString =
+        transport.getResourceId()
+            + ""
+            + transport.getLogisticChainElement().getId()
+            + transport.getElementType();
+    Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
+    lspShipment.getShipmentLog().addPlanElement(transportId, transport);
+  }
 
-	private void logTransport(CarrierServiceEndEvent event) {
-		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
-		builder.setStartTime(event.getTime());
-		builder.setLogisticChainElement(logisticChainElement);
-		builder.setResourceId(resource.getId());
-		builder.setFromLinkId(event.getLinkId());
-		builder.setCarrierId(event.getCarrierId());
-		ShipmentLeg transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
-		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
-	}
+  public CarrierService getCarrierService() {
+    return carrierService;
+  }
 
+  public LSPShipment getLspShipment() {
+    return lspShipment;
+  }
 
-	public CarrierService getCarrierService() {
-		return carrierService;
-	}
+  public LogisticChainElement getElement() {
+    return logisticChainElement;
+  }
 
+  public Id<LSPResource> getResourceId() {
+    return resource.getId();
+  }
 
-	public LSPShipment getLspShipment() {
-		return lspShipment;
-	}
+  @Override
+  public void setEmbeddingContainer(LSPShipment pointer) {
+    this.lspShipment = pointer;
+  }
 
-
-	public LogisticChainElement getElement() {
-		return logisticChainElement;
-	}
-
-
-	public Id<LSPResource> getResourceId() {
-		return resource.getId();
-	}
-
-
-	@Override
-	public void setEmbeddingContainer(LSPShipment pointer) {
-		this.lspShipment = pointer;
-	}
-
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {}
 }

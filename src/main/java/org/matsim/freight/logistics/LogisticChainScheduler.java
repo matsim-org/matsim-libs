@@ -20,24 +20,26 @@
 
 package org.matsim.freight.logistics;
 
-
 /**
- * Serve the purpose of routing a set of {@link org.matsim.freight.logistics.shipment.LSPShipment}s through a set of
- * {@link LogisticChain}s, which, in turn, consist of several {@link LogisticChainElement}s
- * and the corresponding {@link LSPResource}s.
+ * Serve the purpose of routing a set of {@link org.matsim.freight.logistics.shipment.LSPShipment}s
+ * through a set of {@link LogisticChain}s, which, in turn, consist of several {@link
+ * LogisticChainElement}s and the corresponding {@link LSPResource}s.
  */
 public interface LogisticChainScheduler extends HasBackpointer<LSP> {
 
-	void scheduleLogisticChain();
+  void scheduleLogisticChain();
 
-	/**
-	 * The buffer time is <b>only taken into account in planning / scheduling</b>.
-	 * The idea is to ensure that the goods are available for the next ressource "in time", because the scheduling does not take into account
-	 * any congestion during the simulation. E.g. if multiple vehicle are leaving the depot at the same time and thus influence each other.<br>
-	 * It is <b> not </b> intended to be available as buffer in the simulation itself -> It does not influence the events and shipmentLogs.
-	 * As a consequence, the transportation (in simulation, events, ...) is in many cases earlier than scheduled.
-	 * (Information from TM after asking; KMT 17.11.23)
-	 * @param bufferTime for scheduling [in sec]
-	 */
-	void setBufferTime(int bufferTime);
+  /**
+   * The buffer time is <b>only taken into account in planning / scheduling</b>. The idea is to
+   * ensure that the goods are available for the next ressource "in time", because the scheduling
+   * does not take into account any congestion during the simulation. E.g. if multiple vehicle are
+   * leaving the depot at the same time and thus influence each other.<br>
+   * It is <b> not </b> intended to be available as buffer in the simulation itself -> It does not
+   * influence the events and shipmentLogs. As a consequence, the transportation (in simulation,
+   * events, ...) is in many cases earlier than scheduled. (Information from TM after asking; KMT
+   * 17.11.23)
+   *
+   * @param bufferTime for scheduling [in sec]
+   */
+  void setBufferTime(int bufferTime);
 }

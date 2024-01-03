@@ -20,83 +20,87 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
 final class ScheduledShipmentTransport implements ShipmentLeg {
 
-	private final double startTime;
-	private final double endTime;
-	private final LogisticChainElement element;
-	private final Id<LSPResource> resourceId;
-	private final Id<Carrier> carrierId;
-	private final Id<Link> fromLinkId;
-	private final Id<Link> toLinkId;
-	private final CarrierService carrierService;
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
+  private final Id<Carrier> carrierId;
+  private final Id<Link> fromLinkId;
+  private final Id<Link> toLinkId;
+  private final CarrierService carrierService;
 
-	ScheduledShipmentTransport(ShipmentUtils.ScheduledShipmentTransportBuilder builder) {
-		this.startTime = builder.startTime;
-		this.endTime = builder.endTime;
-		this.element = builder.element;
-		this.resourceId = builder.resourceId;
-		this.carrierId = builder.carrierId;
-		this.fromLinkId = builder.fromLinkId;
-		this.toLinkId = builder.toLinkId;
-		this.carrierService = builder.carrierService;
-	}
+  ScheduledShipmentTransport(ShipmentUtils.ScheduledShipmentTransportBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+    this.carrierId = builder.carrierId;
+    this.fromLinkId = builder.fromLinkId;
+    this.toLinkId = builder.toLinkId;
+    this.carrierService = builder.carrierService;
+  }
 
+  @Override
+  public String getElementType() {
+    return "TRANSPORT";
+  }
 
-	@Override
-	public String getElementType() {
-		return "TRANSPORT";
-	}
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
 
-	@Override
-	public double getStartTime() {
-		return startTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public void setEndTime(double time) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public LogisticChainElement getLogisticChainElement() {
-		return element;
-	}
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
-	@Override
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
+  @Override
+  public Id<Link> getToLinkId() {
+    return toLinkId;
+  }
 
-	@Override public Id<Link> getToLinkId() {
-		return toLinkId;
-	}
+  @Override
+  public void setToLinkId(Id<Link> endLinkId) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
+  @Override
+  public Id<Carrier> getCarrierId() {
+    return carrierId;
+  }
 
+  @Override
+  public Id<Link> getFromLinkId() {
+    return fromLinkId;
+  }
 
-	@Override public Id<Link> getFromLinkId() {
-		return fromLinkId;
-	}
-
-	@Override public CarrierService getCarrierService() {
-		return carrierService;
-	}
-	@Override public void setEndTime( double time ){
-		throw new RuntimeException( "not implemented" );
-	}
-	@Override public void setToLinkId( Id<Link> endLinkId ){
-		throw new RuntimeException( "not implemented" );
-	}
-
+  @Override
+  public CarrierService getCarrierService() {
+    return carrierService;
+  }
 }
