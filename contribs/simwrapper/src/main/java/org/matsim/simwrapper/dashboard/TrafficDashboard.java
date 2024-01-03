@@ -6,6 +6,7 @@ import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
@@ -53,7 +54,7 @@ public class TrafficDashboard implements Dashboard {
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
 					.x("hour")
 					.y("congestion_index")
-					.name("road_type", Plotly.ColorScheme.Spectral)
+					.name("road_type", ColorScheme.Spectral)
 				);
 			})
 			.el(Table.class, ((viz, data) -> {
@@ -82,7 +83,7 @@ public class TrafficDashboard implements Dashboard {
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "avg_speed";
 			viz.display.lineColor.join = "link_id";
-			viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, 5, false);
+			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, false);
 
 			viz.display.lineWidth.dataset = "traffic";
 			viz.display.lineWidth.columnName = "simulated_traffic_volume";

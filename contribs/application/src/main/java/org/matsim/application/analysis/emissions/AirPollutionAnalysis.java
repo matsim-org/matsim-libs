@@ -53,9 +53,9 @@ import java.util.Map;
 )
 @CommandSpec(requireRunDirectory = true,
 	produces = {
-		"emissions_total.csv", "emissions_grid_per_day.xyt.csv", "emissions_per_link.csv",
+		"emissions_total.csv", "emissions_grid_per_day.csv", "emissions_per_link.csv",
 		"emissions_per_link_per_m.csv",
-		"emissions_grid_per_hour.xyt.csv",
+		"emissions_grid_per_hour.csv",
 		"emissions_vehicle_info.csv",
 	}
 )
@@ -253,7 +253,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.xyt.csv")),
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.csv")),
 			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
 			String crs = ProjectionUtils.getCRS(network);
@@ -263,7 +263,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 				crs = config.global().getCoordinateSystem();
 
 			// print coordinate system
-			printer.printComment(crs);
+//			printer.printComment(crs);
 
 			// print header
 			printer.print("time");
@@ -280,8 +280,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 					Coord coord = raster.getCoordForIndex(xi, yi);
 					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 
-					if (value == 0)
-						continue;
+//					if (value == 0)
+//						continue;
 
 					printer.print(0.0);
 					printer.print(coord.getX());
@@ -309,7 +309,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = firstBin.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("emissions_grid_per_hour.xyt.csv").toString()),
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("emissions_grid_per_hour.csv").toString()),
 			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
 			String crs = ProjectionUtils.getCRS(network);
@@ -337,8 +337,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 						Coord coord = raster.getCoordForIndex(xi, yi);
 						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 
-						if (value == 0)
-							continue;
+//						if (value == 0)
+//							continue;
 
 						printer.print(timeBin.getStartTime());
 						printer.print(coord.getX());

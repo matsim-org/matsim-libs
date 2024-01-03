@@ -41,7 +41,7 @@ public class OverviewDashboard implements Dashboard {
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";
 			viz.display.lineColor.join = "link_id";
-			viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, 5, true);
+			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
 
 			viz.display.lineWidth.dataset = "traffic";
 			viz.display.lineWidth.columnName = "simulated_traffic_volume";
