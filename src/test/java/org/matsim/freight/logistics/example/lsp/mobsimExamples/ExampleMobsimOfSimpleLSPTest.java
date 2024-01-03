@@ -1,11 +1,11 @@
 package org.matsim.freight.logistics.example.lsp.mobsimExamples;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -13,7 +13,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ExampleMobsimOfSimpleLSPTest {
 	private static final Logger log = LogManager.getLogger(ExampleMobsimOfSimpleLSPTest.class);
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

@@ -20,15 +20,15 @@
 
 package org.matsim.freight.logistics.example.lsp.lspScoring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler;
 import static org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner;
 
 import java.util.*;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -51,12 +51,12 @@ import org.matsim.vehicles.VehicleType;
 
 public class CollectionLSPScoringTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 	private final int numberOfShipments = 25;
 	private LSP collectionLSP;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");

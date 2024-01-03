@@ -20,12 +20,12 @@
 
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.*;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -55,12 +55,12 @@ import org.matsim.vehicles.VehicleType;
 
 public class CollectionLSPReplanningTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private LSP collectionLSP;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 
 		Config config = new Config();
