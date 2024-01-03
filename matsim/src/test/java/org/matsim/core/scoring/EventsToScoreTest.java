@@ -92,7 +92,7 @@ public class EventsToScoreTest {
 
 		for (int mockIteration = config.controller().getFirstIteration(); mockIteration <= config.controller().getLastIteration() ; mockIteration++ ) {
 
-			e2s.beginIteration(mockIteration, false); ;
+			e2s.beginIteration(mockIteration, false);
 			events.initProcessing();
 
 			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):

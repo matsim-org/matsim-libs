@@ -32,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author mrieser

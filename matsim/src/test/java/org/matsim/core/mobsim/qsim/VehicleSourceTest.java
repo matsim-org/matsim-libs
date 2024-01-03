@@ -19,7 +19,6 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -104,7 +103,9 @@ public class VehicleSourceTest {
 		config.qsim().setVehiclesSource(vehiclesSource );
 		config.qsim().setUsePersonIdForMissingVehicleId(usingPersonIdForMissingVehicleId );
 
-		config.controller().setOutputDirectory(helper.getOutputDirectory());
+		config.controller()
+			.setOutputDirectory(
+				helper.getOutputDirectory(vehiclesSource.name() + "_" + usingPersonIdForMissingVehicleId + "_" + providingVehiclesInPerson));
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(1);
 		config.controller().setCreateGraphs(false);

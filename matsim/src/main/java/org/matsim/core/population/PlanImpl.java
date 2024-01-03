@@ -28,7 +28,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +41,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 /* deliberately package */  final class PlanImpl implements Plan {
 
 	private Id<Plan> id=  null;
-	
+
 	private ArrayList<PlanElement> actsLegs = new ArrayList<>();
 
 	private Double score = null;
@@ -54,9 +53,9 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private final static Logger log = LogManager.getLogger(Plan.class);
 
 	private Customizable customizableDelegate;
-	
+
 	private final Attributes attributes = new AttributesImpl();
-	
+
 	@Override
 	public final Attributes getAttributes() {
 		return this.attributes;
@@ -73,7 +72,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 //		return a;
 //	}
 
-	
+
 
 	//////////////////////////////////////////////////////////////////////
 	// create methods
@@ -126,7 +125,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	public void setType(final String type) {
 		this.type = type;
 	}
-    
+
 	@Override
 	public Id<Plan> getId() {
 		if(this.id!=null)
@@ -136,7 +135,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 				return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),Plan.class);
 			else return null;
 		}
-			
+
 	}
 
 	@Override
@@ -144,7 +143,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId.toString());
 		this.id = planId;
 	}
-	
+
 	@Override
 	public int getIterationCreated() {
 		return (int) this.getAttributes().getAttribute(PlanInheritanceModule.ITERATION_CREATED);
@@ -212,7 +211,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 //	public final void setLocked() {
 //		for ( PlanElement pe : this.actsLegs ) {
 //			if ( pe instanceof ActivityImpl ) {
-//				((ActivityImpl) pe).setLocked(); 
+//				((ActivityImpl) pe).setLocked();
 //			} else if ( pe instanceof LegImpl ) {
 //				((LegImpl) pe).setLocked() ;
 //			}

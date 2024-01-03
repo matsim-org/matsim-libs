@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.FailingObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
@@ -38,7 +37,7 @@ public interface ActivityFacilities extends MatsimToplevelContainer, Attributabl
 	public String getName();
 
 	public void setName(String name);
-	
+
 	@Override
 	public ActivityFacilitiesFactory getFactory();
 
@@ -53,5 +52,5 @@ public interface ActivityFacilities extends MatsimToplevelContainer, Attributabl
 	 * so there seems to be a need for it...   mrieser/jul13
 	 */
 	public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
-	
+
 }

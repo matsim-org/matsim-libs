@@ -2,6 +2,8 @@ package org.matsim.contrib.drt.sharingmetrics;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
@@ -16,9 +18,7 @@ import java.util.*;
 /**
  * @author nkuehnel / MOIA
  */
-public class SharingMetricsTracker implements PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler, MobsimBeforeCleanupListener {
-
-	private final GroupPredicate groupPredicate;
+public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler, MobsimBeforeCleanupListener {
 
 	record Segment(double start, int occupancy) {
 	}
@@ -27,26 +27,33 @@ public class SharingMetricsTracker implements PassengerPickedUpEventHandler, Pas
 
 	private final Map<Id<Request>, List<Segment>> segments = new HashMap<>();
 
+	private final Map<Id<Request>, List<Id<Person>>> knownGroups = new HashMap<>();
+
 	private final Map<Id<Request>, Double> sharingFactors = new HashMap<>();
 	private final Map<Id<Request>, Boolean> poolingRate = new HashMap<>();
 
-	public interface GroupPredicate {
-		boolean isGroupRepresentative(Id<Person> personId);
+
+	public SharingMetricsTracker() {
 	}
 
-	public SharingMetricsTracker(GroupPredicate groupPredicate) {
-		this.groupPredicate = groupPredicate;
+	@Override
+	public void handleEvent(DrtRequestSubmittedEvent event) {
+		knownGroups.put(event.getRequestId(), new ArrayList<>(event.getPersonIds()));
 	}
-
 
 	@Override
 	public void handleEvent(PassengerDroppedOffEvent event) {
-		if (groupPredicate.isGroupRepresentative(event.getPersonId())) {
+
+		List<Id<Person>> passengers = knownGroups.get(event.getRequestId());
+		passengers.remove(event.getPersonId());
+
+		if (passengers.isEmpty()) {
+			// all passengers of the group have been dropped off
+			knownGroups.remove(event.getRequestId());
 
 			List<Id<Request>> occupancy = map.get(event.getVehicleId());
 			occupancy.remove(event.getRequestId());
 			occupancy.forEach(p -> segments.get(p).add(new Segment(event.getTime(), occupancy.size())));
-
 
 			List<Segment> finishedSegments = segments.remove(event.getRequestId());
 
@@ -82,9 +89,15 @@ public class SharingMetricsTracker implements PassengerPickedUpEventHandler, Pas
 
 	@Override
 	public void handleEvent(PassengerPickedUpEvent event) {
-		if (groupPredicate.isGroupRepresentative(event.getPersonId())) {
-			map.computeIfAbsent(event.getVehicleId(), vehicleId -> new ArrayList<>());
-			List<Id<Request>> occupancy = map.get(event.getVehicleId());
+		List<Id<Request>> occupancy = map.computeIfAbsent(event.getVehicleId(), vehicleId -> new ArrayList<>());
+		if (occupancy.contains(event.getRequestId())) {
+			if (knownGroups.get(event.getRequestId()).size() > 1) {
+				//group request, skip for additional persons
+				return;
+			} else {
+				throw new RuntimeException("Single rider request picked up twice!");
+			}
+		} else {
 			occupancy.add(event.getRequestId());
 			occupancy.forEach(
 					p -> segments.computeIfAbsent(p, requestId -> new ArrayList<>()).add(new Segment(event.getTime(), occupancy.size()))
@@ -98,6 +111,7 @@ public class SharingMetricsTracker implements PassengerPickedUpEventHandler, Pas
 		segments.clear();
 		poolingRate.clear();
 		sharingFactors.clear();
+		knownGroups.clear();
 	}
 
 	public Map<Id<Request>, Double> getSharingFactors() {

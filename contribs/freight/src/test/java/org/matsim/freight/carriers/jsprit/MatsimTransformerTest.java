@@ -48,9 +48,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MatsimTransformerTest {
@@ -78,7 +75,7 @@ public class MatsimTransformerTest {
 				.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0)
 				.setFixedCost(100.0).build();
 		VehicleType matsimType = MatsimJspritFactory.createMatsimVehicleType(jspritType);
-		assertThat(matsimType, is(not(MatsimJspritFactory.createMatsimVehicleType(jspritType))));
+		assertNotEquals(matsimType, MatsimJspritFactory.createMatsimVehicleType(jspritType));
 	}
 
 	@Test

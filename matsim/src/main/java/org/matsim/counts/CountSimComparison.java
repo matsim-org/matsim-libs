@@ -21,13 +21,12 @@
 package org.matsim.counts;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * Classes implementing this interface can be used to access the data
  * needed to compare traffic counts and simulation traffic at a specific
  * link for a one hour time step.
- * 
+ *
  * @author dgrether
  */
 public interface CountSimComparison<T> {
@@ -38,11 +37,11 @@ public interface CountSimComparison<T> {
 	public Id<T> getId();
 
 	/**
-	 * 
+	 *
 	 * @return The Id of the count station
 	 */
 	public String getCsId();
-	
+
 	/**
 	 * The time at which the data was measured.
 	 * @return A value in 1..24, 1 means 0 - 1 am, 2 means 1 - 2 am and so on
@@ -70,10 +69,10 @@ public interface CountSimComparison<T> {
 	 * @return the normalized relative error
 	 */
 	public double calculateNormalizedRelativeError();
-	
+
 	/**
 	 * Calculates the GEH value
 	 * @return the GEH value
 	 */
-	public double calculateGEHValue();	
+	public double calculateGEHValue();
 }

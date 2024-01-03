@@ -22,14 +22,11 @@
 
 package org.matsim.modules;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

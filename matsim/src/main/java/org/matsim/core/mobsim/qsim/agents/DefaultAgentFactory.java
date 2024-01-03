@@ -22,10 +22,7 @@ package org.matsim.core.mobsim.qsim.agents;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-
-import java.sql.Time;
 
 import jakarta.inject.Inject;
 
