@@ -226,7 +226,6 @@ public final class SimWrapper {
 		public String footer_en;
 		public String footer_de;
 		public String css;
-
 		public String theme;
 
 	}
