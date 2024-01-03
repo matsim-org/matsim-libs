@@ -6,6 +6,7 @@ import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import tech.tablesaw.plotly.components.Axis;
@@ -136,7 +137,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(), ds.mapping()
 					.x("n")
 					.y("source")
-					.name("quality", Plotly.ColorScheme.RdYlBu)
+					.name("quality", ColorScheme.RdYlBu)
 				);
 			}).el(context, Plotly.class, (viz, data) -> {
 
@@ -153,7 +154,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("road_type")
 					.y("share")
-					.name("quality", Plotly.ColorScheme.RdYlBu)
+					.name("quality", ColorScheme.RdYlBu)
 				);
 
 			});
@@ -220,7 +221,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.display.lineColor.dataset = "counts";
 				viz.display.lineColor.columnName = "quality";
 				viz.display.lineColor.join = "link_id";
-				viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, labels.size(), false);
+				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, labels.size(), false);
 
 				// 8px
 				viz.display.lineWidth.dataset = "@8";
