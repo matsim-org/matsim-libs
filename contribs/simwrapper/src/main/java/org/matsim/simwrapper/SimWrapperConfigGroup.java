@@ -45,9 +45,12 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		if (!params.containsKey(context)) {
 			ContextParams p = new ContextParams();
 			p.context = context;
-			if (!context.equals("")) {
+			if (!context.isEmpty()) {
 				// Copy default params from the global config
 				p.sampleSize = defaultParams().sampleSize;
+				p.shp = defaultParams().shp;
+				p.mapCenter = defaultParams().mapCenter;
+				p.mapZoomLevel = defaultParams().mapZoomLevel;
 			}
 			addParameterSet(p);
 			return p;
