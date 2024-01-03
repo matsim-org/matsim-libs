@@ -1,6 +1,6 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;

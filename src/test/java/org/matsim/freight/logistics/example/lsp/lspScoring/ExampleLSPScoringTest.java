@@ -1,6 +1,5 @@
 package org.matsim.freight.logistics.example.lsp.lspScoring;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -31,7 +30,7 @@ public class ExampleLSPScoringTest {
 		controler.run();
 
 		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-			Assert.assertEquals(13.245734044444207, lsp.getSelectedPlan().getScore(), Double.MIN_VALUE);
+			Assertions.assertEquals(13.245734044444207, lsp.getSelectedPlan().getScore(), Double.MIN_VALUE);
 		}
 
 	}

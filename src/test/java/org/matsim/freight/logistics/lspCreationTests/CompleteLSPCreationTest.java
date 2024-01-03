@@ -20,7 +20,7 @@
 
 package org.matsim.freight.logistics.lspCreationTests;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
