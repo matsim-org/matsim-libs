@@ -3,13 +3,13 @@ package org.matsim.simwrapper;
 import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
-import scala.util.parsing.combinator.testing.Str;
 
+import javax.annotation.Nullable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -25,12 +25,12 @@ public final class Data {
 	/**
 	 * Maps context to command runners.
 	 */
-	private final Map<String, CommandRunner> runners = new HashMap<>();
+	private final Map<String, CommandRunner> runners;
 
 	/**
 	 * Resources that needs to be copied.
 	 */
-	private final Map<Path, URL> resources = new HashMap<>();
+	private final Map<Path, URL> resources;
 
 	/**
 	 * The output directory.
@@ -41,8 +41,20 @@ public final class Data {
 
 	Data(SimWrapperConfigGroup config) {
 		// path needed, but not available yet
-		this.currentContext = runners.computeIfAbsent("", CommandRunner::new);
 		this.config = config;
+		this.runners = new LinkedHashMap<>();
+		this.resources = new LinkedHashMap<>();
+
+		this.currentContext = runners.computeIfAbsent("", CommandRunner::new);
+		this.context = config.get("");
+	}
+
+	private Data(Data other, String context) {
+		this.config = other.config;
+		this.runners = other.runners;
+		this.resources = other.resources;
+		this.path = other.path;
+		this.setCurrentContext(context);
 	}
 
 	/**
@@ -109,13 +121,15 @@ public final class Data {
 
 	/**
 	 * Uses a command to construct the required output.
-	 * @param command the command to be executed
-	 * @param file name of the produced output file, which must contain a placeholder that is going to be replaced
+	 *
+	 * @param command     the command to be executed
+	 * @param file        name of the produced output file, which must contain a placeholder that is going to be replaced
 	 * @param placeholder string to insert into the placeholder
 	 */
 	public String computeWithPlaceholder(Class<? extends MATSimAppCommand> command, String file, String placeholder, String... args) {
 		throw new UnsupportedOperationException("Not implemented yet.");
 	}
+
 	public String subcommand(String command, String file) {
 		throw new UnsupportedOperationException("Not implemented yet.");
 	}
@@ -195,11 +209,31 @@ public final class Data {
 
 	/**
 	 * Switch to a different context, which can hold different arguments and shp options.
+	 * This changes the state of the underlying object. The pubic API will return a new object and leave the original unchanged.
+	 *
+	 * @see #withContext(String)
 	 */
 	void setCurrentContext(String name) {
 		currentContext = runners.computeIfAbsent(name, CommandRunner::new);
 		currentContext.setOutput(path);
 		context = config.get(name);
+	}
+
+	/**
+	 * Use the default context for this data object.
+	 */
+	public Data withDefaultContext() {
+		return withContext(null);
+	}
+
+	/**
+	 * Change the context of this data object.
+	 */
+	public Data withContext(@Nullable String name) {
+		if (name == null)
+			name = "";
+
+		return new Data(this, name);
 	}
 
 	void setPath(Path path) {

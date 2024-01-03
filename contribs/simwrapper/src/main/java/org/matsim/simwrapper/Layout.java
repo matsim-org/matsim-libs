@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.simwrapper.viz.Viz;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -46,10 +47,12 @@ public final class Layout {
 	 * Create a new row and adds it to specified tab.
 	 *
 	 * @param name internal name of the row.
-	 * @param tab  title of the tab
+	 * @param tab  title of the tab, can be null in which case no tab will be created
 	 */
-	public Row row(String name, String tab) {
-		tab(tab).add(name);
+	public Row row(String name, @Nullable String tab) {
+		if (tab != null)
+			tab(tab).add(name);
+
 		return rows.computeIfAbsent(name, Row::new);
 	}
 
@@ -171,9 +174,10 @@ public final class Layout {
 
 		/**
 		 * Add a row with given name to this tab.
+		 * @param row name of the row, row names must be unique across all tabs
 		 */
-		public Tab add(String name) {
-			rows.add(name);
+		public Tab add(String row) {
+			rows.add(row);
 			return this;
 		}
 
