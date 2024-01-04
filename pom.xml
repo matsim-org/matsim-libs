@@ -54,17 +54,15 @@
 			<scope>test</scope>
 		</dependency>
 
-
+        <!-- Junit 5 testing. Version is inherited from the parent project (MATSim), thus not needed here -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
 
