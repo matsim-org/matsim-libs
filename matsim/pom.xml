@@ -91,6 +91,7 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
+							<goal>test-jar</goal>
 							<goal>jar</goal>
 						</goals>
 					</execution>
