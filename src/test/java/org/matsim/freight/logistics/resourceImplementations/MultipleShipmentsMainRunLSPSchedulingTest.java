@@ -356,10 +356,10 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
-			assertSame(endHandler.getElement(), planElements.get(0).getLogisticChainElement());
-			assertSame(endHandler.getElement(), planElements.get(1).getLogisticChainElement());
-			assertSame(endHandler.getElement(), planElements.get(2).getLogisticChainElement());
-			assertSame(endHandler.getElement(), solutionElements.get(0));
+			assertSame(endHandler.getLogisticChainElement(), planElements.get(0).getLogisticChainElement());
+			assertSame(endHandler.getLogisticChainElement(), planElements.get(1).getLogisticChainElement());
+			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
+			assertSame(endHandler.getLogisticChainElement(), solutionElements.get(0));
 			assertSame(endHandler.getLspShipment(), shipment);
 			assertSame(endHandler.getResourceId(), planElements.get(0).getResourceId());
 			assertSame(endHandler.getResourceId(), planElements.get(1).getResourceId());

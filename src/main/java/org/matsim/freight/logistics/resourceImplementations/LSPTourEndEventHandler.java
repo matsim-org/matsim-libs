@@ -174,12 +174,17 @@ public class LSPTourEndEventHandler
 		return lspShipment;
 	}
 
-	public LogisticChainElement getElement() {
+	public LogisticChainElement getLogisticChainElement() {
 		return logisticChainElement;
 	}
 
 	public Id<LSPResource> getResourceId() {
 		return resource.getId();
+	}
+
+	// Ex Main Run //
+	public LSPCarrierResource getResource() {
+		return resource;
 	}
 
 	@Override
@@ -225,17 +230,6 @@ public class LSPTourEndEventHandler
 	}
 
 
-
-
-	// Ex Main Run //
-	public LogisticChainElement getLogisticChainElement() {
-		return logisticChainElement;
-	}
-
-	// Ex Main Run //
-	public LSPCarrierResource getResource() {
-		return resource;
-	}
 
 }
 
