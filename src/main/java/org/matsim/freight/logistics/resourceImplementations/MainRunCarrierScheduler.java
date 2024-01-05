@@ -403,7 +403,7 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getShipments().contains(tuple)) {
         LSPTourEndEventHandler handler =
             new LSPTourEndEventHandler(
-                tuple.getShipment(), carrierService, element, resource, tour);
+					carrierService, tuple.getShipment(), element, resource, tour);
         tuple.getShipment().addSimulationTracker(handler);
         break;
       }

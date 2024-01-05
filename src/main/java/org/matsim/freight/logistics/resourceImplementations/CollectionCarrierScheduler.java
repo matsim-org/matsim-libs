@@ -211,7 +211,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
       if (element.getIncomingShipments().getShipments().contains(tuple)) {
         LSPTourEndEventHandler handler =
             new LSPTourEndEventHandler(
-                carrierService, tuple.getShipment(), element, resource, tour);
+					tuple.getShipment(), carrierService, element, resource, tour);
         tuple.getShipment().addSimulationTracker(handler);
         break;
       }

@@ -71,21 +71,6 @@ public class LSPTourEndEventHandler
 	private final Tour tour;
 	private LSPShipment lspShipment;
 
-	// Ex CollectionRun
-	public LSPTourEndEventHandler(
-			CarrierService carrierService,
-			LSPShipment lspShipment,
-			LogisticChainElement element,
-			LSPCarrierResource resource,
-			Tour tour) {
-		this.carrierService = carrierService;
-		this.lspShipment = lspShipment;
-		this.logisticChainElement = element;
-		this.resource = resource;
-		this.tour = tour;
-	}
-
-	// Ex Main Run //
 	public LSPTourEndEventHandler(
 			LSPShipment lspShipment,
 			CarrierService carrierService,
