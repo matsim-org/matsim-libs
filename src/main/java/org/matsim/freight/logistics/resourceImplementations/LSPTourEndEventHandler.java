@@ -102,7 +102,6 @@ public class LSPTourEndEventHandler
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -125,7 +124,7 @@ public class LSPTourEndEventHandler
 		}
 	}
 
-
+	// ex Collection run
 	private void logUnload(CarrierTourEndEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder =
 				ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
@@ -144,7 +143,7 @@ public class LSPTourEndEventHandler
 		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
 	}
 
-
+	// ex Collection run
 	private void logTransport(CarrierTourEndEvent event, Tour tour) {
 		String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
@@ -153,6 +152,37 @@ public class LSPTourEndEventHandler
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
 			transport.setEndTime(event.getTime());
 			transport.setToLinkId(tour.getEndLinkId());
+		}
+	}
+
+	// Ex Main Run //
+	private void logUnload(CarrierTourEndEvent event) {
+		ShipmentUtils.LoggedShipmentUnloadBuilder builder =
+				ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+		builder.setStartTime(event.getTime() - getTotalUnloadingTime(tour));
+		builder.setEndTime(event.getTime());
+		builder.setLogisticChainElement(logisticChainElement);
+		builder.setResourceId(resource.getId());
+		builder.setCarrierId(event.getCarrierId());
+		ShipmentPlanElement unload = builder.build();
+		String idString =
+				unload.getResourceId()
+						+ ""
+						+ unload.getLogisticChainElement().getId()
+						+ unload.getElementType();
+		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
+		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
+	}
+
+	// Ex Main Run //
+	private void logTransport(CarrierTourEndEvent event) {
+		String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
+		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
+		ShipmentPlanElement abstractPlanElement =
+				lspShipment.getShipmentLog().getPlanElements().get(id);
+		if (abstractPlanElement instanceof ShipmentLeg transport) {
+			transport.setEndTime(event.getTime() - getTotalUnloadingTime(tour));
+			transport.setToLinkId(event.getLinkId());
 		}
 	}
 
@@ -193,36 +223,7 @@ public class LSPTourEndEventHandler
 
 	// ***** (Begin) Ex MainRun *** //
 
-	// Ex Main Run //
-	private void logUnload(CarrierTourEndEvent event) {
-		ShipmentUtils.LoggedShipmentUnloadBuilder builder =
-				ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
-		builder.setStartTime(event.getTime() - getTotalUnloadingTime(tour));
-		builder.setEndTime(event.getTime());
-		builder.setLogisticChainElement(logisticChainElement);
-		builder.setResourceId(resource.getId());
-		builder.setCarrierId(event.getCarrierId());
-		ShipmentPlanElement unload = builder.build();
-		String idString =
-				unload.getResourceId()
-						+ ""
-						+ unload.getLogisticChainElement().getId()
-						+ unload.getElementType();
-		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
-	}
 
-	// Ex Main Run //
-	private void logTransport(CarrierTourEndEvent event) {
-		String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
-		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentPlanElement abstractPlanElement =
-				lspShipment.getShipmentLog().getPlanElements().get(id);
-		if (abstractPlanElement instanceof ShipmentLeg transport) {
-			transport.setEndTime(event.getTime() - getTotalUnloadingTime(tour));
-			transport.setToLinkId(event.getLinkId());
-		}
-	}
 
 
 
