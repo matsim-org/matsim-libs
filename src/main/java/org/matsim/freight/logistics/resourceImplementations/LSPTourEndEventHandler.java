@@ -182,11 +182,6 @@ public class LSPTourEndEventHandler
 		return resource.getId();
 	}
 
-	// Ex Main Run //
-	public LSPCarrierResource getResource() {
-		return resource;
-	}
-
 	@Override
 	public void setEmbeddingContainer(LSPShipment pointer) {
 		this.lspShipment = pointer;
