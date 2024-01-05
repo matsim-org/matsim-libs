@@ -42,8 +42,6 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
@@ -59,9 +57,7 @@ import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 public class MainRunTourStartEventHandler
-    implements AfterMobsimListener,
-        CarrierTourStartEventHandler,
-        LSPSimulationTracker<LSPShipment> {
+    implements CarrierTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
   // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
   // to do the junit testing. kmt jun'23
 
@@ -173,6 +169,4 @@ public class MainRunTourStartEventHandler
     this.lspShipment = pointer;
   }
 
-  @Override
-  public void notifyAfterMobsim(AfterMobsimEvent event) {}
 }
