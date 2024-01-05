@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * The road is simulated as an active agent, moving arround vehicles.

@@ -329,7 +329,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
 			params = tmp;
 		} else {
-			log.fatal( "Teleportation (= mode routing) params neither defined for " + TransportMode.walk + " nor for " + TransportMode.non_network_walk + ".  There are two cases:" ); ;
+			log.fatal( "Teleportation (= mode routing) params neither defined for " + TransportMode.walk + " nor for " + TransportMode.non_network_walk + ".  There are two cases:" );
 			log.fatal( "(1) " + TransportMode.walk + " is teleported.  Then you need to define the corresponding teleportation (= mode routing) params for " + TransportMode.walk + "." );
 			log.fatal( "(2) " + TransportMode.walk + " is routed on the network.  Then you need to define the corresponding teleportation (= mode routing) params for "
 						  + TransportMode.non_network_walk + ".");

@@ -33,7 +33,6 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 public final class NetworkWriteAsTable implements NetworkRunnable {
 
@@ -107,7 +106,7 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 				offsetVector = CoordUtils.scalarMult(offset/CoordUtils.length(offsetVector),offsetVector);
 				Coord fc = CoordUtils.plus(f.getCoord(),offsetVector);
 				Coord tc = CoordUtils.plus(t.getCoord(),offsetVector);
-				
+
 				out_l.write(l.getId() + "\t" + fc.getX() + "\t" + fc.getY() + "\t");
 				out_l.write(tc.getX() + "\t" + tc.getY() + "\t" + l.getLength() + "\t");
 				out_l.write(l.getFreespeed()+"\t"

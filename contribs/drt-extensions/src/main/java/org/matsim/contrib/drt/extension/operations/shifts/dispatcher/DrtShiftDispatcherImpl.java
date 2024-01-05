@@ -177,7 +177,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private void assignShifts(double timeStep) {
         // Remove elapsed shifts
-        unscheduledShifts.removeIf(shift -> shift.getStartTime() < timeStep);
+        unscheduledShifts.removeIf(shift -> {
+			if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
+				logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
+				return true;
+			}
+		return false;
+		});
 
         // Assign shifts
         Set<DrtShift> assignableShifts = new LinkedHashSet<>();

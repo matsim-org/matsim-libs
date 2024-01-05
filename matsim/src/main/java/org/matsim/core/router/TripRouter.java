@@ -40,11 +40,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Class acting as an intermediate between clients needing to

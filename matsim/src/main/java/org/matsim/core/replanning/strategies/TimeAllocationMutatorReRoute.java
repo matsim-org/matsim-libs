@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.strategies;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;

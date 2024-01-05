@@ -340,7 +340,7 @@ public class SimulatedLaneFlowCapacityTest {
 	 *
 	 * @author tthunig
 	 */
-	class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler{
+	static class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler{
 
 		private double linkCapacity;
 		private Map<Id<Lane>, Double> laneCapacities = new HashMap<>();

@@ -91,7 +91,6 @@ public final class PersonUtils {
         return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
     }
 
-    @SuppressWarnings("unchecked")
     /**
      * convenience method for often used demographic attribute
      * There is apparently no way to register a Map(String, Double) at ObjectAttributesConverter since all Maps default
@@ -99,6 +98,7 @@ public final class PersonUtils {
      * scoring mode constants uses a Map(String, String). If this attribute is read often an alternative similar to
      * PersonVehicles can be considered.
      */
+    @SuppressWarnings("unchecked")
     public static Map<String, String> getModeConstants(Person person) {
         try {
 

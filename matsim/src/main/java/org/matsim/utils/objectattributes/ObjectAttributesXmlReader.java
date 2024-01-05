@@ -25,22 +25,13 @@ import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.ATTR_O
 import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.TAG_ATTRIBUTE;
 import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.TAG_OBJECT;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
-import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
-import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
-import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
-import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
-import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

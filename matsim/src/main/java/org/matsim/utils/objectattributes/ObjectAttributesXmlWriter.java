@@ -68,9 +68,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			xmlAttributes.clear();
 			// sort attributes by name
 			Map<String, Object> objAttributes = new TreeMap<String, Object>();
-			for (Map.Entry<String, Object> objAttribute : entry.getValue().entrySet()) {
-				objAttributes.put(objAttribute.getKey(), objAttribute.getValue());
-			}
+			objAttributes.putAll(entry.getValue());
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
 				Class<?> clazz = objAttribute.getValue().getClass();

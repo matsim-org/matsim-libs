@@ -111,7 +111,6 @@ public class VehicleWriterV2Test {
 
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();
-		;
 		assertEquals("pass. car", VehicleUtils.getHbefaVehicleCategory(engineInformation));
 		assertEquals("petrol", VehicleUtils.getHbefaTechnology(engineInformation));
 		assertEquals("< 1,4L", VehicleUtils.getHbefaSizeClass(engineInformation));

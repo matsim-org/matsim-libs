@@ -21,7 +21,6 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,13 +35,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
  * routes from a {@link Facility} to another {@link Facility}, as we need in MATSim.
- * 
+ *
  * @author thibautd
  */
 public final class NetworkRoutingModule implements RoutingModule {
@@ -63,7 +60,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final LeastCostPathCalculator routeAlgo) {
 		 Gbl.assertNotNull(network);
 //		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
-		 // makes many tests fail.  
+		 // makes many tests fail.
 		 this.network = network;
 		 this.routeAlgo = routeAlgo;
 		 this.mode = mode;
@@ -76,7 +73,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 
 		Gbl.assertNotNull(fromFacility);
@@ -94,7 +91,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 		}
 		Gbl.assertNotNull(fromLink);
 		Gbl.assertNotNull(toLink);
-		
+
 		if (toLink != fromLink) {
 			// (a "true" route)
 			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
