@@ -39,9 +39,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionServiceEndEventHandler;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionTourEndEventHandler;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubTourEndEventHandler;
 import org.matsim.freight.logistics.shipment.LSPShipment;
@@ -283,14 +280,14 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 
-			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
-			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
+			assertTrue(eventHandlers.get(0) instanceof LSPTourEndEventHandler);
+			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.get(0);
 			assertSame(endHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
-			assertSame(endHandler.getElement(), planElements.get(2).getLogisticChainElement());
-			assertSame(endHandler.getElement(), lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
+			assertSame(endHandler.getLogisticChainElement(), lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(endHandler.getLspShipment(), shipment);
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), lsp.getResources().iterator().next().getId());

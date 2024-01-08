@@ -1,4 +1,25 @@
 /*
+  *********************************************************************** *
+  * project: org.matsim.*
+  *                                                                         *
+  * *********************************************************************** *
+  *                                                                         *
+  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
+  *                   LICENSE and WARRANTY file.                            *
+  * email           : info at matsim dot org                                *
+  *                                                                         *
+  * *********************************************************************** *
+  *                                                                         *
+  *   This program is free software; you can redistribute it and/or modify  *
+  *   it under the terms of the GNU General Public License as published by  *
+  *   the Free Software Foundation; either version 2 of the License, or     *
+  *   (at your option) any later version.                                   *
+  *   See also COPYING, LICENSE and WARRANTY file                           *
+  *                                                                         *
+  * ***********************************************************************
+ */
+
+/*
  *  *********************************************************************** *
  *  * project: org.matsim.*
  *  * *********************************************************************** *
@@ -18,7 +39,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.freight.logistics.resourceImplementations.mainRunCarrier;
+package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +49,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 
 /*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource>
     implements LSPCarrierResource {
