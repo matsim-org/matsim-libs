@@ -462,10 +462,10 @@ public class SecondReloadLSPSchedulingTest {
 			assertSame(mainRunStartHandler.getLogisticChainElement(), planElements.get(6).getLogisticChainElement());
 			assertSame(mainRunStartHandler.getLogisticChainElement(), solutionElements.get(2));
 			assertSame(mainRunStartHandler.getLspShipment(), shipment);
-			assertSame(mainRunStartHandler.getResource().getId(), planElements.get(4).getResourceId());
-			assertSame(mainRunStartHandler.getResource().getId(), planElements.get(5).getResourceId());
-			assertSame(mainRunStartHandler.getResource().getId(), planElements.get(6).getResourceId());
-			assertSame(mainRunStartHandler.getResource().getId(), resources.get(2).getId());
+			assertSame(mainRunStartHandler.getResourceId(), planElements.get(4).getResourceId());
+			assertSame(mainRunStartHandler.getResourceId(), planElements.get(5).getResourceId());
+			assertSame(mainRunStartHandler.getResourceId(), planElements.get(6).getResourceId());
+			assertSame(mainRunStartHandler.getResourceId(), resources.get(2).getId());
 
 			assertTrue(eventHandlers.get(3) instanceof LSPTourEndEventHandler);
 			LSPTourEndEventHandler mainRunEndHandler = (LSPTourEndEventHandler) eventHandlers.get(3);

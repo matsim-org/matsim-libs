@@ -49,6 +49,7 @@ import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 import org.matsim.freight.logistics.LSPCarrierResource;
+import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.shipment.LSPShipment;
@@ -160,8 +161,8 @@ public class MainRunTourStartEventHandler
     return logisticChainElement;
   }
 
-  public LSPCarrierResource getResource() {
-    return resource;
+  public Id<LSPResource> getResourceId() {
+    return resource.getId();
   }
 
   @Override
