@@ -562,10 +562,10 @@ public class CompleteLSPSchedulingTest {
 			assertEquals(distributionStartHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(0, distributionStartHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
 			assertEquals(Integer.MAX_VALUE, distributionStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
-			assertSame(distributionStartHandler.getElement(), planElements.get(8).getLogisticChainElement());
-			assertSame(distributionStartHandler.getElement(), planElements.get(9).getLogisticChainElement());
-			assertSame(distributionStartHandler.getElement(), planElements.get(10).getLogisticChainElement());
-			assertSame(distributionStartHandler.getElement(), solutionElements.get(4));
+			assertSame(distributionStartHandler.getLogisticChainElement(), planElements.get(8).getLogisticChainElement());
+			assertSame(distributionStartHandler.getLogisticChainElement(), planElements.get(9).getLogisticChainElement());
+			assertSame(distributionStartHandler.getLogisticChainElement(), planElements.get(10).getLogisticChainElement());
+			assertSame(distributionStartHandler.getLogisticChainElement(), solutionElements.get(4));
 			assertSame(distributionStartHandler.getLspShipment(), shipment);
 			assertSame(distributionStartHandler.getResource().getId(), planElements.get(8).getResourceId());
 			assertSame(distributionStartHandler.getResource().getId(), planElements.get(9).getResourceId());

@@ -40,7 +40,7 @@ public class DistributionTourStartEventHandler
   // to do the junit testing. kmt jun'23
 
   private final CarrierService carrierService;
-  private final LogisticChainElement element;
+  private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private final Tour tour;
   private LSPShipment lspShipment;
@@ -48,12 +48,12 @@ public class DistributionTourStartEventHandler
   DistributionTourStartEventHandler(
       CarrierService carrierService,
       LSPShipment lspShipment,
-      LogisticChainElement element,
+      LogisticChainElement logisticChainElement,
       LSPCarrierResource resource,
       Tour tour) {
     this.carrierService = carrierService;
     this.lspShipment = lspShipment;
-    this.element = element;
+    this.logisticChainElement = logisticChainElement;
     this.resource = resource;
     this.tour = tour;
   }
@@ -83,7 +83,7 @@ public class DistributionTourStartEventHandler
         ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
     builder.setCarrierId(event.getCarrierId());
     builder.setLinkId(event.getLinkId());
-    builder.setLogisticsChainElement(element);
+    builder.setLogisticsChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
     builder.setEndTime(event.getTime());
     builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
@@ -103,7 +103,7 @@ public class DistributionTourStartEventHandler
     builder.setCarrierId(event.getCarrierId());
     builder.setFromLinkId(event.getLinkId());
     builder.setToLinkId(tour.getEndLinkId());
-    builder.setLogisticChainElement(element);
+    builder.setLogisticChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
     builder.setStartTime(event.getTime());
     ShipmentPlanElement transport = builder.build();
@@ -134,8 +134,8 @@ public class DistributionTourStartEventHandler
     return lspShipment;
   }
 
-  public LogisticChainElement getElement() {
-    return element;
+  public LogisticChainElement getLogisticChainElement() {
+    return logisticChainElement;
   }
 
   public LSPCarrierResource getResource() {
