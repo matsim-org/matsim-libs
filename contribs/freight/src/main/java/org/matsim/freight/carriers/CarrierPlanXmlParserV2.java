@@ -211,7 +211,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				if (vehicleType == null) {
 					switch (handlingOfIncompleteData) {
 						case EXCEPTION -> throw new RuntimeException("vehicleTypeId=" + typeId + " is missing.");
-						case SHOW_ERROR_AND_CONTINUE -> logger.warn("vehicleTypeId=" + typeId + " is missing.");
+						case SHOW_ERROR_AND_CONTINUE -> logger.warn("vehicleTypeId=" + typeId + " is missing. Continue because of handlingOfIncompleteData=SHOW_ERROR_AND_CONTINUE. Use only for Analysis.");
 						default -> throw new RuntimeException("vehicleTypeId=" + typeId + " is missing. Unknown handling of incomplete data: " + handlingOfIncompleteData);
 					}
 					break;
