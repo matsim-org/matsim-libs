@@ -18,43 +18,51 @@
 
 package org.matsim.codeexamples.extensions.freight;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarrierPlanWriter;
 import org.matsim.freight.carriers.controler.CarrierModule;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 
 /**
  * @see org.matsim.freight.carriers
  */
-public class RunFreightExample {
+public class RunFreightFoodRetailingBerlinExample {
 
 	public static void main(String[] args) throws ExecutionException, InterruptedException{
 		run(args, false);
 	}
 	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
 
+		// Path to public repo:
+		String pathToInput = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/";
 		// ### config stuff: ###
 		Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
-			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
-			config.plans().setInputFile( null ); // remove passenger input
-			config.controller().setOutputDirectory( "./output/freight" );
+			config = ConfigUtils.createConfig();
+			config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/output-berlinv5.5/berlin-v5.5.3-10pct.output_network.xml.gz");
+			config.controller().setOutputDirectory( "./output/freight3" );
 			config.controller().setLastIteration( 0 );  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
+			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+			config.global().setCoordinateSystem("EPSG:31468");
 
 			FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
-      freightConfigGroup.setCarriersFile("singleCarrierFiveActivitiesWithoutRoutes_Shipments.xml");
-			freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml" );
+			freightConfigGroup.setCarriersFile(  pathToInput + "CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEV.xml" );
+			freightConfigGroup.setCarriersVehicleTypesFile( pathToInput + "vehicleTypesBVWP100_DC_noTax.xml" );
 		} else {
 			config = ConfigUtils.loadConfig( args, new FreightCarriersConfigGroup() );
 		}
@@ -65,8 +73,12 @@ public class RunFreightExample {
 		//load carriers according to freight config
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
-		// how to set the capacity of the "light" vehicle type to "1":
-//		CarriersUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
+		//Filter out only one carrier and reduce number of jsprit iteration to 1. Both for computational reasons.
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
+		var carrier = carriers.getCarriers().get(Id.create("rewe_DISCOUNTER_TROCKEN", Carrier.class));
+		CarriersUtils.setJspritIterations(carrier, 1);
+		carriers.getCarriers().clear();
+		carriers.addCarrier(carrier);
 
 		// output before jsprit run (not necessary)
 		new CarrierPlanWriter(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
@@ -89,6 +101,13 @@ public class RunFreightExample {
 
 		// ## Start of the MATSim-Run: ##
 		controler.run();
+
+		var analysis = new RunFreightAnalysisEventBased(config.controller().getOutputDirectory()+"/", config.controller().getOutputDirectory()+"/analysis", "EPSG:31468");
+		try {
+			analysis.runAnalysis();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
