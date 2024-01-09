@@ -24,8 +24,8 @@ package org.matsim.freight.carriers.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.events.CarrierEventsReaders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -81,7 +81,7 @@ public class RunFreightAnalysisEventBased {
 		//freight settings
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
 		freightCarriersConfigGroup.setCarriersFile( SIM_OUTPUT_PATH + "output_carriers.xml.gz");
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_carriersVehicleTypes.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
 
 		//Were to store the analysis output?
 		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;
@@ -96,8 +96,13 @@ public class RunFreightAnalysisEventBased {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//load carriers according to freight config
-		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
+//		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
+		CarrierVehicleTypes vehTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
+		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersVehicleTypesFile()) );
+
+		Carriers carriers = CarriersUtils.addOrGetCarriers( scenario );
+		new CarrierPlanXmlReader( carriers, vehTypes, CarrierPlanXmlReader.HandlingOfIncompleteData.SHOW_ERROR_AND_CONTINUE ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile() ) );
 
 		// CarrierPlanAnalysis
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(CarriersUtils.getCarriers(scenario));
