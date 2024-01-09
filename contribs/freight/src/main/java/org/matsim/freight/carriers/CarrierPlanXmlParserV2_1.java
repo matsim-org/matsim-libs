@@ -63,6 +63,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	private boolean selected;
 	private final Carriers carriers;
 	private final CarrierVehicleTypes carrierVehicleTypes;
+	private final CarrierPlanXmlReader.HandlingOfIncompleteData handlingOfIncompleteData;
 	private double currentLegTransTime;
 	private double currentLegDepTime;
 	private Builder capabilityBuilder;
@@ -78,11 +79,13 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	 *
 	 * @param carriers which is a map that stores carriers
 	 * @param carrierVehicleTypes
+	 * @param handlingOfIncompleteData
 	 */
-	CarrierPlanXmlParserV2_1(Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
+	CarrierPlanXmlParserV2_1(Carriers carriers, CarrierVehicleTypes carrierVehicleTypes, CarrierPlanXmlReader.HandlingOfIncompleteData handlingOfIncompleteData) {
 		super(ValidationType.XSD_ONLY);
 		this.carriers = carriers;
 		this.carrierVehicleTypes = carrierVehicleTypes;
+		this.handlingOfIncompleteData = handlingOfIncompleteData;
 	}
 
 	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
@@ -201,7 +204,12 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				if (typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.create(typeId, VehicleType.class));
 				if (vehicleType == null) {
-					throw new RuntimeException("vehicleTypeId=" + typeId + " is missing.");
+					switch (handlingOfIncompleteData) {
+						case EXCEPTION -> throw new RuntimeException("vehicleTypeId=" + typeId + " is missing.");
+						case SHOW_ERROR_AND_CONTINUE -> logger.warn("vehicleTypeId=" + typeId + " is missing.");
+						default -> throw new RuntimeException("vehicleTypeId=" + typeId + " is missing. Unknown handling of incomplete data: " + handlingOfIncompleteData);
+					}
+					break;
 				}
 
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType);

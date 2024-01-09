@@ -46,8 +46,19 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	private final CarriersPlanReader reader;
 
+	/**
+	 * This enum defines how the reader should handle incomplete data.
+	 * The case "SHOW_ERROR_AND_CONTINUE" changes some exceptions to warning, because the exceptions are expected for the analysis.
+	 * Use this case only for analysis.
+	 */
+	public enum HandlingOfIncompleteData {EXCEPTION, SHOW_ERROR_AND_CONTINUE}
+
 	public CarrierPlanXmlReader( final Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
-		this.reader = new CarriersPlanReader( carriers, carrierVehicleTypes ) ;
+		this.reader = new CarriersPlanReader( carriers, carrierVehicleTypes, HandlingOfIncompleteData.EXCEPTION) ;
+	}
+
+	public CarrierPlanXmlReader( final Carriers carriers, CarrierVehicleTypes carrierVehicleTypes, HandlingOfIncompleteData handlingOfIncompleteData) {
+		this.reader = new CarriersPlanReader( carriers, carrierVehicleTypes, handlingOfIncompleteData) ;
 	}
 
 	@Override
@@ -97,13 +108,15 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	private static final class CarriersPlanReader extends MatsimXmlParser {
 		private final Carriers carriers;
 		private final CarrierVehicleTypes carrierVehicleTypes;
+		private final HandlingOfIncompleteData handlingOfIncompleteData;
 
 		private MatsimXmlParser delegate = null;
 
-		CarriersPlanReader( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
+		CarriersPlanReader(Carriers carriers, CarrierVehicleTypes carrierVehicleTypes, HandlingOfIncompleteData handlingOfIncompleteData) {
 			super(ValidationType.XSD_ONLY);
 			this.carriers = carriers;
 			this.carrierVehicleTypes = carrierVehicleTypes;
+			this.handlingOfIncompleteData = handlingOfIncompleteData;
 		}
 
 		@Override
@@ -113,16 +126,16 @@ public class CarrierPlanXmlReader implements MatsimReader {
 				log.info("Found following schemeLocation in carriers definition file: " + str);
 				if (str == null){
 					log.warn("Carrier plans file does not contain a valid xsd header. Using CarrierPlanReaderV2.");
-					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes ) ;
+					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes, handlingOfIncompleteData) ;
 				} else if ( str.contains( "carriersDefinitions_v1.0.xsd" ) ){
 					log.info("Found carriersDefinitions_v1.0.xsd. Using CarrierPlanReaderV1.");
 					delegate = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 				} else if ( str.contains( "carriersDefinitions_v2.0.xsd" ) ) {
 					log.info("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
-					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes );
+					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes, handlingOfIncompleteData );
 				} else if ( str.contains( "carriersDefinitions_v2.1.xsd" ) ) {
 					log.info("Found carriersDefinitions_v2.1.xsd. Using CarrierPlanReaderV2.1");
-					delegate = new CarrierPlanXmlParserV2_1( carriers, carrierVehicleTypes );
+					delegate = new CarrierPlanXmlParserV2_1( carriers, carrierVehicleTypes, handlingOfIncompleteData);
 				}else {
 					throw new RuntimeException("no reader found for " + str ) ;
 				}
