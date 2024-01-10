@@ -39,9 +39,10 @@ public class TrafficCountsDashboardTest {
 		generateDummyCounts(config);
 
 		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		simWrapperConfigGroup.sampleSize = 0.01;
+
 		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.defaultParams();
 		contextParams.mapCenter = "12,48.95";
-		contextParams.sampleSize = 0.01;
 		contextParams.mapZoomLevel = 9.0;
 
 		SimWrapper sw = SimWrapper.create(config)

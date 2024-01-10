@@ -19,12 +19,18 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("Whether default dashboards are loaded via SPI.")
 	public Mode defaultDashboards = Mode.enabled;
+
 	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
 	public Set<String> packages = new HashSet<>();
+
 	@Parameter
 	@Comment("Set of simple class names or fully qualified class names of dashboards to exclude")
 	public Set<String> exclude = new HashSet<>();
+
+	@Parameter
+	@Comment("Sample size of the run, which may be required by certain analysis functions.")
+	public Double sampleSize = 1.0d;
 
 	public SimWrapperConfigGroup() {
 		super(NAME);
@@ -47,7 +53,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 			p.context = context;
 			if (!context.isEmpty()) {
 				// Copy default params from the global config
-				p.sampleSize = defaultParams().sampleSize;
 				p.shp = defaultParams().shp;
 				p.mapCenter = defaultParams().mapCenter;
 				p.mapZoomLevel = defaultParams().mapZoomLevel;
@@ -95,10 +100,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		@Parameter
 		@Comment("Name of the context, empty string means default context.")
 		public String context = "";
-
-		@Parameter
-		@Comment("Sample size of the run, which may be required by certain analysis functions.")
-		public Double sampleSize = 1.0d;
 
 		@Parameter
 		@Comment("Shp file that may be used by analysis functions that support shp file input.")

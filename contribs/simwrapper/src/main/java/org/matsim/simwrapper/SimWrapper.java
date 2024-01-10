@@ -180,7 +180,7 @@ public final class SimWrapper {
 
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
-			runner.setSampleSize(ctx.sampleSize);
+			runner.setSampleSize(configGroup.sampleSize);
 
 			if (ctx.shp != null) {
 
