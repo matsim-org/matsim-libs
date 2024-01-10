@@ -39,7 +39,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -108,7 +107,7 @@ public class DecongestionRunExample {
 		Controler controler = new Controler(scenario);
 
 		// congestion toll computation
-		controler.addOverridingModule(new DecongestionModule(scenario) );
+		controler.addOverridingModule(new DecongestionModule() );
 
 		// toll-adjusted routing
 		controler.addOverridingModule(new AbstractModule(){

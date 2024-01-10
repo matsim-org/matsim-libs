@@ -37,7 +37,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -72,22 +71,18 @@ public class DecongestionRunExampleFromConfig {
 		Config config = ConfigUtils.loadConfig(configFile, new DecongestionConfigGroup() );
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
 		Controler controler = new Controler(scenario);
 
-		// #############################################################
-
 		// congestion toll computation
-
-		controler.addOverridingModule(new DecongestionModule(scenario) );
+		controler.addOverridingModule(new DecongestionModule() );
 
 		// toll-adjusted routing
-
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( new TollTimeDistanceTravelDisutilityFactory() );
 				// yyyy try if this could add the class instead of the instance.  possibly as singleton.  kai, jan'24
-
 			}
 		});
 
