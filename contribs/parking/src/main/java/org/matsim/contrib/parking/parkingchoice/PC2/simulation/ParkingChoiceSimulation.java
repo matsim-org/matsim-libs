@@ -48,8 +48,8 @@ public final class ParkingChoiceSimulation
 
 
 
-	private ParkingInfrastructure parkingInfrastructureManager;
-	private Scenario scenario;
+	private final ParkingInfrastructure parkingInfrastructureManager;
+	private final Scenario scenario;
 	private IntegerValueHashMap<Id<Person>> currentPlanElementIndex;
 	private HashMap<Id<Person>, ParkingOperationRequestAttributes> parkingOperationRequestAttributes;
 	private DoubleValueHashMap<Id<Person>> firstDepartureTimeOfDay;
@@ -60,24 +60,24 @@ public final class ParkingChoiceSimulation
 	}
 
 	@Override
-	public void reset(int iteration) {
-	}
-
-	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		currentPlanElementIndex.increment(event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
+
 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car) && !event.getPersonId().toString().contains("pt") && isNotTransitAgent(event.getPersonId())) {
+			// (exclude some cases (in a brittle way, i.e. based on IDs))
+
 			if (!firstDepartureTimeOfDay.containsKey(event.getPersonId())) {
 				firstDepartureTimeOfDay.put(event.getPersonId(), event.getTime());
-				// (I think that this is to remember the wrap-around activity.
-				// kai, jul'15)
+				// (I think that this is to remember the wrap-around activity. kai, jul'15)
 			}
 
 			if (isFirstCarDepartureOfDay(event.getPersonId())) {
+				// (special case, think about it later)
+
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 				parkingAttributes.personId = event.getPersonId();
 				// this is a trick to get the correct departure time
@@ -85,19 +85,12 @@ public final class ParkingChoiceSimulation
 				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0, event.getTime());
 				parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
 			} else {
-				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes
-						.get(event.getPersonId());
-				parkingAttributes.parkingDurationInSeconds = GeneralLib
-						.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
+				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
+				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
 				if (parkingAttributes.parkingDurationInSeconds == 24 * 3600) {
 					// (yyyy no idea what this is and why. kai, jul'15)
 
-					parkingAttributes.parkingDurationInSeconds = 1; // not zero,
-																	// because
-																	// this
-																	// might
-																	// lead to
-																	// NaN
+					parkingAttributes.parkingDurationInSeconds = 1; // not zero, because this might lead to NaN
 				}
 
 				PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
@@ -111,19 +104,25 @@ public final class ParkingChoiceSimulation
 	public void handleEvent(PersonArrivalEvent event) {
 		Id<Person> personId = event.getPersonId();
 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)  && !event.getPersonId().toString().contains("pt") && isNotTransitAgent(event.getPersonId())) {
-			ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
-			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
-			Activity nextActivity = getNextActivity(personId);
+			// (exclude some cases (in a brittle way, i.e. based on IDs))
 
-			parkingAttributes.destCoordinate = link.getCoord();
-			parkingAttributes.arrivalTime = event.getTime();
-			parkingAttributes.personId = personId;
-			parkingAttributes.facilityId = nextActivity.getFacilityId();
-			parkingAttributes.actType = nextActivity.getType();
+			// I think that this just packages some information together into the parkingAttributes:
+			ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
+			{
+				Link link = scenario.getNetwork().getLinks().get( event.getLinkId() );
+				Activity nextActivity = getNextActivity( personId );
+
+				parkingAttributes.destCoordinate = link.getCoord();
+				parkingAttributes.arrivalTime = event.getTime();
+				parkingAttributes.personId = personId;
+				parkingAttributes.facilityId = nextActivity.getFacilityId();
+				parkingAttributes.actType = nextActivity.getType();
+			}
 
 			if (isLastCarLegOfDay(personId)) {
-				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(),
-						firstDepartureTimeOfDay.get(personId));
+				// (special case, think about it later)
+
+				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(), firstDepartureTimeOfDay.get(personId));
 			} else {
 				Activity activityBeforeNextCarLeg = getActivityBeforeNextCarLeg(personId);
 
@@ -131,6 +130,8 @@ public final class ParkingChoiceSimulation
 				double parkingDuration=0;
 
 				if (endTime==Double.NEGATIVE_INFINITY || endTime==Double.POSITIVE_INFINITY){
+					// (I think that this _can_ happen, especially in context of within-day replanning, if departure time is unknown. (*))
+
 					// try to estimate parking duration
 
 					Person person = scenario.getPopulation().getPersons().get(personId);
@@ -148,20 +149,22 @@ public final class ParkingChoiceSimulation
 					}
 				}
 
-				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(),
-						endTime);
+				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(), endTime);
+				// (This is the _estimated_ parking duration, since we are at arrival.  This is needed to define the "best" parking
+				// location ... cf. short-term/long-term parking at airports. Could rename the attributed into "expected...", but we
+				// have seen at other places in the code that such attributes may change their interpretation based on context so will
+				// not do this here.)
 			}
 
 			parkingAttributes.legIndex = currentPlanElementIndex.get(personId);
 
 			PC2Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
-			// to me this looks like first the agent arrives at his/her
-			// activity. And then the negative parking score is added after the
-			// fact, however without consuming time. I.e. there is no physics.
-			// kai, jul'15
+			// to me this looks like first the agent arrives at his/her activity. And then the negative parking score is added after the
+			// fact, however without consuming time. I.e. there is no physics. kai, jul'15
 
 			if (isLastCarLegOfDay(personId)) {
 				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes, parking);
+				// (The last arrival of the day is scored here, since there is no corresponding departure event.)
 			}
 
 			parkingOperationRequestAttributes.put(personId, parkingAttributes);
@@ -184,10 +187,8 @@ public final class ParkingChoiceSimulation
 			if (PopulationUtils.hasCarLeg(person.getSelectedPlan()) && isNotTransitAgent(person.getId())) {
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 
-				Activity firstActivityOfDayBeforeDepartingWithCar = PopulationUtils
-						.getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
-				Activity firstActivityAfterLastCarLegOfDay = PopulationUtils
-						.getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
+				Activity firstActivityOfDayBeforeDepartingWithCar = PopulationUtils.getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
+				Activity firstActivityAfterLastCarLegOfDay = PopulationUtils.getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
 
 				parkingAttributes.destCoordinate = firstActivityAfterLastCarLegOfDay.getCoord();
 				// parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();

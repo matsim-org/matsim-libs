@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.parkingchoice.example;
+package org.matsim.contrib.parking.parkingchoice.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -27,7 +27,7 @@ import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
  * @author jbischoff
  *
  */
-public class ParkingCostCalculatorExample implements ParkingCostModel {
+class ParkingCostCalculatorExample implements ParkingCostModel {
 
 	private double hourlyParkingCharge;
 
