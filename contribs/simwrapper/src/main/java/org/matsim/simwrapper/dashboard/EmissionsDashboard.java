@@ -54,10 +54,10 @@ public class 	EmissionsDashboard implements Dashboard {
 				viz.description = "per day";
 				viz.height = 12.;
 				viz.cellSize = 100;
-				viz.opacity = 0.5;
+				viz.opacity = 0.2;
 				viz.maxHeight = 100;
 				viz.projection = "EPSG:25832";
-				viz.setColorRamp("RdYlGn", 10, false);
+				viz.setColorRamp("greenRed", 10, false);
 				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.csv");
 			});
 
@@ -67,10 +67,10 @@ public class 	EmissionsDashboard implements Dashboard {
 				viz.description = "per hour";
 				viz.height = 12.;
 				viz.cellSize = 100;
-				viz.opacity = 0.5;
+				viz.opacity = 0.2;
 				viz.maxHeight = 100;
 				viz.projection = "EPSG:25832";
-				viz.setColorRamp("RdYlGn", 10, false);
+				viz.setColorRamp("greenRed", 10, false);
 				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_hour.csv");
 			});
 
