@@ -21,7 +21,7 @@
 /**
  *
  */
-package org.matsim.contrib.decongestion;
+package org.matsim.contrib.decongestion.run;
 
 
 import java.io.IOException;
@@ -29,14 +29,14 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.decongestion.DecongestionConfigGroup.DecongestionApproach;
-import org.matsim.contrib.decongestion.DecongestionConfigGroup.IntegralApproach;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.decongestion.DecongestionConfigGroup;
+import org.matsim.contrib.decongestion.DecongestionModule;
 import org.matsim.contrib.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -45,14 +45,13 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author ikaddoura
  *
  */
-public class DecongestionRunExample {
+public class DecongestionRunExampleFromConfig {
 
-	private static final Logger log = LogManager.getLogger(DecongestionRunExample.class);
+	private static final Logger log = LogManager.getLogger(DecongestionRunExampleFromConfig.class);
 
 	private static String configFile;
 
 	public static void main(String[] args) throws IOException {
-
 		if (args.length > 0) {
 			log.info("Starting simulation run with the following arguments:");
 
@@ -63,62 +62,31 @@ public class DecongestionRunExample {
 			configFile = "path/to/config.xml";
 		}
 
-		DecongestionRunExample main = new DecongestionRunExample();
+		DecongestionRunExampleFromConfig main = new DecongestionRunExampleFromConfig();
 		main.run();
-
 	}
 
 	private void run() {
 
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setToleratedAverageDelaySec(30.);
-		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
-		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
-		decongestionSettings.setUpdatePriceInterval(1);
-		decongestionSettings.setMsa(false);
-		decongestionSettings.setTollBlendFactor(1.0);
-
-//		decongestionSettings.setDecongestionApproach(DecongestionApproach.P_MC);
-
-		decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
-		decongestionSettings.setKd(0.005);
-		decongestionSettings.setKi(0.005);
-		decongestionSettings.setKp(0.005);
-		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
-		decongestionSettings.setIntegralApproachAverageAlpha(0.0);
-
-//		decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
-//		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
-//		decongestionSettings.setINITIAL_TOLL(1.0);
-
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.addModule(decongestionSettings);
+		Config config = ConfigUtils.loadConfig(configFile, new DecongestionConfigGroup() );
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
 		Controler controler = new Controler(scenario);
 
-		// #############################################################
-
 		// congestion toll computation
-
-		controler.addOverridingModule(new DecongestionModule(scenario));
+		controler.addOverridingModule(new DecongestionModule() );
 
 		// toll-adjusted routing
-
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-                                this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( new TollTimeDistanceTravelDisutilityFactory() );
+				// yyyy try if this could add the class instead of the instance.  possibly as singleton.  kai, jan'24
 			}
 		});
 
-		// #############################################################
-
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.run();
-
+		controler.run();
 	}
 }
 
