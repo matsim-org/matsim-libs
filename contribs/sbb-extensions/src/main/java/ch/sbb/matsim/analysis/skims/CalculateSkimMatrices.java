@@ -494,7 +494,8 @@ public class CalculateSkimMatrices {
 
         log.info("calc PT matrices for " + Time.writeTime(startTime) + " - " + Time.writeTime(endTime));
         PTSkimMatrices.PtIndicators<String> matrices = PTSkimMatrices.calculateSkimMatrices(
-                raptorData, this.coordsPerZone, startTime, endTime, 120, raptorParameters, this.numberOfThreads, trainDetector);
+			raptorData, this.coordsPerZone, startTime, endTime, 120, raptorParameters, this.numberOfThreads, trainDetector, new PTSkimMatrices.CoordAggregator() {
+			});
         return matrices;
 
     }
@@ -511,15 +512,6 @@ public class CalculateSkimMatrices {
         return null;
     }
 
-    private static class WeightedCoord {
-
-        Coord coord;
-        double weight;
-
-        private WeightedCoord(Coord coord, double weight) {
-            this.coord = coord;
-            this.weight = weight;
-        }
-    }
+	public record WeightedCoord(Coord coord, double weight){}
 
 }
