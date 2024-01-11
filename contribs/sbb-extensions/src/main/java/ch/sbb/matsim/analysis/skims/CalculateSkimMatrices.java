@@ -321,7 +321,7 @@ public class CalculateSkimMatrices {
                 int idx = Integer.parseInt(parts[1]);
                 double x = Double.parseDouble(parts[2]);
                 double y = Double.parseDouble(parts[3]);
-                final int length = idx > maxIdx ? idx : maxIdx;
+                final int length = Math.max(idx, maxIdx);
                 Coord[] coords = this.coordsPerZone.computeIfAbsent(zoneId, k -> new Coord[length + 1]);
                 if (coords.length < (idx + 1)) {
                     Coord[] tmp = new Coord[idx + 1];
