@@ -28,8 +28,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
+import org.matsim.contrib.decongestion.data.LinkInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTollingAll;
@@ -43,8 +47,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.net.URL;
 
 /**
  *
@@ -114,21 +123,18 @@ public class DecongestionPricingTestIT {
 
 		// toll-adjusted routing
 
-		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-
-                controler.addOverridingModule(new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( new TollTimeDistanceTravelDisutilityFactory() );
 			}
 		});
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();
+		controler.run();
 
-        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
-        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
-        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+		double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+		double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+		double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
 		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
@@ -138,8 +144,8 @@ public class DecongestionPricingTestIT {
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
 		Assertions.assertEquals(-33.940316666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
 		Assertions.assertEquals(50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON, "Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5");
 		Assertions.assertEquals(50.5 * 0.0123, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON, "Wrong toll.");
@@ -155,14 +161,14 @@ public class DecongestionPricingTestIT {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
-		final String configFile = testUtils.getPackageInputDirectory() + "/config0.xml";
+		// ---
 
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "/config0.xml" );
 
-		String outputDirectory = testUtils.getOutputDirectory() + "/";
-		config.controller().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory( testUtils.getOutputDirectory()  );
 
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		final DecongestionConfigGroup decongestionSettings = ConfigUtils.addOrGetModule( config, DecongestionConfigGroup.class );
+
 		decongestionSettings.setWriteOutputIteration(1);
 		decongestionSettings.setKp(0.0123);
 		decongestionSettings.setKd(0.0);
@@ -171,31 +177,34 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setTollBlendFactor(1.0);
 		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
 		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
-		config.addModule(decongestionSettings);
+
+		// ---
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// ---
+
 		Controler controler = new Controler(scenario);
 
 		// congestion toll computation
-		controler.addOverridingModule(new DecongestionModule(scenario));
+		controler.addOverridingModule(new DecongestionModule() );
 
 		// toll-adjusted routing
 
-		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-
-                controler.addOverridingModule(new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( new TollTimeDistanceTravelDisutilityFactory() );
 			}
 		});
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();
+		controler.run();
 
-        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
-        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
-        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+		// ---
+
+		double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+		double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+		double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
 		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
@@ -204,6 +213,114 @@ public class DecongestionPricingTestIT {
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
 		Assertions.assertEquals(-33.940316666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
+	}
+
+	/**
+	 * Kp = 0.0123, other syntax, kn
+	 *
+	 */
+	@Test
+	final void test0amodifiedKn() {
+
+		URL configUrl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
+
+		Config config = ConfigUtils.loadConfig( configUrl );
+		config.controller().setOutputDirectory( testUtils.getOutputDirectory()  );
+
+		config.plans().setInputFile( "plans2000.xml.gz" );
+		// (in my first attempts, the default plans file had too few agents.  after my later changes, it may no longer be necessary to use this file here.  kai, jan'23)
+
+		config.controller().setLastIteration( 20 );
+		// (need some iterations for the decongestion to unfold.  20 may be more than really needed.  kai, jan'23)
+
+		final DecongestionConfigGroup decongestionSettings = ConfigUtils.addOrGetModule( config, DecongestionConfigGroup.class );
+
+		decongestionSettings.setWriteOutputIteration(1);
+//		decongestionSettings.setKp(0.0123);
+		decongestionSettings.setKp(0.123);
+		decongestionSettings.setKd(0.0);
+		decongestionSettings.setKi(0.0);
+		decongestionSettings.setMsa(false);
+		decongestionSettings.setTollBlendFactor(1.0);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
+
+		// ===
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		Network network = scenario.getNetwork();
+
+		// make middle link faster
+		network.getLinks().get( Id.createLinkId( "6" )).setFreespeed( 100. );
+
+		// make alternative wider
+		network.getLinks().get( Id.createLinkId( "14" ) ).setCapacity( 100000. );
+
+		// increase some other capacities:
+		network.getLinks().get( Id.createLinkId( "5" ) ).setCapacity( 100000. );
+		network.getLinks().get( Id.createLinkId( "6" ) ).setCapacity( 100000. );
+
+		// remove all other alternatives:
+		network.removeLink( Id.createLinkId( "11" ) );
+		network.removeLink( Id.createLinkId( "12" ) );
+		network.removeLink( Id.createLinkId( "13" ) );
+		network.removeLink( Id.createLinkId( "16" ) );
+		network.removeLink( Id.createLinkId( "17" ) );
+		network.removeLink( Id.createLinkId( "18" ) );
+		network.removeLink( Id.createLinkId( "19" ) );
+
+		network.removeLink( Id.createLinkId( "2" ) );
+		network.removeLink( Id.createLinkId( "3" ) );
+		network.removeLink( Id.createLinkId( "4" ) );
+		network.removeLink( Id.createLinkId( "7" ) );
+		network.removeLink( Id.createLinkId( "8" ) );
+		network.removeLink( Id.createLinkId( "9" ) );
+		network.removeLink( Id.createLinkId( "10" ) );
+
+		// ---
+
+		Population population = scenario.getPopulation();
+
+		// remove 3/4 of the population to reduce computation time:
+		for ( int ii=500; ii<2000; ii++ ){
+			population.removePerson( Id.createPersonId( ii ) );
+		}
+
+
+		// ---
+
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new DecongestionModule() );
+
+//		controler.addOverridingModule( new OTFVisLiveModule() );
+
+		controler.run();
+
+		// ===
+
+		DecongestionInfo info = controler.getInjector().getInstance( DecongestionInfo.class );
+
+		final LinkInfo linkInfo = info.getlinkInfos().get( Id.createLinkId( "15" ) );
+		if ( linkInfo!= null ){
+			System.out.println( linkInfo.getTime2toll().toString() );
+		}
+
+		final TravelTime linkTravelTimes = controler.getLinkTravelTimes();
+		double tt0a = linkTravelTimes.getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("15" ) ), 6 * 3600-1 , null, null );
+		double tt0b = linkTravelTimes.getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("15" ) ), 6 * 3600 , null, null );
+		double tt0c = linkTravelTimes.getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("15" ) ), 6 * 3600+15*60 , null, null );
+		double tt1 = linkTravelTimes.getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("14" ) ), 6 * 3600, null, null );
+
+		System.err.println( tt0a + " " + tt0b + " " + tt0c );
+		System.err.println( tt1 );
+
+		Assertions.assertEquals(179.985, tt0a, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(344.04, tt0b, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(179.985, tt0c, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(180.0, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+
 	}
 
 	/**
@@ -265,19 +382,21 @@ public class DecongestionPricingTestIT {
 
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
 
-                controler.addOverridingModule(new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( travelDisutilityFactory );
 			}
 		});
 
 		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();
+		controler.run();
 
-        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
-        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
-        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+		// ===
+
+		double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+		double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+		double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
 		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
@@ -287,8 +406,8 @@ public class DecongestionPricingTestIT {
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
 		Assertions.assertEquals(-134.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
 		Assertions.assertEquals(50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON, "Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5");
 		Assertions.assertEquals(50.5 * 2, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON, "Wrong toll.");
@@ -325,25 +444,25 @@ public class DecongestionPricingTestIT {
 		Controler controler = new Controler(scenario);
 
 		// congestion toll computation
-		controler.addOverridingModule(new DecongestionModule(scenario));
+		controler.addOverridingModule(new DecongestionModule() );
 
 		// toll-adjusted routing
 
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
 
-                controler.addOverridingModule(new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( travelDisutilityFactory );
 			}
 		});
 
 		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();
+		controler.run();
 
-        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
-        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
-        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+		double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+		double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+		double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
 		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
@@ -405,7 +524,7 @@ public class DecongestionPricingTestIT {
 
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
 
-                controler.addOverridingModule(new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
@@ -413,11 +532,11 @@ public class DecongestionPricingTestIT {
 		});
 
 		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();
+		controler.run();
 
-        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
-        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
-        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+		double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+		double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+		double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
 
 		Assertions.assertEquals(100.0, tt0, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(150.5, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
@@ -427,8 +546,8 @@ public class DecongestionPricingTestIT {
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
 		Assertions.assertEquals(-33.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
 		Assertions.assertEquals(50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON, "Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5");
 		Assertions.assertNull(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), "Wrong toll.");
@@ -505,11 +624,9 @@ public class DecongestionPricingTestIT {
 
 		System.out.println(testUtils.getPackageInputDirectory());
 
-		final String configFile = testUtils.getPackageInputDirectory() + "/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "/config.xml" );
 
-		String outputDirectory = testUtils.getOutputDirectory() + "/";
-		config.controller().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory( testUtils.getOutputDirectory() );
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWriteOutputIteration(1);
@@ -545,9 +662,9 @@ public class DecongestionPricingTestIT {
 			}
 		});
 
-        controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();
+		controler.run();
 
+		// ---
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get( index ) ;
