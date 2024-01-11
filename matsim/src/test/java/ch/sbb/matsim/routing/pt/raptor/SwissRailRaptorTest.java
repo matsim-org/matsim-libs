@@ -60,6 +60,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -879,18 +880,20 @@ public class SwissRailRaptorTest {
         int[] transferCount = new int[] { 0 };
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        SwissRailRaptor router = new Builder(data, f.config).with((transfer, staticConfig, raptorParams, totalTravelTime, totalTransferCount, existingTransferCosts, now) -> {
-            transferCount[0]++;
-            Transfer t = transfer.get();
+        SwissRailRaptor router = new Builder(data, f.config).with((RaptorTransferCostCalculator) (currentPE, transfer, staticConfig, raptorParams, totalTravelTime, totalTransferCount, existingTransferCosts, currentTime) -> {
 
-            assertEquals(f.stop1, t.getFromStop());
-            assertEquals(f.stop2, t.getToStop());
-            assertEquals(Id.create("0to1", TransitLine.class), t.getFromTransitLine().getId());
-            assertEquals(Id.create("2to3", TransitLine.class), t.getToTransitLine().getId());
-            assertEquals(Id.create("0to1", TransitRoute.class), t.getFromTransitRoute().getId());
-            assertEquals(Id.create("2to3", TransitRoute.class), t.getToTransitRoute().getId());
+                transferCount[0]++;
+                Transfer t = transfer.get();
 
-            return 0.5;
+                assertEquals(f.stop1, t.getFromStop());
+                assertEquals(f.stop2, t.getToStop());
+                assertEquals(Id.create("0to1", TransitLine.class), t.getFromTransitLine().getId());
+                assertEquals(Id.create("2to3", TransitLine.class), t.getToTransitLine().getId());
+                assertEquals(Id.create("0to1", TransitRoute.class), t.getFromTransitRoute().getId());
+                assertEquals(Id.create("2to3", TransitRoute.class), t.getToTransitRoute().getId());
+
+                return 0.5;
+
         }).build();
 
         Coord fromCoord = f.fromFacility.getCoord();

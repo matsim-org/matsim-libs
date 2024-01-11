@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  */
 public class DefaultRaptorTransferCostCalculator implements RaptorTransferCostCalculator {
 	@Override
-	public double calcTransferCost(Supplier<Transfer> transfer, RaptorStaticConfig staticConfig, RaptorParameters raptorParams, int totalTravelTime, int transferCount, double existingTransferCosts, double currentTime) {
+	public double calcTransferCost(SwissRailRaptorCore.PathElement currentPE, Supplier<Transfer> transfer, RaptorStaticConfig staticConfig, RaptorParameters raptorParams, int totalTravelTime, int transferCount, double existingTransferCosts, double currentTime) {
 		double transferCostBase = raptorParams.getTransferPenaltyFixCostPerTransfer();
 		double transferCostModeToMode = staticConfig.isUseModeToModeTransferPenalty()?staticConfig.getModeToModeTransferPenalty(transfer.get().getFromTransitRoute().getTransportMode(),transfer.get().getToTransitRoute().getTransportMode()):0.0;
 		double transferCostPerHour = raptorParams.getTransferPenaltyPerTravelTimeHour();
