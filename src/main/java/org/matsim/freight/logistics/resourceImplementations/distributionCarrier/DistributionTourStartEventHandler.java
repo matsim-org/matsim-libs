@@ -21,6 +21,8 @@
 package org.matsim.freight.logistics.resourceImplementations.distributionCarrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
@@ -71,23 +73,34 @@ public class DistributionTourStartEventHandler
         if (tourElement instanceof ServiceActivity serviceActivity) {
           if (serviceActivity.getService().getId() == carrierService.getId()
               && event.getCarrierId() == resource.getCarrier().getId()) {
-            logLoad(event);
-            logTransport(event);
+            if (resource instanceof DistributionCarrierResource) {
+              logLoad(
+                  event.getCarrierId(),
+                  event.getLinkId(),
+                  event.getTime() - getCumulatedLoadingTime(tour),
+                  event.getTime());
+              logTransport(
+                  event.getCarrierId(), event.getLinkId(), tour.getEndLinkId(), event.getTime());
+            } // else if (resource instanceof MainRunCarrierResource) {
+                //....
+//            }
+
           }
         }
       }
     }
   }
 
-  private void logLoad(CarrierTourStartEvent event) {
+  private void logLoad(Id<Carrier> carrierId, Id<Link> linkId,
+      double startTime, double endTime) {
     ShipmentUtils.LoggedShipmentLoadBuilder builder =
         ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
-    builder.setCarrierId(event.getCarrierId());
-    builder.setLinkId(event.getLinkId());
+    builder.setCarrierId(carrierId);
+    builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
-    builder.setEndTime(event.getTime());
-    builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
+    builder.setEndTime(endTime);
+    builder.setStartTime(startTime);
     ShipmentPlanElement loggedShipmentLoad = builder.build();
     String idString =
         loggedShipmentLoad.getResourceId()
@@ -98,15 +111,16 @@ public class DistributionTourStartEventHandler
     lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
   }
 
-  private void logTransport(CarrierTourStartEvent event) {
+  private void logTransport(Id<Carrier> carrierId, Id<Link> fromLinkId,
+      Id<Link> toLinkId, double startTime) {
     ShipmentUtils.LoggedShipmentTransportBuilder builder =
         ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
-    builder.setCarrierId(event.getCarrierId());
-    builder.setFromLinkId(event.getLinkId());
-    builder.setToLinkId(tour.getEndLinkId());
+    builder.setCarrierId(carrierId);
+    builder.setFromLinkId(fromLinkId);
+    builder.setToLinkId(toLinkId);
     builder.setLogisticChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
-    builder.setStartTime(event.getTime());
+    builder.setStartTime(startTime);
     ShipmentPlanElement transport = builder.build();
     String idString =
         transport.getResourceId()
