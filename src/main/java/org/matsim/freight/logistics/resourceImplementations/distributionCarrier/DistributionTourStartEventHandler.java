@@ -34,6 +34,7 @@ import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
@@ -121,7 +122,7 @@ public class DistributionTourStartEventHandler
     builder.setLogisticChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
     builder.setStartTime(startTime);
-    ShipmentPlanElement transport = builder.build();
+    ShipmentLeg transport = builder.build();
     String idString =
         transport.getResourceId()
             + ""
