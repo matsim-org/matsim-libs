@@ -160,9 +160,7 @@ public class CalcLinkStats {
 	}
 
 	public void writeFile(final String filename) {
-		BufferedWriter out = null;
-		try {
-			out = IOUtils.getBufferedWriter(filename);
+		try (BufferedWriter out = IOUtils.getBufferedWriter(filename)) {
 
 			// write header
 			out.write("LINK\tORIG_ID\tFROM\tTO\tLENGTH\tFREESPEED\tCAPACITY");
@@ -238,16 +236,7 @@ public class CalcLinkStats {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					log.warn("Could not close output-stream.", e);
-				}
-			}
+			log.error("could not write linkstats", e);
 		}
 	}
 
@@ -255,9 +244,7 @@ public class CalcLinkStats {
 		// start with a clean, empty data structure
 		reset();
 
-		BufferedReader reader = null;
-		try {
-			reader = IOUtils.getBufferedReader(filename);
+		try (BufferedReader reader = IOUtils.getBufferedReader(filename)) {
 
 			// read header
 			String header = reader.readLine();
@@ -342,14 +329,7 @@ public class CalcLinkStats {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				try { reader.close(); }
-				catch (IOException e) {
-					log.warn("Could not close input-stream.", e);
-				}
-			}
+			log.error("could not read linkstats.", e);
 		}
 	}
 

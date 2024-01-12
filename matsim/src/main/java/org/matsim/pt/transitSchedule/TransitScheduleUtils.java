@@ -23,7 +23,6 @@ package org.matsim.pt.transitSchedule;
 import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 

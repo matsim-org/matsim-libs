@@ -54,6 +54,11 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 	}
 
 	@Override
+	public void initialize() {
+		delegate.initialize();
+	}
+
+	@Override
 	public void dispatch(double timeStep) {
 		delegate.dispatch(timeStep);
 		checkChargingAtHub(timeStep);

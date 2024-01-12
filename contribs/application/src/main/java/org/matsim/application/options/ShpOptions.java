@@ -16,6 +16,7 @@ import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -46,6 +47,11 @@ import java.util.zip.ZipInputStream;
  * @see CommandLine.Mixin
  */
 public final class ShpOptions {
+
+	/**
+	 * Special value for {@link #createIndex(String, String)} to use the same crs as the shape file.
+	 */
+	public static final String SAME_CRS = "same_crs";
 
 	private static final Logger log = LogManager.getLogger(ShpOptions.class);
 
@@ -204,10 +210,15 @@ public final class ShpOptions {
 		if (queryCRS == null)
 			throw new IllegalArgumentException("Query crs must not be null!");
 
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
-
 		try {
-			return new Index(ct, attr, filter);
+			ShapefileDataStore ds = openDataStoreAndSetCRS();
+			CoordinateTransformation ct;
+			if (queryCRS.equals(SAME_CRS))
+				ct = new IdentityTransformation();
+			else {
+				ct = TransformationFactory.getCoordinateTransformation(queryCRS, shpCrs);
+			}
+			return new Index(ct, ds, attr, filter);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -220,6 +231,15 @@ public final class ShpOptions {
 	 */
 	public Index createIndex(String queryCRS, String attr) {
 		return createIndex(queryCRS, attr, null);
+	}
+
+	/**
+	 * Create an index without a filter and the same query crs as the shape file.
+	 *
+	 * @see #createIndex(String, String)
+	 */
+	public Index createIndex(String attr) {
+		return createIndex(SAME_CRS, attr, null);
 	}
 
 	/**
@@ -248,6 +268,25 @@ public final class ShpOptions {
 	}
 
 	/**
+	 * Open the shape file for processing and set the crs if not already specified.
+	 */
+	private ShapefileDataStore openDataStoreAndSetCRS() throws IOException {
+		ShapefileDataStore ds = openDataStore(shp);
+
+		if (shpCrs == null) {
+			try {
+				CoordinateReferenceSystem crs = ds.getSchema().getCoordinateReferenceSystem();
+				shpCrs = "EPSG:" + CRS.lookupEpsgCode(crs, true);
+				log.info("Using detected crs for {}: {}", shp, shpCrs);
+			} catch (FactoryException | NullPointerException e) {
+				throw new IllegalStateException("Could not determine crs of the shape file. Try to specify it manually using --shp-crs.", e);
+			}
+		}
+
+		return ds;
+	}
+
+	/**
 	 * Create an inverse coordinate transformation from the shape file crs. Tries to autodetect the crs of the shape file.
 	 */
 	public CoordinateTransformation createInverseTransformation(String toCRS) {
@@ -269,9 +308,7 @@ public final class ShpOptions {
 		 * @param ct   coordinate transform from query to target crs
 		 * @param attr attribute for the result of {@link #query(Coord)}
 		 */
-		Index(CoordinateTransformation ct, String attr, @Nullable Set<String> filter) throws IOException {
-			ShapefileDataStore ds = openDataStore(shp);
-
+		Index(CoordinateTransformation ct, ShapefileDataStore ds, String attr, @Nullable Set<String> filter) throws IOException {
 			if (shpCharset != null)
 				ds.setCharset(shpCharset);
 
@@ -342,11 +379,10 @@ public final class ShpOptions {
 			return false;
 		}
 
-
 		/**
 		 * Return all features in the index.
 		 */
-		public List<SimpleFeature> getAll() {
+		public List<SimpleFeature> getAllFeatures() {
 			List<SimpleFeature> result = new ArrayList<>();
 			itemsTree(result, index.getRoot());
 
@@ -372,6 +408,14 @@ public final class ShpOptions {
 		public int size() {
 			return index.size();
 		}
+
+		/**
+		 * Return underlying shp file. Should be used carefully.
+		 */
+		public ShpOptions getShp() {
+			return ShpOptions.this;
+		}
+
 	}
 
 }

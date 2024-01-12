@@ -138,7 +138,7 @@ import org.matsim.core.utils.io.IOUtils;
 					log.info("got interrupted while waiting for errorHandler to die.", e);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error("problem running executable.", e);
 				this.erg = -2;
 			}
 		}
@@ -170,8 +170,7 @@ import org.matsim.core.utils.io.IOUtils;
 					}
 				}
 			} catch (IOException e) {
-				log.info("StreamHandler got interrupted");
-				e.printStackTrace();
+				log.info("StreamHandler got interrupted", e);
 			}
 		}
 	}

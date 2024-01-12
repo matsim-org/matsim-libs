@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -274,12 +273,12 @@ public class TransportModeNetworkFilterTest {
 	/**
 	 * Tests the algorithm for the case the network contains direct loops, i.e.
 	 * links with the same from and to node.
-	 * 
+	 *
 	 * <code>Issue #178</code> - http://sourceforge.net/apps/trac/matsim/ticket/178
-	 * 
-	 * The problem seems only to happen when the loop link is (accidentally / randomly) 
+	 *
+	 * The problem seems only to happen when the loop link is (accidentally / randomly)
 	 * chosen as start link for the algorithm, as otherwise the node already exists.
-	 * Thus cannot extend existing Fixture to test this, but have to create test 
+	 * Thus cannot extend existing Fixture to test this, but have to create test
 	 * scenario from scratch.
 	 */
 	@Test
@@ -293,9 +292,9 @@ public class TransportModeNetworkFilterTest {
 		Link link1 = factory.createLink(Id.create(1, Link.class), node1, node1);
 		link1.setAllowedModes(createHashSet(TransportMode.car));
 		network.addLink(link1);
-		
+
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		
+
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car));
 		Assertions.assertEquals(1, subNetwork.getNodes().size(), "wrong number of nodes.");
@@ -310,28 +309,28 @@ public class TransportModeNetworkFilterTest {
 	void testFilter_timeVariant() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
-		
+
 		Network sourceNetwork = NetworkUtils.createNetwork(config);
 		Node node1 = sourceNetwork.getFactory().createNode(Id.createNodeId("1"), new Coord(0.0, 0.0));
 		Node node2 = sourceNetwork.getFactory().createNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
 		sourceNetwork.addNode(node1);
 		sourceNetwork.addNode(node2);
-		
+
 		Link sourceLink = sourceNetwork.getFactory().createLink(Id.createLinkId("link"), node1, node2);
 		sourceLink.setFreespeed(50.0);
 		sourceLink.setAllowedModes(Collections.singleton("car"));
 		sourceNetwork.addLink(sourceLink);
-		
+
 		NetworkChangeEvent changeEvent = new NetworkChangeEvent(120.0);
 		changeEvent.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 2.0));
 		changeEvent.addLink(sourceLink);
 		((TimeDependentNetwork) sourceNetwork).addNetworkChangeEvent(changeEvent);
-		
+
 		Assertions.assertEquals(50.0, sourceLink.getFreespeed(), 1e-3);
 		Assertions.assertEquals(50.0, sourceLink.getFreespeed(0.0), 1e-3);
 		Assertions.assertEquals(100.0, sourceLink.getFreespeed(120.0), 1e-3);
-		
-		
+
+
 		Network targetNetwork = NetworkUtils.createNetwork(config);
 		new TransportModeNetworkFilter(sourceNetwork).filter(targetNetwork, Collections.singleton("car"));
 		Link targetLink = targetNetwork.getLinks().get(sourceLink.getId());

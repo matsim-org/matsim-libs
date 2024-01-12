@@ -22,10 +22,10 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 	@Override
 	public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry peek) {
 		// old shift hasn't ended yet
-		if (!peek.shift.equals(peek.vehicle.getShifts().peek())) {
+		if (!peek.shift().equals(peek.vehicle().getShifts().peek())) {
 			return false;
 		}
-		Schedule schedule = peek.vehicle.getSchedule();
+		Schedule schedule = peek.vehicle().getSchedule();
 
 		// only active vehicles
 		if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
@@ -36,8 +36,8 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 		Task currentTask = schedule.getCurrentTask();
 		if(currentTask instanceof WaitForShiftStayTask) {
 			//check if optional location requirement is met
-			if(peek.shift.getOperationFacilityId().isPresent()) {
-				Id<OperationFacility> operationFacilityId = peek.shift.getOperationFacilityId().get();
+			if(peek.shift().getOperationFacilityId().isPresent()) {
+				Id<OperationFacility> operationFacilityId = peek.shift().getOperationFacilityId().get();
 				Verify.verify((operationFacilityId.equals(((WaitForShiftStayTask) currentTask).getFacility().getId())),
 						"Vehicle and shift start locations do not match.");
 			}

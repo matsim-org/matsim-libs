@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -57,11 +56,14 @@ public class ShpOptionsTest {
 
 		ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "_");
 
-		List<SimpleFeature> ft = index.getAll();
+		List<SimpleFeature> ft = index.getAllFeatures();
 
 		assertThat(ft)
 				.hasSize(4906)
 				.hasSize(Set.copyOf(ft).size());
+
+		assertThat(shp.readFeatures())
+			.hasSameElementsAs(ft);
 
 	}
 

@@ -161,19 +161,10 @@ public class TravelTimeCalculatorTest {
 		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		if (generateNewData) {
-			BufferedWriter outfile = null;
-			try {
-				outfile = new BufferedWriter(new FileWriter(compareFile));
+			try (BufferedWriter outfile = new BufferedWriter(new FileWriter(compareFile))) {
 				for (int i = 0; i < numberOfTimeSlotsToTest; i++) {
 					double ttime = ttcalc.getLinkTravelTimes().getLinkTravelTime(link10, i*timeBinSize, null, null);
-					outfile.write(Double.toString(ttime) + "\n");
-				}
-			}
-			finally {
-				if (outfile != null) {
-					try {
-						outfile.close();
-					} catch (IOException ignored) {}
+					outfile.write(ttime + "\n");
 				}
 			}
 			fail("A new file containg data for comparison was created. No comparison was made.");

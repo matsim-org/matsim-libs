@@ -40,7 +40,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
 

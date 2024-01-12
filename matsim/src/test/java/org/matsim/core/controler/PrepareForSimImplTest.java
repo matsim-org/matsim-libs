@@ -822,7 +822,7 @@ public class PrepareForSimImplTest {
 		}
 	}
 
-	private class DummyRoutingModule implements RoutingModule {
+	private static class DummyRoutingModule implements RoutingModule {
 		@Override
 		public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 			return Collections.singletonList(PopulationUtils.createLeg("dummyMode"));

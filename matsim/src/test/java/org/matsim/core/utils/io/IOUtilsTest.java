@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 /**
@@ -100,7 +101,7 @@ public class IOUtilsTest {
 	@Test
 	void testGetBufferedReader_encodingIsoLatin1() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt");
-		BufferedReader reader = IOUtils.getBufferedReader(url, Charset.forName("ISO-8859-1"));
+		BufferedReader reader = IOUtils.getBufferedReader(url, StandardCharsets.ISO_8859_1);
 		String line = reader.readLine();
 		Assertions.assertNotNull(line);
 		Assertions.assertEquals("äöüÉç", line);
@@ -131,7 +132,7 @@ public class IOUtilsTest {
 	void testGetBufferedWriter_encodingIsoLatin1() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_IsoLatin1.txt";
 		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, Charset.forName("ISO-8859-1"), false);
+		BufferedWriter writer = IOUtils.getBufferedWriter(url, StandardCharsets.ISO_8859_1, false);
 		writer.write("äöüÉç");
 		writer.close();
 		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt");

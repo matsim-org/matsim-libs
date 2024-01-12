@@ -44,7 +44,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -125,7 +124,7 @@ public class PassingTest {
 
 	}
 
-	private class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
+	private static class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 		VehicleLinkTravelTimeEventHandler hand;

@@ -25,13 +25,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
 
-	/**
+/**
  * @author thibautd
  */
 public class PopulationUtilsTest {

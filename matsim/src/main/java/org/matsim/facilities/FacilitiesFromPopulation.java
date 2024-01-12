@@ -78,7 +78,7 @@ public final class FacilitiesFromPopulation {
 	public FacilitiesFromPopulation( Scenario scenario ) {
 		// "fat" constructor, to configure via config etc.
 		this(scenario.getActivityFacilities());
-		FacilitiesConfigGroup facilityConfigGroup = scenario.getConfig().facilities();;
+		FacilitiesConfigGroup facilityConfigGroup = scenario.getConfig().facilities();
 		this.idPrefix = facilityConfigGroup.getIdPrefix();
 //		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
 		this.removeLinksAndCoordinates = false ;

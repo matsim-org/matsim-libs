@@ -104,6 +104,7 @@ public class EventsManagerImplTest {
 		@Override
 		public void handleEvent(final MyEvent e) {
 			this.counter++;
+			//noinspection divzero
 			int i = 1 / 0; // produce ArithmeticException
 			System.out.println(i);
 		}

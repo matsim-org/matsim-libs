@@ -2,9 +2,7 @@ package org.matsim.core.mobsim.hermes;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -55,8 +53,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
