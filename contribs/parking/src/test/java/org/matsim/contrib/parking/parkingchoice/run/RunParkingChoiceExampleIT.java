@@ -16,11 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.run;
+package org.matsim.contrib.parking.parkingchoice.run;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;

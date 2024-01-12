@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.parkingchoice.example;
+package org.matsim.contrib.parking.parkingchoice.run;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.AbstractParkingBetas;
@@ -26,7 +26,7 @@ import org.matsim.contrib.parking.parkingchoice.PC2.scoring.AbstractParkingBetas
  * @author jbischoff
  *	example class for setting parking betas: we simply return 1 for Beta values. Typically those values should be person- and/or income depending
  */
-public class ParkingBetaExample extends AbstractParkingBetas {
+class ParkingBetaExample extends AbstractParkingBetas {
 
 	
 	@Override
