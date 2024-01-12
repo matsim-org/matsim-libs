@@ -99,8 +99,8 @@ public class DistributionTourStartEventHandler
     builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
-    builder.setEndTime(endTime);
     builder.setStartTime(startTime);
+    builder.setEndTime(endTime);
     ShipmentPlanElement loggedShipmentLoad = builder.build();
     String idString =
         loggedShipmentLoad.getResourceId()

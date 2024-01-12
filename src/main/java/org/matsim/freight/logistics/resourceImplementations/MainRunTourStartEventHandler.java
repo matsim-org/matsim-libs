@@ -42,6 +42,8 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
@@ -93,23 +95,26 @@ public class MainRunTourStartEventHandler
         if (tourElement instanceof ServiceActivity serviceActivity) {
           if (serviceActivity.getService().getId() == carrierService.getId()
               && event.getCarrierId() == resource.getCarrier().getId()) {
-            logLoad(event, tour);
-            logTransport(event, tour);
+            logLoad(event.getCarrierId(), event.getLinkId(),
+                event.getTime() - getCumulatedLoadingTime(tour), event.getTime());
+            logTransport(event.getCarrierId(), event.getLinkId(), tour.getEndLinkId(),
+                event.getTime());
           }
         }
       }
     }
   }
 
-  private void logLoad(CarrierTourStartEvent event, Tour tour) {
+  private void logLoad(Id<Carrier> carrierId, Id<Link> linkId,
+      double startTime, double endTime) {
     ShipmentUtils.LoggedShipmentLoadBuilder builder =
         ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
-    builder.setCarrierId(event.getCarrierId());
-    builder.setLinkId(event.getLinkId());
-    builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
-    builder.setEndTime(event.getTime());
+    builder.setCarrierId(carrierId);
+    builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
+    builder.setStartTime(startTime);
+    builder.setEndTime(endTime);
     ShipmentPlanElement loggedShipmentLoad = builder.build();
     String idString =
         loggedShipmentLoad.getResourceId()
@@ -118,6 +123,26 @@ public class MainRunTourStartEventHandler
             + loggedShipmentLoad.getElementType();
     Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
     lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
+  }
+
+  private void logTransport(Id<Carrier> carrierId, Id<Link> fromLinkId,
+      Id<Link> toLinkId, double startTime) {
+    ShipmentUtils.LoggedShipmentTransportBuilder builder =
+        ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
+    builder.setCarrierId(carrierId);
+    builder.setFromLinkId(fromLinkId);
+    builder.setToLinkId(toLinkId);
+    builder.setLogisticChainElement(logisticChainElement);
+    builder.setResourceId(resource.getId());
+    builder.setStartTime(startTime);
+    ShipmentLeg transport = builder.build();
+    String idString =
+        transport.getResourceId()
+            + ""
+            + transport.getLogisticChainElement().getId()
+            + transport.getElementType();
+    Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
+    lspShipment.getShipmentLog().addPlanElement(transportId, transport);
   }
 
   private double getCumulatedLoadingTime(Tour tour) {
@@ -130,31 +155,12 @@ public class MainRunTourStartEventHandler
     return cumulatedLoadingTime;
   }
 
-  private void logTransport(CarrierTourStartEvent event, Tour tour) {
-    ShipmentUtils.LoggedShipmentTransportBuilder builder =
-        ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
-    builder.setCarrierId(event.getCarrierId());
-    builder.setFromLinkId(event.getLinkId());
-    builder.setToLinkId(tour.getEndLinkId());
-    builder.setStartTime(event.getTime());
-    builder.setLogisticChainElement(logisticChainElement);
-    builder.setResourceId(resource.getId());
-    ShipmentLeg transport = builder.build();
-    String idString =
-        transport.getResourceId()
-            + ""
-            + transport.getLogisticChainElement().getId()
-            + transport.getElementType();
-    Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
-    lspShipment.getShipmentLog().addPlanElement(transportId, transport);
+  public CarrierService getCarrierService() {
+    return carrierService;
   }
 
   public LSPShipment getLspShipment() {
     return lspShipment;
-  }
-
-  public CarrierService getCarrierService() {
-    return carrierService;
   }
 
   public LogisticChainElement getLogisticChainElement() {
@@ -169,5 +175,4 @@ public class MainRunTourStartEventHandler
   public void setEmbeddingContainer(LSPShipment pointer) {
     this.lspShipment = pointer;
   }
-
 }
