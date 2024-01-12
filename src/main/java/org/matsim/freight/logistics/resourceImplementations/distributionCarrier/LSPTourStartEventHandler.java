@@ -38,7 +38,7 @@ import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
-public class DistributionTourStartEventHandler
+public class LSPTourStartEventHandler
     implements CarrierTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
   // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
   // to do the junit testing. kmt jun'23
@@ -49,7 +49,7 @@ public class DistributionTourStartEventHandler
   private final Tour tour;
   private LSPShipment lspShipment;
 
-  DistributionTourStartEventHandler(
+  LSPTourStartEventHandler(
       LSPShipment lspShipment,
       CarrierService carrierService,
       LogisticChainElement logisticChainElement,
