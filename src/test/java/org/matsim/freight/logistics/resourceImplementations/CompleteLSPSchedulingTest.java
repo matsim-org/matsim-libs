@@ -502,6 +502,7 @@ public class CompleteLSPSchedulingTest {
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), resources.get(0).getId());
 
+			//CollectionServiceEnd
 			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
@@ -518,8 +519,9 @@ public class CompleteLSPSchedulingTest {
 			assertSame(serviceHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(serviceHandler.getResourceId(), resources.get(0).getId());
 
-			assertTrue(eventHandlers.get(2) instanceof MainRunTourStartEventHandler);
-			MainRunTourStartEventHandler mainRunStartHandler = (MainRunTourStartEventHandler) eventHandlers.get(2);
+			//MainRunStart
+			assertTrue(eventHandlers.get(2) instanceof LSPTourStartEventHandler);
+			LSPTourStartEventHandler mainRunStartHandler = (LSPTourStartEventHandler) eventHandlers.get(2);
 			assertSame(mainRunStartHandler.getCarrierService().getLocationLinkId(), toLinkId);
 			assertEquals(mainRunStartHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertEquals(mainRunStartHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
@@ -535,6 +537,7 @@ public class CompleteLSPSchedulingTest {
 			assertSame(mainRunStartHandler.getResourceId(), planElements.get(6).getResourceId());
 			assertSame(mainRunStartHandler.getResourceId(), resources.get(2).getId());
 
+			//MainRunEnd
 			assertTrue(eventHandlers.get(3) instanceof LSPTourEndEventHandler);
 			LSPTourEndEventHandler mainRunEndHandler = (LSPTourEndEventHandler) eventHandlers.get(3);
 			assertSame(mainRunEndHandler.getCarrierService().getLocationLinkId(), toLinkId);
@@ -552,6 +555,7 @@ public class CompleteLSPSchedulingTest {
 			assertSame(mainRunEndHandler.getResourceId(), planElements.get(6).getResourceId());
 			assertSame(mainRunEndHandler.getResourceId(), resources.get(2).getId());
 
+			//DistributionRunStart
 			assertTrue(eventHandlers.get(4) instanceof LSPTourStartEventHandler);
 			LSPTourStartEventHandler lspTourStartEventHandler = (LSPTourStartEventHandler) eventHandlers.get(4);
 			assertSame(lspTourStartEventHandler.getCarrierService().getLocationLinkId(), shipment.getTo());
@@ -569,6 +573,7 @@ public class CompleteLSPSchedulingTest {
 			assertSame(lspTourStartEventHandler.getResourceId(), planElements.get(10).getResourceId());
 			assertSame(lspTourStartEventHandler.getResourceId(), resources.get(4).getId());
 
+			//DistributionServiceStart
 			assertTrue(eventHandlers.get(5) instanceof DistributionServiceStartEventHandler);
 			DistributionServiceStartEventHandler distributionServiceHandler = (DistributionServiceStartEventHandler) eventHandlers.get(5);
 			assertSame(distributionServiceHandler.getCarrierService().getLocationLinkId(), shipment.getTo());

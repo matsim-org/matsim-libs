@@ -64,13 +64,13 @@ public class LSPTourStartEventHandler
   // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
   // to do the junit testing. kmt jun'23
 
+  private final Tour tour;
   private final CarrierService carrierService;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
-  private final Tour tour;
   private LSPShipment lspShipment;
 
-  LSPTourStartEventHandler(
+  public LSPTourStartEventHandler(
       LSPShipment lspShipment,
       CarrierService carrierService,
       LogisticChainElement logisticChainElement,
@@ -95,18 +95,26 @@ public class LSPTourStartEventHandler
         if (tourElement instanceof ServiceActivity serviceActivity) {
           if (serviceActivity.getService().getId() == carrierService.getId()
               && event.getCarrierId() == resource.getCarrier().getId()) {
-            if (resource instanceof DistributionCarrierResource) {
+            if (resource instanceof DistributionCarrierResource) { //DistributionTourStarts
               logLoad(
                   event.getCarrierId(),
                   event.getLinkId(),
                   event.getTime() - getCumulatedLoadingTime(tour),
                   event.getTime());
               logTransport(
-                  event.getCarrierId(), event.getLinkId(), tour.getEndLinkId(), event.getTime());
-            } // else if (resource instanceof MainRunCarrierResource) {
-                //....
-//            }
-
+                  event.getCarrierId(),
+                  event.getLinkId(), tour.getEndLinkId(),
+                  event.getTime());
+            } else if (resource instanceof MainRunCarrierResource) { //MainRunTourStarts
+              logLoad(event.getCarrierId(),
+                  event.getLinkId(),
+                event.getTime() - getCumulatedLoadingTime(tour),
+                  event.getTime());
+              logTransport(event.getCarrierId(),
+                  event.getLinkId(),
+                  tour.getEndLinkId(),
+                  event.getTime());
+            }
           }
         }
       }
