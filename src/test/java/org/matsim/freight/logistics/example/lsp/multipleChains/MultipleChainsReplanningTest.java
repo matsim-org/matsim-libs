@@ -30,7 +30,7 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlan;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;

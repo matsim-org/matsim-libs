@@ -385,8 +385,8 @@ import org.matsim.vehicles.VehicleType;
       Tour tour) {
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getShipments().contains(tuple)) {
-        MainRunTourStartEventHandler handler =
-            new MainRunTourStartEventHandler(
+        LSPTourStartEventHandler handler =
+            new LSPTourStartEventHandler(
                 tuple.getShipment(), carrierService, element, resource, tour);
         tuple.getShipment().addSimulationTracker(handler);
         break;
