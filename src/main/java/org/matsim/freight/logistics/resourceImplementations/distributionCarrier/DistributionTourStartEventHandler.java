@@ -28,6 +28,7 @@ import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 import org.matsim.freight.logistics.LSPCarrierResource;
+import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.shipment.LSPShipment;
@@ -46,13 +47,13 @@ public class DistributionTourStartEventHandler
   private LSPShipment lspShipment;
 
   DistributionTourStartEventHandler(
-      CarrierService carrierService,
       LSPShipment lspShipment,
+      CarrierService carrierService,
       LogisticChainElement logisticChainElement,
       LSPCarrierResource resource,
       Tour tour) {
-    this.carrierService = carrierService;
     this.lspShipment = lspShipment;
+    this.carrierService = carrierService;
     this.logisticChainElement = logisticChainElement;
     this.resource = resource;
     this.tour = tour;
@@ -138,8 +139,8 @@ public class DistributionTourStartEventHandler
     return logisticChainElement;
   }
 
-  public LSPCarrierResource getResource() {
-    return resource;
+  public Id<LSPResource> getResourceId() {
+    return resource.getId();
   }
 
   @Override

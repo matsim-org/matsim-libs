@@ -353,7 +353,7 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getShipments().contains(tuple)) {
         DistributionTourStartEventHandler handler =
             new DistributionTourStartEventHandler(
-                carrierService, tuple.getShipment(), element, resource, tour);
+                tuple.getShipment(), carrierService, element, resource, tour);
         tuple.getShipment().addSimulationTracker(handler);
         break;
       }

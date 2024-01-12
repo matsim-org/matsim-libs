@@ -567,10 +567,10 @@ public class CompleteLSPSchedulingTest {
 			assertSame(distributionStartHandler.getLogisticChainElement(), planElements.get(10).getLogisticChainElement());
 			assertSame(distributionStartHandler.getLogisticChainElement(), solutionElements.get(4));
 			assertSame(distributionStartHandler.getLspShipment(), shipment);
-			assertSame(distributionStartHandler.getResource().getId(), planElements.get(8).getResourceId());
-			assertSame(distributionStartHandler.getResource().getId(), planElements.get(9).getResourceId());
-			assertSame(distributionStartHandler.getResource().getId(), planElements.get(10).getResourceId());
-			assertSame(distributionStartHandler.getResource().getId(), resources.get(4).getId());
+			assertSame(distributionStartHandler.getResourceId(), planElements.get(8).getResourceId());
+			assertSame(distributionStartHandler.getResourceId(), planElements.get(9).getResourceId());
+			assertSame(distributionStartHandler.getResourceId(), planElements.get(10).getResourceId());
+			assertSame(distributionStartHandler.getResourceId(), resources.get(4).getId());
 
 			assertTrue(eventHandlers.get(5) instanceof DistributionServiceStartEventHandler);
 			DistributionServiceStartEventHandler distributionServiceHandler = (DistributionServiceStartEventHandler) eventHandlers.get(5);
