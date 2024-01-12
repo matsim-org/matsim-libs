@@ -37,7 +37,7 @@ import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
