@@ -21,19 +21,22 @@ package org.matsim.contrib.drt.extension.companions;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.router.MainModeIdentifier;
+
 
 /**
  * This module samples additional drt rides on booked drt trips in order to
  * replicate a more realistic vehicle occupancy.
  *
  * @author Steffen Axer
- *
  */
 public class DrtCompanionModule extends AbstractDvrpModeModule {
-    DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup;
+	DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup;
 
 	public DrtCompanionModule(String mode, DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		super(mode);
@@ -45,12 +48,19 @@ public class DrtCompanionModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(DrtCompanionRideGenerator.class).toProvider(
 				modalProvider(getter -> new DrtCompanionRideGenerator(
-						getMode(), //
-						getter.get(MainModeIdentifier.class), //
-						getter.get(Scenario.class), //
-						getter.getModal(Network.class),  //
-						this.drtWithExtensionsConfigGroup)))
-				.asEagerSingleton();
+					getMode(), //
+					getter.get(MainModeIdentifier.class), //
+					getter.get(Scenario.class), //
+					getter.getModal(Network.class),  //
+					this.drtWithExtensionsConfigGroup)))
+			.asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(DrtCompanionRideGenerator.class));
+		installOverridingQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
+			@Override
+			protected void configureQSim() {
+				bindModal(PassengerGroupIdentifier.class).toProvider(modalProvider(getter -> new DrtCompanionGroupIdentifier(getter.get(Population.class))));
+			}
+		});
+
 	}
 }
