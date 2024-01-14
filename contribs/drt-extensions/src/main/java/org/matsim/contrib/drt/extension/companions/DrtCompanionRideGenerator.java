@@ -65,7 +65,7 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	private int passengerGroupIdentifier = 0; // Should be unique over the entire simulation
 
 	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier,
-							  final Scenario scenario, final Network network,
+							  final Scenario scenario,
 							  final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		this.scenario = scenario;
 		this.mainModeIdentifier = mainModeIdentifier;
@@ -89,7 +89,7 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 		}
 	}
 
-	void addCompanionAgents() {
+	private void addCompanionAgents() {
 		int personIdentifierSuffix = 0;
 		HashMap<String, Integer> drtCompanionAgents = new HashMap<>();
 		Collection<Person> companions = new ArrayList<>();
@@ -164,7 +164,7 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 		return person;
 	}
 
-	void removeCompanionAgents() {
+	private void removeCompanionAgents() {
 		int counter = 0;
 
 		for (Id<Person> drtCompanion : companionAgentIds) {

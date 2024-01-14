@@ -30,7 +30,7 @@ import java.util.Optional;
 /**
  * @author steffenaxer
  */
-public class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
+class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
 	private final Population population;
 	DrtCompanionGroupIdentifier(final Population population)
 	{

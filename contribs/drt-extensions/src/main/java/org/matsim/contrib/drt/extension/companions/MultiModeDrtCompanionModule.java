@@ -29,11 +29,9 @@ import org.matsim.core.controler.AbstractModule;
  * @author steffenaxer
  */
 public class MultiModeDrtCompanionModule extends AbstractModule {
-	@Inject
-	private MultiModeDrtConfigGroup multiModeDrtCfg;
-
 	@Override
 	public void install() {
+		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(getConfig());
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			if (drtCfg instanceof DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup && ((DrtWithExtensionsConfigGroup) drtCfg).getDrtCompanionParams().isPresent()) {
 				drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) drtCfg;
