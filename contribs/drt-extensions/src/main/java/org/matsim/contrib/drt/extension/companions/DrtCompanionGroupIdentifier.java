@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2022 by the members listed in the COPYING,        *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.contrib.drt.extension.companions;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+
+import java.util.Optional;
 
 /**
  * @author steffenaxer
  */
-public final class DrtCompanionControlerCreator {
-
-
-	public static Controler createControler(Config config) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
-
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.addOverridingModule(new MultiModeDrtCompanionModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
-
-		return controler;
+class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
+	private final Population population;
+	DrtCompanionGroupIdentifier(final Population population)
+	{
+		this.population = population;
 	}
+
+	@Override
+	public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent) {
+		Person person = wrapMobsimPassengerAgentToPerson(agent);
+		return DrtCompanionUtils.getPassengerGroupIdentifier(person);
+	}
+
+	private Person wrapMobsimPassengerAgentToPerson(MobsimPassengerAgent agent)
+	{
+		return this.population.getPersons().get(agent.getId());
+	}
+
 }
