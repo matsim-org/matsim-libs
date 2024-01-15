@@ -4,6 +4,12 @@ import static org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.Passen
 
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 
+import java.util.Optional;
+
+/**
+ * dvrp needs {@link PassengerHandler} bound to something.  It is first bound to a {@link PassengerEngine} so it can also do stuff on its own.  Then,
+ * {@link PassengerEngine} is bound to one of the existing implementations.
+ */
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	public enum PassengerEngineType {
 		DEFAULT, WITH_PREBOOKING, TELEPORTING
@@ -23,19 +29,26 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	@Override
 	protected void configureQSim() {
 		bindModal(PassengerHandler.class).to(modalKey(PassengerEngine.class));
+		bindModal(PassengerGroupIdentifier.class).toInstance(agent -> Optional.empty());
+
+		// (PassengerEngine is a more powerful interface.)
+
 		addMobsimScopeEventHandlerBinding().to(modalKey(PassengerEngine.class));
-		switch (type) {
-			case DEFAULT:
-				addModalComponent(PassengerEngine.class, DefaultPassengerEngine.createProvider(getMode()));
+
+		switch( type ){
+			case DEFAULT -> {
+				addModalComponent( PassengerEngine.class, DefaultPassengerEngine.createProvider( getMode() ) );
 				return;
-			case WITH_PREBOOKING:
-				addModalComponent(PassengerEngine.class, PassengerEngineWithPrebooking.createProvider(getMode()));
+			}
+			case WITH_PREBOOKING -> {
+				addModalComponent( PassengerEngine.class, PassengerEngineWithPrebooking.createProvider( getMode() ) );
 				return;
-			case TELEPORTING:
-				addModalComponent(PassengerEngine.class, TeleportingPassengerEngine.createProvider(getMode()));
+			}
+			case TELEPORTING -> {
+				addModalComponent( PassengerEngine.class, TeleportingPassengerEngine.createProvider( getMode() ) );
 				return;
-			default:
-				throw new IllegalStateException("Type: " + type + " is not supported");
+			}
+			default -> throw new IllegalStateException( "Type: " + type + " is not supported" );
 		}
 	}
 }

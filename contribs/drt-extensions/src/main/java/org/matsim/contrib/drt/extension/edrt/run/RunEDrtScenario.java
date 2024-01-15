@@ -54,14 +54,14 @@ public class RunEDrtScenario {
 				new OTFVisConfigGroup(), new EvConfigGroup()), otfvis);
 	}
 
-	public static void run(Config config, boolean otfvis) {
+	public static Controler createControler(Config config, boolean otfvis) {
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 				@Override
 				public void install() {
 					bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new EDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC));
+							new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				}
 			});
 		}
@@ -75,6 +75,11 @@ public class RunEDrtScenario {
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
-		controler.run();
+		
+		return controler;
+	}
+	
+	public static void run(Config config, boolean otfvis) {
+		createControler(config, otfvis).run();
 	}
 }

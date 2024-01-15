@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -50,12 +50,12 @@ import java.util.*;
 public class JointTravelUtilsTest {
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 
-	@After
+	@AfterEach
 	public void clearFixtures() {
 		fixtures.clear();
 	}
 
-	@Before
+	@BeforeEach
 	public void initOnePassengerFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -115,7 +115,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initTwoPassengerTwoOdFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.create("Alain Prost", Person.class));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.create("Tintin", Person.class));
@@ -206,7 +206,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initTwoPassengersTwoOdsTwoJtFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -327,7 +327,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initTwoPassengersMiddleTripFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -426,7 +426,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -515,7 +515,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsWithDifferentDriversFixture() {
 		final Person driver1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person driver2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Michel Vaillant"));
@@ -611,7 +611,7 @@ public class JointTravelUtilsTest {
 	}
 
 	// bugs may depend on iteration order...
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsWithDifferentDriversSecondDriverFirstFixture() {
 		final Person driver1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person driver2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Michel Vaillant"));
@@ -712,7 +712,7 @@ public class JointTravelUtilsTest {
 	 * the same way going to the bus station when no bus is running is a valid, though stupid,
 	 * plan.
 	 */
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsInconsistentSequenceFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -802,32 +802,32 @@ public class JointTravelUtilsTest {
 	}
 
 	@Test
-	public void testExtractJointTrips() throws Exception {
+	void testExtractJointTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
 			JointTravelStructure struct = JointTravelUtils.analyseJointTravel(f.plan);
 
-			Assert.assertEquals(
+			Assertions.assertEquals(
+					f.structure,
+					struct,
 					"wrong structure for fixture "+f.name+
 					" of size "+f.structure.getJointTrips().size()+
-					" compared to result of size "+struct.getJointTrips().size(),
-					f.structure,
-					struct);
+					" compared to result of size "+struct.getJointTrips().size());
 		}
 	}
 
 	@Test
-	public void testParseDriverTrips() throws Exception {
+	void testParseDriverTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
 			List<DriverTrip> trips = JointTravelUtils.parseDriverTrips(f.plan);
 
-			Assert.assertEquals(
-					"wrong number of driver trips: "+f.driverTrips+" is the target, got "+trips,
+			Assertions.assertEquals(
 					f.driverTrips.size(),
-					trips.size());
+					trips.size(),
+					"wrong number of driver trips: "+f.driverTrips+" is the target, got "+trips);
 
-			Assert.assertTrue(
-					"wrong driver trips: "+f.driverTrips+" is the target, got "+trips,
-					trips.containsAll( f.driverTrips ));
+			Assertions.assertTrue(
+					trips.containsAll( f.driverTrips ),
+					"wrong driver trips: "+f.driverTrips+" is the target, got "+trips);
 		}
 	}
 

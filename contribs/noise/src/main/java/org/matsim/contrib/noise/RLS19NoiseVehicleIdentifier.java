@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.matsim.vehicles.VehicleUtils.getOrCreateAllvehicles;
 

@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -51,7 +51,7 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 	private final EventsManager events;
 
 	@Inject
-	public TemperatureManager(Config config, EventsManager events) {
+	TemperatureManager(Config config, EventsManager events) {
 		this.events = events;
 		TemperatureChangeConfigGroup temperatureChangeConfigGroup = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);

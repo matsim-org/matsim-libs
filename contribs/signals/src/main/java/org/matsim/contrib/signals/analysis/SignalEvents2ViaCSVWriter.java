@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ import java.util.Map;
 
 /**
  * Write a csv file for visualizing signals in via based on the events.
- * 
+ *
  * @author tthunig
  *
  */
@@ -63,7 +63,7 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 	private static final String Y_COORD = "y";
 	private static final String TIME = "time";
 	private static final String SIGNAL_STATE = "signal state";
-	
+
 	private int countWarnings = 0;
 
 	/**
@@ -92,7 +92,7 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == scenario.getConfig().controler().getFirstIteration()) {
+		if (event.getIteration() == scenario.getConfig().controller().getFirstIteration()) {
 			/*
 			 * do all the stuff that is needed only once a simulation: - calculating coordinations for the via file - getting the signals data out of the scenario
 			 */
@@ -100,9 +100,9 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 		}
 
 		// write signal events in the same interval als usual matsim events
-		if (event.isLastIteration() || (scenario.getConfig().controler().getWriteEventsInterval() != 0 && event.getIteration() % scenario.getConfig().controler().getWriteEventsInterval() == 0)) {
+		if (event.isLastIteration() || (scenario.getConfig().controller().getWriteEventsInterval() != 0 && event.getIteration() % scenario.getConfig().controller().getWriteEventsInterval() == 0)) {
 			writeThisIteration = true;
-			String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
+			String signalCSVFilename = scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
 
 			// log.info("Initializing SignalsCSVWriter ...");
 			signalsCSVWriter = IOUtils.getBufferedWriter(signalCSVFilename);

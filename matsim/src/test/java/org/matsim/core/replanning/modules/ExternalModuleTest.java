@@ -22,10 +22,10 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -33,31 +33,29 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExternalModuleTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private Scenario scenario;
     private OutputDirectoryHierarchy outputDirectoryHierarchy;
     private Scenario originalScenario;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         final String outputDirectory = utils.getOutputDirectory();
         outputDirectoryHierarchy = new OutputDirectoryHierarchy(
-                outputDirectory, OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controler().getCompressionType());
-        scenario.getConfig().controler().setOutputDirectory( outputDirectory );
+                outputDirectory, OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controller().getCompressionType());
+        scenario.getConfig().controller().setOutputDirectory( outputDirectory );
 //        scenario.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 //        // the following includes all retrofittings that were added later:
@@ -73,8 +71,8 @@ public class ExternalModuleTest {
 //        prepareForSim.run();
     }
 
-    @Test
-    public void testNoOpExternalModule() {
+	@Test
+	void testNoOpExternalModule() {
         ExternalModule testee = new ExternalModule(new ExternalModule.ExeRunnerDelegate() {
             @Override
             public boolean invoke() {
@@ -84,11 +82,11 @@ public class ExternalModuleTest {
             }
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
-        Assert.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
+        Assertions.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
     }
 
-    @Test
-    public void testPlanEmptyingExternalModule() {
+	@Test
+	void testPlanEmptyingExternalModule() {
         ExternalModule testee = new ExternalModule(new ExternalModule.ExeRunnerDelegate() {
             @Override
             public boolean invoke() {
@@ -101,7 +99,7 @@ public class ExternalModuleTest {
             }
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
-        Assert.assertFalse(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
+        Assertions.assertFalse(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
     }
 
     private Population loadPopulation(String filename) {

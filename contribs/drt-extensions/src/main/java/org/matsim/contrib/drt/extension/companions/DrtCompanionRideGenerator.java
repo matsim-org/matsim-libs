@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +52,7 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 
 	private static final Logger LOG = LogManager.getLogger(DrtCompanionRideGenerator.class);
 	public final static String DRT_COMPANION_AGENT_PREFIX = "COMPANION";
+	public static final String DRT_COMPANION_TYPE = "drtCompanion";
 
 	private final Scenario scenario;
 	private final String drtModes;
@@ -61,7 +61,8 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	private Set<Id<Person>> companionAgentIds = new HashSet<>();
 	private WeightedRandomSelection<Integer> sampler;
 
-	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier, final Scenario scenario, final Network network,
+	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier,
+							  final Scenario scenario, final Network network,
 							  final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		this.scenario = scenario;
 		this.mainModeIdentifier = mainModeIdentifier;
@@ -77,26 +78,35 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 		if (!drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getDrtCompanionSamplingWeights()
 				.isEmpty()) {
 			this.sampler = DrtCompanionUtils.createIntegerSampler(
-					drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getDrtCompanionSamplingWeights());
+					drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow()
+							.getDrtCompanionSamplingWeights());
 		} else {
-			throw new IllegalStateException("drtCompanionSamplingWeights are empty, please check your DrtCompanionParams");
+			throw new IllegalStateException(
+					"drtCompanionSamplingWeights are empty, please check your DrtCompanionParams");
 		}
 	}
 
 	void addCompanionAgents() {
+		int identifier = 0;
 		HashMap<String, Integer> drtCompanionAgents = new HashMap<>();
 		Collection<Person> companions = new ArrayList<>();
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
 				if (this.drtModes.equals(mainMode)) {
+
 					int additionalCompanions = sampler.select();
+
 					for (int i = 0; i < additionalCompanions; i++) {
 						int currentCounter = drtCompanionAgents.getOrDefault(mainMode, 0);
 						currentCounter++;
 						drtCompanionAgents.put(mainMode, currentCounter);
+						int groupSize = additionalCompanions + 1;
+						int groupPart = i;
+
 						companions.add(createCompanionAgent(mainMode, person, trip, trip.getOriginActivity(),
-								trip.getDestinationActivity()));
+								trip.getDestinationActivity(), groupPart, groupSize, identifier));
+						identifier++;
 					}
 				}
 			}
@@ -112,10 +122,11 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	}
 
 	private Person createCompanionAgent(String drtMode, Person originalPerson, TripStructureUtils.Trip trip,
-										Activity fromActivity, Activity toActivity) {
+										Activity fromActivity, Activity toActivity, int groupPart, int groupSize, int identifier) {
 		String prefix = getCompanionPrefix(drtMode);
-		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + UUID.randomUUID();
+		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + identifier;
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(companionId));
+		DrtCompanionUtils.setDRTCompanionType(person, DRT_COMPANION_TYPE);
 
 		// Copy attributes from person
 		AttributesUtils.copyAttributesFromTo(originalPerson, person);
@@ -130,7 +141,13 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 		plan.getPlanElements().add(copyFromActivity);
 		plan.getPlanElements().addAll(trip.getTripElements());
 		plan.getPlanElements().add(toActivity);
+
 		person.addPlan(plan);
+
+		// Add group information to trip
+		DrtCompanionUtils.setAdditionalGroupPart(person, groupPart);
+		DrtCompanionUtils.setAdditionalGroupSize(person, groupSize);
+
 		return person;
 	}
 

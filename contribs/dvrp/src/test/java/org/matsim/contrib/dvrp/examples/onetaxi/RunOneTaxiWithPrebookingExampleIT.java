@@ -32,9 +32,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.assertj.core.data.Offset;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,19 +68,19 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 	private static final Logger log = LogManager.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testRun() {
+	void testRun() {
 		// load config
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"generic_dvrp_one_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		{
 			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config,
 					QSimComponentsConfigGroup.class);
@@ -142,7 +142,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 					if (event instanceof AgentWakeupEvent) {
 						wakeupEvents.put(((AgentWakeupEvent)event).getPersonId(), (AgentWakeupEvent)event);
 					} else if (event instanceof PassengerRequestScheduledEvent) {
-						requestScheduledEvents.put(((PassengerRequestScheduledEvent)event).getPersonId(),
+						requestScheduledEvents.put(((PassengerRequestScheduledEvent)event).getPersonIds().stream().findFirst().orElseThrow(),
 								(PassengerRequestScheduledEvent)event);
 					} else if (event instanceof ActivityEndEvent && ((ActivityEndEvent)event).getActType()
 							.equals("dummy")) {
@@ -239,7 +239,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		PassengerRequestScheduledEvent event = events.get(Id.createPersonId(personId));
 		assertThat(event.getVehicleId().toString()).isEqualTo("taxi_one");
 		assertThat(event.getPickupTime()).isCloseTo(pickupTime, Offset.offset(0.01));
-		assertThat(event.getPersonId().toString()).isEqualTo(personId);
+		assertThat(event.getPersonIds().get(0).toString()).isEqualTo(personId);
 		assertThat(event.getRequestId().toString()).isEqualTo(requestId);
 	}
 

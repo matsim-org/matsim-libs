@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -72,17 +72,17 @@ class RunJointDemandCarExample {
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setTravelTimeSliceWidth(3600);
-        freightConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
+        FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+        freightCarriersConfigGroup.setTravelTimeSliceWidth(3600);
+        freightCarriersConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
+        freightCarriersConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
 
         prepareConfig(config);
 
         Scenario scenario = loadScenario(config);
-        FreightUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
+        CarriersUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightCarriersConfigGroup
         //alternatively, one can read in the input Carriers and CarrierVehicleTypes manually and use
-        //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
+        //CarrierControlerUtils.getCarriers(scenario) and CarrierControlerUtils.getCarrierVehicleTypes(scenario)
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JointDemandModule() );
@@ -90,28 +90,28 @@ class RunJointDemandCarExample {
     }
 
     private static void prepareConfig(Config config) {
-        StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
-        config.strategy().addStrategySettings(changeExpBeta);
+        config.replanning().addStrategySettings(changeExpBeta);
 
-        StrategyConfigGroup.StrategySettings changeJobOperator = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings changeJobOperator = new ReplanningConfigGroup.StrategySettings();
         changeJobOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeJobOperator.setWeight(0.5);
-        config.strategy().addStrategySettings(changeJobOperator);
+        config.replanning().addStrategySettings(changeJobOperator);
 
-        config.strategy().setFractionOfIterationsToDisableInnovation(.8);
-        PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        config.replanning().setFractionOfIterationsToDisableInnovation(.8);
+        ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
-        config.planCalcScore().addActivityParams(home);
-        PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        config.scoring().addActivityParams(home);
+        ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
-        config.planCalcScore().addActivityParams(work);
-        config.controler().setWriteEventsInterval(5);
-        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarExample");
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(5);
+        config.scoring().addActivityParams(work);
+        config.controller().setWriteEventsInterval(5);
+        config.controller().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarExample");
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(5);
     }
 }

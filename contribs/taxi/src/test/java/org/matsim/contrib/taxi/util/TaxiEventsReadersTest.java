@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +46,7 @@ import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
@@ -71,7 +71,7 @@ public class TaxiEventsReadersTest {
 	);
 
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		taxiEvents.forEach(writer::handleEvent);
@@ -83,7 +83,7 @@ public class TaxiEventsReadersTest {
 		eventsManager.initProcessing();
 		TaxiEventsReaders.createEventsReader(eventsManager)
 				.readStream(new ByteArrayInputStream(outputStream.toByteArray()),
-						ControlerConfigGroup.EventsFileFormat.xml);
+						ControllerConfigGroup.EventsFileFormat.xml);
 		eventsManager.finishProcessing();
 
 		assertThat(handler.handledEvents).usingRecursiveFieldByFieldElementComparator()

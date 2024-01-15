@@ -31,29 +31,29 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyTime" />
- *  
+ *
  * @author ikaddoura
  *
  */
 public class PRStrategyTime implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
-	
+
 	public PRStrategyTime(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );
-				
+
 		PRTimeAllocationMutator prTimeModule = new PRTimeAllocationMutator(controler.getConfig());
 		planStrategyDelegate.addStrategyModule(prTimeModule);
-		
+
 		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
-		
+
 	}
 
 	@Override

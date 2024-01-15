@@ -1,16 +1,15 @@
 package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.junit.Test;
-
 import java.util.Collection;
-import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StringCollectionConverterTest {
 
 	@Test
-	public void test() {
+	void test() {
 
 		var expectedString = "[\"a\",\"b\"]";
 		var converter = new StringCollectionConverter();

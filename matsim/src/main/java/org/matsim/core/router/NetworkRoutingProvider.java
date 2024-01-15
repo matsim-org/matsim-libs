@@ -21,6 +21,8 @@
 
  package org.matsim.core.router;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -28,7 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -39,21 +41,20 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NetworkRoutingProvider implements Provider<RoutingModule> {
+public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
-	
+
 	private final String routingMode;
 
 	@Inject Map<String, TravelTime> travelTimes;
 	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	@Inject SingleModeNetworksCache singleModeNetworksCache;
-	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	@Inject
+	RoutingConfigGroup routingConfigGroup;
 	@Inject Network network;
 	@Inject NetworkConfigGroup networkConfigGroup;
 	@Inject PopulationFactory populationFactory;
@@ -64,7 +65,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	@Inject
 	@Named(TransportMode.walk)
 	private RoutingModule walkRouter;
-	
+
 	/**
 	 * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
 	 * same.
@@ -74,7 +75,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	public NetworkRoutingProvider(String mode) {
 		this( mode, mode ) ;
 	}
-	
+
 	/**
 	 * The effect of this constructor is a router configured for "routingMode" will be used for routing, but the route
 	 * will then have the mode "mode".   So one can, for example, have an uncongested and a congested within-day router,
@@ -85,7 +86,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	 */
 	public NetworkRoutingProvider(String mode, String routingMode ) {
 //		log.setLevel(Level.DEBUG);
-		
+
 		this.mode = mode;
 		this.routingMode = routingMode ;
 	}
@@ -96,7 +97,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	public RoutingModule get() {
 		log.debug( "requesting network routing module with routingMode="
 						   + routingMode + ";\tmode=" + mode) ;
-		
+
 		// the network refers to the (transport)mode:
 		Network filteredNetwork = null;
 
@@ -129,19 +130,23 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 						travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if ( !plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			/* 
+		if ( !routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+			/*
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
-			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass an
-			 * accessEgressToNetworkRouter RoutingModule.
+			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard
+			 * accessEgressToNetworkRouter RoutingModule for walk..
 			 */
+
 			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
+
+			// more precisely: If the transport mode is walk, then code is used that does not need the accessEgressToNetwork router.  kai, jun'22
+
 			if (mode.equals(TransportMode.walk)) {
 				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation, multimodalLinkChooser);
 			} else {
 				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser) ;
 			}
-			
+
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}

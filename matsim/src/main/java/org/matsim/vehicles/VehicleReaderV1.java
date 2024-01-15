@@ -16,6 +16,7 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 	private VehicleType currentVehType = null;
 
 	VehicleReaderV1( final Vehicles vehicles ){
+		super(ValidationType.XSD_ONLY);
 		log.info("Using " + this.getClass().getName());
 		this.vehicles = vehicles;
 		this.builder = this.vehicles.getFactory();

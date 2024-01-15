@@ -24,7 +24,7 @@ import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution

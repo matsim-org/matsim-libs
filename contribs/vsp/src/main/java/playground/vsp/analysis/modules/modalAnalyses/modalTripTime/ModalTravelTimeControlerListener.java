@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -55,14 +55,14 @@ public class ModalTravelTimeControlerListener implements StartupListener, Iterat
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
+		this.firstIteration = event.getServices().getConfig().controller().getFirstIteration();
 		this.events.addHandler(this.travelTimeHandler);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		String outputDir = event.getServices().getConfig().controler().getOutputDirectory();
+		String outputDir = event.getServices().getConfig().controller().getOutputDirectory();
 
 		SortedMap<String, Double > mode2AvgTripTime = modalAvgTime();
 		modeHistory.addAll(mode2AvgTripTime.keySet());

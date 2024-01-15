@@ -1,0 +1,19 @@
+type: plotly
+datasets:
+  dataset: test.csv
+traces:
+- fill: none
+  "y": $dataset.yColumn
+  x: $dataset.xColumn
+  text: $dataset.labelColumn
+  mode: markers
+  marker:
+    cauto: true
+    autocolorscale: true
+    opacity: 1.0
+    sizemode: diameter
+  whiskerwidth: 0.0
+  type: scatter
+  size: $dataset.sizeColumn
+  color: $dataset.colorColumn
+  opacity: $dataset.opacityColumn

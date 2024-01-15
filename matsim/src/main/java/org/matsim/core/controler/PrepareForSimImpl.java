@@ -19,9 +19,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -49,7 +51,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
@@ -57,10 +58,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData;
 
@@ -86,14 +85,21 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final TimeInterpretation timeInterpretation;
 
 	/**
-	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
+	 * Can be null if instantiated via constructor, which should only happen in tests.
+	 */
+	@Nullable
+	@Inject
+	private Set<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
+
+	/**
+	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
 	 * nor the AnalysisMainModeidentifier used for analysis (ModeStats etc.).
 	 */
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
-				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
-				PlansConfigGroup plansConfigGroup, 
+				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup,
+				PlansConfigGroup plansConfigGroup,
 				MainModeIdentifier backwardCompatibilityMainModeIdentifier,
 				TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
@@ -169,8 +175,19 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// the person (maybe via the household).    kai, feb'18
 		// each agent receives a vehicle for each main mode now. janek, aug'19
 		createAndAddVehiclesForEveryNetworkMode();
-		
+
 		adaptOutdatedPlansForRoutingMode();
+
+		// Can be null if instantiated via constructor, which should only happen in tests
+		if (prepareForSimAlgorithms != null) {
+			// This does not nake use of multi-threading because it can not be assumed that these instances are thread-safe
+			// thread-safety could be ensured with Providers, but they can not be used automatically in conjunction with set binders.
+			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
+				for (Person person : population.getPersons().values()) {
+					algo.run(person);
+				}
+			}
+		}
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
@@ -180,7 +197,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario,
 						carOnlyNetwork)
 		);
-		
+
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
@@ -189,7 +206,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		if (population instanceof Lockable) {
 			((Lockable) population).setLocked();
 		}
-		
+
 		if ( network instanceof Lockable ) {
 			((Lockable) network).setLocked();
 		}
@@ -210,13 +227,35 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
-			var modeToVehicle = modeVehicleTypes.entrySet().stream()
-					// map mode type to vehicle id
-					.map(modeType -> Tuple.of(modeType, createVehicleId(person, modeType.getKey())))
-					// create a corresponding vehicle
-					.peek(tuple -> createAndAddVehicleIfNecessary(tuple.getSecond(), tuple.getFirst().getValue()))
-					// write mode-string to vehicle-id into a map
-					.collect(Collectors.toMap(tuple -> tuple.getFirst().getKey(), Tuple::getSecond));
+
+			Map<String, Id<Vehicle>> modeToVehicle = new HashMap<>();
+
+			// optional attribute, that can be null
+			Map<String, Id<VehicleType>> modeTypes = VehicleUtils.getVehicleTypes(person);
+
+			for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
+
+				String mode = modeType.getKey();
+
+				Id<Vehicle> vehicleId = createVehicleId(person, mode);
+
+				// get the type
+				VehicleType type = modeType.getValue();
+
+				// Use the person attribute to map to a more specific vehicle type
+				if (modeTypes != null && modeTypes.containsKey(mode)) {
+					Id<VehicleType> typeId = modeTypes.get(mode);
+					type = scenario.getVehicles().getVehicleTypes().get(typeId);
+					if (type == null) {
+						throw new IllegalStateException("Vehicle type " + typeId + " specified for person " + person.getId() + ", but not found in scenario.");
+					}
+				}
+
+				createAndAddVehicleIfNecessary(vehicleId, type);
+
+				// write mode-string to vehicle-id into a map
+				modeToVehicle.put(mode, vehicleId);
+			}
 
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
 		}
@@ -246,7 +285,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 
 		Set<String> modes = new HashSet<>(qSimConfigGroup.getMainModes());
-		modes.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+		modes.addAll(scenario.getConfig().routing().getNetworkModes());
 
 		for (String mode : modes) {
 			VehicleType type;
@@ -289,9 +328,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			}
 		}
 	}
-	
+
 	private static boolean insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = true;
-	
+
 	private void adaptOutdatedPlansForRoutingMode() {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

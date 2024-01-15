@@ -53,7 +53,7 @@ import org.matsim.vehicles.Vehicles;
 
 /**
  * Hook to register paratransit black box with MATSim
- * 
+ *
  * @author aneumann
  */
 final class PControlerListener implements IterationStartsListener, StartupListener, ScoringListener {
@@ -66,7 +66,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final POperators operators ;
 
 	@Inject(optional=true) private PersonReRouteStuckFactory stuckFactory;
-	
+
 	@Inject
 	private TimeInterpretation timeInterpretation;
 
@@ -92,7 +92,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		PBox pBox = (PBox) operators ;
 		final MatsimServices controler = event.getServices();
-		if(event.getIteration() == controler.getConfig().controler().getFirstIteration()){
+		if(event.getIteration() == controler.getConfig().controller().getFirstIteration()){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
 			pBox.notifyIterationStarts(event);

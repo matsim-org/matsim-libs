@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;

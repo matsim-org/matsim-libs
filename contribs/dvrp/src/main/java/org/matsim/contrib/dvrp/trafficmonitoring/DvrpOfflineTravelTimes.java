@@ -33,7 +33,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -58,7 +58,7 @@ public class DvrpOfflineTravelTimes {
 		//header row
 		writer.append("linkId" + DELIMITER);
 		for (int i = 0; i < intervalCount; i++) {
-			int time = i * timeDiscretizer.getTimeInterval();
+			double time = i * timeDiscretizer.getTimeInterval();
 			writer.append(time + DELIMITER);
 		}
 		writer.append('\n');
@@ -118,7 +118,7 @@ public class DvrpOfflineTravelTimes {
 		String[] headerLine = reader.readLine().split(";");
 		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
 		verify(headerLine[0].equals("linkId"));
-		timeDiscretizer.forEach((bin, time) -> verify(Integer.parseInt(headerLine[bin + 1]) == time));
+		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
 
 		//regular rows
 		reader.lines().map(line -> line.split(DELIMITER)).forEach(cells -> {

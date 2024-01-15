@@ -194,7 +194,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 			//scenario  = ScenarioUtils.createScenario(this.config);
 			//ScenarioUtils.loadScenario(scenario) ;
 		}
-		this.config.parallelEventHandling().makeLocked();
+		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
 		this.overrides = scenario == null ?
 						 new ScenarioByConfigModule() :
@@ -505,7 +505,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	}
 
     /**
-     * Only use if you know what you are doing, for experts only.
+     * @deprecated  -- Only use if you know what you are doing, for experts only.
      */
 	@Override
 	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {

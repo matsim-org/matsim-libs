@@ -59,13 +59,8 @@ public class ShapeFileTextLookup implements MATSimAppCommand {
             return 1;
         }
 
-        if (shp.getShapeFile() == null) {
+        if (!shp.isDefined()) {
             throw new IllegalArgumentException("Shape file must be given!");
-        }
-
-        if (!Files.exists(shp.getShapeFile())) {
-            log.error("Shape file {} does not exists", shp.getShapeFile());
-            return 1;
         }
 
         List<SimpleFeature> features = shp.readFeatures();

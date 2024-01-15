@@ -30,13 +30,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
+import org.matsim.core.config.groups.EventsManagerConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
@@ -67,7 +67,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	private AtomicReference<Throwable> hadException = new AtomicReference<>();
 
 	@Inject
-	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
+	SimStepParallelEventsManagerImpl(EventsManagerConfigGroup config) {
 		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
 	}
 

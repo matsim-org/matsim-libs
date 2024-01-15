@@ -32,6 +32,8 @@ import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.router.util.TravelTime;
 
@@ -43,12 +45,12 @@ import com.google.common.annotations.VisibleForTesting;
 class ExtensiveInsertionProvider {
 	static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg, InsertionCostCalculator insertionCostCalculator,
 											 TravelTimeMatrix travelTimeMatrix, TravelTime travelTime, ForkJoinPool forkJoinPool,
-											 IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
+											 StopTimeCalculator stopTimeCalculator) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
 				insertionParams.admissibleBeelineSpeedFactor, travelTimeMatrix, travelTime);
 		return new ExtensiveInsertionProvider((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(),
-				insertionCostCalculator, new InsertionGenerator(incrementalStopDurationEstimator, admissibleTimeEstimator),
+				insertionCostCalculator, new InsertionGenerator(stopTimeCalculator, admissibleTimeEstimator),
 				forkJoinPool);
 	}
 

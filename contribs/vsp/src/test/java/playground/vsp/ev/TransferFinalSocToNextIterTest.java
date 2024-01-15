@@ -23,14 +23,13 @@ package playground.vsp.ev;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -46,17 +45,17 @@ public class TransferFinalSocToNextIterTest {
 	private static final Integer LAST_ITERATION = 1;
 	private static final double INITIAL_SOC = 0.95;
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	@Test
-	public void test() {
+	void test() {
 		//adapt scenario
-		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
-		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
+		scenario.getConfig().controller().setLastIteration(LAST_ITERATION);
+		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		ElectricVehicleSpecifications.setInitialSoc(vehicle1, INITIAL_SOC);
+		ElectricFleetUtils.setInitialSoc(vehicle1, INITIAL_SOC );
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -64,18 +63,18 @@ public class TransferFinalSocToNextIterTest {
 		controler.run();
 
 		// testInitialEnergyInIter0
-		Assert.assertEquals(INITIAL_SOC, handler.iterationInitialSOC.get(0), 0.0);
+		Assertions.assertEquals(INITIAL_SOC, handler.iterationInitialSOC.get(0), 0.0);
 
 		// testSOCIsDumpedIntoVehicleType
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		var evSpec = new ElectricVehicleSpecificationImpl(vehicle);
-		Assert.assertNotEquals(evSpec.getInitialSoc(), INITIAL_SOC);
-		Assert.assertEquals(0.7273605127621898, evSpec.getInitialSoc(), MatsimTestUtils.EPSILON); //should not be fully charged
+		var evSpec = ElectricFleetUtils.createElectricVehicleSpecificationDefaultImpl(vehicle );
+		Assertions.assertNotEquals(evSpec.getInitialSoc(), INITIAL_SOC);
+		Assertions.assertEquals(0.7273605127621898, evSpec.getInitialSoc(), MatsimTestUtils.EPSILON); //should not be fully charged
 
 		// testSOCisTransferredToNextIteration
 		for (int i = 0; i < LAST_ITERATION; i++) {
-			Assert.assertEquals(handler.iterationEndSOC.get(i), handler.iterationInitialSOC.get(i + 1));
+			Assertions.assertEquals(handler.iterationEndSOC.get(i), handler.iterationInitialSOC.get(i + 1));
 		}
 	}
 
@@ -86,7 +85,7 @@ public class TransferFinalSocToNextIterTest {
 
 		SOCHandler(Scenario scenario) {
 			var car = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-			evSpec = new ElectricVehicleSpecificationImpl(car);
+			evSpec = ElectricFleetUtils.createElectricVehicleSpecificationDefaultImpl(car );
 		}
 
 		@Override

@@ -23,12 +23,9 @@
 package org.matsim.core.controler;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,7 +36,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -117,6 +113,14 @@ public abstract class AbstractModule implements Module {
 		// not in this class.
 		this.binder = binder.skipSources(AbstractModule.class);
 
+		initializeMultibinders();
+
+		this.install();
+	}
+
+	private void initializeMultibinders() {
+		// We do need to make these calls here in order to register the multi binders. Otherwise, guice doesn't know, that they exist. In particular,
+		// if none of the corresponding addXXXBinding methods was called, the set binder would not be registered, and guice would complain.
 		this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
@@ -128,7 +132,6 @@ public abstract class AbstractModule implements Module {
 						new TypeLiteral<AttributeConverter<?>>() {} );
 		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
 		this.qsimOverridingModulesMultibinder = Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
-		this.install();
 	}
 
 	public abstract void install();
@@ -219,6 +222,10 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(RoutingModule.class).annotatedWith(Names.named(mode));
 	}
 
+	protected final LinkedBindingBuilder<PersonPrepareForSimAlgorithm> addPersonPrepareForSimAlgorithm() {
+		return Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class).addBinding();
+	}
+
 	protected final com.google.inject.binder.LinkedBindingBuilder<EventsManager> bindEventsManager() {
 		return binder().bind(EventsManager.class);
 	}
@@ -252,7 +259,7 @@ public abstract class AbstractModule implements Module {
 		return binder;
 	}
 
-	protected final <T> javax.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
+	protected final <T> jakarta.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
 		return binder.getProvider(Key.get(typeLiteral));
 	}
 

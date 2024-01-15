@@ -22,9 +22,9 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,15 +35,13 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+@Timeout(10)
 public class QSimEventsIntegrationTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Rule
-	public Timeout globalTimeout = new Timeout(10000);
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void netsimEngineHandlesExceptionCorrectly() {
+	void netsimEngineHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -60,10 +58,10 @@ public class QSimEventsIntegrationTest {
 	}
 
 	@Test
-	public void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
+	void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.parallelEventHandling().setNumberOfThreads(1);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(true);
+		config.eventsManager().setNumberOfThreads(1);
+		config.eventsManager().setSynchronizeOnSimSteps(true);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
@@ -75,10 +73,10 @@ public class QSimEventsIntegrationTest {
 	}
 
 	@Test
-	public void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
+	void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.parallelEventHandling().setNumberOfThreads(1);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+		config.eventsManager().setNumberOfThreads(1);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {

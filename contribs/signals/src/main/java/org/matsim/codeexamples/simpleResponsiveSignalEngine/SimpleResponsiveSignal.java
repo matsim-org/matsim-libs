@@ -52,10 +52,10 @@ import com.google.inject.Inject;
 
 /**
  * Example for a responsive signal.
- * 
- * It updates the fixed signal control depending on the average delay every i-th iteration, 
+ *
+ * It updates the fixed signal control depending on the average delay every i-th iteration,
  * whereby i is defined in the variable INTERVAL.
- * 
+ *
  * @author tthunig
  *
  */
@@ -63,19 +63,19 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 
 	private static final Logger LOG = LogManager.getLogger(SimpleResponsiveSignal.class);
 	public static final String IDENTIFIER = "SimpleResponsiveSignalControl";
-	
+
 	// increase this if agents should have "time" (iterations) to react to the changed signal control
 	private static final int INTERVAL = 1;
-	
+
 	private Map<Id<Link>, Double> link2avgDelay = new HashMap<>();
-	
+
 	private Scenario scenario;
 	private SignalModelFactory factory;
 
 	private SignalController delegatePlanbasedSignalController;
-	
+
 	public final static class SimpleResponsiveSignalFactory implements SignalControllerFactory {
-		
+
 		@Inject ControlerListenerManager manager;
 		@Inject Scenario scenario;
 		@Inject SignalModelFactory factory;
@@ -86,31 +86,31 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 			controller.setSignalSystem(signalSystem);
 			controller.setFactory(factory);
 			controller.setScenario(scenario);
-			
-			/* add the responsive signal as a controler listener to be able to listen to 
+
+			/* add the responsive signal as a controler listener to be able to listen to
 			 * AfterMobsimEvents (which provide the TravelTime object): */
 			manager.addControlerListener(controller);
-			
+
 			return controller;
 		}
 	}
-	
+
 	private SimpleResponsiveSignal() {
 		super();
 	}
-	
+
 	void setScenario(Scenario scenario) {
 		this.scenario = scenario;
 	}
-	
+
 	void setFactory(SignalModelFactory factory) {
 		this.factory = factory;
 	}
-	
+
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// change signal green split every INTERVAL iteration
-		if (event.getIteration() % INTERVAL == 0 && event.getIteration() != scenario.getConfig().controler().getFirstIteration()){
+		if (event.getIteration() % INTERVAL == 0 && event.getIteration() != scenario.getConfig().controller().getFirstIteration()){
 			computeDelays(event);
 			LOG.info("+++ Iteration " + event.getIteration() + ". Update signal green split...");
 			updateSignals();
@@ -119,14 +119,14 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 
 	private void computeDelays(AfterMobsimEvent event) {
 		TravelTime travelTime = event.getServices().getLinkTravelTimes();
-		int timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
-		
-		for (Link link : scenario.getNetwork().getLinks().values()){	
+		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
+
+		for (Link link : scenario.getNetwork().getLinks().values()){
 			double freespeedTT = link.getLength() / link.getFreespeed();
-			
+
 			int timeBinCounter = 0;
 			double summedDelay = 0.0;
-			for (int endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
+			for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
 				double avgDelay = travelTime.getLinkTravelTime(link, (endTime - timeBinSize/2.), null, null) - freespeedTT;
 				summedDelay += avgDelay;
 				timeBinCounter++;
@@ -134,22 +134,22 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 			link2avgDelay.put(link.getId(), summedDelay/timeBinCounter);
 			LOG.info("Link id: " + link.getId() + ", avg delay: " + summedDelay/timeBinCounter);
 		}
-		
+
 	}
 
-	/** 
+	/**
 	 * create a new signal plan with shifted green times and save it in field signalPlans directly
 	 */
-	private void updateSignals() {		
+	private void updateSignals() {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
-		
+
 		SignalSystemControllerData signalControlSystem1 = signalControl.getSignalSystemControllerDataBySystemId().get(Id.create("SignalSystem1", SignalSystem.class));
 		SignalPlanData signalPlan = signalControlSystem1.getSignalPlanData().get(Id.create("SignalPlan1", SignalPlan.class));
 		SortedMap<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettings = signalPlan.getSignalGroupSettingsDataByGroupId();
 		SignalGroupSettingsData group1Setting = signalGroupSettings.get(Id.create("SignalGroup1", SignalGroup.class));
 		SignalGroupSettingsData group2Setting = signalGroupSettings.get(Id.create("SignalGroup2", SignalGroup.class));
-		
+
 		// shift green time by one second depending on which delay is higher
 		double delaySignalGroup1 = link2avgDelay.get(Id.createLinkId("2_3")) + link2avgDelay.get(Id.createLinkId("4_3"));
 		double delaySignalGroup2 = link2avgDelay.get(Id.createLinkId("7_3")) + link2avgDelay.get(Id.createLinkId("8_3"));
@@ -161,7 +161,7 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 			group2Setting.setOnset(group2Setting.getOnset() + greenTimeShift);
 			LOG.info("SignalGroup1: onset " + group1Setting.getOnset() + ", dropping " + group1Setting.getDropping());
 			LOG.info("SignalGroup2: onset " + group2Setting.getOnset() + ", dropping " + group2Setting.getDropping());
-			/* the new plan needs to be added to the signal control since it was made persistent over the iterations 
+			/* the new plan needs to be added to the signal control since it was made persistent over the iterations
 			 * and is not built newly each iteration from the data. theresa, jan'20 */
 			addPlan(this.factory.createSignalPlan(signalPlan));
 		} else {

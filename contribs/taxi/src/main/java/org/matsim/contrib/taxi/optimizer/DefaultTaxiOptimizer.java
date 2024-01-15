@@ -21,13 +21,16 @@ package org.matsim.contrib.taxi.optimizer;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.RequestQueue;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -42,7 +45,11 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final RequestQueue<DrtRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestPlanningHorizon();
+	private final Collection<DrtRequest> unplannedRequests = new TreeSet<>(
+			Comparator.comparing(PassengerRequest::getEarliestStartTime) //
+					.thenComparing(PassengerRequest::getLatestStartTime) //
+					.thenComparing(Request::getSubmissionTime) //
+					.thenComparing(Request::getId));
 
 	private final UnplannedRequestInserter requestInserter;
 
@@ -65,8 +72,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
-		requiresReoptimization |= !unplannedRequests.getSchedulableRequests().isEmpty();
+		requiresReoptimization |= !unplannedRequests.isEmpty();
 
 		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
 			if (params.doUnscheduleAwaitingRequests) {
@@ -81,7 +87,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 				}
 			}
 
-			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
+			requestInserter.scheduleUnplannedRequests(unplannedRequests);
 
 			if (params.doUnscheduleAwaitingRequests && taxiCfg.vehicleDiversion) {
 				scheduler.stopAllAimlessDriveTasks();
@@ -98,12 +104,12 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	protected void unscheduleAwaitingRequests() {
 		List<DrtRequest> removedRequests = scheduler.removeAwaitingRequestsFromAllSchedules();
-		removedRequests.forEach(unplannedRequests::addRequest);
+		removedRequests.forEach(unplannedRequests::add);
 	}
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.addRequest((DrtRequest)request);
+		unplannedRequests.add((DrtRequest)request);
 	}
 
 	@Override

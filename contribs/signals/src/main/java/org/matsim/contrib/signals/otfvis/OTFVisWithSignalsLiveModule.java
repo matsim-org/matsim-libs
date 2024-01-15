@@ -44,7 +44,7 @@ import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 
@@ -56,14 +56,14 @@ public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 	private static class OTFVisMobsimListener implements MobsimInitializedListener{
 		@Inject Scenario scenario ;
 		@Inject EventsManager events ;
-		@Override 
+		@Override
 		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			QSim qsim = (QSim) e.getQueueSimulation() ; 
+			QSim qsim = (QSim) e.getQueueSimulation() ;
 			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qsim);
 			OTFClientLiveWithSignals.run(scenario.getConfig(), server);
 		}
 	}
-	
+
 	static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
 		Network network = scenario.getNetwork();
@@ -103,5 +103,5 @@ public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 		server.pause();
 		return server;
 	}
-	
+
 }

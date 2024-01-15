@@ -19,20 +19,16 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,28 +81,16 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mrieser
  */
 
-@RunWith(Parameterized.class)
 public final class QLinkTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger logger = LogManager.getLogger( QLinkTest.class );
 
-	private final boolean isUsingFastCapacityUpdate;
-
-	public QLinkTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
-
-
-	@Test public void testInit() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testInit(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertNotNull(f.qlink1);
 		assertEquals(1.0, f.qlink1.getSimulatedFlowCapacityPerTimeStep(), MatsimTestUtils.EPSILON);
@@ -120,7 +104,9 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testAdd() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testAdd(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
@@ -151,7 +137,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testGetVehicle_Driving() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetVehicle_Driving(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -181,7 +169,7 @@ public final class QLinkTest {
 		f.qlink1.getAcceptingQLane().addFromUpstream(veh);
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
-		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
+		assertEquals(veh, f.qlink1.getVehicle(id1), "vehicle not found on link.");
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		now = 1. ;
@@ -205,7 +193,7 @@ public final class QLinkTest {
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 //		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
-		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
+		assertNull(f.qlink1.getVehicle(id1), "vehicle should not be on link anymore.");
 		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
@@ -216,7 +204,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testGetVehicle_Parking() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetVehicle_Parking(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -235,14 +225,14 @@ public final class QLinkTest {
 		f.qlink1.addParkedVehicle(veh);
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // vehicle not on _lane_
-		assertEquals("vehicle not found in parking list.", veh, f.qlink1.getVehicle(id1));
+		assertEquals(veh, f.qlink1.getVehicle(id1), "vehicle not found in parking list.");
 		assertEquals(1, f.qlink1.getAllVehicles().size()); // vehicle indeed on _link_
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 
-		assertEquals("removed wrong vehicle.", veh, f.qlink1.removeParkedVehicle(veh.getId()));
+		assertEquals(veh, f.qlink1.removeParkedVehicle(veh.getId()), "removed wrong vehicle.");
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
-		assertNull("vehicle not found in parking list.", f.qlink1.getVehicle(id1));
+		assertNull(f.qlink1.getVehicle(id1), "vehicle not found in parking list.");
 		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
@@ -253,7 +243,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testGetVehicle_Departing() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetVehicle_Departing(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -286,7 +278,7 @@ public final class QLinkTest {
 		f.queueNetwork.simEngine.getNetsimInternalInterface().arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue
 		assertTrue(f.qlink1.isNotOfferingVehicle()); // veh not in buffer
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // veh not on lane
-		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1)); // veh _should_ be on link (in waiting list)
+		assertEquals(veh, f.qlink1.getVehicle(id1), "vehicle not found in waiting list."); // veh _should_ be on link (in waiting list)
 		assertEquals(1, f.qlink1.getAllVehicles().size()); // dto
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next()); // dto
 
@@ -297,7 +289,7 @@ public final class QLinkTest {
 		f.qlink1.doSimStep();
 		assertFalse(f.qlink1.isNotOfferingVehicle()); // i.e. is offering the vehicle
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // somewhere on lane
-		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1)); // somewhere on link
+		assertEquals(veh, f.qlink1.getVehicle(id1), "vehicle not found in buffer."); // somewhere on link
 		assertEquals(1, f.qlink1.getAllVehicles().size()); // somewhere on link
 
         now = 2. ;
@@ -307,7 +299,7 @@ public final class QLinkTest {
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
-		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
+		assertNull(f.qlink1.getVehicle(id1), "vehicle should not be on link anymore.");
 		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
@@ -317,7 +309,9 @@ public final class QLinkTest {
 	 * @author mrieser
 	 */
 
-	@Test public void testBuffer() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBuffer(boolean isUsingFastCapacityUpdate) {
 		Config conf = utils.loadConfig((String)null);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -440,7 +434,9 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testStorageSpaceDifferentVehicleSizes() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testStorageSpaceDifferentVehicleSizes(boolean isUsingFastCapacityUpdate) {
 
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -472,7 +468,7 @@ public final class QLinkTest {
 		driver5.setVehicle(veh5);
 		driver5.endActivityAndComputeNextState( now );
 
-		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), MatsimTestUtils.EPSILON);
+		assertEquals(10.0, f.qlink2.getSpaceCap(), MatsimTestUtils.EPSILON, "wrong initial storage capacity.");
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh5);  // used vehicle equivalents: 5
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh5);  // used vehicle equivalents: 10
@@ -541,7 +537,9 @@ public final class QLinkTest {
 	}
 
 
-	@Test public void testStuckEvents() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testStuckEvents(boolean isUsingFastCapacityUpdate) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);

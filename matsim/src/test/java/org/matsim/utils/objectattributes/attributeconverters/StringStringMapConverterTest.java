@@ -1,13 +1,13 @@
 package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class StringStringMapConverterTest {
 
 	@Test
-	public void test() {
+	void test() {
 
 		var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
 		var converter = new StringStringMapConverter();

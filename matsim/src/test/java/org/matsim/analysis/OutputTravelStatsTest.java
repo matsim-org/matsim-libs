@@ -19,8 +19,8 @@
 
 package org.matsim.analysis;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
@@ -36,17 +36,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OutputTravelStatsTest {
 
-	@Rule
-	public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testActivitiesOutputCSV() throws IOException {
+	void testActivitiesOutputCSV() throws IOException {
 		String outputDirectory = util.getOutputDirectory();
 
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(10);
-		config.controler().setWriteTripsInterval(1);
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setLastIteration(10);
+		config.controller().setWriteTripsInterval(1);
+		config.controller().setOutputDirectory(outputDirectory);
 		Controler c = new Controler(config);
 
 		c.run();

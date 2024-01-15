@@ -24,9 +24,9 @@ import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -54,15 +54,16 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class RoutingIT {
 	/*package*/ static final Logger log = LogManager.getLogger(RoutingIT.class);
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private interface RouterProvider {
 		public String getName();
 		public LeastCostPathCalculatorFactory getFactory(Network network, TravelDisutility costCalc, TravelTime timeCalc);
 	}
+
 	@Test
-	public void testDijkstra() {
+	void testDijkstra() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -74,21 +75,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testFastDijkstra() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastDijkstra";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastDijkstraFactory();
-			}
-		});
-	}
-	@Test
-	public void testSpeedyDijkstra() {
+	void testSpeedyDijkstra() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -100,8 +89,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testDijkstraPruneDeadEnds() {
+	void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -113,21 +103,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testFastDijkstraPruneDeadEnds() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastDijkstraPruneDeadends";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastDijkstraFactory();
-			}
-		});
-	}
-	@Test	
-	public void testAStarEuclidean() {
+	void testAStarEuclidean() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -139,21 +117,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testFastAStarEuclidean() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastAStarEuclidean";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarEuclideanFactory();
-			}
-		});
-	}
-	@Test	
-	public void testAStarLandmarks() {
+	void testAStarLandmarks() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -165,21 +131,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testFastAStarLandmarks() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastAStarLandmarks";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarLandmarksFactory(2);
-			}
-		});
-	}
-	@Test
-	public void testSpeedyALT() {
+	void testSpeedyALT() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -200,19 +154,19 @@ public class RoutingIT {
 //		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		final String inPlansName = utils.getClassInputDirectory() + "/plans.xml.gz" ;
 		new PopulationReader(scenario).readFile(inPlansName);
-			
+
 		calcRoute(provider, scenario);
 
 		final Scenario referenceScenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
 		new PopulationReader(referenceScenario).readFile(inPlansName);
-		
+
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
-		Assert.assertTrue("different plans files.", isEqual);
+		Assertions.assertTrue(isEqual, "different plans files.");
 	}
 
 	private static void calcRoute(
@@ -223,7 +177,7 @@ public class RoutingIT {
 
 		final FreespeedTravelTimeAndDisutility calculator =
 				new FreespeedTravelTimeAndDisutility(
-						scenario.getConfig().planCalcScore() );
+						scenario.getConfig().scoring() );
 		final LeastCostPathCalculatorFactory factory1 = provider.getFactory(
 				scenario.getNetwork(),
 				calculator,
@@ -251,7 +205,7 @@ public class RoutingIT {
 
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		final PersonAlgorithm router = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));
-		
+
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run(p);
 		}

@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.config;
 
 import java.util.HashSet;
@@ -20,7 +35,7 @@ public class SBBTransitConfigGroup extends ReflectiveConfigGroup {
     static private final String PARAM_DETERMINISTIC_SERVICE_MODES = "deterministicServiceModes";
     static private final String PARAM_CREATE_LINK_EVENTS_INTERVAL = "createLinkEventsInterval";
 
-    private Set<String> deterministicServiceModes = new HashSet<>();
+    private final Set<String> deterministicServiceModes = new HashSet<>();
     private int createLinkEventsInterval = 0;
 
     public SBBTransitConfigGroup() {

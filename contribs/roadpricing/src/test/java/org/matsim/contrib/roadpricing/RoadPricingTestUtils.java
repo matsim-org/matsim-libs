@@ -22,7 +22,7 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -274,9 +274,9 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
-		Assert.assertNotNull(expectedRoute) ;
-		Assert.assertNotNull(realRoute);
-		Assert.assertNotNull(realRoute.getLinkIds()) ;
+		Assertions.assertNotNull(expectedRoute) ;
+		Assertions.assertNotNull(realRoute);
+		Assertions.assertNotNull(realRoute.getLinkIds()) ;
 
 		StringBuilder strBuilder = new StringBuilder();
 
@@ -285,6 +285,6 @@ import org.matsim.core.utils.misc.Time;
 			strBuilder.append(' ');
 		}
 		String route = strBuilder.toString();
-		Assert.assertEquals(expectedRoute + " ", route);
+		Assertions.assertEquals(expectedRoute + " ", route);
 	}
 }

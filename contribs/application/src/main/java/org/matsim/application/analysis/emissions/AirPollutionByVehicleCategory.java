@@ -64,12 +64,16 @@ import java.util.Map;
 import static org.matsim.application.ApplicationUtils.globFile;
 
 
+/**
+ * @deprecated Use {@link AirPollutionAnalysis}
+ */
 @CommandLine.Command(
 		name = "air-pollution-by-vehicle",
 		description = "Run offline air pollution analysis assuming default vehicles",
 		mixinStandardHelpOptions = true,
 		showDefaultValues = true
 )
+@Deprecated
 public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(AirPollutionByVehicleCategory.class);
@@ -131,8 +135,8 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		config.transit().setVehiclesFile(globFile(runDirectory, runId, "transitVehicles"));
 		config.global().setCoordinateSystem(crs.getInputCRS());
 		config.plans().setInputFile(null);
-		config.parallelEventHandling().setNumberOfThreads(null);
-		config.parallelEventHandling().setEstimatedNumberOfEvents(null);
+		config.eventsManager().setNumberOfThreads(null);
+		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
 
 		EmissionsConfigGroup eConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);

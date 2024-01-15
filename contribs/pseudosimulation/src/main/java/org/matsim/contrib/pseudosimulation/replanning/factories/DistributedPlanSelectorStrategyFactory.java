@@ -26,7 +26,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author fouriep Creates plan selector for distributed Simulation. Limits the expected value of being selected for PSim execution

@@ -20,16 +20,16 @@
 
 package org.matsim.core.replanning.selectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,21 +58,21 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	private Network network = null;
 	private Config config = null;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
-		config.planCalcScore().setBrainExpBeta(2.0);
-		config.planCalcScore().setPathSizeLogitBeta(2.0);
+		config.scoring().setBrainExpBeta(2.0);
+		config.scoring().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.network = null;
 		this.config = null;
 	}
 
 	@Override
 	protected PlanSelector<Plan,Person> getPlanSelector() {
-		return new PathSizeLogitSelector(config.planCalcScore(), createNetwork());
+		return new PathSizeLogitSelector(config.scoring(), createNetwork());
 	}
 
 	@Override
@@ -215,7 +215,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 	}
 
-	@Test public void testPathSizeLogitSelector() {
+	@Test
+	void testPathSizeLogitSelector() {
 		this.network = createNetwork();
 
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
@@ -287,7 +288,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 
-		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.planCalcScore(), network);
+		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.scoring(), network);
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

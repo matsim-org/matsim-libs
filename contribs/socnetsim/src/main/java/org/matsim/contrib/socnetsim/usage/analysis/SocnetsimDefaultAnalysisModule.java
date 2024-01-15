@@ -32,7 +32,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.Collections;
 
 /**
@@ -62,7 +62,7 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 					}
 				});
 
-		this.addControlerListenerBinding().toProvider( 
+		this.addControlerListenerBinding().toProvider(
 				new Provider<ControlerListener>() {
 					@Inject OutputDirectoryHierarchy controlerIO;
 					@Inject Scenario scenario;
@@ -104,7 +104,7 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 
 	private static class Identifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {
 		private AbstractPlanAnalyzerPerGroup.GroupIdentifier delegate;
-		
+
 		@Inject
 		public void injectDelegate( final GroupIdentifier replanningIdentifier ) {
 			this.delegate = replanningIdentifier instanceof FixedGroupsIdentifier ?

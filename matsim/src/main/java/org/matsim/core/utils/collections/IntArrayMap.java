@@ -274,7 +274,6 @@ public class IntArrayMap<V> implements Map<Integer, V> {
 		return new ValuesView<>(this);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Set<Map.Entry<Integer, V>> entrySet() {
 		return new EntrySetView<>(this);

@@ -33,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class RandomDynAgentSource implements AgentSource {
 	private static final int AGENT_COUNT = 100;
@@ -60,11 +60,11 @@ public class RandomDynAgentSource implements AgentSource {
 
 //			qSim.createAndParkVehicleOnLink(qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
 //					VehicleUtils.getDefaultVehicleType()), startLinkId);
-			
+
 			final Vehicle vehicle = qSimVehicleFactory.createVehicle( Id.create( id, Vehicle.class ), VehicleUtils.getDefaultVehicleType() ) ;
 			QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory.  kai, nov'18
 			qSim.addParkedVehicle( qVehicle, startLinkId );
-			
+
 			qSim.insertAgentIntoMobsim( agent );
 		}
 	}

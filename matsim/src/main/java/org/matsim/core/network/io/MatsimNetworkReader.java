@@ -74,7 +74,8 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 	}
 
 	public MatsimNetworkReader(String inputCRS, String targetCRS, Network network) {
-	    this.inputCRS = inputCRS;
+		super(ValidationType.DTD_ONLY);
+		this.inputCRS = inputCRS;
 		this.targetCRS = targetCRS;
 		this.network = network;
 	}

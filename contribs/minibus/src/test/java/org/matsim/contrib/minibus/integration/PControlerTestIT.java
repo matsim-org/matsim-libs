@@ -21,13 +21,12 @@ package org.matsim.contrib.minibus.integration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
@@ -43,18 +42,18 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Integration test of the minibus package
- * 
+ *
  * @author aneumann
  */
 public class PControlerTestIT implements TabularFileHandler{
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 
 
 	@Test
-	public final void testPControler() {
+	final void testPControler() {
 
 		final String scenarioName = "corr_s1_0";
 		final int numberOfIterations = 10;
@@ -63,23 +62,23 @@ public class PControlerTestIT implements TabularFileHandler{
 		final String outputPath = utils.getOutputDirectory() + scenarioName + "/";
 
 		final String configFile = inputPath + "config_" + scenarioName + ".xml";
-		
+
 		// ---
 
 		Config config = ConfigUtils.loadConfig(configFile, new PConfigGroup());
 
-		config.controler().setLastIteration(numberOfIterations);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setCreateGraphs(false);
-		config.controler().setOutputDirectory(outputPath);
-		
+		config.controller().setLastIteration(numberOfIterations);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setCreateGraphs(false);
+		config.controller().setOutputDirectory(outputPath);
+
 		// ---
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);
-		
+
 		// ---
-		
+
 		Controler controler = new Controler(scenario);
 
 		// manipulate config
@@ -90,20 +89,20 @@ public class PControlerTestIT implements TabularFileHandler{
 
 		controler.run();
 
-		// Check standard output files	
+		// Check standard output files
 		List<String> filesToCheckFor = new LinkedList<>();
 		filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.txt");
+		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.csv");
+		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.csv");
+		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.csv");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStat_light.gexf.gz");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStat.gexf.gz");
 
 		for (String filename : filesToCheckFor) {
 			File f = new File(filename);
-			Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
+			Assertions.assertEquals(true, f.exists() && !f.isDirectory(), filename + " does not exist");
 		}
 
 
@@ -115,36 +114,36 @@ public class PControlerTestIT implements TabularFileHandler{
 
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
-		Assert.assertEquals("There a less than the expected number of " + (numberOfIterations + 2) + " lines in " + filenameOfpStats, 12, this.pStatsResults.size());
+		Assertions.assertEquals(12, this.pStatsResults.size(), "There a less than the expected number of " + (numberOfIterations + 2) + " lines in " + filenameOfpStats);
 
 		// Check first iteration
-		Assert.assertEquals("Number of coops (first iteration)", "1", this.pStatsResults.get(1)[1]);
-		Assert.assertEquals("Number of routes (first iteration)", "1", this.pStatsResults.get(1)[3]);
-		Assert.assertEquals("Number of pax (first iteration)", "3092", this.pStatsResults.get(1)[5]);
-		Assert.assertEquals("Number of veh (first iteration)", "3", this.pStatsResults.get(1)[7]);
-		Assert.assertEquals("Number of budget (first iteration)", "-149.4493333333", this.pStatsResults.get(1)[9]);
+		Assertions.assertEquals("1", this.pStatsResults.get(1)[1], "Number of coops (first iteration)");
+		Assertions.assertEquals("1", this.pStatsResults.get(1)[3], "Number of routes (first iteration)");
+		Assertions.assertEquals("3092", this.pStatsResults.get(1)[5], "Number of pax (first iteration)");
+		Assertions.assertEquals("3", this.pStatsResults.get(1)[7], "Number of veh (first iteration)");
+		Assertions.assertEquals("-149.4493333333", this.pStatsResults.get(1)[9], "Number of budget (first iteration)");
 
-		Assert.assertEquals("Number of +coops (first iteration)", "0", this.pStatsResults.get(1)[2]);
-		Assert.assertEquals("Number of +routes (first iteration)", "0", this.pStatsResults.get(1)[4]);
-		Assert.assertEquals("Number of +pax (first iteration)", "0", this.pStatsResults.get(1)[6]);
-		Assert.assertEquals("Number of +veh (first iteration)", "0", this.pStatsResults.get(1)[8]);
-		Assert.assertEquals("Number of +budget (first iteration)", "NaN", this.pStatsResults.get(1)[10]);
+		Assertions.assertEquals("0", this.pStatsResults.get(1)[2], "Number of +coops (first iteration)");
+		Assertions.assertEquals("0", this.pStatsResults.get(1)[4], "Number of +routes (first iteration)");
+		Assertions.assertEquals("0", this.pStatsResults.get(1)[6], "Number of +pax (first iteration)");
+		Assertions.assertEquals("0", this.pStatsResults.get(1)[8], "Number of +veh (first iteration)");
+		Assertions.assertEquals("NaN", this.pStatsResults.get(1)[10], "Number of +budget (first iteration)");
 
-		Assert.assertEquals("Number of coops (last iteration)", "3", this.pStatsResults.get(11)[1]);
-		Assert.assertEquals("Number of routes (last iteration)", "3", this.pStatsResults.get(11)[3]);
-		Assert.assertEquals("Number of pax (last iteration)", "6728", this.pStatsResults.get(11)[5]);
-		Assert.assertEquals("Number of veh (last iteration)", "10", this.pStatsResults.get(11)[7]);
-		Assert.assertEquals("Number of budget (last iteration)", "68.7117037037", this.pStatsResults.get(11)[9]);
+		Assertions.assertEquals("3", this.pStatsResults.get(11)[1], "Number of coops (last iteration)");
+		Assertions.assertEquals("3", this.pStatsResults.get(11)[3], "Number of routes (last iteration)");
+		Assertions.assertEquals("6728", this.pStatsResults.get(11)[5], "Number of pax (last iteration)");
+		Assertions.assertEquals("10", this.pStatsResults.get(11)[7], "Number of veh (last iteration)");
+		Assertions.assertEquals("68.7117037037", this.pStatsResults.get(11)[9], "Number of budget (last iteration)");
 
-		Assert.assertEquals("Number of +coops (last iteration)", "2", this.pStatsResults.get(11)[2]);
-		Assert.assertEquals("Number of +routes (last iteration)", "2", this.pStatsResults.get(11)[4]);
-		Assert.assertEquals("Number of +pax (last iteration)", "6508", this.pStatsResults.get(11)[6]);
-		Assert.assertEquals("Number of +veh (last iteration)", "7", this.pStatsResults.get(11)[8]);
-		Assert.assertEquals("Number of +budget (last iteration)", "113.2005555555", this.pStatsResults.get(11)[10]);
+		Assertions.assertEquals("2", this.pStatsResults.get(11)[2], "Number of +coops (last iteration)");
+		Assertions.assertEquals("2", this.pStatsResults.get(11)[4], "Number of +routes (last iteration)");
+		Assertions.assertEquals("6508", this.pStatsResults.get(11)[6], "Number of +pax (last iteration)");
+		Assertions.assertEquals("7", this.pStatsResults.get(11)[8], "Number of +veh (last iteration)");
+		Assertions.assertEquals("113.2005555555", this.pStatsResults.get(11)[10], "Number of +budget (last iteration)");
 	}
 
 	@Override
 	public void startRow(String[] row) {
-		this.pStatsResults.add(row);	
-	}		
+		this.pStatsResults.add(row);
+	}
 }

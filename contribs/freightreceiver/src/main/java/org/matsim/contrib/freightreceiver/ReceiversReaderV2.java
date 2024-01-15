@@ -22,8 +22,8 @@ package org.matsim.contrib.freightreceiver;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -93,6 +93,7 @@ import java.util.Stack;
 	private final Counter counter = new Counter("   receiver # ");
 
 	public ReceiversReaderV2(final Receivers receivers) {
+		super(ValidationType.DTD_ONLY);
 		this.receivers = receivers;
 	}
 

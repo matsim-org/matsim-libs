@@ -18,9 +18,9 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -35,23 +35,23 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author michalm
  */
 public class RunETaxiScenarioIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testOneTaxi() {
+	void testOneTaxi() {
 		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml").toString();
 		runScenario(configPath);
 	}
 
 	@Test
-	public void testRuleBased() {
+	void testRuleBased() {
 		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
 		runScenario(configPath);
 	}
 
 	@Test
-	public void testAssignment() {
+	void testAssignment() {
 		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
 		runScenario(configPath);
 	}
@@ -68,13 +68,13 @@ public class RunETaxiScenarioIT {
 			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
 
 			boolean result = PopulationUtils.comparePopulations(expected, actual);
-			Assert.assertTrue(result);
+			Assertions.assertTrue(result);
 		}
 		{
 			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 			String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 			EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
-			Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 		}
 	}
 }

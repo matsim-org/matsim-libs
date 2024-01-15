@@ -14,10 +14,10 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory {
-	
+
 	private final Scenario scenario;
 	private final ScoringParametersForPerson params;
 	private final DemandHandler demandHandler;
@@ -42,7 +42,7 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 		scoringFunctionSum.addScoringFunction(
 	    new CarsharingLegScoringFunction( params.getScoringParameters( person ),
 	    								 this.scenario.getConfig(),
-	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer, 
+	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer,
 	    								 this.carsharingSupplyContainer, person));
 		scoringFunctionSum.addScoringFunction(
 				new CharyparNagelLegScoring(

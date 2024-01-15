@@ -21,16 +21,16 @@
 
 package org.matsim.core.controler;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 
 class TerminateAtFixedIterationNumber implements TerminationCriterion {
 	private final int lastIteration;
 
 	@Inject
-	TerminateAtFixedIterationNumber(ControlerConfigGroup controlerConfigGroup) {
-		this.lastIteration = controlerConfigGroup.getLastIteration();
+	TerminateAtFixedIterationNumber(ControllerConfigGroup controllerConfigGroup) {
+		this.lastIteration = controllerConfigGroup.getLastIteration();
 	}
 
 	@Override

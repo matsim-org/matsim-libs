@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 import java.io.BufferedWriter;
 import java.io.IOException;
 

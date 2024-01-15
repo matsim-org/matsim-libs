@@ -39,6 +39,7 @@ public class DrtShiftsReader extends MatsimXmlParser {
     private DrtShiftSpecificationImpl.Builder currentBuilder;
 
     public DrtShiftsReader( final DrtShiftsSpecification shiftsSpecification){
+			super(ValidationType.NO_VALIDATION);
         log.info("Using " + this.getClass().getName());
 		this.shiftsSpecification = shiftsSpecification;
         this.setValidating(false);

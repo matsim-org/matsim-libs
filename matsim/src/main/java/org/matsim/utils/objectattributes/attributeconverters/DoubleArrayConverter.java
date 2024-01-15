@@ -22,7 +22,6 @@ package org.matsim.utils.objectattributes.attributeconverters;/*
  */
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class DoubleArrayConverter implements AttributeConverter<double[]> {

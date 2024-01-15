@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.controler.corelisteners;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,38 +42,38 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class ListenersInjectionTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDumpDataAtEndIsSingleton() {
+	void testDumpDataAtEndIsSingleton() {
 		testIsSingleton( DumpDataAtEnd.class );
 	}
 
 	@Test
-	public void testEvensHandlingIsSingleton() {
+	void testEvensHandlingIsSingleton() {
 		testIsSingleton( EventsHandling.class );
 	}
 
 	@Test
-	public void testPlansDumpingIsSingleton() {
+	void testPlansDumpingIsSingleton() {
 		testIsSingleton( PlansDumping.class );
 	}
 
 	@Test
-	public void testPlansReplanningIsSingleton() {
+	void testPlansReplanningIsSingleton() {
 		testIsSingleton( PlansReplanning.class );
 	}
 
 	@Test
-	public void testPlansScoringIsSingleton() {
+	void testPlansScoringIsSingleton() {
 		testIsSingleton( PlansScoring.class );
 	}
 
 	private void testIsSingleton( final Class<? extends ControlerListener> klass ) {
 		final Config config = ConfigUtils.createConfig();
 		final String outputDir = utils.getOutputDirectory();
-		config.controler().setOutputDirectory( outputDir );
+		config.controller().setOutputDirectory( outputDir );
 
         final com.google.inject.Injector injector = Injector.createInjector(
                 config,
@@ -86,7 +86,7 @@ public class ListenersInjectionTest {
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
 								OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-								config.controler().getCompressionType()));
+								config.controller().getCompressionType()));
 						bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
 						bind(IterationCounter.class).toInstance(() -> 0);
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
@@ -98,10 +98,10 @@ public class ListenersInjectionTest {
 		final ControlerListener o1 = injector.getInstance( klass );
 		final ControlerListener o2 = injector.getInstance( klass );
 
-		Assert.assertSame(
-				"Two different instances of "+klass.getName()+" returned by injector!",
+		Assertions.assertSame(
 				o1,
-				o2 );
+				o2,
+				"Two different instances of "+klass.getName()+" returned by injector!" );
 	}
 }
 

@@ -51,7 +51,7 @@ import com.google.common.util.concurrent.Futures;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
+public class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 
 	public static final int MAX_THREADS = 4;
 
@@ -64,8 +64,8 @@ class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupListener
 
 	private final ExecutorService executorService;
 
-	SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
+	public SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
+											   TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
 		this(network, travelTime, travelDisutility, drtCfg.numberOfThreads, new SpeedyALTFactory());
 	}
 
@@ -81,7 +81,7 @@ class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupListener
 		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
-	InsertionDetourData calculatePaths(DrtRequest drtRequest, Insertion insertion) {
+	public InsertionDetourData calculatePaths(DrtRequest drtRequest, Insertion insertion) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 

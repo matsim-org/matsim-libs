@@ -20,8 +20,8 @@
 
 package org.matsim.core.scoring;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -44,40 +44,43 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ScoringFunctionsForPopulationStressIT {
 
 	static final int MAX = 1000000;
 
-	@Test(expected = RuntimeException.class)
-	public void exceptionInScoringFunctionPropagates() {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		Id<Person> personId = Id.createPersonId(1);
-		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
-		EventsManager events = EventsUtils.createEventsManager(config);
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
-		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
-		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
-		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
-		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
-		events.addHandler(e2legsActs);
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
-				controlerListenerManager,
-				events,
-				e2acts,
-				e2legs,
-				scenario.getPopulation(),
-				throwingScoringFunctionFactory,
-				config
-		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
-		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
-		scoringFunctionsForPopulation.finishScoringFunctions();
+	@Test
+	void exceptionInScoringFunctionPropagates() {
+		assertThrows(RuntimeException.class, () -> {
+			Config config = ConfigUtils.createConfig();
+			Scenario scenario = ScenarioUtils.createScenario(config);
+			Id<Person> personId = Id.createPersonId(1);
+			scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
+			EventsManager events = EventsUtils.createEventsManager(config);
+			ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+			ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
+			EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+			EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
+			EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
+			events.addHandler(e2legsActs);
+			ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+					controlerListenerManager,
+					events,
+					e2acts,
+					e2legs,
+					scenario.getPopulation(),
+					throwingScoringFunctionFactory,
+					config
+			);
+			controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+			events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
+			scoringFunctionsForPopulation.finishScoringFunctions();
+		});
 	}
 
-	private class ThrowingScoringFunctionFactory implements ScoringFunctionFactory {
+	private static class ThrowingScoringFunctionFactory implements ScoringFunctionFactory {
 		@Override
 		public ScoringFunction createNewScoringFunction(Person person) {
 			return new ScoringFunction() {
@@ -95,12 +98,12 @@ public class ScoringFunctionsForPopulationStressIT {
 				public void agentStuck(double time) {
 					throw new RuntimeException();
 				}
-				
+
 				@Override
 				public void handleTrip( final TripStructureUtils.Trip trip ) {
 					throw new RuntimeException();
 				}
-				
+
 				@Override
 				public void addMoney(double amount) {
 					throw new RuntimeException();
@@ -130,28 +133,28 @@ public class ScoringFunctionsForPopulationStressIT {
 	}
 
 	@Test
-	public void workWithNewEventsManager() {
+	void workWithNewEventsManager() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setOneThreadPerHandler(true);
+		config.eventsManager().setOneThreadPerHandler(true);
 		work(config);
 	}
 
 	@Test
-	public void workWithOldEventsManager() {
+	void workWithOldEventsManager() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setNumberOfThreads(8);
+		config.eventsManager().setNumberOfThreads(8);
 		work(config);
 	}
 
 	private void work(Config config) {
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.planCalcScore().addActivityParams(work);
-		PlanCalcScoreConfigGroup.ModeParams car = new PlanCalcScoreConfigGroup.ModeParams("car");
+		config.scoring().addActivityParams(work);
+		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.planCalcScore().addModeParams(car);
+		config.scoring().addModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -177,12 +180,12 @@ public class ScoringFunctionsForPopulationStressIT {
 					public void agentStuck(double time) {
 						delegateFunction.agentStuck(time);
 					}
-					
+
 					@Override
 					public void handleTrip( final TripStructureUtils.Trip trip ) {
 						delegateFunction.handleTrip(trip);
 					}
-					
+
 					@Override
 					public void addMoney(double amount) {
 						delegateFunction.addMoney(amount);
@@ -233,35 +236,36 @@ public class ScoringFunctionsForPopulationStressIT {
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		
+
 		//assert when TypicalDurationScoreComputation.uniform
 //		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
-		
+
 		//assert when TypicalDurationScoreComputation.relative
 		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}
 
-	/* I (mrieser, 2019-01-09) disabled this test. By definition, events for one person should come in the right sequence,
-	   so this tests actually tests some additional (and potentially optional) behavior. But, more importantly, it poses
-	   inherent problems with the addition of trip scoring: to detect trips, it is important that activities and legs
-	   occur in the correct sequence, which means that also the corresponding events must be in the right sequence.
-	   If the sequence is disturbed, the trip detection already fails. So, with trip scoring, this test would always fail
-	   as it tests some non-required functionality.
+	/*I (mrieser, 2019-01-09) disabled this test. By definition, events for one person should come in the right sequence,
+		so this tests actually tests some additional (and potentially optional) behavior. But, more importantly, it poses
+		inherent problems with the addition of trip scoring: to detect trips, it is important that activities and legs
+		occur in the correct sequence, which means that also the corresponding events must be in the right sequence.
+		If the sequence is disturbed, the trip detection already fails. So, with trip scoring, this test would always fail
+		as it tests some non-required functionality.
 	 */
-	@Test @Ignore
-	public void unlikelyTimingOfScoringFunctionStillWorks() {
+	@Test
+	@Disabled
+	void unlikelyTimingOfScoringFunctionStillWorks() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setNumberOfThreads(8);
-		config.parallelEventHandling().setOneThreadPerHandler(true);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		config.eventsManager().setNumberOfThreads(8);
+		config.eventsManager().setOneThreadPerHandler(true);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.planCalcScore().addActivityParams(work);
-		PlanCalcScoreConfigGroup.ModeParams car = new PlanCalcScoreConfigGroup.ModeParams("car");
+		config.scoring().addActivityParams(work);
+		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.planCalcScore().addModeParams(car);
+		config.scoring().addModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -302,7 +306,7 @@ public class ScoringFunctionsForPopulationStressIT {
 						}
 						delegateFunction.agentStuck(time);
 					}
-					
+
 					@Override
 					public void handleTrip( final TripStructureUtils.Trip trip ) {
 						try {
@@ -312,7 +316,7 @@ public class ScoringFunctionsForPopulationStressIT {
 						}
 						delegateFunction.handleTrip(trip);
 					}
-					
+
 					@Override
 					public void addMoney(double amount) {
 						try {
@@ -382,10 +386,10 @@ public class ScoringFunctionsForPopulationStressIT {
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		
+
 		//assert when TypicalDurationScoreComputation.uniform
 //		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
-		
+
 		//assert when TypicalDurationScoreComputation.relative
 		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}

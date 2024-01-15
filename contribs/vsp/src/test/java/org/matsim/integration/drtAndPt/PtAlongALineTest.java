@@ -3,9 +3,9 @@ package org.matsim.integration.drtAndPt;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -27,10 +27,10 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -48,12 +48,12 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class PtAlongALineTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testPtAlongALine() {
+	void testPtAlongALine() {
 
 		Config config = createConfig(utils.getOutputDirectory());
 
@@ -68,9 +68,9 @@ public class PtAlongALineTest {
 	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
 	 * only the middle stop is accessible by bike.
 	 */
-	@Ignore
+	@Disabled
 	@Test
-	public void testPtAlongALineWithRaptorAndBike() {
+	void testPtAlongALineWithRaptorAndBike() {
 
 		Config config = createConfig(utils.getOutputDirectory());
 
@@ -91,9 +91,9 @@ public class PtAlongALineTest {
 	 * Test of Drt. 200 drt Vehicles are generated on Link 499-500, and all Agents rely on these
 	 * drts to get to their destination
 	 */
-	@Ignore
+	@Disabled
 	@Test
-	public void testDrtAlongALine() {
+	void testDrtAlongALine() {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -119,37 +119,37 @@ public class PtAlongALineTest {
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
+			DrtConfigs.adjustDrtConfig(drtCfg, config.scoring(), config.routing());
 		}
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler()
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice);
 			stratSets.setWeight(0.1);
-			config.strategy().addStrategySettings(stratSets);
+			config.replanning().addStrategySettings(stratSets);
 			//
 			config.subtourModeChoice().setModes(new String[] { TransportMode.car, "drt_A" });
 		}
 		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 			stratSets.setWeight(1.);
-			config.strategy().addStrategySettings(stratSets);
+			config.replanning().addStrategySettings(stratSets);
 		}
 
 		{
 			ModeParams modeParams = new ModeParams("drt_A");
-			config.planCalcScore().addModeParams(modeParams);
+			config.scoring().addModeParams(modeParams);
 		}
 
 		{
 			ModeParams modeParams = new ModeParams("drt_A_walk");
-			config.planCalcScore().addModeParams(modeParams);
+			config.scoring().addModeParams(modeParams);
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -202,29 +202,29 @@ public class PtAlongALineTest {
 	 * drt, which is set by a StopFilterAttribute
 	 */
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
+	void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		// yy why?  kai, jun'19
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		ModeParams accessWalk = new ModeParams(TransportMode.non_network_walk);
 		accessWalk.setMarginalUtilityOfTraveling(0);
-		config.planCalcScore().addModeParams(accessWalk);
+		config.scoring().addModeParams(accessWalk);
 
 		// (scoring parameters for drt modes)
 		{
 			ModeParams modeParams = new ModeParams(TransportMode.drt);
-			config.planCalcScore().addModeParams(modeParams);
+			config.scoring().addModeParams(modeParams);
 		}
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		{
 			// (raptor config)
@@ -257,7 +257,7 @@ public class PtAlongALineTest {
 		}
 
 		for (DrtConfigGroup drtConfigGroup : mm.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtConfigGroup, config.planCalcScore(), config.plansCalcRoute());
+			DrtConfigs.adjustDrtConfig(drtConfigGroup, config.scoring(), config.routing());
 		}
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
@@ -309,11 +309,11 @@ public class PtAlongALineTest {
 
 		config.global().setNumberOfThreads(1);
 
-		config.controler().setOutputDirectory(outputDir);
-		config.controler().setLastIteration(0);
+		config.controller().setOutputDirectory(outputDir);
+		config.controller().setLastIteration(0);
 
-		config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).setTeleportedModeSpeed(3.);
-		config.plansCalcRoute().getModeRoutingParams().get(TransportMode.bike).setTeleportedModeSpeed(10.);
+		config.routing().getModeRoutingParams().get(TransportMode.walk).setTeleportedModeSpeed(3.);
+		config.routing().getModeRoutingParams().get(TransportMode.bike).setTeleportedModeSpeed(10.);
 
 		config.qsim().setEndTime(24. * 3600.);
 
@@ -346,19 +346,19 @@ public class PtAlongALineTest {
 	private static void configureScoring(Config config) {
 		ModeParams accessWalk = new ModeParams(TransportMode.non_network_walk);
 		accessWalk.setMarginalUtilityOfTraveling(0);
-		config.planCalcScore().addModeParams(accessWalk);
+		config.scoring().addModeParams(accessWalk);
 
 		ModeParams transitWalk = new ModeParams("transit_walk");
 		transitWalk.setMarginalUtilityOfTraveling(0);
-		config.planCalcScore().addModeParams(transitWalk);
+		config.scoring().addModeParams(transitWalk);
 
 		ModeParams bike = new ModeParams("bike");
 		bike.setMarginalUtilityOfTraveling(0);
-		config.planCalcScore().addModeParams(bike);
+		config.scoring().addModeParams(bike);
 
 		ModeParams drt = new ModeParams("drt");
 		drt.setMarginalUtilityOfTraveling(0);
-		config.planCalcScore().addModeParams(drt);
+		config.scoring().addModeParams(drt);
 	}
 
 	static SwissRailRaptorConfigGroup createRaptorConfigGroup(int radiusWalk, int radiusBike) {

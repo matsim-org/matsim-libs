@@ -22,9 +22,9 @@ package org.matsim.analysis.linkPaxVolumes;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesAnalysis;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesWriter;
 import org.matsim.analysis.linkpaxvolumes.VehicleStatsPerVehicleType;
@@ -52,15 +52,15 @@ import java.util.stream.Collectors;
 
 public class LinkPaxVolumesAnalysisTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    /**
-     * Test method for {@link LinkPaxVolumesAnalysis}.
-     */
+	/**
+	* Test method for {@link LinkPaxVolumesAnalysis}.
+	*/
 
-    @Test
-    public void testLinkPaxVolumes() {
+	@Test
+	void testLinkPaxVolumes() {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -331,12 +331,12 @@ public class LinkPaxVolumesAnalysisTest {
                 List<CSVRecord> allDayRecordList = parser.getRecords();
 
                 List<CSVRecord> allDayRecordListLink2 = allDayRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2")).collect(Collectors.toList());
-                Assert.assertEquals("Either no record or more than one record",1, allDayRecordListLink2.size());
-                Assert.assertEquals("Wrong PassengerInclDriver on Link2",8, Double.parseDouble(allDayRecordListLink2.get(0).get(2)),MatsimTestUtils.EPSILON);
+                Assertions.assertEquals(1, allDayRecordListLink2.size(), "Either no record or more than one record");
+                Assertions.assertEquals(8, Double.parseDouble(allDayRecordListLink2.get(0).get(2)),MatsimTestUtils.EPSILON,"Wrong PassengerInclDriver on Link2");
 
                 List<CSVRecord> allDayRecordListLink2b = allDayRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2b")).collect(Collectors.toList());
-                Assert.assertEquals("Either no record or more than one record",1, allDayRecordListLink2b.size());
-                Assert.assertEquals("Wrong amount of Vehicles on Link2b",3, Double.parseDouble(allDayRecordListLink2b.get(0).get(1)),MatsimTestUtils.EPSILON);
+                Assertions.assertEquals(1, allDayRecordListLink2b.size(), "Either no record or more than one record");
+                Assertions.assertEquals(3, Double.parseDouble(allDayRecordListLink2b.get(0).get(1)),MatsimTestUtils.EPSILON,"Wrong amount of Vehicles on Link2b");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -353,20 +353,20 @@ public class LinkPaxVolumesAnalysisTest {
             List<CSVRecord> networkModePerHourRecordList = parser.getRecords();
 
             List<CSVRecord> networkModePerHourRecordListLink2 = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink2.size());
-            Assert.assertEquals("Wrong PassengerInclDriver on Link2",3, Double.parseDouble(networkModePerHourRecordListLink2.get(0).get("passengersInclDriver")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, networkModePerHourRecordListLink2.size(), "Either no record or more than one record");
+            Assertions.assertEquals(3, Double.parseDouble(networkModePerHourRecordListLink2.get(0).get("passengersInclDriver")),MatsimTestUtils.EPSILON,"Wrong PassengerInclDriver on Link2");
 
             List<CSVRecord> networkModePerHourRecordListLink2b = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2b") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink2b.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link2b",2, Double.parseDouble(networkModePerHourRecordListLink2b.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, networkModePerHourRecordListLink2b.size(), "Either no record or more than one record");
+            Assertions.assertEquals(2, Double.parseDouble(networkModePerHourRecordListLink2b.get(0).get("vehicles")),MatsimTestUtils.EPSILON,"Wrong amount of Vehicles on Link2b");
 
             List<CSVRecord> networkModePerHourRecordListLink2Pt = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("networkMode")).equals("train") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink2Pt.size());
-            Assert.assertEquals("Wrong amount of passengersInclDriver on Link2",5, Double.parseDouble(networkModePerHourRecordListLink2Pt.get(0).get("passengersInclDriver")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, networkModePerHourRecordListLink2Pt.size(), "Either no record or more than one record");
+            Assertions.assertEquals(5, Double.parseDouble(networkModePerHourRecordListLink2Pt.get(0).get("passengersInclDriver")),MatsimTestUtils.EPSILON,"Wrong amount of passengersInclDriver on Link2");
 
             List<CSVRecord> networkModePerHourRecordListLink4b = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link4b") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("10")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink4b.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link4b",0, Double.parseDouble(networkModePerHourRecordListLink4b.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, networkModePerHourRecordListLink4b.size(), "Either no record or more than one record");
+            Assertions.assertEquals(0, Double.parseDouble(networkModePerHourRecordListLink4b.get(0).get("vehicles")),MatsimTestUtils.EPSILON,"Wrong amount of Vehicles on Link4b");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -383,12 +383,12 @@ public class LinkPaxVolumesAnalysisTest {
             List<CSVRecord> vehicleTypePerHourRecordList = parser.getRecords();
 
             List<CSVRecord> vehicleTypePerHourRecordListLink2 = vehicleTypePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("vehicleType")).equals("vehiclesType1") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, vehicleTypePerHourRecordListLink2.size());
-            Assert.assertEquals("Wrong PassengerInclDriver on Link2",3, Double.parseDouble(vehicleTypePerHourRecordListLink2.get(0).get(4)),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, vehicleTypePerHourRecordListLink2.size(), "Either no record or more than one record");
+            Assertions.assertEquals(3, Double.parseDouble(vehicleTypePerHourRecordListLink2.get(0).get(4)),MatsimTestUtils.EPSILON,"Wrong PassengerInclDriver on Link2");
 
             List<CSVRecord> vehicleTypePerHourRecordListLink2b = vehicleTypePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2b") && record.get(parser.getHeaderMap().get("vehicleType")).equals("transitVehicleType") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, vehicleTypePerHourRecordListLink2b.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link2b",1, Double.parseDouble(vehicleTypePerHourRecordListLink2b.get(0).get(3)),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, vehicleTypePerHourRecordListLink2b.size(), "Either no record or more than one record");
+            Assertions.assertEquals(1, Double.parseDouble(vehicleTypePerHourRecordListLink2b.get(0).get(3)),MatsimTestUtils.EPSILON,"Wrong amount of Vehicles on Link2b");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -404,14 +404,14 @@ public class LinkPaxVolumesAnalysisTest {
             List<CSVRecord> perPassengerModeRecordList = parser.getRecords();
 
             List<CSVRecord> perPassengerModeRecordListLink4b = perPassengerModeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link4b") && record.get(parser.getHeaderMap().get("passengerMode")).equals("pt") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, perPassengerModeRecordListLink4b.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link4b",1, Double.parseDouble(perPassengerModeRecordListLink4b.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
-            Assert.assertEquals("Wrong amount of passengersPossiblyInclDriver on Link4b",3, Double.parseDouble(perPassengerModeRecordListLink4b.get(0).get("passengersPossiblyInclDriver")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, perPassengerModeRecordListLink4b.size(), "Either no record or more than one record");
+            Assertions.assertEquals(1, Double.parseDouble(perPassengerModeRecordListLink4b.get(0).get("vehicles")),MatsimTestUtils.EPSILON,"Wrong amount of Vehicles on Link4b");
+            Assertions.assertEquals(3, Double.parseDouble(perPassengerModeRecordListLink4b.get(0).get("passengersPossiblyInclDriver")),MatsimTestUtils.EPSILON,"Wrong amount of passengersPossiblyInclDriver on Link4b");
 
             List<CSVRecord> perPassengerModeRecordListLink2 = perPassengerModeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("passengerMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, perPassengerModeRecordListLink2.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link2b",1, Double.parseDouble(perPassengerModeRecordListLink2.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
-            Assert.assertEquals("Wrong amount of passengersPossiblyInclDriver on Link4b",2, Double.parseDouble(perPassengerModeRecordListLink2.get(0).get("passengersPossiblyInclDriver")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, perPassengerModeRecordListLink2.size(), "Either no record or more than one record");
+            Assertions.assertEquals(1, Double.parseDouble(perPassengerModeRecordListLink2.get(0).get("vehicles")),MatsimTestUtils.EPSILON,"Wrong amount of Vehicles on Link2b");
+            Assertions.assertEquals(2, Double.parseDouble(perPassengerModeRecordListLink2.get(0).get("passengersPossiblyInclDriver")),MatsimTestUtils.EPSILON,"Wrong amount of passengersPossiblyInclDriver on Link4b");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -427,14 +427,14 @@ public class LinkPaxVolumesAnalysisTest {
             List<CSVRecord> statsPerVehicleTypeRecordList = parser.getRecords();
 
             List<CSVRecord> statsPerVehicleTypeRecordListVehiclesType1 = statsPerVehicleTypeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("vehicleType")).equals("vehiclesType1")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, statsPerVehicleTypeRecordListVehiclesType1.size());
-            Assert.assertEquals("Wrong sum of passengerKm",0.6, Double.parseDouble(statsPerVehicleTypeRecordListVehiclesType1.get(0).get("passengerKm")),MatsimTestUtils.EPSILON);
-            Assert.assertEquals("Wrong sum of vehicleKm",0.2, Double.parseDouble(statsPerVehicleTypeRecordListVehiclesType1.get(0).get("vehicleKm")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(1, statsPerVehicleTypeRecordListVehiclesType1.size(), "Either no record or more than one record");
+            Assertions.assertEquals(0.6, Double.parseDouble(statsPerVehicleTypeRecordListVehiclesType1.get(0).get("passengerKm")),MatsimTestUtils.EPSILON,"Wrong sum of passengerKm");
+            Assertions.assertEquals(0.2, Double.parseDouble(statsPerVehicleTypeRecordListVehiclesType1.get(0).get("vehicleKm")),MatsimTestUtils.EPSILON,"Wrong sum of vehicleKm");
 
             List<CSVRecord> statsPerVehicleTypeRecordListTransitVehicleType = statsPerVehicleTypeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("vehicleType")).equals("transitVehicleType")).collect(Collectors.toList());
-            Assert.assertEquals("Wrong sum of passengerKm",3.1, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("passengerKm")),MatsimTestUtils.EPSILON);
-            Assert.assertEquals("Wrong sum of vehicleKm",0.7, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("vehicleKm")),MatsimTestUtils.EPSILON);
-            Assert.assertEquals("Wrong vehicleHoursOnNetwork",0.0125, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("vehicleHoursOnNetwork")),MatsimTestUtils.EPSILON);
+            Assertions.assertEquals(3.1, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("passengerKm")),MatsimTestUtils.EPSILON,"Wrong sum of passengerKm");
+            Assertions.assertEquals(0.7, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("vehicleKm")),MatsimTestUtils.EPSILON,"Wrong sum of vehicleKm");
+            Assertions.assertEquals(0.0125, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("vehicleHoursOnNetwork")),MatsimTestUtils.EPSILON,"Wrong vehicleHoursOnNetwork");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

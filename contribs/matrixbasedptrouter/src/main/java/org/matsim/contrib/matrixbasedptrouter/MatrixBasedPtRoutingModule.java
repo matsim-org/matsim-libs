@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
@@ -35,7 +35,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,12 +44,12 @@ import java.util.List;
  * <li>yyyy The module includes walk times and walk distances.  But rather than putting them into a separate leg, they are
  * included "silently" in the pt leg, which thus pretends to go door to door. kai, jul'13
  * </ul>
- * 
+ *
  * @author thomas
  *
  */
 public final class MatrixBasedPtRoutingModule implements RoutingModule {
-	
+
 	// 1) read a file with every transit stop
 	// 2) read a file with travel times and general costs from every stop to every other stop ("matrix")
 	// 3) route:
@@ -68,25 +68,25 @@ public final class MatrixBasedPtRoutingModule implements RoutingModule {
 		this.genericRouteFactory = new GenericRouteFactory();
 		this.ptMatrix = ptMatrix;
 	}
-	
+
 	@Override
 	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		final Facility fromFacility = request.getFromFacility();
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
-		
+
 		Leg newLeg = scenario.getPopulation().getFactory().createLeg( TransportMode.pt );
 		Id<Link> startLinkId = fromFacility.getLinkId();
 		Id<Link> endLinkId = toFacility.getLinkId();
 		newLeg.setDepartureTime( departureTime );
 		double travelTime = this.ptMatrix.getTotalTravelTime_seconds(fromFacility.getCoord(), toFacility.getCoord());
 		newLeg.setTravelTime( travelTime );
-		
+
 		final Route route = genericRouteFactory.createRoute(startLinkId, endLinkId);
 		double distance = this.ptMatrix.getTotalTravelDistance_meter(fromFacility.getCoord(), toFacility.getCoord()) ;
 		route.setDistance(distance) ;
 		newLeg.setRoute(route);
-		
+
 		return Arrays.asList( newLeg );
 	}
 

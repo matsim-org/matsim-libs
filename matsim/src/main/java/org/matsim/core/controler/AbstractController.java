@@ -23,10 +23,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.MemoryObserver;
+
+import java.io.UncheckedIOException;
 
 /*package*/ abstract class AbstractController {
     // we already had one case where a method of this was removed, causing downstream failures; better just not
@@ -46,7 +48,7 @@ import org.matsim.utils.MemoryObserver;
 
 
     private Integer thisIteration = null;
-    
+
     protected AbstractController() {
         this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
@@ -97,7 +99,7 @@ import org.matsim.utils.MemoryObserver;
     protected abstract void runMobSim();
 
     protected abstract void prepareForSim();
-    
+
     protected abstract void prepareForMobsim() ;
 
     /**
@@ -112,11 +114,11 @@ import org.matsim.utils.MemoryObserver;
 	protected abstract boolean shouldTerminate(int iteration);
 
     private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-    	int iteration = config.controler().getFirstIteration();
-    	
+    	int iteration = config.controller().getFirstIteration();
+
     	// Special case if lastIteration == -1 -> Do not run any Mobsim
-    	boolean doTerminate = config.controler().getLastIteration() < iteration;
-    	
+    	boolean doTerminate = config.controller().getLastIteration() < iteration;
+
     	while (!doTerminate) {
     		boolean isLastIteration = mayTerminateAfterIteration(iteration);
     		iteration(config, iteration, isLastIteration);
@@ -124,7 +126,7 @@ import org.matsim.utils.MemoryObserver;
     		iteration++;
     	}
     }
-    
+
     final String MARKER = "### ";
 
     private void iteration(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -143,7 +145,7 @@ import org.matsim.utils.MemoryObserver;
             }
         });
 
-        if (iteration > config.controler().getFirstIteration()) {
+        if (iteration > config.controller().getFirstIteration()) {
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
@@ -172,12 +174,12 @@ import org.matsim.utils.MemoryObserver;
 
         this.getStopwatch().endIteration();
         try {
-            this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+            this.getStopwatch().writeSeparatedFile(this.getControlerIO().getOutputFilename("stopwatch.csv"), config.global().getDefaultDelimiter());
         } catch (UncheckedIOException e) {
             log.error("Could not write stopwatch file.", e);
         }
-        if (config.controler().isCreateGraphs()) {
-            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        if (config.controller().getCreateGraphsInterval() > 0 && iteration % config.controller().getCreateGraphsInterval() == 0) {
+            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch.png", ControllerConfigGroup.CompressionType.none));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
         log.info(Controler.DIVIDER);
@@ -196,7 +198,7 @@ import org.matsim.utils.MemoryObserver;
                     controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
-            
+
             iterationStep( "prepareForMobsim", new Runnable(){
                     @Override
                 public void run() {
@@ -224,7 +226,7 @@ import org.matsim.utils.MemoryObserver;
 
 			// Java 7 seems able to detect which throwables this can be, thus no
 			// need to wrap or anything... Nice!
-			// If an exception occurs in the finally bloc, this exception will be
+			// If an exception occurs in the finally-block, this exception will be
 			// suppressed, but at least we logged it.
 			throw t;
         }

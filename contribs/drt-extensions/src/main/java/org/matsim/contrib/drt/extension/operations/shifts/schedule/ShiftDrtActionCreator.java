@@ -32,11 +32,11 @@ public class ShiftDrtActionCreator implements DynActionCreator {
         Task task = vehicle.getSchedule().getCurrentTask();
         if (task instanceof ShiftBreakTask) {
             DrtStopTask t = (DrtStopTask)task;
-            return new DrtStopActivity(passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
+            return new DrtStopActivity(passengerHandler, dynAgent, t::getEndTime, t.getDropoffRequests(), t.getPickupRequests(),
                     DRT_SHIFT_BREAK_NAME);
         } else if (task instanceof ShiftChangeOverTask) {
             DrtStopTask t = (DrtStopTask) task;
-            return new DrtStopActivity(passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
+            return new DrtStopActivity(passengerHandler, dynAgent, t::getEndTime, t.getDropoffRequests(), t.getPickupRequests(),
                     DRT_SHIFT_CHANGEOVER_NAME);
         } else if (task instanceof WaitForShiftStayTask) {
             return new IdleDynActivity(DRT_SHIFT_WAIT_FOR_SHIFT_NAME, task::getEndTime);

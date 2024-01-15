@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -39,7 +39,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
  */
 public class TravelTimeMatricesTest {
 	@Test
-	public void travelTimeMatrix() {
+	void travelTimeMatrix() {
 		Network network = NetworkUtils.createNetwork();
 		Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 		Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
@@ -58,7 +58,7 @@ public class TravelTimeMatricesTest {
 	}
 
 	@Test
-	public void travelTimeSparseMatrix_maxDistance() {
+	void travelTimeSparseMatrix_maxDistance() {
 		Network network = NetworkUtils.createNetwork();
 		Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 		Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
@@ -69,7 +69,7 @@ public class TravelTimeMatricesTest {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("CA"), nodeC, nodeA, 600, 15, 80, 1);
 
 		double maxDistance = 300;// B->A->C and C->A->B are pruned by  the limit
-		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), maxDistance, 0, 0);
+		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), maxDistance, 0, 0).orElseThrow();
 
 		assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
 		assertThat(matrix.get(nodeA, nodeB)).isEqualTo(10);
@@ -85,7 +85,7 @@ public class TravelTimeMatricesTest {
 	}
 
 	@Test
-	public void travelTimeSparseMatrix_maxTravelTime() {
+	void travelTimeSparseMatrix_maxTravelTime() {
 		Network network = NetworkUtils.createNetwork();
 		Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 		Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
@@ -97,7 +97,7 @@ public class TravelTimeMatricesTest {
 
 		// 20 s (max TT) corresponds to 300 m (max distance) in another test (see: travelTimeSparseMatrix_maxDistance())
 		double maxTravelTime = 20;// B->A->C and C->A->B are pruned by  the limit
-		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), 0, maxTravelTime, 0);
+		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), 0, maxTravelTime, 0).orElseThrow();
 
 		assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
 		assertThat(matrix.get(nodeA, nodeB)).isEqualTo(10);

@@ -19,8 +19,8 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 public class MobsimListenerManagerTest {
 
 	@Test
-	public void testAddQueueSimulationListener() {
+	void testAddQueueSimulationListener() {
 		MobsimListenerManager manager = new MobsimListenerManager(null);
 		TestSimListener simpleListener = new TestSimListener();
 		TestSubSimListener subListener = new TestSubSimListener();
@@ -41,14 +41,14 @@ public class MobsimListenerManagerTest {
 		manager.addQueueSimulationListener(extendedListener);
 		manager.addQueueSimulationListener(doubleListener);
 		manager.fireQueueSimulationInitializedEvent();
-		Assert.assertEquals(1, simpleListener.count);
-		Assert.assertEquals(1, subListener.count);
-		Assert.assertEquals(1, extendedListener.count);
-		Assert.assertEquals(1, doubleListener.count);
+		Assertions.assertEquals(1, simpleListener.count);
+		Assertions.assertEquals(1, subListener.count);
+		Assertions.assertEquals(1, extendedListener.count);
+		Assertions.assertEquals(1, doubleListener.count);
 	}
 
 	@Test
-	public void testRemoveQueueSimulationListener() {
+	void testRemoveQueueSimulationListener() {
 		MobsimListenerManager manager = new MobsimListenerManager(null);
 		TestSimListener simpleListener = new TestSimListener();
 		TestSubSimListener subListener = new TestSubSimListener();
@@ -59,20 +59,20 @@ public class MobsimListenerManagerTest {
 		manager.addQueueSimulationListener(extendedListener);
 		manager.addQueueSimulationListener(doubleListener);
 		manager.fireQueueSimulationInitializedEvent();
-		Assert.assertEquals(1, simpleListener.count);
-		Assert.assertEquals(1, subListener.count);
-		Assert.assertEquals(1, extendedListener.count);
-		Assert.assertEquals(1, doubleListener.count);
+		Assertions.assertEquals(1, simpleListener.count);
+		Assertions.assertEquals(1, subListener.count);
+		Assertions.assertEquals(1, extendedListener.count);
+		Assertions.assertEquals(1, doubleListener.count);
 
 		manager.removeQueueSimulationListener(simpleListener);
 		manager.removeQueueSimulationListener(subListener);
 		manager.removeQueueSimulationListener(extendedListener);
 		manager.removeQueueSimulationListener(doubleListener);
 		manager.fireQueueSimulationInitializedEvent();
-		Assert.assertEquals(1, simpleListener.count); // should stay at 1
-		Assert.assertEquals(1, subListener.count);
-		Assert.assertEquals(1, extendedListener.count);
-		Assert.assertEquals(1, doubleListener.count);
+		Assertions.assertEquals(1, simpleListener.count); // should stay at 1
+		Assertions.assertEquals(1, subListener.count);
+		Assertions.assertEquals(1, extendedListener.count);
+		Assertions.assertEquals(1, doubleListener.count);
 	}
 
 	/*package*/ static class TestSimListener implements MobsimInitializedListener {

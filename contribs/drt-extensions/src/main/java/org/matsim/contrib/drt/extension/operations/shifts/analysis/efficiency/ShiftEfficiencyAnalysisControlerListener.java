@@ -27,7 +27,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -56,9 +56,10 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
+		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
 
-        writeAndPlotShiftEfficiency(
+		writeAndPlotShiftEfficiency(
                 shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift(),
                 shiftEfficiencyTracker.getCurrentRecord().getRequestsByShift(),
                 shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts(),

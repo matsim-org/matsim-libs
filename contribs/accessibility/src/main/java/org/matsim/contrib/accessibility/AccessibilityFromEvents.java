@@ -58,7 +58,7 @@ public final class AccessibilityFromEvents{
 	public void run() {
 		LinkedHashMap<String, TravelTime> map = new LinkedHashMap<>(  ) ;
 		EventsManager events = EventsUtils.createEventsManager();
-		for( String mode : scenario.getConfig().plansCalcRoute().getNetworkModes() ){
+		for( String mode : scenario.getConfig().routing().getNetworkModes() ){
 			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder( scenario.getNetwork() );
 			builder.setCalculateLinkTravelTimes( true );
 			builder.setCalculateLinkToLinkTravelTimes( false );
@@ -74,7 +74,7 @@ public final class AccessibilityFromEvents{
 				install( new ScenarioByInstanceModule( scenario ) ) ;
 				install( new TripRouterModule() ) ;
 				install( new TimeInterpretationModule() );
-				for( String mode : getConfig().plansCalcRoute().getNetworkModes() ){
+				for( String mode : getConfig().routing().getNetworkModes() ){
 					addTravelTimeBinding( mode ).toInstance( map.get(mode) );
 				}
 				install( new TravelDisutilityModule() ) ;

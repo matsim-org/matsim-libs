@@ -25,18 +25,17 @@ import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
+import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
+import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -61,7 +60,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
         CollaborationUtils.setCoalitionFromReceiverAttributes( sc );
 
         // clean out plans, services, shipments from carriers:
-        Map<Id<Carrier>, Carrier> carriers = FreightUtils.getCarriers(sc).getCarriers();
+        Map<Id<Carrier>, Carrier> carriers = CarriersUtils.getCarriers(sc).getCarriers();
         for( Carrier carrier : carriers.values() ){
             carrier.clearPlans();
             carrier.getShipments().clear();
@@ -119,10 +118,10 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             carrier.setSelectedPlan(newPlan);
 
         }
-        String outputdirectory = sc.getConfig().controler().getOutputDirectory();
+        String outputdirectory = sc.getConfig().controller().getOutputDirectory();
         outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
-//        new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
-        new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory +receiverConfig.getCarriersFile() );
+//        new CarrierPlanWriter(CarrierControlerUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
+        new CarrierPlanWriter(CarriersUtils.getCarriers(sc)).write(outputdirectory +receiverConfig.getCarriersFile() );
 //        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + ReceiverConfigGroup.RECEIVERS_FILE);
         new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + receiverConfig.getReceiversFile());
     }

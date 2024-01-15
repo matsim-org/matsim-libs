@@ -70,6 +70,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             final String externalInputCRS,
             final String targetCRS,
             final ActivityFacilities facilities) {
+        super(ValidationType.DTD_ONLY);
         this.externalInputCRS = externalInputCRS;
         this.targetCRS = targetCRS;
         this.facilities = facilities;

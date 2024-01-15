@@ -1,6 +1,6 @@
 package org.matsim.modechoice.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BestChoiceGeneratorTest extends ScenarioTest {
 
 	@Test
-	public void choices() {
+	void choices() {
 
 		BestChoiceGenerator generator = injector.getInstance(BestChoiceGenerator.class);
 

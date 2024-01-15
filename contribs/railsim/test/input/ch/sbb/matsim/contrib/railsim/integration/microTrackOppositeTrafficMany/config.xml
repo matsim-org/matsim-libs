@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711"/>
+		<param name="coordinateSystem" value="Atlantis"/>
+	</module>
+
+	<module name="controler">
+		<param name="runId" value="test"/>
+		<param name="firstIteration" value="0"/>
+	</module>
+
+	<module name="qsim">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00"/>
+		<param name="endTime" value="24:00:00"/>
+
+		<param name="snapshotperiod" value="00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name="mainMode" value="car"/>
+
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="999999."/>
+	</module>
+
+	<module name="transit">
+		<param name="routingAlgorithmType" value="SwissRailRaptor"/>
+		<param name="transitScheduleFile" value="transitSchedule.xml"/>
+		<param name="useTransit" value="true"/>
+		<param name="usingTransitInMobsim" value="true"/>
+		<param name="vehiclesFile" value="transitVehicles.xml"/>
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="trainNetwork.xml"/>
+	</module>
+
+</config>

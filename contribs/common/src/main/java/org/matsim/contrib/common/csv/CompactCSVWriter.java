@@ -21,9 +21,8 @@
 package org.matsim.contrib.common.csv;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
-
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import com.opencsv.CSVWriter;
 
