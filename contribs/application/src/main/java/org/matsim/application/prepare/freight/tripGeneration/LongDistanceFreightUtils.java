@@ -44,15 +44,12 @@ public class LongDistanceFreightUtils {
 	static void setTripRelationIndex(Person person, String tripRelationId) {
 		person.getAttributes().putAttribute("trip_relation_index", tripRelationId);
 	}
-
 	static void setPreRunMode(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("mode_pre-run", tripRelation.getModePreRun());
 	}
-
 	static void setMainRunMode(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("mode_main-run", tripRelation.getModeMainRun());
 	}
-
 	static void setPostRunMode(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("mode_post-run", tripRelation.getModePostRun());
 	}

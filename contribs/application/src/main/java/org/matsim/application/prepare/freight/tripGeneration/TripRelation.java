@@ -160,6 +160,7 @@ public class TripRelation {
 			this.tonsPerYearPostRun = value;
 			return this;
 		}
+
 		public Builder tonKMPerYearPreRun(double value) {
 			this.tonKMPerYearPreRun = value;
 			return this;
@@ -174,6 +175,7 @@ public class TripRelation {
 			this.tonKMPerYearPostRun = value;
 			return this;
 		}
+
 		public TripRelation build() {
 			return new TripRelation(this);
 		}
@@ -245,12 +247,15 @@ public class TripRelation {
 	public double getTonsPerYearPreRun() {
 		return tonsPerYearPreRun;
 	}
+
 	public double getTonsPerYearMainRun() {
 		return tonsPerYearMainRun;
 	}
+
 	public double getTonsPerYearPostRun() {
 		return tonsPerYearPostRun;
 	}
+
 	public double getTonKMPerYearPreRun() {
 		return tonKMPerYearPreRun;
 	}
@@ -276,7 +281,7 @@ public class TripRelation {
 			builder.modePreRun(record.get(column_mode_PreRun)).modeMainRun(record.get(column_mode_MainRun)).modePostRun(record.get(
 				column_mode_PostRun));
 
-			// Read goods type and tons
+			// Read the goods type and tons
 			builder.goodsTypePreRun(record.get(column_goodsType_PreRun)).goodsTypeMainRun(record.get(column_goodsType_MainRun)).goodsTypePostRun(
 				record.get(column_goodsType_PostRun));
 			builder.tonsPerYearPreRun(Double.parseDouble(record.get(column_tones_PreRun))).tonsPerYearMainRun(
