@@ -166,12 +166,13 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 	private void renderWarnings(BufferedWriter writer, Set<Warning> warnings) throws IOException {
 
+		// TODO: maybe remove no warnings message
+
 		if (warnings.isEmpty()) {
 			writer.write("<h3 class=\"no-warnings\">No warnings found ✅</h3>\n\n");
 		} else {
 
 			Map<String, List<Warning>> grouped = warnings.stream().collect(Collectors.groupingBy(w -> w.module, Collectors.toList()));
-			writer.write(String.format("<h3 class=\"found-warnings\">Warnings found in %d module%s ❌</h3>\n\n", grouped.size(), grouped.size() > 1 ? "s" : ""));
 
 			for (Map.Entry<String, List<Warning>> e : grouped.entrySet()) {
 
@@ -188,9 +189,7 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		writer.write("""
 			<style>
 			.dash-row.row-warnings .dash-card-frame {
-				margin-top: 0;
-				margin-bottom: 0;
-				padding: 0 0.4em;
+			    background: none;
 			}
 			.dash-row.row-warnings .no-warnings {
 				color: #4BB543;
