@@ -214,7 +214,7 @@ public class TripRelation {
 		return destinationCellMainRun;
 	}
 
-	public String getFinalDestinationCell() {
+	public String getDestinationCell() {
 		return destinationCell;
 	}
 

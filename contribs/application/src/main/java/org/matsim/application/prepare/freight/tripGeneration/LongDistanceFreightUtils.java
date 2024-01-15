@@ -66,7 +66,7 @@ public class LongDistanceFreightUtils {
 		person.getAttributes().putAttribute("destination_cell_main_run", tripRelation.getDestinationCellMainRun());
 	}
 	static void setFinalDestinationCell(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("final_destination_cell", tripRelation.getFinalDestinationCell());
+		person.getAttributes().putAttribute("destination_cell", tripRelation.getDestinationCell());
 	}
 	static void setGoodsTypePreRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("goods_type_pre-run", tripRelation.getGoodsTypePreRun());
