@@ -266,7 +266,7 @@ public class TripRelation {
 	public static List<TripRelation> readTripRelations(String pathToKettenData) throws IOException {
 		List<TripRelation> tripRelations = new ArrayList<>();
 		CSVParser parser = CSVParser.parse(URI.create(pathToKettenData).toURL(), StandardCharsets.ISO_8859_1,
-			CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader());
+			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build());
 		for (CSVRecord record : parser) {
 			Builder builder = new Builder();
 			// Read locations
