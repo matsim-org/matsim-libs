@@ -97,7 +97,7 @@ public class TripRelation {
 		private double tonKMPerYearPostRun;
 
 		public Builder originalCell(String value) {
-			this.originalCell = value;
+			this.originCell = value;
 			return this;
 		}
 
