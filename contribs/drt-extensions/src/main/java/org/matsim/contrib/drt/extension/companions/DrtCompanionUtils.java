@@ -37,6 +37,7 @@ public class DrtCompanionUtils {
 	public final static String ADDITIONAL_GROUP_PART_ATTRIBUTE = "additionalGroupPart";
 	public static final String COMPANION_TYPE_ATTRIBUTE = "companionType";
 	public static final String GROUP_IDENTIFIER_ATTRIBUTE = "groupIdentifier";
+	public static final String DRT_COMPANION_AGENT_PREFIX = "COMPANION";
 
 	private DrtCompanionUtils() {
 		throw new IllegalStateException("Utility class");
@@ -44,6 +45,10 @@ public class DrtCompanionUtils {
 
 	public static boolean isDrtCompanion(Person person) {
 		return getDRTCompanionType(person) != null;
+	}
+
+	public static boolean isDrtCompanion(Id<Person> personId) {
+		return personId.toString().startsWith(DRT_COMPANION_AGENT_PREFIX);
 	}
 
 	public static void setDRTCompanionType(Person person, String drtCompanionType) {

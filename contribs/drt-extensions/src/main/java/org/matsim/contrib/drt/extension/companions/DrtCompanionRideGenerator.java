@@ -30,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -46,15 +45,15 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
+import static org.matsim.contrib.drt.extension.companions.DrtCompanionUtils.DRT_COMPANION_AGENT_PREFIX;
+
 /**
  * @author Steffen Axer
  */
 final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobsimListener {
 
 	private static final Logger LOG = LogManager.getLogger(DrtCompanionRideGenerator.class);
-	public final static String DRT_COMPANION_AGENT_PREFIX = "COMPANION";
 	public static final String DRT_COMPANION_TYPE = "drtCompanion";
-
 	private final Scenario scenario;
 	private final String drtModes;
 	private final MainModeIdentifier mainModeIdentifier;
