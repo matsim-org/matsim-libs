@@ -35,11 +35,11 @@ public class TripRelation {
 	/**
 	 * Start location of the full trip relation
 	 */
-	private final String originalCell;
+	private final String originCell;
 	/**
 	 * Start location of the main run; Also the destination of the pre-run (when applicable)
 	 */
-	private final String originalCellMainRun;
+	private final String originCellMainRun;
 	/**
 	 * Destination of the main run; Also the starting location of the post-run (when applicable)
 	 */
@@ -77,8 +77,8 @@ public class TripRelation {
 	// private final String destinationTerminal; // Destination terminal for main run (also the starting terminal for the post-run)
 
 	public static class Builder {
-		private String originalCell;
-		private String originalCellMainRun;
+		private String originCell;
+		private String originCellMainRun;
 		private String destinationCellMainRun;
 		private String destinationCell;
 
@@ -101,8 +101,8 @@ public class TripRelation {
 			return this;
 		}
 
-		public Builder originalCellMainRun(String value) {
-			this.originalCellMainRun = value;
+		public Builder originCellMainRun(String value) {
+			this.originCellMainRun = value;
 			return this;
 		}
 
@@ -180,8 +180,8 @@ public class TripRelation {
 	}
 
 	private TripRelation(Builder builder) {
-		this.originalCell = builder.originalCell;
-		this.originalCellMainRun = builder.originalCellMainRun;
+		this.originCell = builder.originCell;
+		this.originCellMainRun = builder.originCellMainRun;
 		this.destinationCellMainRun = builder.destinationCellMainRun;
 		this.destinationCell = builder.destinationCell;
 
@@ -202,12 +202,12 @@ public class TripRelation {
 		this.tonKMPerYearPostRun = builder.tonKMPerYearPostRun;
 	}
 
-	public String getOriginalOriginCell() {
-		return originalCell;
+	public String getOriginCell() {
+		return originCell;
 	}
 
-	public String getOriginalCellMainRun() {
-		return originalCellMainRun;
+	public String getOriginCellMainRun() {
+		return originCellMainRun;
 	}
 
 	public String getDestinationCellMainRun() {
@@ -270,7 +270,7 @@ public class TripRelation {
 		for (CSVRecord record : parser) {
 			Builder builder = new Builder();
 			// Read locations
-			builder.originalCell(record.get(column_originCell)).originalCellMainRun(record.get(column_originCell_MainRun)).
+			builder.originalCell(record.get(column_originCell)).originCellMainRun(record.get(column_originCell_MainRun)).
 				destinationCellMainRun(record.get(column_destinationCell_MainRun)).destinationCell(record.get(column_destinationCell));
 			// Read trips
 			builder.modePreRun(record.get(column_mode_PreRun)).modeMainRun(record.get(column_mode_MainRun)).modePostRun(record.get(
@@ -297,7 +297,7 @@ public class TripRelation {
 	public static TripRelation readTripRelation(CSVRecord record) {
 		Builder builder = new Builder();
 		// Read locations
-		builder.originalCell(record.get(column_originCell)).originalCellMainRun(record.get(column_originCell_MainRun)).
+		builder.originalCell(record.get(column_originCell)).originCellMainRun(record.get(column_originCell_MainRun)).
 			destinationCellMainRun(record.get(column_destinationCell_MainRun)).destinationCell(record.get(column_destinationCell));
 		// Read trips
 		builder.modePreRun(record.get(column_mode_PreRun)).modeMainRun(record.get(column_mode_MainRun)).modePostRun(record.get(column_mode_PostRun));

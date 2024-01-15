@@ -57,10 +57,10 @@ public class LongDistanceFreightUtils {
 		person.getAttributes().putAttribute("mode_post-run", tripRelation.getModePostRun());
 	}
 	static void setOriginalOriginCell(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("original_origin_cell", tripRelation.getOriginalOriginCell());
+		person.getAttributes().putAttribute("origin_cell", tripRelation.getOriginCell());
 	}
 	static void setOriginCellMainRun(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("origin_cell_main_run", tripRelation.getOriginalCellMainRun());
+		person.getAttributes().putAttribute("origin_cell_main_run", tripRelation.getOriginCellMainRun());
 	}
 	static void setDestinationCellMainRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_cell_main_run", tripRelation.getDestinationCellMainRun());
