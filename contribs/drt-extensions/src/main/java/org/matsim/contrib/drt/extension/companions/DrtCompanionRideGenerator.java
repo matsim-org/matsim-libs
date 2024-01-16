@@ -116,14 +116,15 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 					// Initial person travels now in a group
 					DrtCompanionUtils.setPassengerGroupIdentifier(person, getGroupIdentifier());
 
-					// Add companions
 					int groupSize = additionalCompanions + 1;
-					int currentGroupSize = 1;
+					int currentGroupSize = 1; // Initial person
 
+					// Add companions
 					for (int i = 0; i < additionalCompanions; i++) {
 						int groupPart = i;
 
-						if(currentGroupSize>this.maxCapacity)
+						// currentGroupSize+1 exceeds maxCapacity, create a new passengerGroupIdentifier
+						if(currentGroupSize+1>this.maxCapacity)
 						{
 							passengerGroupIdentifier++;
 							currentGroupSize=0;
@@ -134,6 +135,7 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 							trip.getDestinationActivity(), groupPart, groupSize, personIdentifierSuffix, getGroupIdentifier()));
 						personIdentifierSuffix++;
 						drtCompanionAgents++;
+						currentGroupSize++;
 					}
 				}
 			}

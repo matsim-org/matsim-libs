@@ -60,7 +60,11 @@ public class RunDrtWithCompanionExampleIT {
 		// Add DrtCompanionParams with some default values into existing Drt configurations
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
 		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
-		drtWithExtensionsConfigGroup.addParameterSet(new DrtCompanionParams());
+
+		DrtCompanionParams crtCompanionParams = new DrtCompanionParams();
+		crtCompanionParams.setDrtCompanionSamplingWeights(List.of(0.5,0.2,0.1,0.1,0.1));
+
+		drtWithExtensionsConfigGroup.addParameterSet(crtCompanionParams);
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
@@ -69,7 +73,7 @@ public class RunDrtWithCompanionExampleIT {
 		controler.run();
 
 		int actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides).isEqualTo(471);
+		Assertions.assertThat(actualRides).isEqualTo(706);
 	}
 
 	private int getTotalNumberOfDrtRides() {

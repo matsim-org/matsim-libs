@@ -49,7 +49,7 @@ public class DrtCompanionModule extends AbstractDvrpModeModule {
 				modalProvider(getter -> new DrtCompanionRideGenerator(
 					getMode(), //
 					getter.get(MainModeIdentifier.class), //
-					getter.get(FleetSpecification.class), //
+					getter.getModal(FleetSpecification.class), //
 					getter.get(Scenario.class), //
 					this.drtWithExtensionsConfigGroup)))
 			.asEagerSingleton();
