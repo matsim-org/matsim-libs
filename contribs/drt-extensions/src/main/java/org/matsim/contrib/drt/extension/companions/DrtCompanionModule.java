@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.extension.companions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -48,6 +49,7 @@ public class DrtCompanionModule extends AbstractDvrpModeModule {
 				modalProvider(getter -> new DrtCompanionRideGenerator(
 					getMode(), //
 					getter.get(MainModeIdentifier.class), //
+					getter.get(FleetSpecification.class), //
 					getter.get(Scenario.class), //
 					this.drtWithExtensionsConfigGroup)))
 			.asEagerSingleton();

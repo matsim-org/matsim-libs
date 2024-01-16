@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.common.util.WeightedRandomSelection;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -55,8 +57,9 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	private static final Logger LOG = LogManager.getLogger(DrtCompanionRideGenerator.class);
 	public static final String DRT_COMPANION_TYPE = "drtCompanion";
 	private final Scenario scenario;
-	private final String drtModes;
+	private final String drtMode;
 	private final MainModeIdentifier mainModeIdentifier;
+	private final int maxCapacity;
 
 	private final Set<Id<Person>> companionAgentIds = new HashSet<>();
 	private WeightedRandomSelection<Integer> sampler;
@@ -64,11 +67,18 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	private int passengerGroupIdentifier = 0; // Should be unique over the entire simulation
 
 	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier,
+							  final FleetSpecification fleet,
 							  final Scenario scenario,
 							  final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		this.scenario = scenario;
 		this.mainModeIdentifier = mainModeIdentifier;
-		this.drtModes = drtMode;
+		this.drtMode = drtMode;
+		this.maxCapacity = fleet.getVehicleSpecifications()
+				.values()
+				.stream()
+				.mapToInt(DvrpVehicleSpecification::getCapacity)
+				.max()
+				.orElse(0);;
 		installSampler(drtWithExtensionsConfigGroup);
 	}
 
@@ -88,35 +98,42 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 		}
 	}
 
+	private Id<PassengerGroupIdentifier.PassengerGroup> getGroupIdentifier()
+	{
+		return Id.create(this.passengerGroupIdentifier, PassengerGroupIdentifier.PassengerGroup.class);
+	}
+
 	private void addCompanionAgents() {
 		int personIdentifierSuffix = 0;
-		HashMap<String, Integer> drtCompanionAgents = new HashMap<>();
+		int drtCompanionAgents = 0;
 		Collection<Person> companions = new ArrayList<>();
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			Id<PassengerGroupIdentifier.PassengerGroup> passengerGroupIdentifierId = Id.create(this.passengerGroupIdentifier, PassengerGroupIdentifier.PassengerGroup.class);
 			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
-				if (this.drtModes.equals(mainMode)) {
-
+				if (this.drtMode.equals(mainMode)) {
 					int additionalCompanions = sampler.select();
 
-					if(additionalCompanions>0)
-					{
-						// Initial person travels now in a group
-						DrtCompanionUtils.setPassengerGroupIdentifier(person, passengerGroupIdentifierId);
-					}
+					// Initial person travels now in a group
+					DrtCompanionUtils.setPassengerGroupIdentifier(person, getGroupIdentifier());
+
+					// Add companions
+					int groupSize = additionalCompanions + 1;
+					int currentGroupSize = 1;
 
 					for (int i = 0; i < additionalCompanions; i++) {
-						int currentCounter = drtCompanionAgents.getOrDefault(mainMode, 0);
-						currentCounter++;
-						drtCompanionAgents.put(mainMode, currentCounter);
-						int groupSize = additionalCompanions + 1;
 						int groupPart = i;
+
+						if(currentGroupSize>this.maxCapacity)
+						{
+							passengerGroupIdentifier++;
+							currentGroupSize=0;
+						}
 
 						// Bypass passengerGroupIdentifierId to each group member
 						companions.add(createCompanionAgent(mainMode, person, trip, trip.getOriginActivity(),
-							trip.getDestinationActivity(), groupPart, groupSize, personIdentifierSuffix, passengerGroupIdentifierId));
+							trip.getDestinationActivity(), groupPart, groupSize, personIdentifierSuffix, getGroupIdentifier()));
 						personIdentifierSuffix++;
+						drtCompanionAgents++;
 					}
 				}
 			}
@@ -127,9 +144,9 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 			this.companionAgentIds.add(p.getId());
 		});
 
-		for (Map.Entry<String, Integer> drtModeEntry : drtCompanionAgents.entrySet()) {
-			LOG.info("Added # {} drt companion agents for mode {}", drtModeEntry.getValue(), drtModeEntry.getKey());
-		}
+
+		LOG.info("Added # {} drt companion agents for mode {}", drtCompanionAgents, this.drtMode);
+
 	}
 
 	private Person createCompanionAgent(String drtMode, Person originalPerson, TripStructureUtils.Trip trip,
