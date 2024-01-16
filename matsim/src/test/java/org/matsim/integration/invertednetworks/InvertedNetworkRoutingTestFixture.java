@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,10 +78,10 @@ public class InvertedNetworkRoutingTestFixture {
 
 	public InvertedNetworkRoutingTestFixture(boolean doCreateModes, boolean doCreateLanes, boolean doCreateSignals) {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setLastIteration(0);
-		config.controler().setLinkToLinkRoutingEnabled(true);
+		config.controller().setLastIteration(0);
+		config.controller().setLinkToLinkRoutingEnabled(true);
 		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
-		config.controler().setMobsim("qsim");
+		config.controller().setMobsim("qsim");
 		config.global().setNumberOfThreads(1);
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10000.0);
@@ -90,12 +90,12 @@ public class InvertedNetworkRoutingTestFixture {
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 		stratSets.setWeight(1.0);
-		config.strategy().addStrategySettings(stratSets);
+		config.replanning().addStrategySettings(stratSets);
 		final double traveling = -1200.0;
-		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
+		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		ActivityParams params = new ActivityParams("home");
 		params.setTypicalDuration(24.0 * 3600.0);
-		config.planCalcScore().addActivityParams(params);
+		config.scoring().addActivityParams(params);
 		config.qsim().setUseLanes(doCreateLanes);
 
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
@@ -160,7 +160,7 @@ public class InvertedNetworkRoutingTestFixture {
 		network.addNode(n);
 		n = f.createNode(Id.create(6, Node.class), new Coord((double) 0, (double) 600));
 		network.addNode(n);
-		l = f.createLink(Id.create(01, Link.class), network.getNodes().get(Id.create(0, Node.class)), network.getNodes().get(Id.create(1, Node.class)));
+		l = f.createLink(Id.create(1, Link.class), network.getNodes().get(Id.create(0, Node.class)), network.getNodes().get(Id.create(1, Node.class)));
 		l.setLength(300.0);
 		l.setFreespeed(10.0);
 		l.setCapacity(3600.0);
@@ -196,7 +196,7 @@ public class InvertedNetworkRoutingTestFixture {
 		l.setCapacity(3600.0);
 		network.addLink(l);
 	}
-	
+
 	private void createPopulation() {
 		Population pop = this.scenario.getPopulation();
 		PopulationFactory f = pop.getFactory();

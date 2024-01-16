@@ -21,9 +21,9 @@ package org.matsim.core.router;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.Injector;
@@ -57,15 +57,15 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 		final Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
-		
+
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
@@ -80,10 +80,10 @@ public class PseudoTransitRoutingModuleTest {
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(400.0, tt, 1e-8);
-			Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(400.0, tt, 1e-8);
+			Assertions.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(3.);
@@ -91,21 +91,21 @@ public class PseudoTransitRoutingModuleTest {
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(600.0, tt, 1e-8);
-			Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
-			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(600.0, tt, 1e-8);
+			Assertions.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
 			// above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that disutility.  But preferred to test in context.
 			// Thus the more complicated injector thing.  kai, nov'16
-			
+
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(2.);
 			params.setBeelineDistanceFactor(1.);
 			params.setTeleportedModeFreespeedLimit(5.);
-			f.s.getConfig().plansCalcRoute().addModeRoutingParams(params);
-			f.s.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
-			
+			f.s.getConfig().routing().addModeRoutingParams(params);
+			f.s.getConfig().controller().setOutputDirectory(utils.getOutputDirectory());
+
 			com.google.inject.Injector injector = Injector.createInjector(f.s.getConfig(), new AbstractModule() {
 				@Override public void install() {
 					install(new NewControlerModule());
@@ -114,19 +114,19 @@ public class PseudoTransitRoutingModuleTest {
 					install(new ScenarioByInstanceModule(f.s));
 				}
 			});
-			
+
 			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
-			
+
 			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
 			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
-			
+
 			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new AttributesImpl()) ;
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
 
-			Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
 	}
 
@@ -134,12 +134,12 @@ public class PseudoTransitRoutingModuleTest {
 		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		public Fixture() {
-			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			s.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			TeleportedModeParams walk = new TeleportedModeParams(TransportMode.walk);
 			walk.setBeelineDistanceFactor(1.3);
 			walk.setTeleportedModeSpeed(3.0 / 3.6);
-			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
-			
+			s.getConfig().routing().addModeRoutingParams(walk);
+
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
 			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));

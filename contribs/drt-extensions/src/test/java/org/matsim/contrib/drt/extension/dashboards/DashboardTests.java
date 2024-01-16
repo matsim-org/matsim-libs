@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.dashboards;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -17,15 +17,15 @@ import java.nio.file.Path;
 
 public class DashboardTests {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void run() {
 
 		Config config = DrtTestScenario.loadConfig(utils);
-		config.controler().setLastIteration(4);
-		config.controler().setWritePlansInterval(4);
-		config.controler().setWriteEventsInterval(4);
+		config.controller().setLastIteration(4);
+		config.controller().setWritePlansInterval(4);
+		config.controller().setWriteEventsInterval(4);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.defaultParams().sampleSize = 0.001;
@@ -45,7 +45,7 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void drtDefaults() {
+	void drtDefaults() {
 		run();
 
 		// TODO: add test headers!?

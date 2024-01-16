@@ -24,6 +24,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 
 import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;

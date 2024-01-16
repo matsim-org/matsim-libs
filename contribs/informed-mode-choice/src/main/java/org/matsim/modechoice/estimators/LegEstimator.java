@@ -12,6 +12,7 @@ public interface LegEstimator<T extends Enum<?>> {
 
 	/**
 	 * Calculate an estimate of utility íf this mode would be used.
+	 * May return {@link Double#NEGATIVE_INFINITY} if the mode is not available.
 	 *
 	 * @param context person traveling
 	 * @param mode    desire mode

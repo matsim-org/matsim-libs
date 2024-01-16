@@ -23,7 +23,6 @@ package org.matsim.contrib.ev.example;/*
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,14 +31,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.routing.EvNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunEvExample {
@@ -66,7 +63,7 @@ public class RunEvExample {
 
 	public void run( String[] args ) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule( new AbstractModule(){
@@ -74,8 +71,11 @@ public class RunEvExample {
 				install( new EvModule() );
 
 				addRoutingModuleBinding( TransportMode.car ).toProvider(new EvNetworkRoutingProvider(TransportMode.car) );
-				// a router that inserts charging activities when the battery is run empty.  there may be some other way to insert
-				// charging activities, based on the situation.  kai, dec'22
+				// a router that inserts charging activities INTO THE ROUTE when the battery is run empty.  This assumes that a full
+				// charge at the start of the route is not sufficient to drive the route.   There are other settings where the
+				// situation is different, e.g. urban, where there may be a CHAIN of activities, and charging in general is done in
+				// parallel with some of these activities.   That second situation is adressed by some "ev" code in the vsp contrib.
+				// kai, dec'22
 			}
 		} );
 

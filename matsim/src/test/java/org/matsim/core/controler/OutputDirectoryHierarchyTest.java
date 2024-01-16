@@ -18,27 +18,27 @@
  * *********************************************************************** */
 package org.matsim.core.controler;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * @author thibautd
  */
 public class OutputDirectoryHierarchyTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testFailureIfDirectoryExists() {
+	void testFailureIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
 		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
@@ -46,11 +46,11 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
-		Assert.assertTrue(
-				"Directory was not created",
-				new File( outputDirectory ).exists() );
+		Assertions.assertTrue(
+				new File( outputDirectory ).exists(),
+				"Directory was not created" );
 
 		// put something in the directory
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputDirectory+"/some_file" ) ) {
@@ -65,16 +65,16 @@ public class OutputDirectoryHierarchyTest {
 			new OutputDirectoryHierarchy(
 					outputDirectory,
 					OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
-					ControlerConfigGroup.CompressionType.none);
+					ControllerConfigGroup.CompressionType.none);
 		}
 		catch ( RuntimeException e ) {
 			return;
 		}
-		Assert.fail( "no exception thrown when directory exists!" );
+		Assertions.fail( "no exception thrown when directory exists!" );
 	}
 
 	@Test
-	public void testOverrideIfDirectoryExists() {
+	void testOverrideIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
 		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
@@ -82,11 +82,11 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
-		Assert.assertTrue(
-				"Directory was not created",
-				new File( outputDirectory ).exists() );
+		Assertions.assertTrue(
+				new File( outputDirectory ).exists(),
+				"Directory was not created" );
 
 		// put something in the directory
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputDirectory+"/some_file" ) ) {
@@ -100,16 +100,16 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
-		Assert.assertTrue(
-				"Directory was cleared",
-				new File( outputDirectory+"/some_file" ).exists() );
+		Assertions.assertTrue(
+				new File( outputDirectory+"/some_file" ).exists(),
+				"Directory was cleared" );
 
 	}
 
 	@Test
-	public void testDeleteIfDirectoryExists() {
+	void testDeleteIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
 		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
@@ -117,11 +117,11 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
-		Assert.assertTrue(
-				"Directory was not created",
-				new File( outputDirectory ).exists() );
+		Assertions.assertTrue(
+				new File( outputDirectory ).exists(),
+				"Directory was not created" );
 
 		// put something in the directory
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputDirectory+"/some_file" ) ) {
@@ -135,15 +135,15 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
-		Assert.assertTrue(
-				"Directory was deleted but not re-created!",
-				new File( outputDirectory ).exists() );
+		Assertions.assertTrue(
+				new File( outputDirectory ).exists(),
+				"Directory was deleted but not re-created!" );
 
-		Assert.assertFalse(
-				"Directory was not cleared",
-				new File( outputDirectory+"/some_file" ).exists() );
+		Assertions.assertFalse(
+				new File( outputDirectory+"/some_file" ).exists(),
+				"Directory was not cleared" );
 
 	}
 }

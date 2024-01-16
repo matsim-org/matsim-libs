@@ -20,13 +20,13 @@
 
 package org.matsim.contrib.roadpricing;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.Iterator;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
@@ -41,14 +41,15 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class RoadPricingIOTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
 	 */
-	@Test public void testWriteReadWrite() {
+	@Test
+	void testWriteReadWrite() {
 		final String origFile = utils.getClassInputDirectory() + "roadpricing1.xml";
 		final String tmpFile1 = utils.getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = utils.getOutputDirectory() + "roadpricing2.xml";

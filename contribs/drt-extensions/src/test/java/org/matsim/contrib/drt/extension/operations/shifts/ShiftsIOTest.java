@@ -1,12 +1,12 @@
 package org.matsim.contrib.drt.extension.operations.shifts;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.Optional;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
@@ -22,8 +22,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ShiftsIOTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final String TESTSHIFTSINPUT  = "testShifts.xml";
@@ -36,7 +36,8 @@ public class ShiftsIOTest {
 	private final Id<OperationFacility> oid2 = Id.create("op2", OperationFacility.class);
 
 
-	@Test public void testBasicReaderWriter() {
+	@Test
+	void testBasicReaderWriter() {
 
 		DrtShiftsSpecification shiftsSpecification = new DrtShiftsSpecificationImpl();
 

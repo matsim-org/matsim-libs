@@ -3,8 +3,8 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -15,12 +15,11 @@ import playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandle
 
 public class AgentId2EnterLeaveVehicleEventHandlerTest {
 
-    /**
-     * Test method for {@link playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler#AgentId2EnterLeaveVehicleEventHandler(java.util.Set)}.
-     */
-    @Test
-    
-    public void testAgentId2EnterLeaveVehicleEventHandler() {
+	/**
+	* Test method for {@link playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler#AgentId2EnterLeaveVehicleEventHandler(java.util.Set)}.
+	*/
+	@Test
+	void testAgentId2EnterLeaveVehicleEventHandler() {
     	       
     	Set<Id<Person>> idSet = new TreeSet<>();
     	for (int ii=0; ii<9; ii++){
@@ -56,12 +55,12 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         
 //        run tests
         
-        Assert.assertSame(event1, handler.getAgentId2EnterEventMap().get(persId1).get(0));
-        Assert.assertSame(event2, handler.getAgentId2EnterEventMap().get(persId2).get(0));
-        Assert.assertSame(event3, handler.getAgentId2EnterEventMap().get(persId3).get(0));
-        Assert.assertSame(event4, handler.getAgentId2LeaveEventMap().get(persId1).get(0));
-        Assert.assertSame(event5, handler.getAgentId2LeaveEventMap().get(persId2).get(0));
-        Assert.assertSame(event6, handler.getAgentId2LeaveEventMap().get(persId3).get(0));
+        Assertions.assertSame(event1, handler.getAgentId2EnterEventMap().get(persId1).get(0));
+        Assertions.assertSame(event2, handler.getAgentId2EnterEventMap().get(persId2).get(0));
+        Assertions.assertSame(event3, handler.getAgentId2EnterEventMap().get(persId3).get(0));
+        Assertions.assertSame(event4, handler.getAgentId2LeaveEventMap().get(persId1).get(0));
+        Assertions.assertSame(event5, handler.getAgentId2LeaveEventMap().get(persId2).get(0));
+        Assertions.assertSame(event6, handler.getAgentId2LeaveEventMap().get(persId3).get(0));
         
         
     }

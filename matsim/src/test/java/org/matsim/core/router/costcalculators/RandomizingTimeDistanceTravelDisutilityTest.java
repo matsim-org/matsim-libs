@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingRequest;
@@ -57,47 +57,47 @@ import org.matsim.facilities.Facility;
 public class RandomizingTimeDistanceTravelDisutilityTest {
 
 	@Test
-	public void testRoutesForDifferentSigmas() {
-		
+	void testRoutesForDifferentSigmas() {
+
 		{
 			Set<String> routes = new HashSet<>();
 			for (int i = 0; i<=5; i++) {
 				NetworkRoute route = computeRoute(0.);
-				routes.add(route.getLinkIds().toString());	
+				routes.add(route.getLinkIds().toString());
 			}
 			System.out.println("Route (sigma = 0.0): " + routes.toString());
-			Assert.assertEquals("There should only be a single route in the sigma = 0 case.", 1, routes.size());
+			Assertions.assertEquals(1, routes.size(), "There should only be a single route in the sigma = 0 case.");
 		}
-		
+
 		{
 			Set<String> routes = new HashSet<>();
 			for (int i = 0; i<=5; i++) {
 				NetworkRoute route = computeRoute(3.);
-				routes.add(route.getLinkIds().toString());	
+				routes.add(route.getLinkIds().toString());
 			}
 			System.out.println("Route (sigma = 3.0): " + routes.toString());
-			Assert.assertEquals("There should be two routes in the sigma = 3 case.", 2, routes.size());
+			Assertions.assertEquals(2, routes.size(), "There should be two routes in the sigma = 3 case.");
 		}
 	}
-	
+
 	public NetworkRoute computeRoute(double sigma) {
 		Fixture f = new Fixture();
 //		PlanCalcScoreConfigGroup planCalcScoreCfg = new PlanCalcScoreConfigGroup();
 		Config config = ConfigUtils.createConfig();
-		PlanCalcScoreConfigGroup planCalcScoreCfg = config.planCalcScore();
+		ScoringConfigGroup planCalcScoreCfg = config.scoring();
 		ModeParams modeParams = new ModeParams(TransportMode.car);
 		modeParams.setMonetaryDistanceRate(-0.1);
 		planCalcScoreCfg.addModeParams(modeParams);
-		config.plansCalcRoute().setRoutingRandomness( sigma );
-		
+		config.routing().setRoutingRandomness( sigma );
+
 		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
                 TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(f.s.getNetwork());
-		TravelTimeCalculator calculator = builder.build();	
-		
+		TravelTimeCalculator calculator = builder.build();
+
 		TravelTime travelTime = calculator.getLinkTravelTimes();
 		TravelDisutility disutility = factory.createTravelDisutility(travelTime);
 		LeastCostPathCalculator router = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(f.s).createPathCalculator(f.s.getNetwork(), disutility, travelTime);
-		
+
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
 		fromAct.setLinkId(Id.create("1", Link.class));
@@ -112,8 +112,8 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
 		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 7.0*3600, person)) ;
-		Assert.assertEquals(1, result.size() );
-		Leg leg = (Leg) result.get(0) ;				
+		Assertions.assertEquals(1, result.size() );
+		Leg leg = (Leg) result.get(0) ;
 		return (NetworkRoute) leg.getRoute();
 	}
 

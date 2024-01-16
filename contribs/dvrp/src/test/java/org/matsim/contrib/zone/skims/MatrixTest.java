@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
 
@@ -46,7 +46,7 @@ public class MatrixTest {
 	private final static int MAX_ALLOWED_VALUE = (1 << 16) - 2;
 
 	@Test
-	public void get_unsetValue() {
+	void get_unsetValue() {
 		for (Zone from : zones) {
 			for (Zone to : zones) {
 				assertThatThrownBy(() -> matrix.get(from, to)).isExactlyInstanceOf(NoSuchElementException.class)
@@ -56,7 +56,7 @@ public class MatrixTest {
 	}
 
 	@Test
-	public void get_validValue() {
+	void get_validValue() {
 		matrix.set(zoneA, zoneB, 0);
 		assertThat(matrix.get(zoneA, zoneB)).isEqualTo(0);
 
@@ -65,7 +65,7 @@ public class MatrixTest {
 	}
 
 	@Test
-	public void set_invalidValue() {
+	void set_invalidValue() {
 		assertThatThrownBy(() -> matrix.set(zoneA, zoneB, Double.POSITIVE_INFINITY)).isExactlyInstanceOf(
 				IllegalArgumentException.class);
 		assertThatThrownBy(() -> matrix.set(zoneA, zoneC, -1)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -74,13 +74,13 @@ public class MatrixTest {
 	}
 
 	@Test
-	public void get_unknownZone() {
+	void get_unknownZone() {
 		assertThatThrownBy(() -> matrix.get(zoneA, unknownZone)).isExactlyInstanceOf(IllegalArgumentException.class);
 		assertThatThrownBy(() -> matrix.get(unknownZone, zoneC)).isExactlyInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
-	public void set_unknownZone() {
+	void set_unknownZone() {
 		assertThatThrownBy(() -> matrix.set(zoneA, unknownZone, 1)).isExactlyInstanceOf(IllegalArgumentException.class);
 		assertThatThrownBy(() -> matrix.set(unknownZone, zoneC, 1)).isExactlyInstanceOf(IllegalArgumentException.class);
 	}

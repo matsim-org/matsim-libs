@@ -19,9 +19,8 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.locationchoice;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.replanning.ReplanningContext;
@@ -37,11 +36,11 @@ import jakarta.inject.Provider;
 
 public class BestReplyLocationChoicePlanStrategyTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testOne() {
+	void testOne() {
 
 //		Config config = ConfigUtils.loadConfig(this.utils.getPackageInputDirectory() + "config.xml");
 //		Scenario scenario = ScenarioUtils.loadScenario(config);

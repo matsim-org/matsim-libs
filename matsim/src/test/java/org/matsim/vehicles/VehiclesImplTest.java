@@ -19,8 +19,8 @@
 
 package org.matsim.vehicles;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 public class VehiclesImplTest {
 
 	@Test
-	public void testAddVehicle() {
+	void testAddVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType testType = vehicles.getFactory().createVehicleType(Id.create("test", VehicleType.class));
@@ -40,7 +40,7 @@ public class VehiclesImplTest {
 		/* Must add vehicle type before adding vehicle. */
 		try{
 			vehicles.addVehicle(v1);
-			Assert.fail("Should not allow adding a vehicle if vehicle type has not been added to container first.");
+			Assertions.fail("Should not allow adding a vehicle if vehicle type has not been added to container first.");
 		} catch(IllegalArgumentException e){
 			/* Pass. */
 		}
@@ -51,7 +51,7 @@ public class VehiclesImplTest {
 		Vehicle v2 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), testType);
 		try{
 			vehicles.addVehicle(v2);
-			Assert.fail("Cannot add another vehicle with the same Id.");
+			Assertions.fail("Cannot add another vehicle with the same Id.");
 		} catch (IllegalArgumentException e){
 			/* Pass. */
 		}
@@ -59,7 +59,7 @@ public class VehiclesImplTest {
 
 
 	@Test
-	public void testGetVehicles(){
+	void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType testType = vehicles.getFactory().createVehicleType(Id.create("test", VehicleType.class));
@@ -70,7 +70,7 @@ public class VehiclesImplTest {
 		try{
 			vehicles.getVehicles().put(Id.create("v1", Vehicle.class), v1 );
 			vehicles.getVehicles();
-			Assert.fail("Should not be able to add to an unmodiafiable Map");
+			Assertions.fail("Should not be able to add to an unmodiafiable Map");
 		} catch (UnsupportedOperationException e){
 			/* Pass. */
 		}
@@ -78,21 +78,21 @@ public class VehiclesImplTest {
 
 
 	@Test
-	public void testGetVehicleTypes(){
+	void testGetVehicleTypes(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		/* Should get an unmodifiable Map of the Vehicles container. */
 		try{
 			vehicles.getVehicleTypes().put(Id.create("type1", VehicleType.class), t1 );
-			Assert.fail("Should not be able to add to an unmodiafiable Map");
+			Assertions.fail("Should not be able to add to an unmodiafiable Map");
 		} catch (UnsupportedOperationException e){
 			/* Pass. */
 		}
 	}
 
 	@Test
-	public void testAddVehicleType(){
+	void testAddVehicleType(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
@@ -101,29 +101,29 @@ public class VehiclesImplTest {
 		vehicles.addVehicleType(t1);
 		try{
 			vehicles.addVehicleType(t2);
-			Assert.fail("Cannot add another vehicle type with the same Id");
+			Assertions.fail("Cannot add another vehicle type with the same Id");
 		} catch (IllegalArgumentException e){
 			/* Pass. */
 		}
 	}
 
 	@Test
-	public void testRemoveVehicle() {
+	void testRemoveVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		vehicles.addVehicleType(t1);
 
 		Vehicle v1 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), t1);
 
-		Assert.assertEquals(0, vehicles.getVehicles().size());
+		Assertions.assertEquals(0, vehicles.getVehicles().size());
 		vehicles.addVehicle(v1);
-		Assert.assertEquals(1, vehicles.getVehicles().size());
+		Assertions.assertEquals(1, vehicles.getVehicles().size());
 		vehicles.removeVehicle(Id.create("v1", Vehicle.class));
-		Assert.assertEquals(0, vehicles.getVehicles().size());
+		Assertions.assertEquals(0, vehicles.getVehicles().size());
 	}
 
 	@Test
-	public void testRemoveVehicleType() {
+	void testRemoveVehicleType() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		vehicles.addVehicleType(t1);
@@ -132,7 +132,7 @@ public class VehiclesImplTest {
 
 		try {
 			vehicles.removeVehicleType(t1.getId());
-			Assert.fail("expected exception, as vehicle type is still in use.");
+			Assertions.fail("expected exception, as vehicle type is still in use.");
 		} catch (IllegalArgumentException e) {
 			// pass
 		}

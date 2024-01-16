@@ -1,8 +1,8 @@
 package org.matsim.application.analysis;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimApplication;
 import org.matsim.application.MATSimApplicationTest;
@@ -16,23 +16,23 @@ import java.nio.file.Path;
 
 public class LogFileAnalysisTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void output() throws IOException {
+	void output() throws IOException {
 
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(2);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(2);
 
 		int execute = MATSimApplication.execute(MATSimApplicationTest.TestScenario.class, config);
 
 		Assertions.assertThat(execute)
 			.isEqualTo(0);
 
-		Path out = Path.of(config.controler().getOutputDirectory());
+		Path out = Path.of(config.controller().getOutputDirectory());
 		new LogFileAnalysis().execute(
 			"--input", ApplicationUtils.matchInput("logfile.log", out).toString(),
 			"--output-memory-stats", out.resolve("mem_stats.csv").toString(),

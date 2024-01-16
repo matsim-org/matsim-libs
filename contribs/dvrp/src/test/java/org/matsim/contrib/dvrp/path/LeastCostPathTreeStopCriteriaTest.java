@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntToDoubleFunction;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.router.speedy.LeastCostPathTree.StopCriterion;
 import org.matsim.testcases.fakes.FakeNode;
@@ -39,7 +39,7 @@ import org.matsim.testcases.fakes.FakeNode;
 public class LeastCostPathTreeStopCriteriaTest {
 
 	@Test
-	public void testAnd() {
+	void testAnd() {
 		StopCriterion scTrue = (nodeIndex, arrivalTime, travelCost, distance, departureTime) -> true;
 		StopCriterion scFalse = (nodeIndex, arrivalTime, travelCost, distance, departureTime) -> false;
 
@@ -51,7 +51,7 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testOr() {
+	void testOr() {
 		StopCriterion scTrue = (nodeIndex, arrivalTime, travelCost, distance, departureTime) -> true;
 		StopCriterion scFalse = (nodeIndex, arrivalTime, travelCost, distance, departureTime) -> false;
 
@@ -63,7 +63,7 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testMaxTravelTime() {
+	void testMaxTravelTime() {
 		StopCriterion sc = maxTravelTime(100);
 
 		//TT is 100 - continue
@@ -74,13 +74,13 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testAllEndNodesReached_noEndNodes() {
+	void testAllEndNodesReached_noEndNodes() {
 		assertThatThrownBy(() -> allEndNodesReached(List.of())).isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessage("At least one end node must be provided.");
 	}
 
 	@Test
-	public void testAllEndNodesReached_oneEndNode() {
+	void testAllEndNodesReached_oneEndNode() {
 		var endNode = new FakeNode(Id.createNodeId("end_node"));
 		var otherNode = new FakeNode(Id.createNodeId("other_node"));
 		StopCriterion sc = allEndNodesReached(List.of(endNode));
@@ -96,7 +96,7 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testAllEndNodesReached_twoEndNodes() {
+	void testAllEndNodesReached_twoEndNodes() {
 		var endNode1 = new FakeNode(Id.createNodeId("end_node_1"));
 		var endNode2 = new FakeNode(Id.createNodeId("end_node_2"));
 		var otherNode = new FakeNode(Id.createNodeId("other_node"));
@@ -119,13 +119,13 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testLeastCostEndNodeReached_noEndNodes() {
+	void testLeastCostEndNodeReached_noEndNodes() {
 		assertThatThrownBy(() -> new LeastCostEndNodeReached(List.of(), value -> 0)).isExactlyInstanceOf(
 				IllegalArgumentException.class).hasMessage("At least one end node must be provided.");
 	}
 
 	@Test
-	public void testLeastCostEndNodeReached_oneEndNode() {
+	void testLeastCostEndNodeReached_oneEndNode() {
 		var endNodeId = Id.createNodeId("end_node");
 		var otherNodeId = Id.createNodeId("other_node");
 
@@ -152,7 +152,7 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testLeastCostEndNodeReached_twoEndNodes_stopBeforeReachingTheOtherEndNode() {
+	void testLeastCostEndNodeReached_twoEndNodes_stopBeforeReachingTheOtherEndNode() {
 		var endNodeId1 = Id.createNodeId("end_node");
 		var endNodeId2 = Id.createNodeId("end_node_2");
 		var otherNodeId = Id.createNodeId("other_node");
@@ -172,7 +172,7 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testLeastCostEndNodeReached_twoEndNodes_bothVisited_fartherEndNodeWithLowerTotalCost() {
+	void testLeastCostEndNodeReached_twoEndNodes_bothVisited_fartherEndNodeWithLowerTotalCost() {
 		var endNodeId1 = Id.createNodeId("end_node");
 		var endNodeId2 = Id.createNodeId("end_node_2");
 
@@ -192,7 +192,7 @@ public class LeastCostPathTreeStopCriteriaTest {
 	}
 
 	@Test
-	public void testLeastCostEndNodeReached_twoEndNodes_noAdditionalCost_stopAfterVisitingFirstEndNode() {
+	void testLeastCostEndNodeReached_twoEndNodes_noAdditionalCost_stopAfterVisitingFirstEndNode() {
 		var endNodeId1 = Id.createNodeId("end_node");
 		var endNodeId2 = Id.createNodeId("end_node_2");
 

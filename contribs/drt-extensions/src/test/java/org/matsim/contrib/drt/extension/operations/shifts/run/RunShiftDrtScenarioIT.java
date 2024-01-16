@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts.run;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
@@ -17,9 +17,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class RunShiftDrtScenarioIT {
 
 	@Test
-	public void test() {
+	void test() {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
 
@@ -84,10 +84,10 @@ public class RunShiftDrtScenarioIT {
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		PlanCalcScoreConfigGroup.ModeParams scoreParams = new PlanCalcScoreConfigGroup.ModeParams("drt");
-		config.planCalcScore().addModeParams(scoreParams);
-		PlanCalcScoreConfigGroup.ModeParams scoreParams2 = new PlanCalcScoreConfigGroup.ModeParams("walk");
-		config.planCalcScore().addModeParams(scoreParams2);
+		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
+		config.scoring().addModeParams(scoreParams);
+		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
+		config.scoring().addModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -95,33 +95,33 @@ public class RunShiftDrtScenarioIT {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
-		final PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		final ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
 		home.setTypicalDuration(8 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams other = new PlanCalcScoreConfigGroup.ActivityParams("other");
+		final ScoringConfigGroup.ActivityParams other = new ScoringConfigGroup.ActivityParams("other");
 		other.setTypicalDuration(4 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams education = new PlanCalcScoreConfigGroup.ActivityParams("education");
+		final ScoringConfigGroup.ActivityParams education = new ScoringConfigGroup.ActivityParams("education");
 		education.setTypicalDuration(6 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams shopping = new PlanCalcScoreConfigGroup.ActivityParams("shopping");
+		final ScoringConfigGroup.ActivityParams shopping = new ScoringConfigGroup.ActivityParams("shopping");
 		shopping.setTypicalDuration(2 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
-		config.planCalcScore().addActivityParams(home);
-		config.planCalcScore().addActivityParams(other);
-		config.planCalcScore().addActivityParams(education);
-		config.planCalcScore().addActivityParams(shopping);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(home);
+		config.scoring().addActivityParams(other);
+		config.scoring().addActivityParams(education);
+		config.scoring().addActivityParams(shopping);
+		config.scoring().addActivityParams(work);
 
-		final StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);
 		stratSets.setStrategyName("ChangeExpBeta");
-		config.strategy().addStrategySettings(stratSets);
+		config.replanning().addStrategySettings(stratSets);
 
-		config.controler().setLastIteration(1);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setLastIteration(1);
+		config.controller().setWriteEventsInterval(1);
 
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory("test/output/holzkirchen_shifts");
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
 		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);

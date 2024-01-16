@@ -1,7 +1,7 @@
 package org.matsim.modechoice.estimators;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -13,15 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ComplexEstimatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void bindings() {
+	void bindings() {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		config.controler().setLastIteration(2);
+		config.controller().setLastIteration(2);
 		Controler controler = MATSimApplication.prepare(TestScenario.class, config, "--complex");
 
 		controler.run();

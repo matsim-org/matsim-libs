@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Random;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author michalm
@@ -37,7 +37,7 @@ public class WeightedRandomSelectionTest {
 	private final MutableDouble randomDouble = new MutableDouble();
 	private WeightedRandomSelection<String> weightedRandomSelection;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		weightedRandomSelection = new WeightedRandomSelection<>(new Random() {
 			@Override
@@ -48,7 +48,7 @@ public class WeightedRandomSelectionTest {
 	}
 
 	@Test
-	public void testIncorrectInput() {
+	void testIncorrectInput() {
 		assertIncorrectWeight(-Double.MIN_VALUE);
 		assertIncorrectWeight(-1);
 		assertIncorrectWeight(-Double.MAX_VALUE);
@@ -71,7 +71,7 @@ public class WeightedRandomSelectionTest {
 	}
 
 	@Test
-	public void testEmptyList() {
+	void testEmptyList() {
 		assertThat(weightedRandomSelection.size()).isEqualTo(0);
 		assertThatThrownBy(() -> weightedRandomSelection.select())//
 				.isExactlyInstanceOf(IllegalStateException.class)//
@@ -79,7 +79,7 @@ public class WeightedRandomSelectionTest {
 	}
 
 	@Test
-	public void testZeroTotalWeight() {
+	void testZeroTotalWeight() {
 		weightedRandomSelection.add("A", 0.);
 		weightedRandomSelection.add("B", 0.);
 		assertThatThrownBy(() -> weightedRandomSelection.select())//
@@ -88,7 +88,7 @@ public class WeightedRandomSelectionTest {
 	}
 
 	@Test
-	public void testSingleValueList() {
+	void testSingleValueList() {
 		weightedRandomSelection.add("A", 1);
 		assertThat(weightedRandomSelection.size()).isEqualTo(1);
 
@@ -100,7 +100,7 @@ public class WeightedRandomSelectionTest {
 	}
 
 	@Test
-	public void testThreeValuesList() {
+	void testThreeValuesList() {
 		weightedRandomSelection.add("A", 1);
 		weightedRandomSelection.add("B", 0.5);
 		weightedRandomSelection.add("C", 1.5);

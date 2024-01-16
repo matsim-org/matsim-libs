@@ -18,8 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim.core.router;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
@@ -33,7 +33,6 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
-import org.junit.Assert;
 
 
 /**
@@ -45,7 +44,7 @@ public class InvertertedNetworkRoutingTest {
 
 
 	@Test
-	public void testInvertedNetworkLegRouter() {
+	void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
 		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig() );
@@ -65,36 +64,36 @@ public class InvertertedNetworkRoutingTest {
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		
 		NetworkRoute route = calcRoute(router, fromFacility, toFacility, person);
-		Assert.assertNotNull(route);
-		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
-		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
-		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
-		Assert.assertEquals(Id.create("34", Link.class), route.getLinkIds().get(1));
-		Assert.assertEquals(Id.create("47", Link.class), route.getLinkIds().get(2));
+		Assertions.assertNotNull(route);
+		Assertions.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
+		Assertions.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
+		Assertions.assertEquals(3, route.getLinkIds().size());
+		Assertions.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
+		Assertions.assertEquals(Id.create("34", Link.class), route.getLinkIds().get(1));
+		Assertions.assertEquals(Id.create("47", Link.class), route.getLinkIds().get(2));
 		
 		//test 2
 		tt.setTurningMoveCosts(100.0, 0.0, 50.0);
         route = calcRoute(router, fromFacility, toFacility, person);
-		Assert.assertNotNull(route);
-		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
-		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
-		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
-		Assert.assertEquals(Id.create("35", Link.class), route.getLinkIds().get(1));
-		Assert.assertEquals(Id.create("57", Link.class), route.getLinkIds().get(2));
+		Assertions.assertNotNull(route);
+		Assertions.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
+		Assertions.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
+		Assertions.assertEquals(3, route.getLinkIds().size());
+		Assertions.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
+		Assertions.assertEquals(Id.create("35", Link.class), route.getLinkIds().get(1));
+		Assertions.assertEquals(Id.create("57", Link.class), route.getLinkIds().get(2));
 		
 		//test 3
 		tt.setTurningMoveCosts(50.0, 100.0, 0.0);
 		
         route = calcRoute(router, fromFacility, toFacility, person);
-		Assert.assertNotNull(route);
-		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
-		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
-		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
-		Assert.assertEquals(Id.create("36", Link.class), route.getLinkIds().get(1));
-		Assert.assertEquals(Id.create("67", Link.class), route.getLinkIds().get(2));
+		Assertions.assertNotNull(route);
+		Assertions.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
+		Assertions.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
+		Assertions.assertEquals(3, route.getLinkIds().size());
+		Assertions.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
+		Assertions.assertEquals(Id.create("36", Link.class), route.getLinkIds().get(1));
+		Assertions.assertEquals(Id.create("67", Link.class), route.getLinkIds().get(2));
 
 
 		

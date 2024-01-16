@@ -1,6 +1,6 @@
 package org.matsim.modechoice.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 	@Test
-	public void choices() {
+	void choices() {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
@@ -44,7 +44,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 	}
 
 	@Test
-	public void person() {
+	void person() {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
@@ -59,7 +59,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 
 	@Test
-	public void invariance() {
+	void invariance() {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
@@ -87,7 +87,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 	}
 
 	@Test
-	public void predefined() {
+	void predefined() {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
@@ -122,7 +122,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 	}
 
 	@Test
-	public void threshold() {
+	void threshold() {
 
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);

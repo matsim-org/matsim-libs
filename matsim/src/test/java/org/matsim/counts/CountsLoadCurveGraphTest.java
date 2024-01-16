@@ -20,24 +20,25 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsLoadCurveGraphTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testCreateChart() {
+	@Test
+	void testCreateChart() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
 		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
-		assertNotNull("No graph is created", eg.createChart(0));
+		assertNotNull(eg.createChart(0), "No graph is created");
 	}
 }

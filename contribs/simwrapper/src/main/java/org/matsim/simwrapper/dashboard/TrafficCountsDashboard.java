@@ -88,7 +88,7 @@ public class TrafficCountsDashboard implements Dashboard {
 			argList.addAll(List.of("--counts", countsPath));
 
 		if (networkModes != null)
-			argList.addAll(List.of("--transport-mode", String.join(",", networkModes)));
+			argList.addAll(List.of("--network-mode", String.join(",", networkModes)));
 
 		String[] args = argList.toArray(new String[0]);
 

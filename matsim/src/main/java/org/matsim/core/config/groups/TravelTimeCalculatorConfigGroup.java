@@ -19,11 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,9 +39,6 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 
 	public static final String GROUPNAME = "travelTimeCalculator";
 
-	public enum TravelTimeCalculatorType {TravelTimeCalculatorArray,TravelTimeCalculatorHashMap}
-
-	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
 	private static final String TRAVEL_TIME_GETTER = "travelTimeGetter";
@@ -56,7 +51,6 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	private static final String FILTERMODES = "filterModes";
 	private static final String SEPARATEMODES = "separateModes";
 
-	private TravelTimeCalculatorType travelTimeCalculator = TravelTimeCalculatorType.TravelTimeCalculatorArray;
 	private String travelTimeAggregator = "optimistic";
 	private String travelTimeGetter = "average";
 	private double traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
@@ -89,22 +83,11 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 							 "respected by the travel time collector. 'car' is default which includes also buses from the pt simulation module.");
 		map.put(FILTERMODES, "(only for backwards compatiblity; only used if " + SEPARATEMODES + "==false)  Only modes included in analyzedModes are included." ) ;
 		map.put(SEPARATEMODES, "(only for backwards compatibility) If false, link travel times are measured and aggregated over all vehicles using the link." ) ;
-		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + Arrays.stream( TravelTimeCalculatorType.values() ).map( type -> type.toString() + ' ' ).collect( Collectors.joining() ) );
 		return map;
 	}
 
 	enum DifferentModesHandling { separateAccordingToAnalyzedModes, jointButRestrictedToAnalyzedModes, jointAndUsingAllModes }
 
-	// ---
-	@StringSetter( TRAVEL_TIME_CALCULATOR )
-	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
-		// leaving this as setter from string for backwards compatibility; enum.name() is not that terrible.  kai, feb'18
-		this.travelTimeCalculator = TravelTimeCalculatorType.valueOf( travelTimeCalculator ) ;
-	}
-	@StringGetter( TRAVEL_TIME_CALCULATOR )
-	public TravelTimeCalculatorType getTravelTimeCalculatorType(){
-		return this.travelTimeCalculator;
-	}
 	// ---
 	@StringSetter( TRAVEL_TIME_AGGREGATOR )
 	public void setTravelTimeAggregatorType(final String travelTimeAggregator){

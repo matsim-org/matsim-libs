@@ -22,13 +22,7 @@
 
 package org.matsim.analysis;
 
-import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 public final class LinkStatsModule extends AbstractModule {
 

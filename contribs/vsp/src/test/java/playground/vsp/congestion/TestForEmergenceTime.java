@@ -21,9 +21,9 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,11 +60,11 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
  */
 
 public class TestForEmergenceTime {
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void emergenceTimeTest_v4(){
+	final void emergenceTimeTest_v4(){
 
 		String [] congestionPricingImpl = {"v4"};
 
@@ -72,8 +72,8 @@ public class TestForEmergenceTime {
 			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
 			for(CongestionEvent event : congestionEvents){
 				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
-					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON);
-					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
+					Assertions.assertEquals(8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON, "wrong emergence time");
+					Assertions.assertEquals(Id.createLinkId("3"), event.getLinkId(), "wrong linkId");
 				}
 			}
 		}
@@ -94,7 +94,7 @@ public class TestForEmergenceTime {
 //			}
 //		}
 //	}
-	
+
 	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
 
 		int numberOfPersonInPlan = 10;
@@ -117,7 +117,7 @@ public class TestForEmergenceTime {
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
@@ -137,8 +137,8 @@ public class TestForEmergenceTime {
 	}
 
 	/**
-	 * generates network with 8 links. Even persons will go on one branch (down) and odd persons will go on other (up). A person come from top. 
-	 *<p> 
+	 * generates network with 8 links. Even persons will go on one branch (down) and odd persons will go on other (up). A person come from top.
+	 *<p>
 	 *<p>				  o
 	 *<p> 				  |
 	 *<p>				  8
@@ -146,7 +146,7 @@ public class TestForEmergenceTime {
 	 *<p>				  |
 	 *<p>				  o
 	 *<p> 				  |
-	 *<p>				  7 
+	 *<p>				  7
 	 *<p>				  |
 	 *<p>				  |
 	 *<p>  o--1---o---2---o----3----o----4----o

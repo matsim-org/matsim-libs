@@ -20,20 +20,19 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jakarta.inject.Inject;
 
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -54,11 +53,12 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 
 public class ActivityReplanningMapTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testGetTimeBin() {
+	@Test
+	void testGetTimeBin() {
 		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager());
 
 		// test default setting with start time = 0.0 and time step size = 1.0
@@ -97,17 +97,18 @@ public class ActivityReplanningMapTest {
 		assertEquals(2, arp.getTimeBin(12.1));
 	}
 
-	@Test public void testScenarioRun() {
+	@Test
+	void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(0);
 		config.qsim().setStartTime(0.0);
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());
@@ -117,10 +118,10 @@ public class ActivityReplanningMapTest {
 				addMobsimListenerBinding().to(MobsimListenerForTests.class);
 			}
 		});
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setWritePlansInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setWritePlansInterval(0);
 		controler.run();
 	}
 

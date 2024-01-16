@@ -1,8 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -10,10 +10,7 @@ import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsModule;
-import org.matsim.counts.CountsWriter;
+import org.matsim.counts.*;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
@@ -31,11 +28,11 @@ import java.util.SplittableRandom;
 
 public class TrafficCountsDashboardTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void generate() {
+	void generate() {
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -43,22 +40,22 @@ public class TrafficCountsDashboardTest {
 
 		SimWrapperConfigGroup simWrapperConfigGroup = new SimWrapperConfigGroup();
 		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.get("");
-		contextParams.mapCenter = "12, 48.95";
+		contextParams.mapCenter = "12,48.95";
 		contextParams.sampleSize = 0.01;
 		contextParams.mapZoomLevel = 9.0;
 
 		SimWrapper sw = SimWrapper.create(config)
-				.addDashboard(new TrafficCountsDashboard())
-				.addDashboard(Dashboard.customize(new TrafficCountsDashboard()
-						.withQualityLabels(
-								List.of(0.0, 0.3, 1.7, 2.5),
-								List.of("way too few", "fewer", "exact", "too much", "way too much")
-						)
-				).context("custom"))
-				.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
-					Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml",
-						Set.of(TransportMode.car, "freight"))
-				).context("freight").title("Freight counts"));
+			.addDashboard(new TrafficCountsDashboard())
+			.addDashboard(Dashboard.customize(new TrafficCountsDashboard()
+				.withQualityLabels(
+					List.of(0.0, 0.3, 1.7, 2.5),
+					List.of("way too few", "fewer", "exact", "too much", "way too much")
+				)
+			).context("custom"))
+			.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
+				Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml",
+				Set.of(TransportMode.car, "freight"))
+			).context("freight").title("Freight counts"));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
@@ -68,12 +65,12 @@ public class TrafficCountsDashboardTest {
 		Path freightDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-freight");
 
 		Assertions.assertThat(defaultDir)
-				.isDirectoryContaining("glob:**count_comparison_daily.csv")
-				.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
+			.isDirectoryContaining("glob:**count_comparison_daily.csv")
+			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
 
 		Assertions.assertThat(freightDir)
-				.isDirectoryContaining("glob:**count_comparison_daily.csv")
-				.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
+			.isDirectoryContaining("glob:**count_comparison_daily.csv")
+			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
 
 	}
 
@@ -92,12 +89,18 @@ public class TrafficCountsDashboardTest {
 		for (int i = 0; i <= 100; i++) {
 			Link link = links.get(random.nextInt(size));
 
-			if (counts.getCounts().containsKey(link.getId()))
+			if (counts.getMeasureLocations().containsKey(link.getId()))
 				continue;
 
-			Count<Link> count = counts.createAndAddCount(link.getId(), link.getId().toString() + "_count_station");
-			for (int hour = 1; hour < 25; hour++)
-				count.createVolume(hour, random.nextInt(75));
+			MeasurementLocation<Link> station = counts.createAndAddMeasureLocation(link.getId(), link.getId().toString() + "_count_station");
+
+			Measurable carVolume = station.createVolume(TransportMode.car);
+			Measurable freightVolume = station.createVolume(TransportMode.truck);
+
+			for (int hour = 0; hour < 24; hour++) {
+				carVolume.setAtHour(hour, random.nextInt(500));
+				freightVolume.setAtHour(hour, random.nextInt(100));
+			}
 		}
 
 		try {

@@ -19,9 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
@@ -31,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 /**
@@ -39,80 +42,82 @@ import java.nio.file.Paths;
  */
 public class IOUtilsTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testInitOutputDirLogging() throws IOException {
+	void testInitOutputDirLogging() throws IOException {
 		System.out.println(utils.getOutputDirectory());
 		String outDir = utils.getOutputDirectory();
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outDir);
 
 		File l = new File(outDir + OutputDirectoryLogging.LOGFILE);
 		File errorLog = new File(outDir + OutputDirectoryLogging.WARNLOGFILE);
-		Assert.assertTrue(l.exists());
-		Assert.assertTrue(errorLog.exists());
+		Assertions.assertTrue(l.exists());
+		Assertions.assertTrue(errorLog.exists());
 	}
 
 	/**
 	 * @author mrieser
 	 */
 	@Test
-	public void testDeleteDir() throws IOException {
+	void testDeleteDir() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String testDir = outputDir + "a";
 		String someFilename = testDir + "/a.txt";
 		File dir = new File(testDir);
-		Assert.assertTrue(dir.mkdir());
+		Assertions.assertTrue(dir.mkdir());
 		File someFile = new File(someFilename);
-		Assert.assertTrue(someFile.createNewFile());
+		Assertions.assertTrue(someFile.createNewFile());
 
 		IOUtils.deleteDirectoryRecursively(dir.toPath());
 
-		Assert.assertFalse(someFile.exists());
-		Assert.assertFalse(dir.exists());
+		Assertions.assertFalse(someFile.exists());
+		Assertions.assertFalse(dir.exists());
 	}
 
 	/**
 	 * @author mrieser
 	 */
-	@Test(expected = UncheckedIOException.class)
-	public void testDeleteDir_InexistentDir() {
-		String outputDir = utils.getOutputDirectory();
-		String testDir = outputDir + "a";
-		File dir = new File(testDir);
-		IOUtils.deleteDirectoryRecursively(dir.toPath());
-		Assert.assertFalse(dir.exists());
+	@Test
+	void testDeleteDir_InexistentDir() {
+		assertThrows(UncheckedIOException.class, () -> {
+			String outputDir = utils.getOutputDirectory();
+			String testDir = outputDir + "a";
+			File dir = new File(testDir);
+			IOUtils.deleteDirectoryRecursively(dir.toPath());
+			Assertions.assertFalse(dir.exists());
+		});
 	}
 
 	@Test
-	public void testGetBufferedReader_encodingMacRoman() throws IOException {
+	void testGetBufferedReader_encodingMacRoman() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_MacRoman.txt");
 		BufferedReader reader = IOUtils.getBufferedReader(url, Charset.forName("MacRoman"));
 		String line = reader.readLine();
-		Assert.assertNotNull(line);
-		Assert.assertEquals("äöüÉç", line);
+		Assertions.assertNotNull(line);
+		Assertions.assertEquals("äöüÉç", line);
 	}
 
 	@Test
-	public void testGetBufferedReader_encodingIsoLatin1() throws IOException {
+	void testGetBufferedReader_encodingIsoLatin1() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt");
-		BufferedReader reader = IOUtils.getBufferedReader(url, Charset.forName("ISO-8859-1"));
+		BufferedReader reader = IOUtils.getBufferedReader(url, StandardCharsets.ISO_8859_1);
 		String line = reader.readLine();
-		Assert.assertNotNull(line);
-		Assert.assertEquals("äöüÉç", line);
+		Assertions.assertNotNull(line);
+		Assertions.assertEquals("äöüÉç", line);
 	}
 
 	@Test
-	public void testGetBufferedReader_encodingUTF8() throws IOException {
+	void testGetBufferedReader_encodingUTF8() throws IOException {
 		URL url = IOUtils.resolveFileOrResource(this.utils.getClassInputDirectory() + "textsample_UTF8.txt");
 		BufferedReader reader = IOUtils.getBufferedReader(url);
 		String line = reader.readLine();
-		Assert.assertNotNull(line);
-		Assert.assertEquals("äöüÉç", line);
+		Assertions.assertNotNull(line);
+		Assertions.assertEquals("äöüÉç", line);
 	}
 
 	@Test
-	public void testGetBufferedWriter_encodingMacRoman() throws IOException {
+	void testGetBufferedWriter_encodingMacRoman() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_MacRoman.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, Charset.forName("MacRoman"), false);
@@ -120,23 +125,23 @@ public class IOUtilsTest {
 		writer.close();
 		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_MacRoman.txt");
 		long crc2 = CRCChecksum.getCRCFromFile(filename);
-		Assert.assertEquals("File was not written with encoding MacRoman.", crc1, crc2);
+		Assertions.assertEquals(crc1, crc2, "File was not written with encoding MacRoman.");
 	}
 
 	@Test
-	public void testGetBufferedWriter_encodingIsoLatin1() throws IOException {
+	void testGetBufferedWriter_encodingIsoLatin1() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_IsoLatin1.txt";
 		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, Charset.forName("ISO-8859-1"), false);
+		BufferedWriter writer = IOUtils.getBufferedWriter(url, StandardCharsets.ISO_8859_1, false);
 		writer.write("äöüÉç");
 		writer.close();
 		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt");
 		long crc2 = CRCChecksum.getCRCFromFile(filename);
-		Assert.assertEquals("File was not written with encoding IsoLatin1.", crc1, crc2);
+		Assertions.assertEquals(crc1, crc2, "File was not written with encoding IsoLatin1.");
 	}
 
 	@Test
-	public void testGetBufferedWriter_encodingUTF8() throws IOException {
+	void testGetBufferedWriter_encodingUTF8() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "textsample_UTF8.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -144,11 +149,11 @@ public class IOUtilsTest {
 		writer.close();
 		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_UTF8.txt");
 		long crc2 = CRCChecksum.getCRCFromFile(filename);
-		Assert.assertEquals("File was not written with encoding UTF8.", crc1, crc2);
+		Assertions.assertEquals(crc1, crc2, "File was not written with encoding UTF8.");
 	}
 
 	@Test
-	public void testGetBufferedWriter_overwrite() throws IOException {
+	void testGetBufferedWriter_overwrite() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -159,11 +164,11 @@ public class IOUtilsTest {
 		writer2.close();
 		BufferedReader reader = IOUtils.getBufferedReader(url);
 		String line = reader.readLine();
-		Assert.assertEquals("bbb", line);
+		Assertions.assertEquals("bbb", line);
 	}
 
 	@Test
-	public void testGetBufferedWriter_append() throws IOException {
+	void testGetBufferedWriter_append() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
@@ -174,11 +179,11 @@ public class IOUtilsTest {
 		writer2.close();
 		BufferedReader reader = IOUtils.getBufferedReader(url);
 		String line = reader.readLine();
-		Assert.assertEquals("aaabbb", line);
+		Assertions.assertEquals("aaabbb", line);
 	}
 
 	@Test
-	public void testGetBufferedWriter_overwrite_gzipped() throws IOException {
+	void testGetBufferedWriter_overwrite_gzipped() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
@@ -189,77 +194,83 @@ public class IOUtilsTest {
 		writer2.close();
 		BufferedReader reader = IOUtils.getBufferedReader(url);
 		String line = reader.readLine();
-		Assert.assertEquals("bbb", line);
-	}
-
-	@Test(expected = UncheckedIOException.class)
-	public void testGetBufferedWriter_append_gzipped() throws IOException {
-		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
-		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
-		writer.write("aaa");
-		writer.close();
-		IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		Assertions.assertEquals("bbb", line);
 	}
 
 	@Test
-	public void testGetBufferedWriter_gzipped() throws IOException {
+	void testGetBufferedWriter_append_gzipped() throws IOException {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.gz";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
+	}
+
+	@Test
+	void testGetBufferedWriter_gzipped() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assert.assertTrue("compressed file should be less than 50 bytes, but is " + file.length(), file.length() < 50);
-	}
-
-	@Test(expected = UncheckedIOException.class)
-	public void testGetBufferedWriter_append_lz4() throws IOException {
-		String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
-		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
-		writer.write("aaa");
-		writer.close();
-		IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		Assertions.assertTrue(file.length() < 50, "compressed file should be less than 50 bytes, but is " + file.length());
 	}
 
 	@Test
-	public void testGetBufferedWriter_lz4() throws IOException {
+	void testGetBufferedWriter_append_lz4() throws IOException {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
+	}
+
+	@Test
+	void testGetBufferedWriter_lz4() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assert.assertEquals("compressed file should be equal 35 bytes, but is " + file.length(), 35, file.length());
+		Assertions.assertEquals(35, file.length(), "compressed file should be equal 35 bytes, but is " + file.length());
 
 		String content = IOUtils.getBufferedReader(filename).readLine();
-		Assert.assertEquals("12345678901234567890123456789012345678901234567890", content);
-	}
-
-	@Test(expected = UncheckedIOException.class)
-	public void testGetBufferedWriter_append_bz2() throws IOException {
-		String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
-		URL url = IOUtils.getFileUrl(filename);
-		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
-		writer.write("aaa");
-		writer.close();
-		IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		Assertions.assertEquals("12345678901234567890123456789012345678901234567890", content);
 	}
 
 	@Test
-	public void testGetBufferedWriter_bz2() throws IOException {
+	void testGetBufferedWriter_append_bz2() throws IOException {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
+	}
+
+	@Test
+	void testGetBufferedWriter_bz2() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assert.assertTrue("compressed file should be equal 51 bytes, but is " + file.length(), file.length() == 51);
+		Assertions.assertTrue(file.length() == 51, "compressed file should be equal 51 bytes, but is " + file.length());
 	}
 
 	@Test
-	public void testGetBufferedWriter_append_zst() throws IOException {
+	void testGetBufferedWriter_append_zst() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.zst";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
@@ -270,34 +281,34 @@ public class IOUtilsTest {
 		writer.close();
 		BufferedReader reader = IOUtils.getBufferedReader(url);
 		String content = reader.readLine();
-		Assert.assertEquals("aaabbb", content);
+		Assertions.assertEquals("aaabbb", content);
 	}
 
 	@Test
-	public void testGetBufferedWriter_zst() throws IOException {
+	void testGetBufferedWriter_zst() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test.txt.zst";
 		URL url = IOUtils.getFileUrl(filename);
 		BufferedWriter writer = IOUtils.getBufferedWriter(url);
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assert.assertEquals("compressed file should be equal 28 bytes, but is " + file.length(), 28, file.length());
+		Assertions.assertEquals(28, file.length(), "compressed file should be equal 28 bytes, but is " + file.length());
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithoutBOM() throws IOException {
+	void testGetInputStream_UTFwithoutBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write("ABCdef".getBytes());
 		out.close();
 
 		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 		in.close();
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM() throws IOException {
+	void testGetInputStream_UTFwithBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -305,12 +316,12 @@ public class IOUtilsTest {
 		out.close();
 
 		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 		in.close();
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_Compressed() throws IOException {
+	void testGetInputStream_UTFwithBOM_Compressed() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.gz";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -318,12 +329,12 @@ public class IOUtilsTest {
 		out.close();
 
 		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 		in.close();
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_Lz4() throws IOException {
+	void testGetInputStream_UTFwithBOM_Lz4() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.lz4";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -331,12 +342,12 @@ public class IOUtilsTest {
 		out.close();
 
 		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 		in.close();
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_bz2() throws IOException {
+	void testGetInputStream_UTFwithBOM_bz2() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.bz2";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -344,12 +355,12 @@ public class IOUtilsTest {
 		out.close();
 
 		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 		in.close();
 	}
 
 	@Test
-	public void testGetInputStream_UTFwithBOM_zst() throws IOException {
+	void testGetInputStream_UTFwithBOM_zst() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.zst";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -357,12 +368,12 @@ public class IOUtilsTest {
 		out.close();
 
 		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 		in.close();
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithoutBOM() throws IOException {
+	void testGetBufferedReader_UTFwithoutBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write("ABCdef".getBytes());
@@ -370,23 +381,23 @@ public class IOUtilsTest {
 
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM() throws IOException {
+	void testGetBufferedReader_UTFwithBOM() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt";
 		FileOutputStream out = new FileOutputStream(filename);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -395,23 +406,23 @@ public class IOUtilsTest {
 
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_Compressed() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_Compressed() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.gz";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -420,28 +431,28 @@ public class IOUtilsTest {
 
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename.substring(0, filename.length() - 3))); // without the .gz extension
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_lz4() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_lz4() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.lz4";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -450,23 +461,23 @@ public class IOUtilsTest {
 
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_bz2() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_bz2() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.bz2";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -475,23 +486,23 @@ public class IOUtilsTest {
 
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 	}
 
 	@Test
-	public void testGetBufferedReader_UTFwithBOM_zst() throws IOException {
+	void testGetBufferedReader_UTFwithBOM_zst() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.zst";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
@@ -500,17 +511,17 @@ public class IOUtilsTest {
 
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 		{
 			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
-			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
 			in.close();
 		}
 	}
@@ -522,19 +533,19 @@ public class IOUtilsTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testGetBufferedWriter_withPlusInFilename() throws IOException {
+	void testGetBufferedWriter_withPlusInFilename() throws IOException {
 		String filename = this.utils.getOutputDirectory() + "test+test.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(IOUtils.getFileUrl(filename));
 		writer.write("hello world!");
 		writer.close();
 
 		File file = new File(filename);
-		Assert.assertTrue(file.exists());
-		Assert.assertEquals("test+test.txt", file.getCanonicalFile().getName());
+		Assertions.assertTrue(file.exists());
+		Assertions.assertEquals("test+test.txt", file.getCanonicalFile().getName());
 	}
 
 	@Test
-	public void testNewUrl() throws MalformedURLException {
+	void testNewUrl() throws MalformedURLException {
 		URL context = Paths.get("").toUri().toURL();
 		System.out.println(context.toString());
 		URL url = IOUtils.extendUrl(context, "C:\\windows\\directory\\filename.txt");
@@ -542,7 +553,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	public void testResolveFileOrResource() throws URISyntaxException, IOException {
+	void testResolveFileOrResource() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/testfile.jar");
 		String jarUrlString = "file:" + jarFile.getAbsolutePath(); // URLs require absolute paths
@@ -552,29 +563,29 @@ public class IOUtilsTest {
 		try (InputStream is = url.openStream()) {
 			byte[] data = new byte[4096];
 			int size = is.read(data);
-			Assert.assertEquals(9, size);
-			Assert.assertEquals("Success!\n", new String(data, 0, size));
+			Assertions.assertEquals(9, size);
+			Assertions.assertEquals("Success!\n", new String(data, 0, size));
 		}
 	}
 
 	@Test
-	public void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
+	void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/test directory/testfile.jar");
 		String fileUrlString = "jar:" + jarFile.toURI().toString() + "!/the_file.txt";
-		Assert.assertTrue(fileUrlString.contains("test%20directory")); // just make sure the space is correctly URL-encoded
+		Assertions.assertTrue(fileUrlString.contains("test%20directory")); // just make sure the space is correctly URL-encoded
 
 		URL url = IOUtils.resolveFileOrResource(fileUrlString);
 		try (InputStream is = url.openStream()) {
 			byte[] data = new byte[4096];
 			int size = is.read(data);
-			Assert.assertEquals(9, size);
-			Assert.assertEquals("Success!\n", new String(data, 0, size));
+			Assertions.assertEquals(9, size);
+			Assertions.assertEquals("Success!\n", new String(data, 0, size));
 		}
 	}
 
 	@Test
-	public void testEncryptedFile() throws IOException {
+	void testEncryptedFile() throws IOException {
 
 		System.setProperty(CipherUtils.ENVIRONMENT_VARIABLE, "abc123");
 
@@ -582,10 +593,10 @@ public class IOUtilsTest {
 
 		// openssl enc -aes256 -md sha512 -pbkdf2 -iter 10000 -in some.secret -out some.secret.enc
 		BufferedReader decrypted = IOUtils.getBufferedReader(new File("test/input/org/matsim/core/utils/io/IOUtils/some.secret.enc").toURL());
-		Assert.assertEquals(input, decrypted.readLine());
+		Assertions.assertEquals(input, decrypted.readLine());
 
 		BufferedReader gziped = IOUtils.getBufferedReader(new File("test/input/org/matsim/core/utils/io/IOUtils/some.secret.gz.enc").toURL());
-		Assert.assertEquals(input, gziped.readLine());
+		Assertions.assertEquals(input, gziped.readLine());
 	}
 
 }

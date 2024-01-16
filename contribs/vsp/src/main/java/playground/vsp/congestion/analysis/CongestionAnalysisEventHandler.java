@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.vsp.congestion.analysis;
 
@@ -55,39 +55,39 @@ import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 /**
- * 
+ *
  * @author ikaddoura , lkroeger
  *
  */
 public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , CongestionEventHandler {
 	private final static Logger log = LogManager.getLogger(CongestionAnalysisEventHandler.class);
 	private final double vtts_car;
-	
+
 	// This analysis uses either money events or congestion events.
 	private final boolean useMoneyEvents;
-	
+
 	private Map<Id<Person>,Integer> personId2actualTripNumber = new HashMap<Id<Person>, Integer>();
 	private Map<Id<Person>,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<Id<Person>,Map<Integer,String>>();
-	
+
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<Id<Person>, Map<Integer,Double>>();
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<Id<Person>, Map<Integer,Double>>();
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id<Person>, Map<Integer,Double>>();
 	private Map<Id<Person>,Double> driverId2totalDistance = new HashMap<Id<Person>,Double>();
-	
+
 	private Map<Id<Person>, Double> causingAgentId2amountSum = new HashMap <Id<Person>, Double>();
 	private Map<Id<Person>, Double> affectedAgentId2amountSum = new HashMap <Id<Person>, Double>();
 	private Set<Id<Person>> persons = new HashSet<Id<Person>>();
-	
+
 	// for pt-distance calculation
 	private Map<Id<Person>,Double> personId2distanceEnterValue = new HashMap<Id<Person>,Double>();
-	
+
 	private List<Id<Person>> ptDrivers = new ArrayList<Id<Person>>();
 	private Scenario scenario;
-	
+
 	private double distance = 500.; // TODO: set dynamically!
 	private double maxDistance = 40 * distance; // TODO: set dynamically!
 	private double timeBinSize = 900.0; // TODO: set dynamically!
-	
+
 	public CongestionAnalysisEventHandler(Scenario scenario, boolean useMoneyEvents) {
 		this.scenario = scenario;
 		this.useMoneyEvents = useMoneyEvents;
@@ -95,7 +95,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		if (useMoneyEvents) {
 			log.warn("Money events may be thrown later than the congestion events... May result in a wrong interpretation of the results. Better use directly the congestion events for analysis.");
 		}
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().scoring().getPerforming_utils_hr()) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
 		log.info("Anlayzing the congestion events during the simulation. Assuming the following VTTS (equal for all agents): " + vtts_car);
 	}
 
@@ -116,16 +116,16 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 
 	@Override
 	public void handleEvent(CongestionEvent event) {
-		
+
 		if (useMoneyEvents == false){
-			
+
 			// trip-based analysis
 			double amount = event.getDelay() / 3600 * this.vtts_car;
 			double emergenceTime = event.getEmergenceTime();
 			int tripNumber = 0;
 			double maxDepTime = 0.;
 			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getCausingAgentId());
-			
+
 			for(int tripNr : tripNumber2departureTime.keySet()) {
 				if(emergenceTime >= tripNumber2departureTime.get(tripNr)) {
 					if (tripNumber2departureTime.get(tripNr) >= maxDepTime) {
@@ -133,13 +133,13 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 					}
 				}
 			}
-				
+
 			double amountBefore = personId2tripNumber2amount.get(event.getCausingAgentId()).get(tripNumber);
 			double updatedAmount = amountBefore + amount;
 			Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getCausingAgentId());
 			tripNumber2amount.put(tripNumber, updatedAmount);
 			personId2tripNumber2amount.put(event.getCausingAgentId(), tripNumber2amount);
-			
+
 			// person-based analysis - causing agent
 			if (this.causingAgentId2amountSum.get(event.getCausingAgentId()) == null) {
 				this.causingAgentId2amountSum.put(event.getCausingAgentId(), amount);
@@ -148,7 +148,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				double amountNew = amountSoFar + amount;
 				this.causingAgentId2amountSum.put(event.getCausingAgentId(), amountNew);
 			}
-			
+
 			// person-based analysis - affected agent
 			if (this.affectedAgentId2amountSum.get(event.getAffectedAgentId()) == null) {
 				this.affectedAgentId2amountSum.put(event.getAffectedAgentId(), amount);
@@ -159,19 +159,19 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			}
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-				
+
 		if (useMoneyEvents == true) {
-			
+
 			// trip-based analysis
 			double amount = event.getAmount();
 			double eventTime = event.getTime();
 			int tripNumber = 0;
 			double maxDepTime = 0.;
 			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
-			
+
 			for(int tripNr : tripNumber2departureTime.keySet()) {
 				if(eventTime >= tripNumber2departureTime.get(tripNr)) {
 					if (tripNumber2departureTime.get(tripNr) >= maxDepTime) {
@@ -179,13 +179,13 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 					}
 				}
 			}
-				
+
 			double amountBefore = personId2tripNumber2amount.get(event.getPersonId()).get(tripNumber);
 			double updatedAmount = amountBefore + amount;
 			Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
 			tripNumber2amount.put(tripNumber, updatedAmount);
 			personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
-			
+
 			// person-based analysis - causing agent
 			if (this.causingAgentId2amountSum.get(event.getPersonId()) == null) {
 				this.causingAgentId2amountSum.put(event.getPersonId(), amount);
@@ -194,10 +194,10 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				double amountNew = amountSoFar + amount;
 				this.causingAgentId2amountSum.put(event.getPersonId(), amountNew);
 			}
-			
+
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		double linkLength = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
@@ -217,9 +217,9 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			personId2tripNumber2tripDistance.put(Id.createPersonId(event.getVehicleId()), tripNumber2tripDistance);
 		}
 	}
-	
+
 //	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	
+
 	public Map<Id<Person>,List<Double>> getPersonId2listOfDepartureTimes(String mode) {
 		Map<Id<Person>,List<Double>> personId2listOfDepartureTimes = new HashMap<Id<Person>, List<Double>>();
 		for(Id<Person> personId: personId2tripNumber2departureTime.keySet()){
@@ -235,7 +235,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		}
 		return personId2listOfDepartureTimes;
 	}
-	
+
 	public Map<Id<Person>,List<Double>> getPersonId2listOfDistances(String mode) {
 		Map<Id<Person>,List<Double>> personId2listOfDistances = new HashMap<Id<Person>, List<Double>>();
 		for(Id<Person> personId: personId2tripNumber2tripDistance.keySet()){
@@ -251,7 +251,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		}
 		return personId2listOfDistances;
 	}
-	
+
 	public Map<Id<Person>,List<Double>> getPersonId2listOfAmounts(String mode) {
 		Map<Id<Person>,List<Double>> personId2listOfAmounts = new HashMap<Id<Person>, List<Double>>();
 		for(Id<Person> personId: personId2tripNumber2amount.keySet()){
@@ -267,7 +267,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		}
 		return personId2listOfAmounts;
 	}
-	
+
 	public Map<Double, Double> getAvgAmountPerTripDepartureTime(String mode) {
 		Map<Double, Double> tripDepTime2avgFare = new HashMap<Double, Double>();
 
@@ -275,15 +275,15 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		double startTime = this.timeBinSize;
 		double periodLength = this.timeBinSize;
 		double endTime = 30. * 3600;
-		
+
 		for (double time = startTime; time <= endTime; time = time + periodLength){
 			List<Double> fares = new ArrayList<Double>();
 			tripDepTime2fares.put(time, fares);
 		}
-		
+
 		Map<Integer, double[]> counter2allDepartureTimesAndAmounts = new HashMap<Integer, double[]>();
 		int i = 0;
-		
+
 		for(Id<Person> personId : personId2tripNumber2departureTime.keySet()){
 			for(int tripNumber : personId2tripNumber2departureTime.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(tripNumber).toString().equals(mode)){
@@ -291,14 +291,14 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 					double belongingAmount = personId2tripNumber2amount.get(personId).get(tripNumber);
 					double[] departureTimeAndAmount = new double[2];
 					departureTimeAndAmount[0] = departureTime;
-					departureTimeAndAmount[1] = belongingAmount;				
+					departureTimeAndAmount[1] = belongingAmount;
 					counter2allDepartureTimesAndAmounts.put(i, departureTimeAndAmount);
 					i++;
 				}else{
 				}
 			}
 		}
-		
+
 		for (Double time : tripDepTime2fares.keySet()){
 			for (int counter : counter2allDepartureTimesAndAmounts.keySet()){
 				if (counter2allDepartureTimesAndAmounts.get(counter)[0] < time && counter2allDepartureTimesAndAmounts.get(counter)[0] >= (time - periodLength)) {
@@ -308,19 +308,19 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				}
 			}
 		}
-		
+
 		for (Double time : tripDepTime2fares.keySet()){
 			double amountSum = 0.;
 			double counter = 0.;
 			for (Double amount : tripDepTime2fares.get(time)){
 				if (amount == null){
-					
+
 				} else {
 					amountSum = amountSum + amount;
 					counter++;
 				}
 			}
-			
+
 			double avgFare = 0.;
 			if (counter!=0.){
 				avgFare = (-1) * amountSum / counter;
@@ -329,7 +329,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		}
 		return tripDepTime2avgFare;
 	}
-	
+
 	public Map<Double, Double> getAvgAmountPerTripDistance(String mode) {
 		Map<Double, Double> tripDistance2avgAmount = new HashMap<Double, Double>();
 
@@ -337,15 +337,15 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		double startDistance = this.distance;
 		double groupsize = this.distance;
 		double endDistance = this.maxDistance;
-		
+
 		for (double distance = startDistance; distance <= endDistance; distance = distance + groupsize){
 			List<Double> amounts = new ArrayList<Double>();
 			tripDistance2amount.put(distance, amounts);
 		}
-		
+
 		Map<Integer, double[]> counter2allDistancesAndAmounts = new HashMap<Integer, double[]>();
 		int i = 0;
-		
+
 		for(Id<Person> personId : personId2tripNumber2tripDistance.keySet()){
 			for(int tripNumber : personId2tripNumber2tripDistance.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(tripNumber).toString().equals(mode)){
@@ -353,13 +353,13 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 					double belongingAmount = personId2tripNumber2amount.get(personId).get(tripNumber);
 					double[] tripDistanceAndAmount = new double[2];
 					tripDistanceAndAmount[0] = tripDistance;
-					tripDistanceAndAmount[1] = belongingAmount;				
+					tripDistanceAndAmount[1] = belongingAmount;
 					counter2allDistancesAndAmounts.put(i, tripDistanceAndAmount);
 					i++;
 				}
 			}
 		}
-		
+
 		for (Double dist : tripDistance2amount.keySet()){
 			for (int counter : counter2allDistancesAndAmounts.keySet()){
 				if (counter2allDistancesAndAmounts.get(counter)[0] < dist && counter2allDistancesAndAmounts.get(counter)[0] >= (dist - groupsize)) {
@@ -369,19 +369,19 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				}
 			}
 		}
-		
+
 		for (Double dist : tripDistance2amount.keySet()){
 			double amountSum = 0.;
 			double counter = 0.;
 			for (Double amount : tripDistance2amount.get(dist)){
 				if (amount == null){
-					
+
 				} else {
 					amountSum = amountSum + amount;
 					counter++;
 				}
 			}
-			
+
 			double avgAmount = 0.;
 			if (counter!=0.){
 				avgAmount = (-1) * amountSum / counter;
@@ -393,13 +393,13 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		
+
 		if (this.persons.contains(event.getPersonId())){
 			// do nothing
 		} else {
 			this.persons.add(event.getPersonId());
 		}
-		
+
 		// A transit driver should not practice any activity,
 		// otherwise the code has to be adapted here.
 		if(ptDrivers.contains(event.getPersonId())){
@@ -417,11 +417,11 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
 				tripNumber2tripDistance.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
-					
+
 				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
 				tripNumber2amount.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
 				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
-		
+
 			} else {
 				// The trip which starts immediately is the first trip of the person
 				personId2actualTripNumber.put(event.getPersonId(), 1);
@@ -431,14 +431,14 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
 				tripNumber2tripDistance.put(1, 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
-				
+
 				Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
 				tripNumber2amount.put(1, 0.0);
 				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 			}
-		}	
+		}
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if(ptDrivers.contains(event.getPersonId())){
@@ -452,7 +452,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
 				if(tripNumber2legMode.containsKey(tripNumber)){
 					// legMode already listed, possible for pt trips
-					if(tripNumber2legMode.get(tripNumber).toString().equals("pt")){	
+					if(tripNumber2legMode.get(tripNumber).toString().equals("pt")){
 					} else{
 						throw new RuntimeException("A leg mode has already been listed.");
 					}
@@ -479,7 +479,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			}
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		if (ptDrivers.contains(event.getDriverId())) {
@@ -489,7 +489,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			driverId2totalDistance.put(Id.createPersonId(event.getVehicleId()),0.0);
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(ptDrivers.contains(event.getPersonId())){
@@ -500,11 +500,11 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			if((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
 			// car drivers not considered here
 			} else {
-				double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
-				
+				double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId()));
+
 				Map<Integer,Double> tripNumber2distance = personId2tripNumber2tripDistance.get(event.getPersonId());
 				tripNumber2distance.put(tripNumber, tripNumber2distance.get(tripNumber) + distanceTravelled);
-				
+
 				personId2distanceEnterValue.remove(event.getPersonId());
 			}
 		}
@@ -528,14 +528,14 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 	public Map<Id<Person>, Double> getCausingAgentId2amountSum() {
 		return causingAgentId2amountSum;
 	}
-	
+
 	public Map<Id<Person>, Double> getAffectedAgentId2amountSum() {
 		return affectedAgentId2amountSum;
 	}
 
 	public Map<Id<Person>, Double> getCausingAgentId2amountSumAllAgents() {
 		Map<Id<Person>, Double> personId2amountSumAllAgents = new HashMap<Id<Person>, Double>();
-		
+
 		List<Id<Person>> personIds = new ArrayList<Id<Person>>();
 		if (this.scenario.getPopulation().getPersons().isEmpty()) {
 			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis (total: " + personIds.size() +").");
@@ -544,7 +544,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
 			personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
 		}
-		
+
 		for (Id<Person> id : personIds) {
 			double amountSum = 0.;
 			if (this.causingAgentId2amountSum.get(id) == null) {
@@ -556,13 +556,13 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		}
 		return personId2amountSumAllAgents;
 	}
-	
+
 	public Map<Id<Person>, Double> getAffectedAgentId2amountSumAllAgents() {
 		Map<Id<Person>, Double> personId2amountSumAllAgents = new HashMap<Id<Person>, Double>();
-		
+
 		if (this.affectedAgentId2amountSum.isEmpty()) {
-			log.warn("There is no info re the affected agents. This info is only avalable when analyzing congestion events and not the money events.");		
-		
+			log.warn("There is no info re the affected agents. This info is only avalable when analyzing congestion events and not the money events.");
+
 		} else {
 			List<Id<Person>> personIds = new ArrayList<Id<Person>>();
 			if (this.scenario.getPopulation().getPersons().isEmpty()) {
@@ -572,7 +572,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 				log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
 				personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
 			}
-			
+
 			for (Id<Person> id : personIds) {
 				double amountSum = 0.;
 				if (this.affectedAgentId2amountSum.get(id) == null) {

@@ -24,9 +24,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -50,13 +50,13 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author mrieser
  */
 public class CalcPaidTollTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	static private final Logger log = LogManager.getLogger(CalcPaidTollTest.class);
 
 	@Test
-	public void testDistanceToll() {
+	void testDistanceToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing1.xml";
 
@@ -92,7 +92,7 @@ public class CalcPaidTollTest {
 	}
 
 	@Test
-	public void testAreaToll() {
+	void testAreaToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing2.xml";
 
@@ -143,7 +143,7 @@ public class CalcPaidTollTest {
 	}
 
 	@Test
-	public void testCordonToll() {
+	void testCordonToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing3.xml";
 
@@ -196,7 +196,7 @@ public class CalcPaidTollTest {
 		log.info("score without toll: " + scoreWithoutToll);
 		log.info("score with toll:    " + scoreWithToll);
 		log.info("expected toll:      " + expectedToll);
-		Assert.assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
+		Assertions.assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class CalcPaidTollTest {
         RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		reader.readFile(tollFile);
-		Assert.assertEquals(tollType, scheme.getType());
+		Assertions.assertEquals(tollType, scheme.getType());
 
 		RoadPricingTestUtils.createPopulation1(scenario);
 		runTollSimulation(scenario, scheme);

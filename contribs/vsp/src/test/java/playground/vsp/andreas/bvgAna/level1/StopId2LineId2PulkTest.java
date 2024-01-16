@@ -1,8 +1,8 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -15,8 +15,9 @@ import org.matsim.vehicles.Vehicle;
 
 public class StopId2LineId2PulkTest {
 
-	@Test @Ignore
-	public void testStopId2LineId2Pulk() {
+	@Test
+	@Disabled
+	void testStopId2LineId2Pulk() {
 
 //	    assign Ids to routes, vehicles and agents to be used in Test
 
@@ -56,7 +57,7 @@ public class StopId2LineId2PulkTest {
 	     *
 	     */
 
-	    Assert.assertEquals(event2, test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
+	    Assertions.assertEquals(event2, test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
 
 	    System.out.println(test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
 	    System.out.println(event2.getVehicleId());

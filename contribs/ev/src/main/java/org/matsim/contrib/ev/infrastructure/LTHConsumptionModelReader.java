@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.discharging.LTHDriveEnergyConsumption;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -43,10 +44,10 @@ import com.google.common.primitives.Doubles;
  */
 public class LTHConsumptionModelReader {
 
-	public LTHConsumptionModelReader(Id<VehicleType> vehicleTypeId) {
+	public LTHConsumptionModelReader() {
 	}
 
-	public LTHDriveEnergyConsumption.Factory readURL(URL fileUrl) {
+	public DriveEnergyConsumption.Factory readURL( URL fileUrl ) {
 		List<Double> speeds = new ArrayList<>();
 		List<Double> slopes = new ArrayList<>();
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();

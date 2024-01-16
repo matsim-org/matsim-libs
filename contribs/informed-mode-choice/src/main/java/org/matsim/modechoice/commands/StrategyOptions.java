@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.replanning.choosers.ForceInnovationStrategyChooser;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -104,7 +104,7 @@ public final class StrategyOptions {
 
 		// Depends on number of pre generated plans
 		if (getModeChoice() == ModeChoice.none)
-			config.strategy().setMaxAgentPlanMemorySize(Math.max(config.strategy().getMaxAgentPlanMemorySize(), group.k) + 5);
+			config.replanning().setMaxAgentPlanMemorySize(Math.max(config.replanning().getMaxAgentPlanMemorySize(), group.k) + 5);
 
 	}
 
@@ -128,13 +128,13 @@ public final class StrategyOptions {
 		);
 
 		// Always collect all strategies, these won't be removed
-		List<StrategyConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings().stream()
+		List<ReplanningConfigGroup.StrategySettings> strategies = config.replanning().getStrategySettings().stream()
 				.filter(s -> !filtered.contains(s.getStrategyName()) || !Objects.equals(s.getSubpopulation(), defaultSubpopulation))
 				.collect(Collectors.toList());
 
 
 		//add time mutation
-		strategies.add(new StrategyConfigGroup.StrategySettings()
+		strategies.add(new ReplanningConfigGroup.StrategySettings()
 				.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator)
 				.setSubpopulation(defaultSubpopulation)
 				.setWeight(group.timeMutation)
@@ -142,7 +142,7 @@ public final class StrategyOptions {
 
 		if (getModeChoice() != ModeChoice.none) {
 
-			strategies.add(new StrategyConfigGroup.StrategySettings()
+			strategies.add(new ReplanningConfigGroup.StrategySettings()
 					.setStrategyName(getModeChoice().getName())
 					.setSubpopulation(defaultSubpopulation)
 					.setWeight(group.weight)
@@ -150,8 +150,8 @@ public final class StrategyOptions {
 		}
 
 		// reset und set new strategies
-		config.strategy().clearStrategySettings();
-		strategies.forEach(s -> config.strategy().addStrategySettings(s));
+		config.replanning().clearStrategySettings();
+		strategies.forEach(s -> config.replanning().addStrategySettings(s));
 
 		if (group.forceInnovation > 0)
 			binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {

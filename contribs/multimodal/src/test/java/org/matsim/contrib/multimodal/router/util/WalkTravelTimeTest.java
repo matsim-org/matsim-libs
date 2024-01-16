@@ -20,16 +20,16 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,13 +46,14 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class WalkTravelTimeTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final Logger log = LogManager.getLogger(WalkTravelTimeTest.class);
 
-	@Test public void testLinkTravelTimeCalculation() {
+	@Test
+	void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
@@ -75,10 +76,10 @@ public class WalkTravelTimeTest {
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		scenario.getConfig().routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 
 		WalkTravelTime walkTravelTime;
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 
 		double speed;
 		double expectedTravelTime;
@@ -91,33 +92,33 @@ public class WalkTravelTimeTest {
 
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0, 0);
 
 		// increase age
 		PersonUtils.setAge(person, 80);
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0, 0);
 
 		// change gender
 		PersonUtils.setSex(person, "f");
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0, 0);
 
 		// change slope from 0% to -10%
 		h2 = -0.1;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		double slope2 = walkTravelTime.getSlope(link);
 		double slopeFactor = walkTravelTime.getSlopeFactor(slope2);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
@@ -125,20 +126,20 @@ public class WalkTravelTimeTest {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0, 0);
 
 		// change slope from -10% to 10%
 		h2 = 0.1;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
         slopeFactor = walkTravelTime.getSlopeFactor(slope);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * slopeFactor;
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		Assert.assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0, 0);
+		Assertions.assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0, 0);
 	}
 
 	private void printInfo(Person p, double expected, double calculated, double slope) {
@@ -166,7 +167,8 @@ public class WalkTravelTimeTest {
 		log.info(sb.toString());
 	}
 
-	@Test public void testThreadLocals() {
+	@Test
+	void testThreadLocals() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -192,7 +194,7 @@ public class WalkTravelTimeTest {
 		double slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 
-		WalkTravelTime walkTravelTime = new WalkTravelTime(config.plansCalcRoute(), linkSlopes);
+		WalkTravelTime walkTravelTime = new WalkTravelTime(config.routing(), linkSlopes);
 
 		double tt1 = walkTravelTime.getLinkTravelTime(link, 0.0, p1, null);
 		double tt2 = walkTravelTime.getLinkTravelTime(link, 0.0, p2, null);

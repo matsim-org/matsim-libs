@@ -96,6 +96,14 @@ public final class EstimateRouter {
 					continue;
 				}
 
+				// TODO: might consider access agress walk modes
+
+				// Filters all kind of modes that did return only walk legs when they could not be used (e.g. drt)
+				if (!mode.equals(TransportMode.walk) && ll.stream().allMatch(l -> l.getMode().equals(TransportMode.walk))) {
+					legs[i++] = null;
+					continue;
+				}
+
 				legs[i++] = ll;
 
 			}

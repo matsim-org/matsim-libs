@@ -1,16 +1,16 @@
 package org.matsim.application;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.application.analysis.TestAnalysis;
 import org.matsim.application.analysis.TestDependentAnalysis;
 import org.matsim.application.options.ShpOptions;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationUtilsTest {
 
 	@Test
-	public void shp() {
+	void shp() {
 
 		assertTrue(ApplicationUtils.acceptsOptions(TestAnalysis.class, ShpOptions.class));
 

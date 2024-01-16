@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -79,11 +78,11 @@ public class ExternalModule implements PlanStrategyModule {
 	private String outFileRoot = "";
 
 	private final OutputDirectoryHierarchy controler;
-	
+
 	private int currentIteration = -1;
-	
+
 	private Population exportPopulation;
-	
+
 	private Map<Id<Person>, Plan> plansToMutate = new HashMap<>();
 
 	public ExternalModule(final String exePath, final String moduleId, final OutputDirectoryHierarchy controler, final Scenario scenario) {
@@ -120,7 +119,7 @@ public class ExternalModule implements PlanStrategyModule {
 		// Creating a dummy population which only contains the plans which are passed here.
 		// I need to copy the plans because I am not supposed to add a plan to a different Person.
 		// I also need to memorize the plans which are passed here, because I am supposed to mutate them.
-		
+
 		final Person personWithOnlySelectedPlan = this.exportPopulation.getFactory().createPerson(plan.getPerson().getId());
 		final Plan planForNewPerson = PopulationUtils.createPlan(personWithOnlySelectedPlan);
 		PopulationUtils.copyFromTo(plan, planForNewPerson);
@@ -149,7 +148,7 @@ public class ExternalModule implements PlanStrategyModule {
 
     private void prepareExternalExeConfig() {
 		Config extConfig;
-		String configFileName = this.scenario.getConfig().strategy().getExternalExeConfigTemplate();
+		String configFileName = this.scenario.getConfig().replanning().getExternalExeConfigTemplate();
 		if (configFileName == null) {
 			extConfig = new Config();
 		} else {

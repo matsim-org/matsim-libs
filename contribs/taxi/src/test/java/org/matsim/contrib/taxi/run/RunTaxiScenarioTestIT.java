@@ -21,8 +21,8 @@ package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,16 +32,16 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiScenarioTestIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunMielecLowDemandLowSupply() {
+	void testRunMielecLowDemandLowSupply() {
 		runMielec("plans_taxi_1.0.xml.gz", "taxis-25.xml");
 	}
 
 	@Test
-	public void testRunMielecHighDemandLowSupply() {
+	void testRunMielecHighDemandLowSupply() {
 		runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
 	}
 
@@ -51,8 +51,8 @@ public class RunTaxiScenarioTestIT {
 				new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
 		TaxiConfigGroup.getSingleModeTaxiConfig(config).taxisFile = taxisFile;
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setDumpDataAtEnd(false);
 		TaxiControlerCreator.createControler(config, false).run();
 	}
 }

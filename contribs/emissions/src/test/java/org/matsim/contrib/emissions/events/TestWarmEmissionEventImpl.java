@@ -28,8 +28,8 @@ package org.matsim.contrib.emissions.events;
  * 3 test the number of attributes returned
  */
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
@@ -59,7 +59,7 @@ public class TestWarmEmissionEventImpl {
 
 
 	@Test
-	public final void testGetAttributesForCompleteEmissionMaps(){
+	final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 		
 		//create a normal event impl
@@ -82,28 +82,19 @@ public class TestWarmEmissionEventImpl {
 		WarmEmissionEvent we = new WarmEmissionEvent(0.0, linkId, vehicleId, map);
 		
 		Map<String, String> weg = we.getAttributes();
-		Assert.assertEquals("the CO value of this warm emission event was "+ Double.parseDouble(weg.get(CO.name()))+ "but should have been "+ co,
-				Double.parseDouble(weg.get(CO.name())), co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the CO2 value of this warm emission event was "+ Double.parseDouble(weg.get(CO2_TOTAL.name()))+ "but should have been "+ c2,
-				Double.parseDouble(weg.get(CO2_TOTAL.name())), c2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the FC value of this warm emission event was "+ Double.parseDouble(weg.get(FC.name()))+ "but should have been "+ fc,
-				Double.parseDouble(weg.get(FC.name())), fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the HC value of this warm emission event was "+ Double.parseDouble(weg.get(HC.name()))+ "but should have been "+ hc,
-				Double.parseDouble(weg.get(HC.name())), hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NMHC value of this warm emission event was "+ Double.parseDouble(weg.get(NMHC.name()))+ "but should have been "+ nm,
-				Double.parseDouble(weg.get(NMHC.name())), nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NO2 value of this warm emission event was "+ Double.parseDouble(weg.get(NO2.name()))+ "but should have been "+ n2,
-				Double.parseDouble(weg.get(NO2.name())), n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NOx value of this warm emission event was "+ Double.parseDouble(weg.get(NOx.name()))+ "but should have been "+ nx,
-				Double.parseDouble(weg.get(NOx.name())), nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the PM value of this warm emission event was "+ Double.parseDouble(weg.get(PM.name()))+ "but should have been "+ pm,
-				Double.parseDouble(weg.get(PM.name())), pm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the SO2 value of this warm emission event was "+ Double.parseDouble(weg.get(SO2.name()))+ "but should have been "+ so,
-				Double.parseDouble(weg.get(SO2.name())), so, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(Double.parseDouble(weg.get(CO.name())), co, MatsimTestUtils.EPSILON, "the CO value of this warm emission event was "+ Double.parseDouble(weg.get(CO.name()))+ "but should have been "+ co);
+		Assertions.assertEquals(Double.parseDouble(weg.get(CO2_TOTAL.name())), c2, MatsimTestUtils.EPSILON, "the CO2 value of this warm emission event was "+ Double.parseDouble(weg.get(CO2_TOTAL.name()))+ "but should have been "+ c2);
+		Assertions.assertEquals(Double.parseDouble(weg.get(FC.name())), fc, MatsimTestUtils.EPSILON, "the FC value of this warm emission event was "+ Double.parseDouble(weg.get(FC.name()))+ "but should have been "+ fc);
+		Assertions.assertEquals(Double.parseDouble(weg.get(HC.name())), hc, MatsimTestUtils.EPSILON, "the HC value of this warm emission event was "+ Double.parseDouble(weg.get(HC.name()))+ "but should have been "+ hc);
+		Assertions.assertEquals(Double.parseDouble(weg.get(NMHC.name())), nm, MatsimTestUtils.EPSILON, "the NMHC value of this warm emission event was "+ Double.parseDouble(weg.get(NMHC.name()))+ "but should have been "+ nm);
+		Assertions.assertEquals(Double.parseDouble(weg.get(NO2.name())), n2, MatsimTestUtils.EPSILON, "the NO2 value of this warm emission event was "+ Double.parseDouble(weg.get(NO2.name()))+ "but should have been "+ n2);
+		Assertions.assertEquals(Double.parseDouble(weg.get(NOx.name())), nx, MatsimTestUtils.EPSILON, "the NOx value of this warm emission event was "+ Double.parseDouble(weg.get(NOx.name()))+ "but should have been "+ nx);
+		Assertions.assertEquals(Double.parseDouble(weg.get(PM.name())), pm, MatsimTestUtils.EPSILON, "the PM value of this warm emission event was "+ Double.parseDouble(weg.get(PM.name()))+ "but should have been "+ pm);
+		Assertions.assertEquals(Double.parseDouble(weg.get(SO2.name())), so, MatsimTestUtils.EPSILON, "the SO2 value of this warm emission event was "+ Double.parseDouble(weg.get(SO2.name()))+ "but should have been "+ so);
 	}
 
 	@Test
-		public final void testGetAttributesForIncompleteMaps(){
+	final void testGetAttributesForIncompleteMaps(){
 			//the getAttributesMethod should
 			// - return null if the emission map is empty
 			// - throw NullPointerExceptions if the emission values are not set
@@ -140,7 +131,7 @@ public class TestWarmEmissionEventImpl {
 			String wp=wpEnum.name();
 
 			//empty map
-			Assert.assertNull(emptyMapEvent.getAttributes().get(wp));
+			Assertions.assertNull(emptyMapEvent.getAttributes().get(wp));
 			
 			//values not set
 			try{
@@ -158,8 +149,8 @@ public class TestWarmEmissionEventImpl {
 				noMapNullPointers++;
 			}
 		}
-		Assert.assertEquals(numberOfWarmPollutants, valuesNotSetNullPointers);
-		Assert.assertEquals(numberOfWarmPollutants, noMapNullPointers);
+		Assertions.assertEquals(numberOfWarmPollutants, valuesNotSetNullPointers);
+		Assertions.assertEquals(numberOfWarmPollutants, noMapNullPointers);
 		}
 
 }

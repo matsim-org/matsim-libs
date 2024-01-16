@@ -21,14 +21,14 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,7 +48,7 @@ import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -69,8 +69,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SimulatedLaneFlowCapacityTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * create this network:
@@ -207,11 +207,12 @@ public class SimulatedLaneFlowCapacityTest {
 	 * test simulated capacity of link 1 in case without lanes.
 	 * the capacity should correspond to the given flow capacity of the link
 	 */
-	@Test public void testCapacityWoLanes() {
+	@Test
+	void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
+		config.scoring().addActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -234,11 +235,12 @@ public class SimulatedLaneFlowCapacityTest {
 	 * test simulated capacities of link 1 in case of one lane representing one lane.
 	 * the capacity of the link should correspond to the capacity of the lane, also when it is less than the link capacity given in the network.
 	 */
-	@Test public void testCapacityWithOneLaneOneLane() {
+	@Test
+	void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
+		config.scoring().addActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -265,11 +267,12 @@ public class SimulatedLaneFlowCapacityTest {
 	 * test simulated capacities of link 1 in case of one lane representing two lanes.
 	 * the capacity of the link should correspond to the capacity of the lane, also when it is less than the link capacity given in the network.
 	 */
-	@Test public void testCapacityWithOneLaneTwoLanes() {
+	@Test
+	void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
+		config.scoring().addActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -297,11 +300,12 @@ public class SimulatedLaneFlowCapacityTest {
 	 * Interestingly, it also corresponds to this sum, if it is more than the link capacity given in the network.
 	 * And, finally, it still only uses the lane capacity given in the network, when it is higher than the link capacity (see lane 2 here).
 	 */
-	@Test public void testCapacityWithThreeLanes() {
+	@Test
+	void testCapacityWithThreeLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
+		config.scoring().addActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -336,7 +340,7 @@ public class SimulatedLaneFlowCapacityTest {
 	 *
 	 * @author tthunig
 	 */
-	class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler{
+	static class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler{
 
 		private double linkCapacity;
 		private Map<Id<Lane>, Double> laneCapacities = new HashMap<>();

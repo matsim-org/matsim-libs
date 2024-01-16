@@ -23,14 +23,14 @@ package org.matsim.core.utils.misc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class OptionalTimesTest {
 	@Test
-	public void requireDefined() {
+	void requireDefined() {
 		assertThatThrownBy(() -> OptionalTimes.requireDefined(OptionalTime.undefined())).isExactlyInstanceOf(
 				IllegalArgumentException.class).hasMessage("Time must be defined");
 

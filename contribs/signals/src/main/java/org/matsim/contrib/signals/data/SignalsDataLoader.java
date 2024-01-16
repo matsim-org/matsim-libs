@@ -31,16 +31,16 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 
 
 /**
  * Loads all data files related to the traffic signal systems model.
- * 
+ *
  * @author dgrether
  *
  */
@@ -147,7 +147,7 @@ public class SignalsDataLoader {
 			log.info("Signals: No signal systems file set, can't load signal systems information!");
 		}
 	}
-	
+
 	private void loadConflicts(SignalsData data) {
 		if (this.signalConfig.getConflictingDirectionsFile() != null) {
 			ConflictingDirectionsReader reader = new ConflictingDirectionsReader(data.getConflictingDirectionsData());

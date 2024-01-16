@@ -20,15 +20,14 @@
 
 package org.matsim.contrib.roadpricing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
 import jakarta.inject.Provider;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +41,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -69,11 +68,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author mrieser
  */
 public class TollTravelCostCalculatorTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDisutilityResults() {
+	void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
 
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
@@ -89,7 +88,7 @@ public class TollTravelCostCalculatorTest {
 		scheme.createAndAddCost(0, 10*3600, 0.0007);
 
 
-		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.scoring());
 
 		double margUtlOfMoney = 1. ;
         final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
@@ -123,7 +122,7 @@ public class TollTravelCostCalculatorTest {
 	}
 
 	@Test
-	public void testDistanceTollRouter() {
+	void testDistanceTollRouter() {
 		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
@@ -135,7 +134,7 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		TravelTime timeCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		TravelTime timeCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped,
 		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
 
@@ -147,7 +146,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 
 		int carLegIndex = 1 ;
-		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -208,7 +207,7 @@ public class TollTravelCostCalculatorTest {
 	}
 
 	@Test
-	public void testLinkTollRouter() {
+	void testLinkTollRouter() {
 		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
@@ -220,7 +219,7 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
@@ -229,7 +228,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 
 		int carLegIndex = 1 ;
-		if (! config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if (! config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -303,7 +302,7 @@ public class TollTravelCostCalculatorTest {
 	}
 
 	@Test
-	public void testCordonTollRouter() {
+	void testCordonTollRouter() {
 		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
@@ -316,13 +315,13 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
 
 		int carLegIndex = 1 ;
-		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
