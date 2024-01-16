@@ -65,6 +65,7 @@ public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, P
 					segments.get(request).add(new Segment(event.getTime(), occupancy.size()));
 				} else {
 					logger.warn("Missing segment info for request " + request.toString());
+					return;
 				}
 			}
 
