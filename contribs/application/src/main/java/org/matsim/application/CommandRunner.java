@@ -314,6 +314,22 @@ public final class CommandRunner {
 	}
 
 	/**
+	 * Insert args for an already existing command. If the command was not added, this does noting.
+	 */
+	public void insertArgs(Class<? extends MATSimAppCommand> command, String... args) {
+
+		if (!this.args.containsKey(command))
+			return;
+
+		String[] existing = this.args.get(command);
+		String[] newArgs = new String[existing.length + args.length];
+		System.arraycopy(args, 0, newArgs, 0, args.length);
+		System.arraycopy(existing, 0, newArgs, args.length, existing.length);
+
+		this.args.put(command, newArgs);
+	}
+
+	/**
 	 * Set specific shape file for certain command.
 	 */
 	public void setShp(Class<? extends MATSimAppCommand> command, String path) {

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.simwrapper.viz.Viz;
@@ -195,6 +196,11 @@ public final class SimWrapper {
 				} catch (URISyntaxException e) {
 					log.warn("Could not set shp file", e);
 				}
+			}
+
+			// Insert the globally defined arguments
+			for (Map.Entry<Class<? extends MATSimAppCommand>, String[]> e : data.getGlobalArgs().entrySet()) {
+				runner.insertArgs(e.getKey(), e.getValue());
 			}
 
 			runner.run(dir);
