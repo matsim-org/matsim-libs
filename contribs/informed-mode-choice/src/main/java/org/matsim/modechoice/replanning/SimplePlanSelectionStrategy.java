@@ -57,6 +57,10 @@ public class SimplePlanSelectionStrategy extends AbstractMultithreadedModule {
 			PlanCandidate candidate = ctx.selector.select(candidates);
 
 			if (candidate != null) {
+				if (ctx.pruner != null) {
+					ctx.pruner.onSelectCandidate(planModel, candidate);
+				}
+
 				candidate.applyTo(plan);
 			}
 		}

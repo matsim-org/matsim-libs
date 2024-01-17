@@ -189,6 +189,10 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 					PlanCandidate select = ctx.selector.select(candidates);
 					if (select != null) {
+						if (ctx.pruner != null) {
+							ctx.pruner.onSelectCandidate(model, select);
+						}
+
 						select.applyTo(plan);
 						break;
 					}
