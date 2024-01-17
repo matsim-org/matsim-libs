@@ -204,7 +204,7 @@ public class PopulationReprojectionIOIT {
 
 				Assertions.assertNotEquals(
 						transformation.transform(o.getCoord()),
-						r,
+						r.getCoord(),
 						"No coordinates transform performed!");
 			}
 		}
@@ -313,7 +313,7 @@ public class PopulationReprojectionIOIT {
 
 				Assertions.assertNotEquals(
 						transformation.transform(o.getCoord()),
-						r,
+						r.getCoord(),
 						"No coordinates transform performed!");
 			}
 		}

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.parking.run;
+package org.matsim.contrib.parking.parkingchoice.run;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

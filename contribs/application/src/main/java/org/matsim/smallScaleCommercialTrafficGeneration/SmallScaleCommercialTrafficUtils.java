@@ -75,7 +75,7 @@ public class SmallScaleCommercialTrafficUtils {
 	private static final Joiner JOIN = Joiner.on("\t");
 
 	/**
-	 * Creates and return the Index of the zones shape.
+	 * Creates and return the Index of the zone shape.
 	 *
 	 * @return indexZones
 	 */
@@ -97,17 +97,28 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Writes a csv file with result of the distribution per zone of the input data.
+	 * Creates and return the Index of the building shape.
+	 *
+	 * @return indexBuildings
 	 */
-	static void writeResultOfDataDistribution(HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
-											  Path outputFileInOutputFolder, HashMap<String, String> zoneIdNameConnection)
+	static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS) {
+
+		ShpOptions shpLanduse = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
+		return shpLanduse.createIndex(shapeCRS, "type");
+	}
+
+	/**
+	 * Writes a csv file with the result of the distribution per zone of the input data.
+	 */
+	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+											  Path outputFileInOutputFolder, Map<String, String> zoneIdNameConnection)
 		throws IOException {
 
 		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdNameConnection);
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
-	static Id<Link> findNearestPossibleLink(String zone, ArrayList<String> noPossibleLinks, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
+	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> regionLinksMap,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
 		double minDistance = Double.MAX_VALUE;
 		searchLink:
@@ -145,9 +156,9 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Writer of data distribution data.
 	 */
-	private static void writeCSVWithCategoryHeader(HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
+	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
 												   Path outputFileInInputFolder,
-												   HashMap<String, String> zoneIdNameConnection) throws MalformedURLException {
+												   Map<String, String> zoneIdNameConnection) throws MalformedURLException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 			StandardCharsets.UTF_8, true);
 		try {
@@ -286,7 +297,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * dispersedTraffic will be added additionally.
 	 */
 	static void readExistingModels(Scenario scenario, double sampleScenario,
-								   Map<String, HashMap<Id<Link>, Link>> regionLinksMap) throws Exception {
+								   Map<String, Map<Id<Link>, Link>> regionLinksMap) throws Exception {
 
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
@@ -515,7 +526,7 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Find the zone where the link is located
 	 */
-	static String findZoneOfLink(Id<Link> linkId, Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
+	static String findZoneOfLink(Id<Link> linkId, Map<String, Map<Id<Link>, Link>> regionLinksMap) {
 		for (String area : regionLinksMap.keySet()) {
 			if (regionLinksMap.get(area).containsKey(linkId))
 				return area;

@@ -23,7 +23,6 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressPar
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.ModeMappingForPassengersParameterSet;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.RangeQuerySettingsParameterSet;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.RouteSelectorParameterSet;
-import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
@@ -33,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -261,6 +261,25 @@ public class SwissRailRaptorConfigGroupTest {
         Assertions.assertNull(config2.getModeMappingForPassengersParameterSet("road"));
         Assertions.assertNull(config2.getModeMappingForPassengersParameterSet("ship"));
     }
+	@Test
+	void testConfigIO_ModeToModePenalties() {
+        SwissRailRaptorConfigGroup config1 = new SwissRailRaptorConfigGroup();
+
+        { // prepare config1
+            config1.setUseModeMappingForPassengers(true);
+			SwissRailRaptorConfigGroup.ModeToModeTransferPenalty penalty = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty(TransportMode.airplane,TransportMode.ship,100);
+			config1.addParameterSet(penalty);
+        }
+
+        SwissRailRaptorConfigGroup config2 = writeRead(config1);
+
+        // do checks
+
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty penalty = config2.getModeToModeTransferPenaltyParameterSets().get(0);
+		Assertions.assertEquals(penalty.transferPenalty,100.0, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(penalty.fromMode,TransportMode.airplane);
+		Assertions.assertEquals(penalty.toMode,TransportMode.ship);
+	}
 
     private SwissRailRaptorConfigGroup writeRead(SwissRailRaptorConfigGroup config) {
         Config fullConfig1 = ConfigUtils.createConfig(config);

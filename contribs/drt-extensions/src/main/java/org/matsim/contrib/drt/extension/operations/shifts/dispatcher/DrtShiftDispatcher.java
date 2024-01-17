@@ -12,15 +12,9 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTas
  */
 public interface DrtShiftDispatcher {
 
-	final class ShiftEntry {
-		public final DrtShift shift;
-		public final ShiftDvrpVehicle vehicle;
+    void initialize();
 
-		public ShiftEntry(DrtShift shift, ShiftDvrpVehicle vehicle) {
-			this.shift = shift;
-			this.vehicle = vehicle;
-		}
-	}
+    record ShiftEntry(DrtShift shift, ShiftDvrpVehicle vehicle){}
 
     void dispatch(double timeStep);
 

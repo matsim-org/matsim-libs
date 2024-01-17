@@ -26,16 +26,17 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
-import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
+
+import static org.matsim.smallScaleCommercialTrafficGeneration.SCTUtils.*;
 
 /**
  * @author Ricardo Ewert
@@ -49,40 +50,35 @@ public class TripDistributionMatrixTest {
 	@Test
 	void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
 
-		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
-		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
-		new File(output.resolve("calculatedData").toString()).mkdir();
+		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
-		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		Network network = NetworkUtils.readNetwork(networkLocation);
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
+					inputDataDirectory, usedLanduseConfiguration,
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
-		ArrayList<String> modesORvehTypes = new ArrayList<String>(
-				List.of("total"));
+		List<String> modesORvehTypes = new ArrayList<>(List.of("total"));
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
+		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());
 		regionLinksMap.get("testArea1_area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
 		regionLinksMap.put("testArea1_area2", new HashMap<>());
@@ -139,23 +135,19 @@ public class TripDistributionMatrixTest {
 	@Test
 	void testTripDistributionGoodsTraffic() throws IOException {
 
-		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
-		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
-		new File(output.resolve("calculatedData").toString()).mkdir();
+		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
-		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		Network network = NetworkUtils.readNetwork(networkLocation);
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
+					inputDataDirectory, usedLanduseConfiguration,
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
@@ -165,14 +157,14 @@ public class TripDistributionMatrixTest {
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
+		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());
 		regionLinksMap.get("testArea1_area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
 		regionLinksMap.put("testArea1_area2", new HashMap<>());

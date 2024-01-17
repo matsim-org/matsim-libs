@@ -19,9 +19,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;

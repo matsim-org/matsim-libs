@@ -10,11 +10,13 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 /**
  * @author nkuehnel, fzwick / MOIA
  */
-public class ShiftDrtOptimizer implements DrtOptimizer {
+public class ShiftDrtOptimizer implements DrtOptimizer, MobsimInitializedListener {
 
     private final DrtOptimizer optimizer;
 
@@ -67,4 +69,8 @@ public class ShiftDrtOptimizer implements DrtOptimizer {
         this.optimizer.requestSubmitted(request);
     }
 
+	@Override
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		dispatcher.initialize();
+	}
 }

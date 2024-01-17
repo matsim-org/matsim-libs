@@ -62,7 +62,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class ScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, ScoreStats {
 
-	public enum ScoreItem { worst, best, average, executed };
+	public enum ScoreItem { worst, best, average, executed }
 
 	private final Population population;
 	private final OutputDirectoryHierarchy controllerIO;

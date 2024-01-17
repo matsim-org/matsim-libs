@@ -80,7 +80,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		});
 	}
 
-	private class ThrowingScoringFunctionFactory implements ScoringFunctionFactory {
+	private static class ThrowingScoringFunctionFactory implements ScoringFunctionFactory {
 		@Override
 		public ScoringFunction createNewScoringFunction(Person person) {
 			return new ScoringFunction() {

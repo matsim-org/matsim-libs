@@ -25,7 +25,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.DefaultTransitPassengerRouteFactory;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -44,7 +43,7 @@ public final class RouteFactories {
 		this.setRouteFactory(ExperimentalTransitRoute.class, new ExperimentalTransitRouteFactory());
 		this.setRouteFactory(DefaultTransitPassengerRoute.class, new DefaultTransitPassengerRouteFactory());
 	}
-	
+
 	/**
 	 * @param routeClass the requested class of the route
 	 * @param startLinkId the link where the route starts
