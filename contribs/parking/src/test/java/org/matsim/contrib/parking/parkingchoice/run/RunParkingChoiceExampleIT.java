@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.* 												   *
- *
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package ch.sbb.matsim.routing.pt.raptor;
+package org.matsim.contrib.parking.parkingchoice.run;
 
-
-import java.util.function.Supplier;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author mrieser / Simunto
+ * @author nagel
+ *
  */
-public interface RaptorTransferCostCalculator {
+public class RunParkingChoiceExampleIT {
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	double calcTransferCost(SwissRailRaptorCore.PathElement currentPE, Supplier<Transfer> transfer, RaptorStaticConfig staticConfig, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double currentTime);
+	/**
+	 * Test method for {@link org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample#run(org.matsim.core.config.Config)}.
+	 */
+	@Test
+	final void testRun() {
+		Config config = ConfigUtils.loadConfig("./src/main/resources/parkingchoice/config.xml");
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setLastIteration(0);
+		RunParkingChoiceExample.run(config);
+
+	}
 
 }

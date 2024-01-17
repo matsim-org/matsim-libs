@@ -20,6 +20,10 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,15 +38,17 @@ import java.util.Map;
  */
 public class RaptorStaticConfig {
 
-    public enum RaptorOptimization {
+
+
+	public enum RaptorOptimization {
         /**
          * Use this option if you plan to calculate simple from-to routes
-         * (see {@link SwissRailRaptor#calcRoute(org.matsim.facilities.Facility, org.matsim.facilities.Facility, double, org.matsim.api.core.v01.population.Person)}).
+         * (see {@link SwissRailRaptor#calcRoute(Facility, Facility, double, double, double, Person, Attributes, RaptorRouteSelector)}
          */
         OneToOneRouting,
         /**
          * Use this option if you plan to calculate one-to-all least-cost-path-trees
-         * (see {@link SwissRailRaptor#calcTree(org.matsim.pt.transitSchedule.api.TransitStopFacility, double, RaptorParameters)}).
+         * (see {@link SwissRailRaptor#calcTree(TransitStopFacility, double, RaptorParameters, Person)} ).
          */
         OneToAllRouting }
 
@@ -60,6 +66,7 @@ public class RaptorStaticConfig {
 
     private boolean useModeMappingForPassengers = false;
     private final Map<String, String> passengerModeMappings = new HashMap<>();
+    private final Map<String, Map<String,Double>> modeToModeTransferPenalties = new HashMap<>();
 
     private boolean useCapacityConstraints = false;
 
@@ -114,6 +121,20 @@ public class RaptorStaticConfig {
     public void setUseModeMappingForPassengers(boolean useModeMappingForPassengers) {
         this.useModeMappingForPassengers = useModeMappingForPassengers;
     }
+	public void addModeToModeTransferPenalty(String fromMode, String toMode, double transferPenalty) {
+		this.modeToModeTransferPenalties.computeIfAbsent(fromMode,s->new HashMap<>()).put(toMode,transferPenalty);
+	}
+	public double getModeToModeTransferPenalty(String fromMode, String toMode){
+		var fromModeSet = this.modeToModeTransferPenalties.get(fromMode);
+		if (fromModeSet!=null){
+			return fromModeSet.getOrDefault(toMode,0.0);
+		}
+		else return 0.0;
+	}
+
+	public boolean isUseModeToModeTransferPenalty(){
+		return !this.modeToModeTransferPenalties.isEmpty();
+	}
 
     public boolean isUseCapacityConstraints() {
         return this.useCapacityConstraints;

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +16,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.parkingchoice.example;
 
+package org.matsim.contrib.drt.extension.companions;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.AbstractParkingBetas;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+
+import java.util.Optional;
 
 /**
- * @author jbischoff
- *	example class for setting parking betas: we simply return 1 for Beta values. Typically those values should be person- and/or income depending
+ * @author steffenaxer
  */
-public class ParkingBetaExample extends AbstractParkingBetas {
-
-	
-	@Override
-	public double getParkingWalkBeta(Person person,
-			double activityDurationInSeconds) {
-		return 1;
+class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
+	private final Population population;
+	DrtCompanionGroupIdentifier(final Population population)
+	{
+		this.population = population;
 	}
 
 	@Override
-	public double getParkingCostBeta(Person person) {
-		return 1;
+	public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent) {
+		Person person = wrapMobsimPassengerAgentToPerson(agent);
+		return DrtCompanionUtils.getPassengerGroupIdentifier(person);
 	}
-	
-	
-	
+
+	private Person wrapMobsimPassengerAgentToPerson(MobsimPassengerAgent agent)
+	{
+		return this.population.getPersons().get(agent.getId());
+	}
 
 }

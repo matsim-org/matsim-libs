@@ -36,14 +36,10 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 /**
  * Calculates zone-to-zone matrices containing a number of performance indicators related to public transport.
@@ -76,7 +72,7 @@ public class PTSkimMatrices {
     }
 
     public static <T> PTSkimMatrices.PtIndicators<T> calculateSkimMatrices(SwissRailRaptorData raptorData, Map<T, Coord[]> coordsPerZone, double minDepartureTime, double maxDepartureTime,
-            double stepSize_seconds, RaptorParameters parameters, int numberOfThreads, BiPredicate<TransitLine, TransitRoute> trainDetector) {
+            double stepSize_seconds, RaptorParameters parameters, int numberOfThreads, BiPredicate<TransitLine, TransitRoute> trainDetector, CoordAggregator coordAggregator) {
         // prepare calculation
         Set<T> zoneIds = coordsPerZone.keySet();
         PtIndicators<T> pti = new PtIndicators<>(zoneIds);
@@ -89,7 +85,7 @@ public class PTSkimMatrices {
         Thread[] threads = new Thread[numberOfThreads];
         for (int i = 0; i < numberOfThreads; i++) {
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(raptorData, config).build();
-            RowWorker<T> worker = new RowWorker<>(originZones, zoneIds, coordsPerZone, pti, raptor, parameters, minDepartureTime, maxDepartureTime, stepSize_seconds, counter, trainDetector);
+            RowWorker<T> worker = new RowWorker<>(originZones, zoneIds, coordsPerZone, pti, raptor, parameters, minDepartureTime, maxDepartureTime, stepSize_seconds, counter, trainDetector, coordAggregator);
             threads[i] = new Thread(worker, "PT-FrequencyMatrix-" + Time.writeTime(minDepartureTime) + "-" + Time.writeTime(maxDepartureTime) + "-" + i);
             threads[i].start();
         }
@@ -148,9 +144,10 @@ public class PTSkimMatrices {
         private final double stepSize;
         private final Counter counter;
         private final BiPredicate<TransitLine, TransitRoute> trainDetector;
+		private final CoordAggregator coordAggregator;
 
-        RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, Map<T, Coord[]> coordsPerZone, PtIndicators<T> pti, SwissRailRaptor raptor, RaptorParameters parameters,
-                double minDepartureTime, double maxDepartureTime, double stepSize, Counter counter, BiPredicate<TransitLine, TransitRoute> trainDetector) {
+		RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, Map<T, Coord[]> coordsPerZone, PtIndicators<T> pti, SwissRailRaptor raptor, RaptorParameters parameters,
+				  double minDepartureTime, double maxDepartureTime, double stepSize, Counter counter, BiPredicate<TransitLine, TransitRoute> trainDetector, CoordAggregator coordAggregator) {
             this.originZones = originZones;
             this.destinationZones = destinationZones;
             this.coordsPerZone = coordsPerZone;
@@ -162,6 +159,7 @@ public class PTSkimMatrices {
             this.stepSize = stepSize;
             this.counter = counter;
             this.trainDetector = trainDetector;
+			this.coordAggregator = coordAggregator;
         }
 
         private static Collection<TransitStopFacility> findStopCandidates(Coord coord, SwissRailRaptor raptor, RaptorParameters parameters) {
@@ -185,14 +183,15 @@ public class PTSkimMatrices {
                 this.counter.incCounter();
                 Coord[] fromCoords = this.coordsPerZone.get(fromZoneId);
                 if (fromCoords != null) {
-                    for (Coord fromCoord : fromCoords) {
-                        calcForRow(fromZoneId, fromCoord);
+				var weightedRelevantFromCoords = coordAggregator.aggregateCoords(fromCoords);
+					for (var fromCoord : weightedRelevantFromCoords) {
+                        calcForRow(fromZoneId, fromCoord.coord(),fromCoord.weight());
                     }
                 }
             }
         }
 
-        private void calcForRow(T fromZoneId, Coord fromCoord) {
+        private void calcForRow(T fromZoneId, Coord fromCoord, double fromCoordWeight) {
             double walkSpeed = this.parameters.getBeelineWalkSpeed();
 
             Collection<TransitStopFacility> fromStops = findStopCandidates(fromCoord, this.raptor, this.parameters);
@@ -216,13 +215,13 @@ public class PTSkimMatrices {
                 Coord[] toCoords = this.coordsPerZone.get(toZoneId);
                 if (toCoords != null) {
                     for (Coord toCoord : toCoords) {
-                        calcForOD(fromZoneId, toZoneId, toCoord, accessTimes, trees);
+                        calcForOD(fromZoneId, toZoneId, toCoord, accessTimes, trees, (float) fromCoordWeight);
                     }
                 }
             }
         }
 
-        private void calcForOD(T fromZoneId, T toZoneId, Coord toCoord, Map<Id<TransitStopFacility>, Double> accessTimes, List<Map<Id<TransitStopFacility>, TravelInfo>> trees) {
+        private void calcForOD(T fromZoneId, T toZoneId, Coord toCoord, Map<Id<TransitStopFacility>, Double> accessTimes, List<Map<Id<TransitStopFacility>, TravelInfo>> trees, float fromCoordWeight) {
             double walkSpeed = this.parameters.getBeelineWalkSpeed();
 
             Collection<TransitStopFacility> toStops = findStopCandidates(toCoord, this.raptor, this.parameters);
@@ -297,15 +296,15 @@ public class PTSkimMatrices {
             float trainShareByTravelTime = (float) (trainInVehTime / totalInVehTime);
             float trainShareByDistance = (float) (trainDistance / totalDistance);
 
-            this.pti.accessTimeMatrix.add(fromZoneId, toZoneId, accessTime);
-            this.pti.egressTimeMatrix.add(fromZoneId, toZoneId, egressTime);
-            this.pti.transferCountMatrix.add(fromZoneId, toZoneId, transferCount);
-            this.pti.travelTimeMatrix.add(fromZoneId, toZoneId, travelTime);
-            this.pti.distanceMatrix.add(fromZoneId, toZoneId, (float) totalDistance);
-            this.pti.trainDistanceShareMatrix.add(fromZoneId, toZoneId, trainShareByDistance);
-            this.pti.trainTravelTimeShareMatrix.add(fromZoneId, toZoneId, trainShareByTravelTime);
+            this.pti.accessTimeMatrix.add(fromZoneId, toZoneId, accessTime*fromCoordWeight);
+            this.pti.egressTimeMatrix.add(fromZoneId, toZoneId, egressTime*fromCoordWeight);
+            this.pti.transferCountMatrix.add(fromZoneId, toZoneId, transferCount*fromCoordWeight);
+            this.pti.travelTimeMatrix.add(fromZoneId, toZoneId, travelTime*fromCoordWeight);
+            this.pti.distanceMatrix.add(fromZoneId, toZoneId, (float) totalDistance*fromCoordWeight);
+            this.pti.trainDistanceShareMatrix.add(fromZoneId, toZoneId, trainShareByDistance*fromCoordWeight);
+            this.pti.trainTravelTimeShareMatrix.add(fromZoneId, toZoneId, trainShareByTravelTime*fromCoordWeight);
 
-            this.pti.dataCountMatrix.add(fromZoneId, toZoneId, 1);
+            this.pti.dataCountMatrix.add(fromZoneId, toZoneId, fromCoordWeight);
         }
 
         private List<ODConnection> buildODConnections(List<Map<Id<TransitStopFacility>, TravelInfo>> trees, Map<Id<TransitStopFacility>, Double> accessTimes,
@@ -358,5 +357,11 @@ public class PTSkimMatrices {
             this.trainDistanceShareMatrix = new FloatMatrix<>(zones, 0);
         }
     }
+
+	public interface CoordAggregator{
+		default List<CalculateSkimMatrices.WeightedCoord> aggregateCoords(Coord[] coords){
+			return Arrays.stream(coords).map(coord -> new CalculateSkimMatrices.WeightedCoord(coord,1.0)).collect(Collectors.toList());
+		}
+	}
 
 }
