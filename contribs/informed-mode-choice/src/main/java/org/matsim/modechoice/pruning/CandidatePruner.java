@@ -37,7 +37,9 @@ public interface CandidatePruner {
 	 *
 	 * @return positive threshold, if negative it will not be applied
 	 */
-	double planThreshold(PlanModel planModel);
+	default double planThreshold(PlanModel planModel) {
+		return -1;
+	}
 
 
 	/**
@@ -45,5 +47,7 @@ public interface CandidatePruner {
 	 *
 	 * @return positive threshold, if negative it will not be applied
 	 */
-	double tripThreshold(PlanModel planModel, int idx);
+	default double tripThreshold(PlanModel planModel, int idx) {
+		return -1;
+	}
 }
