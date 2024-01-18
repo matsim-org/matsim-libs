@@ -27,6 +27,9 @@ public final class Hexagons extends Viz {
 
 	public Double zoom;
 
+	public Double radius;
+	public Double maxHeight;
+
 	/**
 	 * List of all shown aggregations
 	 */
