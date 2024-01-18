@@ -119,10 +119,10 @@ public final class Data {
 	 */
 	public String compute(Class<? extends MATSimAppCommand> command, String file, String... args) {
 		currentContext.add(command, args);
-		Path path = currentContext.getRequiredPath(command, file);
+		Path p = currentContext.getRequiredPath(command, file);
 
 		// Relative path from the simulation output
-		return this.getUnixPath(this.path.getParent().relativize(path));
+		return this.getUnixPath(this.path.getParent().relativize(p));
 	}
 
 	/**
@@ -131,24 +131,13 @@ public final class Data {
 	 * @param placeholder placeholder to be replaced in the file name
 	 * @see #compute(Class, String, String...)
 	 */
-	public String computeOne(Class<? extends MATSimAppCommand> command, String file, String placeholder, String... args) {
+	public String computeWithPlaceholder(Class<? extends MATSimAppCommand> command, String file, String placeholder, String... args) {
 		currentContext.add(command, args);
-		Path path = currentContext.getRequiredPath(command, file, placeholder);
+		Path p = currentContext.getRequiredPath(command, file, placeholder);
 
 		// Relative path from the simulation output
-		return this.getUnixPath(this.path.getParent().relativize(path));
+		return this.getUnixPath(this.path.getParent().relativize(p));
 
-	}
-
-	/**
-	 * Uses a command to construct the required output.
-	 *
-	 * @param command     the command to be executed
-	 * @param file        name of the produced output file, which must contain a placeholder that is going to be replaced
-	 * @param placeholder string to insert into the placeholder
-	 */
-	public String computeWithPlaceholder(Class<? extends MATSimAppCommand> command, String file, String placeholder, String... args) {
-		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	public String subcommand(String command, String file) {

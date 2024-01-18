@@ -12,7 +12,7 @@ import org.matsim.simwrapper.viz.Table;
 /**
  * Shows emission in the scenario.
  */
-public class 	EmissionsDashboard implements Dashboard {
+public class EmissionsDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {
 

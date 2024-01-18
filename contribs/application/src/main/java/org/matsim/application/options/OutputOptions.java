@@ -82,15 +82,18 @@ public final class OutputOptions {
 		if (!name.contains("%s"))
 			throw new IllegalArgumentException(String.format("File %s does not contain placeholder %%s", name));
 
-		name = String.format(name, placeholder);
 		Path output = outputs.containsKey(name) ? outputs.get(name) : Path.of(name);
+		if (!output.toString().contains("%s"))
+			throw new IllegalArgumentException(String.format("Argument %s does not contain placeholder %%s", output));
+
+		Path outputReplaced = Path.of(String.format(output.toString(), placeholder));
 		try {
-			Files.createDirectories(output.toAbsolutePath().getParent());
+			Files.createDirectories(outputReplaced.toAbsolutePath().getParent());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 
-		return output;
+		return outputReplaced;
 	}
 
 	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)

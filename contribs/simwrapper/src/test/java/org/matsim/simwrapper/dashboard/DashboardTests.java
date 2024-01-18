@@ -14,6 +14,9 @@ import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DashboardTests {
 	@RegisterExtension
@@ -111,5 +114,8 @@ public class DashboardTests {
 
 
 	}
+
+	@Test
+	void odFlow() {run(new ODFlowDashboard(Set.of("car", "pt", "walk", "bike", "ride"),"EPSG:25832"));}
 
 }
