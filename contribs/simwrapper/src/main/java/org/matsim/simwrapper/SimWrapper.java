@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.inject.Binder;
+import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
@@ -67,6 +70,13 @@ public final class SimWrapper {
 	 */
 	public static SimWrapper create(org.matsim.core.config.Config config) {
 		return new SimWrapper(config);
+	}
+
+	/**
+	 * Utility method to define a binding for a dashboard. These will be picked up if the MATSim integration is used.
+	 */
+	public static LinkedBindingBuilder<Dashboard> addDashboardBinding(Binder binder) {
+		return Multibinder.newSetBinder(binder, Dashboard.class).addBinding();
 	}
 
 	/**
