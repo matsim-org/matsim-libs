@@ -2,6 +2,7 @@ package org.matsim.simwrapper;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 
@@ -33,7 +34,7 @@ public final class SimWrapperModule extends AbstractModule {
 
 		// Construct the binder one time, even through nothing is added
 		// otherwise the injection will not work
-		SimWrapper.addDashboardBinding(binder());
+		Multibinder.newSetBinder(binder(), Dashboard.class);
 
 	}
 
