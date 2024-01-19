@@ -48,6 +48,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
 
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource>
     implements LSPCarrierResource {
@@ -57,7 +58,7 @@ import org.matsim.freight.logistics.*;
   private final DistributionCarrierScheduler distributionHandler;
   private final Network network;
 
-  DistributionCarrierResource(DistributionCarrierUtils.DistributionCarrierResourceBuilder builder) {
+  DistributionCarrierResource(DistributionCarrierResourceBuilder builder) {
     super(builder.id);
     this.distributionHandler = builder.distributionHandler;
     this.clientElements = builder.clientElements;

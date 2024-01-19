@@ -27,7 +27,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -175,10 +174,10 @@ final class ExampleMultipleOneEchelonChains {
           CarrierVehicle.newInstance(
               Id.createVehicleId("veh_large"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
       LSPResource singleCarrierResource =
-          DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+          ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                   singleCarrier, network)
               .setDistributionScheduler(
-                  DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
               .build();
 
       LogisticChainElement singleCarrierElement =
@@ -214,10 +213,10 @@ final class ExampleMultipleOneEchelonChains {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource carrierLeftResource =
-            DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     carrierLeft, network)
                 .setDistributionScheduler(
-                    DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                 .build();
 
         leftCarrierElement =
@@ -238,10 +237,10 @@ final class ExampleMultipleOneEchelonChains {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource carrierRightResource =
-            DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     carrierRight, network)
                 .setDistributionScheduler(
-                    DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                 .build();
 
         rightCarrierElement =

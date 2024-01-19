@@ -35,7 +35,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -82,8 +83,8 @@ public class DistributionResourceTest {
 		distributionCarrier.setCarrierCapabilities(capabilities);
 
 
-		DistributionCarrierUtils.DistributionCarrierResourceBuilder builder = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
-		builder.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler());
+		DistributionCarrierResourceBuilder builder = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
+		builder.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler());
 		builder.setLocationLinkId(distributionLinkId);
 		distributionResource = builder.build();
 	}

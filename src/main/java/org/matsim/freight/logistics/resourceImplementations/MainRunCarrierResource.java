@@ -49,6 +49,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.MainRunCarrierResourceBuilder;
 
 /*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource>
     implements LSPCarrierResource {
@@ -64,7 +65,7 @@ import org.matsim.freight.logistics.*;
   private final ResourceImplementationUtils.VehicleReturn vehicleReturn;
   private final Network network;
 
-  MainRunCarrierResource(MainRunCarrierUtils.MainRunCarrierResourceBuilder builder) {
+  MainRunCarrierResource(MainRunCarrierResourceBuilder builder) {
     super(builder.getId());
     this.carrier = builder.getCarrier();
     this.fromLinkId = builder.getFromLinkId();

@@ -37,7 +37,7 @@ import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -79,8 +79,8 @@ public class DistributionElementTest {
 
 
 		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
-		adapter = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
-				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+		adapter = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

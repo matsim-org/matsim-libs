@@ -93,8 +93,8 @@ public class CompleteLSPSchedulingTest {
 		Carrier collectionCarrier = CarriersUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		collectionResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+		collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -144,8 +144,8 @@ public class CompleteLSPSchedulingTest {
 		Carrier mainRunCarrier = CarriersUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(fromLinkId)
 				.setToLinkId(toLinkId)
 				.build();
@@ -193,8 +193,8 @@ public class CompleteLSPSchedulingTest {
 		Carrier distributionCarrier = CarriersUtils.createCarrier(distributionCarrierId);
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
-		distributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
-				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+		distributionResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

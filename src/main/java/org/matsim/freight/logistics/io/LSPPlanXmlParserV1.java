@@ -33,9 +33,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.MainRunCarrierUtils;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import org.matsim.freight.logistics.shipment.LSPShipment;
@@ -316,21 +313,21 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         switch (ResourceImplementationUtils.getCarrierType(currentCarrier)) {
           case collectionCarrier -> lspResource =
-              CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(
+              ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
                       currentCarrier, null)
                   .setCollectionScheduler(
-                      CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+                      ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
                   .build();
           case mainRunCarrier -> lspResource =
-              MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
+              ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
                   .setMainRunCarrierScheduler(
-                      MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+                      ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
                   .build();
           case distributionCarrier -> lspResource =
-              DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+              ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                       currentCarrier, null)
                   .setDistributionScheduler(
-                      DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                      ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                   .build();
           default -> throw new IllegalStateException(
               "Unexpected value: " + currentCarrier.getAttributes().toString());

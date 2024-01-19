@@ -86,8 +86,8 @@ public class FirstReloadLSPSchedulingTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		collectionResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+		collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 

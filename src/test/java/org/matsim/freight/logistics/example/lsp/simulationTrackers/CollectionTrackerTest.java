@@ -50,7 +50,7 @@ import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.CollectionCarrierResourceBuilder;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -105,8 +105,8 @@ public class CollectionTrackerTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-				CollectionCarrierUtils.CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler());
+				CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
+		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 

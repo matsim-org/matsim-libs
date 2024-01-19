@@ -30,7 +30,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlan;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
@@ -82,8 +81,8 @@ public class MultipleChainsReplanningTest {
 				carrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarriersUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-				LSPResource carrierLeftResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft, network)
-						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+				LSPResource carrierLeftResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft, network)
+						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
 						.build();
 
 				leftCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("leftCarrierElement", LogisticChainElement.class))
@@ -97,8 +96,8 @@ public class MultipleChainsReplanningTest {
 				carrierRight.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarriersUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-				LSPResource carrierRightResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight, network)
-						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+				LSPResource carrierRightResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight, network)
+						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
 						.build();
 
 				rightCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("rightCarrierElement", LogisticChainElement.class))

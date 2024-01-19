@@ -27,8 +27,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.MainRunCarrierUtils;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.vehicles.VehicleType;
@@ -198,10 +196,10 @@ final class ExampleGroceryDeliveryMultipleChains {
                 depotLinkFromVehicles,
                 vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
         LSPResource singleCarrierResource =
-            DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     singleCarrier, scenario.getNetwork())
                 .setDistributionScheduler(
-                    DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                 .build();
 
         LogisticChainElement singleCarrierElement =
@@ -228,11 +226,11 @@ final class ExampleGroceryDeliveryMultipleChains {
                 depotLinkFromVehicles,
                 vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
         LSPResource mainCarrierResource =
-            MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
                     mainCarrier, scenario.getNetwork())
                 .setFromLinkId(depotLinkFromVehicles)
                 .setMainRunCarrierScheduler(
-                    MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -278,10 +276,10 @@ final class ExampleGroceryDeliveryMultipleChains {
                     .getVehicleTypes()
                     .get(Id.create("heavy40t_electro", VehicleType.class))));
         LSPResource distributionCarrierResource =
-            DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     distributionCarrier, scenario.getNetwork())
                 .setDistributionScheduler(
-                    DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                 .build();
 
         LogisticChainElement distributionCarrierElement =

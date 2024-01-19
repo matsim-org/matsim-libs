@@ -36,7 +36,7 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.VehicleType;
 
 public class CollectionElementTest {
@@ -74,8 +74,8 @@ public class CollectionElementTest {
 		Carrier carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		carrierResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
-				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+		carrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 

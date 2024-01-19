@@ -49,6 +49,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.CollectionCarrierResourceBuilder;
 
 /*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource>
     implements LSPCarrierResource {
@@ -58,7 +59,7 @@ import org.matsim.freight.logistics.*;
   private final CollectionCarrierScheduler collectionScheduler;
   private final Network network;
 
-  CollectionCarrierResource(CollectionCarrierUtils.CollectionCarrierResourceBuilder builder) {
+  CollectionCarrierResource(CollectionCarrierResourceBuilder builder) {
     super(builder.id);
     this.collectionScheduler = builder.collectionScheduler;
     this.clientElements = builder.clientElements;
