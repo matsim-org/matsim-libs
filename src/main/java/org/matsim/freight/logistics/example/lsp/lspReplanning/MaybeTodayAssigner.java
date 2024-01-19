@@ -22,9 +22,8 @@ package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
 import java.util.Random;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.freight.logistics.LSP;
-import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.InitialShipmentAssigner;
+import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /*package-private*/ class MaybeTodayAssigner implements InitialShipmentAssigner {

@@ -22,10 +22,9 @@ package org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.Requirement;
 

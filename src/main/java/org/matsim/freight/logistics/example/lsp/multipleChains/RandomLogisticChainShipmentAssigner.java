@@ -22,7 +22,7 @@ class RandomLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-    Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
+    Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     List<LogisticChain> logisticChains = new ArrayList<>(lspPlan.getLogisticChains());
     Random rand = MatsimRandom.getRandom();
     int index = rand.nextInt(logisticChains.size());

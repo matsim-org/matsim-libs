@@ -4,10 +4,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
@@ -26,7 +25,7 @@ class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner
 
   @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-    Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
+    Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     // prepare the map if empty for the first time with each number of assigned shipments being zero
     if (shipmentCountByChain.isEmpty()) {
       for (LogisticChain chain : lspPlan.getLogisticChains()) {

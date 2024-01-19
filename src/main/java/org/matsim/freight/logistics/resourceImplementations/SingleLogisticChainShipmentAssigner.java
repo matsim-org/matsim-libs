@@ -21,10 +21,9 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
