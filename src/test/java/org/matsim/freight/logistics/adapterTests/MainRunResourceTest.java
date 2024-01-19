@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.resourceImplementations.MainRunCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -82,8 +82,8 @@ public class MainRunResourceTest {
 		carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(carrier, network)
-				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(carrier, network)
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)")).setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();
 

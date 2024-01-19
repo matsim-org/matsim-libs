@@ -39,9 +39,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.MainRunCarrierUtils;
 import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
@@ -83,10 +80,10 @@ import org.matsim.vehicles.VehicleType;
 
     // The collection adapter i.e. the Resource is created
     LSPResource collectionResource =
-        CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
                 collectionCarrier, network)
             .setCollectionScheduler(
-                CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -153,10 +150,10 @@ import org.matsim.vehicles.VehicleType;
 
     // The adapter i.e. the main run resource is created
     LSPResource mainRunResource =
-        MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+        ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
             .setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
             .setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-            .setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+            .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
             .build();
 
     // The LogisticsSolutionElement for the main run Resource is created
@@ -222,13 +219,13 @@ import org.matsim.vehicles.VehicleType;
 
     // The distribution adapter i.e. the Resource is created
     LSPResource distributionResource =
-        DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(
+        ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                 distributionCarrier, network)
             .setLocationLinkId(distributionLinkId)
             // The scheduler for the Resource is created and added. This is where jsprit comes into
             // play.
             .setDistributionScheduler(
-                DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
             .build();
 
     // The adapter is now inserted into the corresponding LogisticsSolutionElement of the only

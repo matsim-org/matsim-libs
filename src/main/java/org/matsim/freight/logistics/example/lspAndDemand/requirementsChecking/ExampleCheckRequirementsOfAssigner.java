@@ -35,7 +35,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.Vehicle;
@@ -74,9 +73,9 @@ class ExampleCheckRequirementsOfAssigner {
     redCarrier.setCarrierCapabilities(redCapabilities);
 
     LSPResource redResource =
-        CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
             .setCollectionScheduler(
-                CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -111,9 +110,9 @@ class ExampleCheckRequirementsOfAssigner {
     blueCarrier.setCarrierCapabilities(blueCapabilities);
 
     LSPResource blueResource =
-        CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
             .setCollectionScheduler(
-                CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
             .setLocationLinkId(collectionLinkId)
             .build();
 

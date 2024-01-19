@@ -35,7 +35,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
@@ -74,9 +73,9 @@ import org.matsim.vehicles.VehicleType;
 
     // The Resource i.e. the Resource is created
     LSPResource collectionResource =
-        CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
             .setCollectionScheduler(
-                CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
             .setLocationLinkId(collectionLinkId)
             .build();
 

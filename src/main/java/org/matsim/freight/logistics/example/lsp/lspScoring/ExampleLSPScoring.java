@@ -40,7 +40,6 @@ import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.CollectionCarrierUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -84,9 +83,9 @@ import org.matsim.vehicles.VehicleType;
     // The Resource i.e. the Resource is created
     // The scheduler for the Resource is created and added. This is where jsprit comes into play.
     LSPResource lspResource =
-        CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
             .setCollectionScheduler(
-                CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
             .setLocationLinkId(collectionLinkId)
             .build();
 
