@@ -32,7 +32,6 @@ import org.matsim.freight.logistics.shipment.Requirement;
 class RequirementsAssigner implements InitialShipmentAssigner {
 
   private final Collection<LogisticChain> feasibleLogisticChains;
-  private LSP lsp;
 
   public RequirementsAssigner() {
     this.feasibleLogisticChains = new ArrayList<>();
@@ -56,13 +55,4 @@ class RequirementsAssigner implements InitialShipmentAssigner {
     chosenSolution.addShipmentToChain(shipment);
   }
 
-  @Override
-  public LSP getLSP() {
-    throw new RuntimeException("not implemented");
-  }
-
-  @Override
-  public void setLSP(LSP lsp) {
-    this.lsp = lsp;
-  }
 }

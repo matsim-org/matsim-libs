@@ -38,18 +38,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  */
 class SingleLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
-  private LSP lsp;
-
   SingleLogisticChainShipmentAssigner() {}
-
-  @Override
-  public LSP getLSP() {
-    throw new RuntimeException("not implemented");
-  }
-
-  public void setLSP(LSP lsp) {
-    this.lsp = lsp;
-  }
 
   @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {

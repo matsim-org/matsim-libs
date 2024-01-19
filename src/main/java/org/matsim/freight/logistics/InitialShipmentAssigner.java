@@ -37,7 +37,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * {@link LogisticChain} of the same {@link LSPPlan}. This is now (since fall 2023; see master
  * thesis of nrichter) part of the (innovative) **Replanning** strategies.
  */
-public interface InitialShipmentAssigner extends KnowsLSP {
+public interface InitialShipmentAssigner {
 
   void assignToPlan(LSPPlan lspPlan, LSPShipment shipment);
 }

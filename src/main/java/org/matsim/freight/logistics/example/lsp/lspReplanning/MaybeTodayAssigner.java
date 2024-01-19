@@ -30,7 +30,6 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 /*package-private*/ class MaybeTodayAssigner implements InitialShipmentAssigner {
 
   private final Random random;
-  private LSP lsp;
 
   public MaybeTodayAssigner() {
     this.random = new Random(1);
@@ -45,13 +44,4 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     }
   }
 
-  @Override
-  public LSP getLSP() {
-    throw new RuntimeException("not implemented");
-  }
-
-  @Override
-  public void setLSP(LSP lsp) {
-    this.lsp = lsp;
-  }
 }

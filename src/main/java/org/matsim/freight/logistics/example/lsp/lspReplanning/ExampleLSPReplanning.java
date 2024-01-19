@@ -217,7 +217,6 @@ import org.matsim.vehicles.VehicleType;
                         LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                         {
                           InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-                          maybeTodayAssigner.setLSP(lsp);
                           strategyManager.addStrategy(
                               new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner)
                                   .createStrategy(),
@@ -232,7 +231,6 @@ import org.matsim.vehicles.VehicleType;
     GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
 
     InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-    maybeTodayAssigner.setLSP(lsp);
 
     strategyManager.addStrategy(
         new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);

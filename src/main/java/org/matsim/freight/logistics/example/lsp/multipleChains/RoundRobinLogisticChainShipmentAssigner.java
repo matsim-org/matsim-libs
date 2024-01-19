@@ -21,18 +21,8 @@ class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner
 
   // map of logistic chains and their number of assigned shipments in order of addition
   Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
-  private LSP lsp;
 
   RoundRobinLogisticChainShipmentAssigner() {}
-
-  @Override
-  public LSP getLSP() {
-    throw new RuntimeException("not implemented");
-  }
-
-  public void setLSP(LSP lsp) {
-    this.lsp = lsp;
-  }
 
   @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
