@@ -30,7 +30,7 @@ class PrimaryLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-    Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
+    Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     LogisticChain firstLogisticChain = lspPlan.getLogisticChains().iterator().next();
     firstLogisticChain.addShipmentToChain(shipment);
   }
