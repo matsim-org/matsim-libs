@@ -92,7 +92,6 @@ public class ResourceImplementationUtils {
 
   public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
     System.out.println("Writing out shipmentPlan for LSP");
-    LSPPlan lspPlan = lsp.getSelectedPlan();
     try (BufferedWriter writer =
         IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_schedules.tsv")) {
       final String str0 = "LSP: " + lsp.getId();
