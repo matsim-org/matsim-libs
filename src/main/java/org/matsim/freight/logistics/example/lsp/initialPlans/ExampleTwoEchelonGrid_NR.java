@@ -284,7 +284,7 @@ final class ExampleTwoEchelonGrid_NR {
               .addLogisticChainElement(directCarrierElement)
               .build();
 
-      final ShipmentAssigner singleSolutionShipmentAssigner =
+      final InitialShipmentAssigner singleSolutionShipmentAssigner =
           ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
       lspPlan_direct =
           LSPUtils.createLSPPlan()

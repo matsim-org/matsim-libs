@@ -195,7 +195,7 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
 		LogisticChain completeSolution = completeSolutionBuilder.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(completeSolution);

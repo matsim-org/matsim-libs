@@ -30,7 +30,7 @@ public class LSPPlanImpl implements LSPPlan {
   private final Collection<ShipmentPlan> shipmentPlans;
   private LSP lsp;
   private Double score = null;
-  private ShipmentAssigner assigner;
+  private InitialShipmentAssigner assigner;
   private String type = null;
 
   public LSPPlanImpl() {
@@ -51,12 +51,12 @@ public class LSPPlanImpl implements LSPPlan {
   }
 
   @Override
-  public ShipmentAssigner getAssigner() {
+  public InitialShipmentAssigner getAssigner() {
     return assigner;
   }
 
   @Override
-  public LSPPlan setAssigner(ShipmentAssigner assigner) {
+  public LSPPlan setAssigner(InitialShipmentAssigner assigner) {
     this.assigner = assigner;
     this.assigner.setLSP(this.lsp);
     return this;

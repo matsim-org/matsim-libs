@@ -113,7 +113,7 @@ public class MultipleChainsReplanningTest {
 					.addLogisticChainElement(rightCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
+			final InitialShipmentAssigner shipmentAssigner = MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(leftChain)
 					.addLogisticChain(rightChain)

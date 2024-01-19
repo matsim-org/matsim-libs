@@ -203,7 +203,7 @@ public class CompleteLSPShipmentAssignerTest {
 				.addLogisticChainElement(distributionElement)
 				.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(completeSolution);

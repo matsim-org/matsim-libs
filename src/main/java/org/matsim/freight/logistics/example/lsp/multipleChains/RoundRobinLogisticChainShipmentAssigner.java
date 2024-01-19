@@ -7,7 +7,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.ShipmentAssigner;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
@@ -17,7 +17,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * evenly in sequence across the logistics chains. Requirements: There must be at least one
  * logisticChain in the plan
  */
-class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner {
+class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   // map of logistic chains and their number of assigned shipments in order of addition
   Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();

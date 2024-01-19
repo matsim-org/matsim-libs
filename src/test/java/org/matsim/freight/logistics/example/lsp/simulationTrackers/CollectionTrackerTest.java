@@ -131,7 +131,7 @@ public class CollectionTrackerTest {
 			logisticChain.addSimulationTracker(tracker);
 		}
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(logisticChain);

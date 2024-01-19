@@ -191,7 +191,7 @@ final class ExampleMultipleOneEchelonChains {
               .addLogisticChainElement(singleCarrierElement)
               .build();
 
-      final ShipmentAssigner singleSolutionShipmentAssigner =
+      final InitialShipmentAssigner singleSolutionShipmentAssigner =
           MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
       singleOneEchelonChainPlan =
           LSPUtils.createLSPPlan()
@@ -260,7 +260,7 @@ final class ExampleMultipleOneEchelonChains {
               .addLogisticChainElement(rightCarrierElement)
               .build();
 
-      final ShipmentAssigner shipmentAssigner =
+      final InitialShipmentAssigner shipmentAssigner =
           MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
       multipleOneEchelonChainsPlan =
           LSPUtils.createLSPPlan()

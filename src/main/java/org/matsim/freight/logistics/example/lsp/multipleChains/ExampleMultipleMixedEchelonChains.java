@@ -275,7 +275,7 @@ final class ExampleMultipleMixedEchelonChains {
                 .build();
       }
 
-      ShipmentAssigner assigner;
+      InitialShipmentAssigner assigner;
 
       switch (assignerSetting) {
         case primary -> assigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();

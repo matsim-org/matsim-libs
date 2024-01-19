@@ -42,7 +42,7 @@ import org.matsim.vehicles.VehicleType;
 public class CollectionLSPCreationTest {
 
 	private LogisticChain logisticChain;
-	private ShipmentAssigner assigner;
+	private InitialShipmentAssigner assigner;
 	private LSP collectionLSP;
 
 	@BeforeEach

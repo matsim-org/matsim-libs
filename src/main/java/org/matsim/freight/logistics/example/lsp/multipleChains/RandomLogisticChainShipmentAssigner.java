@@ -8,7 +8,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.ShipmentAssigner;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
@@ -16,7 +16,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * plan are collected in a list. The chain to which the shipment is to be assigned is selected by a
  * seeded random index. Requirements: There must be at least one logisticChain in the plan.
  */
-class RandomLogisticChainShipmentAssigner implements ShipmentAssigner {
+class RandomLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   private LSP lsp;
 

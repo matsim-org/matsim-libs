@@ -92,7 +92,7 @@ public class WorstPlanSelectorTest {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
+			final InitialShipmentAssigner singleSolutionShipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			lspPlan_singleChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
@@ -141,7 +141,7 @@ public class WorstPlanSelectorTest {
 					.addLogisticChainElement(northCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
+			final InitialShipmentAssigner shipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)

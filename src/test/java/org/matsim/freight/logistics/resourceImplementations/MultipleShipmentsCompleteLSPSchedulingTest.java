@@ -220,7 +220,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 				.addLogisticChainElement(distributionElement)
 				.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(completeSolution);

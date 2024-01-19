@@ -41,7 +41,7 @@ import org.matsim.vehicles.VehicleType;
 
 public class CompleteLSPPlanTest {
 
-	private ShipmentAssigner assigner;
+	private InitialShipmentAssigner assigner;
 	private LSPPlan completePlan;
 	private LogisticChain logisticChain;
 

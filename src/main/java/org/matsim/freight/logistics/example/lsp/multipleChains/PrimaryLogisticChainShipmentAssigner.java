@@ -4,7 +4,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.ShipmentAssigner;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
@@ -12,7 +12,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * shipment is assigned to that chain. If there are more chains, the shipment is assigned to the
  * first of all chains. Requirements: There must be at least one logisticChain in the plan
  */
-class PrimaryLogisticChainShipmentAssigner implements ShipmentAssigner {
+class PrimaryLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   private LSP lsp;
 

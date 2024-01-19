@@ -95,7 +95,7 @@ public class CollectionLSPShipmentAssigmentTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);

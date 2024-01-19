@@ -166,7 +166,7 @@ public class MainRunLSPMobsimTest {
 		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
 		LogisticChain completeSolution = completeSolutionBuilder.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(completeSolution);

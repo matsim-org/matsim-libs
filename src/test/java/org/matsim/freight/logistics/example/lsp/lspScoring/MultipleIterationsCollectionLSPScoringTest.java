@@ -116,7 +116,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);

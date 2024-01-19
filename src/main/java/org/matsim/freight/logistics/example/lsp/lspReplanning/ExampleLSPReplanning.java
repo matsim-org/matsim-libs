@@ -99,7 +99,7 @@ import org.matsim.vehicles.VehicleType;
     // The initial plan of the lsp is generated and the assigner and the solution from above are
     // added
     LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-    ShipmentAssigner assigner =
+    InitialShipmentAssigner assigner =
         ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
     collectionPlan.setAssigner(assigner);
     collectionPlan.addLogisticChain(collectionSolution);
@@ -216,7 +216,7 @@ import org.matsim.vehicles.VehicleType;
                       public LSPStrategyManager get() {
                         LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                         {
-                          ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+                          InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
                           maybeTodayAssigner.setLSP(lsp);
                           strategyManager.addStrategy(
                               new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner)
@@ -231,7 +231,7 @@ import org.matsim.vehicles.VehicleType;
         });
     GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
 
-    ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+    InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
     maybeTodayAssigner.setLSP(lsp);
 
     strategyManager.addStrategy(

@@ -33,9 +33,9 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
 @Deprecated
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
 
-  private final ShipmentAssigner assigner;
+  private final InitialShipmentAssigner assigner;
 
-  /*package-private*/ TomorrowShipmentAssignerStrategyFactory(ShipmentAssigner assigner) {
+  /*package-private*/ TomorrowShipmentAssignerStrategyFactory(InitialShipmentAssigner assigner) {
     this.assigner = assigner;
   }
 
