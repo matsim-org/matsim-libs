@@ -21,10 +21,6 @@ public interface DeadlockAvoidance {
 	default void initResources(Map<Id<RailResource>, RailResource> resources) {
 	}
 
-	/**
-	 * Called when a resource was reserved.
-	 */
-	void onReserve(double time, RailResource resource, TrainPosition position);
 
 	/**
 	 * Check if reserving this link may produce a deadlock.
@@ -39,6 +35,11 @@ public interface DeadlockAvoidance {
 	 * @return true if the rerouting can be performed, false otherwise.
 	 */
 	boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position);
+
+	/**
+	 * Called when a resource was reserved.
+	 */
+	void onReserve(double time, RailResource resource, TrainPosition position);
 
 	/**
 	 * Called when a resource was released.

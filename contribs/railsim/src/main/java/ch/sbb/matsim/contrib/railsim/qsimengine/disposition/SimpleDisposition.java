@@ -72,7 +72,7 @@ public class SimpleDisposition implements TrainDisposition {
 			return new DispositionResponse(0, 0, detour);
 		}
 
-		double reserveDist = resources.tryBlockLink(time, currentLink, RailResourceManager.ANY_TRACK, position);
+		double reserveDist = resources.tryBlockLink(time, currentLink, RailResourceManager.ANY_TRACK_NON_BLOCKING, position);
 
 		if (reserveDist == RailResource.NO_RESERVATION)
 			return new DispositionResponse(0, 0, null);
