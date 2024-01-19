@@ -250,8 +250,7 @@ public class ResourceImplementationUtils {
 
     private DistributionCarrierResourceBuilder(Carrier carrier, Network network) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-      setCarrierType(
-          carrier, CARRIER_TYPE.distributionCarrier);
+      setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
       this.network = network;
@@ -288,8 +287,7 @@ public class ResourceImplementationUtils {
 
     private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-      setCarrierType(
-          carrier, CARRIER_TYPE.collectionCarrier);
+      setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
       this.network = network;
@@ -328,8 +326,7 @@ public class ResourceImplementationUtils {
 
     private MainRunCarrierResourceBuilder(Carrier carrier, Network network) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-      setCarrierType(
-          carrier, CARRIER_TYPE.mainRunCarrier);
+      setCarrierType(carrier, CARRIER_TYPE.mainRunCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
       this.network = network;
@@ -358,8 +355,7 @@ public class ResourceImplementationUtils {
     }
 
     public MainRunCarrierResourceBuilder setCarrier(Carrier carrier) {
-      setCarrierType(
-          carrier, CARRIER_TYPE.mainRunCarrier);
+      setCarrierType(carrier, CARRIER_TYPE.mainRunCarrier);
       this.carrier = carrier;
       return this;
     }
@@ -400,8 +396,7 @@ public class ResourceImplementationUtils {
       return vehicleReturn;
     }
 
-    public MainRunCarrierResourceBuilder setVehicleReturn(
-        VehicleReturn vehicleReturn) {
+    public MainRunCarrierResourceBuilder setVehicleReturn(VehicleReturn vehicleReturn) {
       this.vehicleReturn = vehicleReturn;
       return this;
     }
