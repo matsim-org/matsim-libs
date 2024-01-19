@@ -96,6 +96,7 @@
 		<module>signals</module>
 		<module>simulatedannealing</module>
 		<module>simwrapper</module>
+		<module>small-scale-traffic-generation</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
 		<module>taxi</module>
