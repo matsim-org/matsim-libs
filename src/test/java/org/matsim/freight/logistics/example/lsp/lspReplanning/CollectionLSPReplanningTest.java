@@ -190,7 +190,6 @@ public class CollectionLSPReplanningTest {
 					LSPStrategyManager manager = new LSPStrategyManagerImpl();
 					{
 						InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-						maybeTodayAssigner.setLSP( collectionLSP );
 						final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
 						// (a factory makes sense if it is passed around; in this case it feels like overkill.  kai, jul'22)
 						manager.addStrategy( strategy, null, 1 );
