@@ -161,12 +161,23 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	private void validateGroups() {
 		this.passengerGroups.values().forEach(g -> {
 			GroupTrip representative = g.get(0);
-			Id<Link> fromLinkId = representative.trip.getOriginActivity().getLinkId();
-			Id<Link> toLinkId = representative.trip.getDestinationActivity().getLinkId();
+
+			Id<Link> fromLinkId = PopulationUtils.decideOnLinkIdForActivity(
+				representative.trip.getOriginActivity(),scenario);
+			Id<Link> toLinkId = PopulationUtils.decideOnLinkIdForActivity(
+				representative.trip.getDestinationActivity(),scenario);
+
 			Preconditions.checkNotNull(fromLinkId);
 			Preconditions.checkNotNull(toLinkId);
-			Preconditions.checkArgument(g.stream().allMatch(a -> a.trip.getOriginActivity().getLinkId().equals(fromLinkId)));
-			Preconditions.checkArgument(g.stream().allMatch(a -> a.trip.getDestinationActivity().getLinkId().equals(toLinkId)));
+
+			Preconditions.checkArgument(g.stream().allMatch(
+				a -> PopulationUtils.decideOnLinkIdForActivity(
+				a.trip.getOriginActivity(),scenario).equals(fromLinkId)));
+
+			Preconditions.checkArgument(g.stream().allMatch(
+				a -> PopulationUtils.decideOnLinkIdForActivity(
+				a.trip.getDestinationActivity(),scenario).equals(toLinkId)));
+
 			Preconditions.checkArgument(g.size() <= this.maxCapacity);
 		});
 	}
