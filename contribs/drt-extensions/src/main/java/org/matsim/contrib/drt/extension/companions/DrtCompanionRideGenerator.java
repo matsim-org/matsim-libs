@@ -19,20 +19,17 @@
 
 package org.matsim.contrib.drt.extension.companions;
 
-import java.util.*;
-
 import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.common.util.WeightedRandomSelection;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
@@ -40,11 +37,13 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.matsim.contrib.drt.extension.companions.DrtCompanionUtils.DRT_COMPANION_AGENT_PREFIX;
 
@@ -66,6 +65,8 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	private final Map<Id<PassengerGroupIdentifier.PassengerGroup>,List<GroupTrip>> passengerGroups = new HashMap<>();
 
 	private int passengerGroupIdentifier = 0; // Should be unique over the entire simulation
+
+	private final AtomicInteger personIdentifierSuffix = new AtomicInteger(0);
 
 	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier,
 							  final FleetSpecification fleet,
@@ -107,8 +108,6 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	record GroupTrip(TripStructureUtils.Trip trip, Id<Person> personId) {}
 
 	private void addCompanionAgents() {
-		int personIdentifierSuffix = 0;
-		int drtCompanionAgents = 0;
 		Collection<Person> companions = new ArrayList<>();
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
@@ -128,26 +127,23 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 
 					// Add companions
 					for (int i = 0; i < additionalCompanions; i++) {
-						int groupPart = i;
 
 						// currentGroupSize+1 exceeds maxCapacity, create a new passengerGroupIdentifier
 						if(currentGroupSize+1>this.maxCapacity)
 						{
-							passengerGroupIdentifier++;
+							passengerGroupIdentifier++; // increment due to vehicle capacity
 							currentGroupSize=0;
 							currentGroupIdentifier = getGroupIdentifier();
 						}
 
 						// Bypass passengerGroupIdentifierId to each group member
 						companions.add(createCompanionAgent(mainMode, person, trip, trip.getOriginActivity(),
-							trip.getDestinationActivity(), groupPart, groupSize, personIdentifierSuffix, currentGroupIdentifier));
-						personIdentifierSuffix++;
-						drtCompanionAgents++;
+							trip.getDestinationActivity(), i, groupSize, personIdentifierSuffix.getAndIncrement(), currentGroupIdentifier));
 						currentGroupSize++;
 					}
+					passengerGroupIdentifier++; // increment due to a new trip
 				}
 			}
-			passengerGroupIdentifier++;
 		}
 		companions.forEach(p -> {
 			this.scenario.getPopulation().addPerson(p);
@@ -155,7 +151,7 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 		});
 
 		validateGroups();
-		LOG.info("Added # {} drt companion agents for mode {}", drtCompanionAgents, this.drtMode);
+		LOG.info("Added # {} drt companion agents for mode {}", companions.size(), this.drtMode);
 	}
 
 	private void validateGroups() {
@@ -222,8 +218,11 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 			this.scenario.getPopulation().getPersons().remove(drtCompanion);
 			counter++;
 		}
+
+		// Reset
 		companionAgentIds.clear();
 		passengerGroups.clear();
+		personIdentifierSuffix.set(0);
 		LOG.info("Removed # {} drt companion agents", counter);
 	}
 
