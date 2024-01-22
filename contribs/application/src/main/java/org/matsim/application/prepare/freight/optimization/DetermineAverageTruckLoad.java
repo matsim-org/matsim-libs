@@ -97,7 +97,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         Map<String, Id<Link>> cellToLinkIdMapping = new HashMap<>();
         List<String> relevantNutsIds = new ArrayList<>();
         try (CSVParser parser = CSVParser.parse(URI.create(lookupTablePath).toURL(), StandardCharsets.UTF_8,
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build())) {
             for (CSVRecord record : parser) {
                 String cell = record.get(0);
                 String nutsId = record.get(3);
@@ -118,7 +118,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         // Read counting data
         Map<Id<Link>, Double> referenceCounts = new HashMap<>();
         try (CSVParser parser = CSVParser.parse(URI.create(trafficCount).toURL(), StandardCharsets.ISO_8859_1,
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build())) {
             for (CSVRecord record : parser) {
                 String totalCountString = record.get(37).replace(".", "");
                 if (!totalCountString.equals("") && !totalCountString.equals("0")) {
@@ -158,7 +158,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         // Read data (ketten data)
         List<GoodsFlow> goodsFlows = new ArrayList<>();
         try (CSVParser parser = CSVParser.parse(URI.create(freightData).toURL(), StandardCharsets.ISO_8859_1,
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build())) {
             for (CSVRecord record : parser) {
                 // Vorlauf
                 String modeVL = record.get(6);
@@ -284,7 +284,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
             }
         }
         // Read from the pre-calculated data
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(preCalculatedRoutes), CSVFormat.TDF.withFirstRecordAsHeader())) {
+        try (CSVParser parser = new CSVParser(Files.newBufferedReader(preCalculatedRoutes), CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build())) {
             for (CSVRecord record : parser) {
                 String from = record.get(0);
                 String to = record.get(1);

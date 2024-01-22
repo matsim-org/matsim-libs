@@ -49,9 +49,9 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
         logger.info("Reading NUTS shape files...");
         Set<String> relevantNutsIds = new HashSet<>();
         try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build())) {
             for (CSVRecord record : parser) {
-                if (!record.get(3).equals("")) {
+                if (!record.get(3).isEmpty()) {
                     relevantNutsIds.add(record.get(3));
                 }
             }
@@ -87,11 +87,11 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 
         logger.info("Computing mapping between Verkehrszelle and departure location...");
         try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build())) {
             for (CSVRecord record : parser) {
                 String verkehrszelle = record.get(0);
                 String nuts2021 = record.get(3);
-                if (!nuts2021.equals("") && nutsToLinksMapping.get(nuts2021) != null) {
+                if (!nuts2021.isEmpty() && nutsToLinksMapping.get(nuts2021) != null) {
                     mapping.put(verkehrszelle, nutsToLinksMapping.get(nuts2021).stream().map(Identifiable::getId).collect(Collectors.toList()));
                     continue;
                 }
