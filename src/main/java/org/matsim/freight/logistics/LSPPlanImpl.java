@@ -100,13 +100,6 @@ public class LSPPlanImpl implements LSPPlan {
   @Override
   public void setLSP(LSP lsp) {
     this.lsp = lsp;
-//    if (assigner != null) {
-//      this.assigner.setLSP(lsp);
-//      // yy vom Design her wäre es vlt. einfacher und logischer, wenn der assigner einen backpointer
-//      // auf den LSPPlan hätte. Dann
-//      // müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen. kai,
-//      // may'22
-//    }
     for (LogisticChain solution : logisticChains) {
       solution.setLSP(lsp);
     }
