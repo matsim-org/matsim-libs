@@ -53,7 +53,7 @@ public class SharingFactorTest {
 		}
 
 		//clean up
-		sharingFactorTracker.notifyMobsimBeforeCleanup(null);
+		sharingFactorTracker.reset(0);
 
 		{
 			//two trips exactly after each other, no pooling
@@ -82,7 +82,7 @@ public class SharingFactorTest {
 		}
 
 		//clean up
-		sharingFactorTracker.notifyMobsimBeforeCleanup(null);
+		sharingFactorTracker.reset(0);
 
 		{
 			//two trips overlap half of the time
@@ -112,7 +112,7 @@ public class SharingFactorTest {
 
 
 		//clean up
-		sharingFactorTracker.notifyMobsimBeforeCleanup(null);
+		sharingFactorTracker.reset(0);
 
 		{
 			// second trip (sharing factor = 2) happens completely within first trip (sharing factor = 1.2)
@@ -142,7 +142,7 @@ public class SharingFactorTest {
 		}
 
 		//clean up
-		sharingFactorTracker.notifyMobsimBeforeCleanup(null);
+		sharingFactorTracker.reset(0);
 
 		{
 			// two persons share exact same trip but not part of a group
@@ -174,7 +174,7 @@ public class SharingFactorTest {
 
 
 		//clean up
-		sharingFactorTracker.notifyMobsimBeforeCleanup(null);
+		sharingFactorTracker.reset(0);
 
 		{
 			// two persons part of a group -> not pooled
