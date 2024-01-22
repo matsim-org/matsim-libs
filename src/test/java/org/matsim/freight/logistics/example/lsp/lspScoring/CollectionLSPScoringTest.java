@@ -88,7 +88,7 @@ public class CollectionLSPScoringTest {
 				.addLogisticChainElement(collectionElement).build();
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
-				.setInitialPlan(LSPUtils.createLSPPlan().setAssigner(createSingleLogisticChainShipmentAssigner()).addLogisticChain(collectionSolution))
+				.setInitialPlan(LSPUtils.createLSPPlan().setInitialShipmentAssigner(createSingleLogisticChainShipmentAssigner()).addLogisticChain(collectionSolution))
 				.setLogisticChainScheduler(createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(collectionResource)))
 //				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
 				.build();

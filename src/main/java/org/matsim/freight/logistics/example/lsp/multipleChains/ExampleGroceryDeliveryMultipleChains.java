@@ -303,7 +303,7 @@ final class ExampleGroceryDeliveryMultipleChains {
           LSPUtils.createLSPPlan()
               .addLogisticChain(directChain)
               .addLogisticChain(hubChain)
-              .setAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
+              .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
     }
 
     List<LSPPlan> lspPlans = new ArrayList<>();

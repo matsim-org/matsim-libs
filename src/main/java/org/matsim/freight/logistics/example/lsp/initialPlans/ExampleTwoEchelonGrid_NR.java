@@ -284,12 +284,12 @@ final class ExampleTwoEchelonGrid_NR {
               .addLogisticChainElement(directCarrierElement)
               .build();
 
-      final ShipmentAssigner singleSolutionShipmentAssigner =
+      final InitialShipmentAssigner singleSolutionShipmentAssigner =
           ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
       lspPlan_direct =
           LSPUtils.createLSPPlan()
               .addLogisticChain(solution_direct)
-              .setAssigner(singleSolutionShipmentAssigner);
+              .setInitialShipmentAssigner(singleSolutionShipmentAssigner);
     }
 
     LSPPlan lspPlan_withHub;
@@ -388,7 +388,7 @@ final class ExampleTwoEchelonGrid_NR {
       lspPlan_withHub =
           LSPUtils.createLSPPlan()
               .addLogisticChain(solution_withHub)
-              .setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
+              .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
     }
 
     // Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem

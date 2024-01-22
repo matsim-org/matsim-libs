@@ -275,7 +275,7 @@ final class ExampleMultipleMixedEchelonChains {
                 .build();
       }
 
-      ShipmentAssigner assigner;
+      InitialShipmentAssigner assigner;
 
       switch (assignerSetting) {
         case primary -> assigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
@@ -288,7 +288,7 @@ final class ExampleMultipleMixedEchelonChains {
           LSPUtils.createLSPPlan()
               .addLogisticChain(hubChain)
               .addLogisticChain(directChain)
-              .setAssigner(assigner);
+              .setInitialShipmentAssigner(assigner);
     }
 
     List<LSPPlan> lspPlans = new ArrayList<>();

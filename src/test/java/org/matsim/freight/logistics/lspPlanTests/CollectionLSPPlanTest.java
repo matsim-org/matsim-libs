@@ -41,7 +41,7 @@ import org.matsim.vehicles.VehicleType;
 public class CollectionLSPPlanTest {
 
 	private LogisticChain logisticChain;
-	private ShipmentAssigner assigner;
+	private InitialShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
 
 	@BeforeEach
@@ -92,13 +92,13 @@ public class CollectionLSPPlanTest {
 
 		assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
-		collectionPlan.setAssigner(assigner);
+		collectionPlan.setInitialShipmentAssigner(assigner);
 		collectionPlan.addLogisticChain(logisticChain);
 	}
 
 	@Test
 	public void collectionLSPPlanTest() {
-		assertSame(collectionPlan.getAssigner(), assigner);
+		assertSame(collectionPlan.getInitialShipmentAssigner(), assigner);
 		assertNull(collectionPlan.getScore());
 		assertNull(collectionPlan.getLSP());
 		assertEquals(1, collectionPlan.getLogisticChains().size());

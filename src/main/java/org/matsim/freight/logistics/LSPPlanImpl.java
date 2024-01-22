@@ -30,7 +30,7 @@ public class LSPPlanImpl implements LSPPlan {
   private final Collection<ShipmentPlan> shipmentPlans;
   private LSP lsp;
   private Double score = null;
-  private ShipmentAssigner assigner;
+  private InitialShipmentAssigner assigner;
   private String type = null;
 
   public LSPPlanImpl() {
@@ -51,14 +51,13 @@ public class LSPPlanImpl implements LSPPlan {
   }
 
   @Override
-  public ShipmentAssigner getAssigner() {
+  public InitialShipmentAssigner getInitialShipmentAssigner() {
     return assigner;
   }
 
   @Override
-  public LSPPlan setAssigner(ShipmentAssigner assigner) {
+  public LSPPlan setInitialShipmentAssigner(InitialShipmentAssigner assigner) {
     this.assigner = assigner;
-    this.assigner.setLSP(this.lsp);
     return this;
   }
 
@@ -101,13 +100,6 @@ public class LSPPlanImpl implements LSPPlan {
   @Override
   public void setLSP(LSP lsp) {
     this.lsp = lsp;
-    if (assigner != null) {
-      this.assigner.setLSP(lsp);
-      // yy vom Design her wäre es vlt. einfacher und logischer, wenn der assigner einen backpointer
-      // auf den LSPPlan hätte. Dann
-      // müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen. kai,
-      // may'22
-    }
     for (LogisticChain solution : logisticChains) {
       solution.setLSP(lsp);
     }

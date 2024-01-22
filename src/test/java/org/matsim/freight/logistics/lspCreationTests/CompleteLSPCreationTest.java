@@ -42,7 +42,7 @@ import org.matsim.vehicles.VehicleType;
 
 public class CompleteLSPCreationTest {
 	private LSP completeLSP;
-	private ShipmentAssigner assigner;
+	private InitialShipmentAssigner assigner;
 	private LogisticChain logisticChain;
 
 	@BeforeEach
@@ -201,7 +201,7 @@ public class CompleteLSPCreationTest {
 
 		assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
-		completePlan.setAssigner(assigner);
+		completePlan.setInitialShipmentAssigner(assigner);
 		completePlan.addLogisticChain(logisticChain);
 
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
@@ -225,7 +225,7 @@ public class CompleteLSPCreationTest {
 		LSPPlan selectedPlan = completeLSP.getSelectedPlan();
 		assertNull(selectedPlan.getScore());
 		assertSame(selectedPlan.getLSP(), completeLSP);
-		assertSame(selectedPlan.getAssigner(), assigner);
+		assertSame(selectedPlan.getInitialShipmentAssigner(), assigner);
 		assertSame(selectedPlan.getLogisticChains().iterator().next(), logisticChain);
 		assertSame(selectedPlan.getLogisticChains().iterator().next().getLSP(), completeLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);

@@ -53,7 +53,7 @@ public class AssignmentStrategyFactory {
             for (LSPShipment shipment : lspPlan.getLSP().getShipments()) {
               ShipmentUtils.getOrCreateShipmentPlan(lspPlan, shipment.getId()).clear();
               shipment.getShipmentLog().clear();
-              lspPlan.getAssigner().assignToPlan(lspPlan, shipment);
+              lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, shipment);
             }
           }
 

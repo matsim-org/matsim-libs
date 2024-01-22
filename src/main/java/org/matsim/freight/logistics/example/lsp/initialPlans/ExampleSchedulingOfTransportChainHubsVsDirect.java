@@ -510,7 +510,7 @@ import org.matsim.vehicles.VehicleType;
         "The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
     return LSPUtils.createLSPPlan()
-        .setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
+        .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
         .addLogisticChain(completeSolutionDirect);
   }
 
@@ -541,7 +541,7 @@ import org.matsim.vehicles.VehicleType;
         "The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
     return LSPUtils.createLSPPlan()
-        .setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
+        .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
         .addLogisticChain(completeSolutionWithReloading);
   }
 

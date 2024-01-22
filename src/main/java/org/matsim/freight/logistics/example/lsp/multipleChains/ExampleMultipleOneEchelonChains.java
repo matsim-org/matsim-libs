@@ -191,12 +191,12 @@ final class ExampleMultipleOneEchelonChains {
               .addLogisticChainElement(singleCarrierElement)
               .build();
 
-      final ShipmentAssigner singleSolutionShipmentAssigner =
+      final InitialShipmentAssigner singleSolutionShipmentAssigner =
           MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
       singleOneEchelonChainPlan =
           LSPUtils.createLSPPlan()
               .addLogisticChain(singleChain)
-              .setAssigner(singleSolutionShipmentAssigner);
+              .setInitialShipmentAssigner(singleSolutionShipmentAssigner);
     }
 
     // A plan with two different logistic chains on the left and right, with respective carriers is
@@ -260,13 +260,13 @@ final class ExampleMultipleOneEchelonChains {
               .addLogisticChainElement(rightCarrierElement)
               .build();
 
-      final ShipmentAssigner shipmentAssigner =
+      final InitialShipmentAssigner shipmentAssigner =
           MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
       multipleOneEchelonChainsPlan =
           LSPUtils.createLSPPlan()
               .addLogisticChain(leftChain)
               .addLogisticChain(rightChain)
-              .setAssigner(shipmentAssigner);
+              .setInitialShipmentAssigner(shipmentAssigner);
     }
 
     List<LSPPlan> lspPlans = new ArrayList<>();

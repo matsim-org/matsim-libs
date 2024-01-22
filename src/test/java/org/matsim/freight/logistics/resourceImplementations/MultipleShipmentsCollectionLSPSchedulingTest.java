@@ -99,9 +99,9 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-		collectionPlan.setAssigner(assigner);
+		collectionPlan.setInitialShipmentAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
