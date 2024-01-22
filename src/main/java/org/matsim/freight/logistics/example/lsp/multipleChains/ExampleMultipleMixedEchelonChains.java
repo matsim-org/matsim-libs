@@ -288,7 +288,7 @@ final class ExampleMultipleMixedEchelonChains {
           LSPUtils.createLSPPlan()
               .addLogisticChain(hubChain)
               .addLogisticChain(directChain)
-              .setAssigner(assigner);
+              .setInitialShipmentAssigner(assigner);
     }
 
     List<LSPPlan> lspPlans = new ArrayList<>();

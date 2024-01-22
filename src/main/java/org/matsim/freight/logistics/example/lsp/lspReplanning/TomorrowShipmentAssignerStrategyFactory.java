@@ -55,7 +55,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
           @Override
           public void handlePlan(LSPPlan plan) {
             plan.getLogisticChains().iterator().next().getShipmentIds().clear();
-            plan.setAssigner(assigner);
+            plan.setInitialShipmentAssigner(assigner);
             //				LSP lsp = assigner.getLSP();
             LSP lsp = plan.getLSP();
             Collection<LSPShipment> shipments = lsp.getShipments();
@@ -74,7 +74,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
             for (LSPShipment shipment : plan.getLSP().getShipments()) {
               ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).clear();
               shipment.getShipmentLog().clear();
-              plan.getAssigner().assignToPlan(plan, shipment);
+              plan.getInitialShipmentAssigner().assignToPlan(plan, shipment);
             }
           }
 

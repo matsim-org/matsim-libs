@@ -343,7 +343,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
           LSPUtils.createLSPPlan()
               .addLogisticChain(hubChainLeft)
               .addLogisticChain(hubChainRight)
-              .setAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
+              .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
     }
 
     List<LSPPlan> lspPlans = new ArrayList<>();

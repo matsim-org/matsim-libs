@@ -131,7 +131,7 @@ public class CollectionLSPMobsimTest {
 		{
 			InitialShipmentAssigner assigner = createSingleLogisticChainShipmentAssigner();
 			collectionPlan = LSPUtils.createLSPPlan();
-			collectionPlan.setAssigner(assigner);
+			collectionPlan.setInitialShipmentAssigner(assigner);
 			collectionPlan.addLogisticChain(collectionSolution);
 		}
 		{

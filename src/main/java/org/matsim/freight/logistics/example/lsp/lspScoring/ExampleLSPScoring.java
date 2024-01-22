@@ -108,7 +108,7 @@ import org.matsim.vehicles.VehicleType;
     // added
     LSPPlan lspPlan =
         LSPUtils.createLSPPlan()
-            .setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
+            .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
             .addLogisticChain(logisticChain);
 
     // The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is

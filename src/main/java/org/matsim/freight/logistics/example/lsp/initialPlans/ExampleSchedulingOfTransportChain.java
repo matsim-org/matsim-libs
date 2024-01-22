@@ -258,7 +258,7 @@ import org.matsim.vehicles.VehicleType;
     LSPPlan completePlan = LSPUtils.createLSPPlan();
     InitialShipmentAssigner assigner =
         ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
-    completePlan.setAssigner(assigner);
+    completePlan.setInitialShipmentAssigner(assigner);
     completePlan.addLogisticChain(completeSolution);
 
     LSPUtils.LSPBuilder completeLSPBuilder =

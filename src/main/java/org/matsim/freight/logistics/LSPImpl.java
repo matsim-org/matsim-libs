@@ -62,7 +62,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     }
 
     LSPPlan copiedPlan = LSPUtils.createLSPPlan();
-    copiedPlan.setAssigner(plan2copy.getAssigner());
+    copiedPlan.setInitialShipmentAssigner(plan2copy.getInitialShipmentAssigner());
     copiedPlan.setLSP(plan2copy.getLSP());
     copiedPlan.setScore(plan2copy.getScore());
     copiedPlan.setType(plan2copy.getType());
@@ -152,7 +152,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     // lsp.getselectedPlan.getShipment...
     shipments.add(shipment);
     for (LSPPlan lspPlan : plans) {
-      lspPlan.getAssigner().assignToPlan(lspPlan, shipment);
+      lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, shipment);
     }
   }
 

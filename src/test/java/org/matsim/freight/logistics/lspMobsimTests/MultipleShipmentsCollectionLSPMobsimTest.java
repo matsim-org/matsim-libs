@@ -114,7 +114,7 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-		collectionPlan.setAssigner(assigner);
+		collectionPlan.setInitialShipmentAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));

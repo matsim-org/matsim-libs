@@ -45,9 +45,9 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
    * yy My intuition would be to replace lspPlan#getAssigner().assignToSolution( shipment ) by
    * lspPlan.addShipment( shipment ). kai, may'22
    */
-  InitialShipmentAssigner getAssigner();
+  InitialShipmentAssigner getInitialShipmentAssigner();
 
-  LSPPlan setAssigner(InitialShipmentAssigner assigner);
+  LSPPlan setInitialShipmentAssigner(InitialShipmentAssigner assigner);
 
   Collection<ShipmentPlan> getShipmentPlans();
 

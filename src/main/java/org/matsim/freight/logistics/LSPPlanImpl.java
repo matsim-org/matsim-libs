@@ -51,12 +51,12 @@ public class LSPPlanImpl implements LSPPlan {
   }
 
   @Override
-  public InitialShipmentAssigner getAssigner() {
+  public InitialShipmentAssigner getInitialShipmentAssigner() {
     return assigner;
   }
 
   @Override
-  public LSPPlan setAssigner(InitialShipmentAssigner assigner) {
+  public LSPPlan setInitialShipmentAssigner(InitialShipmentAssigner assigner) {
     this.assigner = assigner;
     return this;
   }

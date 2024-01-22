@@ -117,7 +117,7 @@ public class MultipleChainsReplanningTest {
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(leftChain)
 					.addLogisticChain(rightChain)
-					.setAssigner(shipmentAssigner);
+					.setInitialShipmentAssigner(shipmentAssigner);
 
 			multipleOneEchelonChainsPlan.setType(MultipleChainsUtils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
 		}
