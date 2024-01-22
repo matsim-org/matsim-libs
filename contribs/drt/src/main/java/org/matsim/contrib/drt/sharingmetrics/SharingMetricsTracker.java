@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * @author nkuehnel / MOIA
  */
-public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler, MobsimBeforeCleanupListener {
+public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler {
 
 	private final static Logger logger = LogManager.getLogger(SharingMetricsTracker.class);
 
@@ -122,7 +122,7 @@ public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, P
 	}
 
 	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+	public void reset(int iteration) {
 		occupancyByVehicle.clear();
 		segments.clear();
 		poolingRate.clear();
