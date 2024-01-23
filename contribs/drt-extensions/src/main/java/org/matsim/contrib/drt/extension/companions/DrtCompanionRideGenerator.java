@@ -57,8 +57,8 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 	private final Scenario scenario;
 	private final String drtMode;
 	private final int maxCapacity;
-
 	private final Set<Id<Person>> companionAgentIds = new HashSet<>();
+	private final Set<Leg> drtLegs = new HashSet<>();
 	private WeightedRandomSelection<Integer> sampler;
 
 	private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<GroupLeg>> passengerGroups = new HashMap<>();
@@ -113,6 +113,7 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 
 				for (Leg leg : trip.getLegsOnly()) {
 					if (leg.getMode().equals(this.drtMode)) {
+						this.drtLegs.add(leg);
 						// Initial person travels now in a group
 						Id<PassengerGroupIdentifier.PassengerGroup> currentGroupIdentifier = getGroupIdentifier();
 						DrtCompanionUtils.setPassengerGroupIdentifier(leg, currentGroupIdentifier);
@@ -221,6 +222,10 @@ final class DrtCompanionRideGenerator implements BeforeMobsimListener, AfterMobs
 		passengerGroups.clear();
 		personIdentifierSuffix.set(0);
 		LOG.info("Removed # {} drt companion agents", counter);
+
+		// Remove attribute from legs of initial drt riders
+		this.drtLegs.stream().forEach(DrtCompanionUtils::removePassengerGroupIdentifier);
+		this.drtLegs.clear();
 	}
 
 	@Override
