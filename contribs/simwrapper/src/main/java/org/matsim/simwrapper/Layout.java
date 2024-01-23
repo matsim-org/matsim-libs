@@ -1,15 +1,14 @@
 package org.matsim.simwrapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.simwrapper.viz.Viz;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper class to define the layout of a {@link Dashboard}.
@@ -24,6 +23,7 @@ public final class Layout {
 	 */
 	private final String defaultContext;
 	private final Map<String, Row> rows = new LinkedHashMap<>();
+	private final Map<String, Tab> tabs = new LinkedHashMap<>();
 
 	/**
 	 * Create new layout.
@@ -41,6 +41,35 @@ public final class Layout {
 	 */
 	public Row row(String name) {
 		return rows.computeIfAbsent(name, Row::new);
+	}
+
+	/**
+	 * Create a new row and adds it to specified tab.
+	 *
+	 * @param name internal name of the row.
+	 * @param tab  title of the tab, can be null in which case no tab will be created
+	 */
+	public Row row(String name, @Nullable String tab) {
+		if (tab != null)
+			tab(tab).add(name);
+
+		return rows.computeIfAbsent(name, Row::new);
+	}
+
+	/**
+	 * Return or create a tab with the given title.
+	 */
+	public Tab tab(String title) {
+		return tabs.computeIfAbsent(title, Tab::new);
+	}
+
+	/**
+	 * Return or create a tab with the given title.
+	 *
+	 * @param titleDe title localized in German
+	 */
+	public Tab tab(String title, String titleDe) {
+		return tabs.computeIfAbsent(title, Tab::new).setTitleDe(titleDe);
 	}
 
 	/**
@@ -77,6 +106,13 @@ public final class Layout {
 		return rows;
 	}
 
+	/**
+	 * Create tab representation.
+	 */
+	Collection<Tab> getTabs() {
+		return tabs.isEmpty() ? null : tabs.values();
+	}
+
 
 	/**
 	 * One row holding multiple {@link Viz} elements.
@@ -110,6 +146,38 @@ public final class Layout {
 		 */
 		public <T extends Viz> Row el(String context, Class<T> type, VizElement<T> el) {
 			elements.add(new Holder(context, type, (VizElement<Viz>) el));
+			return this;
+		}
+
+	}
+
+	/**
+	 * Helper class that maps rows to their respective tabs.
+	 */
+	public static final class Tab {
+
+		@JsonProperty(index = 0)
+		private final String title;
+		@JsonProperty(value = "title_de", index = 1)
+		private String titleDe;
+
+		private final Set<String> rows = new LinkedHashSet<>();
+
+		private Tab(String title) {
+			this.title = title;
+		}
+
+		private Tab setTitleDe(String titleDe) {
+			this.titleDe = titleDe;
+			return this;
+		}
+
+		/**
+		 * Add a row with given name to this tab.
+		 * @param row name of the row, row names must be unique across all tabs
+		 */
+		public Tab add(String row) {
+			rows.add(row);
 			return this;
 		}
 
