@@ -249,6 +249,7 @@ public final class CommandRunner {
 
 	/**
 	 * Return the output of a command with a placeholder.
+	 * @param file file name, which must contain a %s, which will be replaced by the placeholder
 	 */
 	public Path getRequiredPath(Class<? extends MATSimAppCommand> command, String file, String placeholder) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
@@ -314,7 +315,7 @@ public final class CommandRunner {
 	}
 
 	/**
-	 * Insert args for an already existing command. If the command was not added, this does noting.
+	 * Insert args for an already existing command. If the command was not added, this does nothing.
 	 */
 	public void insertArgs(Class<? extends MATSimAppCommand> command, String... args) {
 
