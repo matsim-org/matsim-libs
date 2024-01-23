@@ -166,8 +166,6 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 	private void renderWarnings(BufferedWriter writer, Set<Warning> warnings) throws IOException {
 
-		// TODO: maybe remove no warnings message
-
 		if (warnings.isEmpty()) {
 			writer.write("<h3 class=\"no-warnings\">No warnings found ✅</h3>\n\n");
 		} else {
