@@ -38,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -53,6 +54,7 @@ public class RunDrtWithCompanionExampleIT {
 
 	@Test
 	void testRunDrtWithCompanions() {
+		MatsimRandom.reset();
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());
@@ -74,6 +76,33 @@ public class RunDrtWithCompanionExampleIT {
 
 		int actualRides = getTotalNumberOfDrtRides();
 		Assertions.assertThat(actualRides).isEqualTo(706);
+	}
+
+	@Test
+	void testRunDrtWithCompanionsMultiThreaded() {
+		MatsimRandom.reset();
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());
+
+		// Add DrtCompanionParams with some default values into existing Drt configurations
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
+		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
+
+		DrtCompanionParams crtCompanionParams = new DrtCompanionParams();
+		crtCompanionParams.setDrtCompanionSamplingWeights(List.of(0.5,0.2,0.1,0.1,0.1));
+
+		drtWithExtensionsConfigGroup.addParameterSet(crtCompanionParams);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.qsim().setNumberOfThreads(2);
+
+		Controler controler = DrtCompanionControlerCreator.createControler(config);
+		controler.run();
+
+		int actualRides = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRides).isEqualTo(699);
 	}
 
 	private int getTotalNumberOfDrtRides() {
