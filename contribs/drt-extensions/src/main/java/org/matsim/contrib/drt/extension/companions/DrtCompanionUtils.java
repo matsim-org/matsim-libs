@@ -109,4 +109,9 @@ public class DrtCompanionUtils {
 		leg.getAttributes().putAttribute(GROUP_IDENTIFIER_ATTRIBUTE, passengerGroupIdentifierId);
 	}
 
+	public static void removePassengerGroupIdentifier(Leg leg)
+	{
+		leg.getAttributes().removeAttribute(GROUP_IDENTIFIER_ATTRIBUTE);
+	}
+
 }
