@@ -29,7 +29,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -208,13 +207,13 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
                 .build();
 
         LSPResourceScheduler hubSchedulerLeft =
-            TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+            ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
                 .setCapacityNeedFixed(10)
                 .setCapacityNeedLinear(1)
                 .build();
 
         LSPResource hubResourceLeft =
-            TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+            ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                     Id.create("HubLeft", LSPResource.class), HUB_LEFT_LINK_ID, scenario)
                 .setTransshipmentHubScheduler(hubSchedulerLeft)
                 .build();
@@ -286,13 +285,13 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
                 .build();
 
         LSPResourceScheduler hubScheduler =
-            TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+            ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
                 .setCapacityNeedFixed(10)
                 .setCapacityNeedLinear(1)
                 .build();
 
         LSPResource hubResourceRight =
-            TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+            ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                     Id.create("HubRight", LSPResource.class), HUB_RIGHT_LINK_ID, scenario)
                 .setTransshipmentHubScheduler(hubScheduler)
                 .build();

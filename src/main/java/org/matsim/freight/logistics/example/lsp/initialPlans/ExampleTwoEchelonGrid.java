@@ -46,7 +46,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -311,14 +310,14 @@ final class ExampleTwoEchelonGrid {
       // The scheduler for the first reloading point is created --> this will be the depot in this
       // use case
       LSPResourceScheduler hubScheduler =
-          TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+          ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
               .setCapacityNeedFixed(10) // Time needed, fixed (for Scheduler)
               .setCapacityNeedLinear(1) // additional time needed per shipmentSize (for Scheduler)
               .build();
 
       // The scheduler is added to the Resource and the Resource is created
       LSPResource hubResource =
-          TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+          ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                   Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
               .setTransshipmentHubScheduler(hubScheduler)
               .build();

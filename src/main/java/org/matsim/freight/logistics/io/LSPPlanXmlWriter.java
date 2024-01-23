@@ -36,7 +36,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.LSP;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
+import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubResource;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
