@@ -52,8 +52,6 @@ public class OverviewDashboard implements Dashboard {
 
 		layout.row("warnings").el(TextBlock.class, (viz, data) -> {
 			viz.file = data.compute(LogFileAnalysis.class, "status.md");
-			// Force minimal height
-			viz.height = 0.1d;
 		});
 
 		layout.row("config").el(XML.class, (viz, data) -> {
