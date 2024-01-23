@@ -46,6 +46,10 @@ public class TransshipmentHubTourEndEventHandler
   // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
   // to do the junit testing. kmt jun'23
 
+  //This class *should* also get merged into {@link LSPTourEndEventHandler}.
+  //Currently, this is not possible very easyily, because of missing injection (of the scenario.)
+  //KMT, KN (Jan'24)
+
   private final Scenario scenario;
   private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
   private final TransshipmentHubResource transshipmentHubResource;
