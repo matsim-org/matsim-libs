@@ -3,6 +3,8 @@ package org.matsim.application.prepare.freight.tripGeneration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +18,9 @@ import java.util.List;
  * plans file.
  */
 public class TripRelation {
+
+	private static final Logger log = LogManager.getLogger(TripRelation.class);
+
 	public static final String column_originCell = "Quellzelle";
 	public static final String column_originCell_MainRun = "QuellzelleHL";
 	public static final String column_destinationCell_MainRun = "ZielzelleHL";
@@ -74,16 +79,12 @@ public class TripRelation {
 	private final String goodsTypePreRun;
 	private final String goodsTypeMainRun;
 	private final String goodsTypePostRun;
-	private final double tonsPerYearPreRun;
-	private final double tonsPerYearMainRun;
-	private final double tonsPerYearPostRun;
-	private final double tonKMPerYearPreRun;
-	private final double tonKMPerYearMainRun;
-	private final double tonKMPerYearPostRun;
-
-	// TODO Additional data (currently, we don't have the lookup table for those data)
-	// private final String originalTerminal; // Starting terminal for the main run (also the destination for the pre-run)
-	// private final String destinationTerminal; // Destination terminal for main run (also the starting terminal for the post-run)
+	private double tonsPerYearPreRun;
+	private double tonsPerYearMainRun;
+	private double tonsPerYearPostRun;
+	private double tonKMPerYearPreRun;
+	private double tonKMPerYearMainRun;
+	private double tonKMPerYearPostRun;
 
 	public static class Builder {
 		private String originCell;
@@ -333,6 +334,51 @@ public class TripRelation {
 		return tripRelations;
 	}
 
+	/**
+	 * Combines trip relations with the same characteristics (mode, O/D cells, goodsType) to one trip relation with the sum of the tons values
+	 *
+	 * @param tripRelations List of trip relations
+	 */
+	public static void combineSimilarEntries(List<TripRelation> tripRelations) {
+		double sumTonsMainRun = tripRelations.stream().mapToDouble(TripRelation::getTonsPerYearMainRun).sum();
+		int numberOfEntries = tripRelations.size();
+		int numberCombined = 0;
+
+		List<String> checkedOriginCells = new ArrayList<>();
+		for (int i = 0; i < tripRelations.size(); i++) {
+
+			if (i % 100000 == 0) {
+				log.info("Processing: " + i + " out of " + tripRelations.size() + " entries have been processed");
+			}
+			TripRelation tripRelation = tripRelations.get(i);
+			if (checkedOriginCells.contains(tripRelation.getOriginCell()))
+				continue;
+			List<TripRelation> tripRelationsFromThisOrigin = new ArrayList<>(tripRelations.stream().filter(
+                    singeTripRelation -> singeTripRelation.getOriginCell().equals(tripRelation.getOriginCell())).toList());
+			log.info("Processing " + tripRelationsFromThisOrigin.size() + " entries from origin cell " + tripRelation.getOriginCell());
+			for (int j = 0; j < tripRelationsFromThisOrigin.size(); j++) {
+				TripRelation oneTripRelationFromOrigin = tripRelationsFromThisOrigin.get(j);
+				for (int k = j + 1; k < tripRelationsFromThisOrigin.size(); k++) {
+					TripRelation tripRelationOfOriginToCompare = tripRelationsFromThisOrigin.get(k);
+					if (oneTripRelationFromOrigin.isSimilarTo(tripRelationOfOriginToCompare)) {
+						oneTripRelationFromOrigin.combineTonsValuesFotBothRelations(tripRelationOfOriginToCompare);
+						tripRelations.remove(tripRelationOfOriginToCompare);
+						tripRelationsFromThisOrigin.remove(tripRelationOfOriginToCompare);
+						numberCombined++;
+						k--;
+					}
+				}
+			}
+			checkedOriginCells.add(tripRelationsFromThisOrigin.get(0).getOriginCell());
+		}
+		double sumTonsMainRunAfterCombining = tripRelations.stream().mapToDouble(TripRelation::getTonsPerYearMainRun).sum();
+		assert (sumTonsMainRun != sumTonsMainRunAfterCombining);
+		int numberOfEntriesAfterCombining = tripRelations.size();
+		log.info("Combined " + numberCombined + " entries");
+		log.info("Number of entries before combining: " + numberOfEntries + " and after combining: " + numberOfEntriesAfterCombining);
+		log.info("Sum of tons before combining: " + sumTonsMainRun + " and after combining: " + sumTonsMainRunAfterCombining);
+	}
+
 	public static TripRelation readTripRelation(CSVRecord record) {
 		Builder builder = new Builder();
 		// Read locations
@@ -348,4 +394,40 @@ public class TripRelation {
 		return builder.build();
 	}
 
+
+	/**
+	 * Combines the tons values of both trip relations
+	 *
+	 * @param tripRelationOfOriginToCompare
+	 */
+	private void combineTonsValuesFotBothRelations(TripRelation tripRelationOfOriginToCompare) {
+		this.tonsPerYearPreRun = this.tonsPerYearPreRun + tripRelationOfOriginToCompare.tonsPerYearPreRun;
+		this.tonsPerYearMainRun = this.tonsPerYearMainRun + tripRelationOfOriginToCompare.tonsPerYearMainRun;
+		this.tonsPerYearPostRun = this.tonsPerYearPostRun + tripRelationOfOriginToCompare.tonsPerYearPostRun;
+		this.tonKMPerYearPreRun = this.tonKMPerYearPreRun + tripRelationOfOriginToCompare.tonKMPerYearPreRun;
+		this.tonKMPerYearMainRun = this.tonKMPerYearMainRun + tripRelationOfOriginToCompare.tonKMPerYearMainRun;
+		this.tonKMPerYearPostRun = this.tonKMPerYearPostRun + tripRelationOfOriginToCompare.tonKMPerYearPostRun;
+	}
+
+	/**
+	 * Checks if the trip relations have the same characteristics (mode, O/D cells/terminals, goodsType) and only differ in the tons values
+	 *
+	 * @param tripRelationOfOriginToCompare
+	 * @return
+	 */
+	private boolean isSimilarTo(TripRelation tripRelationOfOriginToCompare) {
+		return
+			this.destinationCell.equals(tripRelationOfOriginToCompare.destinationCell)
+			&& this.destinationCellMainRun.equals(tripRelationOfOriginToCompare.destinationCellMainRun)
+			&& this.originCell.equals(tripRelationOfOriginToCompare.originCell)
+			&& this.originCellMainRun.equals(tripRelationOfOriginToCompare.originCellMainRun)
+			&& this.originTerminal.equals(tripRelationOfOriginToCompare.originTerminal)
+			&& this.destinationTerminal.equals(tripRelationOfOriginToCompare.destinationTerminal)
+			&& this.modePreRun.equals(tripRelationOfOriginToCompare.modePreRun)
+			&& this.modeMainRun.equals(tripRelationOfOriginToCompare.modeMainRun)
+			&& this.modePostRun.equals(tripRelationOfOriginToCompare.modePostRun)
+			&& this.goodsTypePreRun.equals(tripRelationOfOriginToCompare.goodsTypePreRun)
+			&& this.goodsTypeMainRun.equals(tripRelationOfOriginToCompare.goodsTypeMainRun)
+			&& this.goodsTypePostRun.equals(tripRelationOfOriginToCompare.goodsTypePostRun);
+	}
 }

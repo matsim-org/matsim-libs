@@ -21,11 +21,16 @@ import java.util.List;
 public class GenerateFreightDemandData implements MATSimAppCommand {
     private static final Logger log = LogManager.getLogger(GenerateFreightDemandData.class);
 
-    @CommandLine.Option(names = "--data", description = "Path to raw data (ketten 2010)",
-            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
-    private String dataPath;
-    @CommandLine.Option(names = "--output", description = "Output folder path", required = true, defaultValue = "output/longDistanceFreightData/")
-    private Path output;
+	@CommandLine.Option(names = "--data", description = "Path to raw data (ketten 2010)", defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
+	private String dataPath;
+
+	@CommandLine.Option(names = "--combineSimilarEntries", description = "The input dara has rows with the" +
+		"same structure (mode, O/D cells, goodsType), but different values (tonsPerYear, tonKMPerYear)." +
+		"If you select this option, you can combine the rows with the same structure to one row with the sum of the values.", defaultValue = "true")
+	private boolean combineSimilarEntries;
+
+	@CommandLine.Option(names = "--output", description = "Output folder path", required = true, defaultValue = "output/longDistanceFreightData3/")
+	private Path output;
 
 
     @Override
@@ -35,8 +40,11 @@ public class GenerateFreightDemandData implements MATSimAppCommand {
         List<TripRelation> tripRelations = TripRelation.readTripRelations(dataPath);
         log.info("Trip relations successfully loaded. There are " + tripRelations.size() + " trip relations");
 
-        log.info("Start generating population...");
-        Population outputPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		if (combineSimilarEntries)
+			TripRelation.combineSimilarEntries(tripRelations);
+
+		log.info("Start generating population...");
+		Population outputPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory populationFactory = PopulationUtils.getFactory();
 		for (int i = 0; i < tripRelations.size(); i++) {
 			Person person = populationFactory.createPerson(Id.createPersonId("freightData_" + i));
