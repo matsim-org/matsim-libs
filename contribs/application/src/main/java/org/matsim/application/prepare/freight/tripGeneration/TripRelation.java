@@ -226,7 +226,7 @@ public class TripRelation {
 		this.tonKMPerYearPreRun = builder.tonKMPerYearPreRun;
 		this.tonKMPerYearMainRun = builder.tonKMPerYearMainRun;
 		this.tonKMPerYearPostRun = builder.tonKMPerYearPostRun;
-	}
+    }
 
 	public String getOriginCell() {
 		return originCell;

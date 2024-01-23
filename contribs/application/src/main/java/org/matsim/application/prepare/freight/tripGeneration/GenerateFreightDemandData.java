@@ -19,7 +19,7 @@ import java.util.List;
         showDefaultValues = true
 )
 public class GenerateFreightDemandData implements MATSimAppCommand {
-    private static final Logger log = LogManager.getLogger(GenerateFreightDemandData.class);
+	private static final Logger log = LogManager.getLogger(GenerateFreightDemandData.class);
 
 	@CommandLine.Option(names = "--data", description = "Path to raw data (ketten 2010)", defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
 	private String dataPath;
@@ -33,12 +33,13 @@ public class GenerateFreightDemandData implements MATSimAppCommand {
 	private Path output;
 
 
-    @Override
-    public Integer call() throws Exception {
+	@Override
+	public Integer call() throws Exception {
 
-        log.info("Reading trip relations...");
-        List<TripRelation> tripRelations = TripRelation.readTripRelations(dataPath);
-        log.info("Trip relations successfully loaded. There are " + tripRelations.size() + " trip relations");
+		boolean sampleResults = false;
+		log.info("Reading trip relations...");
+		List<TripRelation> tripRelations = TripRelation.readTripRelations(dataPath);
+		log.info("Trip relations successfully loaded. There are " + tripRelations.size() + " trip relations");
 
 		if (combineSimilarEntries)
 			TripRelation.combineSimilarEntries(tripRelations);
