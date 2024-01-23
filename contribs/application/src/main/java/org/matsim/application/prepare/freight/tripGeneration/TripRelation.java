@@ -11,6 +11,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The object TripRelation corresponds to each entry (row) in the ketten-2010 table. The information will be read
@@ -329,7 +330,8 @@ public class TripRelation {
 				Double.parseDouble(record.get(column_tonKM_MainRun))).tonKMPerYearPostRun(Double.parseDouble(record.get(
 				column_tonKM_PostRun)));
 			//TODO we have not read the data "Verkehrsart" (konventioneller Verkehr or KV/Container/RoLa). Should we do this?
-
+			assert (Objects.equals(builder.goodsTypePreRun, builder.goodsTypeMainRun) && Objects.equals(builder.goodsTypeMainRun,
+                    builder.goodsTypePostRun));
 			// Build trip relation and add to list
 			tripRelations.add(builder.build());
 		}
@@ -429,8 +431,6 @@ public class TripRelation {
 			&& this.modePreRun.equals(tripRelationOfOriginToCompare.modePreRun)
 			&& this.modeMainRun.equals(tripRelationOfOriginToCompare.modeMainRun)
 			&& this.modePostRun.equals(tripRelationOfOriginToCompare.modePostRun)
-			&& this.goodsTypePreRun.equals(tripRelationOfOriginToCompare.goodsTypePreRun)
-			&& this.goodsTypeMainRun.equals(tripRelationOfOriginToCompare.goodsTypeMainRun)
-			&& this.goodsTypePostRun.equals(tripRelationOfOriginToCompare.goodsTypePostRun);
+			&& this.goodsTypeMainRun.equals(tripRelationOfOriginToCompare.goodsTypeMainRun);
 	}
 }
