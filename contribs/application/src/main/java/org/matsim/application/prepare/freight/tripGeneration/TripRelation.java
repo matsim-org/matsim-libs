@@ -20,6 +20,8 @@ public class TripRelation {
 	public static final String column_originCell_MainRun = "QuellzelleHL";
 	public static final String column_destinationCell_MainRun = "ZielzelleHL";
 	public static final String column_destinationCell = "Zielzelle";
+	public static final String column_originTerminal = "Quellterminal";
+	public static final String column_destinationTerminal = "Zielterminal";
 	public static final String column_mode_PreRun = "ModeVL";
 	public static final String column_mode_MainRun = "ModeHL";
 	public static final String column_mode_PostRun = "ModeNL";
@@ -48,7 +50,14 @@ public class TripRelation {
 	 * Destination of the full trip relation
 	 */
 	private final String destinationCell;
-
+	/**
+	 * Start location of the main run, if it is combined traffic; Also the destination of the pre-run (when applicable)
+	 */
+	private final String originTerminal;
+	/**
+	 * Destination of the main run, if it is combined traffic; Also the starting location of the post-run (when applicable)
+	 */
+	private final String destinationTerminal;
 	/**
 	 * Mode encoding: 0 --> unknown/not applicable; 1 --> railway; 2 --> road; 3 --> container ship; Therefore "2" is what we are mainly looking at
 	 */
@@ -82,6 +91,9 @@ public class TripRelation {
 		private String destinationCellMainRun;
 		private String destinationCell;
 
+		private String originTerminal;
+		private String destinationTerminal;
+
 		private String modePreRun;
 		private String modeMainRun;
 		private String modePostRun;
@@ -114,6 +126,14 @@ public class TripRelation {
 		public Builder destinationCell(String value) {
 			this.destinationCell = value;
 			return this;
+		}
+
+		public void originTerminal(String value) {
+			this.originTerminal = value;
+		}
+
+		public void destinationTerminal(String value) {
+			this.destinationTerminal = value;
 		}
 
 		public Builder modePreRun(String value) {
@@ -187,6 +207,9 @@ public class TripRelation {
 		this.destinationCellMainRun = builder.destinationCellMainRun;
 		this.destinationCell = builder.destinationCell;
 
+		this.originTerminal = builder.originTerminal;
+		this.destinationTerminal = builder.destinationTerminal;
+
 		this.modePreRun = builder.modePreRun;
 		this.modeMainRun = builder.modeMainRun;
 		this.modePostRun = builder.modePostRun;
@@ -218,6 +241,14 @@ public class TripRelation {
 
 	public String getDestinationCell() {
 		return destinationCell;
+	}
+
+	public String getOriginTerminal() {
+		return originTerminal;
+	}
+
+	public String getDestinationTerminal() {
+		return destinationTerminal;
 	}
 
 	public String getModePreRun() {
@@ -277,6 +308,9 @@ public class TripRelation {
 			// Read locations
 			builder.originalCell(record.get(column_originCell)).originCellMainRun(record.get(column_originCell_MainRun)).
 				destinationCellMainRun(record.get(column_destinationCell_MainRun)).destinationCell(record.get(column_destinationCell));
+			// Read Terminals
+			builder.originTerminal(record.get(column_originTerminal));
+			builder.destinationTerminal(record.get(column_destinationTerminal));
 			// Read trips
 			builder.modePreRun(record.get(column_mode_PreRun)).modeMainRun(record.get(column_mode_MainRun)).modePostRun(record.get(
 				column_mode_PostRun));

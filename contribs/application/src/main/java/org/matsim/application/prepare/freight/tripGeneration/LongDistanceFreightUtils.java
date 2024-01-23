@@ -21,6 +21,8 @@ public class LongDistanceFreightUtils {
 		writeCommonAttributesV1(person, tripRelation, tripRelationId);
 		setOriginTerminal(person, tripRelation);
 		setDestinationTerminal(person, tripRelation);
+		setOriginTerminal(person, tripRelation);
+		setDestinationTerminal(person, tripRelation);
 		setGoodsTypePreRun(person, tripRelation);
 		setGoodsTypePostRun(person, tripRelation);
 		setTonsPerYearPreRun(person, tripRelation);
@@ -56,6 +58,12 @@ public class LongDistanceFreightUtils {
 	}
 	static void setDestinationCell(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_cell", tripRelation.getDestinationCell());
+	}
+	static void setOriginTerminal(Person person, TripRelation tripRelation) {
+		person.getAttributes().putAttribute("origin_terminal", tripRelation.getOriginTerminal());
+	}
+	static void setDestinationTerminal(Person person, TripRelation tripRelation) {
+		person.getAttributes().putAttribute("destination_terminal", tripRelation.getDestinationTerminal());
 	}
 	static void setGoodsTypePreRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("goods_type_pre-run", tripRelation.getGoodsTypePreRun());
