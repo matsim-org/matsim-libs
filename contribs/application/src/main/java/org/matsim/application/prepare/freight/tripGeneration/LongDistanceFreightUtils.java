@@ -5,37 +5,29 @@ import org.matsim.api.core.v01.population.Person;
 public class LongDistanceFreightUtils {
 
 	static void writeCommonAttributesV1(Person person, TripRelation tripRelation, String tripRelationId){
-		LongDistanceFreightUtils.setFreightSubpopulation(person);
-		LongDistanceFreightUtils.setTripRelationIndex(person, tripRelationId);
-		LongDistanceFreightUtils.setPreRunMode(person, tripRelation);
-		LongDistanceFreightUtils.setMainRunMode(person, tripRelation);
-		LongDistanceFreightUtils.setPostRunMode(person, tripRelation);
-		LongDistanceFreightUtils.setOriginalOriginCell(person, tripRelation);
-		LongDistanceFreightUtils.setOriginCellMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setDestinationCellMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setFinalDestinationCell(person, tripRelation);
-		LongDistanceFreightUtils.setGoodsTypeMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonsPerYearMainRun(person, tripRelation);
+		setFreightSubpopulation(person);
+		setTripRelationIndex(person, tripRelationId);
+		setPreRunMode(person, tripRelation);
+		setMainRunMode(person, tripRelation);
+		setPostRunMode(person, tripRelation);
+		setOriginOriginCell(person, tripRelation);
+		setOriginCellMainRun(person, tripRelation);
+		setDestinationCellMainRun(person, tripRelation);
+		setDestinationCell(person, tripRelation);
+		setGoodsTypeMainRun(person, tripRelation);
+		setTonsPerYearMainRun(person, tripRelation);
 	}
 	static void writeCommonAttributesV2(Person person, TripRelation tripRelation, String tripRelationId){
-		LongDistanceFreightUtils.setFreightSubpopulation(person);
-		LongDistanceFreightUtils.setTripRelationIndex(person, tripRelationId);
-		LongDistanceFreightUtils.setPreRunMode(person, tripRelation);
-		LongDistanceFreightUtils.setMainRunMode(person, tripRelation);
-		LongDistanceFreightUtils.setPostRunMode(person, tripRelation);
-		LongDistanceFreightUtils.setOriginalOriginCell(person, tripRelation);
-		LongDistanceFreightUtils.setOriginCellMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setDestinationCellMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setFinalDestinationCell(person, tripRelation);
-		LongDistanceFreightUtils.setGoodsTypePreRun(person, tripRelation);
-		LongDistanceFreightUtils.setGoodsTypeMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setGoodsTypePostRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonsPerYearPreRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonsPerYearMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonsPerYearPostRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonKMPerYearPreRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonKMPerYearMainRun(person, tripRelation);
-		LongDistanceFreightUtils.setTonKMPerYearPostRun(person, tripRelation);
+		writeCommonAttributesV1(person, tripRelation, tripRelationId);
+		setOriginTerminal(person, tripRelation);
+		setDestinationTerminal(person, tripRelation);
+		setGoodsTypePreRun(person, tripRelation);
+		setGoodsTypePostRun(person, tripRelation);
+		setTonsPerYearPreRun(person, tripRelation);
+		setTonsPerYearPostRun(person, tripRelation);
+		setTonKMPerYearPreRun(person, tripRelation);
+		setTonKMPerYearMainRun(person, tripRelation);
+		setTonKMPerYearPostRun(person, tripRelation);
 	}
 	static void setFreightSubpopulation(Person person) {
 		person.getAttributes().putAttribute("subpopulation", "freight");
@@ -53,7 +45,7 @@ public class LongDistanceFreightUtils {
 	static void setPostRunMode(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("mode_post-run", tripRelation.getModePostRun());
 	}
-	static void setOriginalOriginCell(Person person, TripRelation tripRelation) {
+	static void setOriginOriginCell(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("origin_cell", tripRelation.getOriginCell());
 	}
 	static void setOriginCellMainRun(Person person, TripRelation tripRelation) {
@@ -62,7 +54,7 @@ public class LongDistanceFreightUtils {
 	static void setDestinationCellMainRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_cell_main_run", tripRelation.getDestinationCellMainRun());
 	}
-	static void setFinalDestinationCell(Person person, TripRelation tripRelation) {
+	static void setDestinationCell(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_cell", tripRelation.getDestinationCell());
 	}
 	static void setGoodsTypePreRun(Person person, TripRelation tripRelation) {
