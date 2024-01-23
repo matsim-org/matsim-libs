@@ -306,12 +306,15 @@ public class TripRelation {
 			CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader().setSkipHeaderRecord(true).build());
 		for (CSVRecord record : parser) {
 			Builder builder = new Builder();
+
 			// Read locations
 			builder.originalCell(record.get(column_originCell)).originCellMainRun(record.get(column_originCell_MainRun)).
 				destinationCellMainRun(record.get(column_destinationCell_MainRun)).destinationCell(record.get(column_destinationCell));
+
 			// Read Terminals
 			builder.originTerminal(record.get(column_originTerminal));
 			builder.destinationTerminal(record.get(column_destinationTerminal));
+
 			// Read trips
 			builder.modePreRun(record.get(column_mode_PreRun)).modeMainRun(record.get(column_mode_MainRun)).modePostRun(record.get(
 				column_mode_PostRun));
