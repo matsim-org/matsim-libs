@@ -39,7 +39,8 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
@@ -98,13 +99,13 @@ import org.matsim.vehicles.VehicleType;
     // The first reloading adapter i.e. the Resource is created
     Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
     Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
-    TranshipmentHubUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder =
-        TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+    TransshipmentHubBuilder firstTransshipmentHubBuilder =
+        ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
             firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 
     // The scheduler for the first reloading point is created
-    TranshipmentHubUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder =
-        TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
+    TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder =
+        ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance();
     firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
     firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
@@ -167,13 +168,13 @@ import org.matsim.vehicles.VehicleType;
     // The second reloading adapter i.e. the Resource is created
     Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
     Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
-    TranshipmentHubUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder =
-        TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+    TransshipmentHubBuilder secondTransshipmentHubBuilder =
+        ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
             secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
 
     // The scheduler for the second reloading point is created
-    TranshipmentHubUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder =
-        TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
+    TranshipmentHubSchedulerBuilder secondSchedulerBuilder =
+        ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance();
     secondSchedulerBuilder.setCapacityNeedFixed(10);
     secondSchedulerBuilder.setCapacityNeedLinear(1);
 

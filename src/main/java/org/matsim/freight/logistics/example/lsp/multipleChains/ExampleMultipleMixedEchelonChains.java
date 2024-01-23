@@ -25,7 +25,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -223,13 +222,13 @@ final class ExampleMultipleMixedEchelonChains {
                 .build();
 
         LSPResourceScheduler hubScheduler =
-            TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+            ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
                 .setCapacityNeedFixed(10)
                 .setCapacityNeedLinear(1)
                 .build();
 
         LSPResource hubResource =
-            TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+            ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                     Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
                 .setTransshipmentHubScheduler(hubScheduler)
                 .build();

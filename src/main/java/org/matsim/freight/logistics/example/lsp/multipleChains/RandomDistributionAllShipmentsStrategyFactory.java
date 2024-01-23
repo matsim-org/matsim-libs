@@ -15,6 +15,9 @@ import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 final class RandomDistributionAllShipmentsStrategyFactory {
+  //This is ok so as long as it is **non-public**.
+  //Before making it public, it should be configurable either via config or Injection.
+  //KMT, KN (Jan'24)
 
   private
   RandomDistributionAllShipmentsStrategyFactory() {} // class contains only static methods; do not

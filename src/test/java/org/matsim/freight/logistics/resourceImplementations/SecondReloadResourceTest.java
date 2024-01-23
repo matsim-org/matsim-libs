@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
 
 public class SecondReloadResourceTest {
 
@@ -38,14 +38,14 @@ public class SecondReloadResourceTest {
 
 	@BeforeEach
 	public void initialize() {
-		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubSchedulerBuilder schedulerBuilder = ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> reloadingId = Id.create("TranshipmentHub2", LSPResource.class);
 		reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
 
-		TranshipmentHubUtils.TransshipmentHubBuilder transshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId, null);
+		TransshipmentHubBuilder transshipmentHubBuilder = ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId, null);
 		transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
 		transshipmentHubResource = transshipmentHubBuilder.build();
 
