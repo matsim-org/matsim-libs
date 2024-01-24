@@ -66,6 +66,11 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 		this.writePlansInterval = config.getWritePlansInterval();
 		this.writeMoreUntilIteration = config.getWritePlansUntilIteration() ;
 	}
+	
+	@Override
+	public double priority() { // this should happen after other BeforeMobsimListeners did their thing
+		return -1000;
+	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
