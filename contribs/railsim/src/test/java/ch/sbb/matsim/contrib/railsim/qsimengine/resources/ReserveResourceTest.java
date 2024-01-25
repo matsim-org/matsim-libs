@@ -2,44 +2,34 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTestUtils;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.mockito.Mockito;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class ReserveResourceTest {
 
 	private TrainPosition d1 = Mockito.mock(TrainPosition.class, Mockito.RETURNS_DEEP_STUBS);
 	private TrainPosition d2 = Mockito.mock(TrainPosition.class, Mockito.RETURNS_DEEP_STUBS);
 	private TrainPosition d3 = Mockito.mock(TrainPosition.class, Mockito.RETURNS_DEEP_STUBS);
 
-	private RailLink l1 = RailsimTestUtils.createLink(10, 2);
-	private RailLink l2 = RailsimTestUtils.createLink(10, 2);
-
-	private RailResourceInternal r;
-
-	@Parameterized.Parameters(name = "{0}")
-	public static Collection<String> args() {
-		return List.of("fixedBlock", "movingBlock");
+	static List<Arguments> params() {
+		RailLink l1 = RailsimTestUtils.createLink(10, 2);
+		RailLink l2 = RailsimTestUtils.createLink(10, 2);
+		return List.of(
+			Arguments.of(l1, l2, new FixedBlockResource(Id.create("r", RailResource.class), List.of(l1, l2))),
+			Arguments.of(l1, l2, new MovingBlockResource(Id.create("r", RailResource.class), List.of(l1, l2)))
+		);
 	}
 
-	public ReserveResourceTest(String type) {
-		r = switch (type) {
-			case "fixedBlock" -> new FixedBlockResource(Id.create("r", RailResource.class), List.of(l1, l2));
-			case "movingBlock" -> new MovingBlockResource(Id.create("r", RailResource.class), List.of(l1, l2));
-			default -> throw new IllegalArgumentException();
-		};
-	}
-
-	@Test
-	public void anyTrack() {
+	@ParameterizedTest
+	@MethodSource("params")
+	public void anyTrack(RailLink l1, RailLink l2, RailResourceInternal r) {
 
 		assertThat(r.hasCapacity(0, l1, RailResourceManager.ANY_TRACK, d1))
 			.isTrue();
@@ -60,8 +50,9 @@ public class ReserveResourceTest {
 
 	}
 
-	@Test
-	public void anyTrackNonBlocking() {
+	@ParameterizedTest
+	@MethodSource("params")
+	public void anyTrackNonBlocking(RailLink l1, RailLink l2, RailResourceInternal r) {
 
 		assertThat(r.hasCapacity(0, l1, RailResourceManager.ANY_TRACK_NON_BLOCKING, d1))
 			.isTrue();
