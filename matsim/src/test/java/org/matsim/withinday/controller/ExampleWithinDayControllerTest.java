@@ -22,8 +22,8 @@
 
 package org.matsim.withinday.controller;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
@@ -39,11 +39,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleWithinDayControllerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRun() {
+	void testRun() {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(1);
 		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);

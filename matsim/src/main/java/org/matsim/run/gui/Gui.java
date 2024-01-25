@@ -449,8 +449,14 @@ public class Gui extends JFrame {
 				}
 				absoluteClasspath.append(new File(cpPart).getAbsolutePath());
 			}
-			String[] cmdArgs = new String[] { txtJvmlocation.getText(), "-cp", absoluteClasspath.toString(),
-					"-Xmx" + txtRam.getText() + "m", mainClass, txtConfigfilename.getText() };
+			String[] cmdArgs = new String[] { txtJvmlocation.getText(),
+					"-cp", absoluteClasspath.toString(),
+					"-Xmx" + txtRam.getText() + "m",
+					"--add-exports", "java.base/java.lang=ALL-UNNAMED",
+					"--add-exports", "java.desktop/sun.awt=ALL-UNNAMED",
+					"--add-exports", "java.desktop/sun.java2d=ALL-UNNAMED",
+					mainClass, txtConfigfilename.getText() };
+			// see https://jogamp.org/bugzilla/show_bug.cgi?id=1317#c21 and/or https://github.com/matsim-org/matsim-libs/pull/2940
 			exeRunner = ExeRunner.run(cmdArgs, textStdOut, textErrOut,
 					new File(txtConfigfilename.getText()).getParent());
 			int exitcode = exeRunner.waitForFinish();

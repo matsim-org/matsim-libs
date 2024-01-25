@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,11 +51,11 @@ public class TravelDistanceStatsTest {
 	Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTravelDistanceStats() {
+	void testTravelDistanceStats() {
 
 		final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 
@@ -337,23 +337,33 @@ public class TravelDistanceStatsTest {
 
 	private void performTest(IdMap<Person, Plan> map, String outputDirectory) {
 
+		TravelDistanceStats travelDistanceStats = getTravelDistanceStats(outputDirectory);
+
+		travelDistanceStats.addIteration(0, map);
+		travelDistanceStats.writeOutput(0, false);
+		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
+				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);
+
+		map.remove(person2.getId());
+		travelDistanceStats.addIteration(1, map);
+		travelDistanceStats.writeOutput(1, false);
+		readAndValidateValues(1, person1legsum + person3legsum, 8, person1TotalNumberOfLegs + person3TotalNumberOfLegs);
+
+		map.remove(person3.getId());
+		travelDistanceStats.addIteration(2, map);
+		travelDistanceStats.writeOutput(2, false);
+		readAndValidateValues(2, person1legsum, 6, person1TotalNumberOfLegs);
+		travelDistanceStats.close();
+	}
+
+	private static TravelDistanceStats getTravelDistanceStats(String outputDirectory) {
 		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
-		travelDistanceStats.addIteration(0, map);
-		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
-				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);
-		map.remove(person2.getId());
-		travelDistanceStats.addIteration(1, map);
-		readAndValidateValues(1, person1legsum + person3legsum, 8, person1TotalNumberOfLegs + person3TotalNumberOfLegs);
-		map.remove(person3.getId());
-		travelDistanceStats.addIteration(2, map);
-		readAndValidateValues(2, person1legsum, 6, person1TotalNumberOfLegs);
-		travelDistanceStats.close();
+        return new TravelDistanceStats(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
 	}
 
 	private void readAndValidateValues(int itr, Double legSum, int totalTrip, long totalLeg) {
@@ -376,15 +386,18 @@ public class TravelDistanceStatsTest {
 					double avgLegvalue = (avglegdis > 0) ? Double.parseDouble(column[avglegdis]) : 0;
 					double avgTripvalue = (avgtripdis > 0) ? Double.parseDouble(column[avgtripdis]) : 0;
 
-					Assert.assertEquals("avg. Average Trip distance does not match", (legSum / totalTrip), avgTripvalue,
-							0);
-					Assert.assertEquals("avg. Average Leg distance does not match", (legSum / totalLeg), avgLegvalue,
-							0);
+					Assertions.assertEquals((legSum / totalTrip), avgTripvalue,
+							0,
+							"avg. Average Trip distance does not match");
+					Assertions.assertEquals((legSum / totalLeg), avgLegvalue,
+							0,
+							"avg. Average Leg distance does not match");
 
 					break;
 				}
 				iteration++;
 			}
+			Assertions.assertEquals(itr, iteration, "There are too less entries.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

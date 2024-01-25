@@ -20,17 +20,12 @@
 
 package org.matsim.examples;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
@@ -47,29 +42,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
-@RunWith(Parameterized.class)
 public class EquilTest  {
 	private static final Logger log = LogManager.getLogger( EquilTest.class ) ;
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final boolean isUsingFastCapacityUpdate;
-
-	public EquilTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
-
-	@Test
-	public void testEquil() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testEquil(boolean isUsingFastCapacityUpdate) {
 		Config config = ConfigUtils.createConfig() ;
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
-		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile );
 
 		String netFileName = "test/scenarios/equil/network.xml";
@@ -102,6 +85,6 @@ public class EquilTest  {
 		writer.closeFile();
 
 		final EventsFileComparator.Result result = new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceFileName , eventsFileName );
-		Assert.assertEquals("different event files.", EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result, "different event files." );
 	}
 }

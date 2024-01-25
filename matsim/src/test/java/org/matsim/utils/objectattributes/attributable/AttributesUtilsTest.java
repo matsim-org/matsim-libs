@@ -1,13 +1,13 @@
 package org.matsim.utils.objectattributes.attributable;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class AttributesUtilsTest {
 
 	@Test
-	public void testCopyToWithPrimitive() {
+	void testCopyToWithPrimitive() {
 
 		var data = 1L;
 		var attributeKey = "data-key";

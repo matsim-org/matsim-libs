@@ -21,9 +21,9 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.freight.carriers.*;
@@ -33,16 +33,16 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CarrierPlanXmlWriterV2_1Test {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Carrier testCarrier;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception{
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
@@ -57,12 +57,12 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingServices_nuOfServicesIsCorrect(){
+	void test_whenReadingServices_nuOfServicesIsCorrect(){
 		assertEquals(3,testCarrier.getServices().size());
 	}
 
 	@Test
-	public void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
+	void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
 
 		CarrierVehicle light = CarriersUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("lightVehicle"));
 		assertEquals("light",light.getVehicleTypeId().toString());
@@ -75,7 +75,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
+	void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
 		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
 		assertEquals(3,carrierVehicles.size());
 		assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(Id.create("lightVehicle", Vehicle.class),
@@ -83,27 +83,27 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingCarrier_itReadsFleetSizeCorrectly(){
+	void test_whenReadingCarrier_itReadsFleetSizeCorrectly(){
 		assertEquals(FleetSize.INFINITE, testCarrier.getCarrierCapabilities().getFleetSize());
 	}
 
 	@Test
-	public void test_whenReadingCarrier_itReadsShipmentsCorrectly(){
+	void test_whenReadingCarrier_itReadsShipmentsCorrectly(){
 		assertEquals(2, testCarrier.getShipments().size());
 	}
 
 	@Test
-	public void test_whenReadingCarrier_itReadsPlansCorrectly(){
+	void test_whenReadingCarrier_itReadsPlansCorrectly(){
 		assertEquals(3, testCarrier.getPlans().size());
 	}
 
 	@Test
-	public void test_whenReadingCarrier_itSelectsPlansCorrectly(){
+	void test_whenReadingCarrier_itSelectsPlansCorrectly(){
 		assertNotNull(testCarrier.getSelectedPlan());
 	}
 
 	@Test
-	public void test_whenReadingPlans_nuOfToursIsCorrect(){
+	void test_whenReadingPlans_nuOfToursIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		assertEquals(1, plans.get(0).getScheduledTours().size());
 		assertEquals(1, plans.get(1).getScheduledTours().size());
@@ -111,7 +111,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
+	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
@@ -119,7 +119,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
+	void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		ScheduledTour tour1 = plan2.getScheduledTours().iterator().next();
@@ -127,7 +127,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
+	void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
@@ -135,7 +135,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingToursOfPlan1_SpritScoreIsCorrect(){
+	void test_whenReadingToursOfPlan1_SpritScoreIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		plan1.getAttributes().getAttribute("jspritScore");
@@ -143,7 +143,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingToursOfPlan2_jSpritScoreIsCorrect(){
+	void test_whenReadingToursOfPlan2_jSpritScoreIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		plan2.getAttributes().getAttribute("jspritScore");
@@ -151,7 +151,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_whenReadingToursOfPlan3_jSpritIsCorrect(){
+	void test_whenReadingToursOfPlan3_jSpritIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		plan3.getAttributes().getAttribute("jspritScore");
@@ -166,13 +166,13 @@ public class CarrierPlanXmlWriterV2_1Test {
 	}
 
 	@Test
-	public void test_CarrierHasAttributes(){
+	void test_CarrierHasAttributes(){
 		assertEquals((TransportMode.drt), CarriersUtils.getCarrierMode(testCarrier));
 		assertEquals(50, CarriersUtils.getJspritIterations(testCarrier));
 	}
 
 	@Test
-	public void test_ServicesAndShipmentsHaveAttributes(){
+	void test_ServicesAndShipmentsHaveAttributes(){
 		Object serviceCustomerAtt = testCarrier.getServices().get(Id.create("serv1",CarrierService.class)).getAttributes().getAttribute("customer");
 		assertNotNull(serviceCustomerAtt);
 		assertEquals("someRandomCustomer", (String) serviceCustomerAtt);
@@ -180,8 +180,9 @@ public class CarrierPlanXmlWriterV2_1Test {
 		assertNotNull(shipmentCustomerAtt);
 		assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
 	}
+
 	@Test
-	public void test_ReadWriteFilesAreEqual(){
+	void test_ReadWriteFilesAreEqual(){
 		MatsimTestUtils.assertEqualFilesLineByLine(this.testUtils.getClassInputDirectory() + "carrierPlansEquils.xml", this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 	}
 }

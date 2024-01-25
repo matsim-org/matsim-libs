@@ -1,17 +1,17 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OsmHbefaMappingTest {
 
-    @Test
-    public void testRegularMapping() {
+	@Test
+	void testRegularMapping() {
 
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("primary", 70 / 3.6);
@@ -22,7 +22,7 @@ public class OsmHbefaMappingTest {
     }
 
 	@Test
-	public void testMergedLinkTypeMapping() {
+	void testMergedLinkTypeMapping() {
 
 		var mapping = OsmHbefaMapping.build();
 		var link = getTestLink("primary|railway.tram", 70 / 3.6);
@@ -32,19 +32,21 @@ public class OsmHbefaMappingTest {
 		assertEquals("URB/Trunk-City/70", hbefaType);
 	}
 
-    @Test(expected = RuntimeException.class)
-    public void testUnknownType() {
+	@Test
+	void testUnknownType() {
+		assertThrows(RuntimeException.class, () -> {
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink("unknown-tag", 100 / 3.6);
+			var mapping = OsmHbefaMapping.build();
+			var link = getTestLink("unknown-tag", 100 / 3.6);
 
-        mapping.determineHebfaType(link);
+			mapping.determineHebfaType(link);
 
-        fail("Expected Runtime Exception.");
-    }
+			fail("Expected Runtime Exception.");
+		});
+	}
 
-    @Test
-    public void testFastMotorway() {
+	@Test
+	void testFastMotorway() {
 
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("motorway", 100 / 3.6);
@@ -55,7 +57,7 @@ public class OsmHbefaMappingTest {
     }
 
 	@Test
-	public void testMotorwayWithNoExactSpeedTag() {
+	void testMotorwayWithNoExactSpeedTag() {
 
 		var mapping = OsmHbefaMapping.build();
 
@@ -70,7 +72,7 @@ public class OsmHbefaMappingTest {
 	}
 
 	@Test
-	public void testFastMotorwayLink() {
+	void testFastMotorwayLink() {
 
 		var mapping = OsmHbefaMapping.build();
 		var link = getTestLink("motorway_link", 100 / 3.6);
@@ -81,7 +83,7 @@ public class OsmHbefaMappingTest {
 	}
 
 	@Test
-	public void testLivingStreet() {
+	void testLivingStreet() {
 		var mapping = OsmHbefaMapping.build();
 		var link = getTestLink("living_street", 50 / 3.6);
 
@@ -90,8 +92,8 @@ public class OsmHbefaMappingTest {
 		assertEquals("URB/Access/50", hbefaType);
 	}
 
-    @Test
-    public void testUnclassified() {
+	@Test
+	void testUnclassified() {
 
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("unclassified", 50 / 3.6);
@@ -101,8 +103,8 @@ public class OsmHbefaMappingTest {
         assertEquals("URB/Access/50", hbefaType);
     }
 
-    @Test
-    public void testNoHighwayType() {
+	@Test
+	void testNoHighwayType() {
 
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink(" ", 60 / 3.6);
@@ -112,8 +114,8 @@ public class OsmHbefaMappingTest {
         assertEquals("URB/Local/60", hbefaType);
     }
 
-    @Test
-    public void testNoAllowedSpeedTag() {
+	@Test
+	void testNoAllowedSpeedTag() {
 
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("residential", 40 / 3.6);

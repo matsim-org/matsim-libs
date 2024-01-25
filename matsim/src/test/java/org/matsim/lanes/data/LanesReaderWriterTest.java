@@ -19,16 +19,16 @@
  * *********************************************************************** */
 package org.matsim.lanes.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,8 +49,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class LanesReaderWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final Logger log = LogManager.getLogger(LanesReaderWriterTest.class);
@@ -79,14 +79,16 @@ public class LanesReaderWriterTest {
 		}
 	}
 
-	@Test public void testReader20() {
+	@Test
+	void testReader20() {
 		Fixture f = new Fixture();
 		LanesReader reader = new LanesReader(f.scenario);
 		reader.readFile(utils.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
 
-	@Test public void testWriter20() {
+	@Test
+	void testWriter20() {
 		Fixture f = new Fixture();
 		String testoutput = utils.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");

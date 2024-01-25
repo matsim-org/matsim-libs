@@ -21,8 +21,8 @@ package org.matsim.core.controler;
 
 import java.util.*;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +72,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PrepareForSimImplTest {
 
 	@Test
-	public void testSingleLegTripRoutingMode() {
+	void testSingleLegTripRoutingMode() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -102,8 +102,9 @@ public class PrepareForSimImplTest {
 
 			prepareForSimImpl.run();
 
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals(TransportMode.pt,
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode!");
 		}
 
 		// test routing mode set, such as after TripsToLegsAlgorithm + replanning strategy
@@ -129,13 +130,14 @@ public class PrepareForSimImplTest {
 
 			prepareForSimImpl.run();
 
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals(TransportMode.pt,
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode!");
 		}
 	}
 
 	@Test
-	public void testSingleFallbackModeLegTrip() {
+	void testSingleFallbackModeLegTrip() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -165,9 +167,10 @@ public class PrepareForSimImplTest {
 
 			prepareForSimImpl.run();
 
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals(TransportMode.walk, leg.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.pt,
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode!");
 		}
 
 		// test outdated fallback mode single leg trip (arbitrary drt mode)
@@ -193,14 +196,15 @@ public class PrepareForSimImplTest {
 
 			prepareForSimImpl.run();
 
-			Assert.assertEquals("wrong leg mode replacement", TransportMode.walk, leg.getMode());
-			Assert.assertEquals("wrong routing mode!", "drt67",
-					TripStructureUtils.getRoutingMode(leg));
+			Assertions.assertEquals(TransportMode.walk, leg.getMode(), "wrong leg mode replacement");
+			Assertions.assertEquals("drt67",
+					TripStructureUtils.getRoutingMode(leg),
+					"wrong routing mode!");
 		}
 	}
 
 	@Test
-	public void testCorrectTripsRemainUnchanged() {
+	void testCorrectTripsRemainUnchanged() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -242,14 +246,14 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 
 			// Check leg modes remain unchanged
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg3.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.car, leg2.getMode(), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong leg mode!");
 
 			// Check routing mode:
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
 		}
 
 		// test complicated intermodal trip with consistent routing modes passes unchanged
@@ -339,34 +343,34 @@ public class PrepareForSimImplTest {
 			// TODO: Currently all TransportMode.non_network_walk legs are replaced by TransportMode.walk, so we cannot check
 			// the correct handling of them right now.
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg1.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg2.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg2.getMode(), "wrong leg mode!");
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg3.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.drt, leg4.getMode());
+			Assertions.assertEquals(TransportMode.drt, leg4.getMode(), "wrong leg mode!");
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg5.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg6.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg6.getMode(), "wrong leg mode!");
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg7.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.pt, leg8.getMode());
+			Assertions.assertEquals(TransportMode.pt, leg8.getMode(), "wrong leg mode!");
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg9.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg10.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg10.getMode(), "wrong leg mode!");
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg11.getMode());
 
 			// Check routing mode remains unchanged
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg3));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg4));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg5));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg6));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg7));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg8));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg9));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg10));
-			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg11));
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg4), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg5), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg6), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg7), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg8), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg9), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg10), "wrong routing mode!");
+			Assertions.assertEquals("intermodal pt", TripStructureUtils.getRoutingMode(leg11), "wrong routing mode!");
 		}
 	}
 
 	@Test
-	public void testRoutingModeConsistency() {
+	void testRoutingModeConsistency() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -406,7 +410,7 @@ public class PrepareForSimImplTest {
 						config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
 
 				prepareForSimImpl.run();
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
 
@@ -443,13 +447,13 @@ public class PrepareForSimImplTest {
 						config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
 
 				prepareForSimImpl.run();
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
 	}
 
 	@Test
-	public void testOutdatedHelperModesReplacement() {
+	void testOutdatedHelperModesReplacement() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
@@ -492,7 +496,7 @@ public class PrepareForSimImplTest {
 						config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
 
 				prepareForSimImpl.run();
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 
 			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
@@ -504,14 +508,14 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg3.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.car, leg2.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong leg mode!");
 
 			// Check routing mode:
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
 		}
 
 		// test car trip with outdated access/egress walk modes
@@ -550,7 +554,7 @@ public class PrepareForSimImplTest {
 						config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
 
 				prepareForSimImpl.run();
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 
 			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
@@ -562,14 +566,14 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg3.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.car, leg2.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong leg mode replacement!");
 
 			// Check routing mode:
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.car, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
 		}
 
 		// test complicated intermodal drt+pt trip with outdated access/egress walk modes
@@ -632,7 +636,7 @@ public class PrepareForSimImplTest {
 						config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
 
 				prepareForSimImpl.run();
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 
 			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
@@ -644,13 +648,13 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.drt, leg2.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg3.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.pt, leg4.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg5.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.pt, leg6.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg7.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.drt, leg2.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.pt, leg4.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.walk, leg5.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.pt, leg6.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.walk, leg7.getMode(), "wrong leg mode replacement!");
 
 			/*
 			 * Check routing mode:
@@ -661,18 +665,18 @@ public class PrepareForSimImplTest {
 			 * For the scope of this test it is sufficient, that the MainModeIdentifier is run, returns a main mode
 			 * and that this main mode is assigned as routingMode to all legs.
 			 */
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg3));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg4));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg5));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg6));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg7));
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg4), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg5), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg6), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg7), "wrong routing mode!");
 		}
 	}
 
 	@Test
-	public void testOutdatedFallbackAndHelperModesReplacement() {
+	void testOutdatedFallbackAndHelperModesReplacement() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
@@ -727,7 +731,7 @@ public class PrepareForSimImplTest {
 						config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
 
 				prepareForSimImpl.run();
-				Assert.fail("expected Exception, got none.");
+				Assertions.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 
 			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
@@ -739,11 +743,11 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong leg mode!", TransportMode.drt, leg2.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg3.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg4.getMode());
-			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg5.getMode());
+			Assertions.assertEquals(TransportMode.walk, leg1.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.drt, leg2.getMode(), "wrong leg mode!");
+			Assertions.assertEquals(TransportMode.walk, leg3.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.walk, leg4.getMode(), "wrong leg mode replacement!");
+			Assertions.assertEquals(TransportMode.walk, leg5.getMode(), "wrong leg mode replacement!");
 
 			/*
 			 * Check routing mode:
@@ -754,16 +758,16 @@ public class PrepareForSimImplTest {
 			 * For the scope of thios test it is sufficient, that the MainModeIdentifier is run, returns a main mode
 			 * and that this main mode is assigned as routingMode to all legs.
 			 */
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg1));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg2));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg3));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg4));
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg5));
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg1), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg2), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg3), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg4), "wrong routing mode!");
+			Assertions.assertEquals(TransportMode.drt, TripStructureUtils.getRoutingMode(leg5), "wrong routing mode!");
 		}
 	}
 
 	@Test
-	public void vehicleTypes() {
+	void vehicleTypes() {
 
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -818,7 +822,7 @@ public class PrepareForSimImplTest {
 		}
 	}
 
-	private class DummyRoutingModule implements RoutingModule {
+	private static class DummyRoutingModule implements RoutingModule {
 		@Override
 		public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 			return Collections.singletonList(PopulationUtils.createLeg("dummyMode"));

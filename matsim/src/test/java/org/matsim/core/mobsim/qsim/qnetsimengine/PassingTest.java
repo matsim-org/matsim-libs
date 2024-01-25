@@ -20,9 +20,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
 import jakarta.inject.Inject;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,7 +44,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -63,7 +62,7 @@ import org.matsim.vehicles.Vehicles;
  */
 public class PassingTest {
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	/**
 	 * A bike enters at t=0; and a car at t=5sec link length = 1000m
@@ -71,7 +70,7 @@ public class PassingTest {
 	 * tt_car = 50 sec; tt_bike = 200 sec
 	 */
 	@Test
-	public void test4PassingInFreeFlowState(){
+	void test4PassingInFreeFlowState(){
 
 		SimpleNetwork net = new SimpleNetwork();
 
@@ -119,13 +118,13 @@ public class PassingTest {
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		Assert.assertEquals("Wrong car travel time", 51, carTravelTime);
-		Assert.assertEquals("Wrong bike travel time", 201, bikeTravelTime);
-		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
+		Assertions.assertEquals(51, carTravelTime, "Wrong car travel time");
+		Assertions.assertEquals(201, bikeTravelTime, "Wrong bike travel time");
+		Assertions.assertEquals(150, bikeTravelTime-carTravelTime, "Passing is not implemented");
 
 	}
 
-	private class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
+	private static class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 		VehicleLinkTravelTimeEventHandler hand;

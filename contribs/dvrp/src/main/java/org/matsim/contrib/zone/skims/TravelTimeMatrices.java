@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.network.Network;
@@ -56,7 +57,7 @@ public final class TravelTimeMatrices {
 	}
 
 	private static void computeForDepartureZone(Zone fromZone, Map<Zone, Node> centralNodes, double departureTime, Matrix travelTimeMatrix,
-			LeastCostPathTree lcpTree) {
+		LeastCostPathTree lcpTree) {
 		Node fromNode = centralNodes.get(fromZone);
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null);
 
@@ -65,26 +66,31 @@ public final class TravelTimeMatrices {
 			int nodeIndex = toNode.getId().index();
 			OptionalTime currOptionalTime = lcpTree.getTime(nodeIndex);
 			double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException(
-					"Undefined Time. Reason could be that the dvrp network is not fully connected. Please check and/or clean."));
+				"Undefined Time. Reason could be that the dvrp network is not fully connected. Please check and/or clean."));
 			double tt = currTime - departureTime;
 			travelTimeMatrix.set(fromZone, toZone, tt);
 		}
 	}
 
-	public static SparseMatrix calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double maxTravelTime, double departureTime) {
+	public static Optional<SparseMatrix> calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double maxTravelTime,
+		double departureTime) {
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
+		if (maxDistance == 0 && maxTravelTime == 0) {
+			return Optional.empty();
+		}
+
 		var nodes = params.routingNetwork.getNodes().values();
 		var counter = "DVRP free-speed TT sparse matrix: node ";
 		Calculation<Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, maxDistance,
-				maxTravelTime);
+			maxTravelTime);
 		calculate(params, nodes, calculation, counter);
-		return travelTimeMatrix;
+		return Optional.of(travelTimeMatrix);
 	}
 
 	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime, SparseMatrix sparseMatrix,
-			LeastCostPathTree lcpTree, double maxDistance, double maxTravelTime) {
+		LeastCostPathTree lcpTree, double maxDistance, double maxTravelTime) {
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null,
-				(nodeIndex, arrivalTime, travelCost, distance, departTime) -> distance >= maxDistance && arrivalTime >= departTime + maxTravelTime);
+			(nodeIndex, arrivalTime, travelCost, distance, departTime) -> distance >= maxDistance && arrivalTime >= departTime + maxTravelTime);
 
 		List<NodeAndTime> neighborNodes = new ArrayList<>();
 		for (Node toNode : nodes) {
@@ -109,8 +115,8 @@ public final class TravelTimeMatrices {
 
 	private static <E> void calculate(RoutingParams params, Collection<? extends E> elements, Calculation<E> calculation, String counterPrefix) {
 		var trees = IntStream.range(0, params.numberOfThreads)
-				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
-				.toList();
+			.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
+			.toList();
 		var executorService = new ExecutorServiceWithResource<>(trees);
 		var counter = new Counter(counterPrefix, " / " + elements.size());
 

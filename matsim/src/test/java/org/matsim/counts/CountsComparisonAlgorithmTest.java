@@ -20,22 +20,23 @@
 
 package org.matsim.counts;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsComparisonAlgorithmTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testCompare() {
+	@Test
+	void testCompare() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
@@ -46,13 +47,14 @@ public class CountsComparisonAlgorithmTest {
 
 		int cnt=0;
 		for (CountSimComparison csc : csc_list) {
-			assertEquals("Wrong sim value set", 2*cnt, csc.getSimulationValue(), 0.0);
+			assertEquals(2*cnt, csc.getSimulationValue(), 0.0, "Wrong sim value set");
 			cnt++;
 			cnt=cnt%24;
 		}//while
 	}
 
-	@Test public void testDistanceFilter() {
+	@Test
+	void testDistanceFilter() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
@@ -61,7 +63,7 @@ public class CountsComparisonAlgorithmTest {
 		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();
-		assertEquals("Distance filter not working", 0, csc_list.size());
+		assertEquals(0, csc_list.size(), "Distance filter not working");
 	}
 
 }

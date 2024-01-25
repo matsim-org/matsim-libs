@@ -1,12 +1,12 @@
 package org.matsim.core.events;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParallelEventsManagerTest {
 
@@ -14,13 +14,13 @@ public class ParallelEventsManagerTest {
 
     private EventsManagerImplTest.CountingMyEventHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         handler = new EventsManagerImplTest.CountingMyEventHandler();
     }
 
-    @Test
-    public void forgetInit() {
+	@Test
+	void forgetInit() {
 
         EventsManager m = EventsUtils.createParallelEventsManager();
 
@@ -36,8 +36,8 @@ public class ParallelEventsManagerTest {
         assertEquals(1, handler.counter);
     }
 
-    @Test
-    public void lateHandler() {
+	@Test
+	void lateHandler() {
 
         EventsManager m = EventsUtils.createParallelEventsManager();
         m.initProcessing();

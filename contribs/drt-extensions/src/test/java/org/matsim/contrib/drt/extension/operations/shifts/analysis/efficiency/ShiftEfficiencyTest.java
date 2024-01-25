@@ -9,8 +9,8 @@
 
 package org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -38,7 +38,7 @@ public class ShiftEfficiencyTest {
 	 * Test method for {@link ShiftEfficiencyTracker}.
 	 */
 	@Test
-	public void testDrtShiftEfficiency() {
+	void testDrtShiftEfficiency() {
 
 		EventsManager events = new EventsManagerImpl();
 		ShiftEfficiencyTracker shiftEfficiencyTracker = new ShiftEfficiencyTracker();
@@ -53,7 +53,7 @@ public class ShiftEfficiencyTest {
 		events.processEvent(new DrtShiftStartedEvent(10 * 3600, shift1, vehicle1, link1)
 		);
 		// should throw because vehicle is already registered with another shift
-		Assert.assertThrows(RuntimeException.class, () -> {
+		Assertions.assertThrows(RuntimeException.class, () -> {
 			events.processEvent(new DrtShiftStartedEvent(10 * 3600, shift1, vehicle1, link1));
 		});
 
@@ -62,14 +62,14 @@ public class ShiftEfficiencyTest {
 
 		events.processEvent(new PassengerDroppedOffEvent(11 * 3600, "drt",
 				request1, person1, vehicle1));
-		Assert.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getRequestsByShift().get(shift1).contains(request1));
+		Assertions.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getRequestsByShift().get(shift1).contains(request1));
 
 		events.processEvent(new PersonMoneyEvent(11 * 3600, person1, -FARE,
 				DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, "drt", request1.toString()));
-		Assert.assertEquals(FARE, shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift().get(shift1), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(FARE, shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift().get(shift1), MatsimTestUtils.EPSILON);
 
-		Assert.assertFalse(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
+		Assertions.assertFalse(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
 		events.processEvent(new DrtShiftEndedEvent(20 * 3600, shift1, vehicle1, link1, operationFacility1));
-		Assert.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
+		Assertions.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
 	}
 }

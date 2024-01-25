@@ -22,21 +22,17 @@ package org.matsim.core.config;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
-import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd
  */
 public class ConfigV2IOTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
@@ -56,10 +52,7 @@ public class ConfigV2IOTest {
 	private void assertTheSame(
 			final Config outConfig,
 			final Config inConfig) {
-		Assert.assertEquals(
-				"names of modules differ!",
-				outConfig.getModules().keySet(),
-				inConfig.getModules().keySet() );
+		Assertions.assertEquals(outConfig.getModules().keySet(), inConfig.getModules().keySet(), "names of modules differ!");
 
 		for ( String name : outConfig.getModules().keySet() ) {
 			if ( !name.equals( ChangeLegModeConfigGroup.CONFIG_MODULE ) ) {
@@ -74,29 +67,17 @@ public class ConfigV2IOTest {
 	private void assertTheSame(
 			final ConfigGroup outModule,
 			final ConfigGroup inModule) {
-		Assert.assertEquals(
-				"wrong module class",
-				outModule.getClass(),
-				inModule.getClass() );
+		Assertions.assertEquals(outModule.getClass(), inModule.getClass(), "wrong module class");
 
-		Assert.assertEquals(
-				"different parameters",
-				outModule.getParams(),
-				inModule.getParams() );
+		Assertions.assertEquals(outModule.getParams(), inModule.getParams(), "different parameters");
 
-		Assert.assertEquals(
-				"different parameterset types",
-				outModule.getParameterSets().keySet(),
-				inModule.getParameterSets().keySet() );
+		Assertions.assertEquals(outModule.getParameterSets().keySet(), inModule.getParameterSets().keySet(), "different parameterset types");
 
 		for ( String type : outModule.getParameterSets().keySet() ) {
 			final Collection<? extends ConfigGroup> outSets = outModule.getParameterSets( type );
 			final Collection<? extends ConfigGroup> inSets = inModule.getParameterSets( type );
 
-			Assert.assertEquals(
-					"different number of sets for type "+type,
-					outSets.size(),
-					inSets.size() );
+			Assertions.assertEquals(outSets.size(), inSets.size(), "different number of sets for type "+type);
 
 			final Iterator<? extends ConfigGroup> outIter = outSets.iterator();
 			final Iterator<? extends ConfigGroup> inIter = inSets.iterator();

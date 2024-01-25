@@ -41,7 +41,7 @@ public class OverviewDashboard implements Dashboard {
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";
 			viz.display.lineColor.join = "link_id";
-			viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, 5, true);
+			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
 
 			viz.display.lineWidth.dataset = "traffic";
 			viz.display.lineWidth.columnName = "simulated_traffic_volume";
@@ -52,8 +52,6 @@ public class OverviewDashboard implements Dashboard {
 
 		layout.row("warnings").el(TextBlock.class, (viz, data) -> {
 			viz.file = data.compute(LogFileAnalysis.class, "status.md");
-			// Force minimal height
-			viz.height = 0.1d;
 		});
 
 		layout.row("config").el(XML.class, (viz, data) -> {
@@ -76,7 +74,7 @@ public class OverviewDashboard implements Dashboard {
 			viz.title = "Score";
 			viz.dataset = data.output("*.scorestats.csv");
 			viz.description = "per Iteration";
-			viz.x = "ITERATION";
+			viz.x = "iteration";
 			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
 			viz.xAxisName = "Iteration";
 			viz.yAxisName = "Score";
@@ -88,7 +86,7 @@ public class OverviewDashboard implements Dashboard {
 				viz.title = "Mode Share Progression";
 				viz.description = "per Iteration";
 				viz.dataset = data.output("*.modestats.csv");
-				viz.x = "Iteration";
+				viz.x = "iteration";
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Share";
 				viz.width = 2d;

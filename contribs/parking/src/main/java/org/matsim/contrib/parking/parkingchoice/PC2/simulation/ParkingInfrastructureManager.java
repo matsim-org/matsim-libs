@@ -261,13 +261,13 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			}
 
 			// put parking that was found into a sorted queue:
-			PriorityQueue<SortableMapObject<PC2Parking>> queue = new PriorityQueue<SortableMapObject<PC2Parking>>();
+			PriorityQueue<SortableMapObject<PC2Parking>> queue = new PriorityQueue<>();
 			for (PC2Parking parking : collection) {
 				double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 						parkingOperationRequestAttributes.arrivalTime,
 						parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
 						parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex, false);
-				queue.add(new SortableMapObject<PC2Parking>(parking, -1.0 * score)); // score made positive, so that priority queue works properly
+				queue.add( new SortableMapObject<>( parking, -1.0 * score ) ); // score made positive, so that priority queue works properly
 			}
 
 			// TODO: should I make MNL only on top 5 here?
@@ -298,8 +298,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			// this puts the personId (!!!! yyyyyy) at the parking location:
 			parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
 
-			// this tells the parking lot to decrease the number of
-			// available spaces:
+			// this tells the parking lot to decrease the number of available spaces:
 			parkVehicle(selectedParking);
 
 			// PC2Parking closestParking =
@@ -364,10 +363,8 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			e.printStackTrace();
 		}
 
-		// yyyyyy the parking arrival event returns person id, not vehicle id.
-		// Do we change to vehicle id, or add the vehicle
-		// id to the event? In the code, the person id is used for the walk
-		// distance. kai, jul'15
+		// yyyyyy the parking arrival event returns person id, not vehicle id. Do we change to vehicle id, or add the vehicle id to
+		// the event? In the code, the person id is used for the walk distance. kai, jul'15
 
 		return selectedParking;
 	}

@@ -20,12 +20,12 @@
 
 package org.matsim.core.population;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,8 +41,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PersonImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private final static Logger log = LogManager.getLogger(PersonImplTest.class);
@@ -50,7 +50,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetRandomUnscoredPlan() {
+	@Test
+	void testGetRandomUnscoredPlan() {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
 		Plan[] plans = new Plan[10];
@@ -97,22 +98,24 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testRemoveUnselectedPlans() {
+	@Test
+	void testRemoveUnselectedPlans() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.createAndAddPlan(person, false);
 		PersonUtils.createAndAddPlan(person, false);
 		Plan selPlan = PersonUtils.createAndAddPlan(person, true);
 		PersonUtils.createAndAddPlan(person, false);
 
-		assertEquals("person should have 4 plans.", 4, person.getPlans().size());
+		assertEquals(4, person.getPlans().size(), "person should have 4 plans.");
 
 		PersonUtils.removeUnselectedPlans(person);
 
-		assertEquals("person should have 1 plan.", 1, person.getPlans().size());
-		assertEquals("remaining plan should be selPlan.", selPlan, person.getPlans().get(0));
+		assertEquals(1, person.getPlans().size(), "person should have 1 plan.");
+		assertEquals(selPlan, person.getPlans().get(0), "remaining plan should be selPlan.");
 	}
 
-	@Test public void testRemovePlan() {
+	@Test
+	void testRemovePlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(5, Person.class));
 		Plan p1 = PersonUtils.createAndAddPlan(person, false);
 		Plan p2 = PersonUtils.createAndAddPlan(person, true);
@@ -120,24 +123,25 @@ public class PersonImplTest {
 		Plan p4 = PersonUtils.createAndAddPlan(person, false);
 		Plan p5 = PopulationUtils.createPlan(null);
 
-		assertEquals("wrong number of plans.", 4, person.getPlans().size());
-		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
+		assertEquals(4, person.getPlans().size(), "wrong number of plans.");
+		assertEquals(p2, person.getSelectedPlan(), "expected different selected plan.");
 		assertTrue(person.removePlan(p3));
-		assertEquals("wrong number of plans.", 3, person.getPlans().size());
-		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
+		assertEquals(3, person.getPlans().size(), "wrong number of plans.");
+		assertEquals(p2, person.getSelectedPlan(), "expected different selected plan.");
 		assertFalse(person.removePlan(p5));
-		assertEquals("wrong number of plans.", 3, person.getPlans().size());
+		assertEquals(3, person.getPlans().size(), "wrong number of plans.");
 		assertTrue(person.removePlan(p2));
-		assertEquals("wrong number of plans.", 2, person.getPlans().size());
-		assertNotSame("removed plan still set as selected.", p2, person.getSelectedPlan());
-		assertFalse("plan cannot be removed twice.", person.removePlan(p2));
-		assertEquals("wrong number of plans.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "wrong number of plans.");
+		assertNotSame(p2, person.getSelectedPlan(), "removed plan still set as selected.");
+		assertFalse(person.removePlan(p2), "plan cannot be removed twice.");
+		assertEquals(2, person.getPlans().size(), "wrong number of plans.");
 		assertTrue(person.removePlan(p1));
 		assertTrue(person.removePlan(p4));
-		assertEquals("wrong number of plans.", 0, person.getPlans().size());
+		assertEquals(0, person.getPlans().size(), "wrong number of plans.");
 	}
 
-	@Test public void testSetSelectedPlan() {
+	@Test
+	void testSetSelectedPlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(11, Person.class));
 		Plan p1 = PersonUtils.createAndAddPlan(person, false);
 		assertEquals(p1, person.getSelectedPlan());
@@ -159,7 +163,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan() {
+	@Test
+	void testGetBestPlan() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		p1.setScore(90.0);
@@ -174,7 +179,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan_multipleBest() {
+	@Test
+	void testGetBestPlan_multipleBest() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		p1.setScore(11.0);
@@ -192,7 +198,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan_oneWithoutScore() {
+	@Test
+	void testGetBestPlan_oneWithoutScore() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		Plan p2 = PopulationUtils.createPlan();
@@ -206,7 +213,8 @@ public class PersonImplTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test public void testGetBestPlan_allWithoutScore() {
+	@Test
+	void testGetBestPlan_allWithoutScore() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan();
 		Plan p2 = PopulationUtils.createPlan();

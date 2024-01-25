@@ -32,8 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author Steffen Axer
- *
+ * @author steffenaxer
  */
 public final class DrtCompanionControlerCreator {
 

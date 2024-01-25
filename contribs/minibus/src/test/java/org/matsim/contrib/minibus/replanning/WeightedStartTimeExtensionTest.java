@@ -22,9 +22,9 @@ package org.matsim.contrib.minibus.replanning;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -40,52 +40,52 @@ import org.matsim.testcases.MatsimTestUtils;
 
 
 public class WeightedStartTimeExtensionTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
-    public final void testRun() {
-	
+	final void testRun() {
+
 		Operator coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
-		
+
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
-		
+
 		PConfigGroup pConfig = new PConfigGroup();
 		pConfig.addParam("timeSlotSize", "900");
-		
+
 		TimeProvider tP = new TimeProvider(pConfig, utils.getOutputDirectory());
 		tP.reset(0);
-		
+
 		WeightedStartTimeExtension strat = new WeightedStartTimeExtension(new ArrayList<String>());
 		strat.setTimeProvider(tP);
-		
+
 		PPlan testPlan = null;
-		
+
 		coop.getBestPlan().setStartTime(19500.0);
 
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("Test plan should be null", testPlan);
-		
+		Assertions.assertEquals(1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON, "Compare number of vehicles");
+		Assertions.assertEquals(19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+		Assertions.assertNull(testPlan, "Test plan should be null");
+
 		coop.getBestPlan().setNVehicles(2);
-		
+
 		// enough vehicles for testing
 		testPlan = strat.run(coop);
-		
-		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNotNull("Test plan should be not null", testPlan);
-		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
-		
+
+		Assertions.assertEquals(2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON, "Compare number of vehicles");
+		Assertions.assertEquals(19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+		Assertions.assertNotNull(testPlan, "Test plan should be not null");
+		Assertions.assertEquals(1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON, "There should be one vehicle bought");
+		Assertions.assertEquals(9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+
 		// enough vehicles for testing
 		testPlan = strat.run(coop);
-		
-		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNotNull("Test plan should be not null", testPlan);
-		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 900.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
-		
+
+		Assertions.assertEquals(2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON, "Compare number of vehicles");
+		Assertions.assertEquals(19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+		Assertions.assertNotNull(testPlan, "Test plan should be not null");
+		Assertions.assertEquals(1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON, "There should be one vehicle bought");
+		Assertions.assertEquals(900.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+
 		// Now same with acts
 		Id<Person> agentId = Id.create("id", Person.class);
 		Id<Link> linkId = Id.create("id", Link.class);
@@ -94,22 +94,22 @@ public class WeightedStartTimeExtensionTest {
 		for (int i = 0; i < 100; i++) {
 			tP.handleEvent(new ActivityEndEvent(9600.0, agentId, linkId, facilityId, "type"));
 		}
-		
+
 		testPlan = strat.run(coop);
-		
-		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNotNull("Test plan should be not null", testPlan);
-		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
-		
+
+		Assertions.assertEquals(2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON, "Compare number of vehicles");
+		Assertions.assertEquals(19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+		Assertions.assertNotNull(testPlan, "Test plan should be not null");
+		Assertions.assertEquals(1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON, "There should be one vehicle bought");
+		Assertions.assertEquals(9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+
 		tP.reset(1);
 		testPlan = strat.run(coop);
-		
-		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNotNull("Test plan should be not null", testPlan);
-		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 8100.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+
+		Assertions.assertEquals(2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON, "Compare number of vehicles");
+		Assertions.assertEquals(19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
+		Assertions.assertNotNull(testPlan, "Test plan should be not null");
+		Assertions.assertEquals(1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON, "There should be one vehicle bought");
+		Assertions.assertEquals(8100.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON, "Compare start time");
 	}
 }

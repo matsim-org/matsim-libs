@@ -96,6 +96,7 @@
 		<module>signals</module>
 		<module>simulatedannealing</module>
 		<module>simwrapper</module>
+		<module>small-scale-traffic-generation</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
 		<module>taxi</module>
@@ -104,8 +105,12 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>

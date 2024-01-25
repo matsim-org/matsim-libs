@@ -26,9 +26,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -52,10 +52,11 @@ public class PtTutorialIT {
 
 	private final static Logger log = LogManager.getLogger(PtTutorialIT.class);
 
-	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void ensure_tutorial_runs() throws MalformedURLException {
+	void ensure_tutorial_runs() throws MalformedURLException {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		config.controller().setLastIteration(1);
 
@@ -70,14 +71,14 @@ public class PtTutorialIT {
 				}
 			});
 			controler.run();
-			Assert.assertEquals( 1867, enterVehicleEventCounter.getCnt() );
+			Assertions.assertEquals( 1867, enterVehicleEventCounter.getCnt() );
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			Assert.fail("There shouldn't be any exception, but there was ... :-(");
+			Assertions.fail("There shouldn't be any exception, but there was ... :-(");
 		}
 		final String it1Plans = "ITERS/it.1/1.plans.xml.gz";
-		Assert.assertTrue(new File(config.controller().getOutputDirectory(), it1Plans).exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory(), "output_config.xml").exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory(), it1Plans).exists());
+		Assertions.assertTrue(new File(config.controller().getOutputDirectory(), "output_config.xml").exists());
 
 		log.info( Controler.DIVIDER ) ;
 		log.info( Controler.DIVIDER ) ;
@@ -105,10 +106,10 @@ public class PtTutorialIT {
 			});
 			controler.run();
 			System.err.println( " cnt=" +  enterVehicleEventCounter.getCnt() ) ;
-			Assert.assertEquals( 1867, enterVehicleEventCounter.getCnt() );
+			Assertions.assertEquals( 1867, enterVehicleEventCounter.getCnt() );
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			Assert.fail("There shouldn't be any exception, but there was ... :-(");
+			Assertions.fail("There shouldn't be any exception, but there was ... :-(");
 		}
 
 	}
@@ -143,13 +144,11 @@ public class PtTutorialIT {
 		@Override public void handleEvent( ActivityEndEvent endEvent ) {
 			if (StageActivityTypeIdentifier.isStageActivity(endEvent.getActType()) ) {
 				ActivityStartEvent startEvent = personId2ActivityStartEvent.get(endEvent.getPersonId());
-				Assert.assertEquals("Stage activity should have same type in current ActivityEndEvent and in last ActivityStartEvent, but did not. PersonId " +
+				Assertions.assertEquals(startEvent.getActType(), endEvent.getActType(), "Stage activity should have same type in current ActivityEndEvent and in last ActivityStartEvent, but did not. PersonId " +
 								endEvent.getPersonId() +  ", ActivityStartEvent type: " + startEvent.getActType() +  ", ActivityEndEvent type: " + endEvent.getActType() +
-								", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime(),
-						startEvent.getActType(), endEvent.getActType());
-				Assert.assertEquals("Stage activity should have a duration of 0 seconds, but did not. PersonId " +
-								endEvent.getPersonId() +  ", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime(),
-						0.0, startEvent.getTime() - endEvent.getTime(), MatsimTestUtils.EPSILON);
+								", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime());
+				Assertions.assertEquals(0.0, startEvent.getTime() - endEvent.getTime(), MatsimTestUtils.EPSILON, "Stage activity should have a duration of 0 seconds, but did not. PersonId " +
+								endEvent.getPersonId() +  ", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime());
 				personId2ActivityStartEvent.remove(endEvent.getPersonId());
 			}
 		}

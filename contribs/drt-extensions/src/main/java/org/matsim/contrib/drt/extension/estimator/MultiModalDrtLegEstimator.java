@@ -41,7 +41,7 @@ public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability>
 
 		OptionalTime departureTime = leg.getDepartureTime();
 
-		DrtEstimator estimator = Objects.requireNonNull(estimators.get(mode), String.format("No drt estimator found for mode %s. Check warnings for errors.", mode));
+		DrtEstimator estimator = Objects.requireNonNull(estimators.get(mode), String.format("No drt estimator found for mode %s. Check log for errors.", mode));
 
 		DrtEstimator.Estimate est = estimator.estimate(route, departureTime);
 		ModeUtilityParameters params = context.scoring.modeParams.get(mode);

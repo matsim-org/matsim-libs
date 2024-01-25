@@ -2,9 +2,9 @@ package org.matsim.contrib.drt.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -16,11 +16,11 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ConfigBehaviorTest{
 
         private static final Logger log = LogManager.getLogger(ConfigBehaviorTest.class );
-        @Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+        @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
-        @Test
-        public final void testMaterializeAfterReadParameterSets() {
+	@Test
+	final void testMaterializeAfterReadParameterSets() {
                 {
                         // generate a test config that sets two values away from their defaults, and write it to file:
                         Config config = ConfigUtils.createConfig();
@@ -46,13 +46,13 @@ public class ConfigBehaviorTest{
                         MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 
                         // this should have two config groups here, but does not:
-                        Assert.assertEquals( 2, multiModeDrtConfigGroup.getModalElements().size() );
+                        Assertions.assertEquals( 2, multiModeDrtConfigGroup.getModalElements().size() );
 
                         // check if you are getting back the values from the config file:
                         for( DrtConfigGroup drtConfigGroup : multiModeDrtConfigGroup.getModalElements() ){
                                 log.info( drtConfigGroup.getMode() );
                                 if ( ! ( drtConfigGroup.getMode().equals( "drt20" ) || drtConfigGroup.getMode().equals( "drt20000" ) ) ) {
-                                        Assert.fail();
+                                        Assertions.fail();
                                 }
                         }
 
@@ -60,8 +60,8 @@ public class ConfigBehaviorTest{
                 }
         }
 
-        @Test
-        public final void testMaterializeAfterReadStandardParams() {
+	@Test
+	final void testMaterializeAfterReadStandardParams() {
                 {
                         // generate a test config that sets two values away from their defaults, and write it to file:
                         Config config = ConfigUtils.createConfig();
@@ -79,8 +79,8 @@ public class ConfigBehaviorTest{
                         DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 
                         // check if you are getting back the values from the config file:
-					Assert.assertEquals( 1.23, dvrpConfig.travelTimeEstimationAlpha, Double.MIN_VALUE );
-					Assert.assertEquals( 4.56, dvrpConfig.travelTimeEstimationBeta, Double.MIN_VALUE );
+					Assertions.assertEquals( 1.23, dvrpConfig.travelTimeEstimationAlpha, Double.MIN_VALUE );
+					Assertions.assertEquals( 4.56, dvrpConfig.travelTimeEstimationBeta, Double.MIN_VALUE );
                 }
         }
 

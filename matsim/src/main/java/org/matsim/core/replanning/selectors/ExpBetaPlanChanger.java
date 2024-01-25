@@ -86,7 +86,7 @@ public final class ExpBetaPlanChanger<T extends BasicPlan, I> implements PlanSel
 			}
 			return currentPlan;
 		}
-		
+
 		// defending against NaN (which should not happen, but happens):
 		if ( currentPlan.getScore().isNaN() ) {
 			return otherPlan ;
@@ -94,13 +94,13 @@ public final class ExpBetaPlanChanger<T extends BasicPlan, I> implements PlanSel
 		if ( otherPlan.getScore().isNaN() ) {
 			return currentPlan ;
 		}
-		
+
 		double currentScore = currentPlan.getScore();
 		double otherScore = otherPlan.getScore();
 
 		if ( betaWrnFlag ) {
 			log.warn("Would make sense to revise this once more.  See comments in code.  kai, nov08") ;
-			/*** Gunnar says, rightly I think, that what is below hits the "0.01*weight > 1" threshold fairly quickly.
+			/*   Gunnar says, rightly I think, that what is below hits the "0.01*weight > 1" threshold fairly quickly.
 			 *   An alternative might be to divide by exp(0.5*beta*oS)+exp(0.5*beta*cS), or the max of these two numbers.  But:
 			 *   (1) someone would need to go through the theory to make sure that we remain within what we have said before
 			 *       (convergence to logit and proba of jump between equal options = 0.01

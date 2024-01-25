@@ -2,8 +2,8 @@ package org.matsim.api.core.v01;
 
 import java.util.Objects;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.IdAnnotations.JsonId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -19,7 +19,7 @@ public class IdAnnotationsTest {
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
-	public void testRecordJsonIds() throws JsonProcessingException {
+	void testRecordJsonIds() throws JsonProcessingException {
 		Id<Person> personId = Id.createPersonId("person");
 		RecordWithIds recordWithIds1 = new RecordWithIds(
 				personId,
@@ -29,26 +29,26 @@ public class IdAnnotationsTest {
 		String s = objectMapper.writeValueAsString(recordWithIds1);
 		RecordWithIds recordWithIds2 = objectMapper.readValue(s, RecordWithIds.class);
 
-		Assert.assertEquals(recordWithIds1, recordWithIds2);
-		Assert.assertEquals(personId, recordWithIds2.personId);
-		Assert.assertSame(personId, recordWithIds2.personId);
+		Assertions.assertEquals(recordWithIds1, recordWithIds2);
+		Assertions.assertEquals(personId, recordWithIds2.personId);
+		Assertions.assertSame(personId, recordWithIds2.personId);
 	}
 
 	@Test
-	public void testRecordJsonIdsWithNull() throws JsonProcessingException {
+	void testRecordJsonIdsWithNull() throws JsonProcessingException {
 		Id<Person> personId = null;
 		RecordWithIds recordWithIds1 = new RecordWithIds(personId, null, null);
 
 		String s = objectMapper.writeValueAsString(recordWithIds1);
 		RecordWithIds recordWithIds2 = objectMapper.readValue(s, RecordWithIds.class);
 
-		Assert.assertEquals(recordWithIds1, recordWithIds2);
-		Assert.assertEquals(personId, recordWithIds2.personId);
-		Assert.assertSame(personId, recordWithIds2.personId);
+		Assertions.assertEquals(recordWithIds1, recordWithIds2);
+		Assertions.assertEquals(personId, recordWithIds2.personId);
+		Assertions.assertSame(personId, recordWithIds2.personId);
 	}
 
 	@Test
-	public void testClassJsonIds() throws JsonProcessingException {
+	void testClassJsonIds() throws JsonProcessingException {
 		Id<Person> personId = Id.createPersonId("person");
 		ClassWithIds classWithIds1 = new ClassWithIds(
 				personId,
@@ -58,22 +58,22 @@ public class IdAnnotationsTest {
 		String s = objectMapper.writeValueAsString(classWithIds1);
 		ClassWithIds classWithIds2 = objectMapper.readValue(s, ClassWithIds.class);
 
-		Assert.assertEquals(classWithIds1, classWithIds2);
-		Assert.assertEquals(personId, classWithIds2.personId);
-		Assert.assertSame(personId, classWithIds2.personId);
+		Assertions.assertEquals(classWithIds1, classWithIds2);
+		Assertions.assertEquals(personId, classWithIds2.personId);
+		Assertions.assertSame(personId, classWithIds2.personId);
 	}
 
 	@Test
-	public void testClassJsonIdsWithNull() throws JsonProcessingException {
+	void testClassJsonIdsWithNull() throws JsonProcessingException {
 		Id<Person> personId = null;
 		ClassWithIds classWithIds1 = new ClassWithIds(personId, null, null);
 
 		String s = objectMapper.writeValueAsString(classWithIds1);
 		ClassWithIds classWithIds2 = objectMapper.readValue(s, ClassWithIds.class);
 
-		Assert.assertEquals(classWithIds1, classWithIds2);
-		Assert.assertEquals(personId, classWithIds2.personId);
-		Assert.assertSame(personId, classWithIds2.personId);
+		Assertions.assertEquals(classWithIds1, classWithIds2);
+		Assertions.assertEquals(personId, classWithIds2.personId);
+		Assertions.assertSame(personId, classWithIds2.personId);
 	}
 
 	@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -81,7 +81,7 @@ public class IdAnnotationsTest {
 			@JsonId Id<Person> personId,
 			@JsonId Id<Link> linkId,
 			@JsonId Id<Node> nodeId) {
-	};
+	}
 
 	@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 	private static class ClassWithIds {
@@ -117,6 +117,6 @@ public class IdAnnotationsTest {
 			return false;
 		}
 
-	};
+	}
 
 }

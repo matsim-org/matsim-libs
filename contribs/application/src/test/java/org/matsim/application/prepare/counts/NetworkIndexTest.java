@@ -2,7 +2,7 @@ package org.matsim.application.prepare.counts;
 
 import org.assertj.core.data.Offset;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 
@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NetworkIndexTest {
 
 	@Test
-	public void angle() {
+	void angle() {
 
 		GeometryFactory f = JTSFactoryFinder.getGeometryFactory();
 

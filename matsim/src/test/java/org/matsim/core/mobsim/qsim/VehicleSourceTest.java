@@ -18,12 +18,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,6 +53,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A test to check the functionality of the VehicleSource.
@@ -61,58 +61,37 @@ import java.util.*;
  * @author amit
  */
 
-@RunWith(Parameterized.class)
 public class VehicleSourceTest {
-
-	private final VehiclesSource vehiclesSource;
-	private final boolean usingPersonIdForMissingVehicleId;
-
-	/**
-	 * testing if there is a meaningful error message if vehicles are _not_ added to person
-	 */
-	private final boolean providingVehiclesInPerson ;
-
-	public VehicleSourceTest( VehiclesSource vehiclesSource, boolean usingPersonIdForMissingVehicleId, boolean providingVehiclesInPerson ) {
-		this.vehiclesSource = vehiclesSource;
-		this.usingPersonIdForMissingVehicleId = usingPersonIdForMissingVehicleId;
-		this.providingVehiclesInPerson = providingVehiclesInPerson;
-	}
-
-	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissingVehicleId == {1}")
-	public static Collection<Object[]> parameterObjects () {
+	public static Stream<Arguments> arguments () {
 
 		// create the combinations manually, since 'fromVehiclesData' in combination with 'isUsingPersonIdForMissingVehicleId' doesn't make sense
-		return Arrays.asList(
-				new Object[]{VehiclesSource.defaultVehicle, true, true},
+		return Stream.of(Arguments.of(VehiclesSource.defaultVehicle, true, true),
 //				new Object[]{VehiclesSource.defaultVehicle, true, false}, // not meaningful for defaultVehicle
-
-				new Object[]{VehiclesSource.defaultVehicle, false, true},
+				Arguments.of(VehiclesSource.defaultVehicle, false, true),
 //				new Object[]{VehiclesSource.defaultVehicle, false, false}, // not meaningful for defaultVehicle
-
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true, true},
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true, false},
-
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false, true },
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false, false },
-
-				new Object[]{VehiclesSource.fromVehiclesData, false, true },
-				new Object[]{VehiclesSource.fromVehiclesData, false, false }
+				Arguments.of(VehiclesSource.modeVehicleTypesFromVehiclesData, true, true),
+				Arguments.of(VehiclesSource.modeVehicleTypesFromVehiclesData, true, false),
+				Arguments.of(VehiclesSource.modeVehicleTypesFromVehiclesData, false, true),
+				Arguments.of(VehiclesSource.modeVehicleTypesFromVehiclesData, false, false),
+				Arguments.of(VehiclesSource.fromVehiclesData, false, true),
+				Arguments.of(VehiclesSource.fromVehiclesData, false, false)
 		);
 	}
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 	private Scenario scenario ;
 	private final String[] transportModes = new String[]{"bike", "car"};
 	private Link link1;
 	private Link link2;
 	private Link link3;
 
-	@Test
-	public void main() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void main(VehiclesSource vehiclesSource, boolean usingPersonIdForMissingVehicleId, boolean providingVehiclesInPerson) {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		createNetwork();
-		createPlans();
+		createPlans(vehiclesSource, providingVehiclesInPerson);
 
 		Config config = scenario.getConfig();
 		config.qsim().setFlowCapFactor(1.0);
@@ -121,10 +100,12 @@ public class VehicleSourceTest {
 		//config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
-		config.qsim().setVehiclesSource(this.vehiclesSource );
-		config.qsim().setUsePersonIdForMissingVehicleId(this.usingPersonIdForMissingVehicleId );
+		config.qsim().setVehiclesSource(vehiclesSource );
+		config.qsim().setUsePersonIdForMissingVehicleId(usingPersonIdForMissingVehicleId );
 
-		config.controller().setOutputDirectory(helper.getOutputDirectory());
+		config.controller()
+			.setOutputDirectory(
+				helper.getOutputDirectory(vehiclesSource.name() + "_" + usingPersonIdForMissingVehicleId + "_" + providingVehiclesInPerson));
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(1);
 		config.controller().setCreateGraphs(false);
@@ -165,9 +146,9 @@ public class VehicleSourceTest {
 			}
 		}
 		if ( providingVehiclesInPerson ) {
-			Assert.assertFalse( expectedException );
+			Assertions.assertFalse( expectedException );
 		} else {
-			Assert.assertTrue( expectedException );
+			Assertions.assertTrue( expectedException );
 			return ;
 		}
 
@@ -187,14 +168,13 @@ public class VehicleSourceTest {
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		switch (this.vehiclesSource ) {
+		switch (vehiclesSource ) {
 			case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
-				Assert.assertEquals("Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
-						0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON, "Both car, bike are default vehicles (i.e. identical), thus should have same travel time.");
 				break;
 			case modeVehicleTypesFromVehiclesData:
 			case fromVehiclesData:
-				Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON, "Passing is not executed.");
 				break;
 			default:
 				throw new RuntimeException("not implemented yet.");
@@ -215,7 +195,7 @@ public class VehicleSourceTest {
 		link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), node3, node4, 100, 25, 600, 1, null, "22");
 	}
 
-	private void createPlans(){
+	private void createPlans(VehiclesSource vehiclesSource, boolean providingVehiclesInPerson){
 
 		Population population = scenario.getPopulation();
 		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
@@ -260,7 +240,7 @@ public class VehicleSourceTest {
 			}
 
 			//adding vehicle type and vehicle to scenario as needed:
-			switch (this.vehiclesSource ) {
+			switch (vehiclesSource ) {
 				case defaultVehicle:
 					//don't add anything
 					break;

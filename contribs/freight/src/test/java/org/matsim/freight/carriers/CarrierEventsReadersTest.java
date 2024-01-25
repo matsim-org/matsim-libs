@@ -20,9 +20,9 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +49,7 @@ import java.util.List;
 public class CarrierEventsReadersTest {
 
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final Id<Link> linkId = Id.createLinkId("demoLink");
@@ -73,7 +73,7 @@ public class CarrierEventsReadersTest {
 	);
 
 	@Test
-	public void testWriteReadServiceBasedEvents() {
+	void testWriteReadServiceBasedEvents() {
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
 		EventsManager eventsManager2 = EventsUtils.createEventsManager();
 		EventsCollector collector1 = new EventsCollector();
@@ -96,12 +96,12 @@ public class CarrierEventsReadersTest {
 				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControllerConfigGroup.EventsFileFormat.xml);
 		eventsManager2.finishProcessing();
 
-		Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
+		Assertions.assertEquals(collector1.getEvents(), collector2.getEvents());
 	}
 
 
 	@Test
-	public void testReadServiceBasedEvents() {
+	void testReadServiceBasedEvents() {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
@@ -114,12 +114,12 @@ public class CarrierEventsReadersTest {
 				.readFile(utils.getClassInputDirectory() + "serviceBasedEvents.xml");
 		eventsManager.finishProcessing();
 
-		Assert.assertEquals("Number of tour related carrier events is not correct", 4 , eventHandlerTours.handledEvents.size());
-		Assert.assertEquals("Number of service related carrier events is not correct", 14 , eventHandlerServices.handledEvents.size());
+		Assertions.assertEquals(4 , eventHandlerTours.handledEvents.size(), "Number of tour related carrier events is not correct");
+		Assertions.assertEquals(14 , eventHandlerServices.handledEvents.size(), "Number of service related carrier events is not correct");
 	}
 
 	@Test
-	public void testWriteReadShipmentBasedEvents() {
+	void testWriteReadShipmentBasedEvents() {
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
 		EventsManager eventsManager2 = EventsUtils.createEventsManager();
 		EventsCollector collector1 = new EventsCollector();
@@ -142,11 +142,11 @@ public class CarrierEventsReadersTest {
 			.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControllerConfigGroup.EventsFileFormat.xml);
 		eventsManager2.finishProcessing();
 
-		Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
+		Assertions.assertEquals(collector1.getEvents(), collector2.getEvents());
 	}
 
 	@Test
-	public void testReadShipmentBasedEvents() {
+	void testReadShipmentBasedEvents() {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
@@ -159,8 +159,8 @@ public class CarrierEventsReadersTest {
 			.readFile(utils.getClassInputDirectory() + "shipmentBasedEvents.xml");
 		eventsManager.finishProcessing();
 
-		Assert.assertEquals("Number of tour related carrier events is not correct", 2 , eventHandlerTours.handledEvents.size());
-		Assert.assertEquals("Number of shipments related carrier events is not correct", 20 , testEventHandlerShipments.handledEvents.size());
+		Assertions.assertEquals(2 , eventHandlerTours.handledEvents.size(), "Number of tour related carrier events is not correct");
+		Assertions.assertEquals(20 , testEventHandlerShipments.handledEvents.size(), "Number of shipments related carrier events is not correct");
 	}
 
 
@@ -169,7 +169,7 @@ public class CarrierEventsReadersTest {
 	 * This test is inspired by the DrtEventsReaderTest from michalm.
 	 */
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		carrierEvents.forEach(writer::handleEvent);
@@ -196,7 +196,7 @@ public class CarrierEventsReadersTest {
 		handledEvents.addAll(eventHandlerShipments.handledEvents);
 
 		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the resukts of the handler...
-		Assert.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
+		Assertions.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
 	}
 
 	private static class TestEventHandlerTours

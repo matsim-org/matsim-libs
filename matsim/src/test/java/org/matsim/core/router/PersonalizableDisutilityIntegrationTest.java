@@ -19,8 +19,8 @@
 
 package org.matsim.core.router;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +47,7 @@ import org.matsim.vehicles.VehicleUtils;
 public class PersonalizableDisutilityIntegrationTest {
 
 	@Test
-	public void testPersonAvailableForDisutility_Dijkstra() {
+	void testPersonAvailableForDisutility_Dijkstra() {
 		Fixture f = new Fixture();
 
 		Dijkstra router = new Dijkstra(f.network, f.costFunction, new FreeSpeedTravelTime());
@@ -57,11 +57,11 @@ public class PersonalizableDisutilityIntegrationTest {
 				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 
-		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
+		Assertions.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
 	}
 
 	@Test
-	public void testPersonAvailableForDisutility_AStarEuclidean() {
+	void testPersonAvailableForDisutility_AStarEuclidean() {
 		Fixture f = new Fixture();
 		PreProcessEuclidean preprocess = new PreProcessEuclidean(f.costFunction);
 		preprocess.run(f.network);
@@ -72,11 +72,11 @@ public class PersonalizableDisutilityIntegrationTest {
 				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 
-		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
+		Assertions.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
 	}
 
 	@Test
-	public void testPersonAvailableForDisutility_SpeedyALT() {
+	void testPersonAvailableForDisutility_SpeedyALT() {
 		Fixture f = new Fixture();
 		LeastCostPathCalculatorFactory routerFactory = new SpeedyALTFactory();
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());
@@ -86,7 +86,7 @@ public class PersonalizableDisutilityIntegrationTest {
 				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 
-		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
+		Assertions.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
 	}
 
 	private static class Fixture {
@@ -128,8 +128,8 @@ public class PersonalizableDisutilityIntegrationTest {
 
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-			Assert.assertEquals("different person than expected!", this.person, person);
-			Assert.assertEquals("different vehicle than expected!", this.veh, vehicle);
+			Assertions.assertEquals(this.person, person, "different person than expected!");
+			Assertions.assertEquals(this.veh, vehicle, "different vehicle than expected!");
 			this.cnt++;
 			return 1.0;
 		}

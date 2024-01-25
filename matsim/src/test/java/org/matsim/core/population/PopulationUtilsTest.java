@@ -21,23 +21,20 @@
 
  package org.matsim.core.population;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author thibautd
  */
 public class PopulationUtilsTest {
 
-	@Test
-	public void testPlanAttributesCopy() {
+	 @Test
+	 void testPlanAttributesCopy() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -61,25 +58,25 @@ public class PopulationUtilsTest {
 		final Plan planCopy = population.getFactory().createPlan();
 		PopulationUtils.copyFromTo( plan , planCopy );
 
-		Assert.assertEquals( "unexpected plan length",
-				plan.getPlanElements().size(),
-				planCopy.getPlanElements().size() );
+		Assertions.assertEquals( plan.getPlanElements().size(),
+				planCopy.getPlanElements().size(),
+				"unexpected plan length" );
 
 		final Activity activityCopy = (Activity) planCopy.getPlanElements().get( 0 );
 
-		Assert.assertEquals( "unexpected attribute",
-				act.getAttributes().getAttribute( "makes sense" ),
-				activityCopy.getAttributes().getAttribute( "makes sense" ) );
+		Assertions.assertEquals( act.getAttributes().getAttribute( "makes sense" ),
+				activityCopy.getAttributes().getAttribute( "makes sense" ),
+				"unexpected attribute" );
 
-		Assert.assertEquals( "unexpected attribute",
-				act.getAttributes().getAttribute( "length" ),
-				activityCopy.getAttributes().getAttribute( "length" ) );
+		Assertions.assertEquals( act.getAttributes().getAttribute( "length" ),
+				activityCopy.getAttributes().getAttribute( "length" ),
+				"unexpected attribute" );
 
 		final Leg legCopy = (Leg) planCopy.getPlanElements().get( 1 );
 
-		Assert.assertEquals( "unexpected attribute",
-				leg.getAttributes().getAttribute( "mpg" ),
-				legCopy.getAttributes().getAttribute( "mpg" ) );
+		Assertions.assertEquals( leg.getAttributes().getAttribute( "mpg" ),
+				legCopy.getAttributes().getAttribute( "mpg" ),
+				"unexpected attribute" );
 	}
 
 }

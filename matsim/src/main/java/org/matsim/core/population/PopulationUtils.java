@@ -381,7 +381,7 @@ public final class PopulationUtils {
 		public void setType(String type) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public Id<Plan> getId() {
 			return this.delegate.getId();
@@ -391,7 +391,7 @@ public final class PopulationUtils {
 		public void setPlanId(Id<Plan> planId) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public int getIterationCreated() {
 			return this.delegate.getIterationCreated();
@@ -679,7 +679,6 @@ public final class PopulationUtils {
 	 *
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
-	@SuppressWarnings("resource")
 	private static InputStream openPopulationInputStream(final Population s1) {
 		try {
 			final PipedInputStream in = new PipedInputStream();
@@ -816,6 +815,14 @@ public final class PopulationUtils {
 		Activity act = getFactory().createInteractionActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
 		return act ;
+	}
+
+	public static Activity convertInteractionToStandardActivity(Activity activity) {
+		if (activity instanceof InteractionActivity) {
+			return createActivity(activity);
+		} else {
+			return activity;
+		}
 	}
 
 	public static Leg createLeg(String transportMode) {

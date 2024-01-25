@@ -20,20 +20,14 @@
 
 package org.matsim.contrib.ev.charging;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -44,7 +38,11 @@ public class ChargingEventSequenceCollector
 	public static class ChargingSequence {
 		@Nullable //null if no queueing occurred
 		private final QueuedAtChargerEvent queuedAtCharger;
+		@Nullable //null if queue was never quit early, i.e. if chargingStartEvent != null;
+		private QuitQueueAtChargerEvent quitQueueEvent;
+		@Nullable //null if queue was quit early, i.e. if QuitQueueAtChargerEvent != null;
 		private ChargingStartEvent chargingStartEvent;
+		@Nullable //null if quitQueueEvent != null OR if charging was never completed
 		private ChargingEndEvent chargingEndEvent;
 
 		public ChargingSequence(@Nullable QueuedAtChargerEvent queuedAtCharger) {
@@ -56,12 +54,19 @@ public class ChargingEventSequenceCollector
 			return Optional.ofNullable(queuedAtCharger);
 		}
 
-		public ChargingStartEvent getChargingStart() {
-			return chargingStartEvent;
+		@Nullable
+		public Optional<QuitQueueAtChargerEvent> getQuitQueueAtChargerEvent() {
+			return Optional.ofNullable(quitQueueEvent);
 		}
 
-		public ChargingEndEvent getChargingEnd() {
-			return chargingEndEvent;
+		@Nullable
+		public Optional<ChargingStartEvent> getChargingStart() {
+			return Optional.ofNullable(chargingStartEvent);
+		}
+
+		@Nullable
+		public Optional<ChargingEndEvent> getChargingEnd() {
+			return Optional.ofNullable(chargingEndEvent);
 		}
 	}
 
@@ -70,6 +75,10 @@ public class ChargingEventSequenceCollector
 
 	public List<ChargingSequence> getCompletedSequences() {
 		return Collections.unmodifiableList(completedSequences);
+	}
+
+	public Set<ChargingSequence> getOnGoingSequences() {
+		return ongoingSequences.values().stream().collect(Collectors.toUnmodifiableSet());
 	}
 
 	@Override
@@ -87,6 +96,7 @@ public class ChargingEventSequenceCollector
 				event.getVehicleId(), event.getChargerId());
 		Preconditions.checkState(sequence.chargingStartEvent == null, "Vehicle (%s) is already plugged",
 				event.getVehicleId(), event.getChargerId());
+		sequence.quitQueueEvent = event;
 		completedSequences.add(sequence);
 	}
 

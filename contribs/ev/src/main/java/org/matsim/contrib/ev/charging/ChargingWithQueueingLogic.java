@@ -19,23 +19,15 @@
 
 package org.matsim.contrib.ev.charging;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	protected final ChargerSpecification charger;
@@ -73,6 +65,11 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
+		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
+		for (int i = 0; i < queuedToPluggedCount; i++) {
+			plugVehicle(queuedVehicles.poll(), now);
+		}
+
 		var arrivingVehiclesIter = arrivingVehicles.iterator();
 		while (arrivingVehiclesIter.hasNext()) {
 			var ev = arrivingVehiclesIter.next();
@@ -82,11 +79,6 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 				queueVehicle(ev, now);
 			}
 			arrivingVehiclesIter.remove();
-		}
-
-		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
-		for (int i = 0; i < queuedToPluggedCount; i++) {
-			plugVehicle(queuedVehicles.poll(), now);
 		}
 	}
 

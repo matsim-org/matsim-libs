@@ -20,10 +20,10 @@
 
 package org.matsim.core.events;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -37,8 +37,8 @@ import org.matsim.vehicles.Vehicle;
 
 public class EventsHandlerHierarchyTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	int eventHandled = 0;
@@ -67,7 +67,8 @@ public class EventsHandlerHierarchyTest {
 	@SuppressWarnings("unused")
 	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
 
-	@Test public final void testHandlerHierarchy() {
+	@Test
+	final void testHandlerHierarchy() {
 		EventsManager events = EventsUtils.createEventsManager();
 		Id<Link> linkId = Id.create("1", Link.class);
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
@@ -83,7 +84,8 @@ public class EventsHandlerHierarchyTest {
 		assertEquals(this.eventHandled, 1);
 	}
 
-	@Test public final void testHierarchicalReset() {
+	@Test
+	final void testHierarchicalReset() {
 		EventsManager events = EventsUtils.createEventsManager();
 		Id<Link> linkId = Id.create("1", Link.class);
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);

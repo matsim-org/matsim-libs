@@ -21,8 +21,8 @@ package org.matsim.core.scoring.functions;
 
 import java.util.Random;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,7 +63,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 	 * the start of the waiting).
 	 */
 	@Test
-	public void testPtParamsDoNotInfluenceCarScore() throws Exception {
+	void testPtParamsDoNotInfluenceCarScore() throws Exception {
 		final Network network = createNetwork();
 		final CharyparNagelLegScoring scoring1 = createScoring( 1 , network );
 		final CharyparNagelLegScoring scoring2 = createScoring( 2 , network );
@@ -105,11 +105,11 @@ public class CharyparNagelLegScoringPtChangeTest {
 		scoring2.finish();
 
 		// here, we should get the same score.
-		Assert.assertEquals(
-				"score for car leg differs when changing pt parameters! Probably a problem in line change handling.",
+		Assertions.assertEquals(
 				scoring1.getScore(),
 				scoring2.getScore(),
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"score for car leg differs when changing pt parameters! Probably a problem in line change handling." );
 	}
 
 	private static CharyparNagelLegScoring createScoring(

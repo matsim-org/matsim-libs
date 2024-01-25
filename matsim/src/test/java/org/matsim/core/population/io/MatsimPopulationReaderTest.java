@@ -21,8 +21,8 @@ package org.matsim.core.population.io;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,94 +42,94 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MatsimPopulationReaderTest {
 
 	@Test
-	public void testReadFile_v4() {
+	void testReadFile_v4() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertEquals(0, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(0, s.getPopulation().getPersons().size());
 		new MatsimNetworkReader(s.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		new PopulationReader(s).readFile("test/scenarios/equil/plans1.xml");
-		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(1, s.getPopulation().getPersons().size());
 	}
 
 	@Test
-	public void testReadFile_v5() {
+	void testReadFile_v5() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertEquals(0, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(0, s.getPopulation().getPersons().size());
 		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_example.xml");
-		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
-		Assert.assertNotNull(person);
+		Assertions.assertNotNull(person);
 		Plan plan = person.getSelectedPlan();
 		List<PlanElement> planElements = plan.getPlanElements();
-		Assert.assertEquals(3, planElements.size());
+		Assertions.assertEquals(3, planElements.size());
 		
-		Assert.assertTrue(planElements.get(0) instanceof Activity);
-		Assert.assertTrue(planElements.get(1) instanceof Leg);
-		Assert.assertTrue(planElements.get(2) instanceof Activity);
+		Assertions.assertTrue(planElements.get(0) instanceof Activity);
+		Assertions.assertTrue(planElements.get(1) instanceof Leg);
+		Assertions.assertTrue(planElements.get(2) instanceof Activity);
 	}
-	
+
 	@Test
-	public void testReadFile_v5_multipleSuccessiveLegs() {
+	void testReadFile_v5_multipleSuccessiveLegs() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertEquals(0, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(0, s.getPopulation().getPersons().size());
 		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegs.xml");
-		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
-		Assert.assertNotNull(person);
+		Assertions.assertNotNull(person);
 		Plan plan = person.getSelectedPlan();
 		List<PlanElement> planElements = plan.getPlanElements();
-		Assert.assertEquals(5, planElements.size());
+		Assertions.assertEquals(5, planElements.size());
 		
-		Assert.assertTrue(planElements.get(0) instanceof Activity);
-		Assert.assertTrue(planElements.get(1) instanceof Leg);
-		Assert.assertTrue(planElements.get(2) instanceof Leg);
-		Assert.assertTrue(planElements.get(3) instanceof Leg);
-		Assert.assertTrue(planElements.get(4) instanceof Activity);
+		Assertions.assertTrue(planElements.get(0) instanceof Activity);
+		Assertions.assertTrue(planElements.get(1) instanceof Leg);
+		Assertions.assertTrue(planElements.get(2) instanceof Leg);
+		Assertions.assertTrue(planElements.get(3) instanceof Leg);
+		Assertions.assertTrue(planElements.get(4) instanceof Activity);
 	}
-		
+
 	@Test
-	public void testReadFile_v5_multipleSuccessiveLegsWithRoutes() {
+	void testReadFile_v5_multipleSuccessiveLegsWithRoutes() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertEquals(0, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(0, s.getPopulation().getPersons().size());
 		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegsWithRoutes.xml");
-		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
-		Assert.assertNotNull(person);
+		Assertions.assertNotNull(person);
 		Plan plan = person.getSelectedPlan();
 		List<PlanElement> planElements = plan.getPlanElements();
-		Assert.assertEquals(5, planElements.size());
+		Assertions.assertEquals(5, planElements.size());
 		
-		Assert.assertTrue(planElements.get(0) instanceof Activity);
-		Assert.assertTrue(planElements.get(1) instanceof Leg);
-		Assert.assertEquals(Id.create("1", Link.class), ((Leg) planElements.get(1)).getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("2", Link.class), ((Leg) planElements.get(1)).getRoute().getEndLinkId());
-		Assert.assertTrue(planElements.get(2) instanceof Leg);
-		Assert.assertEquals(Id.create("2", Link.class), ((Leg) planElements.get(2)).getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("4", Link.class), ((Leg) planElements.get(2)).getRoute().getEndLinkId());
-		Assert.assertTrue(planElements.get(3) instanceof Leg);
-		Assert.assertEquals(Id.create("4", Link.class), ((Leg) planElements.get(3)).getRoute().getStartLinkId());
-		Assert.assertEquals(Id.create("6", Link.class), ((Leg) planElements.get(3)).getRoute().getEndLinkId());
-		Assert.assertTrue(planElements.get(4) instanceof Activity);
+		Assertions.assertTrue(planElements.get(0) instanceof Activity);
+		Assertions.assertTrue(planElements.get(1) instanceof Leg);
+		Assertions.assertEquals(Id.create("1", Link.class), ((Leg) planElements.get(1)).getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("2", Link.class), ((Leg) planElements.get(1)).getRoute().getEndLinkId());
+		Assertions.assertTrue(planElements.get(2) instanceof Leg);
+		Assertions.assertEquals(Id.create("2", Link.class), ((Leg) planElements.get(2)).getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("4", Link.class), ((Leg) planElements.get(2)).getRoute().getEndLinkId());
+		Assertions.assertTrue(planElements.get(3) instanceof Leg);
+		Assertions.assertEquals(Id.create("4", Link.class), ((Leg) planElements.get(3)).getRoute().getStartLinkId());
+		Assertions.assertEquals(Id.create("6", Link.class), ((Leg) planElements.get(3)).getRoute().getEndLinkId());
+		Assertions.assertTrue(planElements.get(4) instanceof Activity);
 	}
-	
+
 	@Test
-	public void testReadFile_v5_multipleSuccessiveLegsWithTeleportation() {
+	void testReadFile_v5_multipleSuccessiveLegsWithTeleportation() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertEquals(0, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(0, s.getPopulation().getPersons().size());
 		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleTeleportedLegs.xml");
-		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Assertions.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
-		Assert.assertNotNull(person);
+		Assertions.assertNotNull(person);
 		Plan plan = person.getSelectedPlan();
 		List<PlanElement> planElements = plan.getPlanElements();
-		Assert.assertEquals(5, planElements.size());
+		Assertions.assertEquals(5, planElements.size());
 		
-		Assert.assertTrue(planElements.get(0) instanceof Activity);
-		Assert.assertTrue(planElements.get(1) instanceof Leg);
+		Assertions.assertTrue(planElements.get(0) instanceof Activity);
+		Assertions.assertTrue(planElements.get(1) instanceof Leg);
 //		Assert.assertTrue(((Leg) planElements.get(1)).getRoute() instanceof GenericRouteImpl); 
-		Assert.assertTrue(planElements.get(2) instanceof Leg);
-		Assert.assertTrue(((Leg) planElements.get(2)).getRoute() instanceof NetworkRoute); 
-		Assert.assertTrue(planElements.get(3) instanceof Leg);
+		Assertions.assertTrue(planElements.get(2) instanceof Leg);
+		Assertions.assertTrue(((Leg) planElements.get(2)).getRoute() instanceof NetworkRoute); 
+		Assertions.assertTrue(planElements.get(3) instanceof Leg);
 //		Assert.assertTrue(((Leg) planElements.get(3)).getRoute() instanceof GenericRouteImpl); 
-		Assert.assertTrue(planElements.get(4) instanceof Activity);
+		Assertions.assertTrue(planElements.get(4) instanceof Activity);
 	}
 }

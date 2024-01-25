@@ -20,18 +20,17 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Assert;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -51,7 +50,7 @@ public class NetworkUtilsTest {
 	private final static double EPSILON = 1e-8;
 
 	@Test
-	public void testGetNodes_Empty() {
+	void testGetNodes_Empty() {
 		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "");
 		assertEquals(0, nodes.size());
@@ -64,14 +63,14 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetNodes_Null() {
+	void testGetNodes_Null() {
 		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, null);
 		assertEquals(0, nodes.size());
 	}
 
 	@Test
-	public void testGetNodes_mixedDelimiters() {
+	void testGetNodes_mixedDelimiters() {
 		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
@@ -83,7 +82,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetNodes_NonExistant() {
+	void testGetNodes_NonExistant() {
 		Network network = getTestNetwork();
 		try {
 			NetworkUtils.getNodes(network, "1 3 ab 5");
@@ -94,7 +93,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetLinks_Empty() {
+	void testGetLinks_Empty() {
 		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "");
 		assertEquals(0, links.size());
@@ -107,14 +106,14 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetLinks_StringNull() {
+	void testGetLinks_StringNull() {
 		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
 
 	@Test
-	public void testGetLinks_mixedDelimiters() {
+	void testGetLinks_mixedDelimiters() {
 		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
@@ -125,7 +124,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetLinks_NonExistant() {
+	void testGetLinks_NonExistant() {
 		Network network = getTestNetwork();
 		try {
 			NetworkUtils.getLinks(network, "1 3 ab 4");
@@ -136,19 +135,19 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetLinksID_ListNull() {
+	void testGetLinksID_ListNull() {
 		List<Id<Link>> linkIds = NetworkUtils.getLinkIds((List<Link>) null);
 		assertEquals(0, linkIds.size());
 	}
 
 	@Test
-	public void testGetLinksID_StringNull() {
+	void testGetLinksID_StringNull() {
 		List<Id<Link>> linkIds = NetworkUtils.getLinkIds((String) null);
 		assertEquals(0, linkIds.size());
 	}
 
 	@Test
-	public void testGetNumberOfLanesAsInt() {
+	void testGetNumberOfLanesAsInt() {
 		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.2)));
 		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.1)));
 		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.0)));
@@ -179,7 +178,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetBoundingBox() {
+	void testGetBoundingBox() {
 		Collection<Node> nodes = new ArrayList<Node>();
 		Id<Node> id = Id.create("dummy", Node.class);
 		nodes.add(new PseudoNode(id, new Coord((double) 100, (double) 100)));
@@ -195,7 +194,7 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testGetBoundingBox_negativeNodesOnly() {
+	void testGetBoundingBox_negativeNodesOnly() {
 		Collection<Node> nodes = new ArrayList<Node>();
 		Id<Node> id = Id.create("dummy", Node.class);
 		final double x4 = -100;
@@ -221,75 +220,75 @@ public class NetworkUtilsTest {
 	}
 
 	@Test
-	public void testIsMultimodal_carOnly() {
+	void testIsMultimodal_carOnly() {
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
-		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertFalse(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testIsMultimodal_walkOnly() {
+	void testIsMultimodal_walkOnly() {
 		// tests that isMultimodal is not somehow hard-coded on "car"
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("walk"));
 		}
-		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertFalse(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testIsMultimodal_2modesOnSingleLink() {
+	void testIsMultimodal_2modesOnSingleLink() {
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[3].setAllowedModes(CollectionUtils.stringToSet("car,bike"));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testIsMultimodal_2modesOnDifferentLinks() {
+	void testIsMultimodal_2modesOnDifferentLinks() {
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[2].setAllowedModes(CollectionUtils.stringToSet("bike"));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testIsMultimodal_3modes() {
+	void testIsMultimodal_3modes() {
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[2].setAllowedModes(CollectionUtils.stringToSet("bike,walk"));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testIsMultimodal_onlyNoModes() {
+	void testIsMultimodal_onlyNoModes() {
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet(""));
 		}
-		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertFalse(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testIsMultimodal_sometimesNoModes() {
+	void testIsMultimodal_sometimesNoModes() {
 		MultimodalFixture f = new MultimodalFixture();
 		for (Link l : f.links) {
 			l.setAllowedModes(CollectionUtils.stringToSet("car"));
 		}
 		f.links[2].setAllowedModes(CollectionUtils.stringToSet(""));
-		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+		Assertions.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
 	@Test
-	public void testGetConnectingLink() {
+	void testGetConnectingLink() {
 		Network net = getTestNetwork();
 		Node node1 = net.getNodes().get(Id.create(1, Node.class));
 		Node node2 = net.getNodes().get(Id.create(2, Node.class));
@@ -297,11 +296,11 @@ public class NetworkUtilsTest {
 		Link link1 = net.getLinks().get(Id.create(1, Link.class));
 		Link link2 = net.getLinks().get(Id.create(2, Link.class));
 		
-		Assert.assertEquals(link1, NetworkUtils.getConnectingLink(node1, node2));
-		Assert.assertEquals(link2, NetworkUtils.getConnectingLink(node2, node3));
-		Assert.assertNull(NetworkUtils.getConnectingLink(node1, node3)); // skip one node
-		Assert.assertNull(NetworkUtils.getConnectingLink(node3, node2)); // backwards
-		Assert.assertNull(NetworkUtils.getConnectingLink(node2, node1)); // backwards
+		Assertions.assertEquals(link1, NetworkUtils.getConnectingLink(node1, node2));
+		Assertions.assertEquals(link2, NetworkUtils.getConnectingLink(node2, node3));
+		Assertions.assertNull(NetworkUtils.getConnectingLink(node1, node3)); // skip one node
+		Assertions.assertNull(NetworkUtils.getConnectingLink(node3, node2)); // backwards
+		Assertions.assertNull(NetworkUtils.getConnectingLink(node2, node1)); // backwards
 	}
 	
 	private static class PseudoLink extends FakeLink {

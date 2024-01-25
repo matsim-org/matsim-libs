@@ -20,8 +20,8 @@
 package org.matsim.core.config.consistency;
 
 import org.apache.logging.log4j.Level;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +38,7 @@ import java.util.Set;
 public class ConfigConsistencyCheckerImplTest {
 
 	@Test
-	public void testCheckPlanCalcScore_DefaultsOk() {
+	void testCheckPlanCalcScore_DefaultsOk() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -46,7 +46,7 @@ public class ConfigConsistencyCheckerImplTest {
 		try {
 			logger.activate();
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(0, logger.getWarnCount());
+			Assertions.assertEquals(0, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
 			logger.deactivate();
@@ -54,7 +54,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_Traveling() {
+	void testCheckPlanCalcScore_Traveling() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -64,7 +64,7 @@ public class ConfigConsistencyCheckerImplTest {
 		try {
 			logger.activate();
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
+			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
 			logger.deactivate();
@@ -72,7 +72,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_TravelingPt() {
+	void testCheckPlanCalcScore_TravelingPt() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -82,7 +82,7 @@ public class ConfigConsistencyCheckerImplTest {
 		try {
 			logger.activate();
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
+			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
 			logger.deactivate();
@@ -90,7 +90,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_TravelingBike() {
+	void testCheckPlanCalcScore_TravelingBike() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -100,7 +100,7 @@ public class ConfigConsistencyCheckerImplTest {
 		try {
 			logger.activate();
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
+			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
 			logger.deactivate();
@@ -108,7 +108,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_TravelingWalk() {
+	void testCheckPlanCalcScore_TravelingWalk() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -118,7 +118,7 @@ public class ConfigConsistencyCheckerImplTest {
 		try {
 			logger.activate();
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
+			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
 			logger.deactivate();
@@ -126,7 +126,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	public void testCheckPlanCalcScore_PtInteractionActivity() {
+	void testCheckPlanCalcScore_PtInteractionActivity() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -136,7 +136,7 @@ public class ConfigConsistencyCheckerImplTest {
 
 		try {
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(0,1) ; // should never get here
+			Assertions.assertEquals(0,1) ; // should never get here
 		} catch ( Exception ee ){
 
 			System.out.println("expected exception") ;
@@ -147,14 +147,14 @@ public class ConfigConsistencyCheckerImplTest {
 		try {
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config );
 		} catch ( Exception ee ){
-			Assert.assertEquals(0,1) ; // should never get here
+			Assertions.assertEquals(0,1) ; // should never get here
 		}
 
 	}
 
 
 	@Test
-	public void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
+	void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
 		{
 			Config config = ConfigUtils.createConfig();
 
@@ -162,7 +162,7 @@ public class ConfigConsistencyCheckerImplTest {
 			config.travelTimeCalculator().setSeparateModes( false );
 			{
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
+				Assertions.assertFalse( problem );
 			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.routing().getNetworkModes() );
@@ -170,7 +170,7 @@ public class ConfigConsistencyCheckerImplTest {
 				config.routing().setNetworkModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
+				Assertions.assertFalse( problem );
 			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
@@ -178,7 +178,7 @@ public class ConfigConsistencyCheckerImplTest {
 				config.travelTimeCalculator().setAnalyzedModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
+				Assertions.assertFalse( problem );
 			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
@@ -186,7 +186,7 @@ public class ConfigConsistencyCheckerImplTest {
 				config.travelTimeCalculator().setAnalyzedModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
+				Assertions.assertFalse( problem );
 			}
 		}
 		{
@@ -214,7 +214,7 @@ public class ConfigConsistencyCheckerImplTest {
 				config.travelTimeCalculator().setAnalyzedModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
+				Assertions.assertFalse( problem );
 			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
@@ -222,7 +222,7 @@ public class ConfigConsistencyCheckerImplTest {
 				config.travelTimeCalculator().setAnalyzedModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
+				Assertions.assertFalse( problem );
 			}
 		}
 

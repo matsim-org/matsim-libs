@@ -55,7 +55,8 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
 		this.printStats();
-		if (controllerConfigGroup.isCreateGraphs()) {
+		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+		if (createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0) {
 			LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
 				LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);

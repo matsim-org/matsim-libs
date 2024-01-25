@@ -22,9 +22,9 @@ package org.matsim.integration.population;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,10 +60,10 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class NonAlternatingPlanElementsIT {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_Controler_QSim_Routechoice_acts() {
+	void test_Controler_QSim_Routechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setMobsim("qsim");
 		config.controller().setLastIteration(10);
@@ -91,11 +91,11 @@ public class NonAlternatingPlanElementsIT {
 		controler.getConfig().controller().setCreateGraphs(false);
         controler.run();
 
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
 	@Test
-	public void test_Controler_QSim_Routechoice_legs() {
+	void test_Controler_QSim_Routechoice_legs() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setMobsim("qsim");
 		config.controller().setLastIteration(10);
@@ -123,7 +123,7 @@ public class NonAlternatingPlanElementsIT {
 		controler.getConfig().controller().setCreateGraphs(false);
         controler.run();
 
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
 	// TODO: make more complicated plans when testing subtour mode choice

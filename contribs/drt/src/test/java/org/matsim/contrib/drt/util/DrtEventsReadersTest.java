@@ -25,9 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -64,14 +65,14 @@ public class DrtEventsReadersTest {
 
 	//standard dvrp events are tested in DvrpEventsReadersTest
 	private final List<Event> drtEvents = List.of(
-			new DrtRequestSubmittedEvent(0, mode, request, person, link1, link2, 111, 222, 412.0, 512.0),//
+			new DrtRequestSubmittedEvent(0, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0),//
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
 			taskEnded(30, DefaultDrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//
 			taskEnded(70, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, 3, link2));
 
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		drtEvents.forEach(writer::handleEvent);

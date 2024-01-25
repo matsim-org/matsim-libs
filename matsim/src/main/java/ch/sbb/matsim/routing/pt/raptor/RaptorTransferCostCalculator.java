@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
+
 import java.util.function.Supplier;
 
 /**
@@ -26,6 +27,6 @@ import java.util.function.Supplier;
  */
 public interface RaptorTransferCostCalculator {
 
-	double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double currentTime);
+	double calcTransferCost(SwissRailRaptorCore.PathElement currentPE, Supplier<Transfer> transfer, RaptorStaticConfig staticConfig, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double currentTime);
 
 }

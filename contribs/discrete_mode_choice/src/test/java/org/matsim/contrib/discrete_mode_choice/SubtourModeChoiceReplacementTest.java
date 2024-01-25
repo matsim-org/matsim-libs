@@ -1,7 +1,5 @@
 package org.matsim.contrib.discrete_mode_choice;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -9,7 +7,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanBuilder;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanTester;
@@ -51,7 +51,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class SubtourModeChoiceReplacementTest {
 	@Test
-	public void testChoiceSet() throws NoFeasibleChoiceException {
+	void testChoiceSet() throws NoFeasibleChoiceException {
 		List<String> modes = Arrays.asList("walk", "pt");
 		List<String> constrainedModes = Arrays.asList();
 		boolean considerCarAvailability = true;
@@ -140,7 +140,7 @@ public class SubtourModeChoiceReplacementTest {
 	}
 
 	@Test
-	public void testConstrainedChoiceSet() throws NoFeasibleChoiceException {
+	void testConstrainedChoiceSet() throws NoFeasibleChoiceException {
 		List<String> modes = Arrays.asList("walk", "car");
 		List<String> constrainedModes = Arrays.asList("car");
 		boolean considerCarAvailability = true;
@@ -229,7 +229,7 @@ public class SubtourModeChoiceReplacementTest {
 	}
 
 	@Test
-	public void testLargerCase() throws NoFeasibleChoiceException {
+	void testLargerCase() throws NoFeasibleChoiceException {
 		List<String> modes = Arrays.asList("walk", "car", "pt", "bike");
 		List<String> constrainedModes = Arrays.asList("car", "bike");
 		boolean considerCarAvailability = true;

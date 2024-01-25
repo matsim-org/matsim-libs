@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
+import org.matsim.contrib.drt.sharingmetrics.SharingMetricsModule;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -136,5 +137,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 								getter.getModal(DrtVehicleDistanceStats.class), getter.get(MatsimServices.class), getter.get(Network.class),
 								getter.getModal(DrtEventSequenceCollector.class), getter.getModal(VehicleOccupancyProfileCalculator.class))))
 				.asEagerSingleton();
+
+		install(new SharingMetricsModule(drtCfg));
 	}
 }

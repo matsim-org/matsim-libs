@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -49,21 +51,23 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, 
-		PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
+public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler,
+		PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler,
 		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
-	
+
+	private static final Logger LOG = LogManager.getLogger(EventWriterTXT.class);
+
 	/* Implement all the different event handlers by its own. Future event types will no longer be
 	 * suitable to be written to a TXT-format file, but will have additional attributes that need to be
 	 * stored in XML. Explicitly listing the event handlers makes sure only events are written to TXT that
 	 * can also correctly be read in again, and helps fix the test cases during introduction of the new,
 	 * additional events.
 	 */
-	
+
 	private BufferedWriter out = null;
 	private double lastTime = Double.NaN;
 	private String timeString = null;
-	
+
 	private Map<Id<Vehicle>, Id<Person>> vehicleToDriverMap = new HashMap<>();
 
 	public EventWriterTXT(final String filename) {
@@ -77,7 +81,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 				this.out.close();
 				this.out = null;
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOG.error(e.getMessage(), e);
 			}
 		}
 	}
@@ -88,7 +92,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 				this.out.close();
 				this.out = null;
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOG.error(e.getMessage(), e);
 			}
 		}
 		try {
@@ -102,7 +106,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 			eventsTxtFile +=  "DESCRIPTION\n";
 			this.out.write(eventsTxtFile);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 	}
 
@@ -133,7 +137,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 			}
 			this.out.write('\n');
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 	}
 
@@ -172,10 +176,10 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	public void handleEvent(PersonDepartureEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.PersonDeparture.ordinal(), PersonDepartureEvent.EVENT_TYPE);
 	}
-	
+
 	public enum Number{ /*0:*/ PersonArrival, dummy, LinkLeave, PersonStuck, /*4:*/ VehicleEntersTraffic,
-		/*5:*/ LinkEnter, PersonDeparture, ActivityStart, ActivityEnd, /*9:*/ PersonMoney } ;
-	
+		/*5:*/ LinkEnter, PersonDeparture, ActivityStart, ActivityEnd, /*9:*/ PersonMoney }
+
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.PersonStuck.ordinal(), PersonStuckEvent.EVENT_TYPE);
@@ -189,7 +193,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.VehicleEntersTraffic.ordinal(), VehicleEntersTrafficEvent.EVENT_TYPE);
-		
+
 		vehicleToDriverMap.put(event.getVehicleId(), event.getPersonId());
 	}
 

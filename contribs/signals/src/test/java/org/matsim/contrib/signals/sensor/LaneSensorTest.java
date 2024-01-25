@@ -1,15 +1,15 @@
 package org.matsim.contrib.signals.sensor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 
 public class LaneSensorTest {
 
 	@Test
-	public void testGetAvgVehiclesPerSecondAfterBucketCollection() {
+	void testGetAvgVehiclesPerSecondAfterBucketCollection() {
 		//test if average is working for constant flow
 		LaneSensor sensor = new LaneSensor(null, null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -22,9 +22,9 @@ public class LaneSensorTest {
 				assertEquals(1.0/3.0, sensor.getAvgVehiclesPerSecond(time), 0.04);
 		}
 	}
-	
+
 	@Test
-	public void testGetAvgVehiclesPerSecondDuringBucketCollection() {
+	void testGetAvgVehiclesPerSecondDuringBucketCollection() {
 		//test if average is working for constant flow
 		LaneSensor sensor = new LaneSensor(null, null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -37,9 +37,9 @@ public class LaneSensorTest {
 				assertEquals(1.0/3.0, sensor.getAvgVehiclesPerSecond(time), 0.04);
 		}
 	}
-	
+
 	@Test
-	public void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucket() {
+	void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucket() {
 		//test if average is working for constant flow
 		LaneSensor sensor = new LaneSensor(null, null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -58,9 +58,9 @@ public class LaneSensorTest {
 				assertEquals((1.0/3.0), sensor.getAvgVehiclesPerSecond(time), 0.02);
 		}
 	}
-	
+
 	@Test
-	public void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucketWhileHavingNotEnoughBuckets() {
+	void testGetAvgVehiclesPerSecondWithNoTrafficForTwoBucketWhileHavingNotEnoughBuckets() {
 		//test if average is working for constant flow
 		LaneSensor sensor = new LaneSensor(null, null);
 		sensor.registerAverageVehiclesPerSecondToMonitor(60, 15);
@@ -83,9 +83,9 @@ public class LaneSensorTest {
 				assertEquals((1.0/3.0), sensor.getAvgVehiclesPerSecond(time), 0.02);
 		}
 	}
-	
+
 	@Test
-	public void testClassicBehaviour() {
+	void testClassicBehaviour() {
 		LaneSensor sensor = new LaneSensor(null, null);
 		sensor.registerAverageVehiclesPerSecondToMonitor();
 		for (int time = 0; time <= 3600; time++) {

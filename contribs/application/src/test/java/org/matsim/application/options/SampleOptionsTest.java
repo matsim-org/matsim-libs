@@ -2,7 +2,7 @@ package org.matsim.application.options;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.application.MATSimAppCommand;
 import picocli.CommandLine;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SampleOptionsTest {
 
 	@Test
-	public void flexible() {
+	void flexible() {
 
 		AtomicInteger size = new AtomicInteger();
 		AtomicDouble dSize = new AtomicDouble();
@@ -39,7 +39,7 @@ public class SampleOptionsTest {
 	}
 
 	@Test
-	public void fixed() {
+	void fixed() {
 
 		AtomicInteger size = new AtomicInteger();
 

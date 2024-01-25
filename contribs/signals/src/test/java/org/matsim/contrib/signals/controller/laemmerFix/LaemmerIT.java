@@ -25,9 +25,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -64,8 +64,8 @@ public class LaemmerIT {
 
 	private static final Logger log = LogManager.getLogger(LaemmerIT.class);
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private static final int maxCycleTime = 90;
 	private static final int cycleIntergreenTime = 10;
@@ -78,7 +78,7 @@ public class LaemmerIT {
 	 * single intersection with demand (equals flow capacity) only in NS-direction. signals should show green only for the NS-direction.
 	 */
 	@Test
-	public void testSingleCrossingScenarioDemandNS() {
+	void testSingleCrossingScenarioDemandNS() {
 		Fixture fixture = new Fixture(1800, 0, 5.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -97,9 +97,9 @@ public class LaemmerIT {
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
 
-		Assert.assertNull("signal group 1 should show no green", avgSignalGreenTimePerCycle.get(signalGroupId1));
-		Assert.assertNotNull("signal group 2 should show green", avgSignalGreenTimePerCycle.get(signalGroupId2));
-		Assert.assertEquals("avg delay at NS-direction should be zero", 0.0, avgDelayNS, MatsimTestUtils.EPSILON);
+		Assertions.assertNull(avgSignalGreenTimePerCycle.get(signalGroupId1), "signal group 1 should show no green");
+		Assertions.assertNotNull(avgSignalGreenTimePerCycle.get(signalGroupId2), "signal group 2 should show green");
+		Assertions.assertEquals(0.0, avgDelayNS, MatsimTestUtils.EPSILON, "avg delay at NS-direction should be zero");
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class LaemmerIT {
 	 * single intersection with high demand in WE-direction, very low demand in NS-direction but minimum green time. I.e. the NS-signal should show green for exactly this 5 seconds per cycle.
 	 */
 	@Test
-	public void testSingleCrossingScenarioLowVsHighDemandWithMinG(){
+	void testSingleCrossingScenarioLowVsHighDemandWithMinG(){
 		Fixture fixture = new Fixture(90, 1800, 5.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -125,14 +125,13 @@ public class LaemmerIT {
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
 
-		Assert.assertTrue("total signal green time of WE-direction should be higher than NS-direction",
-				totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2) > 0);
-		Assert.assertTrue("avg signal green time per cycle of WE-direction should be higher than NS-direction",
-				avgSignalGreenTimePerCycle.get(signalGroupId1)-avgSignalGreenTimePerCycle.get(signalGroupId2) > 0);
-		Assert.assertEquals("avg signal green time per cycle of NS-direction should be the minimum green time of 5 seconds",
-				5.0, avgSignalGreenTimePerCycle.get(signalGroupId2), MatsimTestUtils.EPSILON);
-		Assert.assertTrue("cycle time should stay below 90 seconds", avgCycleTimePerSystem.get(signalSystemId) <= 90);
-		Assert.assertTrue("avg delay per vehicle on WS-direction should be less than on NS-direction", avgDelayWE<avgDelayNS);
+		Assertions.assertTrue(totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2) > 0,
+				"total signal green time of WE-direction should be higher than NS-direction");
+		Assertions.assertTrue(avgSignalGreenTimePerCycle.get(signalGroupId1)-avgSignalGreenTimePerCycle.get(signalGroupId2) > 0,
+				"avg signal green time per cycle of WE-direction should be higher than NS-direction");
+		Assertions.assertEquals(5.0, avgSignalGreenTimePerCycle.get(signalGroupId2), MatsimTestUtils.EPSILON, "avg signal green time per cycle of NS-direction should be the minimum green time of 5 seconds");
+		Assertions.assertTrue(avgCycleTimePerSystem.get(signalSystemId) <= 90, "cycle time should stay below 90 seconds");
+		Assertions.assertTrue(avgDelayWE<avgDelayNS, "avg delay per vehicle on WS-direction should be less than on NS-direction");
 	}
 
 	/**
@@ -140,7 +139,7 @@ public class LaemmerIT {
 	 * single intersection with high demand in WE-direction, very low demand in NS-direction. No minimum green time! I.e. the NS-signal should show green for less than 5 seconds per cycle.
 	 */
 	@Test
-	public void testSingleCrossingScenarioLowVsHighDemandWoMinG(){
+	void testSingleCrossingScenarioLowVsHighDemandWoMinG(){
 		Fixture fixture = new Fixture(90, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -158,20 +157,20 @@ public class LaemmerIT {
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
 
-		Assert.assertTrue("total signal green time of WE-direction should be higher than NS-direction",
-				totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2) > 0);
-		Assert.assertTrue("avg signal green time per cycle of WE-direction should be higher than NS-direction",
-				avgSignalGreenTimePerCycle.get(signalGroupId1)-avgSignalGreenTimePerCycle.get(signalGroupId2) > 0);
-		Assert.assertTrue("avg signal green time per cycle of NS-direction should be less than 5 seconds", avgSignalGreenTimePerCycle.get(signalGroupId2) < 5.0);
-		Assert.assertTrue("cycle time should stay below 90 seconds", avgCycleTimePerSystem.get(signalSystemId) <= 90);
-		Assert.assertTrue("avg delay per vehicle on WS-direction should be less than on NS-direction", avgDelayWE<avgDelayNS);
+		Assertions.assertTrue(totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2) > 0,
+				"total signal green time of WE-direction should be higher than NS-direction");
+		Assertions.assertTrue(avgSignalGreenTimePerCycle.get(signalGroupId1)-avgSignalGreenTimePerCycle.get(signalGroupId2) > 0,
+				"avg signal green time per cycle of WE-direction should be higher than NS-direction");
+		Assertions.assertTrue(avgSignalGreenTimePerCycle.get(signalGroupId2) < 5.0, "avg signal green time per cycle of NS-direction should be less than 5 seconds");
+		Assertions.assertTrue(avgCycleTimePerSystem.get(signalSystemId) <= 90, "cycle time should stay below 90 seconds");
+		Assertions.assertTrue(avgDelayWE<avgDelayNS, "avg delay per vehicle on WS-direction should be less than on NS-direction");
 	}
 
 	/**
 	 * directions with the same demand-capacity-ration should get green for more or less the same time
 	 */
 	@Test
-	public void testSingleCrossingScenarioEqualDemandCapacityRatio(){
+	void testSingleCrossingScenarioEqualDemandCapacityRatio(){
 		Fixture fixture = new Fixture(900, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
@@ -189,10 +188,9 @@ public class LaemmerIT {
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
 
-		Assert.assertEquals("total signal green times should not differ more than 1%", 1,
-				totalSignalGreenTimes.get(signalGroupId1)/totalSignalGreenTimes.get(signalGroupId2), 0.01);
-		Assert.assertEquals("avg signal green times per cycle should not differ more than 1%",
-				1, avgSignalGreenTimePerCycle.get(signalGroupId1)/avgSignalGreenTimePerCycle.get(signalGroupId2), 0.01);
+		Assertions.assertEquals(1,
+				totalSignalGreenTimes.get(signalGroupId1)/totalSignalGreenTimes.get(signalGroupId2), 0.01, "total signal green times should not differ more than 1%");
+		Assertions.assertEquals(1, avgSignalGreenTimePerCycle.get(signalGroupId1)/avgSignalGreenTimePerCycle.get(signalGroupId2), 0.01, "avg signal green times per cycle should not differ more than 1%");
 //		Assert.assertEquals("avg delay per vehicle per link should not differ more than 5%", 1, avgDelayWE/avgDelayNS, 0.05);
 		/* I commented the last line out because the delay strongly depends on the stabilizing regime, namely the arrival rates that are used.
 		 * Even if I use fixed average arrival rates of 0.5 per lane and link, the delays of both directions do not correlate.
@@ -206,7 +204,7 @@ public class LaemmerIT {
 	 * for low demand, i.e. an occupancy rate of 0.5 in the example of nico kuehnel's master thesis, the optimizing regime should be better than the stabilizing regime.
 	 */
 	@Test
-	public void testSingleCrossingScenarioStabilizingVsOptimizingRegimeLowDemand(){
+	void testSingleCrossingScenarioStabilizingVsOptimizingRegimeLowDemand(){
 		Fixture fixtureStab = new Fixture(360, 1440, 0.0, Regime.STABILIZING);
 		SignalAnalysisTool signalAnalyzerStab = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzerStab = fixtureStab.run(signalAnalyzerStab);
@@ -254,37 +252,37 @@ public class LaemmerIT {
 
 		// Test Stabilizing Regime:
 		for (Id<Link> linkId : avgDelayPerLinkStab.keySet()) {
-			Assert.assertTrue("stab: avg delay per link should be below a threshold (i.e. still stable)", avgDelayPerLinkStab.get(linkId) < maxCycleTime);
+			Assertions.assertTrue(avgDelayPerLinkStab.get(linkId) < maxCycleTime, "stab: avg delay per link should be below a threshold (i.e. still stable)");
 		}
-		Assert.assertTrue("stab: total delay should be higher than for the other regimes", generalAnalyzerStab.getTotalDelay() > generalAnalyzerOpt.getTotalDelay());
-		Assert.assertTrue("stab: total delay should be higher than for the other regimes", generalAnalyzerStab.getTotalDelay() > generalAnalyzerComb.getTotalDelay());
-		Assert.assertTrue("the stabilizing regime should satisfy the maximum cycle time", avgCycleTimePerSystemStab.get(signalSystemId) < maxCycleTime);
+		Assertions.assertTrue(generalAnalyzerStab.getTotalDelay() > generalAnalyzerOpt.getTotalDelay(), "stab: total delay should be higher than for the other regimes");
+		Assertions.assertTrue(generalAnalyzerStab.getTotalDelay() > generalAnalyzerComb.getTotalDelay(), "stab: total delay should be higher than for the other regimes");
+		Assertions.assertTrue(avgCycleTimePerSystemStab.get(signalSystemId) < maxCycleTime, "the stabilizing regime should satisfy the maximum cycle time");
 		// stabilizing regime only shows green when number of vehicles beyond a critical number, i.e. some of the cycle time is given away (all signals show red)
-		Assert.assertTrue("stab: sum of green times per cycle plus 10 seconds intergreen time should be more than 10 seconds less than the avg cycle time",
-				avgSignalGreenTimePerCycleStab.get(signalGroupId1) + avgSignalGreenTimePerCycleStab.get(signalGroupId2) + cycleIntergreenTime
-				< avgCycleTimePerSystemStab.get(signalSystemId) - 10);
+		Assertions.assertTrue(avgSignalGreenTimePerCycleStab.get(signalGroupId1) + avgSignalGreenTimePerCycleStab.get(signalGroupId2) + cycleIntergreenTime
+				< avgCycleTimePerSystemStab.get(signalSystemId) - 10,
+				"stab: sum of green times per cycle plus 10 seconds intergreen time should be more than 10 seconds less than the avg cycle time");
 
 		// Test Optimizing Regime:
 		for (Id<Link> linkId : avgDelayPerLinkOpt.keySet()) {
-			Assert.assertTrue("opt: avg delay per link should be below a threshold (i.e. still stable)", avgDelayPerLinkOpt.get(linkId) < maxCycleTime);
+			Assertions.assertTrue(avgDelayPerLinkOpt.get(linkId) < maxCycleTime, "opt: avg delay per link should be below a threshold (i.e. still stable)");
 		}
-		Assert.assertEquals("sum of green times per cycle plus 10 seconds intergreen time should be more or less equal to the avg cycle time",
-				avgCycleTimePerSystemOpt.get(signalSystemId),
+		Assertions.assertEquals(avgCycleTimePerSystemOpt.get(signalSystemId),
 				avgSignalGreenTimePerCycleOpt.get(signalGroupId1) + avgSignalGreenTimePerCycleOpt.get(signalGroupId2) + cycleIntergreenTime,
-				2);
-		Assert.assertTrue("for this demand, the cycle time of the optimizing regime should be still reasonable, i.e. below a threshold",
-				avgCycleTimePerSystemOpt.get(signalSystemId) < maxCycleTime);
+				2,
+				"sum of green times per cycle plus 10 seconds intergreen time should be more or less equal to the avg cycle time");
+		Assertions.assertTrue(avgCycleTimePerSystemOpt.get(signalSystemId) < maxCycleTime,
+				"for this demand, the cycle time of the optimizing regime should be still reasonable, i.e. below a threshold");
 
 		// Test Combined Regime:
 		for (Id<Link> linkId : avgDelayPerLinkComb.keySet()) {
-			Assert.assertTrue("avg delay per link should be below a threshold (i.e. still stable)", avgDelayPerLinkComb.get(linkId) < maxCycleTime);
+			Assertions.assertTrue(avgDelayPerLinkComb.get(linkId) < maxCycleTime, "avg delay per link should be below a threshold (i.e. still stable)");
 		}
-		Assert.assertEquals("comb: sum of green times per cycle plus 10 seconds intergreen time should be more or less equal to the avg cycle time",
-				avgCycleTimePerSystemComb.get(signalSystemId),
+		Assertions.assertEquals(avgCycleTimePerSystemComb.get(signalSystemId),
 				avgSignalGreenTimePerCycleComb.get(signalGroupId1) + avgSignalGreenTimePerCycleComb.get(signalGroupId2) + cycleIntergreenTime,
-				2);
-		Assert.assertTrue("the combined regime should satisfy the maximum cycle time", avgCycleTimePerSystemComb.get(signalSystemId) < maxCycleTime);
-		Assert.assertTrue("total delay with the combined regime should be the lowest", generalAnalyzerOpt.getTotalDelay() > generalAnalyzerComb.getTotalDelay());
+				2,
+				"comb: sum of green times per cycle plus 10 seconds intergreen time should be more or less equal to the avg cycle time");
+		Assertions.assertTrue(avgCycleTimePerSystemComb.get(signalSystemId) < maxCycleTime, "the combined regime should satisfy the maximum cycle time");
+		Assertions.assertTrue(generalAnalyzerOpt.getTotalDelay() > generalAnalyzerComb.getTotalDelay(), "total delay with the combined regime should be the lowest");
 	}
 
 	/**
@@ -293,7 +291,7 @@ public class LaemmerIT {
 	 * no standard cycle pattern). The stabilizing regime should still be stable, the combined regime should be the best.
 	 */
 	@Test
-	public void testSingleCrossingScenarioStabilizingVsOptimizingRegimeHighDemand(){
+	void testSingleCrossingScenarioStabilizingVsOptimizingRegimeHighDemand(){
 		Fixture fixtureStab = new Fixture(360, 1800, 0.0, Regime.STABILIZING);
 		SignalAnalysisTool signalAnalyzerStab = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzerStab = fixtureStab.run(signalAnalyzerStab);
@@ -341,31 +339,31 @@ public class LaemmerIT {
 
 		// Test Stabilizing Regime:
 		for (Id<Link> linkId : avgDelayPerLinkStab.keySet()) {
-			Assert.assertTrue("stab: avg delay per link should be below a threshold (i.e. still stable)", avgDelayPerLinkStab.get(linkId) < maxCycleTime);
+			Assertions.assertTrue(avgDelayPerLinkStab.get(linkId) < maxCycleTime, "stab: avg delay per link should be below a threshold (i.e. still stable)");
 		}
-		Assert.assertTrue("the stabilizing regime should satisfy the maximum cycle time", avgCycleTimePerSystemStab.get(signalSystemId) < maxCycleTime);
+		Assertions.assertTrue(avgCycleTimePerSystemStab.get(signalSystemId) < maxCycleTime, "the stabilizing regime should satisfy the maximum cycle time");
 		// stabilizing regime only shows green when number of vehicles beyond a critical number, i.e. some of the cycle time is given away (all signals show red)
-		Assert.assertTrue("stab: sum of green times per cycle plus 10 seconds intergreen time should be more than 9 seconds less than the avg cycle time",
-				avgSignalGreenTimePerCycleStab.get(signalGroupId1) + avgSignalGreenTimePerCycleStab.get(signalGroupId2) + cycleIntergreenTime
-				< avgCycleTimePerSystemStab.get(signalSystemId) - 9);
+		Assertions.assertTrue(avgSignalGreenTimePerCycleStab.get(signalGroupId1) + avgSignalGreenTimePerCycleStab.get(signalGroupId2) + cycleIntergreenTime
+				< avgCycleTimePerSystemStab.get(signalSystemId) - 9,
+				"stab: sum of green times per cycle plus 10 seconds intergreen time should be more than 9 seconds less than the avg cycle time");
 
 		// Test Optimizing Regime:
-		Assert.assertTrue("avg delay for NS-direction should be very high for the optimizing regime with high demand", avgDelayPerLinkOpt.get(Id.createLinkId("7_3")) > maxCycleTime);
-		Assert.assertTrue("total delay of optimizing regime should be the highest", generalAnalyzerStab.getTotalDelay() < generalAnalyzerOpt.getTotalDelay());
-		Assert.assertTrue("for this demand, the cycle time of the optimizing regime should be very high, i.e. not stable anymore",
-				avgCycleTimePerSystemOpt.get(signalSystemId) > 10*maxCycleTime);
+		Assertions.assertTrue(avgDelayPerLinkOpt.get(Id.createLinkId("7_3")) > maxCycleTime, "avg delay for NS-direction should be very high for the optimizing regime with high demand");
+		Assertions.assertTrue(generalAnalyzerStab.getTotalDelay() < generalAnalyzerOpt.getTotalDelay(), "total delay of optimizing regime should be the highest");
+		Assertions.assertTrue(avgCycleTimePerSystemOpt.get(signalSystemId) > 10*maxCycleTime,
+				"for this demand, the cycle time of the optimizing regime should be very high, i.e. not stable anymore");
 
 		// Test Combined Regime:
 		for (Id<Link> linkId : avgDelayPerLinkComb.keySet()) {
-			Assert.assertTrue("avg delay per link should be below a threshold (i.e. still stable)", avgDelayPerLinkComb.get(linkId) < maxCycleTime);
+			Assertions.assertTrue(avgDelayPerLinkComb.get(linkId) < maxCycleTime, "avg delay per link should be below a threshold (i.e. still stable)");
 		}
-		Assert.assertEquals("comb: sum of green times per cycle plus 10 seconds intergreen time should be more or less equal to the avg cycle time",
-				avgCycleTimePerSystemComb.get(signalSystemId),
+		Assertions.assertEquals(avgCycleTimePerSystemComb.get(signalSystemId),
 				avgSignalGreenTimePerCycleComb.get(signalGroupId1) + avgSignalGreenTimePerCycleComb.get(signalGroupId2) + cycleIntergreenTime,
-				2);
-		Assert.assertTrue("the combined regime should satisfy the maximum cycle time", avgCycleTimePerSystemComb.get(signalSystemId) < maxCycleTime);
-		Assert.assertTrue("total delay with the combined regime should be the lowest", generalAnalyzerOpt.getTotalDelay() > generalAnalyzerComb.getTotalDelay());
-		Assert.assertTrue("total delay with the combined regime should be the lowest", generalAnalyzerStab.getTotalDelay() > generalAnalyzerComb.getTotalDelay());
+				2,
+				"comb: sum of green times per cycle plus 10 seconds intergreen time should be more or less equal to the avg cycle time");
+		Assertions.assertTrue(avgCycleTimePerSystemComb.get(signalSystemId) < maxCycleTime, "the combined regime should satisfy the maximum cycle time");
+		Assertions.assertTrue(generalAnalyzerOpt.getTotalDelay() > generalAnalyzerComb.getTotalDelay(), "total delay with the combined regime should be the lowest");
+		Assertions.assertTrue(generalAnalyzerStab.getTotalDelay() > generalAnalyzerComb.getTotalDelay(), "total delay with the combined regime should be the lowest");
 	}
 
 	/**
@@ -374,7 +372,7 @@ public class LaemmerIT {
 	 * exactly doubled (same departure times).
 	 */
 	@Test
-	public void testSingleCrossingScenarioWithDifferentFlowCapacityFactors(){
+	void testSingleCrossingScenarioWithDifferentFlowCapacityFactors(){
 		Fixture fixtureFlowCap1 = new Fixture(360, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzerFlowCap1 = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzerFlowCap1 = fixtureFlowCap1.run(signalAnalyzerFlowCap1);
@@ -410,28 +408,26 @@ public class LaemmerIT {
 		log.info("avg delay per link: " + avgDelayPerLinkFlowCap1.get(Id.createLinkId("2_3")) + ", " + avgDelayPerLinkFlowCap1.get(Id.createLinkId("7_3")));
 		log.info("Total delay: " + generalAnalyzerFlowCap1.getTotalDelay());
 
-		Assert.assertEquals("total signal green times should not differ", 1,
-				totalSignalGreenTimesFlowCap1.get(signalGroupId1)/totalSignalGreenTimesFlowCap2.get(signalGroupId1), 0.01);
-		Assert.assertEquals("total signal green times should not differ", 1,
-				totalSignalGreenTimesFlowCap1.get(signalGroupId2)/totalSignalGreenTimesFlowCap2.get(signalGroupId2), 0.01);
-		Assert.assertEquals("avg signal green times per cycle should not differ", avgSignalGreenTimePerCycleFlowCap1.get(signalGroupId1),
-				avgSignalGreenTimePerCycleFlowCap2.get(signalGroupId1), 0.1);
-		Assert.assertEquals("avg signal green times per cycle should not differ", avgSignalGreenTimePerCycleFlowCap1.get(signalGroupId2),
-				avgSignalGreenTimePerCycleFlowCap2.get(signalGroupId2), 0.1);
-		Assert.assertEquals("avg cycle time should not differ", avgCycleTimePerSystemFlowCap1.get(signalSystemId),
-				avgCycleTimePerSystemFlowCap2.get(signalSystemId), 0.1);
-		Assert.assertEquals("avg delay per vehicle per link should not differ",
-				avgDelayPerLinkFlowCap1.get(Id.createLinkId("2_3")), avgDelayPerLinkFlowCap2.get(Id.createLinkId("2_3")), 0.1);
-		Assert.assertEquals("avg delay per vehicle per link should not differ",
-				avgDelayPerLinkFlowCap1.get(Id.createLinkId("7_3")), avgDelayPerLinkFlowCap2.get(Id.createLinkId("7_3")), 2);
-		Assert.assertEquals("total delay for doubled demand should be doubled", 2, generalAnalyzerFlowCap2.getTotalDelay()/generalAnalyzerFlowCap1.getTotalDelay(), 0.1);
+		Assertions.assertEquals(1,
+				totalSignalGreenTimesFlowCap1.get(signalGroupId1)/totalSignalGreenTimesFlowCap2.get(signalGroupId1), 0.01, "total signal green times should not differ");
+		Assertions.assertEquals(1,
+				totalSignalGreenTimesFlowCap1.get(signalGroupId2)/totalSignalGreenTimesFlowCap2.get(signalGroupId2), 0.01, "total signal green times should not differ");
+		Assertions.assertEquals(avgSignalGreenTimePerCycleFlowCap1.get(signalGroupId1),
+				avgSignalGreenTimePerCycleFlowCap2.get(signalGroupId1), 0.1, "avg signal green times per cycle should not differ");
+		Assertions.assertEquals(avgSignalGreenTimePerCycleFlowCap1.get(signalGroupId2),
+				avgSignalGreenTimePerCycleFlowCap2.get(signalGroupId2), 0.1, "avg signal green times per cycle should not differ");
+		Assertions.assertEquals(avgCycleTimePerSystemFlowCap1.get(signalSystemId),
+				avgCycleTimePerSystemFlowCap2.get(signalSystemId), 0.1, "avg cycle time should not differ");
+		Assertions.assertEquals(avgDelayPerLinkFlowCap1.get(Id.createLinkId("2_3")), avgDelayPerLinkFlowCap2.get(Id.createLinkId("2_3")), 0.1, "avg delay per vehicle per link should not differ");
+		Assertions.assertEquals(avgDelayPerLinkFlowCap1.get(Id.createLinkId("7_3")), avgDelayPerLinkFlowCap2.get(Id.createLinkId("7_3")), 2, "avg delay per vehicle per link should not differ");
+		Assertions.assertEquals(2, generalAnalyzerFlowCap2.getTotalDelay()/generalAnalyzerFlowCap1.getTotalDelay(), 0.1, "total delay for doubled demand should be doubled");
 	}
 
 	/**
 	 * Test Laemmer with multiple iterations (some variables have to be reset after iterations).
 	 */
 	@Test
-	public void testMultipleIterations() {
+	void testMultipleIterations() {
 		Fixture fixture0It = new Fixture(500, 2000, 5.0, Regime.COMBINED);
 		fixture0It.setLastIteration(0);
 		fixture0It.addLeftTurnTraffic();
@@ -475,19 +471,19 @@ public class LaemmerIT {
 		log.info("avg delay per link in itertion 1: " + avgDelayWE1It + ", " + avgDelayNS1It);
 
 
-		Assert.assertEquals("total green time of signal group 1 should be the same as in the first iteration", totalSignalGreenTimes0It.get(signalGroupId1), totalSignalGreenTimes1It.get(signalGroupId1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("total green time of signal group 1l should be the same as in the first iteration", totalSignalGreenTimes0It.get(signalGroupId1l), totalSignalGreenTimes1It.get(signalGroupId1l), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("total green time of signal group 2 should be the same as in the first iteration", totalSignalGreenTimes0It.get(signalGroupId2), totalSignalGreenTimes1It.get(signalGroupId2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avg green time of signal group 1 should be the same as in the first iteration", avgSignalGreenTimePerCycle0It.get(signalGroupId1), avgSignalGreenTimePerCycle1It.get(signalGroupId1), .01);
-		Assert.assertEquals("avg green time of signal group 1l should be the same as in the first iteration", avgSignalGreenTimePerCycle0It.get(signalGroupId1l), avgSignalGreenTimePerCycle1It.get(signalGroupId1l), .01);
-		Assert.assertEquals("avg green time of signal group 2 should be the same as in the first iteration", avgSignalGreenTimePerCycle0It.get(signalGroupId2), avgSignalGreenTimePerCycle1It.get(signalGroupId2), .01);
-		Assert.assertEquals("avg cycle time should be the same as in the first iteration", avgCycleTimePerSystem0It.get(signalSystemId), avgCycleTimePerSystem1It.get(signalSystemId), .01);
-		Assert.assertEquals("avg delay in direction WE should be the same as in the first iteration", avgDelayWE0It, avgDelayWE1It, .01);
-		Assert.assertEquals("avg delay in direction NS should be the same as in the first iteration", avgDelayNS0It, avgDelayNS1It, .01);
+		Assertions.assertEquals(totalSignalGreenTimes0It.get(signalGroupId1), totalSignalGreenTimes1It.get(signalGroupId1), MatsimTestUtils.EPSILON, "total green time of signal group 1 should be the same as in the first iteration");
+		Assertions.assertEquals(totalSignalGreenTimes0It.get(signalGroupId1l), totalSignalGreenTimes1It.get(signalGroupId1l), MatsimTestUtils.EPSILON, "total green time of signal group 1l should be the same as in the first iteration");
+		Assertions.assertEquals(totalSignalGreenTimes0It.get(signalGroupId2), totalSignalGreenTimes1It.get(signalGroupId2), MatsimTestUtils.EPSILON, "total green time of signal group 2 should be the same as in the first iteration");
+		Assertions.assertEquals(avgSignalGreenTimePerCycle0It.get(signalGroupId1), avgSignalGreenTimePerCycle1It.get(signalGroupId1), .01, "avg green time of signal group 1 should be the same as in the first iteration");
+		Assertions.assertEquals(avgSignalGreenTimePerCycle0It.get(signalGroupId1l), avgSignalGreenTimePerCycle1It.get(signalGroupId1l), .01, "avg green time of signal group 1l should be the same as in the first iteration");
+		Assertions.assertEquals(avgSignalGreenTimePerCycle0It.get(signalGroupId2), avgSignalGreenTimePerCycle1It.get(signalGroupId2), .01, "avg green time of signal group 2 should be the same as in the first iteration");
+		Assertions.assertEquals(avgCycleTimePerSystem0It.get(signalSystemId), avgCycleTimePerSystem1It.get(signalSystemId), .01, "avg cycle time should be the same as in the first iteration");
+		Assertions.assertEquals(avgDelayWE0It, avgDelayWE1It, .01, "avg delay in direction WE should be the same as in the first iteration");
+		Assertions.assertEquals(avgDelayNS0It, avgDelayNS1It, .01, "avg delay in direction NS should be the same as in the first iteration");
 		// compare signal event files
 		long checksum_it0 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it.0/signalEvents2Via.csv");
 		long checksum_itLast = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it."+lastIt+"/signalEvents2Via.csv");
-		Assert.assertEquals("Signal events are different", checksum_it0, checksum_itLast);
+		Assertions.assertEquals(checksum_it0, checksum_itLast, "Signal events are different");
 	}
 
 	// TODO test stochasticity (laemmer better than fixed-time; different than for constant demand)

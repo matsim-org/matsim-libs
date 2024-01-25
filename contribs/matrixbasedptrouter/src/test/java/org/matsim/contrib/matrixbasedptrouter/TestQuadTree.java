@@ -25,9 +25,8 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -107,7 +106,7 @@ public class TestQuadTree {
 				strb.append( ' ' );
 			}
 			System.out.println( strb );
-			Assert.assertEquals( "pt1a pt2a pt3a ", strb.toString() );
+			Assertions.assertEquals( "pt1a pt2a pt3a ", strb.toString() );
 		}
 		{
 			Collection<String> ptColWork = qTree.getDisk(work.getX(), work.getY(), distance);
@@ -119,12 +118,12 @@ public class TestQuadTree {
 				strb.append( ' ') ;
 			}
 			System.out.println( strb );
-			Assert.assertEquals( "pt3b ", strb.toString() );
+			Assertions.assertEquals( "pt3b ", strb.toString() );
 		}
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		TestQuadTree tc = new TestQuadTree();
 		tc.determineNearestPtStation();
 	}

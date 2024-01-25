@@ -21,9 +21,10 @@ package org.matsim.testcases;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -40,45 +41,19 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
 
 /**
- * Some helper methods for writing JUnit 4 tests in MATSim.
- * Inspired by JUnit's rule TestName
+ * Some helper methods for writing JUnit 5 tests in MATSim.
  *
  * @author mrieser
  */
-public final class MatsimTestUtils extends TestWatcher {
+public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallback {
 	private static final Logger log = LogManager.getLogger(MatsimTestUtils.class);
 
 	/**
 	 * A constant for the exactness when comparing doubles.
 	 */
 	public static final double EPSILON = 1e-10;
-
-	public static void assertEqualFilesLineByLine(String inputFilename, String outputFilename) {
-		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
-				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename)) {
-
-			String lineInput;
-			String lineOutput;
-
-			while( ((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null) ){
-				if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ){
-					log.info( "Reading line...  " );
-					log.info( lineInput );
-					log.info( lineOutput );
-					log.info( "" );
-				}
-				assertEquals( "Lines have different content: ", lineInput.trim(), lineOutput.trim() );
-			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
 
 	/** The default output directory, where files of this test should be written to.
 	 * Includes the trailing '/' to denote a directory. */
@@ -103,10 +78,21 @@ public final class MatsimTestUtils extends TestWatcher {
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
-	private String testParameterSetIndex = null;
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext extensionContext) {
+		this.testClass = extensionContext.getTestClass().orElseThrow();
+		this.testMethodName = extensionContext.getRequiredTestMethod().getName();
+	}
+
+	@Override
+	public void afterEach(ExtensionContext extensionContext) {
+		this.testClass = null;
+		this.testMethodName = null;
 	}
 
 	public Config createConfigWithInputResourcePathAsContext() {
@@ -221,7 +207,7 @@ public final class MatsimTestUtils extends TestWatcher {
 				IOUtils.deleteDirectoryRecursively(directory.toPath());
 			}
 			this.outputDirCreated = directory.mkdirs();
-			Assert.assertTrue("Could not create the output directory " + this.outputDirectory, this.outputDirCreated);
+			Assertions.assertTrue(this.outputDirCreated, "Could not create the output directory " + this.outputDirectory);
 		}
 	}
 
@@ -231,10 +217,12 @@ public final class MatsimTestUtils extends TestWatcher {
 	 * @return path to the output directory for this test
 	 */
 	public String getOutputDirectory() {
+		return getOutputDirectory("");
+	}
+
+	public String getOutputDirectory(String subDir) {
 		if (this.outputDirectory == null) {
-			String subDirectoryForParametrisedTests = testParameterSetIndex == null ? "" : testParameterSetIndex + "/";
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/"
-					+ subDirectoryForParametrisedTests;
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/" + subDir;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -306,41 +294,34 @@ public final class MatsimTestUtils extends TestWatcher {
 		this.testMethodName = method.getName();
 	}
 
-	//captures the method name (group 1) and optionally the index of the parameter set (group 2; only if the test is parametrised)
-	//The matching may fail if the parameter set name does not start with {index} (at least one digit is required at the beginning)
-	private static final Pattern METHOD_PARAMETERS_WITH_INDEX_PATTERN = Pattern.compile(
-			"([\\S]*)(?:\\[(\\d+)[\\s\\S]*\\])?");
+	public static void assertEqualFilesLineByLine(String inputFilename, String outputFilename) {
+		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
+			 BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename)) {
 
-	/* inspired by
-	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
-	 */
-	@Override
-	public void starting(Description description) {
-		super.starting(description);
-		this.testClass = description.getTestClass();
+			String lineInput;
+			String lineOutput;
 
-		Matcher matcher = METHOD_PARAMETERS_WITH_INDEX_PATTERN.matcher(description.getMethodName());
-		if (!matcher.matches()) {
-			throw new RuntimeException("The name of the test parameter set must start with {index}");
+			while( ((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null) ){
+				if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ){
+					log.info( "Reading line...  " );
+					log.info( lineInput );
+					log.info( lineOutput );
+					log.info( "" );
+				}
+				Assertions.assertEquals(lineInput.trim(), lineOutput.trim(), "Lines have different content: " );
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		this.testMethodName = matcher.group(1);
-		this.testParameterSetIndex = matcher.group(2); // null for non-parametrised tests
-	}
-
-	@Override
-	public void finished(Description description) {
-		super.finished(description);
-		this.testClass = null;
-		this.testMethodName = null;
 	}
 
   public static void assertEqualEventsFiles( String filename1, String filename2 ) {
-		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
 	}
 
   public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
-	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );
+	  Assertions.assertEquals( checksum1, checksum2, "different file checksums" );
   }
 }
