@@ -5,9 +5,9 @@ import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.Links;
 import org.matsim.simwrapper.viz.Table;
-import org.matsim.simwrapper.viz.XYTime;
 
 /**
  * Shows emission in the scenario.
@@ -49,11 +49,29 @@ public class EmissionsDashboard implements Dashboard {
 			});
 
 		layout.row("second")
-			.el(XYTime.class, (viz, data) -> {
+			.el(GridMap.class, (viz, data) -> {
 				viz.title = "CO₂ Emissions";
 				viz.description = "per day";
 				viz.height = 12.;
-				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.xyt.csv");
+				viz.cellSize = 100;
+				viz.opacity = 0.2;
+				viz.maxHeight = 100;
+				viz.projection = "EPSG:25832";
+				viz.setColorRamp("greenRed", 10, false);
+				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.csv");
+			});
+
+		layout.row("third")
+			.el(GridMap.class, (viz, data) -> {
+				viz.title = "CO₂ Emissions";
+				viz.description = "per hour";
+				viz.height = 12.;
+				viz.cellSize = 100;
+				viz.opacity = 0.2;
+				viz.maxHeight = 100;
+				viz.projection = "EPSG:25832";
+				viz.setColorRamp("greenRed", 10, false);
+				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_hour.csv");
 			});
 
 

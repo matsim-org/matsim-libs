@@ -39,7 +39,7 @@ import org.matsim.contrib.decongestion.data.LinkInfo;
  *
  * @author ikaddoura
  */
-public final class TollTimeDistanceTravelDisutility implements TravelDisutility {
+final class TollTimeDistanceTravelDisutility implements TravelDisutility {
 	private static final Logger log = LogManager.getLogger(TollTimeDistanceTravelDisutility.class);
 
 	private final TravelDisutility delegate;

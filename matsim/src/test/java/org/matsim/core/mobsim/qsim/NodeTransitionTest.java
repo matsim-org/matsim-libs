@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,9 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -739,7 +735,7 @@ public class NodeTransitionTest {
 
 	}
 
-	private final class ThroughputAnalyzer implements LinkLeaveEventHandler {
+	private static final class ThroughputAnalyzer implements LinkLeaveEventHandler {
 
 		private final List<Id<Link>> linksOfInterest;
 		private Map<Id<Link>, Map<Double, Double>> absoluteThroughputPerTimeStep_veh = new HashMap<>();

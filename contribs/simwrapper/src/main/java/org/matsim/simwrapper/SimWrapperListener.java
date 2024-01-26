@@ -14,10 +14,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 /**
@@ -31,12 +28,21 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	 */
 	public static double PRIORITY = -1000;
 	private final SimWrapper simWrapper;
+	private final Set<Dashboard> bindings;
 	private final Config config;
 
 	@Inject
-	public SimWrapperListener(SimWrapper simWrapper, Config config) {
+	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config) {
 		this.simWrapper = simWrapper;
-		this.config = config;
+        this.bindings = bindings;
+        this.config = config;
+	}
+
+	/**
+	 * Create a new listener with no default bindings.
+	 */
+	public SimWrapperListener(SimWrapper simWrapper, Config config) {
+		this(simWrapper, Collections.emptySet(), config);
 	}
 
 	@Override
@@ -68,6 +74,9 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 				log.error("Could not add providers from package {}", pack, e);
 			}
 		}
+
+		// Lambda provider which uses dashboards from bindings
+		addFromProvider(config, List.of((c, sw) -> new ArrayList<>(bindings)));
 
 		// Dashboard provider services
 		if (config.defaultDashboards != SimWrapperConfigGroup.Mode.disabled) {

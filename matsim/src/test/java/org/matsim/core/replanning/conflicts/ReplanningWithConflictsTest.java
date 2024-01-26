@@ -221,7 +221,7 @@ public class ReplanningWithConflictsTest {
 		assertEquals(60, counter.unrestricted);
 	}
 
-	private class LegCounter implements PersonDepartureEventHandler {
+	private static class LegCounter implements PersonDepartureEventHandler {
 		int restricted;
 		int unrestricted;
 

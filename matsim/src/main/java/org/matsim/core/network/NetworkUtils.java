@@ -40,7 +40,6 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;

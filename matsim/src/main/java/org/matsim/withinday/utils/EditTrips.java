@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
 package org.matsim.withinday.utils;
 
 import java.util.ArrayList;
@@ -79,7 +76,7 @@ import org.matsim.withinday.events.ReplanningEvent;
  * At some places the code now sets a travel time which is not really correct because the real value is hard to obtain.
  * Still a defined value at least keeps the simulation running. This should be fixed with look-ups in the transit
  * schedule when exactly the agent arrives at the next stop and can disembark. vsp-gleich nov'21
- * 
+ *
  * @author kainagel
  */
 public final class EditTrips {
@@ -110,7 +107,7 @@ public final class EditTrips {
 				}
 			}
 		}
-		
+
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
@@ -149,7 +146,7 @@ public final class EditTrips {
 
 		// I will treat this here in the way that it will make the trip consistent with the activities.  So if the activity in the
 		// plan has changed, the trip will go to a new location.
-		
+
 		// what matters is the external interface, which is the method call.  Everything below is internal so it does not matter so much.
 
 		Trip trip = findCurrentTrip( agent ) ;
@@ -192,11 +189,11 @@ public final class EditTrips {
 
 	private void replanCurrentLegWithNetworkRoute(Activity newAct, String mainMode, Leg currentLeg, double now, MobsimAgent agent, Attributes routingAttributes) {
 		log.debug("entering replanCurrentLegWithNetworkRoute for agent" + agent.getId()) ;
-		
+
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 		Person person = plan.getPerson() ;
-		
+
 		// (1) get new trip from current position to new activity:
 		Link currentLink = scenario.getNetwork().getLinks().get( agent.getCurrentLinkId() ) ;
 		Facility currentLocationFacility = FacilitiesUtils.wrapLink( currentLink ) ;
@@ -285,7 +282,7 @@ public final class EditTrips {
 			log.debug( "agent with ID=" + agent.getId() + " is waiting at a stop=" + currentOrNextStop ) ;
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now, person, routingAttributes );
 			Gbl.assertIf( newTripElements.get(0) instanceof Leg ); // that is what TripRouter should do.  kai, jul'19
-			
+
 			wantsToLeaveStop = true ;
 			if (newTripElements.size() >= 2) {
 				// check if the agent has a useless teleport leg from a transit stop to the very same stop
@@ -312,7 +309,7 @@ public final class EditTrips {
 					}
 				}
 			}
-			
+
 			// in all other cases leave the stop
 			if (wantsToLeaveStop) {
 				// The agent will not board any bus at the transit stop and will walk away or
@@ -334,8 +331,8 @@ public final class EditTrips {
 			 *  already departed and cannot be reached by the agent even though the agent is currently located on that very same
 			 *  bus (which the router does not know :-( )
 			 *  We have no router or schedule data in "real time", i.e. considering delays, so lets assume that all pt departures
-			 *  are punctual. If we would route from the current time (= "now") instead, it is unclear how long it will take to 
-			 *  arrive at the next stop and we risk that the agent misses the bus he is already riding on. - gl jul'19 
+			 *  are punctual. If we would route from the current time (= "now") instead, it is unclear how long it will take to
+			 *  arrive at the next stop and we risk that the agent misses the bus he is already riding on. - gl jul'19
 			 */
 			double reRoutingTime;
 			if (driver instanceof TransitDriverAgentImpl) { // this is ugly, but there seems to be no other way to find out the scheduled arrival time. Maybe add to interface?
@@ -349,7 +346,7 @@ public final class EditTrips {
 			log.debug( "agent with ID=" + agent.getId() + " is re-routed from next stop " + currentOrNextStop.getId() + " scheduled arrival at " + reRoutingTime);
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, reRoutingTime, person, routingAttributes );
 			// yyyy as discussed elswhere, would make more sense to compute this once arrived at that stop.
-			
+
 			boolean agentStaysOnSameVehicle = false;
 			if (newTripElements.size() >= 2) {
 				// check if the agent has a useless teleport leg from a transit stop to the very same stop
@@ -394,7 +391,7 @@ public final class EditTrips {
 					}
 				}
 			}
-			
+
 			// in all other cases disembark at next stop
 			if (!agentStaysOnSameVehicle) {
 				newTripElements = defaultMergeOldAndNewCurrentPtLeg(currentLeg, newTripElements, agent, currentOrNextStop, oldPtRoute);
@@ -504,14 +501,14 @@ public final class EditTrips {
 			 * before the activity and assumes instead that the agent starts the activity at the time passed as parameter and
 			 * calculates a suitable activity end time based on that start time. This is not useful here :-(
 			 * The end time of the previous activity is not updated when the agent departs for the leg.
-			 * Leg departure time exists as variable but is -Infinity.... 
+			 * Leg departure time exists as variable but is -Infinity....
 			 * So we have no clear and reliable information when the agent will finish its teleport leg.
 			 * Do some estimation and hope for a TODO better solution in the future :-(
-			 * - gl jul'19 
+			 * - gl jul'19
 			 */
 			//			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
 			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
-			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
+			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is
 			// located half way between origin and destination of the teleport leg.
 
 			double travelTime = timeInterpretation.decideOnLegTravelTime(currentLeg).seconds();
@@ -569,7 +566,7 @@ public final class EditTrips {
 			String mainMode, double now, MobsimAgent agent) {
 
 		log.debug("entering replanCurrentTripFromStageActivity for agent" + agent.getId()) ;
-		
+
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 		Person person = plan.getPerson() ;
@@ -632,15 +629,15 @@ public final class EditTrips {
 
 		// prune remaining route from current route:
 		NetworkRoute oldNWRoute = (NetworkRoute) currentLeg.getRoute();
-		
+
 		final Integer currentRouteLinkIdIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
-		
+
 		final NetworkRoute newNWRoute = (NetworkRoute)newCurrentLeg.getRoute();
-		
+
 		final List<Id<Link>> newLinksIds = newNWRoute.getLinkIds().subList(0,newNWRoute.getLinkIds().size()) ;
 		EditRoutes.spliceNewPathIntoOldRoute(currentRouteLinkIdIndex, newNWRoute.getEndLinkId(),
 				oldNWRoute, newLinksIds, agent.getCurrentLinkId()) ;
-		
+
 //		for (int ii = currentRouteLinkIdIndex; ii<oldNWRoute.getLinkIds().size() ; ii++ ) {
 //			oldNWRoute.getLinkIds().remove(ii) ;
 //		}
@@ -664,7 +661,7 @@ public final class EditTrips {
 		// from that transit stop location to that very same transit stop.
 		if (newCurrentLeg.getRoute() instanceof TransitPassengerRoute) {
 			throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
-		}		
+		}
 
 		// prune remaining route from current route:
 		DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute( //
@@ -714,7 +711,7 @@ public final class EditTrips {
 	/**
 	 * In contrast to the other replanFutureLegRoute(...) method, the leg at the given index is replaced
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
-	 * and pt_interaction activities.  
+	 * and pt_interaction activities.
 	 */
 	@Deprecated // prefer the non-static methods
 	public static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
@@ -733,7 +730,7 @@ public final class EditTrips {
 						return PopulationUtils.createActivity((Activity) p);
 					} else return p;
 				})
-				.collect(Collectors.toList());;
+				.collect(Collectors.toList());
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 

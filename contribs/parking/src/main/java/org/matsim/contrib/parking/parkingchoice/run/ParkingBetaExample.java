@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.run;
+package org.matsim.contrib.parking.parkingchoice.run;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.AbstractParkingBetas;
 
 /**
- * @author nagel
- *
+ * @author jbischoff
+ *	example class for setting parking betas: we simply return 1 for Beta values. Typically those values should be person- and/or income depending
  */
-public class RunParkingChoiceExampleIT {
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
+class ParkingBetaExample extends AbstractParkingBetas {
 
-	/**
-	 * Test method for {@link org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample#run(org.matsim.core.config.Config)}.
-	 */
-	@Test
-	final void testRun() {
-		Config config = ConfigUtils.loadConfig("./src/main/resources/parkingchoice/config.xml");
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
-		config.controller().setLastIteration(0);
-		RunParkingChoiceExample.run(config);
-
+	
+	@Override
+	public double getParkingWalkBeta(Person person,
+			double activityDurationInSeconds) {
+		return 1;
 	}
+
+	@Override
+	public double getParkingCostBeta(Person person) {
+		return 1;
+	}
+	
+	
+	
 
 }

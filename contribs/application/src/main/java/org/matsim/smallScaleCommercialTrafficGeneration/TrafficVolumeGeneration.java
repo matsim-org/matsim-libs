@@ -50,10 +50,10 @@ public class TrafficVolumeGeneration {
 	private static final Logger log = LogManager.getLogger(TrafficVolumeGeneration.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
-	private static HashMap<Integer, HashMap<String, Double>> generationRatesStart = new HashMap<>();
-	private static HashMap<Integer, HashMap<String, Double>> generationRatesStop = new HashMap<>();
-	private static HashMap<String, HashMap<String, Double>> commitmentRatesStart = new HashMap<>();
-	private static HashMap<String, HashMap<String, Double>> commitmentRatesStop = new HashMap<>();
+	private static Map<Integer, Map<String, Double>> generationRatesStart = new HashMap<>();
+	private static Map<Integer, Map<String, Double>> generationRatesStop = new HashMap<>();
+	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
+	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
 
 	static class TrafficVolumeKey {
 		private final String zone;
@@ -116,11 +116,11 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @return trafficVolume_start
 	 */
-	static HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
-			ArrayList<String> modesORvehTypes, String trafficType) throws MalformedURLException {
+	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_start, resultingDataPerZone, "start", sample, modesORvehTypes);
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 		Path outputFileStart = output.resolve("calculatedData")
@@ -140,11 +140,11 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @return trafficVolume_stop
 	 */
-	static HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
-			ArrayList<String> modesORvehTypes, String trafficType) throws MalformedURLException {
+	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, resultingDataPerZone, "stop", sample, modesORvehTypes);
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 		Path outputFileStop = output.resolve("calculatedData")
@@ -164,12 +164,12 @@ public class TrafficVolumeGeneration {
 	 * @param sample sample size
 	 */
 	private static void calculateTrafficVolumePerZone(
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String volumeType, double sample,
-			ArrayList<String> modesORvehTypes) {
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
+			Map<String, Object2DoubleMap<String>> resultingDataPerZone, String volumeType, double sample,
+			List<String> modesORvehTypes) {
 
-		HashMap<Integer, HashMap<String, Double>> generationRates;
-		HashMap<String, HashMap<String, Double>> commitmentRates;
+		Map<Integer, Map<String, Double>> generationRates;
+		Map<String, Map<String, Double>> commitmentRates;
 
 		if (volumeType.equals("start")) {
 			generationRates = generationRatesStart;
@@ -216,7 +216,7 @@ public class TrafficVolumeGeneration {
 	 * @param trafficVolume traffic volumes for each combination
 	 * @param outputFileInInputFolder location of written output
 	 */
-	private static void writeCSVTrafficVolume(HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
+	private static void writeCSVTrafficVolume(Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
 			Path outputFileInInputFolder) throws MalformedURLException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 				StandardCharsets.UTF_8, true);
@@ -239,7 +239,7 @@ public class TrafficVolumeGeneration {
 			writer.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Problem writing traffic volume file.", e);
 		}
 	}
 
@@ -273,9 +273,9 @@ public class TrafficVolumeGeneration {
 	 * @param trafficVolumePerTypeAndZone_stop trafficVolume for stop potentials for each zone
 	 */
 	static void reduceDemandBasedOnExistingCarriers(Scenario scenario,
-			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
+			Map<String, Map<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
@@ -321,7 +321,7 @@ public class TrafficVolumeGeneration {
 					}
 				}
 			} else {
-				if (carrier.getServices().size() != 0) {
+				if (!carrier.getServices().isEmpty()) {
 					List<String> possibleStartAreas = new ArrayList<>();
 					for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 						possibleStartAreas
@@ -341,7 +341,7 @@ public class TrafficVolumeGeneration {
 									+ " is not part of the zones. That's why the traffic volume was not reduces by this service.");
 						}
 					}
-				} else if (carrier.getShipments().size() != 0) {
+				} else if (!carrier.getShipments().isEmpty()) {
 					for (CarrierShipment shipment : carrier.getShipments().values()) {
 						String startZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(shipment.getFrom(),
 								regionLinksMap);
@@ -372,8 +372,8 @@ public class TrafficVolumeGeneration {
 	 * @param stopZone end zone
 	 */
 	private static void reduceVolumeForThisExistingJobElement(
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
 			Integer purpose, String startZone, String stopZone) {
 
 		if (startZone != null && stopZone != null) {
@@ -402,7 +402,7 @@ public class TrafficVolumeGeneration {
 	 * @param originalZone zone with volume of 0, although volume in existing model
 	 */
 	private static void reduceVolumeForOtherArea(
-			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
+			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
 			Integer purpose, String volumeType, String originalZone) {
 		ArrayList<TrafficVolumeKey> shuffledKeys = new ArrayList<>(
 				trafficVolumePerTypeAndZone.keySet());
@@ -425,16 +425,16 @@ public class TrafficVolumeGeneration {
 	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param generationType start or stop rates
 	 */
-	private static HashMap<Integer, HashMap<String, Double>> setGenerationRates(String smallScaleCommercialTrafficType,
+	private static Map<Integer, Map<String, Double>> setGenerationRates(String smallScaleCommercialTrafficType,
 			String generationType) {
 
-		HashMap<Integer, HashMap<String, Double>> generationRates = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose1 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose2 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose3 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose4 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose5 = new HashMap<>();
-		HashMap<String, Double> ratesPerPurpose6 = new HashMap<>();
+		Map<Integer, Map<String, Double>> generationRates = new HashMap<>();
+		Map<String, Double> ratesPerPurpose1 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose2 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose3 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose4 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose5 = new HashMap<>();
+		Map<String, Double> ratesPerPurpose6 = new HashMap<>();
 		if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 			if (generationType.equals("start")) {
 				ratesPerPurpose1.put("Inhabitants", 0.0);
@@ -657,43 +657,43 @@ public class TrafficVolumeGeneration {
 	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param commitmentType start or stop parameter
 	 */
-	private static HashMap<String, HashMap<String, Double>> setCommitmentRates(String smallScaleCommercialTrafficType,
+	private static Map<String, Map<String, Double>> setCommitmentRates(String smallScaleCommercialTrafficType,
 			String commitmentType) {
-		HashMap<String, HashMap<String, Double>> commitmentRates = new HashMap<>();
+		Map<String, Map<String, Double>> commitmentRates = new HashMap<>();
 
 		if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 
 			// the first number is the purpose; second number the vehicle type
-			HashMap<String, Double> ratesPerPurpose1_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose1_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose2_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose3_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose4_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose5_5 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_1 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_2 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_3 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_4 = new HashMap<>();
-			HashMap<String, Double> ratesPerPurpose6_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose1_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose2_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose3_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose4_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose5_5 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_1 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_2 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_3 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_4 = new HashMap<>();
+			Map<String, Double> ratesPerPurpose6_5 = new HashMap<>();
 			if (commitmentType.equals("start")) {
 				ratesPerPurpose1_1.put("Inhabitants", 0.0);
 				ratesPerPurpose1_1.put("Employee", 0.8);

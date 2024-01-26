@@ -104,7 +104,7 @@ public class FlowEfficiencyCalculatorTest {
 		return arrivalHandler.latestArrivalTime;
 	}
 
-	private class CustomFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
+	private static class CustomFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
 		private final double factor;
 
 		public CustomFlowEfficiencyCalculator(double factor) {
@@ -117,7 +117,7 @@ public class FlowEfficiencyCalculatorTest {
 		}
 	}
 
-	private class LatestArrivalHandler implements PersonArrivalEventHandler {
+	private static class LatestArrivalHandler implements PersonArrivalEventHandler {
 		Double latestArrivalTime = null;
 
 		@Override

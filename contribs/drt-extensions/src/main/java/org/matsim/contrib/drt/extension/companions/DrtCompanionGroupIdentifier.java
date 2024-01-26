@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.parkingchoice.example;
+
+package org.matsim.contrib.drt.extension.companions;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+
+import java.util.Optional;
 
 /**
- * @author jbischoff
- *
+ * @author steffenaxer
  */
-public class ParkingCostCalculatorExample implements ParkingCostModel {
+class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
 
-	private double hourlyParkingCharge;
-
-	public ParkingCostCalculatorExample(double hourlyParkingCharge) {
-		this.hourlyParkingCharge = hourlyParkingCharge;
-	}
-	
 	@Override
-	public double calcParkingCost(double arrivalTimeInSeconds, double durationInSeconds, Id<Person> personId, Id parkingFacilityId) {
-					
-			return hourlyParkingCharge*(durationInSeconds/3600);
-		
+	public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent) {
+
+		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent);
+
+		if (pe instanceof Leg leg) {
+			return DrtCompanionUtils.getPassengerGroupIdentifier(leg);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }

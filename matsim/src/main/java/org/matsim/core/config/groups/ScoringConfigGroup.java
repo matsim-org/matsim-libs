@@ -572,7 +572,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public enum TypicalDurationScoreComputation {
 		uniform, relative
-	};
+	}
 
 	/* parameter set handling */
 	@Override
