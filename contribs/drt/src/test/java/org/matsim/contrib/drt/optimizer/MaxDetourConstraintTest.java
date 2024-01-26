@@ -2,10 +2,6 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.MaxDetourInsertionCostCalculator;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.MaxDetourOfferAcceptor;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -36,14 +32,16 @@ public class MaxDetourConstraintTest {
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		drtConfigGroup.maxDetourAlpha = 1.5;
-		drtConfigGroup.maxDetourBeta = 300;
-
+		// Max wait time
 		drtConfigGroup.maxWaitTime = 300;
 
-		drtConfigGroup.maxAllowedPickupDelay = 120;
+		// Turn on the max detour constraint
+		drtConfigGroup.maxDetourAlpha = 1.5;
+		drtConfigGroup.maxDetourBeta = 300;
+		drtConfigGroup.maxAllowedPickupDelay = 180;
+		drtConfigGroup.maxAbsoluteDetour = 1200;
 
-		// Make the max total travel time constraints very loose (i.e., similar to disabling it)
+		// Make the max total travel time constraints very loose (i.e., make it not active)
 		drtConfigGroup.maxTravelTimeAlpha = 10;
 		drtConfigGroup.maxTravelTimeBeta = 7200;
 
@@ -56,8 +54,6 @@ public class MaxDetourConstraintTest {
 			controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtCfg.mode) {
 				@Override
 				protected void configureQSim() {
-//					bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-//						getter -> new MaxDetourInsertionCostCalculator((new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))))));
 					bindModal(DrtOfferAcceptor.class).toProvider(modalProvider(getter -> new MaxDetourOfferAcceptor(drtCfg.maxAllowedPickupDelay)));
 				}
 			});
