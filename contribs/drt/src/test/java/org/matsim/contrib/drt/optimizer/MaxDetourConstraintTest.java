@@ -41,7 +41,7 @@ public class MaxDetourConstraintTest {
 
 		drtConfigGroup.maxWaitTime = 300;
 
-		drtConfigGroup.maxAllowedPickupDelay = 180;
+		drtConfigGroup.maxAllowedPickupDelay = 120;
 
 		// Make the max total travel time constraints very loose (i.e., similar to disabling it)
 		drtConfigGroup.maxTravelTimeAlpha = 10;
