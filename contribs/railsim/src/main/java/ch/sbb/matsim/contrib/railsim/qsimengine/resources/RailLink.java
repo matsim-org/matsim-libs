@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim.qsimengine;
+package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import org.matsim.api.core.v01.Id;
@@ -25,52 +25,34 @@ import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * Rail links which can has multiple tracks and corresponds to exactly one link.
  */
 public final class RailLink implements HasLinkId {
-
 	private final Id<Link> id;
-
-	/**
-	 * States per track.
-	 */
-	private final TrackState[] state;
-
 	private final boolean isEntryLink;
 	private final boolean isExitLink;
 
-	/**
-	 * Drivers of each blocked track.
-	 */
-	private final MobsimDriverAgent[] blocked;
-
-	final double length;
-	final double freeSpeed;
-	final double minimumHeadwayTime;
+	public final double length;
+	public final double minimumHeadwayTime;
+	public final double freeSpeed;
+	final int tracks;
 
 	/**
-	 * ID of the resource this link belongs to.
+	 * Resource this link belongs to.
 	 */
-	@Nullable
-	final Id<RailResource> resource;
+	RailResourceInternal resource;
 
 	public RailLink(Link link) {
-		id = link.getId();
-		state = new TrackState[RailsimUtils.getTrainCapacity(link)];
-		Arrays.fill(state, TrackState.FREE);
-		blocked = new MobsimDriverAgent[state.length];
-		length = link.getLength();
-		freeSpeed = link.getFreespeed();
-		minimumHeadwayTime = RailsimUtils.getMinimumHeadwayTime(link);
-		String resourceId = RailsimUtils.getResourceId(link);
-		resource = resourceId != null ? Id.create(resourceId, RailResource.class) : null;
-		isEntryLink = RailsimUtils.isEntryLink(link);
-		isExitLink = RailsimUtils.isExitLink(link);
+		this.id = link.getId();
+		this.length = link.getLength();
+		this.tracks = RailsimUtils.getTrainCapacity(link);
+		this.freeSpeed = link.getFreespeed();
+		this.minimumHeadwayTime = RailsimUtils.getMinimumHeadwayTime(link);
+		this.isEntryLink = RailsimUtils.isEntryLink(link);
+		this.isExitLink = RailsimUtils.isExitLink(link);
 	}
 
 	@Override
@@ -78,16 +60,15 @@ public final class RailLink implements HasLinkId {
 		return id;
 	}
 
-	@Nullable
-	public Id<RailResource> getResourceId() {
-		return resource;
+	void setResource(RailResourceInternal resource) {
+		this.resource = resource;
 	}
 
 	/**
-	 * Number of tracks on this link.
+	 * Access to the underlying resource.
 	 */
-	public int getNumberOfTracks() {
-		return state.length;
+	public RailResource getResource() {
+		return resource;
 	}
 
 	/**
@@ -96,57 +77,6 @@ public final class RailLink implements HasLinkId {
 	public double getAllowedFreespeed(MobsimDriverAgent driver) {
 		return Math.min(freeSpeed, driver.getVehicle().getVehicle().getType().getMaximumVelocity());
 	}
-
-	/**
-	 * Check if driver has already reserved this link.
-	 */
-	public boolean isBlockedBy(MobsimDriverAgent driver) {
-		for (MobsimDriverAgent reservation : blocked) {
-			if (reservation == driver)
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Whether at least one track is free.
-	 */
-	boolean hasFreeTrack() {
-		for (TrackState trackState : state) {
-			if (trackState == TrackState.FREE)
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Block a track that was previously reserved.
-	 */
-	int blockTrack(MobsimDriverAgent driver) {
-		for (int i = 0; i < state.length; i++) {
-			if (state[i] == TrackState.FREE) {
-				blocked[i] = driver;
-				state[i] = TrackState.BLOCKED;
-				return i;
-			}
-		}
-		throw new IllegalStateException("No track was free.");
-	}
-
-	/**
-	 * Release a non-free track to be free again.
-	 */
-	int releaseTrack(MobsimDriverAgent driver) {
-		for (int i = 0; i < state.length; i++) {
-			if (blocked[i] == driver) {
-				state[i] = TrackState.FREE;
-				blocked[i] = null;
-				return i;
-			}
-		}
-		throw new AssertionError("Driver " + driver + " has not reserved the track.");
-	}
-
 
 	/**
 	 * Entry link of a station relevant for re-routing.
@@ -160,6 +90,13 @@ public final class RailLink implements HasLinkId {
 	 */
 	public boolean isExitLink() {
 		return isExitLink;
+	}
+
+	/**
+	 * Length in meter.
+	 */
+	public double getLength() {
+		return length;
 	}
 
 	@Override
