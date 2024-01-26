@@ -107,30 +107,33 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Parameter
 	@Comment(
-			"Defines the maximum allowed absolute detour in seconds of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-					+ "maxAbsoluteDetour should not be smaller than 0. and should be higher than the offset maxTravelTimeBeta.")
+			"Defines the maximum allowed absolute detour in seconds. Note that the detour is computed from the latest promised pickup time. " +
+				"To enable the max detour constraint, maxAllowedPickupDelay has to be specified. maxAbsoluteDetour should not be smaller than 0, "
+				+ "and should be higher than the offset maxDetourBeta. By default, this limit is disabled (i.e. set to Inf)")
 	@PositiveOrZero
 	public double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
 
 	@Parameter
 	@Comment(
-		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
-			+ "This is the ratio part")
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. Note that the detour is computed from the latest promised "
+			+ "pickup time. To enable the max detour constraint, maxAllowedPickupDelay has to be specified. A linear combination similar to travel "
+			+ "time constrain is used. This is the ratio part. By default, this limit is disabled (i.e. set to Inf, together with maxDetourBeta).")
 	@DecimalMin("1.0")
 	public double maxDetourAlpha = Double.POSITIVE_INFINITY;
 
 	@Parameter
 	@Comment(
-		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
-			+ "This is the constant part")
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. Note that the detour is computed from the latest promised "
+			+ "pickup time. To enable the max detour constraint, maxAllowedPickupDelay has to be specified. A linear combination similar to travel "
+			+ "time constrain is used. This is the constant part. By default, this limit is disabled (i.e. set to Inf, together with maxDetourAlpha).")
 	@PositiveOrZero
 	public double maxDetourBeta = Double.POSITIVE_INFINITY;// [s]
 
 	@Parameter
 	@Comment(
-		"Defines the maximum delay allowed from the initial scheduled pick up time. Once a estimated pick up time is determined, the DRT optimizer"
-			+ "should try to keep this promise. By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
+		"Defines the maximum delay allowed from the initial scheduled pick up time. Once the initial pickup time is offered, the latest promised"
+			+ "pickup time is calculated based on initial scheduled pickup time + maxAllowedPickupDelay. "
+			+ "By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
 	@PositiveOrZero
 	public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
 
