@@ -17,16 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim.qsimengine;
+package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 /**
- * Current state of a track.
+ * Current state resource.
  */
-public enum TrackState {
-	FREE,
+public enum ResourceState {
+	EMPTY,
 
-	/**
-	 * Blocked tracks that are exclusively available for trains.
-	 */
-	BLOCKED
+	IN_USE,
+
+	EXHAUSTED,
 }
