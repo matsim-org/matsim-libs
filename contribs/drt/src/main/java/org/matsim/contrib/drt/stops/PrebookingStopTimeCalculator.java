@@ -50,17 +50,14 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 	@Override
 	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		final double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		double stopDuration = provider.calcDropoffDuration(vehicle, request);
 
-		// we need to take into account the general shift of the task and adding the new
-		// stop
-
-		// first, we apply shiftEndTime, TODO: can we do this without the complex
-		// calculation?
-		double shiftedEndTime = shiftEndTime(vehicle, stop, insertionTime);
-
+		// first, check when we can start with the dropoff
+		double earliestStartTime = stop.getBeginTime();
+		earliestStartTime = Math.max(earliestStartTime, insertionTime);
+		
 		// second, we add the dropoff
-		return Math.max(stop.getEndTime(), Math.max(shiftedEndTime, insertionTime + stopDuration));
+		return Math.max(stop.getEndTime(), earliestStartTime + stopDuration);
 	}
 
 	/**
