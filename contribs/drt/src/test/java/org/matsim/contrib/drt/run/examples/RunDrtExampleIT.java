@@ -93,9 +93,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(296.95)
-				.inVehicleTravelTimeMean(387.02)
-				.totalTravelTimeMean(683.97)
+				.waitAverage(301.96)
+				.inVehicleTravelTimeMean(385.72)
+				.totalTravelTimeMean(687.68)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -127,9 +127,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(293.63)
-				.inVehicleTravelTimeMean(388.85)
-				.totalTravelTimeMean(682.48)
+				.waitAverage(292.08)
+				.inVehicleTravelTimeMean(389.45)
+				.totalTravelTimeMean(681.52)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -162,9 +162,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 			.rejectionRate(0.0)
 			.rejections(0)
-			.waitAverage(261.57)
-			.inVehicleTravelTimeMean(382.74)
-			.totalTravelTimeMean(644.32)
+			.waitAverage(262.86)
+			.inVehicleTravelTimeMean(384.44)
+			.totalTravelTimeMean(647.29)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -214,9 +214,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.05)
 				.rejections(17)
-				.waitAverage(260.41)
-				.inVehicleTravelTimeMean(374.87)
-				.totalTravelTimeMean(635.28)
+				.waitAverage(261.88)
+				.inVehicleTravelTimeMean(376.04)
+				.totalTravelTimeMean(637.93)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -271,10 +271,10 @@ public class RunDrtExampleIT {
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.03)
-				.rejections(11)
-				.waitAverage(223.86)
-				.inVehicleTravelTimeMean(389.57)
-				.totalTravelTimeMean(613.44)
+				.rejections(10)
+				.waitAverage(223.28)
+				.inVehicleTravelTimeMean(390.28)
+				.totalTravelTimeMean(613.56)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
