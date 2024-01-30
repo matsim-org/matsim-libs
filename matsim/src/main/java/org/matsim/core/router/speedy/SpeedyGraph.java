@@ -5,7 +5,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implements a highly optimized data structure for representing a MATSim network. Optimized to use as little memory as possible, and thus to fit as much memory as possible into CPU caches for high
@@ -70,7 +73,11 @@ public class SpeedyGraph {
         for (Node node : network.getNodes().values()) {
             this.nodes[node.getId().index()] = node;
         }
-        for (Link link : network.getLinks().values()) {
+        
+        List<Id<Link>> linkIds = new ArrayList<>(network.getLinks().keySet());
+        Collections.sort(linkIds);
+        for (Id<Link> linkId : linkIds) {
+        	Link link = network.getLinks().get(linkId);
             addLink(link);
         }
     }
