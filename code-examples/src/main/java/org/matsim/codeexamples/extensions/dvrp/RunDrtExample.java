@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
@@ -21,8 +22,11 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,7 +42,7 @@ class RunDrtExample{
 	// * move consistency checkers into the corresponding config groups.
 	// * make MultiModeDrt and normal DRT the same.  Make config accordingly so that 1-mode drt is just multi-mode with one entry.
 
-
+	private static final Logger log = LogManager.getLogger( RunDrtExample.class );
 	private static final String DRT_A = "drt_A";
 	private static final String DRT_B = "drt_B";
 	private static final String DRT_C = "drt_C";
@@ -52,7 +56,10 @@ class RunDrtExample{
 		if ( args!=null && args.length>=1 ) {
 			config = ConfigUtils.loadConfig( args );
 		} else {
-			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "dvrp-grid" ), "multi_mode_one_shared_taxi_config.xml" ) );
+			// config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "dvrp-grid" ), "multi_mode_one_shared_taxi_config.xml" ) );
+			// the above is there, but is totally different.  --> consolidate.  kai, jan'23
+
+			config = ConfigUtils.loadConfig( "./scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml" );
 			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		}
 		
@@ -111,6 +118,12 @@ class RunDrtExample{
 			DrtConfigs.adjustDrtConfig(drtCfg, config.scoring(), config.routing());
 		}
 		{
+			// add params so that scoring works:
+			config.scoring().addModeParams( new ModeParams( DRT_A ) );
+			config.scoring().addModeParams( new ModeParams( DRT_B ) );
+			config.scoring().addModeParams( new ModeParams( DRT_C ) );
+		}
+		{
 			// clear strategy settings from config file:
 			config.replanning().clearStrategySettings();
 
@@ -121,17 +134,14 @@ class RunDrtExample{
 			// have a "normal" plans choice strategy:
 			config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
 		}
-		{
-			// add params so that scoring works:
-			config.scoring().addModeParams( new ModeParams( DRT_A ) );
-			config.scoring().addModeParams( new ModeParams( DRT_B ) );
-			config.scoring().addModeParams( new ModeParams( DRT_C ) );
-		}
+
+		// ===
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		ScenarioUtils.loadScenario( scenario );
 		// yyyy in long run, try to get rid of the route factory thing
 
+		// ===
 		Controler controler = new Controler( scenario ) ;
 
 		controler.addOverridingModule( new DvrpModule() ) ;
