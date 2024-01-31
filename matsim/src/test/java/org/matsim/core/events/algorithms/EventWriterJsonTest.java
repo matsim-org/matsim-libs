@@ -1,13 +1,13 @@
 package org.matsim.core.events.algorithms;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.utils.EventsCollector;
@@ -26,7 +26,7 @@ public class EventWriterJsonTest {
 	 * values are correctly encoded when written to a file.
 	 */
 	@Test
-	public void testSpecialCharacters() {
+	void testSpecialCharacters() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		EventWriterJson writer = new EventWriterJson(baos);
 
@@ -40,22 +40,22 @@ public class EventWriterJsonTest {
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		events.initProcessing();
-		new MatsimEventsReader(events).readStream(bios, ControlerConfigGroup.EventsFileFormat.json);
+		new MatsimEventsReader(events).readStream(bios, ControllerConfigGroup.EventsFileFormat.json);
 		events.finishProcessing();
 
-		Assert.assertEquals("there must be 2 events.", 2, collector.getEvents().size());
+		Assertions.assertEquals(2, collector.getEvents().size(), "there must be 2 events.");
 		LinkLeaveEvent event1 = (LinkLeaveEvent) collector.getEvents().get(0);
 		LinkLeaveEvent event2 = (LinkLeaveEvent) collector.getEvents().get(1);
 
-		Assert.assertEquals("link<2", event1.getLinkId().toString());
-		Assert.assertEquals("vehicle>3", event1.getVehicleId().toString());
+		Assertions.assertEquals("link<2", event1.getLinkId().toString());
+		Assertions.assertEquals("vehicle>3", event1.getVehicleId().toString());
 
-		Assert.assertEquals("link'3", event2.getLinkId().toString());
-		Assert.assertEquals("vehicle\"4", event2.getVehicleId().toString());
+		Assertions.assertEquals("link'3", event2.getLinkId().toString());
+		Assertions.assertEquals("vehicle\"4", event2.getVehicleId().toString());
 	}
 
 	@Test
-	public void testNullAttribute() {
+	void testNullAttribute() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		EventWriterJson writer = new EventWriterJson(baos);
 
@@ -72,13 +72,13 @@ public class EventWriterJsonTest {
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		events.initProcessing();
-		new MatsimEventsReader(events).readStream(bios, ControlerConfigGroup.EventsFileFormat.json);
+		new MatsimEventsReader(events).readStream(bios, ControllerConfigGroup.EventsFileFormat.json);
 		events.finishProcessing();
 
-		Assert.assertEquals("there must be 1 event.", 1, collector.getEvents().size());
+		Assertions.assertEquals(1, collector.getEvents().size(), "there must be 1 event.");
 
 		GenericEvent event1 = (GenericEvent) collector.getEvents().get(0);
-		Assert.assertTrue(event1.getAttributes().containsKey("dummy"));
-		Assert.assertNull(event1.getAttributes().get("dummy"));
+		Assertions.assertTrue(event1.getAttributes().containsKey("dummy"));
+		Assertions.assertNull(event1.getAttributes().get("dummy"));
 	}
 }

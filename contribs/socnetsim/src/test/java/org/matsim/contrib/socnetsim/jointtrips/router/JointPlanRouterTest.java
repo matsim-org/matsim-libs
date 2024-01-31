@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +56,7 @@ import org.matsim.facilities.Facility;
  */
 public class JointPlanRouterTest {
 	@Test
-	public void testDriverIdIsKept() throws Exception {
+	void testDriverIdIsKept() throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		final PopulationFactory populationFactory =
                 ScenarioUtils.createScenario(
@@ -93,25 +93,25 @@ public class JointPlanRouterTest {
 
 		final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
 		assertNotSame(
-				"leg not replaced",
 				leg,
-				newLeg);
+				newLeg,
+				"leg not replaced");
 
 		final PassengerRoute newRoute = (PassengerRoute) leg.getRoute();
 		assertNotNull(
-				"new passenger route is null",
+				newRoute,
 
 
-				newRoute);
+				"new passenger route is null");
 
 		assertEquals(
-				"driver id not kept correctly",
 				driverId,
-				newRoute.getDriverId());
+				newRoute.getDriverId(),
+				"driver id not kept correctly");
 	}
 
 	@Test
-	public void testPassengerIdIsKept() throws Exception {
+	void testPassengerIdIsKept() throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		final PopulationFactory populationFactory =
                 ScenarioUtils.createScenario(
@@ -150,25 +150,25 @@ public class JointPlanRouterTest {
 
 		final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
 		assertNotSame(
-				"leg not replaced",
 				leg,
-				newLeg);
+				newLeg,
+				"leg not replaced");
 
 		final DriverRoute newRoute = (DriverRoute) leg.getRoute();
 		assertNotNull(
-				"new driver route is null",
-				newRoute);
+				newRoute,
+				"new driver route is null");
 
 		final Collection<Id<Person>> passengers = Arrays.asList( passengerId1 , passengerId2 );
 		assertEquals(
-				"not the right number of passenger ids in "+newRoute.getPassengersIds(),
 				passengers.size(),
-				newRoute.getPassengersIds().size());
+				newRoute.getPassengersIds().size(),
+				"not the right number of passenger ids in "+newRoute.getPassengersIds());
 
 		assertTrue(
-				"not the right ids in "+newRoute.getPassengersIds(),
 				passengers.containsAll(
-					newRoute.getPassengersIds() ));
+					newRoute.getPassengersIds() ),
+				"not the right ids in "+newRoute.getPassengersIds());
 	}
 
 	private static TripRouter createTripRouter(final PopulationFactory populationFactory, Config config) {

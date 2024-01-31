@@ -20,20 +20,20 @@
 
 package org.matsim.integration.always;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -90,11 +90,11 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class BetaTravelTest66IT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	/* This TestCase uses a custom Controler, named TestControler, to load
+	/*This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
 	 * TimeAllocationMutator, the TimeAllocationMutatorBottleneck.
 	 * LinkAnalyzer, an event handler, collects some statistics on the
@@ -130,10 +130,11 @@ public class BetaTravelTest66IT {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testBetaTravel_66() {
+	@Test
+	void testBetaTravel_66() {
 		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
-		config.controler().setWritePlansInterval(0);
+		config.controller().setWritePlansInterval(0);
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		/*
@@ -151,9 +152,9 @@ public class BetaTravelTest66IT {
 			}
 		});
 		controler.addControlerListener(new TestControlerListener());
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.run();
 	}
 
@@ -275,7 +276,7 @@ public class BetaTravelTest66IT {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<>(config.planCalcScore()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<>(config.scoring()));
 			manager.addStrategy( strategy1, null, 0.80 );
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<>());
@@ -317,12 +318,12 @@ public class BetaTravelTest66IT {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
             // do some test to ensure the scenario is correct
-			double beta_travel = event.getServices().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+			double beta_travel = event.getServices().getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
             if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
                 throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
             }
 
-            int lastIter = event.getServices().getConfig().controler().getLastIteration();
+            int lastIter = event.getServices().getConfig().controller().getLastIteration();
             if (lastIter < 100) {
                 throw new IllegalArgumentException("Controler.lastIteration must be at least 100. Current value is " + lastIter);
             }
@@ -360,7 +361,7 @@ public class BetaTravelTest66IT {
 				event.getServices().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = event.getServices().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+				double beta_travel = event.getServices().getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 *

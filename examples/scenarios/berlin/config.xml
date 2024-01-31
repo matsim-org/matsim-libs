@@ -15,19 +15,15 @@
 		<param name="inputPlansFile" value="plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="./output/berlin" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
 
-	<module name="controler">
-		<param name= "routingAlgorithmType" value="AStarLandmarks" />
-	</module>
-
-	<module name="planCalcScore">
+	<module name="scoring">
 		<param name="learningRate" value="1.0" />
-		<param name="BrainExpBeta" value="2.0" />
+		<param name="brainExpBeta" value="2.0" />
 
 		<parameterset type="scoringParameters">
 			<param name="lateArrival" value="-18" />
@@ -75,8 +71,8 @@
 			</parameterset>
 		</parameterset>
 	</module>
-	
-	<module name="strategy">
+
+	<module name="replanning">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
 		<parameterset type="strategysettings">

@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -74,13 +74,13 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final SingleInsertionDetourPathCalculator detourPathCalculator = new SingleInsertionDetourPathCalculator(
 			null, new FreeSpeedTravelTime(), null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
 
-	@After
+	@AfterEach
 	public void after() {
 		detourPathCalculator.notifyMobsimBeforeCleanup(null);
 	}
 
 	@Test
-	public void calculatePaths() {
+	void calculatePaths() {
 		var pathToPickup = mockCalcLeastCostPath(beforePickupLink, pickupLink, request.getEarliestStartTime(), 11);
 		var pathFromPickup = mockCalcLeastCostPath(pickupLink, afterPickupLink, request.getEarliestStartTime(), 22);
 		var pathToDropoff = mockCalcLeastCostPath(beforeDropoffLink, dropoffLink, request.getLatestArrivalTime(), 33);
@@ -99,7 +99,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 	}
 
 	@Test
-	public void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
+	void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
 		//compute only 2 paths (instead of 4)
 		var pathToPickup = mockCalcLeastCostPath(beforePickupLink, pickupLink, request.getEarliestStartTime(), 11);
 		var pathFromPickup = mockCalcLeastCostPath(pickupLink, dropoffLink, request.getEarliestStartTime(), 22);
@@ -120,7 +120,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 	}
 
 	@Test
-	public void calculatePaths_noDetours() {
+	void calculatePaths_noDetours() {
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
 		var insertion = new Insertion(null, pickup, dropoff);

@@ -22,16 +22,18 @@ package org.matsim.core.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,11 +46,11 @@ import com.google.common.collect.ImmutableSet;
  * @author thibautd
  */
 public class ReflectiveConfigGroupTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDumpAndRead() {
+	void testDumpAndRead() {
 		MyModule dumpedModule = new MyModule();
 		dumpedModule.setDoubleField(1000);
 		dumpedModule.setIdField(Id.create(123, Link.class));
@@ -61,6 +63,9 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.charField = 'z';
 		dumpedModule.byteField = 78;
 		dumpedModule.booleanField = true;
+		dumpedModule.localTimeField = LocalTime.of(23, 59, 59);
+		dumpedModule.localDateField = LocalDate.of(2022, 12, 31);
+		dumpedModule.localDateTimeField = LocalDateTime.of(2022, 12, 31, 23, 59, 59);
 		dumpedModule.enumListField = List.of(MyEnum.VALUE1, MyEnum.VALUE2);
 		dumpedModule.enumSetField = Set.of(MyEnum.VALUE2);
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
@@ -69,13 +74,13 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadNulls() {
+	void testDumpAndReadNulls() {
 		MyModule dumpedModule = new MyModule();
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
 
 	@Test
-	public void testDumpAndReadEmptyCollections() {
+	void testDumpAndReadEmptyCollections() {
 		MyModule dumpedModule = new MyModule();
 		dumpedModule.listField = List.of();
 		dumpedModule.setField = ImmutableSet.of();
@@ -85,7 +90,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadCollectionsWithExactlyOneEmptyString() {
+	void testDumpAndReadCollectionsWithExactlyOneEmptyString() {
 		MyModule dumpedModule = new MyModule();
 
 		//fail on list
@@ -102,7 +107,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadCollectionsIncludingEmptyString() {
+	void testDumpAndReadCollectionsIncludingEmptyString() {
 		MyModule dumpedModule = new MyModule();
 
 		//fail on list
@@ -134,7 +139,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testReadCollectionsIncludingEmptyString() {
+	void testReadCollectionsIncludingEmptyString() {
 		String fileName = utils.getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
 		final Config readConfig = ConfigUtils.loadConfig(fileName);
 		final MyModule readModule = new MyModule();
@@ -145,7 +150,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testComments() {
+	void testComments() {
 		var expectedComments = new HashMap<>();
 		expectedComments.put("floatField", "float");
 		expectedComments.put("longField", "long");
@@ -154,6 +159,9 @@ public class ReflectiveConfigGroupTest {
 		expectedComments.put("charField", "char");
 		expectedComments.put("byteField", "byte");
 		expectedComments.put("booleanField", "boolean");
+		expectedComments.put("localTimeField", "local time");
+		expectedComments.put("localDateField", "local date");
+		expectedComments.put("localDateTimeField", "local datetime");
 		expectedComments.put("enumField", "Possible values: VALUE1,VALUE2");
 		expectedComments.put("enumListField", "list of enum");
 		expectedComments.put("enumSetField", "set of enum");
@@ -163,18 +171,19 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingOrphanSetter() {
-		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
+	void testAllowOnConstructingOrphanSetter() {
+		// no exception
+		new ReflectiveConfigGroup("name") {
 			@StringSetter("setterWithoutGetter")
 			public void setStuff(String s) {
 			}
-		}).isInstanceOf(InconsistentModuleException.class);
+		};
 	}
 
 	@Test
-	public void testFailOnConstructingOrphanGetter() {
+	void testFailOnConstructingOrphanGetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
-			@StringGetter("setterWithoutGetter")
+			@StringGetter("getterWithoutSetter")
 			public Coord getStuff() {
 				return null;
 			}
@@ -182,7 +191,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingInvalidSetter() {
+	void testFailOnConstructingInvalidSetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			// no arg: no good
 			@StringSetter("field")
@@ -211,7 +220,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingInvalidGetter() {
+	void testFailOnConstructingInvalidGetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public Object setStuff(String s) {
@@ -239,7 +248,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingSeveralGetters() {
+	void testFailOnConstructingSeveralGetters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -258,7 +267,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingSeveralSetters() {
+	void testFailOnConstructingSeveralSetters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -276,7 +285,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnConstructingSeveralParameters() {
+	void testFailOnConstructingSeveralParameters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter
 			double field;
@@ -287,7 +296,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailOnMixingGettersSettersWithParameters() {
+	void testFailOnMixingGettersSettersWithParameters() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
 			public void setStuff(double s) {
@@ -304,7 +313,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailUnsupportedType_StringCollections() {
+	void testFailUnsupportedType_StringCollections() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
 			private Collection<String> stuff;
@@ -312,7 +321,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailUnsupportedType_NonStringList() {
+	void testFailUnsupportedType_NonStringList() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
 			private List<Double> stuff;
@@ -320,7 +329,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testFailUnsupportedType_StringHashSet() {
+	void testFailUnsupportedType_StringHashSet() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
 			private HashSet<String> stuff;
@@ -328,7 +337,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testPreferCustomCommentToAutoGeneratedEnumComment() {
+	void testPreferCustomCommentToAutoGeneratedEnumComment() {
 		var config = new ReflectiveConfigGroup("name") {
 			@Comment("my comment")
 			@Parameter("field")
@@ -338,7 +347,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testBehaviorWhenAcceptingUnknownParameters() {
+	void testBehaviorWhenAcceptingUnknownParameters() {
 		final ConfigGroup testee = new ReflectiveConfigGroup("name", true) {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -353,11 +362,11 @@ public class ReflectiveConfigGroupTest {
 		final String param = "my unknown param";
 		final String value = "my val";
 		testee.addParam(param, value);
-		Assert.assertEquals("unexpected stored value", value, testee.getValue(param));
+		Assertions.assertEquals(value, testee.getValue(param), "unexpected stored value");
 	}
 
 	@Test
-	public void testBehaviorWhenRejectingUnknownParameters() {
+	void testBehaviorWhenRejectingUnknownParameters() {
 		final ConfigGroup testee = new ReflectiveConfigGroup("name", false) {
 			@StringSetter("field")
 			public void setStuff(String s) {
@@ -378,7 +387,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testExceptionRedirection() {
+	void testExceptionRedirection() {
 		final RuntimeException expectedException = new RuntimeException();
 		final ConfigGroup m = new ReflectiveConfigGroup("name") {
 			@StringSetter("field")
@@ -399,7 +408,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	private enum MyEnum {
-		VALUE1, VALUE2;
+		VALUE1, VALUE2
 	}
 
 	/**
@@ -438,6 +447,18 @@ public class ReflectiveConfigGroupTest {
 		@Comment("boolean")
 		@Parameter
 		private boolean booleanField;
+
+		@Comment("local time")
+		@Parameter
+		private LocalTime localTimeField;
+
+		@Comment("local date")
+		@Parameter
+		private LocalDate localDateField;
+
+		@Comment("local datetime")
+		@Parameter
+		private LocalDateTime localDateTimeField;
 
 		@Comment("set")
 		@Parameter

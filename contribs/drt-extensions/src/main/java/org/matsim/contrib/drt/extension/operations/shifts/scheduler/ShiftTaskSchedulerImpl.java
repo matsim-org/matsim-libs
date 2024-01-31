@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.*;
@@ -26,7 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -60,9 +59,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 		this.taskFactory = taskFactory;
 		this.network = network;
 		this.drtShiftParams = drtShiftParams;
-		this.router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
-
-		ShiftSchedules.initSchedules(operationFacilities, fleet, taskFactory);
+		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
     @Override

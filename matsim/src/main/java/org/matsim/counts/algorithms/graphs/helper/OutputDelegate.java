@@ -74,19 +74,10 @@ public class OutputDelegate {
 	}
 
 	private void copyResourceToFile(final String resourceFilename, final String destinationFilename) throws IOException {
-		InputStream inStream = null;
-		OutputStream outStream = null;
-		try {
-			inStream = MatsimResource.getAsInputStream(resourceFilename);
-			outStream = new FileOutputStream(destinationFilename);
+		try (InputStream inStream = MatsimResource.getAsInputStream(resourceFilename);
+				 FileOutputStream outStream = new FileOutputStream(destinationFilename)
+		) {
 			IOUtils.copyStream(inStream, outStream);
-		} finally {
-			if (inStream != null) {
-				inStream.close();
-			}
-			if (outStream != null) {
-				outStream.close();
-			}
 		}
 	}
 
@@ -107,17 +98,15 @@ public class OutputDelegate {
 			file2 = new File(iter_path+"/start.html");
 		}
 
-		PrintWriter writer = null;
-		try {
+		;
+		try (PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(file2)))) {
 			ChartRenderingInfo info=null;
 			File file1;
-			if (!indexFile){
+			if (!indexFile) {
 				 info = new ChartRenderingInfo(new StandardEntityCollection());
 				 file1 = new File(iter_path+"/png/"+fileName+".png");
 				 ChartUtils.saveChartAsPNG(file1, chart, width, height, info);
 			}
-
-			writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(file2)));
 
 			writer.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 			//writer.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -200,10 +189,6 @@ public class OutputDelegate {
 
 		} catch (IOException e) {
 			System.out.println(e.toString());
-		} finally {
-			if (writer != null) {
-				writer.close();
-			}
 		}
 	}
 

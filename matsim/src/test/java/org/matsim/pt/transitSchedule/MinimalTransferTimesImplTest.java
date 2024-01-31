@@ -19,8 +19,8 @@
 
 package org.matsim.pt.transitSchedule;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -32,158 +32,170 @@ import java.util.NoSuchElementException;
  */
 public class MinimalTransferTimesImplTest {
 
-	private Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId5 = Id.create(5, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
+	private final Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
 
 	@Test
-	public void testSetGet() {
+	void testSetGet() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId1, this.stopId3, 240.0);
 
-		Assert.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
 
 		// overwrite a value
 		mtt.set(this.stopId1, this.stopId2, 300.0);
-		Assert.assertEquals(300.0, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId2), 0.0);
 
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId4), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId4), 0.0);
 	}
 
 	@Test
-	public void testGetWithDefault() {
+	void testGetNonSetConnection() {
+		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
+		mtt.set(this.stopId1, this.stopId1, 300.0);
+		mtt.set(this.stopId3, this.stopId3, 240.0);
+
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId1), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId3, this.stopId3), 0.0);
+
+		Assertions.assertEquals(300.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+
+	}
+
+	@Test
+	void testGetWithDefault() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		double defaultSeconds = 60.0;
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(60.0,  mtt.get(this.stopId1, this.stopId2, defaultSeconds), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(60.0,  mtt.get(this.stopId1, this.stopId2, defaultSeconds), 0.0);
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId1, this.stopId3, 240.0);
 
-		Assert.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2, defaultSeconds), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3, defaultSeconds), 0.0);
+		Assertions.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2, defaultSeconds), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3, defaultSeconds), 0.0);
 
-		Assert.assertEquals(defaultSeconds, mtt.get(this.stopId1, this.stopId4, defaultSeconds), 0.0);
+		Assertions.assertEquals(defaultSeconds, mtt.get(this.stopId1, this.stopId4, defaultSeconds), 0.0);
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId1, this.stopId3, 240.0);
 
-		Assert.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
 
-		Assert.assertEquals(180.0, mtt.remove(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(180.0, mtt.remove(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
 
-		Assert.assertEquals(Double.NaN, mtt.remove(this.stopId1, this.stopId4), 0.0); // we never set it, let's not throw an exception
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId4), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.remove(this.stopId1, this.stopId4), 0.0); // we never set it, let's not throw an exception
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId4), 0.0);
 	}
 
 	@Test
-	public void testNotBidirection() {
+	void testNotBidirection() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId1, this.stopId3, 240.0);
 
-		Assert.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId2, this.stopId1), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId3, this.stopId1), 0.0);
+		Assertions.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId2, this.stopId1), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId3, this.stopId1), 0.0);
 
 		mtt.set(this.stopId3, this.stopId1, 120.0);
-		Assert.assertEquals(120.0, mtt.get(this.stopId3, this.stopId1), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(120.0, mtt.get(this.stopId3, this.stopId1), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId1, this.stopId3), 0.0);
 	}
 
 	@Test
-	public void testNotTransitive() {
+	void testNotTransitive() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		mtt.set(this.stopId1, this.stopId2, 180.0);
 		mtt.set(this.stopId2, this.stopId3, 240.0);
 
-		Assert.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
-		Assert.assertEquals(240.0, mtt.get(this.stopId2, this.stopId3), 0.0);
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId3), 0.0);
-		Assert.assertEquals(Double.NaN, mtt.get(this.stopId3, this.stopId1), 0.0);
+		Assertions.assertEquals(180.0, mtt.get(this.stopId1, this.stopId2), 0.0);
+		Assertions.assertEquals(240.0, mtt.get(this.stopId2, this.stopId3), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(Double.NaN, mtt.get(this.stopId3, this.stopId1), 0.0);
 
 		mtt.set(this.stopId1, this.stopId3, 480.0);
-		Assert.assertEquals(480.0, mtt.get(this.stopId1, this.stopId3), 0.0);
+		Assertions.assertEquals(480.0, mtt.get(this.stopId1, this.stopId3), 0.0);
 	}
 
 	@Test
-	public void testIterator_empty() {
+	void testIterator_empty() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 
 		MinimalTransferTimes.MinimalTransferTimesIterator iter = mtt.iterator();
 
-		Assert.assertFalse(iter.hasNext());
+		Assertions.assertFalse(iter.hasNext());
 		try {
 			iter.getFromStopId();
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 		try {
 			iter.getToStopId();
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 		try {
 			iter.getSeconds();
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 		try {
 			iter.next();
-			Assert.fail("expected Exception");
+			Assertions.fail("expected Exception");
 		} catch (NoSuchElementException expected) {}
 
 		try {
 			iter.getFromStopId(); // there should still be an exception after calling next()
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 	}
 
 	@Test
-	public void testIterator() {
+	void testIterator() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 
 		MinimalTransferTimes.MinimalTransferTimesIterator iter = mtt.iterator();
-		Assert.assertFalse(iter.hasNext());
+		Assertions.assertFalse(iter.hasNext());
 
 		mtt.set(this.stopId1, this.stopId2, 120.0);
 
 		iter = mtt.iterator();
-		Assert.assertTrue(iter.hasNext());
+		Assertions.assertTrue(iter.hasNext());
 		try {
 			iter.getFromStopId();
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 		iter.next();
-		Assert.assertEquals(this.stopId1, iter.getFromStopId());
-		Assert.assertEquals(this.stopId2, iter.getToStopId());
-		Assert.assertEquals(120, iter.getSeconds(), 0.0);
+		Assertions.assertEquals(this.stopId1, iter.getFromStopId());
+		Assertions.assertEquals(this.stopId2, iter.getToStopId());
+		Assertions.assertEquals(120, iter.getSeconds(), 0.0);
 
-		Assert.assertFalse(iter.hasNext());
+		Assertions.assertFalse(iter.hasNext());
 
 		try {
 			iter.next();
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 		try {
 			iter.getFromStopId();
-			Assert.fail("expected Exception, got none.");
+			Assertions.fail("expected Exception, got none.");
 		} catch (NoSuchElementException expected) {}
 
 		mtt.set(this.stopId1, this.stopId3, 180);
@@ -209,21 +221,21 @@ public class MinimalTransferTimesImplTest {
 			} else if (fromStopId == this.stopId2 && toStopId == this.stopId3 && seconds == 240) {
 				found2to3 = true;
 			} else {
-				Assert.fail("found unexcpected minimal transfer time: " + fromStopId + " / " + toStopId + " / " + seconds);
+				Assertions.fail("found unexcpected minimal transfer time: " + fromStopId + " / " + toStopId + " / " + seconds);
 			}
 			if (count > 3) {
-				Assert.fail("too many elements in iterator.");
+				Assertions.fail("too many elements in iterator.");
 			}
 		}
-		Assert.assertTrue(found1to2);
-		Assert.assertTrue(found1to3);
-		Assert.assertTrue(found2to3);
+		Assertions.assertTrue(found1to2);
+		Assertions.assertTrue(found1to3);
+		Assertions.assertTrue(found2to3);
 
 
 	}
 
 	@Test
-	public void testIterator_withRemove() {
+	void testIterator_withRemove() {
 		MinimalTransferTimes mtt = new MinimalTransferTimesImpl();
 		mtt.set(this.stopId1, this.stopId2, 180);
 		mtt.set(this.stopId2, this.stopId3, 240);
@@ -235,7 +247,7 @@ public class MinimalTransferTimesImplTest {
 			count++;
 			iter.next();
 		}
-		Assert.assertEquals(3, count);
+		Assertions.assertEquals(3, count);
 
 		mtt.remove(this.stopId2, this.stopId3);
 		count = 0;
@@ -244,7 +256,7 @@ public class MinimalTransferTimesImplTest {
 			count++;
 			iter.next();
 		}
-		Assert.assertEquals(2, count);
+		Assertions.assertEquals(2, count);
 
 		mtt.remove(this.stopId1, this.stopId2);
 		count = 0;
@@ -253,10 +265,10 @@ public class MinimalTransferTimesImplTest {
 			count++;
 			iter.next();
 		}
-		Assert.assertEquals(1, count);
+		Assertions.assertEquals(1, count);
 
 		mtt.remove(this.stopId3, this.stopId1);
 		iter = mtt.iterator();
-		Assert.assertFalse(iter.hasNext());
+		Assertions.assertFalse(iter.hasNext());
 	}
 }

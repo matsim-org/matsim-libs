@@ -27,14 +27,16 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -49,7 +51,7 @@ import com.google.common.base.Preconditions;
 public final class DrtSpeedUp implements IterationStartsListener, IterationEndsListener {
 	private static final Logger log = LogManager.getLogger(DrtSpeedUp.class);
 
-	public static boolean isTeleportDrtUsers(DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
+	public static boolean isTeleportDrtUsers(DrtSpeedUpParams drtSpeedUpParams, ControllerConfigGroup controlerConfig,
 			int iteration) {
 		int lastIteration = controlerConfig.getLastIteration();
 		if (iteration < drtSpeedUpParams.fractionOfIterationsSwitchOn * lastIteration
@@ -63,7 +65,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	private final String mode;
 	private final DrtSpeedUpParams drtSpeedUpParams;
-	private final ControlerConfigGroup controlerConfig;
+	private final ControllerConfigGroup controlerConfig;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
 	private final DrtEventSequenceCollector drtEventSequenceCollector;
@@ -76,7 +78,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	private double currentAvgWaitingTime;
 	private double currentAvgInVehicleBeelineSpeed;
 
-	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
+	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControllerConfigGroup controlerConfig,
 			Network network, FleetSpecification fleetSpecification,
 			DrtEventSequenceCollector drtEventSequenceCollector) {
 		this.mode = mode;
@@ -192,18 +194,24 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 				continue;//skip incomplete sequences
 			}
 			DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
-
 			Link depLink = network.getLinks().get(submittedEvent.getFromLinkId());
 			Link arrLink = network.getLinks().get(submittedEvent.getToLinkId());
 			double beelineDistance = DistanceUtils.calculateDistance(depLink.getToNode(), arrLink.getToNode());
 
-			double pickupTime = sequence.getPickedUp().get().getTime();
-			double waitTime = pickupTime - sequence.getSubmitted().getTime();
-			double rideTime = sequence.getDroppedOff().get().getTime() - pickupTime;
+			for (Id<Person> personId : submittedEvent.getPersonIds()) {
+				if(sequence.getPersonEvents().containsKey(personId)) {
+					DrtEventSequenceCollector.EventSequence.PersonEvents personEvents = sequence.getPersonEvents().get(personId);
+					if(personEvents.getPickedUp().isPresent() && personEvents.getDroppedOff().isPresent()) {
+						double pickupTime = personEvents.getPickedUp().get().getTime();
+						double waitTime = pickupTime - sequence.getSubmitted().getTime();
+						double rideTime = personEvents.getDroppedOff().get().getTime() - pickupTime;
 
-			//TODO I would map unshared_ride_time to rideTime -- should be more precise
-			meanInVehicleBeelineSpeed.increment(beelineDistance / rideTime);
-			meanWaitTime.increment(waitTime);
+						//TODO I would map unshared_ride_time to rideTime -- should be more precise
+						meanInVehicleBeelineSpeed.increment(beelineDistance / rideTime);
+						meanWaitTime.increment(waitTime);
+					}
+				}
+			}
 		}
 
 		int count = (int)meanWaitTime.getN();

@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -40,17 +42,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author thibautd
  */
 public class FixedGroupsIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIterationOrderIsDeterministic() throws Exception {
+	void testIterationOrderIsDeterministic() throws Exception {
 		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile().getParentFile()+"/config.xml";
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 
@@ -79,9 +79,9 @@ public class FixedGroupsIT {
 			final Collection<ReplanningGroup> expected,
 			final Collection<ReplanningGroup> actual) {
 		assertEquals(
-				"not the same number of groups",
 				expected.size(),
-				actual.size());
+				actual.size(),
+				"not the same number of groups");
 
 		final Iterator<ReplanningGroup> expectedIter = expected.iterator();
 		final Iterator<ReplanningGroup> actualIter = actual.iterator();
@@ -95,10 +95,10 @@ public class FixedGroupsIT {
 			final Iterator<Person> actualGroupIterator = actualGroup.getPersons().iterator();
 			for (Person expectedPerson : expectedGroup.getPersons()) {
 				assertEquals(
-						"groups "+expectedGroup+" and "+actualGroup+" in position "+
-						c+" are not equal or do not present the persons in the same order",
 						expectedPerson.getId(),
-						actualGroupIterator.next().getId());
+						actualGroupIterator.next().getId(),
+						"groups "+expectedGroup+" and "+actualGroup+" in position "+
+						c+" are not equal or do not present the persons in the same order");
 			}
 		}
 	}

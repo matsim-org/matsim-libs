@@ -21,7 +21,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 

@@ -4,8 +4,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -48,10 +48,10 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 	SingleModeNetworksCache singleModeNetworksCache;
 
 	@Inject
-	PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	ScoringConfigGroup scoringConfigGroup;
 
 	@Inject
-	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	RoutingConfigGroup routingConfigGroup;
 
 	@Inject
 	Network network;
@@ -94,7 +94,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						filteredNetwork,
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
-		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
+		if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
 					routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser );
 		} else {

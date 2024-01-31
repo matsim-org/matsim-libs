@@ -34,12 +34,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
+public final class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public ChargerOccupancyTimeProfileCollectorProvider(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
+	ChargerOccupancyTimeProfileCollectorProvider(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.matsimServices = matsimServices;
 	}
@@ -67,7 +67,7 @@ public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<Mo
 		};
 
 		var collector = new TimeProfileCollector(header, calc, 300, "charger_occupancy_time_profiles", matsimServices);
-		if (matsimServices.getConfig().controler().isCreateGraphs()) {
+		if (matsimServices.getConfig().controller().getCreateGraphsInterval()>0) {
 			collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
 		} else {
 			collector.setChartTypes();

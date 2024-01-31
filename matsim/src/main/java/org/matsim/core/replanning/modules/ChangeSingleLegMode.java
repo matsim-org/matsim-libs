@@ -20,7 +20,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -61,7 +60,7 @@ public class ChangeSingleLegMode extends AbstractMultithreadedModule {
 			this.allowSwitchFromListedModesOnly = true;
 		} else this.allowSwitchFromListedModesOnly=false;
 	}
-	
+
 	public ChangeSingleLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
 		super(nOfThreads);
 		this.availableModes = modes.clone();

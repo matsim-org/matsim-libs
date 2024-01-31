@@ -36,7 +36,7 @@ import com.google.inject.name.Names;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ChargingInfrastructureModule extends AbstractModule {
+public final class ChargingInfrastructureModule extends AbstractModule {
 	public static final String CHARGERS = "chargers";
 	private final Key<Network> networkKey;
 
@@ -56,7 +56,7 @@ public class ChargingInfrastructureModule extends AbstractModule {
 		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
 
 		bind(ChargingInfrastructureSpecification.class).toProvider(() -> {
-			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
+			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationDefaultImpl();
 			new ChargerReader(chargingInfrastructureSpecification).parse(
 					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
 			return chargingInfrastructureSpecification;
@@ -76,8 +76,8 @@ public class ChargingInfrastructureModule extends AbstractModule {
 
 					@Override
 					public ChargingInfrastructure get() {
-						return ChargingInfrastructures.createChargingInfrastructure(chargingInfrastructureSpecification,
-								network.getLinks()::get, chargingLogicFactory);
+						return ChargingInfrastructureUtils.createChargingInfrastructure(chargingInfrastructureSpecification,
+								network.getLinks()::get, chargingLogicFactory );
 					}
 				}).asEagerSingleton();
 			}

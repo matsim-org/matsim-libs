@@ -22,8 +22,8 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,7 +38,7 @@ import org.matsim.core.population.PopulationUtils;
 public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 	@Test
-	public void testPruneBiggestPlanWithHigherSum() {
+	void testPruneBiggestPlanWithHigherSum() {
 		final JointPlans jointPlans = new JointPlans();
 
 		// two joint plans, biggest has a higher total weight,
@@ -125,14 +125,14 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 		for ( PlanRecord r : fixture.allRecords ) {
 			if ( fixture.expectedUnfeasiblePlans.contains( r.getPlan() ) ) {
-				Assert.assertFalse(
-						"plan "+r.getPlan()+" unexpectedly feasible",
-						r.isFeasible() );
+				Assertions.assertFalse(
+						r.isFeasible(),
+						"plan "+r.getPlan()+" unexpectedly feasible" );
 			}
 			else {
-				Assert.assertTrue(
-						"plan "+r.getPlan()+" unexpectedly unfeasible",
-						r.isFeasible() );
+				Assertions.assertTrue(
+						r.isFeasible(),
+						"plan "+r.getPlan()+" unexpectedly unfeasible" );
 			}
 		}
 	}

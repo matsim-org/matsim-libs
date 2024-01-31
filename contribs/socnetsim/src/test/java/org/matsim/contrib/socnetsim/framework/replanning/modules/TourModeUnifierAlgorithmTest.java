@@ -26,8 +26,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -45,7 +45,7 @@ public class TourModeUnifierAlgorithmTest {
 	private static final Logger log = LogManager.getLogger( TourModeUnifierAlgorithmTest.class );
 
 	@Test
-	public void testPlanWithOneSingleTour() throws Exception {
+	void testPlanWithOneSingleTour() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink1 = Id.create( "anchor1" , Link.class );
@@ -120,25 +120,25 @@ public class TourModeUnifierAlgorithmTest {
 					new MainModeIdentifierImpl() );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected plan size",
+		Assertions.assertEquals(
 				2 * nActs - 1,
-				plan.getPlanElements().size() );
+				plan.getPlanElements().size(),
+				"unexpected plan size" );
 		for ( Trip trip : TripStructureUtils.getTrips( plan , TripStructureUtils::isStageActivityType ) ) {
-			Assert.assertEquals(
-					"unexpected size of trip "+trip,
+			Assertions.assertEquals(
 					1,
-					trip.getTripElements().size() );
+					trip.getTripElements().size(),
+					"unexpected size of trip "+trip );
 
-			Assert.assertEquals(
-					"unexpected mode of trip "+trip,
+			Assertions.assertEquals(
 					mode,
-					((Leg) trip.getTripElements().get( 0 )).getMode() );
+					((Leg) trip.getTripElements().get( 0 )).getMode(),
+					"unexpected mode of trip "+trip );
 		}
 	}
 
 	@Test
-	public void testPlanWithTwoToursOnOpenTour() throws Exception {
+	void testPlanWithTwoToursOnOpenTour() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> entranceLink = Id.create( "entrance" , Link.class );
@@ -193,52 +193,52 @@ public class TourModeUnifierAlgorithmTest {
 					new MainModeIdentifierImpl() );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected plan size",
+		Assertions.assertEquals(
 				31,
-				plan.getPlanElements().size() );
+				plan.getPlanElements().size(),
+				"unexpected plan size" );
 
 		final List<Trip> trips = TripStructureUtils.getTrips( plan , TripStructureUtils::isStageActivityType );
 
-		Assert.assertEquals(
-				"unexpected number of trips",
+		Assertions.assertEquals(
 				13,
-				trips.size() );
+				trips.size(),
+				"unexpected number of trips" );
 
 		for ( int tripNr : new int[]{0,1,6,11,12} ) {
-			Assert.assertEquals(
-					"unexpected mode for trip "+tripNr,
+			Assertions.assertEquals(
 					modeOfOpenTour,
-					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode(),
+					"unexpected mode for trip "+tripNr );
 		}
 
 		for ( int tripNr : new int[]{2,3,3,4,5} ) {
-			Assert.assertEquals(
-					"unexpected length for trip "+tripNr,
+			Assertions.assertEquals(
 					1,
-					trips.get( tripNr ).getLegsOnly().size() );
+					trips.get( tripNr ).getLegsOnly().size(),
+					"unexpected length for trip "+tripNr );
 
-			Assert.assertEquals(
-					"unexpected mode for trip "+tripNr,
+			Assertions.assertEquals(
 					mode1,
-					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode(),
+					"unexpected mode for trip "+tripNr );
 		}
 
 		for ( int tripNr : new int[]{7,8,9,10} ) {
-			Assert.assertEquals(
-					"unexpected length for trip "+tripNr,
+			Assertions.assertEquals(
 					1,
-					trips.get( tripNr ).getLegsOnly().size() );
+					trips.get( tripNr ).getLegsOnly().size(),
+					"unexpected length for trip "+tripNr );
 
-			Assert.assertEquals(
-					"unexpected mode for trip "+tripNr,
+			Assertions.assertEquals(
 					mode2,
-					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode(),
+					"unexpected mode for trip "+tripNr );
 		}
 	}
 
 	@Test
-	public void testPlanWithTwoHomeBasedTours() throws Exception {
+	void testPlanWithTwoHomeBasedTours() throws Exception {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink = Id.create( "anchor" , Link.class );
@@ -271,7 +271,7 @@ public class TourModeUnifierAlgorithmTest {
 		final List<Activity> activities = TripStructureUtils.getActivities( plan, StageActivityHandling.ExcludeStageActivities );
 		final int nActs = activities.size();
 
-		Assert.assertEquals( 9, nActs );
+		Assertions.assertEquals( 9, nActs );
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm( 
@@ -279,40 +279,40 @@ public class TourModeUnifierAlgorithmTest {
 					new MainModeIdentifierImpl() );
 		testee.run( plan );
 
-		Assert.assertEquals(
-				"unexpected plan size",
+		Assertions.assertEquals(
 				2 * nActs - 1,
-				plan.getPlanElements().size() );
+				plan.getPlanElements().size(),
+				"unexpected plan size" );
 
 		final List<Trip> trips = TripStructureUtils.getTrips( plan , TripStructureUtils::isStageActivityType );
 
-		Assert.assertEquals(
-				"unexpected number of trips",
+		Assertions.assertEquals(
 				8,
-				trips.size() );
+				trips.size(),
+				"unexpected number of trips" );
 
 		for ( int tripNr : new int[]{0,1,2,3} ) {
-			Assert.assertEquals(
-					"unexpected length for trip "+tripNr,
+			Assertions.assertEquals(
 					1,
-					trips.get( tripNr ).getLegsOnly().size() );
+					trips.get( tripNr ).getLegsOnly().size(),
+					"unexpected length for trip "+tripNr );
 
-			Assert.assertEquals(
-					"unexpected mode for trip "+tripNr,
+			Assertions.assertEquals(
 					mode1,
-					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode(),
+					"unexpected mode for trip "+tripNr );
 		}
 
 		for ( int tripNr : new int[]{4,5,6,7} ) {
-			Assert.assertEquals(
-					"unexpected length for trip "+tripNr,
+			Assertions.assertEquals(
 					1,
-					trips.get( tripNr ).getLegsOnly().size() );
+					trips.get( tripNr ).getLegsOnly().size(),
+					"unexpected length for trip "+tripNr );
 
-			Assert.assertEquals(
-					"unexpected mode for trip "+tripNr,
+			Assertions.assertEquals(
 					mode2,
-					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode(),
+					"unexpected mode for trip "+tripNr );
 		}
 	}
 	private static void printPlan( Plan plan ){

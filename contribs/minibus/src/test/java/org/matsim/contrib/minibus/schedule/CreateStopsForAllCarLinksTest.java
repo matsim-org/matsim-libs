@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.minibus.schedule;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,50 +36,50 @@ import org.matsim.testcases.MatsimTestUtils;
 
 
 public class CreateStopsForAllCarLinksTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
-    public final void testCreateStopsForAllCarLinks() {
-		
+	final void testCreateStopsForAllCarLinks() {
+
 		Network net = PScenarioHelper.createTestNetwork().getNetwork();
 		PConfigGroup pC = new PConfigGroup();
-		
+
 		int numberOfCarLinks = 0;
 		for (Link link : net.getLinks().values()) {
 			if (link.getAllowedModes().contains(TransportMode.car)) {
 				numberOfCarLinks++;
 			}
 		}
-		
+
 		TransitSchedule transitSchedule = CreateStopsForAllCarLinks.createStopsForAllCarLinks(net, pC);
-		
+
 		int numberOfParaStops = 0;
 		for (TransitStopFacility stopFacility : transitSchedule.getFacilities().values()) {
 			if (stopFacility.getId().toString().startsWith(pC.getPIdentifier())) {
 				numberOfParaStops++;
 			}
 		}
-		
-		Assert.assertEquals("All car links got a paratransit stop", numberOfCarLinks, numberOfParaStops, MatsimTestUtils.EPSILON);
+
+		Assertions.assertEquals(numberOfCarLinks, numberOfParaStops, MatsimTestUtils.EPSILON, "All car links got a paratransit stop");
 
 		TransitScheduleFactoryImpl tSF = new TransitScheduleFactoryImpl();
-		
+
 		TransitSchedule realTransitSchedule = tSF.createTransitSchedule();
 		TransitStopFacility stop1 = tSF.createTransitStopFacility(Id.create("1314", TransitStopFacility.class), new Coord(0.0, 0.0), false);
 		stop1.setLinkId(Id.create("1314", Link.class));
 		realTransitSchedule.addStopFacility(stop1);
-		
+
 		transitSchedule = CreateStopsForAllCarLinks.createStopsForAllCarLinks(net, pC, realTransitSchedule);
-		
+
 		numberOfParaStops = 0;
 		for (TransitStopFacility stopFacility : transitSchedule.getFacilities().values()) {
 			if (stopFacility.getId().toString().startsWith(pC.getPIdentifier())) {
 				numberOfParaStops++;
 			}
 		}
-		
-		Assert.assertEquals("All car links minus one stop from formal transit got a paratransit stop", numberOfCarLinks - 1, numberOfParaStops, MatsimTestUtils.EPSILON);
-		
+
+		Assertions.assertEquals(numberOfCarLinks - 1, numberOfParaStops, MatsimTestUtils.EPSILON, "All car links minus one stop from formal transit got a paratransit stop");
+
 	}
 
 }

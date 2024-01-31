@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -16,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
@@ -43,25 +62,23 @@ import java.util.Map;
 
 public class RaptorStopFinderTest {
 
-    private Facility fromFac = new FakeFacility(new Coord(0, 0), Id.create("AA", Link.class)); // stop A
-    private Facility toFac = new FakeFacility(new Coord(100000, 0), Id.create("XX", Link.class)); // stop X
+    private final Facility fromFac = new FakeFacility(new Coord(0, 0), Id.create("AA", Link.class)); // stop A
+    private final Facility toFac = new FakeFacility(new Coord(100000, 0), Id.create("XX", Link.class)); // stop X
 
 
-    /** Empty Initial Search Radius
-     * Tests the how the StopFinder reacts when there are no public transit stops within the Initial_Search_Radius.
-     * The expected behaviour of the StopFinder is to find the closest public transit stop and set the new search
-     * radius as the sum of the distance to the nearest stop and the Search_Extension_Radius. However, if the general
-     * radius is smaller than this new search radius, then the StopFinder will  only search to the extents of the general
-     * Radius.
-     *
-     * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
-     * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
-     */
-    
-    
-    @Test
-    public void testDefaultStopFinder_EmptyInitialSearchRadius() {
+	/** Empty Initial Search Radius
+	 * Tests the how the StopFinder reacts when there are no public transit stops within the Initial_Search_Radius.
+	 * The expected behaviour of the StopFinder is to find the closest public transit stop and set the new search
+	 * radius as the sum of the distance to the nearest stop and the Search_Extension_Radius. However, if the general
+	 * radius is smaller than this new search radius, then the StopFinder will  only search to the extents of the general
+	 * Radius.
+	 *
+	 * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
+	 * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
+	 * where StopFilterAttributes are used.
+	 */
+	@Test
+	void testDefaultStopFinder_EmptyInitialSearchRadius() {
         /* General Radius includes no stops. Search_Extension_Radius is 0
         Expected: StopFinder will find no stops, since closest stop is outside of general radius. Therefore
         agent will use transit_walk to get from A to X.
@@ -87,10 +104,10 @@ public class RaptorStopFinderTest {
 
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
-            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+            Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
+
         }
-        
+
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -118,19 +135,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
         }
 
@@ -162,25 +179,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testDefaultStopFinder_EmptyInitialSearchRadius_StopFilterAttributes() {
+	@Test
+	void testDefaultStopFinder_EmptyInitialSearchRadius_StopFilterAttributes() {
         /* Initial_Search_Radius and General Radius contain only stop B.
         Stop B is not "walkAccessible"; all other stops are "walkAccessible" Search_Extension_Radius is 0
         Expected: StopFinder will find no stops, since closest accessible stop is outside of general radius. Therefore
@@ -215,9 +232,9 @@ public class RaptorStopFinderTest {
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
-            
-            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
+            Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
+
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -253,19 +270,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
         }
 
@@ -304,19 +321,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
         }
 
@@ -359,25 +376,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testRandomAccessEgressModeRaptorStopFinder_EmptyInitialSearchRadius() {
+	@Test
+	void testRandomAccessEgressModeRaptorStopFinder_EmptyInitialSearchRadius() {
         /* General Radius includes no stops. Search_Extension_Radius is 0
         Expected: StopFinder will find no stops, since closest stop is outside of general radius. Therefore
         agent will use transit_walk to get from A to X.
@@ -404,10 +421,10 @@ public class RaptorStopFinderTest {
 
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
-            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+            Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
+
         }
-        
+
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -436,19 +453,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
         }
 
@@ -480,25 +497,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testRandomAccessEgressModeRaptorStopFinder_EmptyInitialSearchRadius_StopFilterAttributes() {
+	@Test
+	void testRandomAccessEgressModeRaptorStopFinder_EmptyInitialSearchRadius_StopFilterAttributes() {
         /* Initial_Search_Radius and General Radius contain only stop B.
         Stop B is not "walkAccessible"; all other stops are "walkAccessible" Search_Extension_Radius is 0
         Expected: StopFinder will find no stops, since closest accessible stop is outside of general radius. Therefore
@@ -534,8 +551,8 @@ public class RaptorStopFinderTest {
 
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
-            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+            Assertions.assertNull(legs, "The router should not find a route and return null, but did return something else.");
+
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -572,19 +589,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
         }
 
@@ -624,19 +641,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
         }
 
@@ -680,39 +697,39 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    // ***********************************************************************************************************
+	// ***********************************************************************************************************
 
-    /** Half Full Initial Search Radius
-     * Tests the how the StopFinder reacts when there is only one public transit stop within the Initial_Search_Radius.
-     * In this case, the Initial_Search_Radius will always contain stop B, but no other stops.
-     * The expected behaviour of the StopFinder define a new extended search radius, which is the sum of the distance
-     * to stop B and the Search_Extension_Radius. However, if the general
-     * radius is smaller than this new search radius, then the StopFinder will  only search to the extents of the general
-     * Radius.
-     *
-     * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
-     * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
-     */
-    @Test
-    public void testDefaultStopFinder_HalfFullInitialSearchRadius() {
+	/** Half Full Initial Search Radius
+	* Tests the how the StopFinder reacts when there is only one public transit stop within the Initial_Search_Radius.
+	* In this case, the Initial_Search_Radius will always contain stop B, but no other stops.
+	* The expected behaviour of the StopFinder define a new extended search radius, which is the sum of the distance
+	* to stop B and the Search_Extension_Radius. However, if the general
+	* radius is smaller than this new search radius, then the StopFinder will  only search to the extents of the general
+	* Radius.
+	*
+	* This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
+	* For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
+	* where StopFilterAttributes are used.
+	*/
+	@Test
+	void testDefaultStopFinder_HalfFullInitialSearchRadius() {
         /* Initial_Search_Radius includes B. Search_Extension_Radius is 0.
         General_Radius includes B, C, D and E
         Expected: Stop Finder will only find stop B, since the Search_Extension_Radius doesn't encompass more stops.
@@ -741,19 +758,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
 
@@ -786,19 +803,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
 
@@ -831,25 +848,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testDefaultStopFinder_HalfFullInitialSearchRadius_StopFilterAttributes() {
+	@Test
+	void testDefaultStopFinder_HalfFullInitialSearchRadius_StopFilterAttributes() {
         /* Initial_Search_Radius includes B and C. Search_Extension_Radius is 0.
         General_Radius includes B, C, D and E
         Stop B is not "walkAccessible", but all others are.
@@ -885,19 +902,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
 
@@ -937,25 +954,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testRandomAccessEgressModeRaptorStopFinder_HalfFullInitialSearchRadius() {
+	@Test
+	void testRandomAccessEgressModeRaptorStopFinder_HalfFullInitialSearchRadius() {
         /* Initial_Search_Radius includes B. Search_Extension_Radius is 0.
         General_Radius includes B, C, D and E
         Expected: Stop Finder will only find stop B, since the Search_Extension_Radius doesn't encompass more stops.
@@ -985,19 +1002,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
 
@@ -1031,19 +1048,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
 
@@ -1077,25 +1094,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testRandomAccessEgressModeRaptorStopFinder_HalfFullInitialSearchRadius_StopFilterAttributes() {
+	@Test
+	void testRandomAccessEgressModeRaptorStopFinder_HalfFullInitialSearchRadius_StopFilterAttributes() {
         /* Initial_Search_Radius includes B and C. Search_Extension_Radius is 0.
         General_Radius includes B, C, D and E
         Stop B is not "walkAccessible", but all others are.
@@ -1132,19 +1149,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
 
@@ -1185,38 +1202,38 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    // ***********************************************************************************************************
+	// ***********************************************************************************************************
 
-    /** Full Initial Search Radius
-     * Tests the how the StopFinder reacts when there are at least 2 stop within the Initial_Search_Radius. In the
-     * following tests, the Initial_Search_Radius includes stops B and C.
-     * The StopFinder should then not find stops outside of Initial_Search_Radius, even if the Search_Extension_Radius
-     * is initialized. If the general Radius is smaller than the Initial_Search_Radius, then the StopFinder should only
-     * search to the extents of the general radius.
-     *
-     * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
-     * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
-     */
-    @Test
-    public void testDefaultStopFinder_FullInitialSearchRadius() {
+	/** Full Initial Search Radius
+	* Tests the how the StopFinder reacts when there are at least 2 stop within the Initial_Search_Radius. In the
+	* following tests, the Initial_Search_Radius includes stops B and C.
+	* The StopFinder should then not find stops outside of Initial_Search_Radius, even if the Search_Extension_Radius
+	* is initialized. If the general Radius is smaller than the Initial_Search_Radius, then the StopFinder should only
+	* search to the extents of the general radius.
+	*
+	* This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
+	* For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
+	* where StopFilterAttributes are used.
+	*/
+	@Test
+	void testDefaultStopFinder_FullInitialSearchRadius() {
 
 
          /* Search_Extension_Radius includes D and E
@@ -1248,19 +1265,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
@@ -1295,25 +1312,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testDefaultStopFinder_FullInitialSearchRadius_StopFilterAttributes() {
+	@Test
+	void testDefaultStopFinder_FullInitialSearchRadius_StopFilterAttributes() {
 
 
          /* Initial_Search_Radius includes B, C, and D
@@ -1353,19 +1370,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
@@ -1408,26 +1425,26 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
     }
 
-    @Test
-    public void testRandomAccessEgressModeRaptorStopFinder_FullInitialSearchRadius() {
+	@Test
+	void testRandomAccessEgressModeRaptorStopFinder_FullInitialSearchRadius() {
 
 
          /* Search_Extension_Radius includes D and E
@@ -1460,19 +1477,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
@@ -1508,25 +1525,25 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
         }
 
     }
 
-    @Test
-    public void testRandomAccessEgressModeRaptorStopFinder_FullInitialSearchRadius_StopFilterAttributes() {
+	@Test
+	void testRandomAccessEgressModeRaptorStopFinder_FullInitialSearchRadius_StopFilterAttributes() {
 
 
          /* Initial_Search_Radius includes B, C, and D
@@ -1567,19 +1584,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
@@ -1623,29 +1640,29 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("CC", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
     }
 
 
-    // ***********************************************************************************************************
-    @Deprecated
-    @Test
-    public void testDefaultStopFinder_testMultipleModes() {
+	// ***********************************************************************************************************
+	@Deprecated
+	@Test
+	void testDefaultStopFinder_testMultipleModes() {
 
         // Test 7: Test Stop Filter Attributes
         // Initial_Search_Radius includes B and C and D
@@ -1666,9 +1683,9 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
-            f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
+            f0.scenario.getConfig().scoring().addModeParams(modeParams);
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet zoomerAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1696,19 +1713,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals("zoomer", leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals("zoomer", leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
@@ -1732,9 +1749,9 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
-            f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
+            f0.scenario.getConfig().scoring().addModeParams(modeParams);
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet zoomerAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1762,19 +1779,19 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals("zoomer", leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals("zoomer", leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("DD", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(2);
-            Assert.assertEquals(TransportMode.walk, leg.getMode());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.walk, leg.getMode());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 
 
         }
@@ -1824,15 +1841,15 @@ public class RaptorStopFinderTest {
                 System.out.println(leg);
             }
 
-            Assert.assertEquals("wrong number of legs.", 3, legs.size());
+            Assertions.assertEquals(3, legs.size(), "wrong number of legs.");
             Leg leg = (Leg) legs.get(0);
-            Assert.assertEquals(TransportMode.bike, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.bike, leg.getMode());
+            Assertions.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getEndLinkId());
             leg = (Leg) legs.get(1);
-            Assert.assertEquals(TransportMode.pt, leg.getMode());
-            Assert.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
+            Assertions.assertEquals(TransportMode.pt, leg.getMode());
+            Assertions.assertEquals(Id.create("BB", Link.class), leg.getRoute().getStartLinkId());
+            Assertions.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
 //            leg = legs.get(2);
 //            Assert.assertEquals(TransportMode.bike, leg.getMode());
 //            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getStartLinkId());

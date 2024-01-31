@@ -44,44 +44,44 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class RunAccidents {
 	private static final Logger log = LogManager.getLogger(RunAccidents.class);
-		
-	public static void main(String[] args) throws IOException {		
+
+	public static void main(String[] args) throws IOException {
 		RunAccidents main = new RunAccidents();
 		main.run();
 	}
 
 	private void run() throws MalformedURLException, IOException {
 		log.info("Loading scenario...");
-		
+
 		String configFile = "path/to/configFile.xml";
-		
+
 		Config config = ConfigUtils.loadConfig(configFile );
-		
+
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
 		accidentsSettings.setEnableAccidentsModule(true);
-		
+
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		// Preprocess network
 		AccidentsNetworkModification networkModification = new AccidentsNetworkModification(scenario);
-		
+
 		String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
 		String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
-				
+
 		networkModification.setLinkAttributsBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
-		
+
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AccidentsModule());
-				
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 	}
-	
+
 	private String[] readCSVFile(String csvFile) {
 		ArrayList<Id<Link>> links = new ArrayList<>();
 
 		BufferedReader br = IOUtils.getBufferedReader(csvFile);
-		
+
 		String line = null;
 		try {
 			line = br.readLine();
@@ -92,7 +92,7 @@ public class RunAccidents {
 		try {
 			int countWarning = 0;
 			while ((line = br.readLine()) != null) {
-				
+
 				String[] columns = line.split(";");
 				Id<Link> linkId = null;
 				for (int column = 0; column < columns.length; column++) {
@@ -105,7 +105,7 @@ public class RunAccidents {
 							log.warn("This message is only given once.");
 						}
 						countWarning++;
-					}						
+					}
 				}
 				log.info("Adding link ID " + linkId);
 				links.add(linkId);
@@ -113,7 +113,7 @@ public class RunAccidents {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		String[] linkIDsArray = (String[]) links.toArray();
 		return linkIDsArray ;
 	}

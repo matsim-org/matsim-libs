@@ -26,13 +26,12 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.CheckingOfMarginalUtilityOfTravellng;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -53,9 +52,9 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 	// VSP says that people < 18J should not use car, and implements that via car availability.  How to handle that?
 
-	// 
+	//
 	private static final  Logger log = LogManager.getLogger(VspConfigConsistencyCheckerImpl.class);
-	
+
 	public VspConfigConsistencyCheckerImpl() {
 		// empty.  only here to find out where it is called.
 	}
@@ -75,11 +74,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			default -> throw new RuntimeException( "not implemented" );
 		}
 		log.info("running checkConsistency ...");
-		
+
 		boolean problem = false ; // ini
-		
+
 		// yy: sort the config groups alphabetically
-		
+
 		// === controler:
 
 		problem = checkControlerConfigGroup( config, lvl, problem );
@@ -131,17 +130,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		// === interaction between config groups:
 		boolean containsModeChoice = false ;
-		for ( StrategySettings settings : config.strategy().getStrategySettings() ) {
+		for ( StrategySettings settings : config.replanning().getStrategySettings() ) {
 			if ( settings.getStrategyName().contains("Mode") ) {
 				containsModeChoice = true ;
 			}
 		}
-		
+
 		// added jun'16
-		if ( config.qsim().getVehiclesSource()==VehiclesSource.fromVehiclesData 
-				&& config.qsim().getUsePersonIdForMissingVehicleId() 
-				&& containsModeChoice 
-				&& config.qsim().getMainModes().size() > 1 ) 
+		if ( config.qsim().getVehiclesSource()==VehiclesSource.fromVehiclesData
+				&& config.qsim().getUsePersonIdForMissingVehicleId()
+				&& containsModeChoice
+				&& config.qsim().getMainModes().size() > 1 )
 		{
 			problem = true ;
 			log.log( lvl, "You can't use more than one main (=vehicular) mode while using the agent ID as missing vehicle ID ... "
@@ -149,14 +148,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// === zzz:
-		
+
 		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel() == VspDefaultsCheckingLevel.abort ) {
-			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
+			String str = "found a situation that leads to vsp-abort.  aborting ..." ;
 			System.out.flush() ;
-			log.fatal( str ) ; 
+			log.fatal( str ) ;
 			throw new RuntimeException( str ) ;
 		}
-		
+
 	}
 	private boolean checkSubtourModeChoiceConfigGroup( Config config, Level lvl, boolean problem ){
 		if ( config.subtourModeChoice().considerCarAvailability() ) {
@@ -190,7 +189,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 	}
 	private static boolean checkStrategyConfigGroup( Config config, Level lvl, boolean problem ){
 		boolean found = false ;
-		Collection<StrategySettings> settingsColl = config.strategy().getStrategySettings();
+		Collection<StrategySettings> settingsColl = config.replanning().getStrategySettings();
 		for ( StrategySettings settings : settingsColl ) {
 			if ( settings.getStrategyName().equalsIgnoreCase("ChangeExpBeta") ) {
 				found = true ;
@@ -203,7 +202,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added may'16
-		if ( config.strategy().getFractionOfIterationsToDisableInnovation()==Double.POSITIVE_INFINITY ) {
+		if ( config.replanning().getFractionOfIterationsToDisableInnovation()==Double.POSITIVE_INFINITY ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You have not set fractionOfIterationsToDisableInnovation; vsp default is to set this to 0.8 or similar.  Add the following config lines:" ) ;
@@ -214,7 +213,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		// added nov'15
 		boolean usingTimeMutator = false ;
-		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
+		for ( StrategySettings it : config.replanning().getStrategySettings() ) {
 			if ( DefaultStrategy.TimeAllocationMutator.equals( it.getName() ) ) {
 				usingTimeMutator = true ;
 				break ;
@@ -244,7 +243,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		// added jun'22
 		boolean usingSMC = false ;
-		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
+		for ( StrategySettings it : config.replanning().getStrategySettings() ) {
 			if ( DefaultStrategy.SubtourModeChoice.equals( it.getName() ) ) {
 				usingSMC = true ;
 				break ;
@@ -340,7 +339,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 	}
 	private static boolean checkPlanCalcScoreConfigGroup( Config config, Level lvl, boolean problem ){
 		// use beta_brain=1 // added as of nov'12
-		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
+		if ( config.scoring().getBrainExpBeta() != 1. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
@@ -351,14 +350,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added aug'13:
-		if ( config.planCalcScore().getMarginalUtlOfWaiting_utils_hr() != 0. ) {
+		if ( config.scoring().getMarginalUtlOfWaiting_utils_hr() != 0. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
-		
+
 		// added apr'15:
-		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+		for ( ActivityParams params : config.scoring().getActivityParams() ) {
 			if ( PtConstants.TRANSIT_ACTIVITY_TYPE.equals( params.getActivityType() ) ) {
 				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
 				continue ;
@@ -374,7 +373,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
 			}
 		}
-		for ( ModeParams params : config.planCalcScore().getModes().values() ) {
+		for ( ModeParams params : config.scoring().getModes().values() ) {
 			if ( params.getMonetaryDistanceRate() > 0. ) {
 				problem = true ;
 				System.out.flush() ;
@@ -386,28 +385,28 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if ( config.planCalcScore().getModes().get(TransportMode.car ) != null && config.planCalcScore().getModes().get(TransportMode.car ).getMonetaryDistanceRate() > 0 ) {
+		if ( config.scoring().getModes().get(TransportMode.car ) != null && config.scoring().getModes().get(TransportMode.car ).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 		}
-		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt );
+		final ModeParams modeParamsPt = config.scoring().getModes().get(TransportMode.pt );
 		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here." ) ;
 		}
-		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
+		if ( config.scoring().getMarginalUtilityOfMoney() < 0. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
 
 		// added feb'16
-		if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none ) ) {
+		if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
 			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
 						      "some other value or talk to Kai." ) ;
 		}
 		// added oct'17:
-		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null || config.planCalcScore().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
+		if ( config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +
@@ -418,7 +417,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added apr'21:
-		for( Map.Entry<String, PlanCalcScoreConfigGroup.ScoringParameterSet> entry : config.planCalcScore().getScoringParametersPerSubpopulation().entrySet() ){
+		for( Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getScoringParametersPerSubpopulation().entrySet() ){
 			for( ActivityParams activityParam : entry.getValue().getActivityParams() ){
 				if( activityParam.getMinimalDuration().isDefined() ){
 					log.log( lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey() );
@@ -427,7 +426,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added may'23
-		for ( ModeParams params : config.planCalcScore().getModes().values() ){
+		for ( ModeParams params : config.scoring().getModes().values() ){
 			if ( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng()== CheckingOfMarginalUtilityOfTravellng.allZero ){
 				if( params.getMarginalUtilityOfTraveling() != 0. ){
 					log.log( lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
@@ -479,7 +478,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		return problem;
 	}
 	private static boolean checkControlerConfigGroup( Config config, Level lvl, boolean problem ){
-		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
+		Set<EventsFileFormat> formats = config.controller().getEventsFileFormats();
 		if ( !formats.contains( EventsFileFormat.xml ) ) {
 			problem = true ;
 			System.out.flush() ;
@@ -487,11 +486,9 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// may'21
-		switch ( config.controler().getRoutingAlgorithmType() ) {
+		switch ( config.controller().getRoutingAlgorithmType() ) {
 			case Dijkstra:
 			case AStarLandmarks:
-			case FastDijkstra:
-			case FastAStarLandmarks:
 				log.log( lvl, "you are not using SpeedyALT as routing algorithm.  vsp default (since may'21) is to use SpeedeALT.") ;
 				System.out.flush();
 				break;

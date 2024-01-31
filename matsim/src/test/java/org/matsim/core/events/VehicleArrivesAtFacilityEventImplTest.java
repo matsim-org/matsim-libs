@@ -20,10 +20,10 @@
 
 package org.matsim.core.events;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.utils.misc.Time;
@@ -33,11 +33,12 @@ import org.matsim.vehicles.Vehicle;
 
 public class VehicleArrivesAtFacilityEventImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteReadXml() {
+	@Test
+	void testWriteReadXml() {
 		VehicleArrivesAtFacilityEvent event = new VehicleArrivesAtFacilityEvent(Time.parseTime("10:55:00"),
 				Id.create(5, Vehicle.class),
 				Id.create(11, TransitStopFacility.class),

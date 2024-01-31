@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
@@ -29,20 +31,18 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author nagel
  *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
 	 */
 	@Test
-	public final void testDetailed_vehTypeV2_FallbackToAverage() {
+	final void testDetailed_vehTypeV2_FallbackToAverage() {
 		try {
 //			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
 
@@ -51,8 +51,8 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
 			var configUrl = IOUtils.extendUrl( scenarioUrl, "config_detailed.xml" );
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String [] { configUrl.toString() } );
 
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.controler().setLastIteration( 1 );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(
 					DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //This is the previous behaviour -> Test only passes if falling back to average table :(

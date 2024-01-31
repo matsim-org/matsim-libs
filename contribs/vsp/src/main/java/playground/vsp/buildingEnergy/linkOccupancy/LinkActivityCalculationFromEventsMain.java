@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
@@ -54,7 +54,7 @@ import org.matsim.core.utils.misc.Counter;
 
 
 /**
- * Simple main-routine that parse an eventsfile, using {@link LinkActivityOccupancyCounter}. 
+ * Simple main-routine that parse an eventsfile, using {@link LinkActivityOccupancyCounter}.
  * The generated data is written to csv-tables.
  * @author droeder
  *
@@ -68,7 +68,7 @@ public final class LinkActivityCalculationFromEventsMain {
 
 	private static final String DIR = "E:\\VSP\\svn\\shared-svn\\studies\\droeder\\buildingEnergy\\runs\\";
 	private static final String RUN = "2kW.15";
-	
+
 	private static String[] ARGS = new String[]{
 			DIR + RUN + "\\" + RUN + ".output_network.xml.gz",
 			DIR + RUN + "\\ITERS\\it.1000\\" + RUN + ".1000.plans.xml.gz",
@@ -78,15 +78,15 @@ public final class LinkActivityCalculationFromEventsMain {
 			"86400",
 			RUN
 	};
-	
+
 	private static Counter he= new Counter("home events # ");
 	private static Counter we = new Counter("work events # ");
 	private static Counter hp= new Counter("home plans # ");
 	private static Counter wp = new Counter("work plans # ");
-	
+
 	private static final String PREFIX = "activityCountOnLinks";
-	
-	
+
+
 	/**
 	 * @param args
 	 */
@@ -105,7 +105,7 @@ public final class LinkActivityCalculationFromEventsMain {
 		//catch logEntries
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, runId + "." + PREFIX,
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
-				ControlerConfigGroup.CompressionType.none));
+				ControllerConfigGroup.CompressionType.none));
 		OutputDirectoryLogging.catchLogEntries();
 		Gbl.enableThreadCpuTimeMeasurement();
 		// dump input-parameters
@@ -139,10 +139,10 @@ public final class LinkActivityCalculationFromEventsMain {
 	}
 
 	/**
-	 * @param eventsFile 
-	 * @param work 
-	 * @param home 
-	 * 
+	 * @param eventsFile
+	 * @param work
+	 * @param home
+	 *
 	 */
 	private static void parseEvents(Map<String, LinkActivityOccupancyCounter> home, Map<String, LinkActivityOccupancyCounter> work, String eventsFile) {
 		log.info("parsing events.");
@@ -153,14 +153,14 @@ public final class LinkActivityCalculationFromEventsMain {
 		for(LinkActivityOccupancyCounter v: work.values()){
 			manager.addHandler(v);
 		}
-		
+
 		manager.addHandler(new ActivityStartEventHandler() {
-			
+
 			@Override
 			public void reset(int iteration) {
-				
+
 			}
-			
+
 			@Override
 			public void handleEvent(ActivityStartEvent event) {
 				if(event.getActType().equals("home")) he.incCounter();
@@ -168,7 +168,7 @@ public final class LinkActivityCalculationFromEventsMain {
 			}
 		});
 		new MatsimEventsReader(manager).readFile(eventsFile);
-		log.info("finished (parsing events).");		
+		log.info("finished (parsing events).");
 	}
 
 	/**
@@ -199,7 +199,7 @@ public final class LinkActivityCalculationFromEventsMain {
 //		final Population population = (Population) sc.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
 		reader.addAlgorithm(new PersonAlgorithm() {
-			
+
 			@Override
 			public void run(Person person) {
 				for(int i = 1; i < person.getSelectedPlan().getPlanElements().size(); i++){

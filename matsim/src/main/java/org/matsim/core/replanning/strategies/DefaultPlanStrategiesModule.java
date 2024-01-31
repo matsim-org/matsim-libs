@@ -32,11 +32,12 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.replanning.conflicts.WorstPlanForRemovalSelectorWithConflicts;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
@@ -51,19 +52,22 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     @Override
     public void install() {
-        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.WorstPlanSelector.toString())) {
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.WorstPlanSelector.toString())) {
             bindPlanSelectorForRemoval().to(WorstPlanForRemovalSelector.class);
         }
-        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectRandom.toString())) {
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(WorstPlanForRemovalSelectorWithConflicts.SELECTOR_NAME)) {
+            bindPlanSelectorForRemoval().to(WorstPlanForRemovalSelectorWithConflicts.class);
+        }
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectRandom.toString())) {
             bindPlanSelectorForRemoval().to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
         }
-        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectExpBetaForRemoval.toString())) {
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectExpBetaForRemoval.toString())) {
             bindPlanSelectorForRemoval().toProvider(ExpBetaPlanSelectorForRemoval.class);
         }
-        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.ChangeExpBetaForRemoval.toString())) {
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.ChangeExpBetaForRemoval.toString())) {
             bindPlanSelectorForRemoval().toProvider(ExpBetaPlanChangerForRemoval.class);
         }
-        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString())) {
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString())) {
             bindPlanSelectorForRemoval().toProvider(PathSizeLogitSelectorForRemoval.class);
         }
 
@@ -73,7 +77,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         // that's fine: The StrategyManager will still only add those strategies to itself which are configured.
         // But we don't want to clutter the container here.
         Set<String> usedStrategyNames = new HashSet<>();
-        for (StrategyConfigGroup.StrategySettings settings : getConfig().strategy().getStrategySettings()) {
+        for (ReplanningConfigGroup.StrategySettings settings : getConfig().replanning().getStrategySettings()) {
             usedStrategyNames.add(settings.getStrategyName());
         }
 
@@ -160,7 +164,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     private static class ExpBetaPlanSelectorForRemoval implements Provider<ExpBetaPlanSelector<Plan, Person>> {
 
-        @Inject private PlanCalcScoreConfigGroup config;
+        @Inject private ScoringConfigGroup config;
 
         @Override
         public ExpBetaPlanSelector<Plan, Person> get() {
@@ -170,7 +174,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     private static class ExpBetaPlanChangerForRemoval implements Provider<ExpBetaPlanChanger<Plan, Person>> {
 
-        @Inject private PlanCalcScoreConfigGroup config;
+        @Inject private ScoringConfigGroup config;
 
         @Override
         public ExpBetaPlanChanger<Plan, Person> get() {
@@ -180,7 +184,8 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     private static class PathSizeLogitSelectorForRemoval implements Provider<PathSizeLogitSelector> {
 
-        @Inject PlanCalcScoreConfigGroup config;
+        @Inject
+				ScoringConfigGroup config;
         @Inject Network network;
 
         @Override

@@ -1,9 +1,9 @@
 package playground.vsp.cadyts.marginals;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,32 +38,18 @@ import org.matsim.vehicles.VehicleType;
 
 import jakarta.inject.Inject;
 import java.util.*;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(Parameterized.class)
 public class ModalDistanceAndCountsCadytsIT {
-
-	@Parameterized.Parameters(name = "{index}: countsWeight == {0}; modalDistanceWeight == {1};")
-	public static Collection<Object[]> parameterObjects() {
-		return Arrays.asList(new Object[][]{
-				{150.0, 0.0},
-				{0.0, 150.0},
-				{150.0, 150.0}
-		});
+	public static Stream<Arguments> arguments() {
+		return Stream.of(Arguments.of(0.0, 150.0), Arguments.of(150.0, 0.0), Arguments.of(150.0, 150.0));
 	}
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	private double countsWeight;
-	private double modalDistanceWeight;
-
-	public ModalDistanceAndCountsCadytsIT(double countsWeight, double modalDistanceWeight) {
-		this.modalDistanceWeight = modalDistanceWeight;
-		this.countsWeight = countsWeight;
-	}
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static DistanceDistribution createDistanceDistribution() {
 
@@ -82,51 +68,51 @@ public class ModalDistanceAndCountsCadytsIT {
 		Config config = ConfigUtils.createConfig();
 		String[] modes = new String[]{TransportMode.car, TransportMode.bike};
 
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(40);
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(40);
 
 		config.counts().setWriteCountsInterval(1);
 		config.counts().setAverageCountsOverIterations(1);
 
-		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
 		home.setMinimalDuration(3600);
 		home.setTypicalDuration(3600);
 		home.setEarliestEndTime(0);
-		config.planCalcScore().addActivityParams(home);
+		config.scoring().addActivityParams(home);
 
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setMinimalDuration(3600);
 		work.setTypicalDuration(3600);
 		work.setEarliestEndTime(0);
 		work.setOpeningTime(3600);
 		work.setClosingTime(10 * 3600);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(work);
 
 		// have random selection of plans to generate heterogenity in the beginning, so that cadyts can calibrate its correction
-		StrategyConfigGroup.StrategySettings selectRandom = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings selectRandom = new ReplanningConfigGroup.StrategySettings();
 		selectRandom.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.SelectRandom);
 		selectRandom.setDisableAfter(33);
 		selectRandom.setWeight(0.5);
-		config.strategy().addStrategySettings(selectRandom);
+		config.replanning().addStrategySettings(selectRandom);
 
 		// have change exp beta, so that mode distribution converges at the end of the simulation
-		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		changeExpBeta.setDisableAfter(38);
 		changeExpBeta.setWeight(0.5);
-		config.strategy().addStrategySettings(changeExpBeta);
+		config.replanning().addStrategySettings(changeExpBeta);
 
 		// at the end of the scenario pick the plans with the best score
-		StrategyConfigGroup.StrategySettings bestScore = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings bestScore = new ReplanningConfigGroup.StrategySettings();
 		bestScore.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.BestScore);
 		bestScore.setWeight(0.1);
-		config.strategy().addStrategySettings(bestScore);
+		config.replanning().addStrategySettings(bestScore);
 
 		// remove teleported bike
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
-		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().removeModeRoutingParams(TransportMode.bike);
+		config.routing().setNetworkModes(Arrays.asList(modes));
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setMainModes(Arrays.asList(modes));
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
@@ -253,8 +239,9 @@ public class ModalDistanceAndCountsCadytsIT {
 	 * One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
-	@Test
-	public void test() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void test(double countsWeight, double modalDistanceWeight) {
 
 		Config config = createConfig();
 		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
@@ -343,16 +330,16 @@ public class ModalDistanceAndCountsCadytsIT {
 			modalDistanceCount.merge(mode + "_" + distance, 1, Integer::sum);
 		}
 
-		if (this.modalDistanceWeight > 0 && this.countsWeight == 0) {
+		if (modalDistanceWeight > 0 && countsWeight == 0) {
 			// don't know how to get a better accuracy than 8%
 			assertEquals(100, modalDistanceCount.get("car_2050.0"), 80);
 			assertEquals(100, modalDistanceCount.get("car_2150.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2050.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
-		} else if (this.modalDistanceWeight == 0 && this.countsWeight > 0) {
-			assertTrue("expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0"),
-					modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
-		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
+		} else if (modalDistanceWeight == 0 && countsWeight > 0) {
+			assertTrue(modalDistanceCount.get("car_2250.0") > 500,
+					"expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0")); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
+		} else if (modalDistanceWeight > 0 && countsWeight > 0) {
 			/* This assumes that counts have a higher impact than distance distributions
 			 * (because counts request 1000 on car_2250 and the distance distribution requests 100 on car_2050 and car_2150 but 0 on car_2250).
 			 * Probably this should rather depend on the weight that is set for counts and distance distributions...

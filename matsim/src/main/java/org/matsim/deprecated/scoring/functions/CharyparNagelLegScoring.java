@@ -21,7 +21,6 @@
 package org.matsim.deprecated.scoring.functions;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -62,14 +61,14 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Double.NaN;
-	
+
 	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
 		this.reset();
 	}
-	
+
 	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network, TransitSchedule transitSchedule) {
 		this(params, network);
@@ -112,10 +111,10 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	}
 
 	private static int ccc=0 ;
-	
+
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
-		double travelTime = arrivalTime - departureTime; // travel time in seconds	
+		double travelTime = arrivalTime - departureTime; // travel time in seconds
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
 			if (leg.getMode().equals(TransportMode.transit_walk)) {
@@ -148,7 +147,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
 		return tmpScore;
 	}
-	
+
 	@Override
 	public void handleEvent(Event event) {
 		if ( event instanceof ActivityEndEvent ) {

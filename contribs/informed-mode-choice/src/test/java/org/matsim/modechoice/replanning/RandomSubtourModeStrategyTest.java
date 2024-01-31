@@ -2,7 +2,7 @@ package org.matsim.modechoice.replanning;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.PrepareForMobsim;
 import org.matsim.core.replanning.PlanStrategy;
@@ -18,7 +18,7 @@ public class RandomSubtourModeStrategyTest extends ScenarioTest {
 	}
 
 	@Test
-	public void person() {
+	void person() {
 
 		PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
 		prepare.run();

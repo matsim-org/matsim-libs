@@ -1,8 +1,8 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -18,17 +18,16 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -36,7 +35,6 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.facilities.filters.Filter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
@@ -45,35 +43,35 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import jakarta.inject.Singleton;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestPositionEmissionModule {
 
     private static final String configFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" ), "config_detailed.xml" ).toString();
     // (I changed the above from veh v1 to veh v2 since veh v1 is deprecated, especially for emissions.  kai, apr'21)
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Test
-    @Ignore
-    public void simpleTest() {
+	@Test
+	@Disabled
+	void simpleTest() {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
         emissionConfig.setDetailedVsAverageLookupBehavior(
                 EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable); //This is the previous behaviour
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.qsim().setSnapshotPeriod(1);
         config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        config.controler().setWriteSnapshotsInterval(1);
-        config.controler().setSnapshotFormat(Set.of(ControlerConfigGroup.SnapshotFormat.positionevents));
+        config.controller().setWriteSnapshotsInterval(1);
+        config.controller().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
 
         var scenario = ScenarioUtils.loadScenario(config);
 
@@ -83,41 +81,41 @@ public class TestPositionEmissionModule {
         controler.run();
     }
 
-    @Test
-    public void compareToOtherModule_singleVehicleSingleLink() {
+	@Test
+	void compareToOtherModule_singleVehicleSingleLink() {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
         emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
         emissionConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
         emissionConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
         emissionConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent );
 
-        final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home")
+        final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home")
                 .setTypicalDuration(20);
-        config.planCalcScore().addActivityParams(homeParams);
-        final PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams("work")
+        config.scoring().addActivityParams(homeParams);
+        final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work")
                 .setTypicalDuration(20);
-        config.planCalcScore().addActivityParams(workParams);
+        config.scoring().addActivityParams(workParams);
 
-        var strategy = new StrategyConfigGroup.StrategySettings();
+        var strategy = new ReplanningConfigGroup.StrategySettings();
         strategy.setStrategyName("ChangeExpBeta");
         strategy.setWeight(1.0);
 
-        config.strategy().addParameterSet(strategy);
+        config.replanning().addParameterSet(strategy);
 
         // activate snapshots
         config.qsim().setSnapshotPeriod(1);
         config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        config.controler().setWriteSnapshotsInterval(1);
-        config.controler().setSnapshotFormat(Set.of(ControlerConfigGroup.SnapshotFormat.positionevents));
-        config.controler().setFirstIteration(0);
-        config.controler().setLastIteration(0);
+        config.controller().setWriteSnapshotsInterval(1);
+        config.controller().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
+        config.controller().setFirstIteration(0);
+        config.controller().setLastIteration(0);
 
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 

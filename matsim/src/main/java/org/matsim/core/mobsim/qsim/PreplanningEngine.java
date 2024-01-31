@@ -22,7 +22,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import static java.util.Comparator.comparing;
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivityType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -347,7 +347,6 @@ public final class PreplanningEngine implements MobsimEngine {
 			double departureTime = tripInfo.getExpectedBoardingTime() - 900.; // always depart 15min before pickup
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
 					toFacility, departureTime, null, inputTrip.getTripAttributes());
-			;
 			// not sure if this works for walk, but it should ...
 
 			result.addAll(planElements);

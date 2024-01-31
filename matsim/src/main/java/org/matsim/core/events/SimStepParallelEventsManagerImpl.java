@@ -36,7 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
+import org.matsim.core.config.groups.EventsManagerConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
@@ -67,7 +67,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	private AtomicReference<Throwable> hadException = new AtomicReference<>();
 
 	@Inject
-	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
+	SimStepParallelEventsManagerImpl(EventsManagerConfigGroup config) {
 		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
 	}
 
@@ -291,7 +291,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 					if (event.getTime() < this.lastEventTime) {
 						throw new RuntimeException("Events in the queue are not ordered chronologically. " +
 								"This should never happen. Is the SimTimeStepParallelEventsManager registered " +
-								"as a MobsimAfterSimStepListener?");
+								"as a MobsimAfterSimStepListener? LastEventTime = " + this.lastEventTime +
+							  " currentEvent.time = " + event.getTime() + " currentEvent.type = " + event.getEventType() +
+							  " full event: " + event.toString());
 					} else {
 						this.lastEventTime = event.getTime();
 					}

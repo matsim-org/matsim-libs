@@ -1,9 +1,25 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.CachingTransferProvider;
@@ -621,7 +637,7 @@ public class SwissRailRaptorCore {
                     int inVehicleTime = arrivalTime - currentAgentBoardingTime;
                     double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
                     double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
-                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(transferProvider, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
+                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(boardingPE,transferProvider, data.config, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
                     double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                     double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
                     if (totalArrivalCost <= previousArrivalCost) {
@@ -694,7 +710,7 @@ public class SwissRailRaptorCore {
         if (this.useCapacityConstraints) {
             return findNextDepartureIndexWithConstraints(route, routeStop, time);
         }
-        int depTimeAtRouteStart = (int) (time - routeStop.departureOffset);
+        int depTimeAtRouteStart = time - routeStop.departureOffset;
         int fromIndex = route.indexFirstDeparture;
         int toIndex = fromIndex + route.countDepartures;
         int pos = Arrays.binarySearch(this.data.departures, fromIndex, toIndex, depTimeAtRouteStart);
@@ -742,7 +758,7 @@ public class SwissRailRaptorCore {
                 transferProvider.reset(transfer);
                 int newArrivalTime = arrivalTime + transfer.transferTime;
                 double newArrivalTravelCost = arrivalTravelCost - transfer.transferTime * margUtilityTransitWalk;
-                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(transferProvider, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost, arrivalTime)) : 0;
+                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(fromPE, transferProvider, data.config, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost, arrivalTime)) : 0;
                 double newTotalArrivalCost = newArrivalTravelCost + newArrivalTransferCost;
                 double prevLeastArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                 if (newTotalArrivalCost < prevLeastArrivalCost || (!strict && newTotalArrivalCost <= prevLeastArrivalCost)) {
@@ -771,23 +787,45 @@ public class SwissRailRaptorCore {
 
     private PathElement findLeastCostArrival(Map<TransitStopFacility, InitialStop> destinationStops) {
         double leastCost = Double.POSITIVE_INFINITY;
+        double leastCostFeederOnly = Double.POSITIVE_INFINITY;
         PathElement leastCostPath = null;
+        PathElement leastCostPathFeederOnly = null;
 
-        for (Map.Entry<TransitStopFacility, InitialStop> e : destinationStops.entrySet()) {
+		SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling = data.config.getIntermodalLegOnlyHandling();
+		boolean checkBothPtAndPurelyIntermodalRoutes = intermodalLegOnlyHandling.equals(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.avoid) || intermodalLegOnlyHandling.equals(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid);
+		for (Map.Entry<TransitStopFacility, InitialStop> e : destinationStops.entrySet()) {
             TransitStopFacility stop = e.getKey();
             int stopIndex = this.data.stopFacilityIndices.get(stop);
             PathElement pe = this.arrivalPathPerStop[stopIndex];
-            if (pe != null) {
-                InitialStop egressStop = e.getValue();
-                int arrivalTime = (int) (pe.arrivalTime + egressStop.accessTime);
-                double arrivalTravelCost = pe.arrivalTravelCost + egressStop.accessCost;
-                double totalCost = arrivalTravelCost + pe.arrivalTransferCost;
-                if ((totalCost < leastCost) || (totalCost == leastCost && pe.transferCount < leastCostPath.transferCount)) {
-                    leastCost = totalCost;
-                    leastCostPath = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, null, egressStop); // this is the egress leg
-                }
-            }
+			if (pe!=null) {
+					InitialStop egressStop = e.getValue();
+					int arrivalTime = (int) (pe.arrivalTime + egressStop.accessTime);
+					double arrivalTravelCost = pe.arrivalTravelCost + egressStop.accessCost;
+					double totalCost = arrivalTravelCost + pe.arrivalTransferCost;
+					if ((totalCost < leastCost) || (totalCost == leastCost && pe.transferCount < leastCostPath.transferCount)) {
+						PathElement egressLegCandidate = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, null, egressStop);
+
+						if (pe.comingFrom == null && checkBothPtAndPurelyIntermodalRoutes) {
+							if (totalCost < leastCostFeederOnly) {
+								leastCostFeederOnly = totalCost;
+								leastCostPathFeederOnly = egressLegCandidate;
+							}
+						} else {
+							// this is the egress leg
+							leastCostPath = egressLegCandidate;
+							leastCost = totalCost;
+						}
+					}
+
+				}
+
         }
+
+		if (checkBothPtAndPurelyIntermodalRoutes){
+			if (Double.isInfinite(leastCost)){
+				return leastCostPathFeederOnly;
+			}
+		}
         return leastCostPath;
     }
 
@@ -803,18 +841,6 @@ public class SwissRailRaptorCore {
             }
             pes.addFirst(pe);
         }
-        if (pes.size() == 2 && pes.get(0).isTransfer && pes.get(1).isTransfer) {
-            // it's only access and egress, no real pt trip
-            arrivalCost = Double.POSITIVE_INFINITY;
-            pes.clear();
-        }
-
-	    // yyyyyy I am having the following situation:
-	    // * assume there is only one drt link.  This happens when the pt trip is outside the service area, and then both the starting and the ending
-	    // location are mapped to the same link.
-	    // * In consequence, the trip becomes "access_walk_to_drt"---"egress_walk_to_drt" (*).  However, the cost of that is set to infty here ... with the
-	    // consequence that the raptor returns a "pure transit walk" later.
-	    // I thought that you said that it would directly return (*).  It would (I think) also be easier to debug.  kai, jun'19
 
         RaptorRoute raptorRoute = new RaptorRoute(fromFacility, toFacility, arrivalCost);
         double time = departureTime;
@@ -856,7 +882,7 @@ public class SwissRailRaptorCore {
         return initialStop != null && initialStop.planElements != null;
     }
 
-    private static class PathElement {
+    static class PathElement {
         final PathElement comingFrom;
         final RRouteStop toRouteStop;
         final int firstDepartureTime; // the departure time at the start stop

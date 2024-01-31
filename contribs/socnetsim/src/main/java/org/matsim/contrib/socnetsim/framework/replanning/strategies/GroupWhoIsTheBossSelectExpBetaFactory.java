@@ -53,7 +53,7 @@ public class GroupWhoIsTheBossSelectExpBetaFactory extends NonInnovativeStrategy
 					 incompatiblePlansIdentifierFactory ,
 					 new LogitWeight(
 						MatsimRandom.getLocalInstance(),
-						sc.getConfig().planCalcScore().getBrainExpBeta()) );
+						sc.getConfig().scoring().getBrainExpBeta()) );
 	}
 }
 

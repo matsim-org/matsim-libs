@@ -26,8 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
-import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +33,7 @@ import java.util.Collection;
 /**
  * A simple link speed calculator taking the vehicle's max speed and the link's
  * free speed into account;
- * 
+ *
  * @author mrieser / Senozon AG
  */
 public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator{

@@ -22,9 +22,9 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,35 +47,35 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * 
+ *
  * Tests {@link AreaBtwLinksVsTerminiBeelinePenalty}.
- * 
+ *
  * @author gleich
- * 
+ *
  */
 public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
-	
+
 	Scenario scenario;
 	TransitScheduleFactory factory;
-	
-	@Before
+
+	@BeforeEach
 	public void setUp() {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		factory = scenario.getTransitSchedule().getFactory();
 	}
-	
+
 	@Test
-	public void testRectangularLine() {
+	void testRectangularLine() {
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		ArrayList<TransitRouteStop> stops = new ArrayList<>();
-		
+
 		stopsToBeServed.add(getOrCreateStopAtCoord(0, 0));
 		stopsToBeServed.add(getOrCreateStopAtCoord(10, 0));
-		
+
 		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(0, 0), 0, 0));
 		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(10, 0), 0, 0));
 		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(10, 10), 0, 0));
-		
+
 		// Nodes a-d are passed by TransitRoute, Node e not
 		Id<Node> idNodeA = Id.createNodeId("a");
 		Id<Node> idNodeB = Id.createNodeId("b");
@@ -87,7 +87,7 @@ public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
 		NetworkUtils.createAndAddNode(scenario.getNetwork(), idNodeC, CoordUtils.createCoord(10, 10));
 		NetworkUtils.createAndAddNode(scenario.getNetwork(), idNodeD, CoordUtils.createCoord(0, 10));
 		NetworkUtils.createAndAddNode(scenario.getNetwork(), idNodeE, CoordUtils.createCoord(5, 5));
-		
+
 		Id<Link> idLinkAB = Id.createLinkId("a>b");
 		Id<Link> idLinkBC = Id.createLinkId("b>c");
 		Id<Link> idLinkCD = Id.createLinkId("c>d");
@@ -112,14 +112,14 @@ public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
 		linkIds.add(idLinkBC);
 		linkIds.add(idLinkCD);
 		route.setLinkIds(idLinkAB, linkIds, idLinkDA);
-		
+
 		PPlan pPlan1 = new PPlan(Id.create("PPlan1", PPlan.class), "creator1", Id.create("PPlanParent1", PPlan.class));
 		pPlan1.setStopsToBeServed(stopsToBeServed);
 		TransitLine line1 = factory.createTransitLine(Id.create("line1", TransitLine.class));
 		TransitRoute route1 = factory.createTransitRoute(Id.create("TransitRoute1", TransitRoute.class), route, stops, "bus");
 		line1.addRoute(route1);
 		pPlan1.setLine(line1);
-		
+
 		/* option StopListToEvaluate.transitRouteAllStops */
 		PConfigGroup pConfig = new PConfigGroup();
 		RouteDesignScoreParams params = new RouteDesignScoreParams();
@@ -128,14 +128,14 @@ public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
 		params.setStopListToEvaluate(StopListToEvaluate.transitRouteAllStops);
 		params.setValueToStartScoring(1);
 		pConfig.addRouteDesignScoreParams(params);
-		
+
 		AreaBtwLinksVsTerminiBeelinePenalty penalty = new AreaBtwLinksVsTerminiBeelinePenalty(params, scenario.getNetwork());
 		double actual = penalty.getScore(pPlan1, route1);
 		// area 10 x 10 = 100; beeline termini ({0,0}, {10,0}) = 10
 		double expected = -1 * ((10.0 * 10.0 / 10.0) - 1);
-		Assert.assertEquals(expected, actual, 0.001);
+		Assertions.assertEquals(expected, actual, 0.001);
 	}
-	
+
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {
 		Id<TransitStopFacility> stopId = getStopId(x, y);
 		if (scenario.getTransitSchedule().getFacilities().containsKey(stopId)) {
@@ -145,7 +145,7 @@ public class AreaBtwLinksVsTerminiBeelinePenaltyTest {
 					stopId, CoordUtils.createCoord(x, y), false);
 		}
 	}
-	
+
 	private Id<TransitStopFacility> getStopId(int x, int y) {
 		return Id.create(x + "," + y, TransitStopFacility.class);
 	}

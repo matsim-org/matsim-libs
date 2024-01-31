@@ -22,8 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
@@ -65,9 +65,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 	private Person prevPerson;
 
 
-	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
-			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator, double normalization) {
-		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
+	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, ScoringConfigGroup cnScoringGroup,
+													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization) {
+		final ScoringConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleParams == null) {
 			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 		}
@@ -86,7 +86,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 		this.timeCalculator = timeCalculator;
 
 		this.normalization = normalization;
-		this.sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
+		this.sigma = routingConfigGroup.getRoutingRandomness();
 		this.random = sigma != 0 ? MatsimRandom.getLocalInstance() : null;
 	}
 
@@ -102,20 +102,20 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
 
-		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface);
+		double comfortFactor = BicycleUtils.getComfortFactor(surface );
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
+		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradientFactor = BicycleUtilityUtils.getGradient(link);
+		double gradientFactor = BicycleUtils.getGradient(link );
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
 		double userDefinedNetworkAttritubeDisutility = 0.;
 		if (nameOfUserDefinedNetworkAttribute != null) {
 			String userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute(link, nameOfUserDefinedNetworkAttribute);
-			double userDefinedNetworkAttributeFactor = BicycleUtilityUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString,
-					this.userDefinedNetworkAttributeDefaultValue);
+			double userDefinedNetworkAttributeFactor = BicycleUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString,
+					this.userDefinedNetworkAttributeDefaultValue );
 			userDefinedNetworkAttritubeDisutility = marginalCostOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
 		}
 
@@ -132,10 +132,15 @@ class BicycleTravelDisutility implements TravelDisutility {
 				throw new RuntimeException("you cannot use the randomzing travel disutility without person.  If you need this without a person, set"
 						+ "sigma to zero.") ;
 			}
-			normalRndLink = 0.05 * random.nextGaussian();
-			// yyyyyy are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
+//			normalRndLink = 0.05 * random.nextGaussian();
+			// are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
+			// --> see below.  kai, jul'23
 			if (person != prevPerson) {
 				prevPerson = person;
+
+				normalRndLink = 0.05 * random.nextGaussian();
+				// are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
+				// --> addressed with moving it to down here, i.e. into the person.  Also caused race conditions. kai, jul'23
 
 				logNormalRndDist = Math.exp(sigma * random.nextGaussian());
 				logNormalRndInf = Math.exp(sigma * random.nextGaussian());

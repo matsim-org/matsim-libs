@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -42,37 +42,37 @@ import org.matsim.contrib.socnetsim.sharedvehicles.replanning.VehicularPlanBased
  */
 public class VehicularPlanLinkIdentifierTest {
 	@Test
-	public void testNotLinkedWhenNoVehicleDefined() {
+	void testNotLinkedWhenNoVehicleDefined() {
 		final Plan plan1 = createVehicularPlan( Id.create( 1 , Person.class ) , null );
 		final Plan plan2 = createVehicularPlan( Id.create( 2 , Person.class ) , null );
 
 		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 
-		Assert.assertFalse(
-				"plans without vehicle allocated are considered linked",
-				testee.areLinked( plan1 , plan2 ) );
+		Assertions.assertFalse(
+				testee.areLinked( plan1 , plan2 ),
+				"plans without vehicle allocated are considered linked" );
 	}
 
 	@Test
-	public void testDifferentVehiclesAreNotLinked() {
+	void testDifferentVehiclesAreNotLinked() {
 		final Plan plan1 = createVehicularPlan( Id.create( 1 , Person.class ) , Id.create( 1 , Vehicle.class ) );
 		final Plan plan2 = createVehicularPlan( Id.create( 2 , Person.class ) , Id.create( 2 , Vehicle.class ) );
 
 		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
-		Assert.assertFalse(
-				"plans with different vehicle allocated are considered linked",
-				testee.areLinked( plan1 , plan2 ) );
+		Assertions.assertFalse(
+				testee.areLinked( plan1 , plan2 ),
+				"plans with different vehicle allocated are considered linked" );
 	}
 
 	@Test
-	public void testSameVehiclesAreLinked() {
+	void testSameVehiclesAreLinked() {
 		final Plan plan1 = createVehicularPlan( Id.create( 1 , Person.class ) , Id.create( "car" , Vehicle.class ) );
 		final Plan plan2 = createVehicularPlan( Id.create( 2 , Person.class ) , Id.create( "car" , Vehicle.class ) );
 
 		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
-		Assert.assertTrue(
-				"plans with same vehicle allocated are not considered linked",
-				testee.areLinked( plan1 , plan2 ) );
+		Assertions.assertTrue(
+				testee.areLinked( plan1 , plan2 ),
+				"plans with same vehicle allocated are not considered linked" );
 	}
 
 	// TODO test joint trips

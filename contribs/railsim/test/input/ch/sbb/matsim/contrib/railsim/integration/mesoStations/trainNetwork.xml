@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="Bhf1a" x="0.0" y="100.0">
+		</node>
+		<node id="Bhf1b" x="250.0" y="100.0">
+		</node>
+		<node id="Bhf2a" x="0.0" y="2000.0">
+		</node>
+		<node id="Bhf2b" x="250.0" y="2000.0">
+		</node>
+		<node id="Bhf3a" x="-600.0" y="2500.0">
+		</node>
+		<node id="Bhf3b" x="-350.0" y="2500.0">
+		</node>
+		<node id="D1a" x="0.0" y="0.0">
+		</node>
+		<node id="D1b" x="250.0" y="0.0">
+		</node>
+		<node id="D3a" x="-600.0" y="2600.0">
+		</node>
+		<node id="D3b" x="-350.0" y="2600.0">
+		</node>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="bhf1_link" from="Bhf1a" to="Bhf1b" length="250.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="bhf2_link" from="Bhf2a" to="Bhf2b" length="250.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="bhf3_link" from="Bhf3a" to="Bhf3b" length="250.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="depot1_link" from="D1b" to="D1a" length="250.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="depot3_link" from="D3b" to="D3a" length="250.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="in_bhf1_out_bhf2" from="Bhf2b" to="Bhf1a" length="1916.37678967368" freespeed="38.8889" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="in_bhf2_out_bhf3" from="Bhf3b" to="Bhf2a" length="610.3277807866851" freespeed="38.8889" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="in_depot1_out_bhf1" from="Bhf1b" to="D1b" length="100.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="in_depot3_out_bhf3" from="Bhf3b" to="D3b" length="100.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="out_bhf1_in_bhf2" from="Bhf1b" to="Bhf2a" length="1916.37678967368" freespeed="38.8889" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="out_bhf2_in_bhf3" from="Bhf2b" to="Bhf3a" length="986.154146165801" freespeed="38.8889" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="out_depot1_in_bhf1" from="D1a" to="Bhf1a" length="100.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="out_depot3_in_bhf3" from="D3a" to="Bhf3a" length="100.0" freespeed="5.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>

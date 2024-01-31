@@ -31,10 +31,12 @@ public class IterationTravelStatsModule extends AbstractModule {
 		bind(TravelDistanceStats.class).asEagerSingleton();
 		bind(PKMbyModeCalculator.class).asEagerSingleton();
 		bind(PHbyModeCalculator.class).asEagerSingleton();
-		bind(TripsAndLegsCSVWriter.CustomTripsWriterExtension.class).to(TripsAndLegsCSVWriter.NoTripWriterExtension.class).asEagerSingleton();
-		bind(TripsAndLegsCSVWriter.CustomLegsWriterExtension.class).to(TripsAndLegsCSVWriter.NoLegsWriterExtension.class).asEagerSingleton();
-		bind(TripsAndLegsCSVWriter.CustomTimeWriter.class).to(TripsAndLegsCSVWriter.DefaultTimeWriter.class).asEagerSingleton();
+		bind(TripsAndLegsWriter.CustomTripsWriterExtension.class).to(TripsAndLegsWriter.NoTripWriterExtension.class).asEagerSingleton();
+		bind(TripsAndLegsWriter.CustomLegsWriterExtension.class).to(TripsAndLegsWriter.NoLegsWriterExtension.class).asEagerSingleton();
+		bind(TripsAndLegsWriter.CustomTimeWriter.class).to(TripsAndLegsWriter.DefaultTimeWriter.class).asEagerSingleton();
+		bind(ActivityWriter.class);
+		bind(PersonWriter.class);
+		bind(TripsAndLegsWriter.class);
 		addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
 	}
-
 }

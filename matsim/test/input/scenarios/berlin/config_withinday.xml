@@ -23,16 +23,16 @@
 	</module>
 
 	<module name="controler">
-		<param name= "routingAlgorithmType" value="FastAStarLandmarks" />
+		<param name= "routingAlgorithmType" value="SpeedyALT" />
 	</module>
 
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-	
+
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		
+
 		<param name = "flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
 		<param name = "storageCapacityFactor" value="0.05" />
 	</module>
@@ -46,12 +46,12 @@
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
-		
+
 		<param name="activityType_0"            value="home" />
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
-	
+
 		<param name="activityType_1"            value="work" />
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
@@ -60,12 +60,12 @@
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
-		
+
 		<param name="activityType_2"            value="edu" />
 		<param name="activityPriority_2"        value="1" />
 		<param name="activityTypicalDuration_2" value="08:00:00" />
 	</module>
-	
+
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
@@ -74,7 +74,7 @@
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
-	
+
 		<param name="ModuleProbability_3" value="0.1" />
 		<param name="Module_3" value="TimeAllocationMutator" />
 	</module>

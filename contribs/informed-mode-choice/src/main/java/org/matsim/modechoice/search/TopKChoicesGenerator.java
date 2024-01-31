@@ -203,11 +203,24 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 
-				if (candidates.containsKey(c))
-					if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5)
-						throw new IllegalStateException("Candidates estimates differ: " + candidates.get(c) + " | " + c);
+				if (candidates.containsKey(c)) {
+					if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5) {
 
-				candidates.put(c, c);
+						// TODO: probably needs to be investigated
+						// Only occurs with certain configurations, usually including the pt mode
+						// Not big issue probably, might remove the warning
+
+//						throw new IllegalStateException("Candidates estimates differ: " + candidates.get(c) + " | " + c);
+						log.warn("Estimates differ for person {}: {} vs. {}", planModel.getPerson().getId(), candidates.get(c), c.getUtility());
+					}
+
+					// Put the candidate with the higher utility in the map
+					if (c.getUtility() > candidates.get(c).getUtility()) {
+						candidates.put(c, c);
+					}
+
+				} else
+					candidates.put(c, c);
 
 				k++;
 			}

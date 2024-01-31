@@ -64,6 +64,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	private final BlockingQueue<CompletableFuture<Person>> personInsertionQueue = new LinkedBlockingQueue<>();
 	private Thread personInsertionThread;
+	private Throwable exception = null;
 
 	public ParallelPopulationReaderMatsimV6(
 			final String inputCRS,
@@ -108,6 +109,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);
 			thread.setName(ParallelPopulationReaderMatsimV6Runner.class.toString() + i);
+			thread.setUncaughtExceptionHandler(this::catchReaderException);
 			threads[i] = thread;
 			thread.start();
 		}
@@ -116,6 +118,44 @@ import java.util.concurrent.LinkedBlockingQueue;
 			this.personInsertionThread = new Thread(new PersonInserter(this.scenario.getPopulation(), this.personInsertionQueue));
 			this.personInsertionThread.start();
 		}
+	}
+
+	private void stopThreads() {
+		// signal the threads that they should end parsing
+		for (int i = 0; i < this.numThreads; i++) {
+			this.tagQueue.add(List.of(new EndProcessingTag()));
+		}
+
+		if (isPopulationStreaming) {
+			CompletableFuture<Person> finishPerson = new CompletableFuture<>();
+			finishPerson.complete(null);
+			try {
+				this.personInsertionQueue.put(finishPerson);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		// wait for the threads to finish
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+			if(this.isPopulationStreaming) {
+				this.personInsertionThread.join();
+			}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+
+		if (this.exception != null) {
+			throw new RuntimeException(this.exception);
+		}
+	}
+
+	private void catchReaderException(Thread thread, Throwable throwable) {
+		log.error("Error parsing XML", throwable);
+		this.exception = throwable;
 	}
 
 	@Override
@@ -139,6 +179,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 		// If it is a new person, create a new person and a list for its attributes.
 		if (PERSON.equals(name)) {
+			if (this.exception != null) {
+				this.stopThreads();
+				throw new RuntimeException(this.exception);
+			}
+
 			// Just create a person, but do not add it here!
 			Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 			currentPersonXmlData = new ArrayList<>();
@@ -187,34 +232,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 		// End of population reached
 		if (POPULATION.equals(name)) {
-			// signal the threads that they should end parsing
-			for (int i = 0; i < this.numThreads; i++) {
-				this.tagQueue.add(List.of(new EndProcessingTag()));
-			}
-			if(isPopulationStreaming)
-			{
-				CompletableFuture<Person> finishPerson = new CompletableFuture<>();
-				finishPerson.complete(null);
-				try {
-					this.personInsertionQueue.put(finishPerson);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
-
-			// wait for the threads to finish
-			try {
-				for (Thread thread : threads) {
-					thread.join();
-				}
-				if(this.isPopulationStreaming)
-				{
-					this.personInsertionThread.join();
-				}
-
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
+			this.stopThreads();
 
 			super.endTag(name, content, context);
 			log.info("Finished parallel population reading...");

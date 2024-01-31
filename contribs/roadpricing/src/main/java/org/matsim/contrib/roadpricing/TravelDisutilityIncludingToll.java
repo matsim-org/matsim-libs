@@ -30,7 +30,7 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Calculates the travel disutility for links, including tolls. Currently 
+ * Calculates the travel disutility for links, including tolls. Currently
  * supports distance, cordon and area tolls.
  *
  * @author mrieser
@@ -50,7 +50,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
 	{
-		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
+		this( normalTravelDisutility, scheme, config.scoring().getMarginalUtilityOfMoney(), 0. ) ;
 		// this is using sigma=0 for backwards compatibility (not sure how often this is needed)
 	}
 
@@ -82,7 +82,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) 
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle)
 	{
 		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 
@@ -94,7 +94,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 		// end randomize
 
 		double tollCost = this.tollCostHandler.getTypicalTollCost(link, time );
-		
+
 		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney*logNormalRnd ;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}

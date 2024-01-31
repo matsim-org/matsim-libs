@@ -3,9 +3,9 @@ package org.matsim.contrib.osm.networkReader;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
@@ -18,23 +18,23 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OsmNetworkParserTest {
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 
-	@Rule
-	public MatsimTestUtils matsimUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimUtils = new MatsimTestUtils();
 
-	@After
+	@AfterEach
 	public void shutDownExecutor() {
 		executor.shutdown();
 	}
 
 	@Test
-	public void parse_singleLink() {
+	void parse_singleLink() {
 
 		Utils.OsmData singleLink = Utils.createSingleLink();
 		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parser_single-link.pbf");
@@ -66,7 +66,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_twoIntersectingWays() {
+	void parse_twoIntersectingWays() {
 
 		Utils.OsmData twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parser_two-intersecting-ways.pbf");
@@ -92,7 +92,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_intersectingLinksOneDoesNotMatchFilter() {
+	void parse_intersectingLinksOneDoesNotMatchFilter() {
 
 		Utils.OsmData twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 
@@ -121,7 +121,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void parse_singleLink_withTransformation() {
+	void parse_singleLink_withTransformation() {
 
 		final CoordinateTransformation atlantis = new AtlantisToWGS84();
 

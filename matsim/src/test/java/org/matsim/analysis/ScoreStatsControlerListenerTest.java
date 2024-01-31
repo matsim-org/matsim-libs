@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -20,8 +19,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -32,14 +32,16 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Aravind
  *
  */
 public class ScoreStatsControlerListenerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private int avgexecuted;
 	private int avgworst;
@@ -50,7 +52,7 @@ public class ScoreStatsControlerListenerTest {
 	private Population population = scenario.getPopulation();
 
 	@Test
-	public void testScoreStatsControlerListner() throws IOException {
+	void testScoreStatsControlerListner() throws IOException {
 
 		/************************************
 		 * Person - creating person 1
@@ -474,13 +476,13 @@ public class ScoreStatsControlerListenerTest {
 
 
 	private void performTest(String outputDirectory, Population population) throws IOException {
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controlerConfigGroup, population, controlerIO, null, null);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controllerConfigGroup, population, controlerIO, new GlobalConfigGroup());
 
 		String outDir = utils.getOutputDirectory() + "/ScoreStatsControlerListener";
 
@@ -520,42 +522,53 @@ public class ScoreStatsControlerListenerTest {
 
 	private void readAndValidateValues(String outDir,  int itr, Population population) throws IOException {
 
-		String file = outDir + "/scorestats.txt";
+		String file = outDir + "/scorestats.csv";
 		BufferedReader br;
 		String line;
 
 		br = new BufferedReader(new FileReader(file));
 		String firstRow = br.readLine();
-		String[] columnNames = firstRow.split("	");
+		String delimiter = new GlobalConfigGroup().getDefaultDelimiter();
+		String[] columnNames = firstRow.split(delimiter);
 		decideColumns(columnNames);
 		int iteration = 0;
 		while ((line = br.readLine()) != null) {
 			if (iteration == itr) {
-				String[] column = line.split("	");
+				String[] column = line.split(delimiter);
 
 				// checking if column number in greater than 0, because 0th column is always
 				// 'Iteration' and we don't need that --> see decideColumns() method
-				Double avgExecuted = (avgexecuted > 0) ? Double.valueOf(column[avgexecuted]) : 0;
-				Double avgWorst = (avgworst > 0) ? Double.valueOf(column[avgworst]) : 0;
-				Double avgBest = (avgbest > 0) ? Double.valueOf(column[avgbest]) : 0;
-				Double avgAverage = (avgaverage > 0) ? Double.valueOf(column[avgaverage]) : 0;
+				double avgExecuted = (avgexecuted > 0) ? Double.parseDouble(column[avgexecuted]) : 0;
+				double avgWorst = (avgworst > 0) ? Double.parseDouble(column[avgworst]) : 0;
+				double avgBest = (avgbest > 0) ? Double.parseDouble(column[avgbest]) : 0;
+				double avgAverage = (avgaverage > 0) ? Double.parseDouble(column[avgaverage]) : 0;
 
-				Assert.assertEquals("avg. executed score does not match", (getScore(population, "avgexecuted")/(4-itr)), avgExecuted,
-						0);
-				Assert.assertEquals("avg. worst score does not match", (getScore(population, "avgworst")/(4-itr)), avgWorst,
-						0);
-				Assert.assertEquals("avg. best score does not match", (getScore(population, "avgbest")/(4-itr)), avgBest,
-						0);
-				Assert.assertEquals("avg average score does not match", (getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
-						0);
+				Assertions.assertEquals((getScore(population, "avgexecuted")/(4-itr)), avgExecuted,
+						0,
+						"avg. executed score does not match");
+				Assertions.assertEquals((getScore(population, "avgworst")/(4-itr)), avgWorst,
+						0,
+						"avg. worst score does not match");
+				Assertions.assertEquals((getScore(population, "avgbest")/(4-itr)), avgBest,
+						0,
+						"avg. best score does not match");
+				Assertions.assertEquals((getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
+						0,
+						"avg average score does not match");
+				break;
 			}
 			iteration++;
 		}
 
-		Assertions.assertThat(new File(outDir, "scorestats_group1.txt"))
+		Assertions.assertEquals(itr, iteration);
+
+		assertThat(new File(outDir, "scorestats_group1.csv")).isFile();
+		Assertions.assertEquals(itr, iteration);
+
+		assertThat(new File(outDir, "scorestats_group1.csv"))
 			.isFile();
 
-		Assertions.assertThat(new File(outDir, "scorestats_group2.txt"))
+		assertThat(new File(outDir, "scorestats_group2.csv"))
 			.isFile();
 	}
 
@@ -603,19 +616,19 @@ public class ScoreStatsControlerListenerTest {
 			String name = columnNames[i];
 			switch (name) {
 
-			case "avg. EXECUTED":
+			case "avg_executed":
 				avgexecuted = i;
 				break;
 
-			case "avg. WORST":
+			case "avg_worst":
 				avgworst = i;
 				break;
 
-			case "avg. AVG":
+			case "avg_average":
 				avgaverage = i;
 				break;
 
-			case "avg. BEST":
+			case "avg_best":
 				avgbest = i;
 				break;
 

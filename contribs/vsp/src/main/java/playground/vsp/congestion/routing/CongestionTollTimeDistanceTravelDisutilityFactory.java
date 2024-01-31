@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.vsp.congestion.routing;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -38,10 +38,10 @@ public final class CongestionTollTimeDistanceTravelDisutilityFactory implements 
 	private double blendFactor = 1.0;
 	private RandomizingTimeDistanceTravelDisutilityFactory timeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	private final ScoringConfigGroup cnScoringGroup;
 
 	public CongestionTollTimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory timeDistanceTravelDisutilityFactory,
-			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+			TollHandler tollHandler, ScoringConfigGroup cnScoringGroup) {
 		this.tollHandler = tollHandler;
 		this.timeDistanceTravelDisutilityFactory = timeDistanceTravelDisutilityFactory;
 		this.cnScoringGroup = cnScoringGroup;
@@ -58,11 +58,11 @@ public final class CongestionTollTimeDistanceTravelDisutilityFactory implements 
 				this.blendFactor
 			);
 	}
-	
+
 	public void setSigma ( double val ) {
 		this.sigma = val;
 	}
-	
+
 	public void setBlendFactor ( double blendFactor ) {
 		this.blendFactor = blendFactor;
 	}

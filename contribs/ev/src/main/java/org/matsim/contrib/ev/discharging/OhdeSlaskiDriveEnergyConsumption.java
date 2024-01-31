@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  * https://www.researchgate.net/profile/Michal-Maciejewski-3/publication/312393169_Statistical_analysis_of_real-world_urban_driving_cycles_for_modelling_energy_consumption_of_electric_vehicles/links/59b7a17faca2722453a5fc7f/Statistical-analysis-of-real-world-urban-driving-cycles-for-modelling-energy-consumption-of-electric-vehicles.pdf
  * TODO Add (dis-)charging efficiency relative to SOC, temperature, etc...
  */
-public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption {
+public final class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption {
 	private static final double g = 9.81; // g [m/s^2]
 	private static final double m = 1525; // vehicle mass [kg]
 	private static final double m_s = m + 100; // vehicle mass + extra mass [kg]

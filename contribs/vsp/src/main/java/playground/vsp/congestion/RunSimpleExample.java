@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.vsp.congestion;
 
@@ -54,7 +54,7 @@ public class RunSimpleExample {
 
 		if (args.length > 0) {
 
-			configFile = args[0];		
+			configFile = args[0];
 			log.info("first argument (config file): "+ configFile);
 
 		} else {
@@ -70,10 +70,10 @@ public class RunSimpleExample {
 		Controler controler = new Controler(configFile);
 
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		
+
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig()),
-				tollHandler, controler.getConfig().planCalcScore());		
+				tollHandler, controler.getConfig().scoring());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -86,7 +86,7 @@ public class RunSimpleExample {
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 	}

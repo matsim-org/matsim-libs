@@ -26,8 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -40,33 +39,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Data to calculate a person's travel time on a link is taken from:
- * Weidmann, Ulrich (1992) Transporttechnik der Fussgänger - Transporttechnische Eigenschaften des Fussgängerverkehrs, 
+ * Weidmann, Ulrich (1992) Transporttechnik der Fussgänger - Transporttechnische Eigenschaften des Fussgängerverkehrs,
  * Literaturauswertung, Schriftenreihe des IVT (90), Institut für Verkehrsplanung und Transportsysteme, Zürich.
- * 
+ *
  * Age data from 0..3 and from 80..100 is extrapolated.
  */
 public class WalkTravelTime implements TravelTime {
 
 	private static final Logger log = LogManager.getLogger(WalkTravelTime.class);
-	
+
 	/*
 	 * Cache variables for each thread accessing the object separately.
 	 */
 	/*package*/ final ThreadLocal<Person> personCache;
 	/*package*/ final ThreadLocal<Double> personFactorCache;
 	private final ThreadLocal<Double> personWalkSpeedCache;
-	
+
 	// Map shared between all threads accessing this object.
 	/*package*/ final Map<Id, Double> personFactors;
-	
+
 	private final double referenceWalkSpeed; 				// 1.34 according to Weidmann, [m/s]
-	
+
 	private final double maleScaleFactor = 1.41 / 1.34;		// according to Weidmann
 	private final double femaleScaleFactor = 1.27 / 1.34;	// according to Weidmann
-	
+
 	private final double weidmannReferenceWalkSpeed = 1.34;			// 1.34 according to Weidmann, [m/s]
 	private final double weidmannScatterStandardDeviation = 0.26;	// 0.26 according to Weidmann, [m/s]
-	
+
 	// age from 0 .. 100
 	private final double[] ageFactors = {
 			0.1940, 0.2776, 0.3582, 0.4328, 0.5075, 0.5821, 0.6567, 0.7090, 0.7687, 0.8284,
@@ -96,47 +95,47 @@ public class WalkTravelTime implements TravelTime {
 			1.0133, 1.0033, 0.9922, 0.9801, 0.9670, 0.9530, 0.9382, 0.9227, 0.9067, 0.8903,
 			0.8737, 0.8570, 0.8405, 0.8242, 0.8085, 0.7935, 0.7795, 0.7667, 0.7555, 0.7460,
 			0.7386};
-	
+
 	private final AtomicBoolean warnGender = new AtomicBoolean(true);
 	private final AtomicBoolean warnSlopeRange = new AtomicBoolean(true);
 	private final AtomicBoolean warnSlopeNotFound = new AtomicBoolean(true);
 	private final AtomicBoolean warnAge = new AtomicBoolean(true);
-	
+
 	private final AtomicInteger genderWarnCount = new AtomicInteger(0);
 	private final AtomicInteger slopeRangeWarnCount = new AtomicInteger(0);
 	private final AtomicInteger slopeNotFoundWarnCount = new AtomicInteger(0);
 	private final AtomicInteger ageWarnCount = new AtomicInteger(0);
-	
+
 	private final Map<Id<Link>, Double> linkSlopes;
-	
-	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup, Map<Id<Link>, Double> linkSlopes) {
+
+	public WalkTravelTime(RoutingConfigGroup plansCalcGroup, Map<Id<Link>, Double> linkSlopes) {
 		this.referenceWalkSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
 		this.personCache = new ThreadLocal<>();
 		this.personFactorCache = new ThreadLocal<>();
 		this.personWalkSpeedCache = new ThreadLocal<>();
-		
+
 		this.personFactors = new ConcurrentHashMap<>();
 		this.linkSlopes = linkSlopes;
 	}
-	
+
 	// when used for transit_walk
 	/*package*/ WalkTravelTime(double referenceWalkSpeed, Map<Id<Link>, Double> linkSlopes) {
 		this.referenceWalkSpeed = referenceWalkSpeed;
 		this.personCache = new ThreadLocal<>();
 		this.personFactorCache = new ThreadLocal<>();
 		this.personWalkSpeedCache = new ThreadLocal<>();
-		
+
 		this.personFactors = new ConcurrentHashMap<>();
 		this.linkSlopes = linkSlopes;
 	}
 
 
-	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
+	public WalkTravelTime(RoutingConfigGroup plansCalcGroup) {
 		this(plansCalcGroup, null);
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {		
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		setPerson(person);
 		double slope = getSlope(link);
 		double slopeFactor = getSlopeFactor(slope);
@@ -147,7 +146,7 @@ public class WalkTravelTime implements TravelTime {
 
 	/*package*/ double getSlopeFactor(double slope) {
 		double slopeFactor;
-		
+
 		if (slope > 80.0) {
 			if (slopeRangeWarnCount.get() < 10) {
 				incSlopeRangeWarnCount("Slope is out of expected range (-40% .. -80%). Found slope of " + slope + ". Use 80.0 instead.");
@@ -159,18 +158,18 @@ public class WalkTravelTime implements TravelTime {
 			}
 			slope = -40.0;
 		}
-		slopeFactor = slopeFactors[-(int)Math.round(slope) + 80];			
+		slopeFactor = slopeFactors[-(int)Math.round(slope) + 80];
 		return slopeFactor;
 	}
-			
+
 	/*
 	 * Returns the slope of a link in %.
 	 */
 	/*package*/ final double getSlope(Link link) {
-		
+
 		// if no slope information is available
 		if (this.linkSlopes == null) return 0.0;
-		
+
 		Double slope = this.linkSlopes.get(link.getId());
 		if (slope == null) {
 			incSlopeNotFoundWarnCount("No slope information for link " + link.getId().toString() +
@@ -186,7 +185,7 @@ public class WalkTravelTime implements TravelTime {
 			if (genderWarnCount.get() >= 10) warnGender.set(false);
 		}
 	}
-	
+
 	private void incSlopeRangeWarnCount(String text) {
 		slopeRangeWarnCount.incrementAndGet();
 		if (warnSlopeRange.get()) {
@@ -194,7 +193,7 @@ public class WalkTravelTime implements TravelTime {
 			if (slopeRangeWarnCount.get() >= 10) warnSlopeRange.set(false);
 		}
 	}
-	
+
 	private void incSlopeNotFoundWarnCount(String text) {
 		slopeNotFoundWarnCount.incrementAndGet();
 		if (warnSlopeNotFound.get()) {
@@ -202,7 +201,7 @@ public class WalkTravelTime implements TravelTime {
 			if (slopeNotFoundWarnCount.get() >= 10) warnSlopeNotFound.set(false);
 		}
 	}
-	
+
 	private void incAgeWarnCount(String text) {
 		ageWarnCount.incrementAndGet();
 		if (warnAge.get()) {
@@ -210,19 +209,19 @@ public class WalkTravelTime implements TravelTime {
 			if (ageWarnCount.get() >= 10) warnAge.set(false);
 		}
 	}
-	
+
 	private void printWarning(String text, int count) {
 		if (count >= 10) log.warn(text + " No further warnings from this type will be given!");
 		else log.warn(text);
 	}
-	
+
 	/*package*/ void setPerson(Person person) {
-		/* 
+		/*
 		 * Only recalculate the person's walk speed factor if
 		 * the person has changed and is not in the map.
 		 */
 		if (this.personCache.get() != null && person.getId().equals(this.personCache.get().getId())) return;
-		
+
 		/*
 		 * If the person's walk speed is already in the map, use that value.
 		 * Otherwise calculate it and add it to the map.
@@ -235,7 +234,7 @@ public class WalkTravelTime implements TravelTime {
 			this.personWalkSpeedCache.set(this.referenceWalkSpeed * personFactor);
 			return;
 		}
-		
+
 		double scatterFactor;
 		double ageFactor = 1.0;
 		double genderFactor = 1.0;
@@ -244,7 +243,7 @@ public class WalkTravelTime implements TravelTime {
 		Random random = new Random();
 		random.setSeed(person.getId().toString().hashCode());
 		for (int i = 0; i < 5; i++) random.nextDouble();
-		
+
 		/*
 		 * Limit scatter factor to +/- 4 times the standard deviation.
 		 * Therefore, the scatter factor is 0.224 ... 1.777
@@ -257,10 +256,10 @@ public class WalkTravelTime implements TravelTime {
 			scatterSpeed = weidmannReferenceWalkSpeed + scatterLimit;
 		}
 		scatterFactor = scatterSpeed / weidmannReferenceWalkSpeed;
-		
+
 		if (person instanceof Person) {
 			Person p = person;
-			
+
 			// get gender factor
 			if (PersonUtils.getSex(p) == null) {
 				if (genderWarnCount.get() < 10) {
@@ -273,9 +272,9 @@ public class WalkTravelTime implements TravelTime {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
 			}
-			
+
 			Integer age = PersonUtils.getAge(p);
-			
+
 			if (age == null) {
 				if (ageWarnCount.get() < 10) {
 					incAgeWarnCount("Person's age is not defined. Ignoring age dependent walk speed factor.");
@@ -295,12 +294,12 @@ public class WalkTravelTime implements TravelTime {
 				ageFactor = ageFactors[PersonUtils.getAge(p)];
 			}
 		}
-		
+
 		double personFactor = scatterFactor * ageFactor * genderFactor;
 		this.personCache.set(person);
 		this.personFactorCache.set(personFactor);
 		this.personWalkSpeedCache.set(this.referenceWalkSpeed * personFactor);
-		
+
 		this.personFactors.put(person.getId(), personFactor);
 	}
 

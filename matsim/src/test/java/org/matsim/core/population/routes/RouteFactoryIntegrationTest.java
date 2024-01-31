@@ -20,13 +20,13 @@
 
 package org.matsim.core.population.routes;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRoute;
 import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRouteFactory;
@@ -43,17 +43,17 @@ import java.util.Collection;
  */
 public class RouteFactoryIntegrationTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Tests that the plans-reader and ReRoute-strategy module use the specified RouteFactory.
 	 */
 	@Test
-	public void testRouteFactoryIntegration() {
+	void testRouteFactoryIntegration() {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile("plans2.xml");
-		Collection<StrategySettings> settings = config.strategy().getStrategySettings();
+		Collection<StrategySettings> settings = config.replanning().getStrategySettings();
 		for (StrategySettings setting: settings) {
 			if ("ReRoute".equals(setting.getStrategyName())) {
 				setting.setWeight(1.0);
@@ -61,13 +61,13 @@ public class RouteFactoryIntegrationTest {
 				setting.setWeight(0.0);
 			}
 		}
-		config.controler().setLastIteration(1);
+		config.controller().setLastIteration(1);
 
 //		 test the default
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/default");
+		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/default");
 		Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+        controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.run();
 
         Population population = controler.getScenario().getPopulation();
@@ -77,8 +77,8 @@ public class RouteFactoryIntegrationTest {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						Assert.assertTrue(route instanceof NetworkRoute  || route instanceof GenericRouteImpl ); // that must be different from the class used below
-						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise 
+						Assertions.assertTrue(route instanceof NetworkRoute  || route instanceof GenericRouteImpl ); // that must be different from the class used below
+						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
 						// test would be better. kai, feb'16
 					}
 				}
@@ -86,14 +86,14 @@ public class RouteFactoryIntegrationTest {
 		}
 
 		// test another setting
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/variant1");
+		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/variant1");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(NetworkRoute.class, new HeavyCompressedNetworkRouteFactory(scenario.getNetwork(), TransportMode.car));
 		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler2 = new Controler(scenario);
-        controler2.getConfig().controler().setCreateGraphs(false);
-        controler2.getConfig().controler().setWriteEventsInterval(0);
+        controler2.getConfig().controller().setCreateGraphs(false);
+        controler2.getConfig().controller().setWriteEventsInterval(0);
 		controler2.run();
 
         Population population2 = controler2.getScenario().getPopulation();
@@ -105,9 +105,9 @@ public class RouteFactoryIntegrationTest {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						Assert.assertTrue("person: " + person.getId() + "; plan: " + planCounter,
-								route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl );
-						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise 
+						Assertions.assertTrue(route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl,
+								"person: " + person.getId() + "; plan: " + planCounter );
+						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
 						// test would be better. kai, feb'16
 					}
 				}

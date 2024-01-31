@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import java.util.List;
+
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import com.google.common.collect.ImmutableList;
@@ -36,15 +38,19 @@ public class VehicleEntry {
 	public final Waypoint.Start start;
 	public final ImmutableList<Waypoint.Stop> stops;
 	public final Waypoint.End end;
-	private final double[] slackTimes;// for all insertion points
+	private final double[] slackTimes;// for all insertion points (start, stops, end)
+	private final List<Double> precedingStayTimes;// for all stops
+	public final double createTime;
 
 	public VehicleEntry(DvrpVehicle vehicle, Waypoint.Start start, ImmutableList<Waypoint.Stop> stops,
-			double[] slackTimes) {
+			double[] slackTimes, List<Double> precedingStayTimes, double createTime) {
 		this.vehicle = vehicle;
 		this.start = start;
 		this.stops = stops;
 		this.end = Waypoint.End.OPEN_END;
 		this.slackTimes = slackTimes;
+		this.precedingStayTimes = precedingStayTimes;
+		this.createTime = createTime;
 	}
 
 	protected VehicleEntry(VehicleEntry that) {
@@ -53,6 +59,8 @@ public class VehicleEntry {
 		this.stops = that.stops;
 		this.end = that.end;
 		this.slackTimes = that.slackTimes;
+		this.precedingStayTimes = that.precedingStayTimes;
+		this.createTime = that.createTime;
 	}
 
 	public Waypoint getWaypoint(int index) {
@@ -64,6 +72,14 @@ public class VehicleEntry {
 	}
 
 	public double getSlackTime(int index) {
-		return slackTimes[index];
+		return slackTimes[index + 1];
+	}
+	
+	public double getStartSlackTime() {
+		return slackTimes[0];
+	}
+	
+	public double getPrecedingStayTime(int index) {
+		return precedingStayTimes.get(index);
 	}
 }

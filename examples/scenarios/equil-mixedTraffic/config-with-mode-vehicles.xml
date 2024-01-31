@@ -15,34 +15,34 @@
 		<param name="inputPlansFile" value="plans100.xml" />
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="./output/example" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="mobsim" value="qsim" />
 		<param name="snapshotFormat" value="" />
-		
+
 	</module>
 
-	<module name="qsim">	
+	<module name="qsim">
 		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData" />
 		<param name="mainMode" value="car,bicycle" />
 		<param name="linkDynamics" value="PassingQ" />
 		<param name="trafficDynamics" value="kinematicWaves" />
-		
+
 	</module>
 
-	<module name="planCalcScore">
+	<module name="scoring">
 		<param name="lateArrival" value="-18" />
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
-		
+
 		<parameterset type="activityParams" ><!-- home -->
 			<param name="activityType" value="h" />
 			<param name="minimalDuration" value="08:00:00" />
 			<param name="typicalDuration" value="12:00:00" />
 		</parameterset>
-			
+
 		<parameterset type="activityParams" ><!-- work -->
 			<param name="activityType" value="w" />
 			<param name="minimalDuration" value="06:00:00" />
@@ -51,7 +51,7 @@
 			<param name="latestStartTime" value="09:00:00" />
 			<param name="closingTime" value="18:00:00" />
 		</parameterset>
-	
+
 		<parameterset type="modeParams" >
 			<param name="constant" value="0.0" />
 			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
@@ -59,18 +59,18 @@
 			<param name="mode" value="bicycle" />
 			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
-		
+
 	</module>
-	
-	<module name="planscalcroute" >
+
+	<module name="routing" >
 		<param name="networkModes" value="car,bicycle" />
 	</module>
-	
+
 	<module name="vehicles" >
-		<param name="vehiclesFile" value="mode-vehicles.xml" /> 
+		<param name="vehiclesFile" value="mode-vehicles.xml" />
 	</module>
-	
-	<module name="strategy">
+
+	<module name="replanning">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
 		<parameterset type="strategysettings">
@@ -83,10 +83,10 @@
 			<param name="weight" value="0.1"/>
 		</parameterset>
 	</module>
-	
+
 	<module name="travelTimeCalculator" >
 		<param name="analyzedModes" value="car,bicycle" />
 		<param name="separateModes" value="true" />
-	</module>		
+	</module>
 
 </config>

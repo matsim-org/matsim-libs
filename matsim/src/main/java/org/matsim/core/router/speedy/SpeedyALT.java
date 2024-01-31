@@ -1,7 +1,6 @@
 package org.matsim.core.router.speedy;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -23,7 +22,7 @@ import java.util.List;
  *
  * This implementation always looks at all landmarks and does not filter them, as performance measurements
  * suggest that selecting and re-selecting landmarks regularly actually results in an overhead compared
- * to to just calculate the values for each landmark in each step (using a typical value of 16 landmarks).
+ * to just calculate the values for each landmark in each step (using a typical value of 16 landmarks).
  * This might be due to the fact that all values for each landmark are just next to each other in the memory,
  * so when accessing the travelcosts to/from one landmark basically already loads the values of all landmarks in
  * the CPU cache, making the calculation for the remaining landmarks very fast.

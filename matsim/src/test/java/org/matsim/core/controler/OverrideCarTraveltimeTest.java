@@ -20,10 +20,7 @@
  * *********************************************************************** */
 
  package org.matsim.core.controler;
-
-
-import com.google.inject.Provider;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -31,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -41,12 +37,12 @@ import org.matsim.vehicles.Vehicle;
 import jakarta.inject.Inject;
 import java.util.Map;
 
-public class OverrideCarTraveltimeTest {
+ public class OverrideCarTraveltimeTest {
 
     public static void main(String[] args) {
         final Config config = ConfigUtils.createConfig();
-        config.controler().setLastIteration(1);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.controller().setLastIteration(1);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         Controler controler = new Controler(ScenarioUtils.createScenario(config));
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -96,8 +92,8 @@ public class OverrideCarTraveltimeTest {
 
         @Override
         public void notifyReplanning(ReplanningEvent event) {
-            Assert.assertEquals(42.0, travelTimes.get(TransportMode.car).getLinkTravelTime(null, 0.0, null, null), 0.0);
-            Assert.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
+            Assertions.assertEquals(42.0, travelTimes.get(TransportMode.car).getLinkTravelTime(null, 0.0, null, null), 0.0);
+            Assertions.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
         }
     }
 }

@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.contrib.freightreceiver.*;
 
 public class CollaborationUtils{
@@ -42,7 +42,7 @@ public class CollaborationUtils{
 		/* Add carrier and receivers to coalition */
 		Coalition coalition = CollaborationUtils.createCoalition();
 
-		for (Carrier carrier : FreightUtils.getCarriers(sc).getCarriers().values()){
+		for (Carrier carrier : CarriersUtils.getCarriers(sc).getCarriers().values()){
 			if (!coalition.getCarrierCoalitionMembers().contains(carrier)){
 				coalition.addCarrierCoalitionMember(carrier);
 			}
