@@ -452,6 +452,24 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
+	 * Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
+	 * This method may also be used to predefine some default arguments.
+	 * @param clazz class of the scenario to run
+	 * @param args pass arguments from the main method
+	 * @param defaultArgs predefined default arguments that will always be present
+	 */
+	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
+
+		if (ApplicationUtils.isRunFromDesktop()) {
+//			TODO: implement
+//			runInGui(clazz, args, defaultArgs);
+		} else {
+			run(clazz, ApplicationUtils.mergeArgs(args, defaultArgs));
+		}
+
+	}
+
+	/**
 	 * Calls an application class and forwards any exceptions.
 	 *
 	 * @param config input config, overwrites default given by scenario

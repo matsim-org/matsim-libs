@@ -46,6 +46,31 @@ public class ApplicationUtils {
 	}
 
 	/**
+	 * Utility method to check if a jar might be run from the desktop (using double-click).
+	 */
+	public static boolean isRunFromDesktop() {
+
+		String macIdentifier = System.getenv().getOrDefault("__CFBundleIdentifier", "none");
+
+		if (macIdentifier.equals("com.apple.java.JarLauncher") || macIdentifier.equals("com.apple.JavaLauncher"))
+			return true;
+
+		String os = System.getProperty("os.name");
+
+		if (os.toLowerCase().startsWith("windows")) {
+
+			// system prop: sun.stderr.encoding, sun.stdout.encoding not present
+			// env PROMPT not present
+
+		}
+
+		// TODO: test on win10 as well with GR laptop
+
+		return false;
+
+	}
+
+	/**
 	 * Extends a context (usually config location) with an relative filename.
 	 * If the results is a local file, the path will be returned. Otherwise, it will be an url.
 	 * The results can be used as input for command line parameter or {@link IOUtils#resolveFileOrResource(String)}.
