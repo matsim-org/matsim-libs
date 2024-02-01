@@ -15,8 +15,8 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -61,23 +61,23 @@ public final class RunBicycleExpresswayExample{
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
 		}
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		// set traffic dynamics and visualization to kinematic waves (should be matsim default, but currently (jan'23) is not):
 		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.kinematicWaves );
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.kinematicWaves );
 
 		// run only the zeroth iteration so that we do not have to worry about replanning strategies:
-		config.controler().setLastIteration( 0 );
+		config.controller().setLastIteration( 0 );
 
 		// add bike routing as network routing:
-		config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, BICYCLE ) );
+		config.routing().setNetworkModes( Arrays.asList( TransportMode.car, BICYCLE ) );
 
-		config.plansCalcRoute().setAccessEgressType( AccessEgressType.accessEgressModeToLink );
+		config.routing().setAccessEgressType( AccessEgressType.accessEgressModeToLink );
 		// (NetworkRoutingModule w/o access/egress does not pass the vehicle to the router --> cannot take vehicle max speed into account.  See comment in code in NetworkRoutingModule#calcRoute(...).  kai, jan'23)
 
 		// add (arbitrary) mode params for bike so that the scoring works:
-		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( BICYCLE ) );
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( BICYCLE ) );
 
 		// add bike as network mode to qsim:
 		config.qsim().setMainModes( Arrays.asList( TransportMode.car, BICYCLE ) );

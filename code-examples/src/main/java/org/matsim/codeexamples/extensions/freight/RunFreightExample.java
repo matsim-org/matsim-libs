@@ -19,10 +19,10 @@
 package org.matsim.codeexamples.extensions.freight;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
+import org.matsim.freight.carriers.CarrierPlanWriter;
+import org.matsim.freight.carriers.controler.CarrierModule;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -35,12 +35,12 @@ import java.util.concurrent.ExecutionException;
 
 
 /**
- * @see org.matsim.contrib.freight
+ * @see org.matsim.freight.carriers
  */
 public class RunFreightExample {
 
 	public static void main(String[] args) throws ExecutionException, InterruptedException{
-		run(args, true);
+		run(args, false);
 	}
 	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
 
@@ -49,34 +49,34 @@ public class RunFreightExample {
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
 			config.plans().setInputFile( null ); // remove passenger input
-			config.controler().setOutputDirectory( "./output/freight" );
-			config.controler().setLastIteration( 0 );  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
+			config.controller().setOutputDirectory( "./output/freight" );
+			config.controller().setLastIteration( 0 );  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
 
-			FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-			freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml" );
+			FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
+      freightConfigGroup.setCarriersFile("singleCarrierFiveActivitiesWithoutRoutes_Shipments.xml");
 			freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml" );
 		} else {
-			config = ConfigUtils.loadConfig( args, new FreightConfigGroup() );
+			config = ConfigUtils.loadConfig( args, new FreightCarriersConfigGroup() );
 		}
 
 		// load scenario (this is not loading the freight material):
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		//load carriers according to freight config
-		FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		// how to set the capacity of the "light" vehicle type to "1":
-//		FreightUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
+//		CarriersUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
 
 		// output before jsprit run (not necessary)
-		new CarrierPlanWriter(FreightUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
+		new CarrierPlanWriter(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		// Solving the VRP (generate carrier's tour plans)
-		FreightUtils.runJsprit( scenario );
+		CarriersUtils.runJsprit( scenario );
 
 		// Output after jsprit run (not necessary)
-		new CarrierPlanWriter(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
+		new CarrierPlanWriter(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		// ## MATSim configuration:  ##

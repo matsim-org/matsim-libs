@@ -37,9 +37,9 @@ public class RunRoadpricingExample {
 		Config config ;
 		if ( args==null || args.length==0 || args[0]==null ) {
 			config = ConfigUtils.loadConfig( "scenarios/equil-extended/config-with-roadpricing.xml" );
-			config.controler().setOutputDirectory( "output" );
-			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setLastIteration( 1 );
+			config.controller().setOutputDirectory( "output" );
+			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setLastIteration( 1 );
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}

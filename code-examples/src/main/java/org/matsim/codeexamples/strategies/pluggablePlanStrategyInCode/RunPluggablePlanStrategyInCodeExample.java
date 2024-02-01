@@ -21,7 +21,7 @@ package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -48,14 +48,14 @@ public class RunPluggablePlanStrategyInCodeExample {
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName(STRATEGY_NAME);
 		stratSets.setWeight(0.1);
-		config.strategy().addStrategySettings(stratSets);
+		config.replanning().addStrategySettings(stratSets);
 		
 		//let the output directory be overwritten
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		//only run one iteration
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(1);
 		
 		final Controler controler = new Controler(config);
 		

@@ -9,9 +9,9 @@ import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -39,18 +39,18 @@ public final class RunBicycleContribExample{
 			config.network().setInputFile("network_lane.xml"); // Modify this
 			config.plans().setInputFile("population_1200.xml");
 
-			config.strategy().addStrategySettings( new StrategyConfigGroup.StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(0.8 ) );
-			config.strategy().addStrategySettings( new StrategyConfigGroup.StrategySettings().setStrategyName("ReRoute" ).setWeight(0.2 ) );
+			config.replanning().addStrategySettings( new ReplanningConfigGroup.StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(0.8 ) );
+			config.replanning().addStrategySettings( new ReplanningConfigGroup.StrategySettings().setStrategyName("ReRoute" ).setWeight(0.2 ) );
 
-			config.planCalcScore().addActivityParams( new PlanCalcScoreConfigGroup.ActivityParams("home").setTypicalDuration(12*60*60 ) );
-			config.planCalcScore().addActivityParams( new PlanCalcScoreConfigGroup.ActivityParams("work").setTypicalDuration(8*60*60 ) );
+			config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12*60*60 ) );
+			config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8*60*60 ) );
 
-			config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams("bicycle").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
+			config.scoring().addModeParams( new ScoringConfigGroup.ModeParams("bicycle").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
 
 			config.global().setNumberOfThreads(1 );
-			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
-			config.controler().setLastIteration(100); // Modify if motorized interaction is used
+			config.controller().setLastIteration(100); // Modify if motorized interaction is used
 		}
 
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
@@ -64,7 +64,7 @@ public final class RunBicycleContribExample{
 
 		config.qsim().setMainModes(mainModeList );
 
-		config.plansCalcRoute().setNetworkModes(mainModeList );
+		config.routing().setNetworkModes(mainModeList );
 
 		// ===
 

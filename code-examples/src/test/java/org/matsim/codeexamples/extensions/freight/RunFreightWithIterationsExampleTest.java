@@ -2,9 +2,9 @@ package org.matsim.codeexamples.extensions.freight;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -18,17 +18,17 @@ import java.net.URL;
 
 public class RunFreightWithIterationsExampleTest{
 	private static final Logger log = LogManager.getLogger( RunFreightWithIterationsExampleTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMain(){
+	void testMain(){
 		try{
 			String[] args = { IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ).toString() ,
-					"--config:controler.outputDirectory", utils.getOutputDirectory(),
-					"--config:controler.lastIteration", "1",
+					"--config:controller.outputDirectory", utils.getOutputDirectory(),
+					"--config:controller.lastIteration", "1",
 					"--config:plans.inputPlansFile", "null",
-					"--config:freight.carriersFile", "singleCarrierFiveActivitiesWithoutRoutes.xml",
-					"--config:freight.carriersVehicleTypeFile", "vehicleTypes.xml"
+					"--config:freightCarriers.carriersFile", "singleCarrierFiveActivitiesWithoutRoutes.xml",
+					"--config:freightCarriers.carriersVehicleTypeFile", "vehicleTypes.xml"
 			};
 			RunFreightWithIterationsExample.run(args, false);
 			{
@@ -39,13 +39,13 @@ public class RunFreightWithIterationsExampleTest{
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
 				boolean result = PopulationUtils.comparePopulations( expected, actual );
-				Assert.assertTrue( result );
+				Assertions.assertTrue( result );
 			}
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+				Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
 			}
 
 		} catch( Exception ee ){
@@ -53,7 +53,7 @@ public class RunFreightWithIterationsExampleTest{
 			ee.printStackTrace();
 
 			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 }

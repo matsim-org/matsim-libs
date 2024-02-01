@@ -69,11 +69,11 @@ public class RunWithinDayReplanningAgentExample {
 		URL networkUrl = IOUtils.extendUrl(context, "network-wo-dummy-node.xml");
 //		config.network().setInputFile("scenarios/siouxfalls/network-wo-dummy-node.xml") ;
 		config.network().setInputFile(networkUrl.toString());
-		config.controler().setLastIteration(0) ;
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0) ;
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setEndTime(26.*3600) ;
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue ) ;
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		// base the controler on that:
 		Controler ctrl = new Controler( config ) ;
 		ctrl.addOverridingModule(new AbstractModule() {

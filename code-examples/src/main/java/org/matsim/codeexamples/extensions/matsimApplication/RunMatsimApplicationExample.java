@@ -65,7 +65,7 @@ public class RunMatsimApplicationExample extends MATSimApplication {
 
 	@Override
 	protected Config prepareConfig( Config config) {
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		return config;
 	}
 

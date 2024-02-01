@@ -54,10 +54,10 @@ public class MultipleJvmBlackBox {
 		final URL url = ExamplesUtils.getTestScenarioURL( "equil" );
 		final URL configUrl = IOUtils.extendUrl( url, "config.xml" );;
 		Config config = ConfigUtils.loadConfig( configUrl ) ;
-		config.controler().setOutputDirectory( "./output/" );
+		config.controller().setOutputDirectory( "./output/" );
 		
-		config.controler().setLastIteration( 2 );
-		config.controler().setOverwriteFileSetting( deleteDirectoryIfExists );
+		config.controller().setLastIteration( 2 );
+		config.controller().setOverwriteFileSetting( deleteDirectoryIfExists );
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 

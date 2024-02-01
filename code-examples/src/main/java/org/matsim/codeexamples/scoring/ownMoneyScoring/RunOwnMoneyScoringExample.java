@@ -32,8 +32,8 @@ class RunOwnMoneyScoringExample {
 		final Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-			config.controler().setOutputDirectory( "output/ownMoneyScoring/" );
-			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOutputDirectory( "output/ownMoneyScoring/" );
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}

@@ -52,7 +52,7 @@ public class RunTimeDependentNetworkExample {
 		// configure the time variant network here:
 		config.network().setTimeVariantNetwork(true);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		// ---
 		

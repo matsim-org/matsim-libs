@@ -67,7 +67,7 @@ public final class RunAverageEmissionToolOfflineExample{
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}
-		config.plansCalcRoute().clearTeleportedModeParams();
+		config.routing().clearTeleportedModeParams();
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		{
@@ -122,7 +122,7 @@ public final class RunAverageEmissionToolOfflineExample{
 		// ---
 
 		// add events writer into emissions event handler
-		final EventWriterXML eventWriterXML = new EventWriterXML( config.controler().getOutputDirectory() + '/' + emissionEventOutputFileName );
+		final EventWriterXML eventWriterXML = new EventWriterXML( config.controller().getOutputDirectory() + '/' + emissionEventOutputFileName );
 		eventsManager.addHandler( eventWriterXML );
 
 		// read events file into the events reader.  EmissionsModule and events writer have been added as handlers, and will act accordingly.
@@ -136,7 +136,6 @@ public final class RunAverageEmissionToolOfflineExample{
 		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "/output_network.xml.gz" );
 		ConfigUtils.writeConfig( config, config.controler().getOutputDirectory() + "/output_config.xml" );
 		ConfigUtils.writeMinimalConfig( config, config.controler().getOutputDirectory() + "/output_config_reduced.xml" );
-
 	}
 
 }

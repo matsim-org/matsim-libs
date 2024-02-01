@@ -12,10 +12,10 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.HashSet;
 
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import static org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import static org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
-import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 
@@ -36,8 +36,8 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			config = ConfigUtils.loadConfig( args ) ;
 		} else {
 			config = ConfigUtils.loadConfig( "scenarios/equil/config.xml" ) ;
-			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setLastIteration( 2 );
+			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setLastIteration( 2 );
 		}
 
 		config.qsim().setLinkDynamics( LinkDynamics.PassingQ );
@@ -52,7 +52,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.planCalcScore().addModeParams( params );
+			config.scoring().addModeParams( params );
 		}
 		{
 			String mode = "bicycle" ;
@@ -60,37 +60,37 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.planCalcScore().addModeParams( params );
+			config.scoring().addModeParams( params );
 		}
 		{
 			String mode = "bike" ;
 			// routing, qsim:
-			config.plansCalcRoute().removeTeleportedModeParams( mode );
+			config.routing().removeTeleportedModeParams( mode );
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.planCalcScore().addModeParams( params );
+			config.scoring().addModeParams( params );
 		}
 		{
 			String mode = "walk" ;
 			// routing, qsim:
-			config.plansCalcRoute().removeTeleportedModeParams( mode );
+			config.routing().removeTeleportedModeParams( mode );
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.planCalcScore().addModeParams( params );
+			config.scoring().addModeParams( params );
 		}
 
 		{
 			StrategySettings stratSets = new StrategySettings(  ) ;
 			stratSets.setWeight( 1.0 );
 			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode );
-			config.strategy().addStrategySettings( stratSets );
+			config.replanning().addStrategySettings( stratSets );
 
 			config.changeMode().setModes( networkModesAsSet.toArray( new String[0] ) );
 		}
 
-		config.plansCalcRoute().setNetworkModes( networkModesAsSet ) ;
+		config.routing().setNetworkModes( networkModesAsSet ) ;
 
 		config.qsim().setMainModes( networkModesAsSet );
 

@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -11,7 +11,7 @@ import org.matsim.core.population.PopulationUtils;
 public class MyPlanSelectorTest {
 
 	@Test
-	public final void selectPlanTest()
+	final void selectPlanTest()
 	{
 		//set up 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -25,6 +25,6 @@ public class MyPlanSelectorTest {
 		Plan resultPlan = selector.selectPlan(person);
 		
 		//assert
-		Assert.assertEquals(plan0, resultPlan);		
+		Assertions.assertEquals(plan0, resultPlan);		
 	}
 }

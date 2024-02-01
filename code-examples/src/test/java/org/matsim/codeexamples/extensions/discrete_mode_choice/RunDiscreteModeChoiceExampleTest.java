@@ -2,10 +2,9 @@ package org.matsim.codeexamples.extensions.discrete_mode_choice;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -17,14 +16,14 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class RunDiscreteModeChoiceExampleTest{
 	private static final Logger log = LogManager.getLogger( RunDiscreteModeChoiceExampleTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMain(){
+	void testMain(){
 
 		try{
 			RunDiscreteModeChoiceExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
@@ -45,7 +44,7 @@ public class RunDiscreteModeChoiceExampleTest{
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assert.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
 				}
 			}
 

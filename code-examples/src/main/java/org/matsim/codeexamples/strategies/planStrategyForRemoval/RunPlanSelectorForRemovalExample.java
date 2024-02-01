@@ -35,10 +35,10 @@ public class RunPlanSelectorForRemovalExample {
 	public static void main(String[] args) {
 		
 		Config config = ConfigUtils.createConfig();	
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(1);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(1);
 		
-		config.strategy().setPlanSelectorForRemoval( SELECTOR_NAME );
+		config.replanning().setPlanSelectorForRemoval( SELECTOR_NAME );
 		
 		Controler controler = new Controler(config);
 
@@ -46,7 +46,7 @@ public class RunPlanSelectorForRemovalExample {
 			
 			@Override
 			public void install() {
-				if (getConfig().strategy().getPlanSelectorForRemoval().equals(SELECTOR_NAME)) {
+				if (getConfig().replanning().getPlanSelectorForRemoval().equals(SELECTOR_NAME)) {
 					bindPlanSelectorForRemoval().toProvider(MyExpBetaPlanChangerForRemovalProvider.class);
 				}
 			}

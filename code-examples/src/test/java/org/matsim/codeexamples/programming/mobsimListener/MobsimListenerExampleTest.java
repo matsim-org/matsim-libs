@@ -21,8 +21,8 @@
  */
 package org.matsim.codeexamples.programming.mobsimListener;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.codeexamples.mobsim.mobsimListener.RunMobsimListenerExample;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -32,14 +32,14 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class MobsimListenerExampleTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link RunMobsimListenerExample}
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		RunMobsimListenerExample.outputDirectory = utils.getOutputDirectory() + "/mobsim-listener";
 		RunMobsimListenerExample.main(null);
 	}

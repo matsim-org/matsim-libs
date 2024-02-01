@@ -23,61 +23,41 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
  *
  */
-@RunWith(Parameterized.class)
 public class ExamplesByConfigfileTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
-	private String configFile;
-
-	public ExamplesByConfigfileTest(String configFile ) {
-		this.configFile = configFile ;
-	}
-	
-	@Parameters(name = "{index}: configFilename == {0};")
-	public static Collection<Object[]> createTests() {
-		Collection<Object[]> filesToRun = new ArrayList<>();
-
-		filesToRun.add(new Object [] {"scenarios/equil/config.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil/config-with-minimal-plans-file.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil/config-with-mobsim.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
- 		filesToRun.add(new Object [] {"scenarios/equil/config-with-controlerListener.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil/config-with-pluggablePlanStrategy.xml"});
-
-		filesToRun.add(new Object [] {"scenarios/equil-extended/config-extended.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-lanes.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
-
-		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-subpopulation.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-trips.xml"});
-
-		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml"});
-		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
-
-		filesToRun.add(new Object [] {"examples/tutorial/config/externalReplanning.xml"});
-
-		return filesToRun;
-		
-		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
-		// before running each test. kai, jul'16
+	public static Stream<String> arguments() {
+		return Stream.of("scenarios/equil/config.xml",
+				"scenarios/equil/config-with-minimal-plans-file.xml",
+				"scenarios/equil/config-with-mobsim.xml",
+				"scenarios/equil/example2-config.xml",
+				"scenarios/equil/example5-config.xml",
+				"scenarios/equil/config-with-controlerListener.xml",
+				"scenarios/equil/config-with-pluggablePlanStrategy.xml",
+				"scenarios/equil-extended/config-extended.xml",
+				"scenarios/equil-extended/config-with-lanes.xml",
+				"scenarios/equil-extended/config-with-network-change-events.xml",
+				"scenarios/equil-extended/config-with-subpopulation.xml",
+				"scenarios/equil-extended/config-with-trips.xml",
+				"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml",
+				"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml",
+				"examples/tutorial/config/externalReplanning.xml");
 	}
 
 	private String outputDir ;
@@ -87,8 +67,9 @@ public class ExamplesByConfigfileTest {
 	 * Test method for {@link RunFromConfigfileExample#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	final void testMain(String configFile) {
 		if ( outputDir==null ) {
 			outputDir = utils.getOutputDirectory() ; // removes output dir every time this is run so run it only once
 		}
@@ -112,7 +93,7 @@ public class ExamplesByConfigfileTest {
 			}
 		} catch( Exception ee  ){
 			ee.printStackTrace();
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 

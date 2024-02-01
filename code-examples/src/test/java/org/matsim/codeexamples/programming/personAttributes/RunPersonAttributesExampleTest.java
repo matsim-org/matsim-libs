@@ -23,17 +23,17 @@
  */
 package org.matsim.codeexamples.programming.personAttributes;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.codeexamples.population.personAttributes.RunPersonAttributesExample;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunPersonAttributesExampleTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void test(){
+	void test(){
 		RunPersonAttributesExample.main(null);
 	}
 	

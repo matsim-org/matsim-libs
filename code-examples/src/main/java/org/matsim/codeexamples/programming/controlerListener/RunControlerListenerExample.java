@@ -23,7 +23,7 @@ public class RunControlerListenerExample {
 		OutputDirectoryLogging.catchLogEntries();
 		
 		Config config = ConfigUtils.loadConfig(filename) ;
-		config.controler().setLastIteration(1);
+		config.controller().setLastIteration(1);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 

@@ -48,8 +48,8 @@ public class RunScenarioWithCustomScoring {
 		Config config = ConfigUtils.loadConfig("input/ha2/ha2policyCaseConfig.xml");
 
 		//Relative path locations must be relative to the project folder (both in the config and here)
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration(10);
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration(10);
 		// This loads the scenario
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		final KindergartenArrivalHandler kindergartenArrivalHandler = new KindergartenArrivalHandler();

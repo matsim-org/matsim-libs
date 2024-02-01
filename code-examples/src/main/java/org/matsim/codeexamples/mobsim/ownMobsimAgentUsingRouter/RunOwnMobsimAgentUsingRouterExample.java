@@ -61,7 +61,7 @@ public class RunOwnMobsimAgentUsingRouterExample {
 					@Override
 					public Mobsim get() {
 						scenario.getConfig().qsim().setEndTime(25 * 60 * 60);
-						scenario.getConfig().controler().setLastIteration(0);
+						scenario.getConfig().controller().setLastIteration(0);
 						scenario.getPopulation().getPersons().clear();
 						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(scenario, eventsManager);
 						qsim.addAgentSource(new AgentSource() {

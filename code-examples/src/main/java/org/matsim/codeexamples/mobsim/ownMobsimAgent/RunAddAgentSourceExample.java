@@ -46,8 +46,8 @@ public class RunAddAgentSourceExample{
 	public static void main(String[] args){
 		Config config = ConfigUtils.loadConfig( "scenarios/equil/example5-config.xml" );
 		config.qsim().setEndTime( 25 * 60 * 60 );
-		config.controler().setLastIteration( 0 );
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 0 );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

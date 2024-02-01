@@ -1,9 +1,8 @@
 package org.matsim.codeexamples.mobsim.replaceAgentFactory;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.config.Config;
@@ -17,15 +16,16 @@ import org.matsim.testcases.MatsimTestUtils;
 import jakarta.inject.Inject;
 
 public class RunReplaceAgentFactoryExampleTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-	
-	@Test public void testMain() {
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	@Test
+	void testMain() {
 		try {
 			final RunReplaceAgentFactoryExample main = new RunReplaceAgentFactoryExample();;
 			final Config config = main.prepareConfig();
-			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setLastIteration( 2 );
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setLastIteration( 2 );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
 			
 			Controler controler = main.prepareControler() ;
 			
@@ -39,11 +39,11 @@ public class RunReplaceAgentFactoryExampleTest {
 			
 			main.run() ;
 			
-			Assert.assertEquals( 9024, eventsCounter.getCnt() );
+			Assertions.assertEquals( 9024, eventsCounter.getCnt() );
 			
 		} catch (Exception ee) {
 			ee.printStackTrace();
-			Assert.fail() ;
+			Assertions.fail() ;
 		}
 	}
 	
