@@ -191,7 +191,7 @@ public final class IterationStopWatch {
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
 
 			// print header
-			writer.write("iteration");
+			writer.write("Iteration");
 			for (String identifier : this.identifiers) {
 				writer.write(delimiter);
 				writer.write(identifier);
