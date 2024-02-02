@@ -65,12 +65,10 @@ public class LongDistanceFreightUtils {
 	private static void setTransportType(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("transport_type", String.valueOf(findTransportType(tripRelation.getGoodsTypeMainRun())));
 	}
-
-	static void setFreightSubpopulation(Person person) {
+	private static void setFreightSubpopulation(Person person) {
 		person.getAttributes().putAttribute("subpopulation", "freight");
 	}
-
-	static void setTripRelationIndex(Person person, String tripRelationId) {
+	private static void setTripRelationIndex(Person person, String tripRelationId) {
 		person.getAttributes().putAttribute("trip_relation_index", tripRelationId);
 	}
 
@@ -162,15 +160,7 @@ public class LongDistanceFreightUtils {
 	static int getGoodsTypePostRun(Person person) {
 		return Integer.parseInt(person.getAttributes().getAttribute("goods_type_post-run").toString());
 	}
-
-//	static void setGoodsTypePreRun(Person person, TripRelation tripRelation) {
-//		person.getAttributes().putAttribute("goods_type_pre-run", tripRelation.getGoodsTypePreRun());
-//	}
-
-//	static void setGoodsTypePostRun(Person person, TripRelation tripRelation) {
-//		person.getAttributes().putAttribute("goods_type_post-run", tripRelation.getGoodsTypePostRun());
-//	}
-	static void setTonsPerYearPreRun(Person person, TripRelation tripRelation) {
+	private static void setTonsPerYearPreRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tons_per_year_pre-run", tripRelation.getTonsPerYearPreRun());
 	}
 	static double getTonsPerYearPreRun(Person person) {
@@ -191,10 +181,10 @@ public class LongDistanceFreightUtils {
 	private static void setTonKMPerYearPreRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tonKM_per_year_pre-run", tripRelation.getTonKMPerYearPreRun());
 	}
-	static void setTonKMPerYearMainRun(Person person, TripRelation tripRelation) {
+	private static void setTonKMPerYearMainRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tonKM_per_year_main-run", tripRelation.getTonKMPerYearMainRun());
 	}
-	static void setTonKMPerYearPostRun(Person person, TripRelation tripRelation) {
+	private static void setTonKMPerYearPostRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tonKM_per_year_post-run", tripRelation.getTonKMPerYearPostRun());
 	}
 }
