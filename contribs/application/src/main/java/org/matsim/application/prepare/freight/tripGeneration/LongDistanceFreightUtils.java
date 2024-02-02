@@ -187,4 +187,10 @@ public class LongDistanceFreightUtils {
 	private static void setTonKMPerYearPostRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tonKM_per_year_post-run", tripRelation.getTonKMPerYearPostRun());
 	}
+	static void setTripType(Person person, String tripType) {
+		person.getAttributes().putAttribute("trip_type", tripType);
+	}
+	static String getTripType(Person person) {
+		return person.getAttributes().getAttribute("trip_type").toString();
+	}
 }
