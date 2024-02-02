@@ -39,7 +39,9 @@ public class LongDistanceFreightUtils {
 		setOriginCellMainRun(person, tripRelation);
 		setDestinationCellMainRun(person, tripRelation);
 		setDestinationCell(person, tripRelation);
-		setGoodsType(person, tripRelation);
+		setGoodsTypePreRun(person, tripRelation);
+		setGoodsTypeMainRun(person, tripRelation);
+		setGoodsTypePostRun(person, tripRelation);
 		setTonsPerYearMainRun(person, tripRelation);
 	}
 	static void writeCommonAttributesV2(Person person, TripRelation tripRelation, String tripRelationId){
@@ -112,13 +114,27 @@ public class LongDistanceFreightUtils {
 	private static void setDestinationTerminal(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_terminal", tripRelation.getDestinationTerminal());
 	}
+	static String getDestinationTerminal(Person person) {
+		return person.getAttributes().getAttribute("destination_terminal").toString();
+	}
+	private static void setGoodsTypeMainRun(Person person, TripRelation tripRelation) {
+		person.getAttributes().putAttribute("goods_type_main-run", tripRelation.getGoodsTypeMainRun());
+	}
+	static int getGoodsTypeMainRun(Person person) {
+		return Integer.parseInt(person.getAttributes().getAttribute("goods_type_main-run").toString());
+	}
+	private static void setGoodsTypePreRun(Person person, TripRelation tripRelation) {
+		person.getAttributes().putAttribute("goods_type_pre-run", tripRelation.getGoodsTypePreRun());
+	}
 
-	/** Sets the goods type for this relation. The goods type is the same for pre, main and post run.
-	 * @param person
-	 * @param tripRelation
-	 */
-	static void setGoodsType(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("goods_type", tripRelation.getGoodsTypeMainRun());
+	static int getGoodsTypePreRun(Person person) {
+		return Integer.parseInt(person.getAttributes().getAttribute("goods_type_pre-run").toString());
+	}
+	private static void setGoodsTypePostRun(Person person, TripRelation tripRelation) {
+		person.getAttributes().putAttribute("goods_type_post-run", tripRelation.getGoodsTypePostRun());
+	}
+	static int getGoodsTypePostRun(Person person) {
+		return Integer.parseInt(person.getAttributes().getAttribute("goods_type_post-run").toString());
 	}
 
 //	static void setGoodsTypePreRun(Person person, TripRelation tripRelation) {
