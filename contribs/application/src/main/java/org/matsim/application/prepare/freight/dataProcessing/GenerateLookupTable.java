@@ -57,11 +57,11 @@ public class GenerateLookupTable implements MATSimAppCommand {
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(germanTable, StandardCharsets.UTF_8),
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
-                String verkerhszelle = record.get(0);
+                String verkehrszelle = record.get(0);
                 String name = record.get(1);
                 String nutsId2006 = record.get(3);
                 String nutsId2021 = german2006To2021Transformation.get(nutsId2006);
-                coreDataLookupTable.put(verkerhszelle, new TrafficCellCoreData(verkerhszelle, name, nutsId2006, nutsId2021));
+                coreDataLookupTable.put(verkehrszelle, new TrafficCellCoreData(verkehrszelle, name, nutsId2006, nutsId2021));
             }
         }
 
@@ -69,15 +69,15 @@ public class GenerateLookupTable implements MATSimAppCommand {
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(internationalTable, StandardCharsets.UTF_8),
                 CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
-                String verkerhszelle = record.get(0);
+                String verkehrszelle = record.get(0);
                 String name = record.get(1);
                 String nutsId2006 = record.get(2);
                 String nutsId2021 = record.get(3);
-                coreDataLookupTable.put(verkerhszelle, new TrafficCellCoreData(verkerhszelle, name, nutsId2006, nutsId2021));
+                coreDataLookupTable.put(verkehrszelle, new TrafficCellCoreData(verkehrszelle, name, nutsId2006, nutsId2021));
             }
         }
 
-        // Read verkehrszellen.csv and then writeout lookup table
+        // Read verkehrszellen.csv and then write out lookup table
         List<SimpleFeature> featuresNuts2021 = nuts2021shp.readFeatures();
         CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(output.toString()), CSVFormat.TDF);
         tsvWriter.printRecord("verkehrszelle", "name", "NUTS_2006", "NUTS_2021", "NUTS_2021_name", "coord_x", "coord_y");
@@ -85,27 +85,27 @@ public class GenerateLookupTable implements MATSimAppCommand {
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             List<String[]> incompleteCellLists = new ArrayList<>();
             for (CSVRecord record : parser) {
-                String verkerhszelle = record.get(0);
+                String verkehrszelle = record.get(0);
                 String name = record.get(1);
-                if (!coreDataLookupTable.containsKey(verkerhszelle)) {
-                    incompleteCellLists.add(new String[]{verkerhszelle, name});
+                if (!coreDataLookupTable.containsKey(verkehrszelle)) {
+                    incompleteCellLists.add(new String[]{verkehrszelle, name});
                 } else {
-                    TrafficCellCoreData coreData = coreDataLookupTable.get(verkerhszelle);
+                    TrafficCellCoreData coreData = coreDataLookupTable.get(verkehrszelle);
                     if (coreData.getNuts2021().equals("")) {
-                        incompleteCellLists.add(new String[]{verkerhszelle, name});
+                        incompleteCellLists.add(new String[]{verkehrszelle, name});
                     } else {
                         String nuts2006 = coreData.getNuts2006();
                         String nuts2021 = coreData.getNuts2021();
                         String nuts2021Name = getNutsName(featuresNuts2021, nuts2021);
                         Coord coord = getBackupCoord(featuresNuts2021, nuts2021);
-                        tsvWriter.printRecord(verkerhszelle, name, nuts2006, nuts2021, nuts2021Name, coord.getX(), coord.getY());
+                        tsvWriter.printRecord(verkehrszelle, name, nuts2006, nuts2021, nuts2021Name, coord.getX(), coord.getY());
                     }
                 }
             }
 
-            for (String[] verkerhszelleAndName : incompleteCellLists) {
-                String verkehrszelle = verkerhszelleAndName[0];
-                String name = verkerhszelleAndName[1];
+            for (String[] verkehrszelleAndName : incompleteCellLists) {
+                String verkehrszelle = verkehrszelleAndName[0];
+                String name = verkehrszelleAndName[1];
                 String nuts2006 = coreDataLookupTable.getOrDefault(verkehrszelle, new TrafficCellCoreData(verkehrszelle, name)).getNuts2006();
                 tsvWriter.printRecord(verkehrszelle, name, nuts2006);
             }
