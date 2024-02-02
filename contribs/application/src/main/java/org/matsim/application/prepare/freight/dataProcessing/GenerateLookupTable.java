@@ -91,7 +91,7 @@ public class GenerateLookupTable implements MATSimAppCommand {
                     incompleteCellLists.add(new String[]{verkehrszelle, name});
                 } else {
                     TrafficCellCoreData coreData = coreDataLookupTable.get(verkehrszelle);
-                    if (coreData.getNuts2021().equals("")) {
+                    if (coreData.getNuts2021().isEmpty()) {
                         incompleteCellLists.add(new String[]{verkehrszelle, name});
                     } else {
                         String nuts2006 = coreData.getNuts2006();
