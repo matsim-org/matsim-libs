@@ -11,6 +11,10 @@ public class LongDistanceFreightUtils {
 		FTL, LTL
 	}
 
+	public enum LongDistanceTravelMode {
+		road, train, ship, unallocated
+	}
+
 	private final static Map <TransportType, List<Integer>> transportTypeMap = Map.of(
 			TransportType.FTL, List.of(10, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 71, 72, 32, 33, 80, 90, 100, 110, 120, 160, 170, 190, 200),
 			TransportType.LTL, List.of(40, 50, 60, 130, 140, 150, 180)
@@ -69,14 +73,36 @@ public class LongDistanceFreightUtils {
 	static void setTripRelationIndex(Person person, String tripRelationId) {
 		person.getAttributes().putAttribute("trip_relation_index", tripRelationId);
 	}
-	static void setPreRunMode(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("mode_pre-run", tripRelation.getModePreRun());
+
+	private static void setModePreRun(Person person, TripRelation tripRelation) {
+		setMode(person, tripRelation.getModePreRun(), "mode_pre-run");
 	}
-	static void setMainRunMode(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("mode_main-run", tripRelation.getModeMainRun());
+
+	static LongDistanceTravelMode getModePreRun(Person person) {
+		return LongDistanceTravelMode.valueOf(person.getAttributes().getAttribute("mode_pre-run").toString());
 	}
-	static void setPostRunMode(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("mode_post-run", tripRelation.getModePostRun());
+
+	private static void setModeMainRun(Person person, TripRelation tripRelation) {
+		setMode(person, tripRelation.getModeMainRun(), "mode_main-run");
+	}
+
+	static LongDistanceTravelMode getModeMainRun(Person person) {
+		return LongDistanceTravelMode.valueOf(person.getAttributes().getAttribute("mode_main-run").toString());
+	}
+
+	private static void setModePostRun(Person person, TripRelation tripRelation) {
+		setMode(person, tripRelation.getModePostRun(), "mode_post-run");
+	}
+
+	private static void setMode(Person person, String mode, String attributeName) {
+		LongDistanceTravelMode longDistanceTravelMode = switch (mode) {
+			case "0" -> LongDistanceTravelMode.unallocated;
+			case "1" -> LongDistanceTravelMode.train;
+			case "2" -> LongDistanceTravelMode.road;
+			case "3" -> LongDistanceTravelMode.ship;
+			default -> throw new IllegalArgumentException("Mode " + mode + " not found");
+		};
+		person.getAttributes().putAttribute(attributeName, longDistanceTravelMode);
 	}
 	static LongDistanceTravelMode getModePostRun(Person person) {
 		return LongDistanceTravelMode.valueOf(person.getAttributes().getAttribute("mode_post-run").toString());
