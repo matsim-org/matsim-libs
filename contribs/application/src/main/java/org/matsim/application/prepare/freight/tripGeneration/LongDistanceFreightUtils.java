@@ -32,10 +32,10 @@ public class LongDistanceFreightUtils {
 	static void writeCommonAttributesV1(Person person, TripRelation tripRelation, String tripRelationId){
 		setFreightSubpopulation(person);
 		setTripRelationIndex(person, tripRelationId);
-		setPreRunMode(person, tripRelation);
-		setMainRunMode(person, tripRelation);
-		setPostRunMode(person, tripRelation);
-		setOriginOriginCell(person, tripRelation);
+		setModePreRun(person, tripRelation);
+		setModeMainRun(person, tripRelation);
+		setModePostRun(person, tripRelation);
+		setOriginCell(person, tripRelation);
 		setOriginCellMainRun(person, tripRelation);
 		setDestinationCellMainRun(person, tripRelation);
 		setDestinationCell(person, tripRelation);
@@ -76,22 +76,40 @@ public class LongDistanceFreightUtils {
 	static void setPostRunMode(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("mode_post-run", tripRelation.getModePostRun());
 	}
-	static void setOriginOriginCell(Person person, TripRelation tripRelation) {
+	static LongDistanceTravelMode getModePostRun(Person person) {
+		return LongDistanceTravelMode.valueOf(person.getAttributes().getAttribute("mode_post-run").toString());
+	}
+	private static void setOriginCell(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("origin_cell", tripRelation.getOriginCell());
 	}
-	static void setOriginCellMainRun(Person person, TripRelation tripRelation) {
+	static String getOriginCell(Person person) {
+		return person.getAttributes().getAttribute("origin_cell").toString();
+	}
+	private static void setOriginCellMainRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("origin_cell_main_run", tripRelation.getOriginCellMainRun());
 	}
-	static void setDestinationCellMainRun(Person person, TripRelation tripRelation) {
+	static String getOriginCellMainRun(Person person) {
+		return person.getAttributes().getAttribute("origin_cell_main_run").toString();
+	}
+	private static void setDestinationCellMainRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_cell_main_run", tripRelation.getDestinationCellMainRun());
 	}
-	static void setDestinationCell(Person person, TripRelation tripRelation) {
+	static String getDestinationCellMainRun(Person person) {
+		return person.getAttributes().getAttribute("destination_cell_main_run").toString();
+	}
+	private static void setDestinationCell(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_cell", tripRelation.getDestinationCell());
 	}
-	static void setOriginTerminal(Person person, TripRelation tripRelation) {
+	static String getDestinationCell(Person person) {
+		return person.getAttributes().getAttribute("destination_cell").toString();
+	}
+	private static void setOriginTerminal(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("origin_terminal", tripRelation.getOriginTerminal());
 	}
-	static void setDestinationTerminal(Person person, TripRelation tripRelation) {
+	static String getOriginTerminal(Person person) {
+		return person.getAttributes().getAttribute("origin_terminal").toString();
+	}
+	private static void setDestinationTerminal(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("destination_terminal", tripRelation.getDestinationTerminal());
 	}
 
@@ -113,13 +131,22 @@ public class LongDistanceFreightUtils {
 	static void setTonsPerYearPreRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tons_per_year_pre-run", tripRelation.getTonsPerYearPreRun());
 	}
-	static void setTonsPerYearMainRun(Person person, TripRelation tripRelation) {
+	static double getTonsPerYearPreRun(Person person) {
+		return Double.parseDouble(person.getAttributes().getAttribute("tons_per_year_pre-run").toString());
+	}
+	private static void setTonsPerYearMainRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tons_per_year_main-run", tripRelation.getTonsPerYearMainRun());
 	}
-	static void setTonsPerYearPostRun(Person person, TripRelation tripRelation) {
+	static double getTonsPerYearMainRun(Person person) {
+		return Double.parseDouble(person.getAttributes().getAttribute("tons_per_year_main-run").toString());
+	}
+	private static void setTonsPerYearPostRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tons_per_year_post-run", tripRelation.getTonsPerYearPostRun());
 	}
-	static void setTonKMPerYearPreRun(Person person, TripRelation tripRelation) {
+	static double getTonsPerYearPostRun(Person person) {
+		return Double.parseDouble(person.getAttributes().getAttribute("tons_per_year_post-run").toString());
+	}
+	private static void setTonKMPerYearPreRun(Person person, TripRelation tripRelation) {
 		person.getAttributes().putAttribute("tonKM_per_year_pre-run", tripRelation.getTonKMPerYearPreRun());
 	}
 	static void setTonKMPerYearMainRun(Person person, TripRelation tripRelation) {
