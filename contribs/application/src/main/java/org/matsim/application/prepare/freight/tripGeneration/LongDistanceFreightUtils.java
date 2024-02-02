@@ -20,7 +20,7 @@ public class LongDistanceFreightUtils {
 	 * @param goodsType
 	 * @return
 	 */
-	public static TransportType getTransportType(int goodsType) {
+	public static TransportType findTransportType(int goodsType) {
 		for (Map.Entry<TransportType, List<Integer>> entry : transportTypeMap.entrySet()) {
 			if (entry.getValue().contains(goodsType)) {
 				return entry.getKey();
@@ -59,7 +59,7 @@ public class LongDistanceFreightUtils {
 	}
 
 	private static void setTransportType(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("transport_type_main-run", String.valueOf(getTransportType(Integer.parseInt(tripRelation.getGoodsTypeMainRun()))));
+		person.getAttributes().putAttribute("transport_type", String.valueOf(findTransportType(tripRelation.getGoodsTypeMainRun())));
 	}
 
 	static void setFreightSubpopulation(Person person) {
