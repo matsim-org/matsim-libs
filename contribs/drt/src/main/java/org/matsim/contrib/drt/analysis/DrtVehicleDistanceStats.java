@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.drt.analysis;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -59,12 +61,22 @@ public class DrtVehicleDistanceStats
 		double totalDistance = 0;
 		double totalOccupiedDistance = 0;
 		double totalPassengerTraveledDistance = 0; //in (passenger x meters)
-		final double[] totalDistanceByOccupancy;
-		final double serviceDuration;
+		final ArrayList<Double> totalDistanceByOccupancy;
+		final Double serviceDuration;
+		
+		private VehicleState() {
+			this(0, null);
+		}
 
-		private VehicleState(int maxCapacity, double serviceTime) {
-			this.totalDistanceByOccupancy = new double[maxCapacity + 1];
+		private VehicleState(int expectedOccupancy, Double serviceTime) {
+			this.totalDistanceByOccupancy = new ArrayList<>(Collections.nCopies(expectedOccupancy + 1, 0.0));
 			this.serviceDuration = serviceTime;
+		}
+		
+		private void ensureCapacity(int occupancy) {
+			while (totalDistanceByOccupancy.size() < occupancy + 1) {
+				totalDistanceByOccupancy.add(0.0);
+			}
 		}
 
 		private void linkEntered(Link link) {
@@ -76,7 +88,12 @@ public class DrtVehicleDistanceStats
 				totalOccupiedDistance += linkLength;
 				totalPassengerTraveledDistance += linkLength * occupancy;
 			}
-			totalDistanceByOccupancy[occupancy] += linkLength;
+			ensureCapacity(occupancy);
+			totalDistanceByOccupancy.set(occupancy, totalDistanceByOccupancy.get(occupancy) + linkLength);
+		}
+		
+		private int getMaximumOccupancy() {
+			return totalDistanceByOccupancy.size();
 		}
 	}
 
@@ -101,12 +118,11 @@ public class DrtVehicleDistanceStats
 	}
 
 	private void initializeVehicles() {
-		int maxCapacity = DrtAnalysisControlerListener.findMaxVehicleCapacity(fleetSpecification);
 		fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.forEach(spec -> vehicleStates.put(Id.createVehicleId(spec.getId()),
-					new VehicleState(maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
+					new VehicleState(spec.getCapacity(), spec.getServiceEndTime() - spec.getServiceBeginTime())));
 	}
 
 	@Override

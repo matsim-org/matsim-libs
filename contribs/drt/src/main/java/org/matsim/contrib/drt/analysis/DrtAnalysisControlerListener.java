@@ -872,7 +872,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				bw.write(vehicleId + delimiter//
 						+ format.format(vehicleState.totalDistance) + delimiter//
 						+ format.format(vehicleState.totalOccupiedDistance) + delimiter//
-						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + delimiter//
+						+ format.format(vehicleState.totalDistanceByOccupancy.get(0)) + delimiter//
 						+ format.format(vehicleState.totalPassengerTraveledDistance));
 				bw.newLine();
 			}
@@ -908,7 +908,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			driven.addValue(state.totalDistance);
 			passengerTraveledDistance.addValue(state.totalPassengerTraveledDistance);
 			occupied.addValue(state.totalOccupiedDistance);
-			empty.addValue(state.totalDistanceByOccupancy[0]);
+			empty.addValue(state.totalDistanceByOccupancy.get(0));
 		}
 		double d_p_d_t = passengerTraveledDistance.getSum() / driven.getSum();
 		return String.join(del, vehicleDistances.size() + "",//
@@ -943,7 +943,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
 			for (int i = 0; i <= maxcap; i++) {
-				sum[i] += state.totalDistanceByOccupancy[i];
+				sum[i] += state.totalDistanceByOccupancy.get(i);
 			}
 		}
 		StringBuilder result = new StringBuilder();
