@@ -62,13 +62,13 @@ public class DrtVehicleDistanceStats
 		double totalOccupiedDistance = 0;
 		double totalPassengerTraveledDistance = 0; //in (passenger x meters)
 		final ArrayList<Double> totalDistanceByOccupancy;
-		final Double serviceDuration;
+		final double serviceDuration;
 		
 		private VehicleState() {
-			this(0, null);
+			this(0, Double.NaN);
 		}
 
-		private VehicleState(int expectedOccupancy, Double serviceTime) {
+		private VehicleState(int expectedOccupancy, double serviceTime) {
 			this.totalDistanceByOccupancy = new ArrayList<>(Collections.nCopies(expectedOccupancy + 1, 0.0));
 			this.serviceDuration = serviceTime;
 		}
@@ -129,7 +129,13 @@ public class DrtVehicleDistanceStats
 	public void handleEvent(PassengerPickedUpEvent event) {
 		if (event.getMode().equals(mode)) {
 			if (event.getVehicleId() != null) {
-				vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.put(event.getPersonId(),
+				Id<Vehicle> vehicleId = Id.createVehicleId(event.getVehicleId());
+				
+				if (!vehicleStates.containsKey(vehicleId)) {
+					vehicleStates.put(vehicleId, new VehicleState());
+				}
+				
+				vehicleStates.get(vehicleId).distanceByPersonId.put(event.getPersonId(),
 						new MutableDouble());
 			}
 		}
