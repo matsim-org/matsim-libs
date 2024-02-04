@@ -178,4 +178,8 @@ public class DrtVehicleDistanceStats
 	Map<Id<Request>, Double> getTravelDistances() {
 		return travelDistances;
 	}
+	
+	int getMaximumOccupancy() {
+		return vehicleStates.values().stream().mapToInt(VehicleState::getMaximumOccupancy).max().orElse(0);
+	}
 }
