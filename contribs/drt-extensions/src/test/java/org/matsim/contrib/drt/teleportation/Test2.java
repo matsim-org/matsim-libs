@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.teleportation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,13 +16,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.drt.routing.DrtRouteCreator;
-import org.matsim.contrib.drt.routing.DrtStopFacility;
-import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
-import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
+import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.DrtModeRoutingModule;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
@@ -35,10 +33,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.DefaultRoutingRequest;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.RoutingRequest;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -57,7 +52,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import java.net.URL;
 import java.util.*;
 
-class Test{
+class Test2{
 
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -76,38 +71,12 @@ class Test{
 		ScenarioUtils.loadScenario( scenario );
 
 		Controler controler = new Controler( scenario );
-		controler.addOverridingModule( new AbstractDvrpModeModule("drt"){
+
+		// install the drt routing stuff, but not the mobsim stuff!
+
+		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				DrtConfigGroup drtCfg = ConfigUtils.addOrGetModule( this.getConfig(), DrtConfigGroup.class );
-
-				this.addRoutingModuleBinding( "drt" ).toProvider( new DrtEstimatingRoutingModuleProvider( "drt" ) );
-
-				modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
-															  DvrpRoutingModuleProvider.Stage.MAIN)
-													  .toProvider(new DvrpModeRoutingModule.DefaultMainLegRouterProvider(getMode()) );// not singleton
-				// this seems to bind an enum.  maybe more heavyweight than necessary?
-
-				bindModal( DefaultMainLegRouter.RouteCreator.class ).toProvider(
-						new DrtRouteCreatorProvider(drtCfg) );// not singleton
-				// this is used in DvrpModeRoutingModule (recruited by the DvrpRoutingModuleProvider above)
-
-				bindModal( DrtStopNetwork.class ).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg) ).asEagerSingleton();
-				// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
-
-				switch( drtCfg.operationalScheme ){
-					case door2door -> bindModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ).toProvider(
-																	 modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
-															 .asEagerSingleton();
-					case stopbased, serviceAreaBased -> {
-						bindModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ).toProvider( modalProvider(
-															       getter -> new ClosestAccessEgressFacilityFinder( drtCfg.maxWalkDistance,
-																	       getter.get( Network.class ),
-																	       QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
-													       .asEagerSingleton();
-					}
-					default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.operationalScheme );
-				}
-
+				this.addRoutingModuleBinding( "drt" ).to( DrtEstimatingRoutingModule.class );
 			}
 		} );
 
@@ -116,207 +85,37 @@ class Test{
 	}
 
 	private static class DrtEstimatingRoutingModule implements RoutingModule {
-		private static final Logger logger = LogManager.getLogger( DrtEstimatingRoutingModule.class );
 
-		public interface AccessEgressFacilityFinder {
-			Optional<Pair<Facility, Facility>> findFacilities( Facility fromFacility, Facility toFacility,
-									   Attributes tripAttributes );
+		private final RoutingModule drtRoutingModule;
+		private DrtEstimatingRoutingModule( TripRouter tripRouter ) {
+			this.drtRoutingModule = tripRouter.getRoutingModule( "drt" );
 		}
 
-		private final AccessEgressFacilityFinder stopFinder;
-		private final String mode;
-		private final RoutingModule mainRouter;
-		private final RoutingModule accessRouter;
-		private final RoutingModule egressRouter;
-		private final TimeInterpretation timeInterpretation;
 
-		public DrtEstimatingRoutingModule( RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
-					  AccessEgressFacilityFinder stopFinder, String mode, TimeInterpretation timeInterpretation ) {
-			this.mainRouter = mainRouter;
-			this.stopFinder = stopFinder;
-			this.mode = mode;
-			this.accessRouter = accessRouter;
-			this.egressRouter = egressRouter;
-			this.timeInterpretation = timeInterpretation;
-		}
 
 		@Override
 		public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-			final Facility fromFacility = request.getFromFacility();
-			final Facility toFacility = request.getToFacility();
-			final double departureTime = request.getDepartureTime();
-			final Person person = request.getPerson();
+			List<? extends PlanElement> route = drtRoutingModule.calcRoute( request );
 
-			Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
-					Objects.requireNonNull(fromFacility, "fromFacility is null" ),
-					Objects.requireNonNull(toFacility, "toFacility is null"), request.getAttributes());
-			if (stops.isEmpty()) {
-				logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
-							     + TransportMode.walk
-							     + ") and routing mode "
-							     + mode
-							     + ". Agent Id:\t"
-							     + person.getId());
-				return null;
-			}
+			DrtRouteCreator creator = null;
+			creator.createRoute( departureTime, accessActLink, egressActLink, person, tripAttributes, routeFactories );
 
-			Facility accessFacility = stops.get().getLeft();
-			Facility egressFacility = stops.get().getRight();
-			if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
-				logger.debug("Start and end stop are the same, agent will use fallback mode as leg mode (usually "
-							     + TransportMode.walk
-							     + ") and routing mode "
-							     + mode
-							     + ". Agent Id:\t"
-							     + person.getId());
-				return null;
-			}
+			DrtRouteFactory factory = null;
+			Route drtRoute = factory.createRoute( startLinkId, endLinkId );
 
-			List<PlanElement> trip = new ArrayList<>();
+			// correct the attributes of the route as we need them
 
-			double now = departureTime;
+			DrtInitialEstimator estimator = new DrtInitialEstimator(){
+			};
 
-			// access (sub-)trip:
-			List<? extends PlanElement> accessTrip = accessRouter.calcRoute(
-					DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes() ) );
-			if (!accessTrip.isEmpty()) {
-				trip.addAll(accessTrip);
-				now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
+			DrtEstimator.Estimate estimate = estimator.estimate( route, 12. * 3600 );
 
-				// interaction activity:
-				trip.add(createDrtStageActivity(accessFacility, now));
-			}
+			estimate.travelTime();
+			estimate.distance();
 
-			// dvrp proper leg:
-			List<? extends PlanElement> drtLeg = mainRouter.calcRoute(
-					DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
-			trip.addAll(drtLeg);
-			now = timeInterpretation.decideOnElementsEndTime(drtLeg, now).seconds();
-
-			// egress (sub-)trip:
-			List<? extends PlanElement> egressTrip = egressRouter.calcRoute(
-					DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
-			if (!egressTrip.isEmpty()) {
-				// interaction activity:
-				trip.add(createDrtStageActivity(egressFacility, now));
-
-				trip.addAll(egressTrip);
-			}
-
-			return trip;
-		}
-
-		private Activity createDrtStageActivity( Facility stopFacility, double now ) {
-			return PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stopFacility.getCoord(),
-					stopFacility.getLinkId(), mode );
-		}
-	}
-
-	private static class DrtEstimatingRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtEstimatingRoutingModule> {
-		public enum Stage {ACCESS, MAIN, EGRESS}
-
-		@Inject
-		@Named(TransportMode.walk)
-		private RoutingModule walkRouter;
-
-		@Inject private TimeInterpretation timeInterpretation;
-
-		@Inject private TripRouter tripRouter;
-
-		public DrtEstimatingRoutingModuleProvider(String mode) {
-			super(mode, DvrpModes::mode );
-		}
-
-		@Override
-		public DrtEstimatingRoutingModule get() {
-
-			RoutingModule drtRoutingModule = tripRouter.getRoutingModule( "drt" );
-			drtRoutingModule.c
-
-			Map<DvrpRoutingModuleProvider.Stage, RoutingModule> stageRouters = getModalInstance( new TypeLiteral<Map<DvrpRoutingModuleProvider.Stage, RoutingModule>>() {
-			} );
-			RoutingModule mainRouter = Objects.requireNonNull(stageRouters.get( DvrpRoutingModuleProvider.Stage.MAIN ),
-					"Main mode router must be explicitly bound");
-			RoutingModule accessRouter = stageRouters.getOrDefault( DvrpRoutingModuleProvider.Stage.ACCESS, walkRouter );
-			RoutingModule egressRouter = stageRouters.getOrDefault( DvrpRoutingModuleProvider.Stage.EGRESS, walkRouter );
-
-			return new DrtEstimatingRoutingModule(mainRouter, accessRouter, egressRouter,
-					getModalInstance( DrtEstimatingRoutingModule.AccessEgressFacilityFinder.class ), getMode(), timeInterpretation);
+			return route;
 		}
 
 	}
-
-	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {
-		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-
-		private final DrtConfigGroup drtCfg;
-
-		private DrtRouteCreatorProvider(DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode(), DvrpModes::mode);
-			this.drtCfg = drtCfg;
-			leastCostPathCalculatorFactory = new SpeedyALTFactory();
-		}
-
-		@Override
-		public DrtRouteCreator get() {
-			var travelTime = getModalInstance( TravelTime.class );
-			return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
-					travelTime, getModalInstance( TravelDisutilityFactory.class ));
-		}
-	}
-
-	private static class DrtStopNetworkProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtStopNetwork> {
-
-		private final DrtConfigGroup drtCfg;
-		private final Config config;
-
-		private DrtStopNetworkProvider(Config config, DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode(), DvrpModes::mode);
-			this.drtCfg = drtCfg;
-			this.config = config;
-		}
-
-		@Override
-		public DrtStopNetwork get() {
-			switch (drtCfg.operationalScheme) {
-				case door2door:
-					return ImmutableMap::of;
-				case stopbased:
-					return createDrtStopNetworkFromTransitSchedule(config, drtCfg);
-				case serviceAreaBased:
-					return createDrtStopNetworkFromServiceArea(config, drtCfg, getModalInstance(Network.class));
-				default:
-					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.operationalScheme);
-			}
-		}
-	}
-
-	private static DrtStopNetwork createDrtStopNetworkFromServiceArea(Config config, DrtConfigGroup drtCfg,
-									  Network drtNetwork) {
-		final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-				ConfigGroup.getInputFileURL(config.getContext(), drtCfg.drtServiceAreaShapeFile ) );
-		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = drtNetwork.getLinks()
-											.values()
-											.stream()
-											.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
-													preparedGeometries))
-											.map( DrtStopFacilityImpl::createFromLink )
-											.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
-		return () -> drtStops;
-	}
-
-	private static DrtStopNetwork createDrtStopNetworkFromTransitSchedule(Config config, DrtConfigGroup drtCfg) {
-		URL url = ConfigGroup.getInputFileURL(config.getContext(), drtCfg.transitStopFile);
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario).readURL(url );
-		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
-										      .getFacilities()
-										      .values()
-										      .stream()
-										      .map(DrtStopFacilityImpl::createFromFacility)
-										      .collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
-		return () -> drtStops;
-	}
-
 
 }

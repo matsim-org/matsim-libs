@@ -66,6 +66,7 @@ import com.google.inject.Inject;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtModeRoutingModule extends AbstractDvrpModeModule {
+	// AbstractDvrpModeModule AbstractModalModule, which provides bindModal et al.  AbstractDvrpModeModule gets rid of the generics of AbstractModalModule.
 
 	private final DrtConfigGroup drtCfg;
 
@@ -76,27 +77,38 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+
 		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
+		// (this is the normal routing module binding)
+
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
 						DvrpRoutingModuleProvider.Stage.MAIN)
 				.toProvider(new DefaultMainLegRouterProvider(getMode()));// not singleton
+		// this seems to bind an enum.  maybe more heavyweight than necessary?
+
 		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
 				new DrtRouteCreatorProvider(drtCfg));// not singleton
+		// this is used in DvrpModeRoutingModule (recruited by the DvrpRoutingModuleProvider above)
 
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
+		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
-		if (drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.door2door) {
-			bindModal(AccessEgressFacilityFinder.class).toProvider(
-							modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
-					.asEagerSingleton();
-		} else {
-			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-							getter -> new ClosestAccessEgressFacilityFinder(drtCfg.maxWalkDistance,
-									getter.get(Network.class),
-									QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
-					.asEagerSingleton();
+		switch( drtCfg.operationalScheme ){
+			case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
+												       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
+										       .asEagerSingleton();
+			case stopbased, serviceAreaBased -> {
+				bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
+											     getter -> new ClosestAccessEgressFacilityFinder( drtCfg.maxWalkDistance,
+													     getter.get( Network.class ),
+													     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
+									     .asEagerSingleton();
+			}
+			default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.operationalScheme );
 		}
 
+		// this is, we think, updating the max travel time based on congested travel time and the alpha-beta thing:
+		// (yyyy have same problem in Ride mode but do not address it there)
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Inject
 			private Population population;
@@ -112,6 +124,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			}
 		}).asEagerSingleton();
 
+		// this binds the above as a controler listener:
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 
 	}
