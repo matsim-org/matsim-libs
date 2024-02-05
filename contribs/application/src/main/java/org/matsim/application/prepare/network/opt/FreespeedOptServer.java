@@ -31,6 +31,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class runs a server that receives model parameters for free speed
+ */
 @CommandLine.Command(
 	name = "freespeed-opt-server",
 	description = "Start server for freespeed optimization."

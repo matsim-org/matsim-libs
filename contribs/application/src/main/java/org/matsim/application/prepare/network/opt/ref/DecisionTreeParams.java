@@ -5,7 +5,7 @@ import org.matsim.application.prepare.network.opt.FeatureRegressor;
 import org.matsim.application.prepare.network.opt.NetworkModel;
 
 /**
- * Reference model with a combining decision tree on priority, road type and speed.
+ * Reference model with a manual combining decision tree using priority, road type and speed.
  */
 public final class DecisionTreeParams implements NetworkModel {
 
