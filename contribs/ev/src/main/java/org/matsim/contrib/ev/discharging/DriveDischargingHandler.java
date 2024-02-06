@@ -41,6 +41,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.vehicles.Vehicle;
 
@@ -77,9 +78,10 @@ public final class DriveDischargingHandler
 
 	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
-
+	private final QSim qsim;
 	@Inject
-	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
+	DriveDischargingHandler(QSim qsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+		this.qsim = qsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
@@ -116,7 +118,7 @@ public final class DriveDischargingHandler
 	@Override
 	public void afterSim() {
 		// process remaining events
-		doSimStep(Double.POSITIVE_INFINITY);
+		doSimStep(this.qsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override

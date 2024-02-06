@@ -68,7 +68,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 
 	@Override
 	protected boolean isLastStep(double now) {
-		return updatePickupRequests(now) && leaveTimes.size() == 0 && now >= endTime.get();
+		return updatePickupRequests(now) && processDropoffRequests(now) && now >= endTime.get();
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		processDropoffRequests(now);
 	}
 
-	private void processDropoffRequests(double now) {
+	private boolean processDropoffRequests(double now) {
 		var iterator = leaveTimes.entrySet().iterator();
 
 		while (iterator.hasNext()) {
@@ -98,6 +98,8 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 				iterator.remove();
 			}
 		}
+
+		return leaveTimes.size() == 0;
 	}
 
 	private boolean updatePickupRequests(double now) {
@@ -154,12 +156,9 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		queuePickup(request, now);
 	}
 
-
 	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
-		return pickupRequests.values()
-				.stream()
-				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
-				.findAny()
-				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
+		return pickupRequests.values().stream().filter(
+				r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
+				.findAny().orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
 }

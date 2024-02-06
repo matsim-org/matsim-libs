@@ -19,6 +19,8 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+
 import java.util.Objects;
 
 /**

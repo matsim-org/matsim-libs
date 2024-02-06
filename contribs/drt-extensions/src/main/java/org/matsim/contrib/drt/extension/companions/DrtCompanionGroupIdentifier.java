@@ -20,10 +20,11 @@
 package org.matsim.contrib.drt.extension.companions;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 import java.util.Optional;
 
@@ -31,21 +32,17 @@ import java.util.Optional;
  * @author steffenaxer
  */
 class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
-	private final Population population;
-	DrtCompanionGroupIdentifier(final Population population)
-	{
-		this.population = population;
-	}
 
 	@Override
 	public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent) {
-		Person person = wrapMobsimPassengerAgentToPerson(agent);
-		return DrtCompanionUtils.getPassengerGroupIdentifier(person);
-	}
 
-	private Person wrapMobsimPassengerAgentToPerson(MobsimPassengerAgent agent)
-	{
-		return this.population.getPersons().get(agent.getId());
+		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent);
+
+		if (pe instanceof Leg leg) {
+			return DrtCompanionUtils.getPassengerGroupIdentifier(leg);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }

@@ -8,11 +8,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.*;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
@@ -38,40 +38,38 @@ public class TrafficCountsDashboardTest {
 
 		generateDummyCounts(config);
 
-		SimWrapperConfigGroup simWrapperConfigGroup = new SimWrapperConfigGroup();
-		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.get("");
+		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		simWrapperConfigGroup.sampleSize = 0.01;
+
+		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.defaultParams();
 		contextParams.mapCenter = "12,48.95";
-		contextParams.sampleSize = 0.01;
 		contextParams.mapZoomLevel = 9.0;
 
 		SimWrapper sw = SimWrapper.create(config)
-			.addDashboard(new TrafficCountsDashboard())
-			.addDashboard(Dashboard.customize(new TrafficCountsDashboard()
+			.addDashboard(new TrafficCountsDashboard()
+				.withModes("car", Set.of(TransportMode.car))
+				.withModes("truck", Set.of(TransportMode.truck, "freight"))
+			)
+			.addDashboard(new TrafficCountsDashboard()
 				.withQualityLabels(
 					List.of(0.0, 0.3, 1.7, 2.5),
 					List.of("way too few", "fewer", "exact", "too much", "way too much")
 				)
-			).context("custom"))
-			.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
-				Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml",
-				Set.of(TransportMode.car, "freight"))
-			).context("freight").title("Freight counts"));
+			);
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
 		controler.run();
 
 		Path defaultDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
-		Path freightDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-freight");
+		Path carDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-car");
+		Path truckDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-truck");
 
-		Assertions.assertThat(defaultDir)
-			.isDirectoryContaining("glob:**count_comparison_daily.csv")
-			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
-
-		Assertions.assertThat(freightDir)
-			.isDirectoryContaining("glob:**count_comparison_daily.csv")
-			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
-
+		for (Path dir : List.of(defaultDir, carDir, truckDir)) {
+			Assertions.assertThat(dir)
+				.isDirectoryContaining("glob:**count_comparison_daily.csv")
+				.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
+		}
 	}
 
 	public void generateDummyCounts(Config config) {
