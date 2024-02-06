@@ -22,8 +22,11 @@ import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
@@ -48,6 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
 import java.util.*;
@@ -58,8 +62,8 @@ class Test2{
 
 	@org.junit.jupiter.api.Test void test1() {
 
-		URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "mielec" ), "empty_config.xml" );
-		Config config = ConfigUtils.loadConfig( url );
+		URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "mielec" ), "mielec_drt_config.xml" );
+		Config config = ConfigUtils.loadConfig( url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 
 		config.network().setInputFile( "network.xml" );
 		config.plans().setInputFile( "plans_only_drt_1.0.xml.gz" );
@@ -67,18 +71,39 @@ class Test2{
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.controller().setLastIteration( 0 );
 
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory( config );
-		ScenarioUtils.loadScenario( scenario );
-
-		Controler controler = new Controler( scenario );
 
 		// install the drt routing stuff, but not the mobsim stuff!
+		Controler controler = DrtControlerCreator.createControler(config, false);
 
+
+		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
+
+		DrtSpeedUpParams params = new DrtSpeedUpParams();
+		params.fractionOfIterationsSwitchOn = 0;
+		drtConfigGroup.addParameterSet(params);
+
+		System.out.println(config);
+
+		// TODO
+		// We want to use DRT infrastructure (routing) so we need to integrate into drt teleportation
+		// Write our own TeleportingPassengerEngine
+		// this engine can either calc estimates beforehand or during departure (using information of drt router)
+
+
+		// alternative: implement our own router
+		// do nothing drt specific -> calculate travel time information during routing
+		// can use standard teleportation engines given route information
+		// we need to update routes ourself, we have no drt access egress, no waiting times, no drt output or requests
+		// this would be more general, could be useful for other use cases?
+		// but we only need it for DRT for now?
+
+		/*
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				this.addRoutingModuleBinding( "drt" ).to( DrtEstimatingRoutingModule.class );
 			}
 		} );
+		 */
 
 		controler.run();
 
@@ -98,20 +123,20 @@ class Test2{
 			List<? extends PlanElement> route = drtRoutingModule.calcRoute( request );
 
 			DrtRouteCreator creator = null;
-			creator.createRoute( departureTime, accessActLink, egressActLink, person, tripAttributes, routeFactories );
+		//	creator.createRoute( departureTime, accessActLink, egressActLink, person, tripAttributes, routeFactories );
 
 			DrtRouteFactory factory = null;
-			Route drtRoute = factory.createRoute( startLinkId, endLinkId );
+		//	Route drtRoute = factory.createRoute( startLinkId, endLinkId );
 
 			// correct the attributes of the route as we need them
 
-			DrtInitialEstimator estimator = new DrtInitialEstimator(){
-			};
+		//	DrtInitialEstimator estimator = new DrtInitialEstimator(){
+		//	};
 
-			DrtEstimator.Estimate estimate = estimator.estimate( route, 12. * 3600 );
+	//		DrtEstimator.Estimate estimate = estimator.estimate( route, 12. * 3600 );
 
-			estimate.travelTime();
-			estimate.distance();
+		//	estimate.travelTime();
+		//	estimate.distance();
 
 			return route;
 		}
