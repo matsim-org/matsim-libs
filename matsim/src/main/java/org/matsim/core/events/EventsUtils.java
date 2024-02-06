@@ -25,15 +25,17 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.EventsFileFingerprintComparator;
+import org.matsim.utils.eventsfilecomparison.FingerprintEventHandler;
 
 public final class EventsUtils {
 
 	/**
 	 * Create a events manager instance that guarantees causality of processed events across all handlers.
 	 */
-    public static EventsManager createEventsManager() {
+	public static EventsManager createEventsManager() {
 		return new EventsManagerImpl();
-    }
+	}
 
 	/**
 	 * Creates a parallel events manager, with no guarantees for the order of processed events between multiple handlers.
@@ -43,7 +45,7 @@ public final class EventsUtils {
 	}
 
 	public static EventsManager createEventsManager(Config config) {
-		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );
+		final EventsManager events = Injector.createInjector(config, new EventsManagerModule()).getInstance(EventsManager.class);
 //		events.initProcessing();
 		return events;
 	}
@@ -58,21 +60,44 @@ public final class EventsUtils {
 			return events;
 		} else if (events instanceof ParallelEventsManager) {
 			return events;
-		}
-		else if (events instanceof SynchronizedEventsManagerImpl) {
+		} else if (events instanceof SynchronizedEventsManagerImpl) {
 			return events;
 		} else {
 			return new SynchronizedEventsManagerImpl(events);
 		}
 	}
 
-	public static void readEvents( EventsManager events, String filename ) {
-		new MatsimEventsReader(events).readFile(filename) ;
+	public static void createEventsFingerprint(String eventFile, String outputFingerprintFile) {
+
+		EventsManager manager  = createEventsManager();
+		FingerprintEventHandler fingerprintEventHandler = new FingerprintEventHandler();
+		manager.addHandler(fingerprintEventHandler);
+
+		EventsUtils.readEvents(manager, eventFile);
+
+		FingerprintEventHandler.writeEventFingerprintToFile(outputFingerprintFile,fingerprintEventHandler.eventFingerprint);
+
 	}
 
-	public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
-		EventsFileComparator.Result result = EventsFileComparator.compare( filename1, filename2 );
-		return result ;
+	public static EventsFileComparator.Result createAndCompareEventsFingerprint(String inputFingerprint, String eventFile) {
+
+		// header byte, version byte
+		// bin array time stamps
+		// event type counter map
+		// one hash (sha1?)
+
+		new EventsFileFingerprintComparator();
+
+		return EventsFileComparator.Result.FILES_ARE_EQUAL;
+	}
+
+	public static void readEvents(EventsManager events, String filename) {
+		new MatsimEventsReader(events).readFile(filename);
+	}
+
+	public static EventsFileComparator.Result compareEventsFiles(String filename1, String filename2) {
+		EventsFileComparator.Result result = EventsFileComparator.compare(filename1, filename2);
+		return result;
 	}
 
 }
