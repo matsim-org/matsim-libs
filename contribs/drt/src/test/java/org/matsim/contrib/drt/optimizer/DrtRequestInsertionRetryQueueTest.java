@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.optimizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -43,21 +43,21 @@ public class DrtRequestInsertionRetryQueueTest {
 			.build();
 
 	@Test
-	public void maxRequestAgeZero_noRetry() {
+	void maxRequestAgeZero_noRetry() {
 		var queue = new DrtRequestInsertionRetryQueue(params(10, 0));
 		assertThat(queue.tryAddFailedRequest(request, SUBMISSION_TIME)).isFalse();
 		assertThat(queue.getRequestsToRetryNow(9999)).isEmpty();
 	}
 
 	@Test
-	public void requestMaxAgeExceeded_noRetry() {
+	void requestMaxAgeExceeded_noRetry() {
 		var queue = new DrtRequestInsertionRetryQueue(params(2, 10));
 		assertThat(queue.tryAddFailedRequest(request, SUBMISSION_TIME + 10)).isFalse();
 		assertThat(queue.getRequestsToRetryNow(9999)).isEmpty();
 	}
 
 	@Test
-	public void requestMaxAgeNotExceeded_retry() {
+	void requestMaxAgeNotExceeded_retry() {
 		var queue = new DrtRequestInsertionRetryQueue(params(2, 10));
 		assertThat(queue.tryAddFailedRequest(request, SUBMISSION_TIME)).isTrue();
 
@@ -77,7 +77,7 @@ public class DrtRequestInsertionRetryQueueTest {
 	}
 
 	@Test
-	public void requestMaxAgeNotExceeded_lateRetry() {
+	void requestMaxAgeNotExceeded_lateRetry() {
 		var queue = new DrtRequestInsertionRetryQueue(params(2, 10));
 		assertThat(queue.tryAddFailedRequest(request, SUBMISSION_TIME)).isTrue();
 
@@ -91,7 +91,7 @@ public class DrtRequestInsertionRetryQueueTest {
 	}
 
 	@Test
-	public void queueOrderMaintained() {
+	void queueOrderMaintained() {
 		var queue = new DrtRequestInsertionRetryQueue(params(2, 10));
 		assertThat(queue.tryAddFailedRequest(DrtRequest.newBuilder(request).id(Id.create("a", Request.class)).build(),
 				SUBMISSION_TIME)).isTrue();

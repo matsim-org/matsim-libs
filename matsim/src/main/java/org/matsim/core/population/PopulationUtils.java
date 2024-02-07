@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -71,7 +72,6 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -383,6 +383,36 @@ public final class PopulationUtils {
 		}
 
 		@Override
+		public Id<Plan> getId() {
+			return this.delegate.getId();
+		}
+
+		@Override
+		public void setPlanId(Id<Plan> planId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getIterationCreated() {
+			return this.delegate.getIterationCreated();
+		}
+
+		@Override
+		public void setIterationCreated(int iteration) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getPlanMutator() {
+			return this.delegate.getPlanMutator();
+		}
+
+		@Override
+		public void setPlanMutator(String planMutator) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public void addLeg(Leg leg) {
 			throw new UnsupportedOperationException() ;
 		}
@@ -649,7 +679,6 @@ public final class PopulationUtils {
 	 *
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
-	@SuppressWarnings("resource")
 	private static InputStream openPopulationInputStream(final Population s1) {
 		try {
 			final PipedInputStream in = new PipedInputStream();
@@ -786,6 +815,14 @@ public final class PopulationUtils {
 		Activity act = getFactory().createInteractionActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
 		return act ;
+	}
+
+	public static Activity convertInteractionToStandardActivity(Activity activity) {
+		if (activity instanceof InteractionActivity) {
+			return createActivity(activity);
+		} else {
+			return activity;
+		}
 	}
 
 	public static Leg createLeg(String transportMode) {

@@ -21,11 +21,13 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,13 +41,13 @@ import java.util.function.Consumer;
 
 public class RailsimEngineTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private EventsManager eventsManager;
 	private RailsimTestUtils.EventCollector collector;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		eventsManager = EventsUtils.createEventsManager();
 		collector = new RailsimTestUtils.EventCollector();
@@ -65,7 +67,7 @@ public class RailsimEngineTest {
 				f.accept(link);
 			}
 		}
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net);
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance());
 		TrainRouter router = new TrainRouter(net, res);
 
 		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
@@ -76,7 +78,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testSimple() {
+	void testSimple() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
@@ -101,7 +103,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testCongested() {
+	void testCongested() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml");
 
@@ -117,7 +119,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testCongestedWithHeadway() {
+	void testCongestedWithHeadway() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml", l -> RailsimUtils.setMinimumHeadwayTime(l, 60));
 
@@ -134,7 +136,7 @@ public class RailsimEngineTest {
 
 
 	@Test
-	public void testOpposite() {
+	void testOpposite() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml");
 
@@ -162,7 +164,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testVaryingSpeedOne() {
+	void testVaryingSpeedOne() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMesoUni.xml");
 
@@ -187,7 +189,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testVaryingSpeedMany() {
+	void testVaryingSpeedMany() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMesoUni.xml");
 
@@ -220,7 +222,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testTrainFollowing() {
+	void testTrainFollowing() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMicroUni.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "1-2", "20-21");
@@ -244,7 +246,7 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void testMicroTrainFollowingVaryingSpeed() {
+	void testMicroTrainFollowingVaryingSpeed() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMicroVaryingSpeed.xml");
 

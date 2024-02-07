@@ -24,9 +24,9 @@ import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -55,14 +55,15 @@ import org.matsim.testcases.MatsimTestUtils;
 public class RoutingIT {
 	/*package*/ static final Logger log = LogManager.getLogger(RoutingIT.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private interface RouterProvider {
 		public String getName();
 		public LeastCostPathCalculatorFactory getFactory(Network network, TravelDisutility costCalc, TravelTime timeCalc);
 	}
+
 	@Test
-	public void testDijkstra() {
+	void testDijkstra() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -74,8 +75,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testSpeedyDijkstra() {
+	void testSpeedyDijkstra() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -87,8 +89,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testDijkstraPruneDeadEnds() {
+	void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -102,7 +105,7 @@ public class RoutingIT {
 	}
 
 	@Test
-	public void testAStarEuclidean() {
+	void testAStarEuclidean() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -114,8 +117,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testAStarLandmarks() {
+	void testAStarLandmarks() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -129,7 +133,7 @@ public class RoutingIT {
 	}
 
 	@Test
-	public void testSpeedyALT() {
+	void testSpeedyALT() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -162,7 +166,7 @@ public class RoutingIT {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
-		Assert.assertTrue("different plans files.", isEqual);
+		Assertions.assertTrue(isEqual, "different plans files.");
 	}
 
 	private static void calcRoute(

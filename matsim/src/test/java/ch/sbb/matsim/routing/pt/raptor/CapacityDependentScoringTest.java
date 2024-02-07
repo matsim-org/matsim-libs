@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -81,7 +81,7 @@ import java.util.List;
 public class CapacityDependentScoringTest {
 
 	@Test
-	public void testScoring() {
+	void testScoring() {
 		double normalScore = calcScore(new Fixture(), false);
 		double capDepScore = calcScore(new Fixture(), true);
 
@@ -91,8 +91,8 @@ public class CapacityDependentScoringTest {
 		// in the normal case, it's a 15min trips at full cost, so it should be -6 * (1/4) = -1.5
 		// in the capacity dependent case, the vehicle is empty plus the passenger => occupancy = 0.2, thus the cost should only be 0.8 * original cost => -1.2
 
-		Assert.assertEquals(-1.5, normalScore, 1e-7);
-		Assert.assertEquals(-1.2, capDepScore, 1e-7);
+		Assertions.assertEquals(-1.5, normalScore, 1e-7);
+		Assertions.assertEquals(-1.2, capDepScore, 1e-7);
 	}
 
 	private double calcScore(Fixture f, boolean capacityDependent) {

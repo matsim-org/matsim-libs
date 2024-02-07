@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -46,7 +45,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 
 	private BasicPlanAgentImpl basicAgentDelegate;
 	private final BoardingAcceptance boardingAcceptance ;
-	
+
 	public TransitAgentImpl( BasicPlanAgentImpl basicAgent ) {
 		this( basicAgent, BoardingAcceptance.checkLineAndStop ) ;
 	}

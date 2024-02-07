@@ -22,8 +22,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Provides;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +50,7 @@ import java.util.Arrays;
 
 public class FlowEfficiencyCalculatorTest {
 	@Test
-	public void testFlowEfficiencyCalculator() {
+	void testFlowEfficiencyCalculator() {
 		// In this test we send 1000 vehicles over a link with capacity 500. We then
 		// define a custom FlowEfficiencyCalculator that varies the flow efficiency
 		// globally. We see that with infinite flow efficiency, vehicles move in
@@ -60,16 +60,16 @@ public class FlowEfficiencyCalculatorTest {
 		double latestArrivalTime;
 
 		latestArrivalTime = runTestScenario(Double.POSITIVE_INFINITY);
-		Assert.assertEquals(1003.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(1003.0, latestArrivalTime, 1e-3);
 
 		latestArrivalTime = runTestScenario(1.0);
-		Assert.assertEquals(8195.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(8195.0, latestArrivalTime, 1e-3);
 
 		latestArrivalTime = runTestScenario(2.0);
-		Assert.assertEquals(4599.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(4599.0, latestArrivalTime, 1e-3);
 
 		latestArrivalTime = runTestScenario(0.5);
-		Assert.assertEquals(15388.0, latestArrivalTime, 1e-3);
+		Assertions.assertEquals(15388.0, latestArrivalTime, 1e-3);
 	}
 
 	public double runTestScenario(double factor) {
@@ -104,7 +104,7 @@ public class FlowEfficiencyCalculatorTest {
 		return arrivalHandler.latestArrivalTime;
 	}
 
-	private class CustomFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
+	private static class CustomFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
 		private final double factor;
 
 		public CustomFlowEfficiencyCalculator(double factor) {
@@ -117,7 +117,7 @@ public class FlowEfficiencyCalculatorTest {
 		}
 	}
 
-	private class LatestArrivalHandler implements PersonArrivalEventHandler {
+	private static class LatestArrivalHandler implements PersonArrivalEventHandler {
 		Double latestArrivalTime = null;
 
 		@Override

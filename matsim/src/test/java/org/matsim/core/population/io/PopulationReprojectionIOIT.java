@@ -27,9 +27,9 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+	/**
  * @author thibautd
  */
 public class PopulationReprojectionIOIT {
@@ -66,11 +66,11 @@ public class PopulationReprojectionIOIT {
 	private static final String NET_FILE = "network.xml.gz";
 	private static final String BASE_FILE = "plans_hwh_1pct.xml.gz";
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testInput_V4() {
+	 @Test
+	 void testInput_V4() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V4 format
@@ -84,8 +84,8 @@ public class PopulationReprojectionIOIT {
 		testConversionAtInput(testFile);
 	}
 
-	@Test
-	public void testInput_V5() {
+	 @Test
+	 void testInput_V5() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V5 format
@@ -99,8 +99,8 @@ public class PopulationReprojectionIOIT {
 		testConversionAtInput(testFile);
 	}
 
-	@Test
-	public void testOutput_V4() {
+	 @Test
+	 void testOutput_V4() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
@@ -125,8 +125,8 @@ public class PopulationReprojectionIOIT {
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
 	}
 
-	@Test
-	public void testOutput_V5() {
+	 @Test
+	 void testOutput_V5() {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
@@ -149,8 +149,8 @@ public class PopulationReprojectionIOIT {
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
 	}
 
-	@Test
-	public void testWithControlerAndAttributes() {
+	 @Test
+	 void testWithControlerAndAttributes() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.
@@ -190,10 +190,10 @@ public class PopulationReprojectionIOIT {
 			final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
-			Assert.assertEquals(
-					"unexpected number of activities in reprojected plan",
+			Assertions.assertEquals(
 					originalActivities.size(),
-					reprojectedActivities.size() );
+					reprojectedActivities.size(),
+					"unexpected number of activities in reprojected plan" );
 
 			final Iterator<Activity> originalIterator = originalActivities.iterator();
 			final Iterator<Activity> reprojectedIterator = reprojectedActivities.iterator();
@@ -202,17 +202,17 @@ public class PopulationReprojectionIOIT {
 				final Activity o = originalIterator.next();
 				final Activity r = reprojectedIterator.next();
 
-				Assert.assertNotEquals(
-						"No coordinates transform performed!",
+				Assertions.assertNotEquals(
 						transformation.transform(o.getCoord()),
-						r);
+						r.getCoord(),
+						"No coordinates transform performed!");
 			}
 		}
 
-		Assert.assertEquals(
-				"wrong CRS information after loading",
+		Assertions.assertEquals(
 				TARGET_CRS,
-				ProjectionUtils.getCRS(scenario.getPopulation()));
+				ProjectionUtils.getCRS(scenario.getPopulation()),
+				"wrong CRS information after loading");
 
 		// do not perform ANY mobsim run
 		config.controller().setLastIteration( -1 );
@@ -231,10 +231,10 @@ public class PopulationReprojectionIOIT {
 			final List<Activity> internalActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( dumpedPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
-			Assert.assertEquals(
-					"unexpected number of activities in reprojected plan",
+			Assertions.assertEquals(
 					internalActivities.size(),
-					reprojectedActivities.size() );
+					reprojectedActivities.size(),
+					"unexpected number of activities in reprojected plan" );
 
 			final Iterator<Activity> internalIterator = internalActivities.iterator();
 			final Iterator<Activity> reprojectedIterator = reprojectedActivities.iterator();
@@ -243,16 +243,16 @@ public class PopulationReprojectionIOIT {
 				final Activity o = internalIterator.next();
 				final Activity r = reprojectedIterator.next();
 
-				Assert.assertEquals(
-						"coordinates were reprojected for dump",
+				Assertions.assertEquals(
 						o.getCoord().getX(),
 						r.getCoord().getX(),
-						epsilon );
-				Assert.assertEquals(
-						"coordinates were reprojected for dump",
+						epsilon,
+						"coordinates were reprojected for dump" );
+				Assertions.assertEquals(
 						o.getCoord().getY(),
 						r.getCoord().getY(),
-						epsilon );
+						epsilon,
+						"coordinates were reprojected for dump" );
 			}
 		}
 	}
@@ -265,8 +265,8 @@ public class PopulationReprojectionIOIT {
 		}
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.
@@ -299,10 +299,10 @@ public class PopulationReprojectionIOIT {
 			final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
-			Assert.assertEquals(
-					"unexpected number of activities in reprojected plan",
+			Assertions.assertEquals(
 					originalActivities.size(),
-					reprojectedActivities.size() );
+					reprojectedActivities.size(),
+					"unexpected number of activities in reprojected plan" );
 
 			final Iterator<Activity> originalIterator = originalActivities.iterator();
 			final Iterator<Activity> reprojectedIterator = reprojectedActivities.iterator();
@@ -311,10 +311,10 @@ public class PopulationReprojectionIOIT {
 				final Activity o = originalIterator.next();
 				final Activity r = reprojectedIterator.next();
 
-				Assert.assertNotEquals(
-						"No coordinates transform performed!",
+				Assertions.assertNotEquals(
 						transformation.transform(o.getCoord()),
-						r);
+						r.getCoord(),
+						"No coordinates transform performed!");
 			}
 		}
 
@@ -335,10 +335,10 @@ public class PopulationReprojectionIOIT {
 			final List<Activity> internalActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( dumpedPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
-			Assert.assertEquals(
-					"unexpected number of activities in reprojected plan",
+			Assertions.assertEquals(
 					internalActivities.size(),
-					reprojectedActivities.size() );
+					reprojectedActivities.size(),
+					"unexpected number of activities in reprojected plan" );
 
 			final Iterator<Activity> internalIterator = internalActivities.iterator();
 			final Iterator<Activity> reprojectedIterator = reprojectedActivities.iterator();
@@ -347,16 +347,16 @@ public class PopulationReprojectionIOIT {
 				final Activity o = internalIterator.next();
 				final Activity r = reprojectedIterator.next();
 
-				Assert.assertEquals(
-						"coordinates were reprojected for dump",
+				Assertions.assertEquals(
 						o.getCoord().getX(),
 						r.getCoord().getX(),
-						epsilon );
-				Assert.assertEquals(
-						"coordinates were reprojected for dump",
+						epsilon,
+						"coordinates were reprojected for dump" );
+				Assertions.assertEquals(
 						o.getCoord().getY(),
 						r.getCoord().getY(),
-						epsilon );
+						epsilon,
+						"coordinates were reprojected for dump" );
 			}
 		}
 	}
@@ -382,10 +382,10 @@ public class PopulationReprojectionIOIT {
 	private void assertPopulationCorrectlyTransformed(
 			final Population originalPopulation,
 			final Population reprojectedPopulation) {
-		Assert.assertEquals(
-				"unexpected size of reprojected population",
+		Assertions.assertEquals(
 				originalPopulation.getPersons().size(),
-				reprojectedPopulation.getPersons().size());
+				reprojectedPopulation.getPersons().size(),
+				"unexpected size of reprojected population");
 
 		for (Id<Person> personId : originalPopulation.getPersons().keySet()) {
 			final Person originalPerson = originalPopulation.getPersons().get(personId);
@@ -401,10 +401,10 @@ public class PopulationReprojectionIOIT {
 		final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPlan , StageActivityHandling.StagesAsNormalActivities );
 		final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( reprojectedPlan , StageActivityHandling.StagesAsNormalActivities );
 
-		Assert.assertEquals(
-				"unexpected number of activities in reprojected plan",
+		Assertions.assertEquals(
 				originalActivities.size(),
-				reprojectedActivities.size() );
+				reprojectedActivities.size(),
+				"unexpected number of activities in reprojected plan" );
 
 		final Iterator<Activity> originalIterator = originalActivities.iterator();
 		final Iterator<Activity> reprojectedIterator = reprojectedActivities.iterator();
@@ -420,10 +420,10 @@ public class PopulationReprojectionIOIT {
 	private void assertIsCorrectlyTransformed( final Coord original , final Coord transformed ) {
 		final Coord target = transformation.transform(original);
 
-		Assert.assertEquals(
-				"wrong reprojected value",
+		Assertions.assertEquals(
 				target,
-				transformed);
+				transformed,
+				"wrong reprojected value");
 	}
 
 }

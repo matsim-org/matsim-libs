@@ -25,8 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,65 +64,65 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-public class NetsimRoutingConsistencyTest {
-		@Test
+	public class NetsimRoutingConsistencyTest {
 		/*
-		 * This test shows that the travel time that is predicted with the
-		 * NetworkRoutingModule is NOT equivalent to the travel time that is produced by
-		 * the Netsim.
-		 *
-		 * The scenario is as follows:
-		 *
-		 * N1 ----- N2 ----- N3 ----- N4 ----- N5
-		 *     L12      L23      L34      L45
-		 *
-		 * There are nodes Ni and connecting links Lij. There is one agent P who wants
-		 * to depart at L12 and arrive at L45. He has a plan with an activity at L12 and
-		 * another one at L45 and a connecting leg by car.
-		 *
-		 * This car leg is produced (as would be in the full stack simulation) using the
-		 * NetworkRoutingModule. For the disutility OnlyTimeDependentDisutility is used,
-		 * for the TravelTime, freespeed is used. The freespeed of all links is 10,
-		 * while the length is 1000, hence the traversal time for each link is 100.
-		 *
-		 * Accordingly, the NetworkRoutingModule produces a Leg for the agent with a
-		 * travel time of
-		 *
-		 *    routingTravelTime = 200.0
-		 *
-		 * because link L23 and L45 are taken into account. As expected the routing goes
-		 * from the end node of the departure link to the start node of the arrival
-		 * link. We already know that this will not be the true Netsim simulated time,
-		 * because traversal times are rounded up. So we would expect a
-		 *
-		 *    adjustedRoutingTravelTime = 202.0
-		 *
-		 * because we need to add 1s per traversed link.
-		 *
-		 * Now, the scenario is simulated using the QSim/Netsim. An event handler is set
-		 * up that captures the only "departure" event and the only "arrival" event in
-		 * the simulation (which is produced by the leg of the agent). The travel time
-		 * can be computed an we get:
-		 *
-		 *    netsimTravelTime = 303.0
-		 *
-		 * Apparently, looking at QueueWithBuffer::moveQueueToBuffer , the agent needs
-		 * to traverse the arrival link before he can arrive there. This leads to a
-		 * travel time that is higher than expected by the router and so predictions
-		 * done by the NetworkRoutingModule are inconsistent.
-		 *
-		 * Not sure, what to do about that. Possible options:
-		 * - Adjust Netsim such that agents arrive before they traverse the arrival link
-		 * - Adjust the car routing such that the travel time of the final link is added
-		 * - Adjust the car routing such that the routing goes to the end node of the arrival link
-		 * - Explicitly document this behaviour somewhere
-		 *
-		 * I guess usually this should not make such a big difference for MATSim,
-		 * because the shortest path is found anyway. However, if one wants to predict
-		 * travel times one should state that the NetworkRoutingModule has a bias by the
-		 * arrival link.
-		 */
-		public void testRoutingVsSimulation() {
+* This test shows that the travel time that is predicted with the
+* NetworkRoutingModule is NOT equivalent to the travel time that is produced by
+* the Netsim.
+ *
+* The scenario is as follows:
+ *
+* N1 ----- N2 ----- N3 ----- N4 ----- N5
+*     L12      L23      L34      L45
+ *
+* There are nodes Ni and connecting links Lij. There is one agent P who wants
+* to depart at L12 and arrive at L45. He has a plan with an activity at L12 and
+* another one at L45 and a connecting leg by car.
+ *
+* This car leg is produced (as would be in the full stack simulation) using the
+* NetworkRoutingModule. For the disutility OnlyTimeDependentDisutility is used,
+* for the TravelTime, freespeed is used. The freespeed of all links is 10,
+* while the length is 1000, hence the traversal time for each link is 100.
+ *
+* Accordingly, the NetworkRoutingModule produces a Leg for the agent with a
+* travel time of
+ *
+*    routingTravelTime = 200.0
+ *
+* because link L23 and L45 are taken into account. As expected the routing goes
+* from the end node of the departure link to the start node of the arrival
+* link. We already know that this will not be the true Netsim simulated time,
+* because traversal times are rounded up. So we would expect a
+ *
+*    adjustedRoutingTravelTime = 202.0
+ *
+* because we need to add 1s per traversed link.
+ *
+* Now, the scenario is simulated using the QSim/Netsim. An event handler is set
+* up that captures the only "departure" event and the only "arrival" event in
+* the simulation (which is produced by the leg of the agent). The travel time
+* can be computed an we get:
+ *
+*    netsimTravelTime = 303.0
+ *
+* Apparently, looking at QueueWithBuffer::moveQueueToBuffer , the agent needs
+* to traverse the arrival link before he can arrive there. This leads to a
+* travel time that is higher than expected by the router and so predictions
+* done by the NetworkRoutingModule are inconsistent.
+ *
+* Not sure, what to do about that. Possible options:
+* - Adjust Netsim such that agents arrive before they traverse the arrival link
+* - Adjust the car routing such that the travel time of the final link is added
+* - Adjust the car routing such that the routing goes to the end node of the arrival link
+* - Explicitly document this behaviour somewhere
+ *
+* I guess usually this should not make such a big difference for MATSim,
+* because the shortest path is found anyway. However, if one wants to predict
+* travel times one should state that the NetworkRoutingModule has a bias by the
+* arrival link.
+ */
+		@Test
+	 void testRoutingVsSimulation() {
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Network network = scenario.getNetwork();
 
@@ -202,16 +202,16 @@ public class NetsimRoutingConsistencyTest {
 			// +1s per link
 			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
 
-			Assert.assertEquals(netsimTravelTime, 303.0, 1e-3);
-			Assert.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+			Assertions.assertEquals(netsimTravelTime, 303.0, 1e-3);
+			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
 		}
 
-		@Test
 		/*
-		 * The same test as above, but here the full stack MATSim setup is used (i.e. the
-		 * NetworkRoutingModule, etc. are created implicitly by the Controler).
-		 */
-		public void testRoutingVsSimulationFullStack() {
+* The same test as above, but here the full stack MATSim setup is used (i.e. the
+* NetworkRoutingModule, etc. are created implicitly by the Controler).
+ */
+		@Test
+	 void testRoutingVsSimulationFullStack() {
 			Config config = ConfigUtils.createConfig();
 
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -290,11 +290,11 @@ public class NetsimRoutingConsistencyTest {
 			// +1s per link
 			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
 
-			Assert.assertEquals(netsimTravelTime, 303.0, 1e-3);
-			Assert.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+			Assertions.assertEquals(netsimTravelTime, 303.0, 1e-3);
+			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
 		}
 
-		class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {
+		static class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 			public double departureTime = Double.NaN;
 			public double arrivalTime = Double.NaN;
 

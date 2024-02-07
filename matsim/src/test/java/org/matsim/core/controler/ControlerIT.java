@@ -20,25 +20,22 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -75,27 +72,13 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Provider;
 
-@RunWith(Parameterized.class)
 public class ControlerIT {
 
 	private final static Logger log = LogManager.getLogger(ControlerIT.class);
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
-	private final boolean isUsingFastCapacityUpdate;
-
-	public ControlerIT(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-				return Arrays.asList(capacityUpdates);
-		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
-	}
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testScenarioLoading() {
+	void testScenarioLoading() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Controler controler = new Controler( config );
 
@@ -113,7 +96,7 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void testTerminationCriterion() {
+	void testTerminationCriterion() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Controler controler = new Controler(config);
@@ -132,18 +115,18 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void testConstructor_EventsManagerTypeImmutable() {
+	void testConstructor_EventsManagerTypeImmutable() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		MatsimServices controler = new Controler(config);
 		try {
 			controler.getConfig().setParam("eventsManager", "numberOfThreads", "2");
-			Assert.fail("Expected exception");
+			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
 		}
 		try {
 			controler.getConfig().setParam("eventsManager", "estimatedNumberOfEvents", "200000");
-			Assert.fail("Expected exception");
+			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
 		}
@@ -155,8 +138,9 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testTravelTimeCalculation() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTravelTimeCalculation(boolean isUsingFastCapacityUpdate) {
 		Fixture f = new Fixture(ConfigUtils.createConfig());
 		Config config = f.scenario.getConfig();
 
@@ -213,7 +197,7 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(0);
 
-		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
@@ -221,8 +205,8 @@ public class ControlerIT {
 
 		// test if the travel time calculator got the right result
 		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
-		assertEquals("TravelTimeCalculator has wrong result", avgTravelTimeLink2,
-				controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(avgTravelTimeLink2,
+				controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON, "TravelTimeCalculator has wrong result");
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controller().setLastIteration(1);
@@ -238,8 +222,8 @@ public class ControlerIT {
 
 		// test that the plans have the correct travel times
 		// (travel time of the plan does not contain first and last link)
-		assertEquals("ReRoute seems to have wrong travel times.", avgTravelTimeLink2,
-				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		assertEquals(avgTravelTimeLink2,
+				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON, "ReRoute seems to have wrong travel times.");
 	}
 
 	/**
@@ -248,12 +232,13 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testSetScoringFunctionFactory() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testSetScoringFunctionFactory(boolean isUsingFastCapacityUpdate) {
 		final Config config = this.utils.loadConfig((String) null);
 		config.controller().setLastIteration(0);
 
-		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
@@ -287,8 +272,8 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue("Custom ScoringFunctionFactory was not set.",
-				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
+		assertTrue(controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory,
+				"Custom ScoringFunctionFactory was not set.");
 	}
 
 	/**
@@ -296,8 +281,9 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testCalcMissingRoutes() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testCalcMissingRoutes(boolean isUsingFastCapacityUpdate) {
 		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
@@ -343,7 +329,7 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
-		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
@@ -371,12 +357,12 @@ public class ControlerIT {
 		// but do not assume that the leg will be the same instance...
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
-					"unexpected plan length in "+plan.getPlanElements(),
 					3,
-					plan.getPlanElements().size());
+					plan.getPlanElements().size(),
+					"unexpected plan length in "+plan.getPlanElements());
 			assertNotNull(
-					"null route in plan "+plan.getPlanElements(),
-					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
+					"null route in plan "+plan.getPlanElements());
 		}
 	}
 
@@ -385,8 +371,9 @@ public class ControlerIT {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testCalcMissingActLinks() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testCalcMissingActLinks(boolean isUsingFastCapacityUpdate) {
 		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
@@ -441,7 +428,7 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
-		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
@@ -481,16 +468,16 @@ public class ControlerIT {
 		// but do not assume that the leg will be the same instance...
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
-					"unexpected plan length in "+plan.getPlanElements(),
 					expectedPlanLength,
-					plan.getPlanElements().size());
+					plan.getPlanElements().size(),
+					"unexpected plan length in "+plan.getPlanElements());
 			assertNotNull(
-					"null route in plan "+plan.getPlanElements(),
-					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
+					"null route in plan "+plan.getPlanElements());
 			if ( !f.scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 				assertNotNull(
-					"null route in plan "+plan.getPlanElements(),
-					((Leg) plan.getPlanElements().get( 3 )).getRoute());
+					((Leg) plan.getPlanElements().get( 3 )).getRoute(),
+					"null route in plan "+plan.getPlanElements());
 			}
 		}
 	}
@@ -499,7 +486,7 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testCompressionType() {
+	void testCompressionType() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setCompressionType( CompressionType.zst );
@@ -538,14 +525,14 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetWriteEventsInterval() {
+	void testSetWriteEventsInterval() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				3 == controler.getConfig().controller().getWriteEventsInterval());
+		assertFalse(3 == controler.getConfig().controller().getWriteEventsInterval(),
+				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
 
 		controler.getConfig().controller().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controller().getWriteEventsInterval());
@@ -582,14 +569,14 @@ public class ControlerIT {
 	 * @author wrashid
 	 */
 	@Test
-	public void testSetWriteEventsIntervalConfig() {
+	void testSetWriteEventsIntervalConfig() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				3 == controler.getConfig().controller().getWriteEventsInterval());
+		assertFalse(3 == controler.getConfig().controller().getWriteEventsInterval(),
+				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
         controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -623,14 +610,14 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetWriteEventsNever() {
+	void testSetWriteEventsNever() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(1);
 		config.controller().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				0 == controler.getConfig().controller().getWriteEventsInterval());
+		assertFalse(0 == controler.getConfig().controller().getWriteEventsInterval(),
+				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
 		controler.getConfig().controller().setWriteEventsInterval(0);
 		assertEquals(0, controler.getConfig().controller().getWriteEventsInterval());
         controler.getConfig().controller().setCreateGraphs(false);
@@ -656,7 +643,7 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetWriteEventsAlways() {
+	void testSetWriteEventsAlways() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(1);
 		config.controller().setWritePlansInterval(0);
@@ -687,7 +674,7 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetWriteEventsXml() {
+	void testSetWriteEventsXml() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setWritePlansInterval(0);
@@ -718,7 +705,7 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetDumpDataAtEnd_true() {
+	void testSetDumpDataAtEnd_true() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setWritePlansInterval(0);
@@ -748,7 +735,7 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetDumpDataAtEnd_false() {
+	void testSetDumpDataAtEnd_false() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setWritePlansInterval(0);
@@ -775,25 +762,27 @@ public class ControlerIT {
 		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testShutdown_UncaughtException() {
-		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
-		config.controller().setLastIteration(1);
+	@Test
+	void testShutdown_UncaughtException() {
+		assertThrows(RuntimeException.class, () -> {
+			final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+			config.controller().setLastIteration(1);
 
-		Controler controler = new Controler(config);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().to(CrashingMobsim.class);
-			}
+			Controler controler = new Controler(config);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().to(CrashingMobsim.class);
+				}
+			});
+			controler.getConfig().controller().setCreateGraphs(false);
+			controler.getConfig().controller().setDumpDataAtEnd(false);
+			controler.run();
 		});
-		controler.getConfig().controller().setCreateGraphs(false);
-		controler.getConfig().controller().setDumpDataAtEnd(false);
-		controler.run();
 	}
 
 	@Test
-	public void test_ExceptionOnMissingPopulationFile() {
+	void test_ExceptionOnMissingPopulationFile() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(0);
@@ -816,7 +805,7 @@ public class ControlerIT {
 			controler.getConfig().controller().setCreateGraphs(false);
 			controler.getConfig().controller().setDumpDataAtEnd(false);
 			controler.run();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 
 			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
 			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.
@@ -828,7 +817,7 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void test_ExceptionOnMissingNetworkFile() {
+	void test_ExceptionOnMissingNetworkFile() {
 		try {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
@@ -851,7 +840,7 @@ public class ControlerIT {
 			controler.getConfig().controller().setCreateGraphs(false);
 			controler.getConfig().controller().setDumpDataAtEnd(false);
 			controler.run();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 
 			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
 			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.
@@ -863,7 +852,7 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void test_ExceptionOnMissingFacilitiesFile() {
+	void test_ExceptionOnMissingFacilitiesFile() {
 		try {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
@@ -886,7 +875,7 @@ public class ControlerIT {
 			controler.getConfig().controller().setCreateGraphs(false);
 			controler.getConfig().controller().setDumpDataAtEnd(false);
 			controler.run();
-			Assert.fail("expected exception, got none.");
+			Assertions.fail("expected exception, got none.");
 
 			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
 			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.
@@ -898,13 +887,13 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void testOneSnapshotWriterInConfig() {
+	void testOneSnapshotWriterInConfig() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(0);
 		config.controller().setWritePlansInterval(0);
 		config.qsim().setSnapshotPeriod(10);
-		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;;
+		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controller().setCreateGraphs(false);
@@ -915,7 +904,7 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void testTransimsSnapshotWriterOnQSim() {
+	void testTransimsSnapshotWriterOnQSim() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(2);
 		config.controller().setWriteEventsInterval(0);
@@ -924,7 +913,7 @@ public class ControlerIT {
 		config.controller().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setSnapshotPeriod(600);
-		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
+		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setCreateGraphs(false);
@@ -944,36 +933,38 @@ public class ControlerIT {
 	 * @thibautd
 	 *
 	 */
-	@Test( expected = RuntimeException.class )
-	public void testGuiceModulesCannotAddModules() {
-		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
-		config.controller().setLastIteration( 0 );
-		final Controler controler = new Controler( config );
+	@Test
+	void testGuiceModulesCannotAddModules() {
+		assertThrows(RuntimeException.class, () -> {
+			final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+			config.controller().setLastIteration(0);
+			final Controler controler = new Controler( config );
 
-		final Scenario replacementScenario = ScenarioUtils.createScenario( config );
+			final Scenario replacementScenario = ScenarioUtils.createScenario(config);
 
-		controler.addOverridingModule(
-				new AbstractModule() {
-					@Override
-					public void install() {
-						controler.addOverridingModule(
-								new AbstractModule() {
-									@Override
-									public void install() {
-										bind( Scenario.class ).toInstance( replacementScenario );
+			controler.addOverridingModule(
+					new AbstractModule() {
+						@Override
+						public void install() {
+							controler.addOverridingModule(
+									new AbstractModule() {
+										@Override
+										public void install() {
+											bind(Scenario.class).toInstance(replacementScenario);
+										}
 									}
-								}
-						);
+							);
+						}
 					}
-				}
-		);
+			);
 
-		controler.run();
+			controler.run();
 
-		Assert.assertSame(
-				"adding a Guice module to the controler from a Guice module is allowed but has no effect",
-				replacementScenario,
-				controler.getScenario() );
+			Assertions.assertSame(
+					replacementScenario,
+					controler.getScenario(),
+					"adding a Guice module to the controler from a Guice module is allowed but has no effect");
+		});
 	}
 
 	static class FakeMobsim implements Mobsim {

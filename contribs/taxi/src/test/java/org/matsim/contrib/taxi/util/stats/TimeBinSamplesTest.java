@@ -23,7 +23,7 @@ package org.matsim.contrib.taxi.util.stats;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.taxi.util.stats.TimeBinSamples.taskSamples;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.analysis.ExecutedTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -34,25 +34,25 @@ import org.mockito.Mockito;
  */
 public class TimeBinSamplesTest {
 	@Test
-	public void taskSamples_zeroDuration() {
+	void taskSamples_zeroDuration() {
 		var task = task(10, 10);
 		assertThat(taskSamples(task, 100)).isEmpty();
 	}
 
 	@Test
-	public void taskSamples_oneSample() {
+	void taskSamples_oneSample() {
 		var task = task(110, 190);
 		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task));
 	}
 
 	@Test
-	public void taskSamples_threeSamples() {
+	void taskSamples_threeSamples() {
 		var task = task(110, 390);
 		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task), new TimeBinSample<>(3, task));
 	}
 
 	@Test
-	public void taskSamples_taskEndEqualToTimeBinEnd() {
+	void taskSamples_taskEndEqualToTimeBinEnd() {
 		var task = task(110, 300);
 		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task));
 	}

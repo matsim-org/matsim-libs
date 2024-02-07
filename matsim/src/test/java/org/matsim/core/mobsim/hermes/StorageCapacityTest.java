@@ -22,8 +22,9 @@ package org.matsim.core.mobsim.hermes;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,7 +65,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-	public void testStorageCapacity() {
+	void testStorageCapacity() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -101,9 +102,9 @@ public class StorageCapacityTest {
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
 		System.out.println(counter1.currentMax);
-		Assert.assertEquals(14, counter3.currentMax);  // the bottleneck link can store 14 vehicles
-		Assert.assertEquals(100, counter2.currentMax); //spillback 100 vehicles
-		Assert.assertEquals(100, counter1.currentMax); // spillback
+		Assertions.assertEquals(14, counter3.currentMax);  // the bottleneck link can store 14 vehicles
+		Assertions.assertEquals(100, counter2.currentMax); //spillback 100 vehicles
+		Assertions.assertEquals(100, counter1.currentMax); // spillback
 
 	}
 
@@ -113,7 +114,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-	public void testStorageCapacityDownscaling() {
+	void testStorageCapacityDownscaling() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -153,9 +154,9 @@ public class StorageCapacityTest {
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
 		System.out.println(counter1.currentMax);
-		Assert.assertEquals(1, counter3.currentMax);  // the bottleneck link can store 14 vehicles, but one vehicle counts for 10, so only 1 works
-		Assert.assertEquals(10, counter2.currentMax); //spillback 100 vehicles
-		Assert.assertEquals(10, counter1.currentMax); // spillback
+		Assertions.assertEquals(1, counter3.currentMax);  // the bottleneck link can store 14 vehicles, but one vehicle counts for 10, so only 1 works
+		Assertions.assertEquals(10, counter2.currentMax); //spillback 100 vehicles
+		Assertions.assertEquals(10, counter1.currentMax); // spillback
 
 	}
 
@@ -165,8 +166,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-
-	public void testStorageCapacityWithDifferentPCUs() {
+	void testStorageCapacityWithDifferentPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -219,8 +219,8 @@ public class StorageCapacityTest {
 
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
-		Assert.assertEquals(10, counter3.currentMax);  // the bottleneck link can store 14 vehicles
-		Assert.assertEquals(67, counter2.currentMax); //spillback 100 vehicles
+		Assertions.assertEquals(10, counter3.currentMax);  // the bottleneck link can store 14 vehicles
+		Assertions.assertEquals(67, counter2.currentMax); //spillback 100 vehicles
 
 	}
 
@@ -230,8 +230,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
-
-	public void testStorageCapacityWithVaryingPCUs() {
+	void testStorageCapacityWithVaryingPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkModes(Set.of(TransportMode.car, TransportMode.truck));
@@ -305,8 +304,8 @@ public class StorageCapacityTest {
 		System.out.println(counter2.currentMax);
 		System.out.println(counter3pm.currentMax);
 		System.out.println(counter2pm.currentMax);
-		Assert.assertEquals(14, counter3.currentMax);  // the bottleneck link can store 14 cars
-		Assert.assertEquals(100, counter2.currentMax); //spillback 100 cars
+		Assertions.assertEquals(14, counter3.currentMax);  // the bottleneck link can store 14 cars
+		Assertions.assertEquals(100, counter2.currentMax); //spillback 100 cars
 
 		//the following asserts fail on jenkins, but work on appveyor and travis
 		//Assert.assertEquals(7, counter3pm.currentMax);  // the bottleneck link can store 7 tractors

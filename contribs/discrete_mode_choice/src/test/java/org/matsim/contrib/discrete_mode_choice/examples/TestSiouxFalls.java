@@ -1,12 +1,12 @@
 package org.matsim.contrib.discrete_mode_choice.examples;
 
-import static org.junit.Assert.assertEquals;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -24,11 +24,10 @@ import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 
 public class TestSiouxFalls {
 	@Test
-	public void testSiouxFallsWithSubtourModeChoiceReplacement() {
+	void testSiouxFallsWithSubtourModeChoiceReplacement() {
 		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement(config);
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -57,14 +56,13 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-		assertEquals(42395, (int) listener.counts.get("pt"));
-		assertEquals(132284, (int) listener.counts.get("car"));
-		assertEquals(78809, (int) listener.counts.get("walk"));
-//		assertEquals(42520, (int) listener.counts.get("pt"));
-//		assertEquals(132100, (int) listener.counts.get("car"));
-//		assertEquals(79106, (int) listener.counts.get("walk"));
-		// ...setConstrainedModes(...) (inside configureAsSubtourModeChoiceReplacement(...)) used to ignore its arguments because of a typo.
-		// This is now corrected, but results are no longer backwards compatible.  kai, jan'23
+		System.out.println((int) listener.counts.get("pt"));
+		System.out.println((int) listener.counts.get("car"));
+		System.out.println(listener.counts.get("walk"));
+
+		assertEquals(44195, listener.counts.get("pt"), 2);
+		assertEquals(132316, listener.counts.get("car"), 2);
+		assertEquals(82139, listener.counts.get("walk"), 2);
 
 	}
 

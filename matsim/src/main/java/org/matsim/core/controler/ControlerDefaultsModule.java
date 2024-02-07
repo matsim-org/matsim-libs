@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.population.VspPlansCleanerModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.annealing.ReplanningAnnealer;
+import org.matsim.core.replanning.inheritance.PlanInheritanceModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
@@ -76,6 +77,7 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new VspPlansCleanerModule());
         install(new SnapshotWritersModule());
         install(new DependencyGraphModule());
+        install(new PlanInheritanceModule());
 
 		// Comment by Tarek Chouaki.
 		// To make sure the cache files used under ChartUtils are located in tmp folder in the output directory

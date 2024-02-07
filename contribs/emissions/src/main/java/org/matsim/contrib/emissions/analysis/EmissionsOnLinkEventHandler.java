@@ -42,9 +42,19 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
     private final TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBins;
     private final Map<Id<Link>, Map<Pollutant, Double>> link2pollutants = new HashMap<>();
 
+	/**
+	 * Drop events after end time.
+	 */
+	private final double endTime;
+
     public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
-        this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
+		this(timeBinSizeInSeconds, Double.POSITIVE_INFINITY);
     }
+
+	public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds, double endTime) {
+		this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
+		this.endTime = endTime;
+	}
 
     /**
      * Yields collected emissions
@@ -69,12 +79,18 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
+		if (event.getTime() >= endTime)
+			return;
+
         Map<Pollutant, Double> map = new HashMap<>(event.getWarmEmissions());
         handleEmissionEvent(event.getTime(), event.getLinkId(), map );
     }
 
     @Override
     public void handleEvent(ColdEmissionEvent event) {
+		if (event.getTime() >= endTime)
+			return;
+
         handleEmissionEvent(event.getTime(), event.getLinkId(), event.getColdEmissions());
     }
 

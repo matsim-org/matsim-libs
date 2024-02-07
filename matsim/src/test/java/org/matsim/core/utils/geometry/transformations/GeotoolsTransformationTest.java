@@ -20,8 +20,9 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.testcases.MatsimTestUtils;
@@ -32,11 +33,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class GeotoolsTransformationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testTransform(){
+	@Test
+	void testTransform(){
 		String toCRS = "WGS84";
 		String fromCRS = "WGS84_UTM47S";
 
@@ -55,8 +57,8 @@ public class GeotoolsTransformationTest {
 		double yWGS84 = coordWGS84.getY();
 
 
-		org.junit.Assert.assertEquals(targetX, xWGS84, delta);
-		org.junit.Assert.assertEquals(targetY, yWGS84, delta);
+		Assertions.assertEquals(targetX, xWGS84, delta);
+		Assertions.assertEquals(targetY, yWGS84, delta);
 
 	}
 

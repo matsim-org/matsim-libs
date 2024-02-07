@@ -1,7 +1,7 @@
 package org.matsim.core.router.speedy;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,8 +16,8 @@ import org.matsim.core.router.speedy.SpeedyGraph.LinkIterator;
  */
 public class SpeedyGraphTest {
 
-    @Test
-    public void testConstruction() {
+	@Test
+	void testConstruction() {
         Id.resetCaches();
 
         Fixture f = new Fixture();
@@ -32,58 +32,58 @@ public class SpeedyGraphTest {
         // test out-links node 1
 
         li.reset(f.node1.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link12);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link13);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link14);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test out-links node 2
 
         li.reset(f.node2.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link21);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test out-links node 3
 
         li.reset(f.node3.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link34);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link35);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test out-links node 4
 
         li.reset(f.node4.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link46);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test out-links node 5
 
         li.reset(f.node5.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link56);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test out-links node 6
 
         li.reset(f.node6.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link65);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link62);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test in-links
 
@@ -92,66 +92,66 @@ public class SpeedyGraphTest {
         // test in-links node 1
 
         li.reset(f.node1.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link21);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test in-links node 2
 
         li.reset(f.node2.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link12);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link62);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test in-links node 3
 
         li.reset(f.node3.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link13);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test in-links node 4
 
         li.reset(f.node4.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link14);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link34);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test in-links node 5
 
         li.reset(f.node5.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link35);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link65);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
 
         // test in-links node 6
 
         li.reset(f.node6.getId().index());
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link46);
-        Assert.assertTrue(li.next());
+        Assertions.assertTrue(li.next());
         assertLink(li, f.link56);
-        Assert.assertFalse(li.next());
-        Assert.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
+        Assertions.assertFalse(li.next());
     }
 
     private void assertLink(LinkIterator li, Link link) {
-        Assert.assertEquals(link.getId().index(), li.getLinkIndex());
-        Assert.assertEquals(link.getFromNode().getId().index(), li.getFromNodeIndex());
-        Assert.assertEquals(link.getToNode().getId().index(), li.getToNodeIndex());
-        Assert.assertEquals(link.getLength(), li.getLength(), 1e-2);
-        Assert.assertEquals(link.getLength() / link.getFreespeed(), li.getFreespeedTravelTime(), 1e-2);
+        Assertions.assertEquals(link.getId().index(), li.getLinkIndex());
+        Assertions.assertEquals(link.getFromNode().getId().index(), li.getFromNodeIndex());
+        Assertions.assertEquals(link.getToNode().getId().index(), li.getToNodeIndex());
+        Assertions.assertEquals(link.getLength(), li.getLength(), 1e-2);
+        Assertions.assertEquals(link.getLength() / link.getFreespeed(), li.getFreespeedTravelTime(), 1e-2);
     }
 
     private static class Fixture {

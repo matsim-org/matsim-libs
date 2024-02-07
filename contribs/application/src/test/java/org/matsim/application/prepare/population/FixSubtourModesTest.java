@@ -1,6 +1,6 @@
 package org.matsim.application.prepare.population;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -19,7 +19,7 @@ public class FixSubtourModesTest {
 	private PopulationFactory fact = PopulationUtils.getFactory();
 
 	@Test
-	public void unclosed() {
+	void unclosed() {
 
 		Person person = fact.createPerson(Id.create("1000", Person.class));
 		final Plan plan = fact.createPlan();
@@ -43,7 +43,7 @@ public class FixSubtourModesTest {
 	}
 
 	@Test
-	public void complex() {
+	void complex() {
 
 		Person person = fact.createPerson(Id.create("1000", Person.class));
 		final Plan plan = fact.createPlan();
@@ -72,7 +72,7 @@ public class FixSubtourModesTest {
 
 
 	@Test
-	public void correct() {
+	void correct() {
 
 		Person person = fact.createPerson(Id.create("1000", Person.class));
 		final Plan plan = fact.createPlan();

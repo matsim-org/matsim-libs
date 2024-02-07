@@ -21,7 +21,7 @@
 package org.matsim.population.algorithms;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,10 +30,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,11 +62,8 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author mrieser, michaz
  */
-@RunWith(Parameterized.class)
 public class ChooseRandomLegModeForSubtourTest {
-	
-	private double probaForRandomSingleTripMode;
-	
+
 	private static class AllowTheseModesForEveryone implements
 	PermissibleModesCalculator {
 
@@ -79,18 +75,18 @@ public class ChooseRandomLegModeForSubtourTest {
 
 		@Override
 		public Collection<String> getPermissibleModes(Plan plan) {
-			return availableModes; 
+			return availableModes;
 		}
 
 	}
-	
-	@Rule
+
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	public static enum TripStructureAnalysisLayerOption {facility,link}
 
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
-	private static final String[] CHAIN_BASED_MODES = new String[] { TransportMode.car }; 
+	private static final String[] CHAIN_BASED_MODES = new String[] { TransportMode.car };
 	private static final Collection<String> activityChainStrings = Arrays.asList(
 			"1 2 1",
 			"1 2 20 1",
@@ -108,18 +104,10 @@ public class ChooseRandomLegModeForSubtourTest {
 			"1 2 1 1",
 			"1 2 2 3 2 2 2 1 4 1",
 	"1 2 3 4 3 1");
-	
-	@Parameterized.Parameters(name = "{index}: probaForRandomSingleTripMode == {0}")
-	public static Collection<Object> createTests() {
-		return Arrays.asList(0., 0.5);
-	}
-	public ChooseRandomLegModeForSubtourTest( double proba ) {
-		this.probaForRandomSingleTripMode = proba ;
-	}
-	
-	
-	@Test
-	public void testHandleEmptyPlan() {
+
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testHandleEmptyPlan(double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() , new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(),
 				SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -128,8 +116,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
-	@Test
-	public void testHandlePlanWithoutLeg() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testHandlePlanWithoutLeg(double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(),
 				SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -140,42 +129,46 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 
-	@Test
-	public void testSubTourMutationNetworkBased() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testSubTourMutationNetworkBased(double probaForRandomSingleTripMode) {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
-		this.testSubTourMutationToCar(network);
-		this.testSubTourMutationToPt(network);
-		this.testUnknownModeDoesntMutate(network);
+		this.testSubTourMutationToCar(network, probaForRandomSingleTripMode);
+		this.testSubTourMutationToPt(network, probaForRandomSingleTripMode);
+		this.testUnknownModeDoesntMutate(network, probaForRandomSingleTripMode);
 	}
 
-	@Test
-	public void testSubTourMutationFacilitiesBased() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testSubTourMutationFacilitiesBased(double probaForRandomSingleTripMode) {
 		Config config = utils.loadConfig(CONFIGFILE);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFileURL(config.getContext()));
-		this.testSubTourMutationToCar(facilities);
-		this.testSubTourMutationToPt(facilities);
-		this.testUnknownModeDoesntMutate(facilities);
+		this.testSubTourMutationToCar(facilities, probaForRandomSingleTripMode);
+		this.testSubTourMutationToPt(facilities, probaForRandomSingleTripMode);
+		this.testUnknownModeDoesntMutate(facilities, probaForRandomSingleTripMode);
 	}
 
-	@Test
-	public void testCarDoesntTeleportFromHome() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testCarDoesntTeleportFromHome(double probaForRandomSingleTripMode) {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
-		testCarDoesntTeleport(network, TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport(network, TransportMode.pt, TransportMode.car);
+		testCarDoesntTeleport(network, TransportMode.car, TransportMode.pt, probaForRandomSingleTripMode);
+		testCarDoesntTeleport(network, TransportMode.pt, TransportMode.car, probaForRandomSingleTripMode);
 	}
 
-	@Test
-	public void testSingleTripSubtourHandling() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testSingleTripSubtourHandling(double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {"car", "pt", "walk"};
-		
+
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		Plan plan = PopulationUtils.createPlan();
@@ -187,19 +180,19 @@ public class ChooseRandomLegModeForSubtourTest {
 		plan.addActivity(home1);
 		plan.addLeg(leg);
 		plan.addActivity(home2);
-		
+
 		{ // test default
 			boolean hasCar = false;
 			boolean hasPt = false;
 			boolean hasWalk = false;
-			
+
 			for (int i = 0; i < 50; i++) {
 				testee.run(plan);
 
 				assertEquals(
-						"unexpected plan size",
 						3,
-						plan.getPlanElements().size());
+						plan.getPlanElements().size(),
+						"unexpected plan size");
 
 				final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
 
@@ -214,25 +207,25 @@ public class ChooseRandomLegModeForSubtourTest {
 				}
 			}
 			assertTrue(
+					hasCar && hasPt && hasWalk,
 					"expected subtours with car, pt and walk, got"+
 					(hasCar ? " car" : " NO car")+","+
 					(hasPt ? " pt" : " NO pt")+","+
-					(hasWalk ? " walk" : " NO walk"),
-					hasCar && hasPt && hasWalk);
+					(hasWalk ? " walk" : " NO walk"));
 		}
 		{ // test with special single trip subtour settings
 			testee.setSingleTripSubtourModes(new String[] {"pt", "walk"});
 			boolean hasCar = false;
 			boolean hasPt = false;
 			boolean hasWalk = false;
-			
+
 			for (int i = 0; i < 50; i++) {
 				testee.run(plan);
 
 				assertEquals(
-						"unexpected plan size",
 						3,
-						plan.getPlanElements().size());
+						plan.getPlanElements().size(),
+						"unexpected plan size");
 
 				final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
 
@@ -247,18 +240,19 @@ public class ChooseRandomLegModeForSubtourTest {
 				}
 			}
 			assertTrue(
+					!hasCar && hasPt && hasWalk,
 					"expected subtours with NO car, pt and walk, got"+
 					(hasCar ? " car" : " NO car")+","+
 					(hasPt ? " pt" : " NO pt")+","+
-					(hasWalk ? " walk" : " NO walk"),
-					!hasCar && hasPt && hasWalk);
+					(hasWalk ? " walk" : " NO walk"));
 		}
 
 	}
 
 
-	@Test
-	public void testUnclosedSubtour() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0.0, 0.5})
+	void testUnclosedSubtour(double probaForRandomSingleTripMode) {
 
 		String[] modes = new String[] {"car", "pt", "walk"};
 
@@ -287,7 +281,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 
-	private void testSubTourMutationToCar(Network network) {
+	private void testSubTourMutationToCar(Network network, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -302,8 +296,8 @@ public class ChooseRandomLegModeForSubtourTest {
 			assertSubTourMutated(plan, originalPlan, expectedMode, false);
 		}
 	}
-	
-	private void testSubTourMutationToCar(ActivityFacilities facilities) {
+
+	private void testSubTourMutationToCar(ActivityFacilities facilities, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -318,8 +312,8 @@ public class ChooseRandomLegModeForSubtourTest {
 			assertSubTourMutated(plan, originalPlan, expectedMode, true);
 		}
 	}
-	
-	private void testUnknownModeDoesntMutate(Network network) {
+
+	private void testUnknownModeDoesntMutate(Network network, double probaForRandomSingleTripMode) {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -333,8 +327,8 @@ public class ChooseRandomLegModeForSubtourTest {
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 		}
 	}
-	
-	private void testUnknownModeDoesntMutate(ActivityFacilities facilities) {
+
+	private void testUnknownModeDoesntMutate(ActivityFacilities facilities, double probaForRandomSingleTripMode) {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
@@ -349,7 +343,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 
-	private void testSubTourMutationToPt(ActivityFacilities facilities) {
+	private void testSubTourMutationToPt(ActivityFacilities facilities, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -364,8 +358,8 @@ public class ChooseRandomLegModeForSubtourTest {
 			assertSubTourMutated(plan, originalPlan, expectedMode, true);
 		}
 	}
-	
-	private void testSubTourMutationToPt(Network network) {
+
+	private void testSubTourMutationToPt(Network network, double probaForRandomSingleTripMode) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -380,8 +374,8 @@ public class ChooseRandomLegModeForSubtourTest {
 			assertSubTourMutated(plan, originalPlan, expectedMode, false);
 		}
 	}
-	
-	private void testCarDoesntTeleport(Network network, String originalMode, String otherMode) {
+
+	private void testCarDoesntTeleport(Network network, String originalMode, String otherMode, double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
 
@@ -401,21 +395,21 @@ public class ChooseRandomLegModeForSubtourTest {
 				Id<Link> nextLocation = nextActivity.getLinkId();
 				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
-							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),
 							currentLocation,
-							carLocation);
+							carLocation,
+							"wrong car location at leg "+legCount+" in "+plan.getPlanElements());
 					carLocation = nextLocation;
 				}
 				currentLocation = nextLocation;
 			}
 			assertEquals(
-					"wrong car location at the end of "+plan.getPlanElements(),
 					firstLocation,
-					carLocation);
+					carLocation,
+					"wrong car location at the end of "+plan.getPlanElements());
 		}
 	}
-	
-	private void testCarDoesntTeleport(ActivityFacilities facilities, String originalMode, String otherMode) {
+
+	private void testCarDoesntTeleport(ActivityFacilities facilities, String originalMode, String otherMode, double probaForRandomSingleTripMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom(), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes, probaForRandomSingleTripMode);
 
@@ -435,17 +429,17 @@ public class ChooseRandomLegModeForSubtourTest {
 				Id<Link> nextLocation = nextActivity.getLinkId();
 				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
-							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),
 							currentLocation,
-							carLocation);
+							carLocation,
+							"wrong car location at leg "+legCount+" in "+plan.getPlanElements());
 					carLocation = nextLocation;
 				}
 				currentLocation = nextLocation;
 			}
 			assertEquals(
-					"wrong car location at the end of "+plan.getPlanElements(),
 					firstLocation,
-					carLocation);
+					carLocation,
+					"wrong car location at the end of "+plan.getPlanElements());
 		}
 	}
 
@@ -460,9 +454,9 @@ public class ChooseRandomLegModeForSubtourTest {
 			TripStructureUtils.getSubtours(	plan );
 
 		assertEquals(
-				"number of subtour changed",
 				originalSubtours.size(),
-				mutatedSubtours.size());
+				mutatedSubtours.size(),
+				"number of subtour changed");
 
 		final List<Subtour> mutateds = new ArrayList<Subtour>();
 		for (Subtour mutated : mutatedSubtours) {
@@ -472,14 +466,14 @@ public class ChooseRandomLegModeForSubtourTest {
 			for (Trip trip : mutated.getTripsWithoutSubSubtours()) {
 				if ( expectedMode.equals( trip.getLegsOnly().get( 0 ).getMode() ) ) {
 					assertTrue(
-							"inconsistent mode chain",
-							isFirst || containsMutatedMode );
+							isFirst || containsMutatedMode,
+							"inconsistent mode chain" );
 					containsMutatedMode = true;
 				}
 				else {
 					assertFalse(
-							"inconsistent mode chain",
-							containsMutatedMode );
+							containsMutatedMode,
+							"inconsistent mode chain" );
 				}
 				isFirst = false;
 			}
@@ -488,8 +482,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 
 		assertFalse(
-				"no mutated subtour",
-				mutateds.isEmpty() );
+				mutateds.isEmpty(),
+				"no mutated subtour" );
 
 		int nMutatedWithoutMutatedFather = 0;
 		for ( Subtour s : mutateds ) {
@@ -499,9 +493,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 
 		assertEquals(
-				"unexpected number of roots in mutated subtours",
 				1,
-				nMutatedWithoutMutatedFather);
+				nMutatedWithoutMutatedFather,
+				"unexpected number of roots in mutated subtours");
 	}
 
 	private static Plan createPlan(ActivityFacilities facilities, String facString, String mode) {

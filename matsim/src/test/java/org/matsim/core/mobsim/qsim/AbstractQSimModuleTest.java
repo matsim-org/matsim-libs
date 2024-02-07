@@ -24,8 +24,8 @@
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -47,9 +47,9 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-public class AbstractQSimModuleTest {
-	@Test
-	public void testOverrides() {
+	public class AbstractQSimModuleTest {
+	 @Test
+	 void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
@@ -74,14 +74,14 @@ public class AbstractQSimModuleTest {
 
 		Injector injector = Guice.createInjector(composite);
 
-		Assert.assertTrue(config.getModules().containsKey("testA"));
-		Assert.assertTrue(config.getModules().containsKey("testB"));
+		Assertions.assertTrue(config.getModules().containsKey("testA"));
+		Assertions.assertTrue(config.getModules().containsKey("testB"));
 
-		Assert.assertEquals("testBString", injector.getInstance(String.class));
+		Assertions.assertEquals("testBString", injector.getInstance(String.class));
 	}
 
-	@Test
-	public void testOverrideAgentFactory() {
+	 @Test
+	 void testOverrideAgentFactory() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -101,11 +101,11 @@ public class AbstractQSimModuleTest {
 		controler.addOverridingQSimModule(new TestQSimModule(value));
 		controler.run();
 
-		Assert.assertTrue(value.get() > 0);
+		Assertions.assertTrue(value.get() > 0);
 	}
 
-	@Test
-	public void testOverrideAgentFactoryTwice() {
+	 @Test
+	 void testOverrideAgentFactoryTwice() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -127,11 +127,11 @@ public class AbstractQSimModuleTest {
 		controler.addOverridingQSimModule(new TestQSimModule(value2));
 		controler.run();
 
-		Assert.assertTrue(value1.get() == 0);
-		Assert.assertTrue(value2.get() > 0);
+		Assertions.assertTrue(value1.get() == 0);
+		Assertions.assertTrue(value2.get() > 0);
 	}
 
-	private class TestQSimModule extends AbstractQSimModule {
+	private static class TestQSimModule extends AbstractQSimModule {
 		private final AtomicLong value;
 
 		public TestQSimModule(AtomicLong value) {
@@ -162,8 +162,8 @@ public class AbstractQSimModuleTest {
 		}
 	}
 
-	@Test
-	public void testAddEngine() {
+	 @Test
+	 void testAddEngine() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -187,7 +187,7 @@ public class AbstractQSimModuleTest {
 
 		controler.run();
 
-		Assert.assertTrue(engine.called);
+		Assertions.assertTrue(engine.called);
 	}
 
 	static private class TestEngine implements MobsimEngine {

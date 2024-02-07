@@ -21,13 +21,13 @@ package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunTaxiScenarioTest {
 	@Test
-	public void testRunOneTaxi() {
+	void testRunOneTaxi() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_config.xml");
 		RunTaxiScenario.run(configUrl, false);
 	}

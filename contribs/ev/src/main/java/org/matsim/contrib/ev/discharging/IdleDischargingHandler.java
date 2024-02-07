@@ -45,7 +45,7 @@ import com.google.inject.Inject;
  * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
  * ActivityStartEvent.
  */
-public class IdleDischargingHandler
+public final class IdleDischargingHandler
 		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler, MobsimScopeEventHandler {
 	public interface VehicleProvider {
 		/**

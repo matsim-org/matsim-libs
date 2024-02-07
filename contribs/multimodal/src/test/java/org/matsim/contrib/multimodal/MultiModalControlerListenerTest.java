@@ -25,7 +25,10 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,12 +72,12 @@ public class MultiModalControlerListenerTest {
 
 	private static final Logger log = LogManager.getLogger(MultiModalControlerListenerTest.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@SuppressWarnings("static-method")
 	@Test
-	public void testSimpleScenario() {
+	void testSimpleScenario() {
 		log.info("Run test single threaded...");
 		runSimpleScenario(1);
 
@@ -178,29 +181,29 @@ public class MultiModalControlerListenerTest {
 		controler.run();
 
 		// assume that the number of arrival events is correct
-		Assert.assertEquals(4, linkModeChecker.arrivalCount);
+		Assertions.assertEquals(4, linkModeChecker.arrivalCount);
 
 		// assume that the number of link left events is correct
-		Assert.assertEquals(8, linkModeChecker.linkLeftCount);
+		Assertions.assertEquals(8, linkModeChecker.linkLeftCount);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Disabled("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_singleThreaded() {
+	void testBerlinScenario_singleThreaded() {
 		log.info("Run test single threaded...");
 		runBerlinScenario(1);
 	}
 
-	@Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Disabled("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_multiThreaded_2() {
+	void testBerlinScenario_multiThreaded_2() {
 		log.info("Run test multi threaded with 2 threads...");
 		runBerlinScenario(2);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Disabled("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_multiThreaded_4() {
+	void testBerlinScenario_multiThreaded_4() {
 		log.info("Run test multi threaded with 4 threads...");
 		runBerlinScenario(4);
 	}
@@ -285,23 +288,16 @@ public class MultiModalControlerListenerTest {
 		int carCount = linkModeChecker.leftCountPerMode.get(TransportMode.car);
 		int bikeCount = linkModeChecker.leftCountPerMode.get(TransportMode.bike);
 		int walkCount = linkModeChecker.leftCountPerMode.get(TransportMode.walk);
-		Assert.assertEquals(
-				"unexpected number of link leave events for mode car with number of threads "+numberOfThreads,
-//				513445, carCount);
-				692259, carCount);
-		Assert.assertEquals(
-				"unexpected number of link leave events for mode bike with number of threads "+numberOfThreads,
-				4577, bikeCount);
-		Assert.assertEquals(
-				"unexpected number of link leave events for mode walk with number of threads "+numberOfThreads,
-//				5834, walkCount);
-				7970, walkCount);
+		Assertions.assertEquals(
+				692259, carCount, "unexpected number of link leave events for mode car with number of threads "+numberOfThreads);
+		Assertions.assertEquals(
+				4577, bikeCount, "unexpected number of link leave events for mode bike with number of threads "+numberOfThreads);
+		Assertions.assertEquals(
+				7970, walkCount, "unexpected number of link leave events for mode walk with number of threads "+numberOfThreads);
 
 		// check the total number of link left events
-		Assert.assertEquals(
-				"unexpected total number of link leave events with number of threads "+numberOfThreads,
-//				523856, linkModeChecker.linkLeftCount);
-				704806, linkModeChecker.linkLeftCount);
+		Assertions.assertEquals(
+				704806, linkModeChecker.linkLeftCount, "unexpected total number of link leave events with number of threads "+numberOfThreads);
 
 		// check the total mode travel times
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
@@ -311,23 +307,16 @@ public class MultiModalControlerListenerTest {
 		LogManager.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
 		LogManager.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
 		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			Assert.assertEquals(
-					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
-					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(
+					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for car mode with number of threads "+numberOfThreads);
 		} else {
-			Assert.assertEquals(
-				"unexpected total travel time for car mode with number of threads "+numberOfThreads,
-//				5.7263255E7, carTravelTime, MatsimTestUtils.EPSILON);
-				1.11881636E8, carTravelTime, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(
+				1.11881636E8, carTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for car mode with number of threads "+numberOfThreads);
 		}
-		Assert.assertEquals(
-				"unexpected total travel time for bike mode with number of threads "+numberOfThreads,
-//				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
-				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(
-				"unexpected total travel time for walk mode with number of threads "+numberOfThreads,
-//				3259757.0, walkTravelTime, MatsimTestUtils.EPSILON);
-				3885025.0, walkTravelTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(
+				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for bike mode with number of threads "+numberOfThreads);
+		Assertions.assertEquals(
+				3885025.0, walkTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for walk mode with number of threads "+numberOfThreads);
 	}
 
 	private static Person createPerson(Scenario scenario, String id, String mode) {
@@ -413,7 +402,7 @@ public class MultiModalControlerListenerTest {
 			}
 
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
+			Assertions.assertEquals(true, link.getAllowedModes().contains(mode));
 
 			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;

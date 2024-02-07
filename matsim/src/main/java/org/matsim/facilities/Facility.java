@@ -21,9 +21,7 @@ package org.matsim.facilities;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 /**
  * A Facility is a (Basic)Location ("getCoord") that is connected to a Link ("getLinkId").  Since about 2018, it no longer implements Identifiable, since
@@ -42,5 +40,5 @@ public interface Facility extends BasicLocation, Customizable {
 	public static final String FACILITY_NO_LONGER_IDENTIFIABLE = "After refactoring, facility " +
 													 "does not longer automatically " +
 													 "implement Identifiable.  Don't know what to do.";
-	
+
 }

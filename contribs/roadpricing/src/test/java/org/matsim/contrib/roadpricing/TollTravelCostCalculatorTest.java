@@ -20,15 +20,14 @@
 
 package org.matsim.contrib.roadpricing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
 import jakarta.inject.Provider;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -69,11 +68,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author mrieser
  */
 public class TollTravelCostCalculatorTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDisutilityResults() {
+	void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
 
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
@@ -123,7 +122,7 @@ public class TollTravelCostCalculatorTest {
 	}
 
 	@Test
-	public void testDistanceTollRouter() {
+	void testDistanceTollRouter() {
 		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
@@ -208,7 +207,7 @@ public class TollTravelCostCalculatorTest {
 	}
 
 	@Test
-	public void testLinkTollRouter() {
+	void testLinkTollRouter() {
 		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
@@ -303,7 +302,7 @@ public class TollTravelCostCalculatorTest {
 	}
 
 	@Test
-	public void testCordonTollRouter() {
+	void testCordonTollRouter() {
 		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);

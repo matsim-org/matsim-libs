@@ -37,7 +37,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
-public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
+public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final Logger log = LogManager.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";

@@ -39,17 +39,17 @@ public class RailsimDetourEvent extends Event implements HasVehicleId {
 	public static final String EVENT_TYPE = "railsimDetourEvent";
 
 	private final Id<Vehicle> vehicleId;
-	private final Id<Link> entry;
-	private final Id<Link> exit;
+	private final Id<Link> start;
+	private final Id<Link> end;
 	private final List<Id<Link>> detour;
 	private final Id<TransitStopFacility> newStop;
 
-	public RailsimDetourEvent(double time, Id<Vehicle> vehicleId, Id<Link> entry, Id<Link> exit, List<Id<Link>> detour,
+	public RailsimDetourEvent(double time, Id<Vehicle> vehicleId, Id<Link> start, Id<Link> end, List<Id<Link>> detour,
 							  Id<TransitStopFacility> newStop) {
 		super(time);
 		this.vehicleId = vehicleId;
-		this.entry = entry;
-		this.exit = exit;
+		this.start = start;
+		this.end = end;
 		this.detour = detour;
 		this.newStop = newStop;
 	}
@@ -70,8 +70,8 @@ public class RailsimDetourEvent extends Event implements HasVehicleId {
 		Map<String, String> attributes = super.getAttributes();
 
 		attributes.put(HasVehicleId.ATTRIBUTE_VEHICLE, vehicleId.toString());
-		attributes.put("entry", entry.toString());
-		attributes.put("exit", exit.toString());
+		attributes.put("start", start.toString());
+		attributes.put("end", end.toString());
 		attributes.put("detour", detour.stream().map(Object::toString).collect(Collectors.joining(",")));
 		attributes.put("newStop", Objects.toString(newStop));
 

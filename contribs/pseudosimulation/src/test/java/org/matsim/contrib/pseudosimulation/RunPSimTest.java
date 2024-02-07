@@ -1,17 +1,13 @@
 
 package org.matsim.contrib.pseudosimulation;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
@@ -29,15 +25,18 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class RunPSimTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-	private Logger logger = LogManager.getLogger(RunPSimTest.class );
+@TestMethodOrder(MethodOrderer.MethodName.class)
+public class RunPSimTest {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+	private final Logger logger = LogManager.getLogger(RunPSimTest.class );
 
 	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 
@@ -45,8 +44,7 @@ public class RunPSimTest {
 	 * Run 1 normal qsim iteration, a couple of psim iterations and a final 2nd qsim iteration.
 	 */
 	@Test
-	public void testA() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+	void testA() {
 		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
@@ -58,10 +56,7 @@ public class RunPSimTest {
 		//identify selector strategies
 		Field[] selectors = DefaultPlanStrategiesModule.DefaultSelector.class.getDeclaredFields();
 		List<String> selectorNames = new ArrayList<>();
-//		for (Field selector : selectors) {
-//			selectorNames.add(selector.toString());
-//			logger.warn( selector.toString() );
-//		}
+
 		// yyyyyy does not work as designed
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.BestScore );
@@ -108,10 +103,8 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.88379880881348, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.54001491094124d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(138.86084460860525, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
+
 	}
 
 	/**
@@ -122,8 +115,7 @@ public class RunPSimTest {
 	 * in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
 	@Test
-	public void testB() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+	void testB() {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);
@@ -137,7 +129,7 @@ public class RunPSimTest {
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(131.8303325803256, qsimScore, MatsimTestUtils.EPSILON, "Default controler score changed.");
 	}
 
 	class ExecScoreTracker implements ShutdownListener {

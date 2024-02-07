@@ -21,8 +21,8 @@
 package org.matsim.contrib.multimodal;
 
 import com.google.inject.name.Names;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -65,7 +65,7 @@ import java.util.Set;
 public class MultiModalTripRouterTest {
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 
 		final Config config = ConfigUtils.createConfig();
 		config.routing().addParam("teleportedModeSpeed_bike", "6.01");
@@ -200,7 +200,7 @@ public class MultiModalTripRouterTest {
 					break;
 				}
 			}
-			Assert.assertTrue(validMode);
+			Assertions.assertTrue(validMode);
 
 		}
 	}

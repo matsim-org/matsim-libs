@@ -20,22 +20,23 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
-import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
+
+import static org.matsim.smallScaleCommercialTrafficGeneration.SCTUtils.*;
 
 /**
  * @author Ricardo Ewert
@@ -43,46 +44,41 @@ import java.util.*;
  */
 public class TripDistributionMatrixTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
+	void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
 
-		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
-		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
-		new File(output.resolve("calculatedData").toString()).mkdir();
+		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
-		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		Network network = NetworkUtils.readNetwork(networkLocation);
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
+					inputDataDirectory, usedLanduseConfiguration,
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
-		ArrayList<String> modesORvehTypes = new ArrayList<String>(
-				List.of("total"));
+		List<String> modesORvehTypes = new ArrayList<>(List.of("total"));
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
+		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());
 		regionLinksMap.get("testArea1_area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
 		regionLinksMap.put("testArea1_area2", new HashMap<>());
@@ -104,16 +100,16 @@ public class TripDistributionMatrixTest {
 		odMatrix.clearRoundingError();
 
 		//tests
-		Assert.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);
 		for (String zone : resultingDataPerZone.keySet()) {
-			Assert.assertTrue(odMatrix.getListOfZones().contains(zone));
+			Assertions.assertTrue(odMatrix.getListOfZones().contains(zone));
 		}
-		Assert.assertEquals(1, odMatrix.getListOfModesOrVehTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertTrue(odMatrix.getListOfModesOrVehTypes().contains("total"));
+		Assertions.assertEquals(1, odMatrix.getListOfModesOrVehTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertTrue(odMatrix.getListOfModesOrVehTypes().contains("total"));
 
-		Assert.assertEquals(5, odMatrix.getListOfPurposes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5, odMatrix.getListOfPurposes().size(), MatsimTestUtils.EPSILON);
 		for (int i = 1; i <= 5; i++) {
-			Assert.assertTrue(odMatrix.getListOfPurposes().contains(i));
+			Assertions.assertTrue(odMatrix.getListOfPurposes().contains(i));
 		}
 		double sumStartServices = 0;
 		double sumStopServices = 0;
@@ -129,33 +125,29 @@ public class TripDistributionMatrixTest {
 					sumStartServices += odMatrix.getSumOfServicesForStartZone(zone, modeORvehType, purpose,
 							usedTrafficType);
 					double planedVolume = trafficVolumePerTypeAndZone_stop.get(key).getDouble(purpose);
-					Assert.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
 				}
 			}
 		}
-		Assert.assertEquals(sumStartServices, sumStopServices, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(sumStartServices, sumStopServices, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testTripDistributionGoodsTraffic() throws IOException {
+	void testTripDistributionGoodsTraffic() throws IOException {
 
-		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
-		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
-		new File(output.resolve("calculatedData").toString()).mkdir();
+		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-		Path shapeFileLandusePath = inputDataDirectory.resolve("shp/testLanduse.shp");
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
-		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		Network network = NetworkUtils.readNetwork(networkLocation);
-		HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
+					inputDataDirectory, usedLanduseConfiguration,
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
@@ -165,14 +157,14 @@ public class TripDistributionMatrixTest {
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
-		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
+		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());
 		regionLinksMap.get("testArea1_area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
 		regionLinksMap.put("testArea1_area2", new HashMap<>());
@@ -194,18 +186,18 @@ public class TripDistributionMatrixTest {
 		odMatrix.clearRoundingError();
 
 		//tests
-		Assert.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);
 		for (String zone : resultingDataPerZone.keySet()) {
-			Assert.assertTrue(odMatrix.getListOfZones().contains(zone));
+			Assertions.assertTrue(odMatrix.getListOfZones().contains(zone));
 		}
-		Assert.assertEquals(5, odMatrix.getListOfModesOrVehTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5, odMatrix.getListOfModesOrVehTypes().size(), MatsimTestUtils.EPSILON);
 		for (String modeORvehType : modesORvehTypes) {
-			Assert.assertTrue(odMatrix.getListOfModesOrVehTypes().contains(modeORvehType));
+			Assertions.assertTrue(odMatrix.getListOfModesOrVehTypes().contains(modeORvehType));
 		}
 
-		Assert.assertEquals(6, odMatrix.getListOfPurposes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, odMatrix.getListOfPurposes().size(), MatsimTestUtils.EPSILON);
 		for (int i = 1; i <= 6; i++) {
-			Assert.assertTrue(odMatrix.getListOfPurposes().contains(i));
+			Assertions.assertTrue(odMatrix.getListOfPurposes().contains(i));
 		}
 		double sumStartServices = 0;
 		double sumStopServices = 0;
@@ -221,10 +213,10 @@ public class TripDistributionMatrixTest {
 					sumStartServices += odMatrix.getSumOfServicesForStartZone(zone, modeORvehType, purpose,
 							usedTrafficType);
 					double planedVolume = trafficVolumePerTypeAndZone_stop.get(key).getDouble(purpose);
-					Assert.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
 				}
 			}
 		}
-		Assert.assertEquals(sumStartServices, sumStopServices, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(sumStartServices, sumStopServices, MatsimTestUtils.EPSILON);
 	}
 }

@@ -22,17 +22,16 @@
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -72,10 +71,10 @@ public class PtMatrixTest {
 
 	private static final Logger log = LogManager.getLogger(PtMatrixTest.class);
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
+	@TempDir
+	public File folder;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();
 		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
@@ -87,7 +86,7 @@ public class PtMatrixTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testPtMatrixStops() throws IOException{
+	void testPtMatrixStops() throws IOException{
 		log.info("Start testing the pt matrix with information about the pt stops.");
 		long start = System.currentTimeMillis();
 
@@ -103,7 +102,7 @@ public class PtMatrixTest {
 		config.routing().setTeleportedModeSpeed(TransportMode.pt, defaultPtSpeed ) ;
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
-		String location = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
+		String location = CreateTestNetwork.createTestPtStationCSVFile(new File(folder, "ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
 
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
@@ -136,8 +135,8 @@ public class PtMatrixTest {
 				// the agents will walk 50 m to the nearest pt stop and 50 m back to their origin facility, so the total travel distance have to be 100 m.
 				if(origin == destination){
 
-					Assert.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
-					Assert.assertTrue(totalTravelDistance == 100.);
+					Assertions.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(totalTravelDistance == 100.);
 				}
 
 				// test travel time and distance for neighboring origins and destinations
@@ -145,13 +144,13 @@ public class PtMatrixTest {
 
 					// test total walk travel distance and time
 					// in the test network the total walk distance always is 100 m, because the euclidean distance between a facility and its nearest pt stop always is 50 m
-					Assert.assertTrue(walkTravelDistance == 100.);
-					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(walkTravelDistance == 100.);
+					Assertions.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 
 					// test pt travel distance and time
 					// in the test network the euclidean distance between neighboring pt stops always is 180 m
-					Assert.assertTrue(ptTravelDistance == 180.*beelineDistanceFactor);
-					Assert.assertTrue(ptTravelTime == (180./defaultPtSpeed)*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelDistance == 180.*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelTime == (180./defaultPtSpeed)*beelineDistanceFactor);
 				}
 
 				 // test travel times and distances for diagonal origin destination pairs
@@ -164,16 +163,16 @@ public class PtMatrixTest {
 
 					// test total walk travel distance and time
 					// in the test network the total walk distance always is 100 m, because the euclidean distance between a facility and its nearest pt stop always is 50 m
-					Assert.assertTrue(walkTravelDistance == 100.);
-					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(walkTravelDistance == 100.);
+					Assertions.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 
 					// test upper bounds for pt travel distance and time (as described above)
-					Assert.assertTrue(ptTravelDistance <= euclideanDistance*beelineDistanceFactor);
-					Assert.assertTrue(ptTravelTime <= (euclideanDistance/defaultPtSpeed)*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelDistance <= euclideanDistance*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelTime <= (euclideanDistance/defaultPtSpeed)*beelineDistanceFactor);
 
 					// test lower bounds for pt travel distance and time (as described above)
-					Assert.assertTrue(ptTravelDistance >= 180.*beelineDistanceFactor);
-					Assert.assertTrue(ptTravelTime >= (180./defaultPtSpeed)*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelDistance >= 180.*beelineDistanceFactor);
+					Assertions.assertTrue(ptTravelTime >= (180./defaultPtSpeed)*beelineDistanceFactor);
 				}
 			}
 		}
@@ -190,7 +189,7 @@ public class PtMatrixTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testPtMatrixTimesAndDistances() throws IOException{
+	void testPtMatrixTimesAndDistances() throws IOException{
 		log.info("Start testing the pt matrix with information about the pt stops, pt travel times and distances.");
 		long start = System.currentTimeMillis();
 
@@ -207,8 +206,8 @@ public class PtMatrixTest {
 
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
-		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
-		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(folder.newFile("ptTravelInfo.csv"));	// creates a dummy csv file with pt travel times fitting into the dummy network
+		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile(new File(folder, "ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
+		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(new File(folder, "ptTravelInfo.csv"));	// creates a dummy csv file with pt travel times fitting into the dummy network
 
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setUsingPtStops(true);
@@ -244,8 +243,8 @@ public class PtMatrixTest {
 				// the agents will walk 50 m to the nearest pt stop and 50 m back to their origin facility, so the total travel distance have to be 100 m.
 				if(origin == destination){
 
-					Assert.assertTrue(totalTravelDistance == 100.);
-					Assert.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(totalTravelDistance == 100.);
+					Assertions.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
 				}
 
 				// test travel time and distance for different origins and destinations
@@ -253,13 +252,13 @@ public class PtMatrixTest {
 
 					// test total walk travel distance and time
 					// in the test network the total walk distance always is 100 m, because the euclidean distance between a facility and its nearest pt stop always is 50 m
-					Assert.assertTrue(walkTravelDistance == 100.);
-					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					Assertions.assertTrue(walkTravelDistance == 100.);
+					Assertions.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 
 					// test pt travel distance and time
 					// in the csv-file the pt travel distance is given as 100 m; the pt travel time as 100 min
-					Assert.assertTrue(ptTravelDistance == 100.);
-					Assert.assertTrue(ptTravelTime == 100. * 60); // multiplied by 60 to convert minutes to seconds (csv-files are saved in minutes; matsim works with seconds)
+					Assertions.assertTrue(ptTravelDistance == 100.);
+					Assertions.assertTrue(ptTravelTime == 100. * 60); // multiplied by 60 to convert minutes to seconds (csv-files are saved in minutes; matsim works with seconds)
 				}
 			}
 		}

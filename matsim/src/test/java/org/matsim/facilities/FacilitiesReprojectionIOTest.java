@@ -21,9 +21,9 @@
 
  package org.matsim.facilities;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
+	/**
  * @author thibautd
  */
 public class FacilitiesReprojectionIOTest {
@@ -50,11 +50,11 @@ public class FacilitiesReprojectionIOTest {
 					INITIAL_CRS,
 					TARGET_CRS);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testReprojectionAtImport() {
+	 @Test
+	 void testReprojectionAtImport() {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -64,8 +64,8 @@ public class FacilitiesReprojectionIOTest {
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}
 
-	@Test
-	public void testReprojectionAtExport() {
+	 @Test
+	 void testReprojectionAtExport() {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
@@ -78,8 +78,8 @@ public class FacilitiesReprojectionIOTest {
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}
 
-	@Test
-	public void testWithControlerAndObjectAttributes() {
+	 @Test
+	 void testWithControlerAndObjectAttributes() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.
@@ -103,16 +103,16 @@ public class FacilitiesReprojectionIOTest {
 			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"Wrong coordinate transform performed!",
+			Assertions.assertEquals(
 					transformation.transform(originalCoord),
-					internalCoord);
+					internalCoord,
+					"Wrong coordinate transform performed!");
 		}
 
-		Assert.assertEquals(
-				"wrong CRS information after loading",
+		Assertions.assertEquals(
 				TARGET_CRS,
-				ProjectionUtils.getCRS(scenario.getActivityFacilities()));
+				ProjectionUtils.getCRS(scenario.getActivityFacilities()),
+				"wrong CRS information after loading");
 
 		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
@@ -127,21 +127,21 @@ public class FacilitiesReprojectionIOTest {
 			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"coordinates were reprojected for dump",
+			Assertions.assertEquals(
 					internalCoord.getX(),
 					dumpedCoord.getX(),
-					epsilon );
-			Assert.assertEquals(
-					"coordinates were reprojected for dump",
+					epsilon,
+					"coordinates were reprojected for dump" );
+			Assertions.assertEquals(
 					internalCoord.getY(),
 					dumpedCoord.getY(),
-					epsilon );
+					epsilon,
+					"coordinates were reprojected for dump" );
 		}
 	}
 
-	@Test
-	public void testWithControlerAndConfigParameters() {
+	 @Test
+	 void testWithControlerAndConfigParameters() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
 		// and output coordinates, the more we require the internally reprojected coordinates to be different.
@@ -167,16 +167,16 @@ public class FacilitiesReprojectionIOTest {
 			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
+			Assertions.assertNotEquals(
 					originalCoord.getX(),
 					internalCoord.getX(),
-					epsilon );
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
+					epsilon,
+					"No coordinates transform performed!" );
+			Assertions.assertNotEquals(
 					originalCoord.getY(),
 					internalCoord.getY(),
-					epsilon );
+					epsilon,
+					"No coordinates transform performed!" );
 		}
 
 		config.controller().setLastIteration( -1 );
@@ -192,16 +192,16 @@ public class FacilitiesReprojectionIOTest {
 			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
-			Assert.assertNotEquals(
-					"coordinates not reprojected for dump",
+			Assertions.assertNotEquals(
 					originalCoord.getX(),
 					dumpedCoord.getX(),
-					epsilon );
-			Assert.assertNotEquals(
-					"coordinates not reprojected for dump",
+					epsilon,
+					"coordinates not reprojected for dump" );
+			Assertions.assertNotEquals(
 					originalCoord.getY(),
 					dumpedCoord.getY(),
-					epsilon );
+					epsilon,
+					"coordinates not reprojected for dump" );
 		}
 	}
 
@@ -209,10 +209,10 @@ public class FacilitiesReprojectionIOTest {
 		final ActivityFacilities originalFacilities = originalScenario.getActivityFacilities();
 		final ActivityFacilities reprojectedFacilities = reprojectedScenario.getActivityFacilities();
 
-		Assert.assertEquals(
-				"unexpected size of reprojected facilities",
+		Assertions.assertEquals(
 				originalFacilities.getFacilities().size(),
-				reprojectedFacilities.getFacilities().size() );
+				reprojectedFacilities.getFacilities().size(),
+				"unexpected size of reprojected facilities" );
 
 		for (Id<ActivityFacility> id : originalFacilities.getFacilities().keySet() ) {
 			final ActivityFacility originalFacility = originalFacilities.getFacilities().get( id );
@@ -226,9 +226,9 @@ public class FacilitiesReprojectionIOTest {
 		final Coord original = originalFacility.getCoord();
 		final Coord transformed = reprojectedFacility.getCoord();
 
-		Assert.assertEquals(
-				"wrong reprojected coordinate",
+		Assertions.assertEquals(
 				transformation.transform(original),
-				transformed);
+				transformed,
+				"wrong reprojected coordinate");
 	}
 }

@@ -48,13 +48,31 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	 */
 	@Override
 	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
+		// check if the max riding time constraints is violated (with default config, the max ride duration
+		// is infinity)
+		if (violatesMaxRideDuration(drtRequest, detourTimeInfo)) {
+			return INFEASIBLE_SOLUTION_COST;
+		}
+
 		var vEntry = insertion.vehicleEntry;
 
+		// in case of prebooking, we may have intermediate stay times after pickup
+		// insertion that may reduce the effective pickup delay that remains that the
+		// dropoff insertion point
+		double effectiveDropoffTimeLoss = InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
+				insertion, detourTimeInfo.pickupDetourInfo) + detourTimeInfo.dropoffDetourInfo.dropoffTimeLoss;
+
 		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
-				|| vEntry.getSlackTime(insertion.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
+				|| vEntry.getSlackTime(insertion.dropoff.index) < effectiveDropoffTimeLoss) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
+	}
+
+	private boolean violatesMaxRideDuration(DrtRequest drtRequest, InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
+		// Check if the max travel time constraint for the newly inserted request is violated
+		double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
+		return drtRequest.getMaxRideDuration() < rideDuration;
 	}
 }

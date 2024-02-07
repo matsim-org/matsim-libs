@@ -20,10 +20,10 @@
 
 package org.matsim.core.events;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -37,11 +37,12 @@ import org.matsim.vehicles.Vehicle;
  */
 public class VehicleEntersTrafficEventTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testWriteReadXml() {
+	@Test
+	void testWriteReadXml() {
 		final VehicleEntersTrafficEvent event1 = new VehicleEntersTrafficEvent(8463.7301, Id.create("483", Person.class),
 				Id.create("783", Link.class), Id.create("veh7", Vehicle.class), TransportMode.car, 1.0);
 		final VehicleEntersTrafficEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);

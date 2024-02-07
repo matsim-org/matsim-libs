@@ -51,13 +51,13 @@ import java.util.concurrent.LinkedBlockingQueue;
  * the file and creates empty person objects which are added to the population to ensure
  * that their order is not changed. Note that this approach is not compatible with
  * population streaming. When this feature is activated, the non-parallel reader is used.
- * 
+ *
  * The parallel threads interpret the xml data for each person.
- * 
+ *
  * @author cdobler
  */
 /* deliberately package */  class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
-	
+
 	static final Logger log = LogManager.getLogger(ParallelPopulationReaderMatsimV4.class);
 
 	private final boolean isPopulationStreaming;
@@ -70,6 +70,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 	private List<Tag> currentPersonXmlData;
 
 	private final CoordinateTransformation coordinateTransformation;
+	private Throwable exception = null;
 
 	public ParallelPopulationReaderMatsimV4(
 			final Scenario scenario ) {
@@ -81,14 +82,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 			final Scenario scenario) {
 		super( coordinateTransformation , scenario );
 		this.coordinateTransformation = coordinateTransformation;
-		
+
 		/*
 		 * Check whether population streaming is activated
 		 */
 //		if (scenario.getPopulation() instanceof Population && ((Population)scenario.getPopulation()).isStreaming()) {
 		if ( scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation ) {
 			log.warn("Population streaming is activated - cannot use " + ParallelPopulationReaderMatsimV4.class.getName() + "!");
-			
+
 			this.isPopulationStreaming = true;
 			this.numThreads = 1;
 			this.queue = null;
@@ -98,42 +99,70 @@ import java.util.concurrent.LinkedBlockingQueue;
 			isPopulationStreaming = false;
 
 			if (scenario.getConfig().global().getNumberOfThreads() > 0) {
-				this.numThreads = scenario.getConfig().global().getNumberOfThreads();			
+				this.numThreads = scenario.getConfig().global().getNumberOfThreads();
 			} else this.numThreads = 1;
-			
+
 			this.queue = new LinkedBlockingQueue<>();
 			this.collectorPopulation = new CollectorPopulation(this.plans);
 			this.collectorScenario = new CollectorScenario(scenario, collectorPopulation);
 		}
 	}
-		
+
 	private void initThreads() {
 		threads = new Thread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			
+
 			ParallelPopulationReaderMatsimV4Runner runner =
 					new ParallelPopulationReaderMatsimV4Runner(
 							this.coordinateTransformation,
 							this.collectorScenario,
 							this.queue);
-			
+
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);
 			thread.setName(ParallelPopulationReaderMatsimV4Runner.class.toString() + i);
+			thread.setUncaughtExceptionHandler(this::catchReaderException);
 			threads[i] = thread;
 			thread.start();
 		}
 	}
-	
+
+	private void stopThreads() {
+		// signal the threads that they should end parsing
+		for (int i = 0; i < this.numThreads; i++) {
+			List<Tag> list = new ArrayList<>();
+			list.add(new EndProcessingTag());
+			this.queue.add(list);
+		}
+
+		// wait for the threads to finish
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+
+		if (this.exception != null) {
+			throw new RuntimeException(this.exception);
+		}
+	}
+
+	private void catchReaderException(Thread thread, Throwable throwable) {
+		log.error("Error parsing XML", throwable);
+		this.exception = throwable;
+	}
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		
+
 		// if population streaming is activated, use non-parallel reader
 		if (isPopulationStreaming) {
 			super.startTag(name, atts, context);
 			return;
 		}
-		
+
 		if (PLANS.equals(name)) {
 			log.info("Start parallel population reading...");
 			initThreads();
@@ -149,7 +178,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 				currentPersonXmlData.add(personTag);
 				this.plans.addPerson(person);
 			}
-			
+
 			// Create a new start tag and add it to the person data.
 			StartTag tag = new StartTag();
 			tag.name = name;
@@ -160,30 +189,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		
+
 		// if population streaming is activated, use non-parallel reader
 		if (isPopulationStreaming) {
 			super.endTag(name, content, context);
 			return;
 		}
-		
+
 		if (PLANS.equals(name)) {
-			// signal the threads that they should end parsing
-			for (int i = 0; i < this.numThreads; i++) {
-				List<Tag> list = new ArrayList<>();
-				list.add(new EndProcessingTag());
-				this.queue.add(list);
-			}
-			
-			// wait for the threads to finish
-			try {
-				for (Thread thread : threads) {
-					thread.join();
-				}
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-			
+			this.stopThreads();
 			super.endTag(name, content, context);
 			log.info("Finished parallel population reading...");
 		} else {
@@ -193,24 +207,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 			tag.content = content;
 			tag.context = context;
 			currentPersonXmlData.add(tag);
-			
+
 			// if its a person end tag, add the persons xml data to the queue.
 			if (PERSON.equals(name)) queue.add(currentPersonXmlData);
 		}
 	}
-	
+
 	private static class CollectorScenario implements Scenario {
-		// yyyy Why is this necessary at all?  Could you please explain your design decisions?  The same instance is passed to all threads, so 
+		// yyyy Why is this necessary at all?  Could you please explain your design decisions?  The same instance is passed to all threads, so
 		// what is the difference to using the underlying population directly?
-		
+
 		private final Scenario delegate;
 		private final CollectorPopulation population;
-		
+
 		public CollectorScenario(Scenario scenario, CollectorPopulation population) {
 			this.delegate = scenario;
 			this.population = population;
 		}
-		
+
 		@Override
 		public Network getNetwork() {
 			return this.delegate.getNetwork();
@@ -220,7 +234,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 		public Population getPopulation() {
 			return this.population;	// return collector population
 		}
-		
+
 		@Override
 		public ActivityFacilities getActivityFacilities() {
 			return this.delegate.getActivityFacilities();
@@ -266,15 +280,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 			return this.delegate.getVehicles() ;
 		}
 	}
-	
+
 	private static class CollectorPopulation implements Population {
 
 		private final Population population;
-		
+
 		public CollectorPopulation(Population population) {
 			this.population = population;
 		}
-		
+
 		@Override
 		public PopulationFactory getFactory() {
 			return population.getFactory();
@@ -310,27 +324,27 @@ import java.util.concurrent.LinkedBlockingQueue;
 			throw new RuntimeException("Calls to this method are not expected to happen...");
 		}
 	}
-	
+
 	public abstract static class Tag {
 		String name;
 		Stack<String> context = null;	// not used by the PopulationReader
 	}
-	
-	public final class StartTag extends Tag {
+
+	public static final class StartTag extends Tag {
 		Attributes atts;
 	}
-	
-	public final class PersonTag extends Tag {
+
+	public static final class PersonTag extends Tag {
 		Person person;
 	}
-	
-	public final class EndTag extends Tag {
+
+	public static final class EndTag extends Tag {
 		String content;
 	}
-	
+
 	/*
 	 * Marker Tag to inform the threads that no further data has to be parsed.
 	 */
-	public final class EndProcessingTag extends Tag {
+	public static final class EndProcessingTag extends Tag {
 	}
 }

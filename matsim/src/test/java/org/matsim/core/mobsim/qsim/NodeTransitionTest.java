@@ -18,18 +18,15 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,25 +69,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author tthunig
  *
  */
-@RunWith(Parameterized.class)
 public class NodeTransitionTest {
 
-	@Parameterized.Parameters(name = "{index}: useFastCapUpdate == {0};")
-	public static Collection<Object[]> parameterObjects() {
-		return Arrays.asList(new Object[][]{
-				{true},
-				{false}
-		});
-	}
-
-	private boolean useFastCapUpdate;
-
-	public NodeTransitionTest(boolean useFastCapUpdate) {
-		this.useFastCapUpdate = useFastCapUpdate;
-	}
-
-	@Test
-	public void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -133,18 +116,18 @@ public class NodeTransitionTest {
 		// test throughput for the first time interval
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the commodity on link 6_7 has not begun to send vehicles, i.e. the corresponding throughput should be 0 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("2_7")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 2, avgThroughputFreeFlow.get(Id.createLinkId("4_7")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 0, avgThroughputFreeFlow.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("2_7")), MatsimTestUtils.EPSILON, "Troughput on link 2_7 is wrong");
+		Assertions.assertEquals(2, avgThroughputFreeFlow.get(Id.createLinkId("4_7")), MatsimTestUtils.EPSILON, "Troughput on link 4_7 is wrong");
+		Assertions.assertEquals(0, avgThroughputFreeFlow.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the second time interval
 		/* with probability of 2/3 link 4_7 is selected and sends all vehicles from its buffer, i.e. 2;
 		 * with probability of 1/3 link 2_7 is selected and sends all vehicles from its buffer, i.e. 1 and afterwards link 4_7 can send the remaining 1.
 		 * this means, the expected average throughput of link 2_7 is 1/3 and the expected average throughput of link 4_7 is 2*2/3 + 1/3 = 5/3.
 		 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1./3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta); // 0.25384615384615383
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 5./3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta); // 1.7461538461538462
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1./3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.25384615384615383
+		Assertions.assertEquals(5./3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 1.7461538461538462
+		Assertions.assertEquals(0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the third time interval
 		/* with probability of 2/5 link 4_7 is selected and sends all vehicles from its buffer, i.e. 2;
@@ -152,13 +135,14 @@ public class NodeTransitionTest {
 		 * with probability of 1/5 link 2_7 is selected and sends all vehicles from its buffer, i.e. 1 and afterwards link 4_7 or link 6_7 can send the remaining 1.
 		 * this means, the expected average throughput of link 2_7 is 1/5 and the expected average throughput of link 4_7 and link 6_7 is 2*2/5 + 1/10 = 9/10.
 		 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1./5, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta); // 0.17857142857142858
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta); // 0.8928571428571429
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta); // 0.9285714285714286
+		Assertions.assertEquals(1./5, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.17857142857142858
+		Assertions.assertEquals(9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8928571428571429
+		Assertions.assertEquals(9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.9285714285714286
 	}
 
-	@Test
-	public void testMergeSituationWithMoveVehByVehRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testMergeSituationWithMoveVehByVehRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -202,9 +186,9 @@ public class NodeTransitionTest {
 		// test throughput for the first time interval
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the commodity on link 6_7 has not begun to send vehicles, i.e. the corresponding throughput should be 0 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("2_7")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 2, avgThroughputFreeFlow.get(Id.createLinkId("4_7")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 0, avgThroughputFreeFlow.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("2_7")), MatsimTestUtils.EPSILON, "Troughput on link 2_7 is wrong");
+		Assertions.assertEquals(2, avgThroughputFreeFlow.get(Id.createLinkId("4_7")), MatsimTestUtils.EPSILON, "Troughput on link 4_7 is wrong");
+		Assertions.assertEquals(0, avgThroughputFreeFlow.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the second time interval
 		/* with probability of 2/3 link 4_7 is selected and sends one vehicle; afterwards with probability of 2/3 link 4_7 is allowed to send the second vehicle, with probability 1/3 link 2_7 is allowed to send one.
@@ -214,9 +198,9 @@ public class NodeTransitionTest {
 		 * the numbers are as follows: the expected average throughput of link 2_7 is 2/3*1/3*1 + 1/3*1 = 5/9
 		 * and the expected average throughput of link 4_7 is 2/3*2/3*2 + 2/3*1/3*1 + 1/3*1 = 13/9
 		 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 5./9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta); // 0.5307692307692308
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 13./9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta); // 1.4692307692307693
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5./9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.5307692307692308
+		Assertions.assertEquals(13./9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 1.4692307692307693
+		Assertions.assertEquals(0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the third time interval
 		/* the first vehicle is send by link 2_7 with probability of 1/5 and by one of the other two links with probability 2/5.
@@ -227,13 +211,14 @@ public class NodeTransitionTest {
 		 * the numbers are as follows: the expected average throughput of link 2_7 is 1/5*1/2*1 + 1/5*1/2*1 + 2/5*1/5*1 + 2/5*1/5*1 = 9/25 = 0.36
 		 * and the expected average throughput of link 4_7 and 6_7 is 1/5*1/2*1 + 2/5*2/5*2 + 2/5*1/5*1 + 2/5*2/5*1 + 2/5*2/5*1 = 41/50
 		 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 9./25, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta); // 0.34285714285714286
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta); // 0.8
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta); // 0.8571428571428571
+		Assertions.assertEquals(9./25, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.34285714285714286
+		Assertions.assertEquals(41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8
+		Assertions.assertEquals(41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8571428571428571
 	}
 
-	@Test
-	public void testMergeSituationWithMoveVehByVehDeterministicPriorities() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testMergeSituationWithMoveVehByVehDeterministicPriorities(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createMergeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		// note: the deterministic node transition is only implemented for the case when the node is blocked as soon as one outgoing link is full
@@ -280,29 +265,30 @@ public class NodeTransitionTest {
 		// test throughput for the first time interval
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the commodity on link 6_7 has not begun to send vehicles, i.e. the corresponding throughput should be 0 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("2_7")), delta);
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 2, avgThroughputFreeFlow.get(Id.createLinkId("4_7")), delta);
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 0, avgThroughputFreeFlow.get(Id.createLinkId("6_7")), delta);
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong");
+		Assertions.assertEquals(2, avgThroughputFreeFlow.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong");
+		Assertions.assertEquals(0, avgThroughputFreeFlow.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the second time interval
 		/* the deterministic node transition should distribute the free slots on the downstream link exactly proportional to the outflow capacity of the links,
 		 * i.e. 1:2 in this case
 		 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1./3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), deltaPeriodic); // 0.6692307692307692
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 2./3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), deltaPeriodic); // 1.3307692307692307
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), delta);
+		Assertions.assertEquals(1./3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), deltaPeriodic, "Troughput on link 2_7 is wrong"); // 0.6692307692307692
+		Assertions.assertEquals(2./3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), deltaPeriodic, "Troughput on link 4_7 is wrong"); // 1.3307692307692307
+		Assertions.assertEquals(0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the third time interval
 		/* the deterministic node transition should distribute the free slots on the downstream link exactly proportional to the outflow capacity of the links,
 		 * i.e. 1:2:2 in this case.
 		 */
-		Assert.assertEquals("Troughput on link 2_7 is wrong", 1./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta); // 0.4
-		Assert.assertEquals("Troughput on link 4_7 is wrong", 2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta); // 0.8
-		Assert.assertEquals("Troughput on link 6_7 is wrong", 2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta); // 0.8
+		Assertions.assertEquals(1./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.4
+		Assertions.assertEquals(2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8
+		Assertions.assertEquals(2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8
 	}
 
-	@Test
-	public void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -357,18 +343,18 @@ public class NodeTransitionTest {
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 2, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), MatsimTestUtils.EPSILON, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the second time interval
 		/* with probability 1/3 link 4_5 is selected first and can send all its vehicles from the buffer (i.e. one) before link 2_5 blocks the intersection.
 		 * if link 2_5 is selected first the intersection is blocked immediately.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1./3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta); // 0.36666666666666664
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1./3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.36666666666666664
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the third time interval
 		/* with probability 1/3 link 4_5 is selected first and can send all its vehicles from the buffer (i.e. one) before link 2_5 sends its first one and blocks the intersection.
@@ -377,13 +363,14 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be equal to the flow
 		 * capacity of link 5_8 here, i.e. 1 veh per time step (=sec).
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1./3, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta); // 0.3263157894736842
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1./3, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.3263157894736842
+		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 	}
 
-	@Test
-	public void testBlockedNodeSituationWithMoveVehByVehRandomDistribution() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBlockedNodeSituationWithMoveVehByVehRandomDistribution(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -438,18 +425,18 @@ public class NodeTransitionTest {
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 2, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), MatsimTestUtils.EPSILON, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the second time interval
 		/* with probability 1/3 link 4_5 is selected first and can send one vehicle before link 2_5 blocks the intersection.
 		 * if link 2_5 is selected first the intersection is blocked immediately.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1./3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta); // 0.3333333333333333
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1./3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.3333333333333333
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the third time interval
 		/* with probability 1/3 link 4_5 is selected first and can send one vehicle before link 2_5 sends its first one and blocks the intersection.
@@ -459,13 +446,14 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be equal to the flow
 		 * capacity of link 5_8 here, i.e. 1 veh per time step (=sec).
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 5./9, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta); // 0.5736842105263158
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(5./9, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.5736842105263158
+		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 	}
 
-	@Test
-	public void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
@@ -521,9 +509,9 @@ public class NodeTransitionTest {
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 2, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), delta);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), delta);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), delta);
+		Assertions.assertEquals(2, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the second time interval
 		/* the deterministic node transition should reduce the outflow of all links by the same percentage with which the outflow of links has to be reduced that lead to congested links.
@@ -531,9 +519,9 @@ public class NodeTransitionTest {
 		 * this works because the link with downstream congestion has and keeps the minimal priority (i.e. is always selected first) as soon as the move node step is stopped because of downstream congestion.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), delta);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), delta);
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the third time interval
 		/* the deterministic node transition should reduce the outflow of all links by the same percentage with which the outflow of links has to be reduced that lead to congested links.
@@ -541,9 +529,9 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be equal to the flow
 		 * capacity of link 5_8 here, i.e. 1 veh per time step (=sec).
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 1./2 * 2, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), delta);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 1./2 * 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), delta);
+		Assertions.assertEquals(1./2 * 2, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1./2 * 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 	}
 
 	/**
@@ -553,8 +541,9 @@ public class NodeTransitionTest {
 	 * 2. correct storage capacity bounds for a time bin size smaller than 1 (see e.g. former bug in QueueWithBuffer calculateStorageCapacity);
 	 * 3. both streams are independently (because blockNode=false).
 	 */
-	@Test
-	public void testNodeTransitionWithTimeStepSizeSmallerOne() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testNodeTransitionWithTimeStepSizeSmallerOne(boolean useFastCapUpdate) {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setTimeStepSize(0.5);
@@ -611,18 +600,18 @@ public class NodeTransitionTest {
 		/* the downstream link is not full, i.e. the links can send vehicles with their full outflow capacity.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 1, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), delta);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 0.5, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), delta);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0.0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), delta);
+		Assertions.assertEquals(1, avgThroughputFreeFlow.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(0.5, avgThroughputFreeFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0.0, avgThroughputFreeFlow.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the second time interval
 		/* the downstream link of 2_5 is full, i.e. no vehicles can leave 2_5 in this time interval.
 		 * link 4_5 is not affected by this, because blockNodeWhenSingleOutlinkFull is set to false.
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), delta);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 0.5, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0.0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), delta);
+		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(0.5, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0.0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the third time interval
 		/* the downstream link of 2_5 lets 1 veh in every two time steps, i.e. throughput of link 2_5 should be 0.5 per time step.
@@ -630,9 +619,9 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be equal to the flow
 		 * capacity of link 5_8 here, i.e. 0.5 veh per time step.
 		 */
-		Assert.assertEquals("Troughput on link 2_5 is wrong", 0.5, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), delta);
-		Assert.assertEquals("Troughput on link 4_5 is wrong", 0.5, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta);
-		Assert.assertEquals("Troughput on link 5_8 is wrong", 0.5, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), delta);
+		Assertions.assertEquals(0.5, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(0.5, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(0.5, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 	}
 
 	private static final class Fixture {
@@ -746,7 +735,7 @@ public class NodeTransitionTest {
 
 	}
 
-	private final class ThroughputAnalyzer implements LinkLeaveEventHandler {
+	private static final class ThroughputAnalyzer implements LinkLeaveEventHandler {
 
 		private final List<Id<Link>> linksOfInterest;
 		private Map<Id<Link>, Map<Double, Double>> absoluteThroughputPerTimeStep_veh = new HashMap<>();

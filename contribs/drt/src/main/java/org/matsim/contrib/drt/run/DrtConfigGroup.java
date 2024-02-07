@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
@@ -106,11 +107,35 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Parameter
 	@Comment(
-			"Defines the maximum allowed absolute detour in seconds of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-					+ "maxAbsoluteDetour should not be smaller than 0. and should be higher than the offset maxTravelTimeBeta.")
+			"Defines the maximum allowed absolute detour in seconds. Note that the detour is computed from the latest promised pickup time. " +
+				"To enable the max detour constraint, maxAllowedPickupDelay has to be specified. maxAbsoluteDetour should not be smaller than 0, "
+				+ "and should be higher than the offset maxDetourBeta. By default, this limit is disabled (i.e. set to Inf)")
 	@PositiveOrZero
 	public double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
+	@Comment(
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. Note that the detour is computed from the latest promised "
+			+ "pickup time. To enable the max detour constraint, maxAllowedPickupDelay has to be specified. A linear combination similar to travel "
+			+ "time constrain is used. This is the ratio part. By default, this limit is disabled (i.e. set to Inf, together with maxDetourBeta).")
+	@DecimalMin("1.0")
+	public double maxDetourAlpha = Double.POSITIVE_INFINITY;
+
+	@Parameter
+	@Comment(
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. Note that the detour is computed from the latest promised "
+			+ "pickup time. To enable the max detour constraint, maxAllowedPickupDelay has to be specified. A linear combination similar to travel "
+			+ "time constrain is used. This is the constant part. By default, this limit is disabled (i.e. set to Inf, together with maxDetourAlpha).")
+	@PositiveOrZero
+	public double maxDetourBeta = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
+	@Comment(
+		"Defines the maximum delay allowed from the initial scheduled pick up time. Once the initial pickup time is offered, the latest promised"
+			+ "pickup time is calculated based on initial scheduled pickup time + maxAllowedPickupDelay. "
+			+ "By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
+	@PositiveOrZero
+	public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
 
 	@Parameter
 	@Comment("If true, the max travel and wait times of a submitted request"
@@ -191,9 +216,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
-	@PositiveOrZero
-	public double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
-
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
@@ -208,6 +230,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Nullable
 	private DrtSpeedUpParams drtSpeedUpParams;
+
+	@Nullable
+	private PrebookingParams prebookingParams;
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -249,6 +274,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
 				() -> drtRequestInsertionRetryParams,
 				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
+
+		//prebooking (optional)
+		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
+				() -> prebookingParams,
+				params -> prebookingParams = (PrebookingParams)params);
 	}
 
 	@Override
@@ -322,6 +352,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
+	}
+
+	public Optional<PrebookingParams> getPrebookingParams() {
+		return Optional.ofNullable(prebookingParams);
 	}
 
 	/**

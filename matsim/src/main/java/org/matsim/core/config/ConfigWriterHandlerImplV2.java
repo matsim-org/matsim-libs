@@ -28,10 +28,10 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -110,7 +110,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			Collection<? extends ConfigGroup> comparisonSets = new ArrayList<>() ;
 			if ( comparisonModule != null ) {
 				comparisonSets = comparisonModule.getParameterSets(entry.getKey());
-			};
+			}
 			for ( ConfigGroup pSet : entry.getValue() ) {
 				ConfigGroup comparisonPSet = null ;
 				for ( ConfigGroup cg : comparisonSets ) {

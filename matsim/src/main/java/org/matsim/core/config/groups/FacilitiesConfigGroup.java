@@ -51,7 +51,8 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String FACILITIES_SOURCE = "facilitiesSource";
 	public enum FacilitiesSource {none, fromFile, setInScenario, onePerActivityLinkInPlansFile,
-		onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven, onePerActivityLocationInPlansFile};
+		onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven, onePerActivityLocationInPlansFile}
+
 	private FacilitiesSource facilitiesSource = FacilitiesSource.none;
 //	private boolean addEmptyActivityOption = false;
 

@@ -3,7 +3,7 @@ package org.matsim.modechoice.replanning;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.PrepareForMobsim;
@@ -25,7 +25,7 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 	}
 
 	@Test
-	public void person() {
+	void person() {
 
 		PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
 		prepare.run();
@@ -44,7 +44,7 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 	}
 
 	@Test
-	public void constraint() {
+	void constraint() {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
@@ -68,7 +68,7 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 	}
 
 	@Test
-	public void allowedModes() {
+	void allowedModes() {
 
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);

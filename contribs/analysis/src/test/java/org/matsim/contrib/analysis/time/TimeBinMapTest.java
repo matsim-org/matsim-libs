@@ -1,15 +1,15 @@
 package org.matsim.contrib.analysis.time;
 
-import org.junit.Test;
-
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 public class TimeBinMapTest {
 
-    @Test
-    public void getTimeBin() {
+	@Test
+	void getTimeBin() {
 
         TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10);
 
@@ -18,8 +18,8 @@ public class TimeBinMapTest {
         assertEquals(10, bin.getStartTime(), 0.001);
     }
 
-    @Test
-    public void getTimeBinWithStartTime() {
+	@Test
+	void getTimeBinWithStartTime() {
 
         TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10, 20);
 
@@ -28,18 +28,20 @@ public class TimeBinMapTest {
         assertEquals(20, bin.getStartTime(), 0.001);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getTimeInvalidTime_exception() {
+	@Test
+	void getTimeInvalidTime_exception() {
+		assertThrows(IllegalArgumentException.class, () -> {
 
-        TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10, 20);
+			TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10, 20);
 
-        TimeBinMap.TimeBin<Map<String, String>> bin = map.getTimeBin(19);
+			TimeBinMap.TimeBin<Map<String, String>> bin = map.getTimeBin(19);
 
-        assertEquals(20, bin.getStartTime(), 0.001);
-    }
+			assertEquals(20, bin.getStartTime(), 0.001);
+		});
+	}
 
-    @Test
-    public void getMultipleTimeBins() {
+	@Test
+	void getMultipleTimeBins() {
 
         TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10);
 
@@ -55,8 +57,8 @@ public class TimeBinMapTest {
         assertEquals(30, fourth.getStartTime(), 0.001);
     }
 
-    @Test
-    public void getEndOfLastTimeBucket() {
+	@Test
+	void getEndOfLastTimeBucket() {
 
         TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10);
 
@@ -68,8 +70,8 @@ public class TimeBinMapTest {
         assertEquals(120, map.getEndTimeOfLastBin(), 0.0001);
     }
 
-    @Test
-    public void getAllTimeBins() {
+	@Test
+	void getAllTimeBins() {
 
         TimeBinMap<Map<String, String>> map = new TimeBinMap<>(10);
 
@@ -81,8 +83,8 @@ public class TimeBinMapTest {
         assertEquals(4, map.getTimeBins().size());
     }
 
-    @Test
-    public void timeBin_setEntry() {
+	@Test
+	void timeBin_setEntry() {
 
         final String testValue = "some-value";
 
@@ -97,7 +99,7 @@ public class TimeBinMapTest {
 	}
 
 	@Test
-	public void timeBin_getValue() {
+	void timeBin_getValue() {
 
 		final String testValue = "some-value";
 

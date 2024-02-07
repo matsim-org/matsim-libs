@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-public class MissingEnergyEvent extends Event {
+public final class MissingEnergyEvent extends Event {
 	public static final String EVENT_TYPE = "missing_energy";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_ENERGY = "energy";

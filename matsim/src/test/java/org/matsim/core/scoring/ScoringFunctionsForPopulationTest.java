@@ -21,15 +21,14 @@
 
  package org.matsim.core.scoring;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -44,13 +43,13 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
+	/**
  * @author mrieser / Simunto GmbH
  */
 public class ScoringFunctionsForPopulationTest {
 
-	@Test
-	public void testTripScoring() {
+	 @Test
+	 void testTripScoring() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
@@ -68,43 +67,43 @@ public class ScoringFunctionsForPopulationTest {
 		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
 		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
-		Assert.assertEquals(RecordingScoringFunction.class, s.getClass());
+		Assertions.assertEquals(RecordingScoringFunction.class, s.getClass());
 		RecordingScoringFunction rs = (RecordingScoringFunction) s;
 
 		sf.handleActivity(new PersonExperiencedActivity(personId, pf.createActivityFromCoord("home", new Coord(100, 100))));
-		Assert.assertEquals(0, rs.tripCounter);
+		Assertions.assertEquals(0, rs.tripCounter);
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("walk")));
-		Assert.assertEquals(0, rs.tripCounter);
+		Assertions.assertEquals(0, rs.tripCounter);
 		sf.handleEvent(new ActivityStartEvent(8*3600, personId, null, null, "work", new Coord(1000, 100)));
-		Assert.assertEquals(1, rs.tripCounter);
+		Assertions.assertEquals(1, rs.tripCounter);
 		sf.handleActivity(new PersonExperiencedActivity(personId, pf.createActivityFromCoord("work", new Coord(1000, 100))));
-		Assert.assertEquals(1, rs.tripCounter);
-		Assert.assertEquals(1, rs.lastTrip.getTripElements().size());
-		Assert.assertEquals("walk", ((Leg) rs.lastTrip.getTripElements().get(0)).getMode());
+		Assertions.assertEquals(1, rs.tripCounter);
+		Assertions.assertEquals(1, rs.lastTrip.getTripElements().size());
+		Assertions.assertEquals("walk", ((Leg) rs.lastTrip.getTripElements().get(0)).getMode());
 
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("transit_walk")));
 		sf.handleEvent(new ActivityStartEvent(17*3600 - 10, personId, null, null, "pt interaction", new Coord(1000, 200)));
-		Assert.assertEquals(1, rs.tripCounter);
+		Assertions.assertEquals(1, rs.tripCounter);
 		sf.handleActivity(new PersonExperiencedActivity(personId, PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(1000, 200), null, TransportMode.pt)));
-		Assert.assertEquals(1, rs.tripCounter);
+		Assertions.assertEquals(1, rs.tripCounter);
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("pt")));
 		sf.handleEvent(new ActivityStartEvent(17*3600, personId, null, null, "pt interaction", new Coord(1000, 200)));
-		Assert.assertEquals(1, rs.tripCounter);
+		Assertions.assertEquals(1, rs.tripCounter);
 		sf.handleActivity(new PersonExperiencedActivity(personId, PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(1000, 200), null, TransportMode.pt)));
-		Assert.assertEquals(1, rs.tripCounter);
+		Assertions.assertEquals(1, rs.tripCounter);
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("transit_walk")));
 		sf.handleEvent(new ActivityStartEvent(17*3600 + 10, personId, null, null, "leisure", new Coord(1000, 200)));
-		Assert.assertEquals(2, rs.tripCounter);
+		Assertions.assertEquals(2, rs.tripCounter);
 		sf.handleActivity(new PersonExperiencedActivity(personId, pf.createActivityFromCoord("leisure", new Coord(1000, 200))));
-		Assert.assertEquals(2, rs.tripCounter);
-		Assert.assertEquals(5, rs.lastTrip.getTripElements().size());
-		Assert.assertEquals("transit_walk", ((Leg) rs.lastTrip.getTripElements().get(0)).getMode());
-		Assert.assertEquals("pt", ((Leg) rs.lastTrip.getTripElements().get(2)).getMode());
-		Assert.assertEquals("transit_walk", ((Leg) rs.lastTrip.getTripElements().get(4)).getMode());
+		Assertions.assertEquals(2, rs.tripCounter);
+		Assertions.assertEquals(5, rs.lastTrip.getTripElements().size());
+		Assertions.assertEquals("transit_walk", ((Leg) rs.lastTrip.getTripElements().get(0)).getMode());
+		Assertions.assertEquals("pt", ((Leg) rs.lastTrip.getTripElements().get(2)).getMode());
+		Assertions.assertEquals("transit_walk", ((Leg) rs.lastTrip.getTripElements().get(4)).getMode());
 	}
 
-	@Test
-	public void testPersonScoreEventScoring() {
+	 @Test
+	 void testPersonScoreEventScoring() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
@@ -129,10 +128,10 @@ public class ScoringFunctionsForPopulationTest {
 		eventsManager.processEvent(new PersonScoreEvent(9*3600, Id.create("xyz", Person.class), 2.345, "testing"));
 		eventsManager.finishProcessing();
 
-		Assert.assertTrue(s instanceof RecordingScoringFunction);
+		Assertions.assertTrue(s instanceof RecordingScoringFunction);
 		RecordingScoringFunction rsf = (RecordingScoringFunction) s;
-		Assert.assertEquals(2, rsf.separateScoreCounter);
-		Assert.assertEquals(1.234+2.345, rsf.separateScoreSum, 1e-7);
+		Assertions.assertEquals(2, rsf.separateScoreCounter);
+		Assertions.assertEquals(1.234+2.345, rsf.separateScoreSum, 1e-7);
 	}
 
 	private static class RecordingScoringFunction implements ScoringFunction {

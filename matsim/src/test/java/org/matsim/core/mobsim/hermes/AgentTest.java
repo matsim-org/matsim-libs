@@ -19,14 +19,15 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.util.Assert;
-import static org.junit.Assert.assertEquals;
 
 public class AgentTest {
 
 	@Test
-	public void prepareLinkEntry() {
+	void prepareLinkEntry() {
 		for (int eventid = 1; eventid < HermesConfigGroup.MAX_EVENTS_AGENT; eventid *= 8) {
 			for (int lid = 1; lid < HermesConfigGroup.MAX_LINK_ID; lid *= 8) {
 				for (int j = 0; j < 255; j++) {
@@ -49,55 +50,55 @@ public class AgentTest {
 	}
 
 	@Test
-	public void fastSpeedIsEncodedByAdding90() {
+	void fastSpeedIsEncodedByAdding90() {
 		int encoded = Agent.prepareVelocityForLinkEntry(15);
 		assertEquals(15 + 90, encoded);
 	}
 
 	@Test
-	public void fastSpeedIsDecodedBySubtracting90() {
+	void fastSpeedIsDecodedBySubtracting90() {
 		double decoded = Agent.decodeVelocityFromLinkEntry(15 + 90);
 		assertEquals(15.0, decoded, 0.0);
 	}
 
 	@Test
-	public void encodingFastDecimalPointSpeedRoundsDownToNearestInteger() {
+	void encodingFastDecimalPointSpeedRoundsDownToNearestInteger() {
 		int encoded = Agent.prepareVelocityForLinkEntry(15.3);
 		assertEquals(15 + 90, encoded);
 	}
 
 	@Test
-	public void encodingFastDecimalPointSpeedRoundsUpToNearestInteger() {
+	void encodingFastDecimalPointSpeedRoundsUpToNearestInteger() {
 		int encoded = Agent.prepareVelocityForLinkEntry(15.6);
 		assertEquals(16 + 90, encoded);
 	}
 
 	@Test
-	public void slowSpeedIsEncodedByMultiplyingBy10() {
+	void slowSpeedIsEncodedByMultiplyingBy10() {
 		int encoded = Agent.prepareVelocityForLinkEntry(4.6);
 		assertEquals(46, encoded);
 	}
 
 	@Test
-	public void slowSpeedIsDecodedByDividingBy10() {
+	void slowSpeedIsDecodedByDividingBy10() {
 		double decoded = Agent.decodeVelocityFromLinkEntry(46);
 		assertEquals(4.6, decoded, 0.0);
 	}
 
 	@Test
-	public void encodingSlowDecimalPointSpeedRoundsDown() {
+	void encodingSlowDecimalPointSpeedRoundsDown() {
 		int encoded = Agent.prepareVelocityForLinkEntry(5.33);
 		assertEquals(53, encoded);
 	}
 
 	@Test
-	public void encodingSlowDecimalPointSpeedRoundsUp() {
+	void encodingSlowDecimalPointSpeedRoundsUp() {
 		int encoded = Agent.prepareVelocityForLinkEntry(5.66);
 		assertEquals(57, encoded);
 	}
 
 	@Test
-	public void fastSpeedIsIntegerWithFlatPlan() {
+	void fastSpeedIsIntegerWithFlatPlan() {
 		int eventId = 0;
 		int linkId = 0;
 		double velocity = 15.2;
@@ -108,7 +109,7 @@ public class AgentTest {
 	}
 
 	@Test
-	public void smallSpeedHasOneDecimalPointAccuracyWithFlatPlan() {
+	void smallSpeedHasOneDecimalPointAccuracyWithFlatPlan() {
 		int eventId = 0;
 		int linkId = 0;
 		double velocity = 3.43;

@@ -19,16 +19,16 @@
  * *********************************************************************** */
 package org.matsim.population.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -49,7 +49,7 @@ public class PermissibleModesCalculatorImplTest {
 		public final Plan plan;
 		public final boolean carAvail;
 
-		public Fixture( 
+		public Fixture(
 				final String name,
 				final Plan plan,
 				final boolean carAvail ) {
@@ -60,12 +60,12 @@ public class PermissibleModesCalculatorImplTest {
 	}
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 
-	@After
+	@AfterEach
 	public void clean() {
 		fixtures.clear();
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithNothing() {
 		String name = "no information";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -73,7 +73,7 @@ public class PermissibleModesCalculatorImplTest {
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithNoLicense() {
 		String name = "no License";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -82,7 +82,7 @@ public class PermissibleModesCalculatorImplTest {
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -91,7 +91,7 @@ public class PermissibleModesCalculatorImplTest {
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -101,7 +101,7 @@ public class PermissibleModesCalculatorImplTest {
 	}
 
 	@Test
-	public void testWhenConsideringCarAvailability() throws Exception {
+	void testWhenConsideringCarAvailability() throws Exception {
 		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
 		final List<String> modesWithoutCar = Arrays.asList("rail", "plane");
 		Config config = ConfigUtils.createConfig();
@@ -120,7 +120,7 @@ public class PermissibleModesCalculatorImplTest {
 	}
 
 	@Test
-	public void testWhenNotConsideringCarAvailability() throws Exception {
+	void testWhenNotConsideringCarAvailability() throws Exception {
 		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
 		Config config = ConfigUtils.createConfig();
 		config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
@@ -141,13 +141,13 @@ public class PermissibleModesCalculatorImplTest {
 			final List<String> expected,
 			final Collection<String> actual) {
 		assertEquals(
-				expected+" and "+actual+" have incompatible sizes for fixture "+fixtureName,
 				expected.size(),
-				actual.size());
+				actual.size(),
+				expected+" and "+actual+" have incompatible sizes for fixture "+fixtureName);
 
 		assertTrue(
-				expected+" and "+actual+" are not compatible for fixture "+fixtureName,
-				expected.containsAll( actual ));
+				expected.containsAll( actual ),
+				expected+" and "+actual+" are not compatible for fixture "+fixtureName);
 	}
 }
 

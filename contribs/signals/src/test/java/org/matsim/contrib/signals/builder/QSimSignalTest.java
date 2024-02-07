@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -56,30 +58,30 @@ public class QSimSignalTest implements
 
 	private double link2EnterTime = Double.NaN;
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	private final Fixture fixture = new Fixture();
-	
-	
+
+
 	/**
 	 * Tests the setup with a traffic light that shows all the time green
 	 */
 	@Test
-	public void testTrafficLightIntersection2arms1AgentV20() {
+	void testTrafficLightIntersection2arms1AgentV20() {
 		// configure and load standard scenario
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false );
-		
+
 		this.link2EnterTime = 38.0;
 		runQSimWithSignals(scenario, true);
 	}
 
 
 	/**
-	 * Tests the setup with a traffic light that shows red up to second 99 then in sec 100 green. 
+	 * Tests the setup with a traffic light that shows red up to second 99 then in sec 100 green.
 	 */
 	@Test
-	public void testSignalSystems1AgentGreenAtSec100() {		
+	void testSignalSystems1AgentGreenAtSec100() {
 		// configure and load standard scenario
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false );
 		// modify scenario
@@ -97,37 +99,39 @@ public class QSimSignalTest implements
 		this.link2EnterTime = 100.0;
 		runQSimWithSignals(scenario, true);
 	}
-	
+
 	/**
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
-	@Test(expected = RuntimeException.class)
-	public void testIntergreensAbortOneAgentDriving() {
-		//configure and load standard scenario
-		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(true );
-		// modify scenario
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(
-				fixture.signalSystemId2 );
-		SignalPlanData planData = controllerData.getSignalPlanData().get( fixture.signalPlanId2 );
-		planData.setStartTime(0.0);
-		planData.setEndTime(0.0);
-		planData.setCycleTime(60);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( fixture.signalGroupId100 );
-		groupData.setOnset(0);
-		groupData.setDropping(59);	
-		
-		runQSimWithSignals(scenario, false);
+	@Test
+	void testIntergreensAbortOneAgentDriving() {
+		assertThrows(RuntimeException.class, () -> {
+			//configure and load standard scenario
+			Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(true);
+			// modify scenario
+			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(
+					fixture.signalSystemId2);
+			SignalPlanData planData = controllerData.getSignalPlanData().get(fixture.signalPlanId2);
+			planData.setStartTime(0.0);
+			planData.setEndTime(0.0);
+			planData.setCycleTime(60);
+			SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(fixture.signalGroupId100);
+			groupData.setOnset(0);
+			groupData.setDropping(59);
 
-		// if this code is reached, no exception has been thrown
-		Assert.fail("The simulation should abort because of intergreens violation.");
+			runQSimWithSignals(scenario, false);
+
+			// if this code is reached, no exception has been thrown
+			Assertions.fail("The simulation should abort because of intergreens violation.");
+		});
 	}
-	
+
 	/**
 	 * Tests the setup with a traffic light which red time corresponds to the specified intergreen time of five seconds.
 	 */
 	@Test
-	public void testIntergreensNoAbortOneAgentDriving() {
+	void testIntergreensNoAbortOneAgentDriving() {
 		//configure and load standard scenario
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(true );
 		// modify scenario
@@ -140,31 +144,33 @@ public class QSimSignalTest implements
 		planData.setCycleTime(60);
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( fixture.signalGroupId100 );
 		groupData.setOnset(30);
-		groupData.setDropping(25);	
-		
+		groupData.setDropping(25);
+
 		this.link2EnterTime = 38.0;
 		runQSimWithSignals(scenario, true);
 	}
-	
+
 	/**
 	 * Tests the setup with two conflicting directions showing green together
 	 */
-	@Test(expected = RuntimeException.class)
-	public void testConflictingDirectionsAbortOneAgentDriving() {
-		//configure and load test scenario with data about conflicting directions
-		Scenario scenario = fixture.createAndLoadTestScenarioTwoSignals(true );
+	@Test
+	void testConflictingDirectionsAbortOneAgentDriving() {
+		assertThrows(RuntimeException.class, () -> {
+			//configure and load test scenario with data about conflicting directions
+			Scenario scenario = fixture.createAndLoadTestScenarioTwoSignals(true);
 
-		runQSimWithSignals(scenario, false);
+			runQSimWithSignals(scenario, false);
 
-		// if this code is reached, no exception has been thrown
-		Assert.fail("The simulation should abort because of intergreens violation.");
+			// if this code is reached, no exception has been thrown
+			Assertions.fail("The simulation should abort because of intergreens violation.");
+		});
 	}
-	
+
 	/**
 	 * Tests the setup with two conflicting directions not showing green together
 	 */
 	@Test
-	public void testConflictingDirectionsNoAbortOneAgentDriving() {
+	void testConflictingDirectionsNoAbortOneAgentDriving() {
 		//configure and load test scenario with data about conflicting directions
 		Scenario scenario = fixture.createAndLoadTestScenarioTwoSignals(true );
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
@@ -177,8 +183,8 @@ public class QSimSignalTest implements
 		runQSimWithSignals(scenario, false);
 	}
 
-	
-	
+
+
 	private void runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException {
 //		/*
 //		 * this is the old version how to build an injector without a controler and
@@ -195,7 +201,7 @@ public class QSimSignalTest implements
 //				install(new ScenarioByInstanceModule(scenario));
 //			}
 //		}), new SignalsModule()));
-//	
+//
 //		EventsManager events = injector.getInstance(EventsManager.class);
 //		if (handleEvents){
 //			events.addHandler(this);
@@ -230,10 +236,10 @@ public class QSimSignalTest implements
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
 		if (e.getLinkId().equals( fixture.linkId1 )){
-			Assert.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 		else if (e.getLinkId().equals( fixture.linkId2 )){
-			Assert.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 	}
 

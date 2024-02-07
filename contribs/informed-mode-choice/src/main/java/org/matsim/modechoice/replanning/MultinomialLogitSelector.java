@@ -56,6 +56,11 @@ public class MultinomialLogitSelector implements PlanSelector {
 		if (candidates.size() == 1)
 			return candidates.iterator().next();
 
+		// Short-path to do completely random selection
+		if (scale == Double.POSITIVE_INFINITY) {
+			return candidates.stream().skip(rnd.nextInt(candidates.size())).findFirst().orElse(null);
+		}
+
 		// if two option are exactly the same this will be incorrect
 		// for very small scales, exp overflows, this function needs to return best solution at this point
 		if (scale <= 1 / 700d) {

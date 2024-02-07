@@ -20,16 +20,16 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -42,8 +42,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ControlerEventsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private List<Integer> calledStartupListener = null;
@@ -52,15 +52,16 @@ public class ControlerEventsTest {
 		this.calledStartupListener.add(i);
 	}
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.calledStartupListener = new ArrayList<>(3);
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.calledStartupListener = null;
 	}
 
-	@Test public void testCoreListenerExecutionOrder() {
+	@Test
+	void testCoreListenerExecutionOrder() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
@@ -77,7 +78,8 @@ public class ControlerEventsTest {
 		assertEquals(1, this.calledStartupListener.get(2).intValue());
 	}
 
-	@Test public void testEvents() {
+	@Test
+	void testEvents() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
@@ -86,10 +88,10 @@ public class ControlerEventsTest {
 		controler.run(config);
 		//test for startup events
 		StartupEvent startup = listener.getStartupEvent();
-		assertNotNull("No ControlerStartupEvent fired!", startup);
+		assertNotNull(startup, "No ControlerStartupEvent fired!");
 		//test for shutdown
 		ShutdownEvent shutdown = listener.getShutdownEvent();
-		assertNotNull("No ControlerShutdownEvent fired!", shutdown);
+		assertNotNull(shutdown, "No ControlerShutdownEvent fired!");
 		//test for iterations
 		//setup
 		List<IterationStartsEvent> setupIt = listener.getIterationStartsEvents();
