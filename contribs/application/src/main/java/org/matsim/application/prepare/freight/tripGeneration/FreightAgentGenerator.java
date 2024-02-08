@@ -206,7 +206,8 @@ public List<Person> generateRoadFreightAgents(Person freightDemandDataRelation, 
 
 	public interface LocationCalculator {
         Id<Link> getLocationOnNetwork(String verkehrszelle);
-    }
+		String getVerkehrszelleOfLink(Id<Link> linkId);
+	}
 
     public interface DepartureTimeCalculator {
         double getDepartureTime();

@@ -111,4 +111,13 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
         int size = mapping.get(verkehrszelle).size();
         return mapping.get(verkehrszelle).get(rnd.nextInt(size));
     }
+	@Override
+	public String getVerkehrszelleOfLink(Id<Link> linkId) {
+		for (Map.Entry<String, List<Id<Link>>> entry : mapping.entrySet()) {
+			if (entry.getValue().contains(linkId)) {
+				return entry.getKey();
+			}
+		}
+		throw new IllegalArgumentException("Link " + linkId + " not found in mapping");
+	}
 }
