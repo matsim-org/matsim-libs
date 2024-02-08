@@ -164,8 +164,6 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	public Integer call() throws IOException, InvalidAttributeValueException, ExecutionException, InterruptedException {
 
 		String vehicleTypesFileLocation = carrierVehicleFilePath.toString();
-		String carriersFileLocation = carrierFilePath.toString();
-		String populationFile = populationFilePath;
 		CoordinateTransformation crsTransformationFromNetworkToShape = null;
 
 		// create and prepare MATSim config
@@ -202,7 +200,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		// create the demand
 		log.info("Start creating the demand. Selected option: " + selectedCarrierInputOption);
-		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, polygonsInShape, populationFile,
+		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, polygonsInShape, populationFilePath,
 				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
@@ -341,7 +339,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @param scenario
 	 * @param csvLocationDemand
 	 * @param polygonsInShape
-	 * @param populationFile
+	 * @param populationFilePath
 	 * @param selectedSamplingOption
 	 * @param selectedPopulationOption
 	 * @param combineSimilarJobs
@@ -349,7 +347,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws IOException
 	 */
 	private void createDemand(DemandGenerationOptions selectedDemandGenerationOption, Scenario scenario,
-							  Path csvLocationDemand, Collection<SimpleFeature> polygonsInShape, String populationFile,
+							  Path csvLocationDemand, Collection<SimpleFeature> polygonsInShape, String populationFilePath,
 			PopulationSamplingOption selectedSamplingOption, PopulationOptions selectedPopulationOption,
 			boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
@@ -363,7 +361,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				 * Option creates the demand by using the information given in the read csv file
 				 * and uses a population for finding demand locations
 				 */
-				Population population = PopulationUtils.readPopulation(populationFile);
+				Population population = PopulationUtils.readPopulation(populationFilePath);
 				switch (selectedSamplingOption) {
 					/*
 					 * This option is important if the sample of the population and the sample of
