@@ -1349,8 +1349,8 @@ public final class DemandReaderFromCSV {
 	 * @param nearestLinkPerPerson
 	 * @param person
 	 */
-	static void findLinksForPersons(Scenario scenario,
-			HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
+	static void findLinksForPerson(Scenario scenario,
+								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
 
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
@@ -1428,15 +1428,12 @@ public final class DemandReaderFromCSV {
 					else {
 						Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
 								.findFirst().get();
-						if (nearestLinkPerPerson.containsKey(person.getId()))
-							newLink = scenario.getNetwork().getLinks().get(Id
-									.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-						else {
-							findLinksForPersons(scenario, nearestLinkPerPerson, person);
-							newLink = scenario.getNetwork().getLinks().get(Id
-									.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-						}
-					}
+						if (!nearestLinkPerPerson.containsKey(person.getId())) {
+							findLinksForPerson(scenario, nearestLinkPerPerson, person);
+                        }
+                        newLink = scenario.getNetwork().getLinks().get(Id
+                                .createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
+                    }
 				}
 			} else {
 				if (possiblePersons.isEmpty()) {

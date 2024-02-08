@@ -51,7 +51,7 @@ public class DemandReaderFromCSVTest {
 		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
 		for (Person person :  population.getPersons().values()) {
-			DemandReaderFromCSV.findLinksForPersons(scenario, nearestLinkPerPerson, person);
+			DemandReaderFromCSV.findLinksForPerson(scenario, nearestLinkPerPerson, person);
 		}
 		Assertions.assertEquals("j(1,8)",nearestLinkPerPerson.get(Id.createPersonId("person1")).values().iterator().next());
 		Assertions.assertEquals("j(3,3)",nearestLinkPerPerson.get(Id.createPersonId("person2")).values().iterator().next());
