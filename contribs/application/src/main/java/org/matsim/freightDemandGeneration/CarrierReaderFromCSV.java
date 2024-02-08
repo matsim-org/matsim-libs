@@ -41,7 +41,7 @@ import java.util.*;
 
 /**
  * This CarrierReaderFromCSV reads all carrier information given in the read CSV
- * file and creates the carriers. While the process of creating the carriers the
+ * file and creates the carriers. While the process of creating the carriers, the
  * consistency of the information will be checked.
  *
  * @author Ricardo Ewert
@@ -55,11 +55,11 @@ public final class CarrierReaderFromCSV {
 	 * file. For one carrier several CarrierInformationElement can be read in. This
 	 * is necessary for creating different configurations of the vehicles. Not every
 	 * parameter should be set for creating the carrier. While the process of
-	 * creating the carriers the consistency of the information will be checked.
+	 * creating the carriers, the consistency of the information will be checked.
 	 */
 	static class CarrierInformationElement {
 		/**
-		 * Name of carrier of this information element.
+		 * Name of the carrier of this information element.
 		 */
 		private final String carrierName;
 		/**
@@ -97,8 +97,8 @@ public final class CarrierReaderFromCSV {
 		private final int jspritIterations;
 		/**
 		 * Sets a fixed number of vehicles per vehicleType and location. If this
-		 * number is e.g. 3.: for each vehicleType 3 vehicles at each location will be
-		 * created and the fleetsize is finite.
+		 * number is e.g., 3.: for each vehicleType 3 vehicles at each location will be
+		 * created, and the fleetsize is finite.
 		 */
 		private int fixedNumberOfVehiclePerTypeAndLocation;
 
@@ -302,7 +302,7 @@ public final class CarrierReaderFromCSV {
 	}
 
 	/**
-	 * Checks if the read carrier information are consistent.
+	 * Checks if the read carrier information is consistent.
 	 *
 	 * @param allNewCarrierInformation
 	 * @param freightCarriersConfigGroup
