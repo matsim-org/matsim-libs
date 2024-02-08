@@ -24,17 +24,18 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.freight.carriers.*;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.freight.carriers.*;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ import java.util.*;
 /**
  * This DemandReaderFromCSV reads all demand information given in the read CSV
  * file and creates the demand for the carriers. While the process of creating
- * the demand the consistency of the information will be checked.
+ * the demand, the consistency of the information will be checked.
  *
  * @author Ricardo Ewert
  */
@@ -58,9 +59,9 @@ public final class DemandReaderFromCSV {
 	 * file. Several DemandInformationElement can be read in for one carrier. This
 	 * is necessary for creating configurations of the demand. Not every parameter
 	 * should be set for creating the demand. While the process of creating the
-	 * demand the consistency of the information will be checked. If this demand
-	 * creates a service the information for the firstJobElement should be set. If
-	 * this demands creates a shipment the firstJobElement is the pickup and the
+	 * demand, the consistency of the information will be checked. If this demand
+	 * creates a service, the information for the firstJobElement should be set. If
+	 * this demand creates a shipment, the firstJobElement is the pickup and the
 	 * secondJobElement is the delivery.
 	 */
 	static class DemandInformationElement {
@@ -336,7 +337,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Reads the demand information from the csv file and checks if the information
-	 * are consistent
+	 * is consistent
 	 *
 	 * @param csvLocationDemand
 	 * @return
@@ -887,7 +888,7 @@ public final class DemandReaderFromCSV {
 					throw new RuntimeException("The selected link " + selectedLinkIdDelivery
 							+ " for delivery is not part of the possible links for delivery. Please check!");
 
-		// distribute the demand over the network because no number of jobs are selected
+		// distribute the demand over the network because no number of jobs is selected
 		if (numberOfJobs == null) {
 			// creates shipments with a demand of 1
 			if (possibleLinksPickup.size() > demandToDistribute || possibleLinksDelivery.size() > demandToDistribute) {
@@ -1088,8 +1089,8 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Creates a job Id for a new job. If a certain Id is already used a number will
-	 * be added at the end until no existing job was the same Id.
+	 * Creates a job Id for a new job.
+	 * If a certain Id is already used, a number will be added at the end until no existing job was the same Id.
 	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
@@ -1127,8 +1128,8 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * If jobs of a carrier have the same characteristics (time window, location)
-	 * they will be combined to one job,
+	 * If jobs of a carrier have the same characteristics (time window, location),
+	 * they will be combined to one job.
 	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
@@ -1262,7 +1263,7 @@ public final class DemandReaderFromCSV {
 					possibleLinks.put(link.getId(), link);
 				}
 		} else {
-			Link newPossibleLink = null;
+			Link newPossibleLink;
 			while (possibleLinks.size() < numberOfLocations) {
 				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
 						polygonsInShape, areasForLocations, numberOfLocations, scenario, setLocations,
@@ -1315,7 +1316,7 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Finds all persons which are possible for the demand.
+	 * Finds all persons that are possible for the demand.
 	 *
 	 * @param population
 	 * @param areasForServiceLocations
@@ -1330,13 +1331,9 @@ public final class DemandReaderFromCSV {
 		HashMap<Id<Person>, Person> possiblePersons = new HashMap<Id<Person>, Person>();
 
 		for (Person person : population.getPersons().values()) {
-			Point p = MGC.xy2Point((double) person.getAttributes().getAttribute("homeX"),
-					(double) person.getAttributes().getAttribute("homeY"));
-			Coord coord;
+			Coord coord = getHomeCoord(person);
 			if (crsTransformationNetworkAndShape != null)
-				coord = crsTransformationNetworkAndShape.transform(MGC.point2Coord(p));
-			else
-				coord = MGC.point2Coord(p);
+				coord = crsTransformationNetworkAndShape.transform(coord);
 
 			if (FreightDemandGenerationUtils.checkPositionInShape(null, MGC.coord2Point(coord), polygonsInShape,
 					areasForServiceLocations, crsTransformationNetworkAndShape))
@@ -1352,15 +1349,14 @@ public final class DemandReaderFromCSV {
 	 * @param nearestLinkPerPerson
 	 * @param person
 	 */
-	static void findLinksForPersons(Scenario scenario,
-			HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
+	static void findLinksForPerson(Scenario scenario,
+								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
 
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
 					|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))) {
 
-				Coord homePoint = MGC.point2Coord(MGC.xy2Point((double) person.getAttributes().getAttribute("homeX"),
-						(double) person.getAttributes().getAttribute("homeY")));
+				Coord homePoint = getHomeCoord(person);
 				Coord middlePointLink = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
 				double distance = NetworkUtils.getEuclideanDistance(homePoint, middlePointLink);
 				if (!nearestLinkPerPerson.containsKey(person.getId())
@@ -1369,6 +1365,30 @@ public final class DemandReaderFromCSV {
 					nearestLinkPerPerson.get(person.getId()).put(distance, link.getId().toString());
 				}
 			}
+	}
+
+	/**
+	 * Method to get the home coordinate of a person.
+	 * The default is to get the home coordinate from one home activity of the selected plan.
+	 * If the selected plan does not contain a home activity, the home coordinate is read from the attributes of the person.
+	 *
+	 * @param person The person for which the home coordinate should be returned.
+	 * @return
+	 */
+	private static Coord getHomeCoord(Person person) {
+		Coord homeCoord = null;
+		if (person.getSelectedPlan() != null)
+			homeCoord = PopulationUtils.getActivities(person.getSelectedPlan(),
+				TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream().filter(
+				activity -> activity.getType().contains("home")).findFirst().get().getCoord();
+		if (homeCoord == null) {
+			double home_x = (double) person.getAttributes().getAsMap().entrySet().stream().filter(
+				entry -> entry.getKey().contains("home") && entry.getKey().contains("X")).findFirst().get().getValue();
+			double home_y = (double) person.getAttributes().getAsMap().entrySet().stream().filter(
+				entry -> entry.getKey().contains("home") && entry.getKey().contains("Y")).findFirst().get().getValue();
+			homeCoord = new Coord(home_x, home_y);
+		}
+		return homeCoord;
 	}
 
 	/**
@@ -1406,16 +1426,7 @@ public final class DemandReaderFromCSV {
 						newLink = scenario.getNetwork().getLinks().values().stream()
 								.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
 					else {
-						Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
-								.findFirst().get();
-						if (nearestLinkPerPerson.containsKey(person.getId()))
-							newLink = scenario.getNetwork().getLinks().get(Id
-									.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-						else {
-							findLinksForPersons(scenario, nearestLinkPerPerson, person);
-							newLink = scenario.getNetwork().getLinks().get(Id
-									.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-						}
+						newLink = getNewLinkForPerson(possiblePersons, nearestLinkPerPerson, scenario);
 					}
 				}
 			} else {
@@ -1423,16 +1434,7 @@ public final class DemandReaderFromCSV {
 					newLink = possibleLinks.values().stream().skip(rand.nextInt(possibleLinks.size())).findFirst()
 							.get();
 				} else {
-					Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
-							.findFirst().get();
-					if (nearestLinkPerPerson.containsKey(person.getId()))
-						newLink = scenario.getNetwork().getLinks().get(
-								Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-					else {
-						findLinksForPersons(scenario, nearestLinkPerPerson, person);
-						newLink = scenario.getNetwork().getLinks().get(
-								Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-					}
+					newLink = getNewLinkForPerson(possiblePersons, nearestLinkPerPerson, scenario);
 				}
 			}
 			if (!newLink.getId().toString().contains("pt")
@@ -1443,5 +1445,18 @@ public final class DemandReaderFromCSV {
 				selectedlink = newLink;
 		}
 		return selectedlink;
+	}
+
+	private static Link getNewLinkForPerson(HashMap<Id<Person>, Person> possiblePersons,
+											HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Scenario scenario) {
+		Link newLink;
+		Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
+			.findFirst().get();
+		if (!nearestLinkPerPerson.containsKey(person.getId())) {
+			findLinksForPerson(scenario, nearestLinkPerPerson, person);
+		}
+		newLink = scenario.getNetwork().getLinks().get(
+			Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
+		return newLink;
 	}
 }
