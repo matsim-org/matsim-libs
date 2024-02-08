@@ -124,7 +124,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private ShpOptions shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 
 	@CommandLine.Option(names = "--populationFileLocation", description = "Path to the population file.", defaultValue = "")
-	private Path populationFilePath;
+	private String populationFilePath;
 
 	@CommandLine.Option(names = "--populationCRS", description = "CRS of the input network (e.g.\"EPSG:31468\")")
 	private String populationCRS;
@@ -165,7 +165,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		String vehicleTypesFileLocation = carrierVehicleFilePath.toString();
 		String carriersFileLocation = carrierFilePath.toString();
-		String populationFile = populationFilePath.toString();
+		String populationFile = populationFilePath;
 		CoordinateTransformation crsTransformationFromNetworkToShape = null;
 
 		// create and prepare MATSim config
