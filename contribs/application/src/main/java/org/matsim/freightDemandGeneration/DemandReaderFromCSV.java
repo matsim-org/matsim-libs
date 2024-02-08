@@ -1263,7 +1263,7 @@ public final class DemandReaderFromCSV {
 					possibleLinks.put(link.getId(), link);
 				}
 		} else {
-			Link newPossibleLink = null;
+			Link newPossibleLink;
 			while (possibleLinks.size() < numberOfLocations) {
 				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
 						polygonsInShape, areasForLocations, numberOfLocations, scenario, setLocations,
