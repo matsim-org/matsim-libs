@@ -215,6 +215,8 @@ public List<Person> generateRoadFreightAgents(Person freightDemandDataRelation, 
 
     public interface NumOfTripsCalculator {
         int calculateNumberOfTrips(double tonsPerYear, String goodsType);
-    }
+		int calculateNumberOfTripsV2(double tonsPerYear, String goodsType);
+
+	}
 
 }
