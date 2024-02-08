@@ -367,7 +367,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				Population population = PopulationUtils.readPopulation(populationFile);
 				switch (selectedSamplingOption) {
 					/*
-					 * this option is important if the sample of the population and the sample of
+					 * This option is important if the sample of the population and the sample of
 					 * the resulting demand is different. For example, you can create with a 10pct
 					 * sample a 100pct demand modal for the waste collection.
 					 */
