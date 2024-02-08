@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;

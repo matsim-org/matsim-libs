@@ -55,6 +55,9 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--with-properties", description = "Put network attributes as properties into the geojson.")
 	private boolean withProperties;
 
+	@CommandLine.Option(names = "--filter-properties", description = "Only include listed properties in the output.")
+	private Set<String> filterProperties;
+
 	public static void main(String[] args) {
 		new CreateGeoJsonNetwork().execute(args);
 	}
@@ -152,6 +155,11 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 
 				for (Map.Entry<String, Object> e : link.getAttributes().getAsMap().entrySet()) {
 					Object value = e.getValue();
+
+					// Skip properties that are not defined
+					if (filterProperties != null && !filterProperties.isEmpty() && !filterProperties.contains(e.getKey()))
+						continue;
+
 					if (value instanceof String || value instanceof Number || value instanceof Boolean)
 						prop.putPOJO(e.getKey(), value);
 				}

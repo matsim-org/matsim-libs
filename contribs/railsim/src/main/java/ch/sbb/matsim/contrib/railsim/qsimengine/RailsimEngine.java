@@ -26,14 +26,13 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -52,6 +51,11 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
  */
 final class RailsimEngine implements Steppable {
 
+	/**
+	 * Additional safety distance in meter that is added to the reservation distance.
+	 * Ensure that trains always have enough distance to progress.
+	 */
+	private static double SAFETY_DIST = 10;
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
@@ -210,8 +214,8 @@ final class RailsimEngine implements Steppable {
 
 		boolean allBlocked = blockLinkTracks(time, state);
 
-		// Driver can advance if the next link is already free
-		if (allBlocked || (nextLink != null && nextLink.isBlockedBy(state.driver))) {
+		// Driver can advance if there is approved distance
+		if (allBlocked || FuzzyUtils.greaterThan(state.approvedDist, 0)) {
 
 			if (allBlocked)
 				event.checkReservation = -1;
@@ -219,8 +223,11 @@ final class RailsimEngine implements Steppable {
 				event.checkReservation = time + config.pollInterval;
 			}
 
-			// Train already waits at the end of previous link
-			if (event.waitingForLink) {
+			// Train already waits at the end of previous link, next link is already blocked
+			if (event.waitingForLink &&
+				nextLink != null &&
+				resources.isBlockedBy(nextLink, state) &&
+				FuzzyUtils.equals(resources.getLink(state.headLink).length, state.headPosition)) {
 
 				enterLink(time, event);
 				event.waitingForLink = false;
@@ -238,7 +245,7 @@ final class RailsimEngine implements Steppable {
 			event.checkReservation = time + config.pollInterval;
 
 			// If train is already standing still and waiting, there is no update needed.
-			if (event.waitingForLink) {
+			if (event.waitingForLink && FuzzyUtils.equals(state.speed, 0)) {
 				event.plannedTime = time + config.pollInterval;
 			} else {
 				decideNextUpdate(event);
@@ -259,7 +266,7 @@ final class RailsimEngine implements Steppable {
 		state.tailPosition = firstLink.length - state.train.length();
 
 		// reserve links and start if first one is free
-		if (blockLinkTracks(time, state) || resources.isBlockedBy(firstLink, state.driver)) {
+		if (blockLinkTracks(time, state) || resources.isBlockedBy(firstLink, state)) {
 
 			createEvent(new PersonEntersVehicleEvent(time, state.driver.getId(), state.driver.getVehicle().getId()));
 			createEvent(new VehicleEntersTrafficEvent(time, state.driver.getId(),
@@ -296,74 +303,48 @@ final class RailsimEngine implements Steppable {
 	 */
 	private boolean blockLinkTracks(double time, TrainState state) {
 
-		List<RailLink> links = RailsimCalc.calcLinksToBlock(state, resources.getLink(state.headLink));
+		double reserveDist = RailsimCalc.calcReservationDistance(state, resources.getLink(state.headLink));
 
-		if (links.isEmpty())
-			return true;
+		DispositionResponse response = disposition.requestNextSegment(time, state, reserveDist);
 
-		if (state.pt != null && RailsimCalc.considerReRouting(links, resources.getLink(state.headLink))) {
+		// Disposition assigned a detour
+		if (state.pt != null && response.detour() != null) {
 
-			int start = -1;
-			int end = -1;
-			RailLink entry = null;
-			RailLink exit = null;
+			List<RailLink> subRoute = state.route.subList(response.detour().startIdx(), response.detour().endIdx());
 
-			for (int i = Math.max(0, state.routeIdx - 1); i < state.route.size(); i++) {
-				RailLink l = state.route.get(i);
+			TransitStopFacility newStop = state.pt.addDetour(subRoute, response.detour().newRoute());
 
-				if (l.isEntryLink()) {
-					entry = l;
-					start = i;
-				} else if (start > -1 && l.isBlockedBy(state.driver)) {
-					// check if any link beyond entry is already blocked
-					// if that is the case re-route is not possible anymore
-					break;
-				} else if (start > -1 && l.isExitLink()) {
-					exit = l;
-					end = i;
-					break;
-				}
+			subRoute.clear();
+			subRoute.addAll(response.detour().newRoute());
+
+			if (newStop != null) {
+				state.nextStop = newStop;
 			}
 
-			// there might be no exit link if this is the end of the route
-			// exit will be set to null if re-route is too late
-			// network could be wrong as well, but hard to verify
-			if (exit != null) {
+			createEvent(new RailsimDetourEvent(
+				time, state.driver.getVehicle().getId(),
+				response.detour().startLink(), response.detour().endLink(),
+				response.detour().newRoute().stream().map(RailLink::getLinkId).toList(),
+				newStop != null ? newStop.getId() : null
+			));
 
-				// check if this route is different
-				List<RailLink> subRoute = state.route.subList(start + 1, end);
-
-				List<RailLink> detour = disposition.requestRoute(time, state.pt, subRoute, entry, exit);
-
-				if (detour != null && !subRoute.equals(detour)) {
-
-					TransitStopFacility newStop = state.pt.addDetour(subRoute, detour);
-
-					subRoute.clear();
-					subRoute.addAll(detour);
-
-					if (newStop != null) {
-						state.nextStop = newStop;
-					}
-
-					createEvent(new RailsimDetourEvent(
-						time, state.driver.getVehicle().getId(),
-						entry.getLinkId(), exit.getLinkId(),
-						detour.stream().map(RailLink::getLinkId).toList(),
-						newStop != null ? newStop.getId() : null
-					));
-
-					// Block links again using the updated route
-					links = RailsimCalc.calcLinksToBlock(state, resources.getLink(state.headLink));
-
-				}
-			}
+			// reserve the assigned links from the detour
+			response = disposition.requestNextSegment(time, state, reserveDist);
 		}
 
-		List<RailLink> blocked = disposition.blockRailSegment(time, state.driver, links);
+		state.approvedDist = response.approvedDist();
 
-		// Only continue successfully if all requested link have been blocked
-		return links.size() == blocked.size();
+		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive, but was " + response.approvedDist();
+
+		// At the moment the approved speed from the disposition is not used
+		// Stop when the approved distance is not enough
+		if (FuzzyUtils.lessThan(state.approvedDist, reserveDist + SAFETY_DIST))
+			state.approvedSpeed = 0;
+		else
+			state.approvedSpeed = Double.POSITIVE_INFINITY;
+
+		// Return whether the train has to stop
+		return state.approvedSpeed != 0;
 	}
 
 	private void enterLink(double time, UpdateEvent event) {
@@ -393,7 +374,7 @@ final class RailsimEngine implements Steppable {
 
 			// Free all reservations
 			for (RailLink link : state.route) {
-				if (link.isBlockedBy(state.driver)) {
+				if (resources.isBlockedBy(link, state)) {
 					disposition.unblockRailLink(time, state.driver, link);
 				}
 			}
@@ -412,7 +393,7 @@ final class RailsimEngine implements Steppable {
 
 			RailLink currentLink = state.route.get(state.routeIdx);
 			// If this linked is blocked the driver can continue
-			if (!currentLink.isBlockedBy(state.driver)) {
+			if (!resources.isBlockedBy(currentLink, state)) {
 				event.waitingForLink = true;
 				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
 				event.plannedTime = time + config.pollInterval;
@@ -424,15 +405,16 @@ final class RailsimEngine implements Steppable {
 		createEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
 		// Get link and increment
-		state.headPosition = 0;
 		state.headLink = state.route.get(state.routeIdx++).getLinkId();
+
+		assert resources.isBlockedBy(resources.getLink(state.headLink), state) : "Link has to be blocked by driver when entered";
+
+		state.headPosition = 0;
+		// Reset waiting flag
+		event.waitingForLink = false;
 
 		state.driver.notifyMoveOverNode(state.headLink);
 		createEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));
-
-		RailLink link = resources.getLink(state.headLink);
-
-		assert link.isBlockedBy(state.driver) : "Link has to be blocked by driver when entered";
 
 		decideTargetSpeed(event, state);
 
@@ -529,18 +511,20 @@ final class RailsimEngine implements Steppable {
 
 		state.headPosition += dist;
 		state.tailPosition += dist;
+		state.approvedDist -= dist;
 
 		if (Double.isFinite(state.targetDecelDist)) {
 			state.targetDecelDist -= dist;
 		}
 
 		// When trains are put into the network their tail may be longer than the current link
-		// this assertion may not hold depending on the network, should possibly be removed
-		assert state.routeIdx <= 2 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
+		// this assertion may not hold depending on the network
+//		assert state.routeIdx <= 2 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
 
 		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
 		assert FuzzyUtils.lessEqualThan(state.speed, state.allowedMaxSpeed) : "Speed must be less equal than the allowed speed";
+		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive";
 
 		state.timestamp = time;
 
@@ -587,19 +571,24 @@ final class RailsimEngine implements Steppable {
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
 		if (!state.isRouteAtEnd() && !event.isAwaitingReservation()) {
-			reserveDist = RailsimCalc.nextLinkReservation(state, currentLink);
 
+			// Check first if more distance than for the next stop is needed
+			double nextStop = RailsimCalc.calcDistToNextStop(state, currentLink);
+
+			if (!FuzzyUtils.equals(state.approvedDist, nextStop)) {
+				double requiredDist = RailsimCalc.calcReservationDistance(state, currentLink);
+				// when the approved distance is equal to the required distance, new reservation needs to be made
+				reserveDist = state.approvedDist - requiredDist;
+			}
+
+			// With moving blocks the reserve distance might not be set to 0, but rather the accel or decel distance
 			if (reserveDist < 0)
 				reserveDist = 0;
 
 			// Outside of block track the reserve distance is always greater 0
 			// infinite loops would occur otherwise
 			if (!(event.type != UpdateEvent.Type.BLOCK_TRACK || FuzzyUtils.greaterThan(reserveDist, 0))) {
-				// There are here for debugging
-				List<RailLink> tmp = RailsimCalc.calcLinksToBlock(state, currentLink);
-				double r = RailsimCalc.nextLinkReservation(state, currentLink);
-
-				throw new AssertionError("Reserve distance must be positive, but was " + r);
+				throw new AssertionError("Reserve distance must be positive, but was " + reserveDist);
 			}
 		}
 
@@ -615,7 +604,18 @@ final class RailsimEngine implements Steppable {
 		// Find the earliest required update
 
 		double dist;
-		if (reserveDist <= accelDist && reserveDist <= decelDist && reserveDist <= tailDist && reserveDist <= headDist) {
+		if (FuzzyUtils.lessEqualThan(tailDist, decelDist) &&
+			FuzzyUtils.lessEqualThan(tailDist, reserveDist) &&
+			FuzzyUtils.lessEqualThan(tailDist, headDist) &&
+			FuzzyUtils.lessEqualThan(tailDist, accelDist)) {
+
+			// leave link has priority, and is ensured to be executed before others at same time step
+			// otherwise train might block links of same length as itself
+
+			dist = tailDist;
+			event.type = UpdateEvent.Type.LEAVE_LINK;
+
+		} else if (reserveDist <= accelDist && reserveDist <= decelDist && reserveDist <= tailDist && reserveDist <= headDist) {
 			dist = reserveDist;
 			event.type = UpdateEvent.Type.BLOCK_TRACK;
 		} else if (accelDist <= decelDist && accelDist <= reserveDist && accelDist <= tailDist && accelDist <= headDist) {
@@ -624,9 +624,6 @@ final class RailsimEngine implements Steppable {
 		} else if (decelDist <= accelDist && decelDist <= reserveDist && decelDist <= tailDist && decelDist <= headDist) {
 			dist = decelDist;
 			event.type = UpdateEvent.Type.SPEED_CHANGE;
-		} else if (tailDist <= decelDist && tailDist <= reserveDist && tailDist <= headDist) {
-			dist = tailDist;
-			event.type = UpdateEvent.Type.LEAVE_LINK;
 		} else {
 			dist = headDist;
 			event.type = UpdateEvent.Type.ENTER_LINK;
@@ -674,7 +671,28 @@ final class RailsimEngine implements Steppable {
 		state.targetSpeed = state.allowedMaxSpeed;
 		state.targetDecelDist = Double.POSITIVE_INFINITY;
 
-		for (int i = state.routeIdx; i <= state.route.size(); i++) {
+		boolean stop = false;
+
+		// Set speed approved by disposition
+		if (state.approvedSpeed < minAllowed) {
+
+			RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(state.approvedDist,
+				state.train.acceleration(), state.train.deceleration(),
+				state.speed, state.allowedMaxSpeed, state.approvedSpeed);
+
+			assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist is " + target.decelDist() + ", stopping is not possible";
+
+			if (FuzzyUtils.equals(target.decelDist(), 0)) {
+				state.targetSpeed = state.approvedSpeed;
+				state.targetDecelDist = Double.POSITIVE_INFINITY;
+				stop = true;
+			} else {
+				state.targetSpeed = target.targetSpeed();
+				state.targetDecelDist = target.decelDist();
+			}
+		}
+
+		for (int i = state.routeIdx; i <= state.route.size() && !stop; i++) {
 
 			RailLink link;
 			double allowed;
@@ -687,8 +705,6 @@ final class RailsimEngine implements Steppable {
 				// If the previous link is a transit stop the speed needs to be 0 at the next link
 				// train stops at the very end of a link
 				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
-					allowed = 0;
-				else if (!resources.isBlockedBy(link, state.driver))
 					allowed = 0;
 				else
 					allowed = link.getAllowedFreespeed(state.driver);
@@ -723,7 +739,7 @@ final class RailsimEngine implements Steppable {
 			if (link != null)
 				dist += link.length;
 
-			if (dist >= window)
+			if (FuzzyUtils.greaterEqualThan(dist, window))
 				break;
 
 			minAllowed = allowed;
@@ -761,4 +777,16 @@ final class RailsimEngine implements Steppable {
 		return maxSpeed;
 	}
 
+	/**
+	 * Remove all trains from simulation and generate events at the end of the day.
+	 *
+	 * @param now end of day time
+	 */
+	void clearTrains(double now) {
+
+		for (TrainState train : activeTrains) {
+			eventsManager.processEvent(new VehicleAbortsEvent(now, train.driver.getVehicle().getId(), train.headLink));
+			eventsManager.processEvent(new PersonStuckEvent(now, train.driver.getId(), train.headLink, train.driver.getMode()));
+		}
+	}
 }

@@ -4,6 +4,7 @@ import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
 import tech.tablesaw.plotly.components.Axis;
@@ -95,7 +96,7 @@ public class TripDashboard implements Dashboard {
 		first.el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Trip distance distribution";
-			viz.colorRamp = Plotly.ColorScheme.Viridis;
+			viz.colorRamp = ColorScheme.Viridis;
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args))
@@ -199,7 +200,7 @@ public class TripDashboard implements Dashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
-					.name("purpose", Plotly.ColorScheme.Spectral)
+					.name("purpose", ColorScheme.Spectral)
 					.x("h")
 					.y("departure")
 			);
@@ -218,7 +219,7 @@ public class TripDashboard implements Dashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
-					.name("purpose", Plotly.ColorScheme.Spectral)
+					.name("purpose", ColorScheme.Spectral)
 					.x("h")
 					.y("arrival")
 			);

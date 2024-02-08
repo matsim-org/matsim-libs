@@ -24,7 +24,12 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
  */
 final class FuzzyUtils {
 
-	private static final double EPSILON = 1E-5;
+	/**
+	 * The allowed deviation for small numbers to be considered equal.
+	 * Contrary to intuition, this value should not be too large.
+	 * It might happen that trains are moved too earlier over links.
+	 */
+	private static final double EPSILON = 1E-6;
 
 	private FuzzyUtils() {
 	}

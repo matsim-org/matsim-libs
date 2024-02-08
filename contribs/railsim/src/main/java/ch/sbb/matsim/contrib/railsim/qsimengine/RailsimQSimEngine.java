@@ -21,6 +21,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -79,7 +80,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void afterSim() {
-
+		engine.clearTrains(qsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override
