@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="t1_1-t1_2" x="100" y="0" linkRefId="t1_1-t1_2">
+		</stopFacility>
+		<stopFacility id="t1_40-t1_41" x="4900" y="0" linkRefId="t1_40-t1_41">
+		</stopFacility>
+		<stopFacility id="t2_1-t2_2" x="100" y="-200" linkRefId="t2_1-t2_2">
+		</stopFacility>
+		<stopFacility id="t2_40-t2_41" x="4900" y="-200" linkRefId="t2_40-t2_41">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="t1_line">
+		<transitRoute id="t1_line_route">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t1_1-t1_2" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="t1_40-t1_41" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="t1_1-t1_2"/>
+				<link refId="t1_2-t1_3"/>
+				<link refId="t1_3-t1_4"/>
+				<link refId="t1_4-t1_5"/>
+				<link refId="t1_5-t1_6"/>
+				<link refId="t1_6-t1_7"/>
+				<link refId="t1_7-t1_8"/>
+				<link refId="t1_8-t1_9"/>
+				<link refId="t1_9-t1_10"/>
+				<link refId="t1_10-t1_11"/>
+				<link refId="t1_11-t1_12"/>
+				<link refId="t1_12-t1_13"/>
+				<link refId="t1_13-t1_14"/>
+				<link refId="t1_14-t1_15"/>
+				<link refId="t1_15-t1_16"/>
+				<link refId="t1_16-t1_17"/>
+				<link refId="t1_17-t1_18"/>
+				<link refId="t1_18-t1_19"/>
+				<link refId="t1_19-t1_20"/>
+				<link refId="t1_20-t1_21"/>
+				<link refId="t1_21-t1_22"/>
+				<link refId="t1_22-t1_23"/>
+				<link refId="t1_23-t1_24"/>
+				<link refId="t1_24-t1_25"/>
+				<link refId="t1_25-t1_26"/>
+				<link refId="t1_26-t1_27"/>
+				<link refId="t1_27-t1_28"/>
+				<link refId="t1_28-t1_29"/>
+				<link refId="t1_29-t1_30"/>
+				<link refId="t1_30-t1_31"/>
+				<link refId="t1_31-t1_32"/>
+				<link refId="t1_32-t1_33"/>
+				<link refId="t1_33-t1_34"/>
+				<link refId="t1_34-t1_35"/>
+				<link refId="t1_35-t1_36"/>
+				<link refId="t1_36-t1_37"/>
+				<link refId="t1_37-t1_38"/>
+				<link refId="t1_38-t1_39"/>
+				<link refId="t1_39-t1_40"/>
+				<link refId="t1_40-t1_41"/>
+			</route>
+			<departures>
+				<departure id="t1_0" departureTime="08:00:00" vehicleRefId="t1_train1"/>
+				<departure id="t1_1" departureTime="08:00:05" vehicleRefId="t1_train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="t2_line">
+		<transitRoute id="t2_line_route">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t2_1-t2_2" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="t2_40-t2_41" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="t2_1-t2_2"/>
+				<link refId="t2_2-t2_3"/>
+				<link refId="t2_3-t2_4"/>
+				<link refId="t2_4-t2_5"/>
+				<link refId="t2_5-t2_6"/>
+				<link refId="t2_6-t2_7"/>
+				<link refId="t2_7-t2_8"/>
+				<link refId="t2_8-t2_9"/>
+				<link refId="t2_9-t2_10"/>
+				<link refId="t2_10-t2_11"/>
+				<link refId="t2_11-t2_12"/>
+				<link refId="t2_12-t2_13"/>
+				<link refId="t2_13-t2_14"/>
+				<link refId="t2_14-t2_15"/>
+				<link refId="t2_15-t2_16"/>
+				<link refId="t2_16-t2_17"/>
+				<link refId="t2_17-t2_18"/>
+				<link refId="t2_18-t2_19"/>
+				<link refId="t2_19-t2_20"/>
+				<link refId="t2_20-t2_21"/>
+				<link refId="t2_21-t2_22"/>
+				<link refId="t2_22-t2_23"/>
+				<link refId="t2_23-t2_24"/>
+				<link refId="t2_24-t2_25"/>
+				<link refId="t2_25-t2_26"/>
+				<link refId="t2_26-t2_27"/>
+				<link refId="t2_27-t2_28"/>
+				<link refId="t2_28-t2_29"/>
+				<link refId="t2_29-t2_30"/>
+				<link refId="t2_30-t2_31"/>
+				<link refId="t2_31-t2_32"/>
+				<link refId="t2_32-t2_33"/>
+				<link refId="t2_33-t2_34"/>
+				<link refId="t2_34-t2_35"/>
+				<link refId="t2_35-t2_36"/>
+				<link refId="t2_36-t2_37"/>
+				<link refId="t2_37-t2_38"/>
+				<link refId="t2_38-t2_39"/>
+				<link refId="t2_39-t2_40"/>
+				<link refId="t2_40-t2_41"/>
+			</route>
+			<departures>
+				<departure id="t2_0" departureTime="08:00:00" vehicleRefId="t2_train1"/>
+				<departure id="t2_1" departureTime="08:00:05" vehicleRefId="t2_train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
