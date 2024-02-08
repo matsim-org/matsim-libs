@@ -21,29 +21,30 @@ package org.matsim.freightDemandGeneration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Collection of different methods for the FreightDemandGeneration.
@@ -164,42 +165,34 @@ public class FreightDemandGenerationUtils {
 	 * Checks if a link is one of the possible areas.
 	 *
 	 * @param link
-	 * @param point
-	 * @param polygonsInShape
+	 * @param givenCoord
+	 * @param indexShape
 	 * @param possibleAreas
 	 * @param crsTransformationNetworkAndShape
 	 * @return
 	 */
-	static boolean checkPositionInShape(Link link, Point point, Collection<SimpleFeature> polygonsInShape,
-			String[] possibleAreas, CoordinateTransformation crsTransformationNetworkAndShape) {
-
-		if (polygonsInShape == null)
+	static boolean checkPositionInShape(Link link, Coord givenCoord, ShpOptions.Index indexShape,
+										String[] possibleAreas, CoordinateTransformation crsTransformationNetworkAndShape) {
+		if (indexShape == null)
 			return true;
-		boolean isInShape = false;
-		Point p = null;
-		if (link != null && point == null) {
+		Coord coordToCheck = null;
+		if (link != null && givenCoord == null) {
 			if (crsTransformationNetworkAndShape != null)
-				p = MGC.coord2Point(crsTransformationNetworkAndShape.transform(getCoordOfMiddlePointOfLink(link)));
+				coordToCheck = crsTransformationNetworkAndShape.transform(getCoordOfMiddlePointOfLink(link));
 			else
-				p = MGC.coord2Point(getCoordOfMiddlePointOfLink(link));
-		} else if (link == null && point != null)
-			p = point;
-		for (SimpleFeature singlePolygon : polygonsInShape) {
-			if (possibleAreas != null) {
-				for (String area : possibleAreas) {
-					if (area.equals(singlePolygon.getAttribute("Ortsteil"))
-							|| area.equals(singlePolygon.getAttribute("BEZNAME")))
-						if (((Geometry) singlePolygon.getDefaultGeometry()).contains(p)) {
-							return true;
-						}
-				}
-			} else {
-				if (((Geometry) singlePolygon.getDefaultGeometry()).contains(p)) {
+				coordToCheck = getCoordOfMiddlePointOfLink(link);
+		} else if (link == null && givenCoord != null)
+			coordToCheck = givenCoord;
+		if (possibleAreas != null) {
+			for (String area : possibleAreas) {
+				if (Objects.equals(indexShape.query(coordToCheck), area)) {
 					return true;
 				}
 			}
+		} else {
+			return indexShape.contains(coordToCheck);
 		}
-		return isInShape;
+		return false;
 	}
 
 	/**

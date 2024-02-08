@@ -40,13 +40,11 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
-import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
 import javax.management.InvalidAttributeValueException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -187,20 +185,20 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		// load or create carrier
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Collection<SimpleFeature> polygonsInShape = null;
+		ShpOptions.Index indexShape = null;
 		shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 		if (shp.isDefined()) {
 			log.warn("Use of shpFile. Locations for the carriers and the demand only in shp: " + shp.getShapeFile());
-			polygonsInShape = shp.readFeatures();
+			indexShape = shp.createIndex(shapeCategory);
 			crsTransformationFromNetworkToShape = shp.createTransformation(networkCRS);
 		}
 		log.info("Start creating carriers. Selected option: " + selectedCarrierInputOption);
-		createCarrier(scenario, selectedCarrierInputOption, csvCarrierPath, polygonsInShape,
+		createCarrier(scenario, selectedCarrierInputOption, csvCarrierPath, indexShape,
 				defaultJspritIterations, crsTransformationFromNetworkToShape);
 
 		// create the demand
 		log.info("Start creating the demand. Selected option: " + selectedCarrierInputOption);
-		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, polygonsInShape, populationFilePath,
+		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
 				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
@@ -291,13 +289,13 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @param scenario
 	 * @param selectedCarrierInputOption
 	 * @param csvLocationCarrier
-	 * @param polygonsInShape
+	 * @param indexShape
 	 * @param defaultJspritIterations
 	 * @param crsTransformationNetworkAndShape
 	 * @throws IOException
 	 */
 	private void createCarrier(Scenario scenario, CarrierInputOptions selectedCarrierInputOption,
-			Path csvLocationCarrier, Collection<SimpleFeature> polygonsInShape,
+			Path csvLocationCarrier, ShpOptions.Index indexShape,
 			int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
@@ -312,7 +310,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 					log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
-							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
+						indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 				}
 			}
 			case readCarrierFile -> {
@@ -327,7 +325,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case createCarriersFromCSV ->
 				// creates all carriers based on the given information in the read carrier csv
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
-							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
+						indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 			default -> throw new RuntimeException("no method to create or read carrier selected.");
 		}
 	}
@@ -338,7 +336,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @param selectedDemandGenerationOption
 	 * @param scenario
 	 * @param csvLocationDemand
-	 * @param polygonsInShape
+	 * @param indexShape
 	 * @param populationFilePath
 	 * @param selectedSamplingOption
 	 * @param selectedPopulationOption
@@ -347,14 +345,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws IOException
 	 */
 	private void createDemand(DemandGenerationOptions selectedDemandGenerationOption, Scenario scenario,
-							  Path csvLocationDemand, Collection<SimpleFeature> polygonsInShape, String populationFilePath,
-			PopulationSamplingOption selectedSamplingOption, PopulationOptions selectedPopulationOption,
-			boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+							  Path csvLocationDemand, ShpOptions.Index indexShape, String populationFilePath,
+							  PopulationSamplingOption selectedSamplingOption, PopulationOptions selectedPopulationOption,
+							  boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
 		switch (selectedDemandGenerationOption) {
 			case createDemandFromCSV ->
 				// creates the demand by using the information given in the read csv file
-					DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape, combineSimilarJobs,
+					DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape, combineSimilarJobs,
 							crsTransformationNetworkAndShape, null, shapeCategory);
 			case createDemandFromCSVAndUsePopulation -> {
 				/*
@@ -390,14 +388,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						break;
 					case useHolePopulation:
 						// uses the hole population as possible demand locations
-						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
+						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
 								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
 						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
 								shp.createIndex(populationCRS, "_"));
-						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
+						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
 								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
 					default:
