@@ -123,7 +123,88 @@ public class FreightAgentGenerator {
         return freightAgents;
     }
 
-    public interface LocationCalculator {
+		//TODO integrate Terminals
+		//TODO überlegen ob man start/End Locations eventuell bei einigen Gütergruppen gleich lassen
+		//TODO eventuell Attribute nur für Daten dieser Trips hinzufügen (nur pre, main, post)
+		//TODO link of end of pre run should be link of start of main run
+
+	/** Generates freight agents for a given freight demand data relation.
+	 * @param freightDemandDataRelation
+	 * @param tripRelationId
+	 * @return
+	 */
+public List<Person> generateRoadFreightAgents(Person freightDemandDataRelation, String tripRelationId) {
+	List<Person> freightAgents = new ArrayList<>();
+	if (LongDistanceFreightUtils.getModePreRun(freightDemandDataRelation).equals(LongDistanceFreightUtils.LongDistanceTravelMode.road)) {
+		String tripType = "pre-run";
+		String fromCell = LongDistanceFreightUtils.getOriginCell(freightDemandDataRelation);
+		String toCell = LongDistanceFreightUtils.getOriginCellMainRun(freightDemandDataRelation);
+		double tonsPerYear = LongDistanceFreightUtils.getTonsPerYearPreRun(freightDemandDataRelation);
+		String goodsType = String.valueOf(LongDistanceFreightUtils.getGoodsTypePreRun(freightDemandDataRelation));
+
+		createFreightAgent(freightDemandDataRelation, tripRelationId, tripType, fromCell, toCell, tonsPerYear, goodsType, freightAgents);
+	}
+	if (LongDistanceFreightUtils.getModeMainRun(freightDemandDataRelation).equals(LongDistanceFreightUtils.LongDistanceTravelMode.road)) {
+		String tripType = "main-run";
+		String fromCell = LongDistanceFreightUtils.getOriginCellMainRun(freightDemandDataRelation);
+		String toCell = LongDistanceFreightUtils.getDestinationCellMainRun(freightDemandDataRelation);
+		double tonsPerYear = LongDistanceFreightUtils.getTonsPerYearMainRun(freightDemandDataRelation);
+		String goodsType = String.valueOf(LongDistanceFreightUtils.getGoodsTypeMainRun(freightDemandDataRelation));
+
+		createFreightAgent(freightDemandDataRelation, tripRelationId, tripType, fromCell, toCell, tonsPerYear, goodsType, freightAgents);
+	}
+	if (LongDistanceFreightUtils.getModePostRun(freightDemandDataRelation).equals(LongDistanceFreightUtils.LongDistanceTravelMode.road)) {
+		String tripType = "post-run";
+		String fromCell = LongDistanceFreightUtils.getDestinationCellMainRun(freightDemandDataRelation);
+		String toCell = LongDistanceFreightUtils.getDestinationCell(freightDemandDataRelation);
+		double tonsPerYear = LongDistanceFreightUtils.getTonsPerYearPostRun(freightDemandDataRelation);
+		String goodsType = String.valueOf(LongDistanceFreightUtils.getGoodsTypePostRun(freightDemandDataRelation));
+
+		createFreightAgent(freightDemandDataRelation, tripRelationId, tripType, fromCell, toCell, tonsPerYear, goodsType, freightAgents);
+	}
+	return freightAgents;
+	}
+
+	/** Generates all necessary freight agents for a given freight demand data relation.
+	 * @param freightDemandDataRelation
+	 * @param tripRelationId
+	 * @param tripType
+	 * @param fromCell
+	 * @param toCell
+	 * @param tonsPerYear
+	 * @param goodsType
+	 * @param freightAgents
+	 */
+	private void createFreightAgent(Person freightDemandDataRelation, String tripRelationId, String tripType, String fromCell, String toCell,
+									double tonsPerYear, String goodsType, List<Person> freightAgents) {
+		int numOfTrips = numOfTripsCalculator.calculateNumberOfTripsV2(tonsPerYear, goodsType);
+		for (int i = 0; i < numOfTrips; i++) {
+			Person person = populationFactory.createPerson(Id.createPersonId("freight_" + tripRelationId + "_" + i + "_" + tripType));
+			double departureTime = departureTimeCalculator.getDepartureTime();
+
+			Id<Link> startLinkId = locationCalculator.getLocationOnNetwork(fromCell);
+			Id<Link> endLinkId = locationCalculator.getLocationOnNetwork(toCell);
+			Plan plan = populationFactory.createPlan();
+
+			Activity startAct = populationFactory.createActivityFromLinkId("freight_start", startLinkId);
+			startAct.setCoord(network.getLinks().get(startLinkId).getToNode().getCoord());
+			startAct.setEndTime(departureTime);
+			plan.addActivity(startAct);
+
+			PopulationUtils.createAndAddLeg(plan, "freight");
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "freight_end", endLinkId);
+
+			person.addPlan(plan);
+			LongDistanceFreightUtils.setTripType(person, tripType);
+			freightDemandDataRelation.getAttributes().getAsMap().forEach((k, v) -> person.getAttributes().putAttribute(k, v));
+			freightAgents.add(person);
+		}
+	}
+	public String getVerkehrszelleOfLink(Id<Link> linkId) {
+		return locationCalculator.getVerkehrszelleOfLink(linkId);
+	}
+
+	public interface LocationCalculator {
         Id<Link> getLocationOnNetwork(String verkehrszelle);
     }
 
