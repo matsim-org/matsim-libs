@@ -388,7 +388,7 @@ final class RailsimEngine implements Steppable {
 			return;
 		}
 
-		// Train stopped and reserves next links
+		// Train stopped exactly at the end of the link and tries to enter the next link
 		if (FuzzyUtils.equals(state.speed, 0) && !blockLinkTracks(time, state)) {
 
 			RailLink currentLink = state.route.get(state.routeIdx);
