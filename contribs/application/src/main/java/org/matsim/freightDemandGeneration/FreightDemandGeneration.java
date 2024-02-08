@@ -258,12 +258,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private static void setNetworkAndNetworkChangeEvents(Config config, String networkPathOfOtherNetwork,
 			String networkChangeEventsFileLocation) throws RuntimeException {
 
-		if (networkPathOfOtherNetwork.equals(""))
+		if (networkPathOfOtherNetwork.isEmpty())
 			throw new RuntimeException("no correct network path network");
 		else {
 			config.network().setInputFile(networkPathOfOtherNetwork);
 			log.info("The following input network is selected: imported network from " + networkPathOfOtherNetwork);
-			if (networkChangeEventsFileLocation.equals(""))
+			if (networkChangeEventsFileLocation.isEmpty())
 				log.info("No networkChangeEvents selected");
 			else {
 				log.info("Setting networkChangeEventsInput file: " + networkChangeEventsFileLocation);
@@ -341,7 +341,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	}
 
 	/**
-	 * Differs between the different options of creating the demand..
+	 * Differs between the different options of creating the demand.
 	 *
 	 * @param selectedDemandGenerationOption
 	 * @param scenario
@@ -379,7 +379,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					case createMoreLocations ->
 						/*
 						 * If the demand sample is higher than the population sample, more demand
-						 * location are created related to the given share of persons of the population
+						 * locations are created related to the given share of persons in the population
 						 * with this demand.
 						 */
 							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
@@ -460,7 +460,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			Controler controler) throws ExecutionException, InterruptedException {
 		switch (selectedSolution) {
 			case runJspritAndMATSim -> {
-				// solves the VRP with jsprit and runs MATSim afterwards
+				// solves the VRP with jsprit and runs MATSim afterward
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
 						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, false);
@@ -469,8 +469,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 			}
 			case runJspritAndMATSimWithDistanceConstraint -> {
-				// solves the VRP with jsprit by using the distance constraint and runs MATSim
-				// afterwards
+				// solves the VRP with jsprit by using the distance constraint and runs MATSim afterward
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
 						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, true);
