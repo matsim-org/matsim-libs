@@ -12,37 +12,17 @@
 		</node>
 		<node id="t1_2" x="0" y="0">
 		</node>
-		<node id="t1_3" x="300" y="0">
+		<node id="t1_3" x="900" y="0">
 		</node>
-		<node id="t1_4" x="600" y="0">
+		<node id="t1_4" x="1800" y="0">
 		</node>
-		<node id="t1_5" x="900" y="0">
+		<node id="t1_5" x="2700" y="0">
 		</node>
-		<node id="t1_6" x="1200" y="0">
+		<node id="t1_6" x="3600" y="0">
 		</node>
-		<node id="t1_7" x="1500" y="0">
+		<node id="t1_7" x="4500" y="0">
 		</node>
-		<node id="t1_8" x="1800" y="0">
-		</node>
-		<node id="t1_9" x="2100" y="0">
-		</node>
-		<node id="t1_10" x="2400" y="0">
-		</node>
-		<node id="t1_11" x="2700" y="0">
-		</node>
-		<node id="t1_12" x="3000" y="0">
-		</node>
-		<node id="t1_13" x="3300" y="0">
-		</node>
-		<node id="t1_14" x="3600" y="0">
-		</node>
-		<node id="t1_15" x="3900" y="0">
-		</node>
-		<node id="t1_16" x="4200" y="0">
-		</node>
-		<node id="t1_17" x="4500" y="0">
-		</node>
-		<node id="t1_18" x="5500" y="0">
+		<node id="t1_8" x="5500" y="0">
 		</node>
 
 		<!-- lower track nodes -->
@@ -76,97 +56,37 @@
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
 			</attributes>
 		</link>
-		<link id="t1_2-t1_3" from="t1_2" to="t1_3" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="t1_2-t1_3" from="t1_2" to="t1_3" length="900" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="t1_3-t1_4" from="t1_3" to="t1_4" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="t1_3-t1_4" from="t1_3" to="t1_4" length="900" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="t1_4-t1_5" from="t1_4" to="t1_5" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="t1_4-t1_5" from="t1_4" to="t1_5" length="900" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="t1_5-t1_6" from="t1_5" to="t1_6" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="t1_5-t1_6" from="t1_5" to="t1_6" length="900" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="t1_6-t1_7" from="t1_6" to="t1_7" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="t1_6-t1_7" from="t1_6" to="t1_7" length="900" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="t1_7-t1_8" from="t1_7" to="t1_8" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_8-t1_9" from="t1_8" to="t1_9" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_9-t1_10" from="t1_9" to="t1_10" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_10-t1_11" from="t1_10" to="t1_11" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_11-t1_12" from="t1_11" to="t1_12" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_12-t1_13" from="t1_12" to="t1_13" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_13-t1_14" from="t1_13" to="t1_14" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_14-t1_15" from="t1_14" to="t1_15" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_15-t1_16" from="t1_15" to="t1_16" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_16-t1_17" from="t1_16" to="t1_17" length="300" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-			<attributes>
-				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="t1_17-t1_18" from="t1_17" to="t1_18" length="1000" freespeed="1.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="t1_7-t1_8" from="t1_7" to="t1_8" length="1000" freespeed="1.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>

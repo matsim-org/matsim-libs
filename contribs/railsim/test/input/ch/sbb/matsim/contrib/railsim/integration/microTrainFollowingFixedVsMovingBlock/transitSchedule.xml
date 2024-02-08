@@ -6,7 +6,7 @@
 	<transitStops>
 		<stopFacility id="t1_A" x="0" y="0" linkRefId="t1_1-t1_2">
 		</stopFacility>
-		<stopFacility id="t1_B" x="0" y="0" linkRefId="t1_17-t1_18">
+		<stopFacility id="t1_B" x="0" y="0" linkRefId="t1_7-t1_8">
 		</stopFacility>
 		<stopFacility id="t2_A" x="5500" y="-200" linkRefId="t2_1-t2_2">
 		</stopFacility>
@@ -28,16 +28,6 @@
 				<link refId="t1_5-t1_6"/>
 				<link refId="t1_6-t1_7"/>
 				<link refId="t1_7-t1_8"/>
-				<link refId="t1_8-t1_9"/>
-				<link refId="t1_9-t1_10"/>
-				<link refId="t1_10-t1_11"/>
-				<link refId="t1_11-t1_12"/>
-				<link refId="t1_12-t1_13"/>
-				<link refId="t1_13-t1_14"/>
-				<link refId="t1_14-t1_15"/>
-				<link refId="t1_15-t1_16"/>
-				<link refId="t1_16-t1_17"/>
-				<link refId="t1_17-t1_18"/>
 			</route>
 			<departures>
 				<departure id="t1_0" departureTime="08:00:00" vehicleRefId="t1_train1"/>
