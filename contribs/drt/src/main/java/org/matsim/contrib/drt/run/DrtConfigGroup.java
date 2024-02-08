@@ -360,8 +360,17 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	/**
 	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
+	 *
+	 * @deprecated -- use {@link #setDrtInsertionSearchParams(DrtInsertionSearchParams) instead}
 	 */
+	@Deprecated
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		addParameterSet(pars);
+	}
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
+	 */
+	public final void setDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);
 	}
 }
