@@ -1353,12 +1353,11 @@ public final class DemandReaderFromCSV {
 	 */
 	static void findLinksForPerson(Scenario scenario,
 								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
-
+		Coord homePoint = getHomeCoord(person);
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
 					|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))) {
 
-				Coord homePoint = getHomeCoord(person);
 				Coord middlePointLink = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
 				double distance = NetworkUtils.getEuclideanDistance(homePoint, middlePointLink);
 				if (!nearestLinkPerPerson.containsKey(person.getId())

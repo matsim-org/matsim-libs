@@ -76,16 +76,39 @@ public class FreightDemandGenerationUtils {
 				personsToRemove.add(person.getId());
 				continue;
 			}
-			for (Plan plan : person.getPlans())
-				for (PlanElement element : plan.getPlanElements())
-					if (element instanceof Activity)
-						if (((Activity) element).getType().contains("home")) {
-							double x = ((Activity) element).getCoord().getX();
-							double y = ((Activity) element).getCoord().getY();
-							person.getAttributes().putAttribute("homeX", x);
-							person.getAttributes().putAttribute("homeY", y);
-							break;
-						}
+			Coord homeCoord = null;
+			if (person.getSelectedPlan() != null) {
+				if (PopulationUtils.getActivities(person.getSelectedPlan(),
+					TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream().anyMatch(
+					activity -> activity.getType().contains("home"))) {
+					homeCoord = PopulationUtils.getActivities(person.getSelectedPlan(),
+						TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream().filter(
+						activity -> activity.getType().contains("home")).findFirst().get().getCoord();
+				}
+			} else if (!person.getPlans().isEmpty())
+				for (Plan plan : person.getPlans())
+					if (PopulationUtils.getActivities(plan,
+						TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream().anyMatch(
+						activity -> activity.getType().contains("home"))) {
+						homeCoord = PopulationUtils.getActivities(plan,
+							TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream().filter(
+							activity -> activity.getType().contains("home")).findFirst().get().getCoord();
+					}
+			if (homeCoord == null){
+				double home_x = (double) person.getAttributes().getAsMap().entrySet().stream().filter(
+					entry -> entry.getKey().contains("home") && entry.getKey().contains("X") || entry.getKey().contains("x")).findFirst().get().getValue();
+				double home_y = (double) person.getAttributes().getAsMap().entrySet().stream().filter(
+					entry -> entry.getKey().contains("home") && (entry.getKey().contains("Y") || entry.getKey().contains("y"))).findFirst().get().getValue();
+				homeCoord = new Coord(home_x, home_y);
+			}
+
+
+			if (homeCoord != null) {
+				person.getAttributes().putAttribute("homeX", homeCoord.getX());
+				person.getAttributes().putAttribute("homeY", homeCoord.getY());
+			} else {
+				log.warn("No home found for person " + person.getId());
+			}
 			person.removePlan(person.getSelectedPlan());
 		}
 		for (Id<Person> id : personsToRemove)
