@@ -26,14 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierPlanWriter;
-import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.Carriers;
-import org.matsim.freight.carriers.controler.CarrierModule;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -44,12 +36,15 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierModule;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
 import javax.management.InvalidAttributeValueException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Objects;
@@ -129,7 +124,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private ShpOptions shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 
 	@CommandLine.Option(names = "--populationFileLocation", description = "Path to the population file.", defaultValue = "")
-	private Path populationFilePath;
+	private String populationFilePath;
 
 	@CommandLine.Option(names = "--populationCRS", description = "CRS of the input network (e.g.\"EPSG:31468\")")
 	private String populationCRS;
@@ -170,7 +165,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		String vehicleTypesFileLocation = carrierVehicleFilePath.toString();
 		String carriersFileLocation = carrierFilePath.toString();
-		String populationFile = populationFilePath.toString();
+		String populationFile = populationFilePath;
 		CoordinateTransformation crsTransformationFromNetworkToShape = null;
 
 		// create and prepare MATSim config
@@ -258,12 +253,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private static void setNetworkAndNetworkChangeEvents(Config config, String networkPathOfOtherNetwork,
 			String networkChangeEventsFileLocation) throws RuntimeException {
 
-		if (networkPathOfOtherNetwork.equals(""))
+		if (networkPathOfOtherNetwork.isEmpty())
 			throw new RuntimeException("no correct network path network");
 		else {
 			config.network().setInputFile(networkPathOfOtherNetwork);
 			log.info("The following input network is selected: imported network from " + networkPathOfOtherNetwork);
-			if (networkChangeEventsFileLocation.equals(""))
+			if (networkChangeEventsFileLocation.isEmpty())
 				log.info("No networkChangeEvents selected");
 			else {
 				log.info("Setting networkChangeEventsInput file: " + networkChangeEventsFileLocation);
@@ -341,7 +336,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	}
 
 	/**
-	 * Differs between the different options of creating the demand..
+	 * Differs between the different options of creating the demand.
 	 *
 	 * @param selectedDemandGenerationOption
 	 * @param scenario
@@ -372,14 +367,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				Population population = PopulationUtils.readPopulation(populationFile);
 				switch (selectedSamplingOption) {
 					/*
-					 * this option is important if the sample of the population and the sample of
+					 * This option is important if the sample of the population and the sample of
 					 * the resulting demand is different. For example, you can create with a 10pct
 					 * sample a 100pct demand modal for the waste collection.
 					 */
 					case createMoreLocations ->
 						/*
 						 * If the demand sample is higher than the population sample, more demand
-						 * location are created related to the given share of persons of the population
+						 * locations are created related to the given share of persons in the population
 						 * with this demand.
 						 */
 							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
@@ -460,7 +455,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			Controler controler) throws ExecutionException, InterruptedException {
 		switch (selectedSolution) {
 			case runJspritAndMATSim -> {
-				// solves the VRP with jsprit and runs MATSim afterwards
+				// solves the VRP with jsprit and runs MATSim afterward
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
 						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, false);
@@ -469,8 +464,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 			}
 			case runJspritAndMATSimWithDistanceConstraint -> {
-				// solves the VRP with jsprit by using the distance constraint and runs MATSim
-				// afterwards
+				// solves the VRP with jsprit by using the distance constraint and runs MATSim afterward
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
 						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, true);
