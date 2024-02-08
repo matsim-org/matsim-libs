@@ -41,8 +41,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-import static org.matsim.smallScaleCommercialTrafficGeneration.SCTUtils.*;
-
 /**
  * @author Ricardo Ewert
  *
@@ -66,7 +64,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 
 		String usedTrafficType = "commercialPersonTraffic";
@@ -192,7 +190,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
@@ -517,7 +515,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
@@ -525,7 +523,7 @@ public class TrafficVolumeGenerationTest {
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, getZoneIndex(inputDataDirectory), buildingsPerZone);
+				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), buildingsPerZone);
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
@@ -672,7 +670,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
@@ -680,7 +678,7 @@ public class TrafficVolumeGenerationTest {
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, getZoneIndex(inputDataDirectory), buildingsPerZone);
+				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), buildingsPerZone);
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 

@@ -33,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.matsim.smallScaleCommercialTrafficGeneration.SCTUtils.*;
-
 /**
  * @author Ricardo Ewert
  *
@@ -58,7 +56,7 @@ public class LanduseBuildingAnalysisTest {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						inputDataDirectory, usedLanduseConfiguration,
-						getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+						SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		Assertions.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
@@ -145,10 +143,10 @@ public class LanduseBuildingAnalysisTest {
 		}
 
 		// tests if the reading of the buildings works correctly
-		List<SimpleFeature> buildingsFeatures = getIndexBuildings(inputDataDirectory).getAllFeatures();
+		List<SimpleFeature> buildingsFeatures = SCTUtils.getIndexBuildings(inputDataDirectory).getAllFeatures();
 		Assertions.assertEquals(31, buildingsFeatures.size(), MatsimTestUtils.EPSILON);
 		LanduseBuildingAnalysis.analyzeBuildingType(buildingsFeatures, buildingsPerZone,
-				landuseCategoriesAndDataConnection, getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory));
+				landuseCategoriesAndDataConnection, SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory));
 
 		Assertions.assertEquals(3, buildingsPerZone.size(), MatsimTestUtils.EPSILON);
 		Assertions.assertTrue(buildingsPerZone.containsKey("testArea1_area1"));
@@ -245,7 +243,7 @@ public class LanduseBuildingAnalysisTest {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
 
 		Assertions.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
