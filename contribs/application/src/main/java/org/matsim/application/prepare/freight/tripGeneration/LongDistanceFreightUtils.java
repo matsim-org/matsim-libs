@@ -63,7 +63,7 @@ public class LongDistanceFreightUtils {
 	}
 
 	private static void setTransportType(Person person, TripRelation tripRelation) {
-		person.getAttributes().putAttribute("transport_type", String.valueOf(findTransportType(tripRelation.getGoodsTypeMainRun())));
+		person.getAttributes().putAttribute("transport_type", String.valueOf(findTransportType(Integer.parseInt(tripRelation.getGoodsTypeMainRun()))));
 	}
 	private static void setFreightSubpopulation(Person person) {
 		person.getAttributes().putAttribute("subpopulation", "freight");
