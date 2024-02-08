@@ -883,9 +883,12 @@ public final class DemandReaderFromCSV {
 							+ " for pickup is not part of the possible links for pickup. Please check!");
 
 		if (setLocationsOfDelivery != null)
-			for (String selectedLinkIdDelivery : setLocationsOfDelivery)
-				if (!possibleLinksDelivery.containsKey(Id.createLinkId(selectedLinkIdDelivery)))
-					throw new RuntimeException("The selected link " + selectedLinkIdDelivery
+			if (numberOfDeliveryLocations < setLocationsOfDelivery.length)
+				log.warn("You selected more certain locations than the set number of locations. Randomly selected locations will be used.");
+			else
+				for (String selectedLinkIdDelivery : setLocationsOfDelivery)
+					if (!possibleLinksDelivery.containsKey(Id.createLinkId(selectedLinkIdDelivery)))
+						throw new RuntimeException("The selected link " + selectedLinkIdDelivery
 							+ " for delivery is not part of the possible links for delivery. Please check!");
 
 		// distribute the demand over the network because no number of jobs is selected
