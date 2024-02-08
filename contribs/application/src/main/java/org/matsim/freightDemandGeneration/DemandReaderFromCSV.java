@@ -1426,30 +1426,15 @@ public final class DemandReaderFromCSV {
 						newLink = scenario.getNetwork().getLinks().values().stream()
 								.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
 					else {
-						Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
-								.findFirst().get();
-						if (!nearestLinkPerPerson.containsKey(person.getId())) {
-							findLinksForPerson(scenario, nearestLinkPerPerson, person);
-                        }
-                        newLink = scenario.getNetwork().getLinks().get(Id
-                                .createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-                    }
+						newLink = getNewLinkForPerson(possiblePersons, nearestLinkPerPerson, scenario);
+					}
 				}
 			} else {
 				if (possiblePersons.isEmpty()) {
 					newLink = possibleLinks.values().stream().skip(rand.nextInt(possibleLinks.size())).findFirst()
 							.get();
 				} else {
-					Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
-							.findFirst().get();
-					if (nearestLinkPerPerson.containsKey(person.getId()))
-						newLink = scenario.getNetwork().getLinks().get(
-								Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-					else {
-						findLinksForPersons(scenario, nearestLinkPerPerson, person);
-						newLink = scenario.getNetwork().getLinks().get(
-								Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-					}
+					newLink = getNewLinkForPerson(possiblePersons, nearestLinkPerPerson, scenario);
 				}
 			}
 			if (!newLink.getId().toString().contains("pt")
@@ -1460,5 +1445,18 @@ public final class DemandReaderFromCSV {
 				selectedlink = newLink;
 		}
 		return selectedlink;
+	}
+
+	private static Link getNewLinkForPerson(HashMap<Id<Person>, Person> possiblePersons,
+											HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Scenario scenario) {
+		Link newLink;
+		Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
+			.findFirst().get();
+		if (!nearestLinkPerPerson.containsKey(person.getId())) {
+			findLinksForPerson(scenario, nearestLinkPerPerson, person);
+		}
+		newLink = scenario.getNetwork().getLinks().get(
+			Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
+		return newLink;
 	}
 }
