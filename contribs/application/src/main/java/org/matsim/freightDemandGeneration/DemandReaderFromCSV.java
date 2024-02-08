@@ -46,7 +46,7 @@ import java.util.*;
 /**
  * This DemandReaderFromCSV reads all demand information given in the read CSV
  * file and creates the demand for the carriers. While the process of creating
- * the demand the consistency of the information will be checked.
+ * the demand, the consistency of the information will be checked.
  *
  * @author Ricardo Ewert
  */
@@ -59,9 +59,9 @@ public final class DemandReaderFromCSV {
 	 * file. Several DemandInformationElement can be read in for one carrier. This
 	 * is necessary for creating configurations of the demand. Not every parameter
 	 * should be set for creating the demand. While the process of creating the
-	 * demand the consistency of the information will be checked. If this demand
-	 * creates a service the information for the firstJobElement should be set. If
-	 * this demands creates a shipment the firstJobElement is the pickup and the
+	 * demand, the consistency of the information will be checked. If this demand
+	 * creates a service, the information for the firstJobElement should be set. If
+	 * this demand creates a shipment, the firstJobElement is the pickup and the
 	 * secondJobElement is the delivery.
 	 */
 	static class DemandInformationElement {
@@ -337,7 +337,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Reads the demand information from the csv file and checks if the information
-	 * are consistent
+	 * is consistent
 	 *
 	 * @param csvLocationDemand
 	 * @return
@@ -888,7 +888,7 @@ public final class DemandReaderFromCSV {
 					throw new RuntimeException("The selected link " + selectedLinkIdDelivery
 							+ " for delivery is not part of the possible links for delivery. Please check!");
 
-		// distribute the demand over the network because no number of jobs are selected
+		// distribute the demand over the network because no number of jobs is selected
 		if (numberOfJobs == null) {
 			// creates shipments with a demand of 1
 			if (possibleLinksPickup.size() > demandToDistribute || possibleLinksDelivery.size() > demandToDistribute) {
@@ -1089,8 +1089,8 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Creates a job Id for a new job. If a certain Id is already used a number will
-	 * be added at the end until no existing job was the same Id.
+	 * Creates a job Id for a new job.
+	 * If a certain Id is already used, a number will be added at the end until no existing job was the same Id.
 	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
@@ -1128,8 +1128,8 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * If jobs of a carrier have the same characteristics (time window, location)
-	 * they will be combined to one job,
+	 * If jobs of a carrier have the same characteristics (time window, location),
+	 * they will be combined to one job.
 	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
@@ -1316,7 +1316,7 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Finds all persons which are possible for the demand.
+	 * Finds all persons that are possible for the demand.
 	 *
 	 * @param population
 	 * @param areasForServiceLocations
