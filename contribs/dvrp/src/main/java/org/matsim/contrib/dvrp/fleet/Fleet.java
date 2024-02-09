@@ -21,16 +21,75 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.Id;
-
-import com.google.common.collect.ImmutableMap;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
+ * Contains all DvrpVehicles generated for a given iteration. Its lifespan is
+ * limited to a single QSim simulation.
+ * 
+ * Fleet (and the contained DvrpVehicles) are created from FleetSpecification
+ * (and the contained DvrpVehicleSpecifications).
+ * 
+ * Vehicles may be added and removed during the QSim simulation.
  *
  * @author michalm
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> getVehicles();
+public final class Fleet {
+	private final String mode;
+
+	private final EventsManager eventsManager;
+	private final MobsimTimer timer;
+
+	private final DvrpVehicleLookup lookup;
+
+	private final IdMap<DvrpVehicle, DvrpVehicle> vehicles = new IdMap<>(DvrpVehicle.class);
+
+	public Fleet(String mode, EventsManager eventsManager, MobsimTimer timer, DvrpVehicleLookup lookup) {
+		this.mode = mode;
+		this.eventsManager = eventsManager;
+		this.timer = timer;
+		this.lookup = lookup;
+	}
+
+	/**
+	 * Adds a vehicle to the fleet.
+	 * 
+	 * @return True if the vehicle was not already part of the fleet
+	 */
+	public boolean addVehicle(DvrpVehicle vehicle) {
+		boolean added = vehicles.put(vehicle.getId(), vehicle) == null;
+
+		if (added) {
+			lookup.addVehicle(mode, vehicle);
+			eventsManager.processEvent(new VehicleAddedEvent(timer.getTimeOfDay(), mode, vehicle.getId()));
+		}
+
+		return added;
+	}
+
+	/**
+	 * Removes a vehicle from the fleet.
+	 * 
+	 * @return True if the vehicle existed in the fleet
+	 */
+	public boolean removeVehicle(Id<DvrpVehicle> vehicleId) {
+		boolean removed = vehicles.remove(vehicleId) != null;
+
+		if (removed) {
+			lookup.removeVehicle(mode, vehicleId);
+			eventsManager.processEvent(new VehicleRemovedEvent(timer.getTimeOfDay(), mode, vehicleId));
+		}
+
+		return removed;
+	}
+
+	/**
+	 * Returns a map of vehicles for this fleet
+	 */
+	public IdMap<DvrpVehicle, DvrpVehicle> getVehicles() {
+		return vehicles;
+	}
 }
