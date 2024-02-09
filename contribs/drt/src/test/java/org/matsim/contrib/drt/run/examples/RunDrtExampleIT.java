@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -47,17 +48,27 @@ import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.drt.util.DrtFleetExtensionHelper;
+import org.matsim.contrib.drt.util.DrtFleetExtensionHelper.DrtFleetExtensionHelperQSimModule;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -353,6 +364,70 @@ public class RunDrtExampleIT {
 				.waitAverage(232.76)
 				.inVehicleTravelTimeMean(389.09)
 				.totalTravelTimeMean(621.85)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+	
+
+	@Test
+	void testRunWithVariableFleetSize() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_drt_config.xml");
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
+		drtConfig.addParameterSet(new PrebookingParams());
+
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		
+		double extensionTime = 7200.0;
+		
+		FleetSpecification addedFleetSpecification = new FleetSpecificationImpl();
+		for (int i = 0; i < 3; i++) {
+			addedFleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
+					.id(Id.create("added:" + i, DvrpVehicle.class)) //
+					.capacity(4) //
+					.serviceBeginTime(28800.0) //
+					.serviceEndTime(43200.0) //
+					.startLinkId(Id.createLinkId("313")) //
+					.build());
+		}
+		
+		controller.addOverridingQSimModule(new DrtFleetExtensionHelperQSimModule("drt"));
+		
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {
+			@Override
+			protected void configureQSim() {
+				addModalComponent(MobsimBeforeSimStepListener.class, modalProvider(getter -> {
+					DrtFleetExtensionHelper helper = getter.getModal(DrtFleetExtensionHelper.class);
+					
+					return new MobsimBeforeSimStepListener() {
+						@Override
+						public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+							if (e.getSimulationTime() == extensionTime) {
+								addedFleetSpecification.getVehicleSpecifications().values().forEach(helper::addVehicle);
+							}
+						}
+					};
+				}));
+			}
+		});
+
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.03)
+				.rejections(12)
+				.waitAverage(255.58)
+				.inVehicleTravelTimeMean(387.27)
+				.totalTravelTimeMean(642.85)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

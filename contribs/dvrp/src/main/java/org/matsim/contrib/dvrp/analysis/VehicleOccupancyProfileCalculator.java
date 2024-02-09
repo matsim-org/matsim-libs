@@ -19,11 +19,11 @@
  */
 package org.matsim.contrib.dvrp.analysis;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.Id;
@@ -35,11 +35,11 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
@@ -49,7 +49,6 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -68,13 +67,13 @@ public class VehicleOccupancyProfileCalculator
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
-	private ImmutableList<double[]> vehicleOccupancyProfiles;
+	private ArrayList<double[]> vehicleOccupancyProfiles;
 
 	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes;
 	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
 	private final double analysisEndTime;
-	private final int maxCapacity;
+	private int initialCapacity;
 
 	private final String dvrpMode;
 
@@ -95,7 +94,7 @@ public class VehicleOccupancyProfileCalculator
 		analysisEndTime = Math.max(qsimEndTime, maxServiceEndTime);
 		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(analysisEndTime), timeInterval);
 
-		maxCapacity = fleet.getVehicleSpecifications()
+		initialCapacity = fleet.getVehicleSpecifications()
 				.values()
 				.stream()
 				.mapToInt(DvrpVehicleSpecification::getCapacity)
@@ -164,12 +163,12 @@ public class VehicleOccupancyProfileCalculator
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
 		Verify.verify(state.occupancy >= 0);
-		Verify.verify(state.occupancy <= maxCapacity);
+		Verify.verify(state.occupancy <= initialCapacity);
 
 		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || state.occupancy > 0;
 
 		double[] profile = servingPassengers ?
-				vehicleOccupancyProfiles.get(state.occupancy) :
+				occupancyProfile(state.occupancy) :
 				nonPassengerServingTaskProfiles.computeIfAbsent(state.taskType,
 						v -> new double[timeDiscretizer.getIntervalCount()]);
 		increment(profile, Math.min(state.beginTime, endTime), endTime);
@@ -249,13 +248,21 @@ public class VehicleOccupancyProfileCalculator
 		return personId.equals(vehicleId);
 	}
 
+	private double[] occupancyProfile(int occupancy) {
+		while (vehicleOccupancyProfiles.size() <= occupancy) {
+			vehicleOccupancyProfiles.add(new double[timeDiscretizer.getIntervalCount()]);
+		}
+		
+		return vehicleOccupancyProfiles.get(occupancy);
+	}
+
 	@Override
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
-		vehicleOccupancyProfiles = IntStream.rangeClosed(0, maxCapacity)
+		vehicleOccupancyProfiles = new ArrayList<>(IntStream.rangeClosed(0, initialCapacity)
 				.mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
-				.collect(toImmutableList());
+				.collect(Collectors.toList()));
 
 		nonPassengerServingTaskProfiles = new HashMap<>();
 		wasConsolidatedInThisIteration = false;

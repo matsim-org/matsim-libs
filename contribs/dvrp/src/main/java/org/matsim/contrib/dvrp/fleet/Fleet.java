@@ -64,7 +64,7 @@ public final class Fleet {
 
 		if (added) {
 			lookup.addVehicle(mode, vehicle);
-			eventsManager.processEvent(new VehicleAddedEvent(timer.getTimeOfDay(), mode, vehicle.getId()));
+			eventsManager.processEvent(new VehicleAddedEvent(timer.getTimeOfDay(), mode, vehicle.getId(), vehicle.getCapacity()));
 		}
 
 		return added;

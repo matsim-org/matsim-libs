@@ -34,7 +34,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.VehicleAddedEvent;
+import org.matsim.contrib.dvrp.fleet.VehicleAddedEventHandler;
+import org.matsim.contrib.dvrp.fleet.VehicleRemovedEvent;
+import org.matsim.contrib.dvrp.fleet.VehicleRemovedEventHandler;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
@@ -45,6 +48,7 @@ import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEvent
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
 /**
  * @author jbischoff
@@ -52,7 +56,7 @@ import com.google.common.base.Preconditions;
  */
 public class DrtVehicleDistanceStats
 		implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,
-		TeleportationArrivalEventHandler {
+		TeleportationArrivalEventHandler, VehicleAddedEventHandler, VehicleRemovedEventHandler {
 
 	static class VehicleState {
 		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
@@ -61,8 +65,11 @@ public class DrtVehicleDistanceStats
 		double totalPassengerTraveledDistance = 0; //in (passenger x meters)
 		final double[] totalDistanceByOccupancy;
 		final double serviceDuration;
+		final int maxCapacity;
+		boolean active = true;
 
 		private VehicleState(int maxCapacity, double serviceTime) {
+			this.maxCapacity = maxCapacity;
 			this.totalDistanceByOccupancy = new double[maxCapacity + 1];
 			this.serviceDuration = serviceTime;
 		}
@@ -85,36 +92,44 @@ public class DrtVehicleDistanceStats
 
 	private final String mode;
 	private final Network network;
-	private final FleetSpecification fleetSpecification;
 
-	public DrtVehicleDistanceStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
+	public DrtVehicleDistanceStats(Network network, DrtConfigGroup drtCfg) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
-		this.fleetSpecification = fleetSpecification;
-		initializeVehicles();
 	}
 
 	@Override
 	public void reset(int iteration) {
 		vehicleStates.clear();
-		initializeVehicles();
 	}
 
-	private void initializeVehicles() {
-		int maxCapacity = DrtAnalysisControlerListener.findMaxVehicleCapacity(fleetSpecification);
-		fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.forEach(spec -> vehicleStates.put(Id.createVehicleId(spec.getId()),
-					new VehicleState(maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
+	@Override
+	public void handleEvent(VehicleAddedEvent event) {
+		var state = vehicleStates.get(Id.createVehicleId(event.getVehicleId()));
+		
+		if (state == null) {
+			vehicleStates.put(Id.createVehicleId(event.getVehicleId()), new VehicleState(event.getCapacity(), Double.NaN)); 
+		} else {
+			state.active = true;
+			Verify.verify(state.maxCapacity == event.getCapacity());
+		}
+	}
+	
+	@Override
+	public void handleEvent(VehicleRemovedEvent event) {
+		Objects.requireNonNull(vehicleStates.get(Id.createVehicleId(event.getVehicleId()))).active = false;
 	}
 
 	@Override
 	public void handleEvent(PassengerPickedUpEvent event) {
 		if (event.getMode().equals(mode)) {
 			if (event.getVehicleId() != null) {
-				vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.put(event.getPersonId(),
-						new MutableDouble());
+				var state = vehicleStates.get(Id.createVehicleId(event.getVehicleId()));
+				
+				if (state.active) {
+					state.distanceByPersonId.put(event.getPersonId(),
+							new MutableDouble());
+				}
 			}
 		}
 	}
@@ -122,7 +137,7 @@ public class DrtVehicleDistanceStats
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		VehicleState vehicleState = vehicleStates.get(event.getVehicleId());
-		if (vehicleState != null) {
+		if (vehicleState != null && vehicleState.active) {
 			vehicleState.linkEntered(network.getLinks().get(event.getLinkId()));
 		}
 	}
@@ -133,9 +148,13 @@ public class DrtVehicleDistanceStats
 	public void handleEvent(PassengerDroppedOffEvent event) {
 		if (event.getMode().equals(mode)) {
 			if (event.getVehicleId() != null) {
-				double distance = vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.remove(
-						event.getPersonId()).doubleValue();
-				travelDistances.put(event.getRequestId(), distance);
+				var state = vehicleStates.get(Id.createVehicleId(event.getVehicleId()));
+				
+				if (state.active) {
+					double distance = state.distanceByPersonId.remove(
+							event.getPersonId()).doubleValue();
+					travelDistances.put(event.getRequestId(), distance);
+				}
 			} else {
 				Preconditions.checkArgument(
 						soonArrivingTeleportedRequests.put(event.getPersonId(), event.getRequestId()) == null,

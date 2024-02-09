@@ -99,7 +99,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 
 		bindModal(DrtVehicleDistanceStats.class).toProvider(
-						modalProvider(getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg, getter.getModal(FleetSpecification.class))))
+						modalProvider(getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg)))
 				.asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtVehicleDistanceStats.class));
 
