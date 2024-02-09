@@ -68,7 +68,9 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 
 	@Override
 	protected boolean isLastStep(double now) {
-		return updatePickupRequests(now) && processDropoffRequests(now) && now >= endTime.get();
+		boolean pickupsReady = updatePickupRequests(now);
+		boolean dropoffsReady = updateDropoffRequests(now);
+		return pickupsReady && dropoffsReady && now >= endTime.get();
 	}
 
 	@Override
@@ -83,10 +85,10 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			leaveTimes.put(request.getId(), leaveTime);
 		}
 
-		processDropoffRequests(now);
+		updateDropoffRequests(now);
 	}
 
-	private boolean processDropoffRequests(double now) {
+	private boolean updateDropoffRequests(double now) {
 		var iterator = leaveTimes.entrySet().iterator();
 
 		while (iterator.hasNext()) {
