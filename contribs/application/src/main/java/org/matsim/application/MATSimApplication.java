@@ -70,6 +70,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 	private static final Logger log = LogManager.getLogger(MATSimApplication.class);
 
+	private static final String ARGS_DELIMITER = "§$";
+
 	public static final String COLOR = "@|bold,fg(81) ";
 	static final String DEFAULT_NAME = "MATSimApplication";
 	static final String HEADER = COLOR +
@@ -202,9 +204,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 				} catch (Exception e) {
 					log.error("Error running post-processing", e);
 				}
-
 			}
-
 		}
 
 
@@ -337,6 +337,12 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			l.addAll(Arrays.asList(args));
 
 			args = l.toArray(new String[0]);
+
+			// Pass stored args to the instance as well
+			if (System.getenv().containsKey("MATSIM_GUI_ARGS")) {
+				String[] guiArgs = System.getenv("MATSIM_GUI_ARGS").split(ARGS_DELIMITER);
+				args = ApplicationUtils.mergeArgs(args, guiArgs);
+			}
 		}
 
 		prepareArgs(args);
@@ -369,12 +375,26 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
 
 		if (ApplicationUtils.isRunFromDesktop()) {
-//			TODO: implement
-//			runInGui(clazz, args, defaultArgs);
+
+			String value = String.join(ARGS_DELIMITER, defaultArgs);
+			System.getenv().put("MATSIM_GUI_ARGS", value);
+
+			run(clazz, "gui");
+
 		} else {
+			// run if no other command is present
+			if (args.length > 0) {
+				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui") ){
+					// valid command is present
+				} else
+					// Automatically add run command
+					args = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+			} else
+				// Automatically add run command
+				args = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+
 			run(clazz, ApplicationUtils.mergeArgs(args, defaultArgs));
 		}
-
 	}
 
 	/**
@@ -670,7 +690,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
-	 * Option to switch post processing behavour
+	 * Option to switch post-processing behaviour
 	 */
 	public enum PostProcessOption {
 
