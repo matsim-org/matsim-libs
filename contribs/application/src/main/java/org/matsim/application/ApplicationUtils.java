@@ -1,5 +1,9 @@
 package org.matsim.application;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -7,11 +11,14 @@ import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigAliases;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -21,8 +28,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ApplicationUtils {
 
@@ -71,7 +80,128 @@ public class ApplicationUtils {
 	}
 
 	/**
-	 * Extends a context (usually config location) with an relative filename.
+	 * Apply run configuration in yaml format.
+	 */
+	public static void applyConfigUpdate(Config config, Path yaml) {
+
+		if (!Files.exists(yaml)) {
+			throw new IllegalArgumentException("Desired run config does not exist:" + yaml);
+		}
+
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
+			.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+
+		ConfigAliases aliases = new ConfigAliases();
+		Deque<String> emptyStack = new ArrayDeque<>();
+
+		try (BufferedReader reader = Files.newBufferedReader(yaml)) {
+
+			JsonNode node = mapper.readTree(reader);
+
+			Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+
+			while (fields.hasNext()) {
+				Map.Entry<String, JsonNode> field = fields.next();
+				String configGroupName = aliases.resolveAlias(field.getKey(), emptyStack);
+				ConfigGroup group = config.getModules().get(configGroupName);
+				if (group == null) {
+					log.warn("Config group not found: {}", configGroupName);
+					continue;
+				}
+
+				applyNodeToConfigGroup(field.getValue(), group);
+			}
+
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+	}
+
+	/**
+	 * Sets the json config into
+	 */
+	private static void applyNodeToConfigGroup(JsonNode node, ConfigGroup group) {
+
+		Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+
+		while (fields.hasNext()) {
+			Map.Entry<String, JsonNode> field = fields.next();
+
+			if (isParameterSet(field.getValue())) {
+
+				// store the current parameters sets, newly added sets are not merged with each other
+				List<? extends ConfigGroup> params = new ArrayList<>(group.getParameterSets(field.getKey()));
+
+				for (JsonNode item : field.getValue()) {
+					applyNodeAsParameterSet(field.getKey(), item, group, params);
+				}
+			} else {
+
+				if (field.getValue().isTextual())
+					group.addParam(field.getKey(), field.getValue().textValue());
+				else if (field.getValue().isArray()) {
+					// arrays are joined using ","
+					Stream<JsonNode> stream = StreamSupport.stream(field.getValue().spliterator(), false);
+					String string = stream.map(n -> n.isTextual() ? n.textValue() : n.toString()).collect(Collectors.joining(","));
+					group.addParam(field.getKey(), string);
+				} else
+					group.addParam(field.getKey(), field.getValue().toString());
+			}
+		}
+	}
+
+	/**
+	 * Any array of complex object can be considered a config group.
+	 */
+	private static boolean isParameterSet(JsonNode node) {
+
+		if (!node.isArray())
+			return false;
+
+		// any object can be assigned as parameter set
+		for (JsonNode el : node) {
+			if (!el.isObject())
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Handle possible update and creation of parameter sets within a config group.
+	 */
+	private static void applyNodeAsParameterSet(String groupName, JsonNode item, ConfigGroup group, List<? extends ConfigGroup> params) {
+
+		Iterator<Map.Entry<String, JsonNode>> it = item.fields();
+		while (!params.isEmpty() && it.hasNext()) {
+
+			Map.Entry<String, JsonNode> attr = it.next();
+			List<? extends ConfigGroup> candidates = params.stream()
+				.filter(p -> p.getParams().containsKey(attr.getKey()))
+				.filter(p -> p.getParams().get(attr.getKey())
+					.equals(attr.getValue().isTextual() ? attr.getValue().textValue() : attr.getValue().toString()))
+				.toList();
+
+			if (candidates.isEmpty())
+				break;
+
+			params = candidates;
+		}
+
+		if (params.size() > 1) {
+			throw new IllegalArgumentException("Ambiguous parameter set: " + item);
+		} else if (params.size() == 1) {
+			applyNodeToConfigGroup(item, params.get(0));
+		} else {
+			ConfigGroup newGroup = group.createParameterSet(groupName);
+			group.addParameterSet(newGroup);
+			applyNodeToConfigGroup(item, newGroup);
+		}
+	}
+
+	/**
+	 * Extends a context (usually config location) with a relative filename.
 	 * If the results is a local file, the path will be returned. Otherwise, it will be an url.
 	 * The results can be used as input for command line parameter or {@link IOUtils#resolveFileOrResource(String)}.
 	 *
@@ -100,10 +230,11 @@ public class ApplicationUtils {
 		PathMatcher m = path.getFileSystem().getPathMatcher("glob:" + pattern);
 
 		try {
-			return Files.list(path)
-				.filter(p -> m.matches(p.getFileName()))
-				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("No " + pattern + " file found."));
+			try (Stream<Path> list = Files.list(path)) {
+				return list.filter(p -> m.matches(p.getFileName()))
+					.findFirst()
+					.orElseThrow(() -> new IllegalStateException("No " + pattern + " file found."));
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -1,0 +1,10 @@
+
+test:
+  params:
+    - mode: car
+      subpopulation: person
+      values: ["-1", "-2"]
+    - mode: bike
+      subpopulation: person
+      values: [3, 4]
+      extra: "extra"

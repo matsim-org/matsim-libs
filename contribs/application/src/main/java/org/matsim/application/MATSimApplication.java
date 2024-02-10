@@ -1,9 +1,5 @@
 package org.matsim.application;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,7 +7,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.commands.RunScenario;
 import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigAliases;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -23,15 +18,12 @@ import picocli.AutoComplete;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -170,7 +162,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		Objects.requireNonNull(config);
 
 		if (specs != null)
-			applySpecs(config, specs);
+			ApplicationUtils.applyConfigUpdate(config, specs);
 
 		if (remainingArgs != null) {
 			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
@@ -218,90 +210,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		return 0;
 	}
-
-	/**
-	 * Apply given specs to config.
-	 */
-	private static void applySpecs(Config config, Path specs) {
-
-		if (!Files.exists(specs)) {
-			throw new IllegalArgumentException("Desired run config does not exist:" + specs);
-		}
-
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
-				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
-
-		ConfigAliases aliases = new ConfigAliases();
-		Deque<String> emptyStack = new ArrayDeque<>();
-
-		try (BufferedReader reader = Files.newBufferedReader(specs)) {
-
-			JsonNode node = mapper.readTree(reader);
-
-			Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
-			while (fields.hasNext()) {
-				Map.Entry<String, JsonNode> field = fields.next();
-				String configGroupName = aliases.resolveAlias(field.getKey(), emptyStack);
-				ConfigGroup group = config.getModules().get(configGroupName);
-				if (group == null) {
-					log.warn("Config group not found: {}", configGroupName);
-					continue;
-				}
-
-				applyNodeToConfigGroup(field.getValue(), group);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * Sets the json config into
-	 */
-	private static void applyNodeToConfigGroup(JsonNode node, ConfigGroup group) {
-
-		Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
-		while (fields.hasNext()) {
-			Map.Entry<String, JsonNode> field = fields.next();
-
-			if (field.getValue().isArray()) {
-
-				Collection<? extends ConfigGroup> params = group.getParameterSets(field.getKey());
-
-				// single node and entry merged directly
-				if (field.getValue().size() == 1 && params.size() == 1) {
-					applyNodeToConfigGroup(field.getValue().get(0), params.iterator().next());
-				} else {
-
-					for (JsonNode item : field.getValue()) {
-
-						Map.Entry<String, JsonNode> first = item.fields().next();
-						Optional<? extends ConfigGroup> m = params.stream().filter(p -> p.getParams().get(first.getKey()).equals(first.getValue().textValue())).findFirst();
-						if (m.isEmpty())
-							throw new IllegalArgumentException("Could not find matching param by key" + first);
-
-						applyNodeToConfigGroup(item, m.get());
-					}
-				}
-
-			} else {
-
-				if (!field.getValue().isValueNode())
-					throw new IllegalArgumentException("Received complex value type instead of primitive: " + field.getValue());
-
-
-				if (field.getValue().isTextual())
-					group.addParam(field.getKey(), field.getValue().textValue());
-				else
-					group.addParam(field.getKey(), field.getValue().toString());
-			}
-		}
-	}
-
 
 	/**
 	 * Custom module configs that will be added to the {@link Config} object.
@@ -530,7 +438,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		config = tmp != null ? tmp : config;
 
 		if (app.specs != null) {
-			applySpecs(config, app.specs);
+			ApplicationUtils.applyConfigUpdate(config, app.specs);
 		}
 
 		if (app.remainingArgs != null) {
