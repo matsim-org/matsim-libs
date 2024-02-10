@@ -100,8 +100,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 			// Copy the MATSIM_GUI_ARGS environment variable to the process environment
 			// these arguments may be used internally by the matsim scenario
-			if (System.getenv().containsKey("MATSIM_GUI_ARGS")) {
-				processBuilder.environment().put("MATSIM_GUI_ARGS", System.getenv("MATSIM_GUI_ARGS"));
+			if (System.getProperty("MATSIM_GUI_ARGS") != null) {
+				processBuilder.environment().put("MATSIM_GUI_ARGS", System.getProperty("MATSIM_GUI_ARGS"));
 			}
 
 			if (workingDirectory != null) {

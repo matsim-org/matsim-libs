@@ -341,7 +341,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			// Pass stored args to the instance as well
 			if (System.getenv().containsKey("MATSIM_GUI_ARGS")) {
 				String[] guiArgs = System.getenv("MATSIM_GUI_ARGS").split(ARGS_DELIMITER);
-				args = ApplicationUtils.mergeArgs(args, guiArgs);
+				if (guiArgs.length > 0)
+					args = ApplicationUtils.mergeArgs(args, guiArgs);
 			}
 		}
 
@@ -376,9 +377,12 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		if (ApplicationUtils.isRunFromDesktop()) {
 
-			String value = String.join(ARGS_DELIMITER, defaultArgs);
-			System.getenv().put("MATSIM_GUI_ARGS", value);
+			if (defaultArgs.length > 0) {
+				String value = String.join(ARGS_DELIMITER, defaultArgs);
+				System.setProperty("MATSIM_GUI_ARGS", value);
+			}
 
+			// args should be empty when run from desktop and is not used
 			run(clazz, "gui");
 
 		} else {
