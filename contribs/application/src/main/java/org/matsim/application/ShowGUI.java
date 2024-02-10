@@ -1,14 +1,14 @@
-package org.matsim.application.commands;
+package org.matsim.application;
 
-import org.matsim.application.MATSimApplication;
 import org.matsim.run.gui.Gui;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 @CommandLine.Command(name = "gui", description = "Run the scenario through the MATSim GUI")
-public class ShowGUI implements Callable<Integer> {
+class ShowGUI implements Callable<Integer> {
 
     @CommandLine.ParentCommand
     private MATSimApplication parent;
@@ -26,7 +26,15 @@ public class ShowGUI implements Callable<Integer> {
             name = name.substring(MATSimApplication.COLOR.length(), name.length() - 4);
         }
 
-        Future<Gui> f = Gui.show(name, parent.getClass());
+		File configFile = null;
+
+		// Try to load default config file
+		if (parent.getConfigPath() != null && parent.getConfigPath().exists())
+			configFile = parent.getConfigPath();
+		else if (parent.getDefaultScenario() != null && new File(parent.getDefaultScenario()).exists())
+			configFile = new File(parent.getDefaultScenario());
+
+        Future<Gui> f = Gui.show(name, parent.getClass(), configFile);
 
         Gui gui = f.get();
 

@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.application.commands.RunScenario;
-import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -209,6 +207,15 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 
 		return 0;
+	}
+
+	File getConfigPath() {
+		return configPath;
+	}
+
+	@Nullable
+	String getDefaultScenario() {
+		return defaultScenario;
 	}
 
 	/**
