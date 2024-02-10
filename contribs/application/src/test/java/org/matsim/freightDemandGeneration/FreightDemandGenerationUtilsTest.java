@@ -1,12 +1,8 @@
 package org.matsim.freightDemandGeneration;
 
-import java.nio.file.Path;
-import java.util.Collection;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,9 +12,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
+
+import java.nio.file.Path;
 
 /**
  * @author Ricardo Ewert
@@ -113,14 +109,14 @@ public class FreightDemandGenerationUtilsTest {
 		Link link = network.getLinks().get(Id.createLinkId("i(8,8)"));
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath,"WGS84", null);
-		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
-		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, null, null));
-		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area1"}, null));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area2"}, null));
+		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
+		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
+		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area1"}, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area2"}, null));
 		link = network.getLinks().get(Id.createLinkId("i(6,3)R"));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, null, null));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area1"}, null));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area2"}, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area1"}, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area2"}, null));
 
 	}
 
@@ -128,15 +124,15 @@ public class FreightDemandGenerationUtilsTest {
 	void testCheckPositionInShape_point() {
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath,"WGS84", null);
-		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
-		Point point = MGC.xy2Point(6000, 6000);
-		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(null, point, polygonsInShape, null, null));
-		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(null, point, polygonsInShape, new String[]{"area1"}, null));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, point, polygonsInShape, new String[]{"area2"}, null));
-		point = MGC.xy2Point(2000, 2000);
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, point, polygonsInShape, null, null));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, point, polygonsInShape, new String[]{"area1"}, null));
-		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, point, polygonsInShape, new String[]{"area2"}, null));
+		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
+		Coord coord = new Coord(6000, 6000);
+		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape, null, null));
+		Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape, new String[]{"area1"}, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape, new String[]{"area2"}, null));
+		coord = new Coord(2000, 2000);
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape, null, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape, new String[]{"area1"}, null));
+		Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape, new String[]{"area2"}, null));
 
 	}
 }

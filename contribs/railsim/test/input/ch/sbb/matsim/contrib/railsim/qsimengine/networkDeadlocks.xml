@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<!--
+
+	A								F
+	  \							   /
+		B			     		 E
+	      \			     		/
+			x  -  y1 - y2  -  z
+	      /			    		\
+	    D				 		 G
+	   / 						   \
+	 C 								H
+	-->
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<!-- diag of 1km length: 700m offset, diag 200m: 150m -->
+
+		<node id="A" x="-950" y="950"/>
+		<node id="B" x="-700" y="700"/>
+		<node id="C" x="-700" y="-700"/>
+		<node id="D" x="-950" y="-950"/>
+
+		<node id="x" x="0" y="0"/>
+		<node id="y1" x="500" y="0"/>
+		<node id="y2" x="600" y="0"/>
+		<node id="z" x="1100" y="0"/>
+
+		<node id="E" x="1800" y="700"/>
+		<node id="F" x="2050" y="950"/>
+		<node id="G" x="1800" y="-700"/>
+		<node id="H" x="2050" y="-950"/>
+
+
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+
+		<link id="AB" from="A" to="B" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
+			</attributes>
+		</link>
+		<link id="BA" from="B" to="A" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
+			</attributes>
+		</link>
+		<link id="Bx" from="B" to="x" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">Bx</attribute>
+			</attributes>
+		</link>
+		<link id="xB" from="x" to="B" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">Bx</attribute>
+			</attributes>
+		</link>
+
+		<link id="CD" from="C" to="D" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">CD</attribute>
+			</attributes>
+		</link>
+		<link id="DC" from="D" to="C" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">CD</attribute>
+			</attributes>
+		</link>
+		<link id="Cx" from="C" to="x" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">Cx</attribute>
+			</attributes>
+		</link>
+		<link id="xC" from="x" to="C" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">Cx</attribute>
+			</attributes>
+		</link>
+
+
+		<link id="xy" from="x" to="y1" length="500" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">xy</attribute>
+			</attributes>
+		</link>
+		<link id="yx" from="y1" to="x" length="500" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">xy</attribute>
+			</attributes>
+		</link>
+
+		<link id="y1y" from="y1" to="y2" length="100" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">yy</attribute>
+			</attributes>
+		</link>
+		<link id="yy1" from="y2" to="y1" length="100" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">yy</attribute>
+			</attributes>
+		</link>
+
+		<link id="yz" from="y2" to="z" length="500" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">yz</attribute>
+			</attributes>
+		</link>
+		<link id="zy" from="z" to="y2" length="500" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">yz</attribute>
+			</attributes>
+		</link>
+
+		<link id="zE" from="z" to="E" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">zE</attribute>
+			</attributes>
+		</link>
+		<link id="Ez" from="E" to="z" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">zE</attribute>
+			</attributes>
+		</link>
+		<link id="EF" from="E" to="F" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">EF</attribute>
+			</attributes>
+		</link>
+		<link id="FE" from="F" to="E" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">EF</attribute>
+			</attributes>
+		</link>
+
+		<link id="Gz" from="G" to="z" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">Gz</attribute>
+			</attributes>
+		</link>
+		<link id="zG" from="z" to="G" length="1000" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">Gz</attribute>
+			</attributes>
+		</link>
+		<link id="GH" from="G" to="H" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GH</attribute>
+			</attributes>
+		</link>
+		<link id="HG" from="H" to="G" length="200" freespeed="10" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GH</attribute>
+			</attributes>
+		</link>
+
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>
