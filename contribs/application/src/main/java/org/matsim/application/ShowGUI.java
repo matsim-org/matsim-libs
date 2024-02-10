@@ -29,10 +29,12 @@ class ShowGUI implements Callable<Integer> {
 		File configFile = null;
 
 		// Try to load default config file
+		if (parent.getDefaultScenario() != null && new File(parent.getDefaultScenario()).exists())
+			configFile = new File(parent.getDefaultScenario());
+
+		// override the default if present
 		if (parent.getConfigPath() != null && parent.getConfigPath().exists())
 			configFile = parent.getConfigPath();
-		else if (parent.getDefaultScenario() != null && new File(parent.getDefaultScenario()).exists())
-			configFile = new File(parent.getDefaultScenario());
 
         Future<Gui> f = Gui.show(name, parent.getClass(), configFile);
 
