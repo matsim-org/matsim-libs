@@ -395,16 +395,25 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		} else {
 			// run if no other command is present
 			if (args.length > 0) {
+				// valid command is present
 				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui") ){
-					// valid command is present
-				} else
+					// If this is a run command, the default args can be applied
+					if (args[0].equals("run"))
+						args = ApplicationUtils.mergeArgs(args, defaultArgs);
+
+				} else {
 					// Automatically add run command
-					args = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+					String[] runArgs = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+					args = ApplicationUtils.mergeArgs(defaultArgs, runArgs);
+				}
+
 			} else
 				// Automatically add run command
 				args = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
 
-			run(clazz, ApplicationUtils.mergeArgs(args, defaultArgs));
+			log.info("Running {} with: {}", clazz.getSimpleName(), String.join(" ", args));
+
+			run(clazz, args);
 		}
 	}
 

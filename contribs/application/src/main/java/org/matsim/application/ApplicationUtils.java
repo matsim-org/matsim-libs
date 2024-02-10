@@ -61,11 +61,11 @@ public class ApplicationUtils {
 
 		// check if gui was explicitly enabled
 		String env = System.getenv().getOrDefault("RUN_GUI", "false");
-		if (env.equalsIgnoreCase("true") || env.equals("1") )
+		if (env.equalsIgnoreCase("true") || env.equals("1"))
 			return true;
 
 		String property = System.getProperty("RUN_GUI", "false");
-		if (property.equalsIgnoreCase("true") || property.equals("1") )
+		if (property.equalsIgnoreCase("true") || property.equals("1"))
 			return true;
 
 		String macIdentifier = System.getenv().getOrDefault("__CFBundleIdentifier", "none");
