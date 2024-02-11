@@ -51,20 +51,26 @@ public class ConfigYamlUpdateTest {
 			config, input.resolve("multiLevel.yml")
 		);
 
+		testGroup.addParam("values", "1, 2, 3");
+
+		assertThat(testGroup.values)
+			.containsExactly(1, 2, 3);
+
 		Collection<? extends ConfigGroup> params = testGroup.getParameterSets("params");
 
 		assertThat(params).hasSize(2);
 
 		Iterator<? extends ConfigGroup> it = params.iterator();
-		ConfigGroup next = it.next();
+		TestParamSet next = (TestParamSet) it.next();
 
 		assertThat(next.getParams().get("mode")).isEqualTo("car");
-		assertThat(next.getParams().get("values")).isEqualTo("-1, -2");
+		assertThat(next.getParams().get("values")).isEqualTo("-1.0, -2.0");
+		assertThat(next.values).containsExactly(-1d, -2d);
 
-		next = it.next();
+		next = (TestParamSet) it.next();
 
 		assertThat(next.getParams().get("mode")).isEqualTo("bike");
-		assertThat(next.getParams().get("values")).isEqualTo("3, 4");
+		assertThat(next.getParams().get("values")).isEqualTo("3.0, 4.0");
 		assertThat(next.getParams().get("extra")).isEqualTo("extra");
 	}
 
@@ -91,10 +97,10 @@ public class ConfigYamlUpdateTest {
 		ConfigGroup next = it.next();
 
 		// These parameters are recognized as lists correctly
-		assertThat(next.getParams().get("values")).isEqualTo("-1, -2");
+		assertThat(next.getParams().get("values")).isEqualTo("-1.0, -2.0");
 
 		next = it.next();
-		assertThat(next.getParams().get("values")).isEqualTo("3, 4");
+		assertThat(next.getParams().get("values")).isEqualTo("3.0, 4.0");
 		assertThat(next.getParams().get("extra")).isEqualTo("extra");
 
 	}
@@ -122,7 +128,7 @@ public class ConfigYamlUpdateTest {
 	public static final class TestConfigGroup extends ReflectiveConfigGroup {
 
 		@Parameter
-		private List<String> values;
+		private List<Integer> values;
 
 		public TestConfigGroup() {
 			super("test");
@@ -142,7 +148,7 @@ public class ConfigYamlUpdateTest {
 	public static final class TestParamSet extends ReflectiveConfigGroup {
 
 		@Parameter
-		private List<String> values;
+		private List<Double> values;
 
 		public TestParamSet() {
 			super("params", true);

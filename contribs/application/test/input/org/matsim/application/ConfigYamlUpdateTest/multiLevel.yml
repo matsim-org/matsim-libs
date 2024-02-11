@@ -1,5 +1,6 @@
 
 test:
+  values: [1,2,3]
   params:
     - mode: car
       subpopulation: person
