@@ -19,17 +19,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion.repeatedselective;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.*;
-import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
 import static org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.INSERTION_WITH_COST_COMPARATOR;
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.stops.StopTimeCalculator;
-import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrix;
-import org.matsim.core.router.util.TravelTime;
-
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 
 import java.util.Collection;
@@ -37,11 +27,21 @@ import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
+
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author steffenaxer
  */
 class RepeatedSelectiveInsertionProvider {
-    private static final double SPEED_FACTOR = 1.;
     private final InsertionCostCalculator insertionCostCalculator;
     private final InsertionGenerator insertionGenerator;
     private final ForkJoinPool forkJoinPool;
@@ -54,14 +54,11 @@ class RepeatedSelectiveInsertionProvider {
         this.forkJoinPool = forkJoinPool;
     }
 
-    public static RepeatedSelectiveInsertionProvider create( InsertionCostCalculator insertionCostCalculator, AdaptiveTravelTimeMatrix updatableTravelTimeMatrix,
-															TravelTime travelTime,
-															ForkJoinPool forkJoinPool, StopTimeCalculator stopTimeCalculator) {
-        var detourTimeEstimatorWithUpdatedTravelTimes = DetourTimeEstimatorWithAdaptiveTravelTimes.create(
-                SPEED_FACTOR, updatableTravelTimeMatrix, travelTime);
-        return new RepeatedSelectiveInsertionProvider(insertionCostCalculator,
-                new InsertionGenerator(stopTimeCalculator, detourTimeEstimatorWithUpdatedTravelTimes), forkJoinPool);
-    }
+	public static RepeatedSelectiveInsertionProvider create(InsertionCostCalculator insertionCostCalculator,
+			ForkJoinPool forkJoinPool, StopTimeCalculator stopTimeCalculator, DetourTimeEstimator detourTimeEstimator) {
+		return new RepeatedSelectiveInsertionProvider(insertionCostCalculator,
+				new InsertionGenerator(stopTimeCalculator, detourTimeEstimator), forkJoinPool);
+	}
 
     public List<InsertionWithDetourData> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
         // Parallel outer stream over vehicle entries. The inner stream (flatmap) is
