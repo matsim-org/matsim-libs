@@ -105,6 +105,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 					
 					Fleet fleet = new Fleet(getMode(), eventsManager, mobsimTimer, lookup);
 					
+					// use the FleetCreator to initialize the vehicles in Fleet
 					FleetCreator fleetCreator = getter.getModal(FleetCreator.class);
 					fleetCreator.createFleet(fleet);
 					

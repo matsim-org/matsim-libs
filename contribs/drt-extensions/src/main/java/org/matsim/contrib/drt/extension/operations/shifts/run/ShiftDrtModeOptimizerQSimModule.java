@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.run;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -22,17 +24,8 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskF
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DefaultShiftBreakImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreakSpecification;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
+import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
@@ -66,9 +59,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Singleton;
 
 /**
  * @author nkuehnel, fzwick / MOIA

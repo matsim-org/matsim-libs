@@ -387,6 +387,9 @@ public class RunDrtExampleIT {
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		
+		// here starts the extension of the fleet
+		// at 02h00 we add two new vehicles to the fleet that are in service between 8h00 and 12h00
+		
 		double extensionTime = 7200.0;
 		
 		FleetSpecification addedFleetSpecification = new FleetSpecificationImpl();
@@ -420,6 +423,8 @@ public class RunDrtExampleIT {
 			}
 		});
 
+		// end of code extending the fleet
+		
 		controller.run();
 
 		var expectedStats = Stats.newBuilder()

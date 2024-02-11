@@ -12,6 +12,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 /**
  * This is a convenience class that simplifies the process of adding VRP agents
  * during the QSim.
+ * 
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class FleetExtensionHelper implements MobsimEngine {
 	private final VrpAgentSource source;

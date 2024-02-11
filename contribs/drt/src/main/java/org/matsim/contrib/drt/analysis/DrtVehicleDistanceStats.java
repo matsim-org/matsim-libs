@@ -53,6 +53,7 @@ import com.google.common.base.Verify;
 /**
  * @author jbischoff
  * @author Michal Maciejewski
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class DrtVehicleDistanceStats
 		implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,

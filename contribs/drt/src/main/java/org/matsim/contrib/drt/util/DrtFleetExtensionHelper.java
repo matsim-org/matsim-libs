@@ -13,6 +13,8 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  * This is a convenience class that simplifies the process of adding VRP agents
  * to a DRT fleet during the QSim. On top of DVRP's FleetExtensionHelper it also
  * makes sure to initialize the first schedule task.
+ * 
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class DrtFleetExtensionHelper {
 	private final FleetExtensionHelper delegate;
