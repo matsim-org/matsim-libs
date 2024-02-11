@@ -146,11 +146,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	 */
 	public static final class Builder {
 
-		private final Map<String, Class<? extends FixedCostsEstimator<?>>> fixedCosts = new HashMap<>();
-		private final Map<String, Class<? extends LegEstimator<?>>> legEstimators = new HashMap<>();
-		private final Map<String, Class<? extends TripEstimator<?>>> tripEstimators = new HashMap<>();
+		private final Map<String, Class<? extends FixedCostsEstimator>> fixedCosts = new HashMap<>();
+		private final Map<String, Class<? extends LegEstimator>> legEstimators = new HashMap<>();
+		private final Map<String, Class<? extends TripEstimator>> tripEstimators = new HashMap<>();
 
-		private final Map<String, Class<? extends ModeOptions<?>>> options = new HashMap<>();
+		private final Map<String, Class<? extends ModeOptions>> options = new HashMap<>();
 
 		private final Set<Class<? extends TripConstraint<?>>> constraints = new LinkedHashSet<>();
 
@@ -161,7 +161,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a fixed cost to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withFixedCosts(Class<? extends FixedCostsEstimator<T>> estimator, String... modes) {
+		public Builder withFixedCosts(Class<? extends FixedCostsEstimator> estimator, String... modes) {
 
 			for (String mode : modes) {
 				fixedCosts.put(mode, estimator);
@@ -173,7 +173,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a {@link LegEstimator} to one or more modes.
 		 */
-		public <T extends Enum<T>> Builder withLegEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
+		public Builder withLegEstimator(Class<? extends LegEstimator> estimator, Class<? extends ModeOptions> option,
 															String... modes) {
 
 			for (String mode : modes) {
@@ -193,7 +193,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a {@link TripEstimator} to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withTripEstimator(Class<? extends TripEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
+		public Builder withTripEstimator(Class<? extends TripEstimator> estimator, Class<? extends ModeOptions> option,
 															 String... modes) {
 
 			for (String mode : modes) {

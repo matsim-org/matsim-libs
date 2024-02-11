@@ -255,7 +255,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		// Add the fixed costs estimate if a mode has been used
 		for (ModeEstimate mode : options) {
 
-			FixedCostsEstimator<Enum<?>> f = (FixedCostsEstimator<Enum<?>>) fixedCosts.get(mode.getMode());
+			FixedCostsEstimator f = fixedCosts.get(mode.getMode());
 
 			// Fixed costs are not required for each mode
 			if (f == null)
@@ -273,7 +273,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			for (ModeEstimate mode : options) {
 				if (mode.getMode() == consolidateMode && usedModes.contains(consolidateMode)) {
 
-					TripEstimator<Enum<?>> f = (TripEstimator<Enum<?>>) tripEstimator.get(mode.getMode());
+					TripEstimator f = tripEstimator.get(mode.getMode());
 
 					// subtract all the trip estimates that have been made before
 					for (int i = 0; i < result.length; i++) {
