@@ -183,6 +183,10 @@ public class ApplicationUtils {
 	private static void applyNodeAsParameterSet(String groupName, JsonNode item, ConfigGroup group, List<? extends ConfigGroup> params) {
 
 		Iterator<Map.Entry<String, JsonNode>> it = item.fields();
+
+		// There was at least one matching group
+		boolean matched = false;
+
 		while (!params.isEmpty() && it.hasNext()) {
 
 			Map.Entry<String, JsonNode> attr = it.next();
@@ -195,12 +199,13 @@ public class ApplicationUtils {
 			if (candidates.isEmpty())
 				break;
 
+			matched = true;
 			params = candidates;
 		}
 
 		if (params.size() > 1) {
 			throw new IllegalArgumentException("Ambiguous parameter set: " + item);
-		} else if (params.size() == 1) {
+		} else if (params.size() == 1 && matched) {
 			applyNodeToConfigGroup(item, params.get(0));
 		} else {
 			ConfigGroup newGroup = group.createParameterSet(groupName);

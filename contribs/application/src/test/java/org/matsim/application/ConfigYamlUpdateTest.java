@@ -106,6 +106,35 @@ public class ConfigYamlUpdateTest {
 	}
 
 	@Test
+	void updateOne() {
+
+		Config config = ConfigUtils.createConfig();
+		Path input = Path.of(utils.getClassInputDirectory());
+
+		TestConfigGroup testGroup = ConfigUtils.addOrGetModule(config, TestConfigGroup.class);
+
+		testGroup.addParameterSet(new TestParamSet("car", "person", "work"));
+
+		ApplicationUtils.applyConfigUpdate(
+			config, input.resolve("multiLevel.yml")
+		);
+
+		Collection<? extends ConfigGroup> params = testGroup.getParameterSets("params");
+		assertThat(params).hasSize(2);
+
+		Iterator<? extends ConfigGroup> it = params.iterator();
+		ConfigGroup next = it.next();
+
+		assertThat(next.getParams().get("mode")).isEqualTo("car");
+		assertThat(next.getParams().get("values")).isEqualTo("-1.0, -2.0");
+
+		next = it.next();
+		assertThat(next.getParams().get("mode")).isEqualTo("bike");
+		assertThat(next.getParams().get("values")).isEqualTo("3.0, 4.0");
+		assertThat(next.getParams().get("extra")).isEqualTo("extra");
+	}
+
+	@Test
 	void ambiguous() {
 
 		Config config = ConfigUtils.createConfig();
