@@ -1,75 +1,45 @@
 package org.matsim.contrib.drt.teleportation;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
-import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
-import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.modal.ModalProviders;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
 import java.util.*;
 
-class Test2{
+class Test2 {
 
-	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@org.junit.jupiter.api.Test void test1() {
+	@org.junit.jupiter.api.Test
+	void test1() {
 
-		URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "mielec" ), "mielec_drt_config.xml" );
-		Config config = ConfigUtils.loadConfig( url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+		URL url = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 
-		config.network().setInputFile( "network.xml" );
-		config.plans().setInputFile( "plans_only_drt_1.0.xml.gz" );
+		config.network().setInputFile("network.xml");
+		config.plans().setInputFile("plans_only_drt_1.0.xml.gz");
 
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
-		config.controller().setLastIteration( 0 );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
 
 
 		// install the drt routing stuff, but not the mobsim stuff!
@@ -112,35 +82,108 @@ class Test2{
 	private static class DrtEstimatingRoutingModule implements RoutingModule {
 
 		private final RoutingModule drtRoutingModule;
-		private DrtEstimatingRoutingModule( TripRouter tripRouter ) {
-			this.drtRoutingModule = tripRouter.getRoutingModule( "drt" );
-		}
 
+		private DrtEstimatingRoutingModule(TripRouter tripRouter) {
+			this.drtRoutingModule = tripRouter.getRoutingModule("drt");
+		}
 
 
 		@Override
 		public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-			List<? extends PlanElement> route = drtRoutingModule.calcRoute( request );
+			List<? extends PlanElement> route = drtRoutingModule.calcRoute(request);
 
 			DrtRouteCreator creator = null;
-		//	creator.createRoute( departureTime, accessActLink, egressActLink, person, tripAttributes, routeFactories );
+			//	creator.createRoute( departureTime, accessActLink, egressActLink, person, tripAttributes, routeFactories );
 
 			DrtRouteFactory factory = null;
-		//	Route drtRoute = factory.createRoute( startLinkId, endLinkId );
+			//	Route drtRoute = factory.createRoute( startLinkId, endLinkId );
 
 			// correct the attributes of the route as we need them
 
-		//	DrtInitialEstimator estimator = new DrtInitialEstimator(){
-		//	};
+			//	DrtInitialEstimator estimator = new DrtInitialEstimator(){
+			//	};
 
-	//		DrtEstimator.Estimate estimate = estimator.estimate( route, 12. * 3600 );
+			//		DrtEstimator.Estimate estimate = estimator.estimate( route, 12. * 3600 );
 
-		//	estimate.travelTime();
-		//	estimate.distance();
+			//	estimate.travelTime();
+			//	estimate.distance();
 
 			return route;
 		}
 
 	}
+
+	public record EstimatedDrtTeleportationInfo(double estTotalTravelTime, double estWaitTime, double estRideTime, double estRideDistance) {
+		// The teleportation info refers to the main DRT leg (accessLink -> egressLink, departing at departureTime)
+		// The info teleportation engine can make use of this data to generate a teleport leg
+		// wait time and ride time are specified, such that we can score them differently (if required)
+	}
+
+	public record DrtRouteInfoEstimator(LeastCostPathCalculator router, TravelTime travelTime, DistributionGenerator distributionGenerator) {
+		// This record/class is to be created before (each?) MobSim/QSim.
+		public EstimatedDrtTeleportationInfo estimateDrtRoute(Link accessLink, Link egressLink, double departureTime) {
+			double waitTime = distributionGenerator.generateWaitTime();
+			double directRideTime = VrpPaths.calcAndCreatePath(accessLink, egressLink, departureTime + waitTime, router, travelTime).getTravelTime();
+			double rideTime = distributionGenerator.generateRideTime(directRideTime);
+
+			// since VrpPath does not contain Path information. We need to calculate this manually.
+			// VRP path logic: toNode of fromLink -> fromNode of toLink -> toNode of toLink
+			LeastCostPathCalculator.Path path = router.calcLeastCostPath(accessLink.getToNode(), egressLink.getFromNode(),
+				departureTime + waitTime, null, null);
+			path.links.add(egressLink);
+
+			double directRideDistance = path.links.stream().mapToDouble(Link::getLength).sum();
+			double rideDistance = distributionGenerator.generateRideDistance(rideTime, directRideTime, directRideDistance);
+
+			return new EstimatedDrtTeleportationInfo(waitTime + rideTime, waitTime, rideTime, rideDistance);
+		}
+	}
+
+	public static class DistributionGenerator {
+		private final Random random = new Random(4711);
+		private final double estRideTimeAlpha;
+		private final double estRideTimeBeta;
+		private final double rideTimeStd;
+		private final double estMeanWaitTime;
+		private final double waitTimeStd;
+		private final double probabilityRejection;
+
+		public DistributionGenerator(double estRideTimeAlpha, double estRideTimeBeta, double rideTimeStd, double estMeanWaitTime,
+									 double waitTimeStd, double probabilityRejection) {
+			this.estRideTimeAlpha = estRideTimeAlpha;
+			this.estRideTimeBeta = estRideTimeBeta;
+			this.rideTimeStd = rideTimeStd;
+			this.estMeanWaitTime = estMeanWaitTime;
+			this.waitTimeStd = waitTimeStd;
+			this.probabilityRejection = probabilityRejection;
+		}
+
+		public DistributionGenerator generateExampleDistributionGenerator() {
+			return new DistributionGenerator(1.5, 300, 0.2, 300, 0.4, 0.0);
+		}
+
+		public double generateRideTime(double directRideTime) {
+			// TODO improve this distribution
+			double estMeanRideTime = estRideTimeAlpha * directRideTime + estRideTimeBeta;
+			return Math.max(directRideTime, estMeanRideTime * (1 + random.nextGaussian() * rideTimeStd));
+		}
+
+		public double generateRideDistance(double estRideTime, double directRideTime, double directRideDistance) {
+			// TODO Currently, same ratio is used as in the ride time estimation; improve this distribution
+			double ratio = estRideTime / directRideTime;
+			return ratio * directRideDistance;
+		}
+
+		public double generateWaitTime() {
+			// TODO improve this distribution
+			return Math.max(estMeanWaitTime * (1 + random.nextGaussian() * waitTimeStd), 0);
+		}
+
+		public boolean generateIsTripAccepted() {
+			// TODO maybe incorporate this into the estimated wait time, ride time and ride distance
+			return random.nextDouble() >= probabilityRejection;
+		}
+	}
+
 
 }
