@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.matsim</groupId>
         <artifactId>matsim-all</artifactId>
-		<version>16.0-2024w06</version>
+		<version>16.0-2024w07</version>
 <!--		<version>16.0-2023w41</version>-->
 <!--        <version>16.0-2023w23</version>-->
 <!--        <version>16.0-SNAPSHOT</version>-->
