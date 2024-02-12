@@ -53,8 +53,8 @@ public interface CostCalculationStrategy {
 	class DiscourageSoftConstraintViolations implements CostCalculationStrategy {
 		//XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
 		//XXX however, at the same time prefer max-wait-time to max-travel-time violations
-		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
-		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
+		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1000;// 1000 second of penalty per 1 second of late departure
+		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10 * MAX_WAIT_TIME_VIOLATION_PENALTY; // 10 times of the MAX_WAIT_TIME_VIOLATION_PENALTY
 
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
