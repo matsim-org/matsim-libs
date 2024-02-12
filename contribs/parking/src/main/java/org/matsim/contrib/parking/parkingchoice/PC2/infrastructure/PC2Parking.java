@@ -26,7 +26,7 @@ public interface PC2Parking {
 
 	public Id<PC2Parking> getId();
 
-	public int getMaximumParkingCapacity();
+//	public int getMaximumParkingCapacity();
 
 	public int getAvailableParkingCapacity();
 

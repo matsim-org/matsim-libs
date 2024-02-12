@@ -46,11 +46,9 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class ParkingChoiceSimulation
 		implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
 
-
-
 	private final ParkingInfrastructure parkingInfrastructureManager;
 	private final Scenario scenario;
-	private IntegerValueHashMap<Id<Person>> currentPlanElementIndex;
+	private IntegerValueHashMap<Id<Person>> currentPlanElementIndices;
 	private HashMap<Id<Person>, ParkingOperationRequestAttributes> parkingOperationRequestAttributes;
 	private DoubleValueHashMap<Id<Person>> firstDepartureTimeOfDay;
 
@@ -61,7 +59,7 @@ public final class ParkingChoiceSimulation
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		currentPlanElementIndex.increment(event.getPersonId());
+		currentPlanElementIndices.increment(event.getPersonId() );
 	}
 
 	@Override
@@ -76,25 +74,37 @@ public final class ParkingChoiceSimulation
 			}
 
 			if (isFirstCarDepartureOfDay(event.getPersonId())) {
-				// (special case, think about it later)
+				// for the first departure of the day, we do not know when the parking actually started.  The scoring is, in
+				// consequence, not done here, but done when _starting_ the _last_ parking of the day (see there).
+				// (yy what happens if the agent arrives by car but departs by some other mode, or the other way round?  Can happen in particular if there is an additional home stop during the day.)
 
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 				parkingAttributes.personId = event.getPersonId();
-				// this is a trick to get the correct departure time
+
+				// for the time being, we memorize a parking record with arrival time zero.   This is corrected later, at the last arrival of the day.
 				parkingAttributes.arrivalTime = 0;
 				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0, event.getTime());
 				parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
 			} else {
+				// parking has just ended:
+
+				// finalize the corresponding record:
 				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
 				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
+
+				// hedge against a special case:
 				if (parkingAttributes.parkingDurationInSeconds == 24 * 3600) {
 					// (yyyy no idea what this is and why. kai, jul'15)
+					// (Presumably, the code is such that it cannot handle a parking duration of zero.  Presumably, a parking
+					// duration of zero cannot happen, and therefore this is ok.  However, if someone parks for exactly 24 hours,
+					// then this is at some point mapped back to zero, and then it may happen. kai, feb'24)
 
 					parkingAttributes.parkingDurationInSeconds = 1; // not zero, because this might lead to NaN
 				}
 
-				PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
-				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes, parking);
+				// score the parking:
+				final PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent( parkingAttributes );
+				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes, parking );
 			}
 
 		}
@@ -106,7 +116,7 @@ public final class ParkingChoiceSimulation
 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)  && !event.getPersonId().toString().contains("pt") && isNotTransitAgent(event.getPersonId())) {
 			// (exclude some cases (in a brittle way, i.e. based on IDs))
 
-			// I think that this just packages some information together into the parkingAttributes:
+			// Generate most of the parking record (departure time will be added later):
 			ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 			{
 				Link link = scenario.getNetwork().getLinks().get( event.getLinkId() );
@@ -120,9 +130,13 @@ public final class ParkingChoiceSimulation
 			}
 
 			if (isLastCarLegOfDay(personId)) {
-				// (special case, think about it later)
-
+				// if this is the last arrival of the day, the parking record is already there, since it was generated at the first
+				// departure.  However, the duration is not correct since at that time the arrival time was not known.
+				// (yy It looks to me that the arrivalTime remains at 0.  why?)
 				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(), firstDepartureTimeOfDay.get(personId));
+
+				// scoring of this special case is done further down, see there
+
 			} else {
 				Activity activityBeforeNextCarLeg = getActivityBeforeNextCarLeg(personId);
 
@@ -130,19 +144,19 @@ public final class ParkingChoiceSimulation
 				double parkingDuration=0;
 
 				if (endTime==Double.NEGATIVE_INFINITY || endTime==Double.POSITIVE_INFINITY){
-					// (I think that this _can_ happen, especially in context of within-day replanning, if departure time is unknown. (*))
+					// (in general, we take the (parking) end time from above.  Sometimes, this end time does not have a useful value, in which case the current
 
-					// try to estimate parking duration
+					// try to estimate parking duration:
 
 					Person person = scenario.getPopulation().getPersons().get(personId);
 					List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 
-					for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
-						if (planElements.get(i) instanceof Activity) {
-							parkingDuration+= ((Activity)planElements.get(i)).getMaximumDuration().seconds();
+					for ( int ii = currentPlanElementIndices.get(personId ) ; ii < planElements.size(); ii++) {
+						if (planElements.get(ii) instanceof Activity) {
+							parkingDuration+= ((Activity)planElements.get(ii)).getMaximumDuration().seconds();
 						}
 
-						if (planElements.get(i) == activityBeforeNextCarLeg) {
+						if (planElements.get(ii) == activityBeforeNextCarLeg) {
 							endTime=event.getTime()+parkingDuration;
 							break;
 						}
@@ -150,15 +164,16 @@ public final class ParkingChoiceSimulation
 				}
 
 				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(), endTime);
-				// (This is the _estimated_ parking duration, since we are at arrival.  This is needed to define the "best" parking
+				// (This is the _estimated_ parking duration, since we are at arrival, and in this special case we did not have the
+				// corresponding activity end time.  This is needed to define the "best" parking
 				// location ... cf. short-term/long-term parking at airports. Could rename the attributed into "expected...", but we
 				// have seen at other places in the code that such attributes may change their interpretation based on context so will
 				// not do this here.)
 			}
 
-			parkingAttributes.legIndex = currentPlanElementIndex.get(personId);
+			parkingAttributes.legIndex = currentPlanElementIndices.get(personId );
 
-			PC2Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
+			final PC2Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
 			// to me this looks like first the agent arrives at his/her activity. And then the negative parking score is added after the
 			// fact, however without consuming time. I.e. there is no physics. kai, jul'15
 
@@ -171,15 +186,11 @@ public final class ParkingChoiceSimulation
 
 		}
 
-		currentPlanElementIndex.increment(personId);
+		currentPlanElementIndices.increment(personId );
 	}
 
-	private boolean isNotTransitAgent(Id<Person> persondId) {
-		return (Integer.parseInt(persondId.toString())< 1000000000);
-	}
-
-	public void prepareForNewIteration() {
-		currentPlanElementIndex = new IntegerValueHashMap<>();
+	public void notifyBeforeMobsim() {
+		currentPlanElementIndices = new IntegerValueHashMap<>();
 		parkingOperationRequestAttributes = new HashMap<>();
 		firstDepartureTimeOfDay = new DoubleValueHashMap<>();
 
@@ -215,6 +226,10 @@ public final class ParkingChoiceSimulation
 
 	// === only private helper functions below this line ===
 
+	private boolean isNotTransitAgent(Id<Person> persondId) {
+		return (Integer.parseInt(persondId.toString())< 1000000000);
+	}
+
 	private boolean isFirstCarDepartureOfDay(Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 
@@ -223,7 +238,7 @@ public final class ParkingChoiceSimulation
 		}
 
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		for (int i = currentPlanElementIndex.get(personId) - 1; i >= 0; i--) {
+		for ( int i = currentPlanElementIndices.get(personId ) - 1 ; i >= 0; i--) {
 			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);
 
@@ -240,7 +255,7 @@ public final class ParkingChoiceSimulation
 	private boolean isLastCarLegOfDay(Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		for (int i = currentPlanElementIndex.get(personId) + 1; i < planElements.size(); i++) {
+		for ( int i = currentPlanElementIndices.get(personId ) + 1 ; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Leg) {
 				Leg Leg = (Leg) planElements.get(i);
 
@@ -257,7 +272,7 @@ public final class ParkingChoiceSimulation
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		int indexOfNextCarLeg = -1;
-		for (int i = currentPlanElementIndex.get(personId) + 1; i < planElements.size(); i++) {
+		for ( int i = currentPlanElementIndices.get(personId ) + 1 ; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Leg) {
 				Leg Leg = (Leg) planElements.get(i);
 
@@ -281,7 +296,7 @@ public final class ParkingChoiceSimulation
 	private Activity getNextActivity(Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
+		for ( int i = currentPlanElementIndices.get(personId ) ; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Activity) {
 				return (Activity) planElements.get(i);
 			}
