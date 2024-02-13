@@ -65,13 +65,17 @@ public class ApplicationUtils {
 	public static boolean isRunFromDesktop() {
 
 		// check if gui was explicitly enabled
-		String env = System.getenv().getOrDefault("RUN_GUI", "false");
+		String env = System.getenv().getOrDefault("RUN_GUI", "undefined");
 		if (env.equalsIgnoreCase("true") || env.equals("1"))
 			return true;
+		else if (env.equalsIgnoreCase("false") || env.equals("0"))
+			return false;
 
-		String property = System.getProperty("RUN_GUI", "false");
+		String property = System.getProperty("RUN_GUI", "undefined");
 		if (property.equalsIgnoreCase("true") || property.equals("1"))
 			return true;
+		else if (property.equalsIgnoreCase("false") || property.equals("0"))
+			return false;
 
 		String macIdentifier = System.getenv().getOrDefault("__CFBundleIdentifier", "none");
 
@@ -96,7 +100,12 @@ public class ApplicationUtils {
 			if (encoding.equals(WIN_CLI_ENCODING) || sunEncoding.equals(WIN_CLI_ENCODING))
 				return false;
 
-			// if no other cli indicates are present, we have to assume that the jar was run from the desktop
+			// Run from intelij, will not start the gui by default
+			if (System.getenv().containsKey("IDEA_INITIAL_DIRECTORY"))
+				return false;
+			// also file.encoding=UTF-8, seems to be set by default in IntelliJ
+
+			// if no other cli indicators are present, we have to assume that the jar was run from the desktop
 			return true;
 		}
 
