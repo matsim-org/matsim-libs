@@ -1018,4 +1018,8 @@ public final class NetworkUtils {
 		DisallowedNextLinks disallowedNextLinks = getOrCreateDisallowedNextLinks(link);
 		return disallowedNextLinks.addDisallowedLinkSequence(mode, linkIds);
 	}
+	
+	public static void removeDisallowedNextLinks(Link link) {
+		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
 }
