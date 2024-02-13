@@ -6,28 +6,30 @@ import org.matsim.core.population.PersonUtils;
 import java.util.List;
 
 /**
- * Interface to determine which mode options are available to an agent and considered when computing best options.
+ * Interface to determine which {@link ModeAvailability} are available to an agent and considered when computing best options.
  * <p>
  * This interface also contains the default implementations.
  *
- * @param <T> enum listing the possible options
  */
-public interface ModeOptions<T extends Enum<?>> {
+public interface ModeOptions {
 
 	/**
 	 * Determine options for one agent.
 	 */
-	List<T> get(Person person);
+	List<ModeAvailability> get(Person person);
 
 	/**
-	 * Return whether an option allows to use the mode. Normally only one of the option should forbid using the mode at all.
+	 * Return whether an option allows to use the mode.
 	 */
-	boolean allowUsage(T option);
+	default boolean allowUsage(ModeAvailability option) {
+		return option.isModeAvailable();
+	}
 
 	/**
 	 * The mode is always available and considered.
+	 * This also means that there should be no daily costs associated with the mode.
 	 */
-	final class AlwaysAvailable implements ModeOptions<ModeAvailability> {
+	final class AlwaysAvailable implements ModeOptions {
 
 		private static final List<ModeAvailability> YES = List.of(ModeAvailability.YES);
 		private static final List<ModeAvailability> NO = List.of(ModeAvailability.NO);
@@ -37,16 +39,12 @@ public interface ModeOptions<T extends Enum<?>> {
 			return YES;
 		}
 
-		@Override
-		public boolean allowUsage(ModeAvailability option) {
-			return option == ModeAvailability.YES;
-		}
 	}
 
 	/**
 	 * Plans are considered with and without this mode.
 	 */
-	final class ConsiderYesAndNo implements ModeOptions<ModeAvailability> {
+	final class ConsiderYesAndNo implements ModeOptions {
 
 		private static final List<ModeAvailability> BOTH = List.of(ModeAvailability.YES, ModeAvailability.NO);
 
@@ -55,17 +53,13 @@ public interface ModeOptions<T extends Enum<?>> {
 			return BOTH;
 		}
 
-		@Override
-		public boolean allowUsage(ModeAvailability option) {
-			return option == ModeAvailability.YES;
-		}
 	}
 
 
 	/**
 	 * Consider both options if car is available, otherwise none.
 	 */
-	final class ConsiderIfCarAvailable implements ModeOptions<ModeAvailability> {
+	final class ConsiderIfCarAvailable implements ModeOptions {
 
 		@Override
 		public List<ModeAvailability> get(Person person) {
@@ -74,11 +68,6 @@ public interface ModeOptions<T extends Enum<?>> {
 				return ConsiderYesAndNo.BOTH;
 
 			return AlwaysAvailable.NO;
-		}
-
-		@Override
-		public boolean allowUsage(ModeAvailability option) {
-			return option == ModeAvailability.YES;
 		}
 	}
 }

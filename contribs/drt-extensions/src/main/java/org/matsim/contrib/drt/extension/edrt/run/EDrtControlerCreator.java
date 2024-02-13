@@ -25,7 +25,7 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.EvBaseModule;
 import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
@@ -50,7 +50,7 @@ public class EDrtControlerCreator {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule(new EvBaseModule());
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(drtCfg.getMode()));

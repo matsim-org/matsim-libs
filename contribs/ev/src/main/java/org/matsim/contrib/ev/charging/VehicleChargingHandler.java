@@ -52,7 +52,10 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -69,8 +72,12 @@ public class VehicleChargingHandler
 	public static final String CHARGING_IDENTIFIER = " charging";
 	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
 			CHARGING_IDENTIFIER);
-	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
+	/*
+	 * actually this set is not needed as long as driver id's equal the vehicle id's. Because the internal id handling would sort that out
+	 * (it seems id types are irrelevant, in the end. Meaning that agentsInChargerQueue.remove(vehicleId) with Id<Vehicle> vehicleId works out, actually.
+	 */
 	private final Map<Id<Vehicle>, Id<Person>> lastDriver = new HashMap<>();
+	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 	private final Set<Id<Person>> agentsInChargerQueue = ConcurrentHashMap.newKeySet();
 
@@ -90,7 +97,7 @@ public class VehicleChargingHandler
 	/**
 	 * This assumes no liability which charger is used, as long as the type matches
 	 *
-	 * @param event
+	 * @param event the corresponding ActivityStartEvent to handle
 	 */
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
@@ -137,12 +144,13 @@ public class VehicleChargingHandler
 	public void handleEvent(ChargingEndEvent event) {
 		//Charging has ended before activity ends
 		vehiclesAtChargers.remove(event.getVehicleId());
-		agentsInChargerQueue.remove(lastDriver.get(event.getVehicleId()));
+		//the following should not be necessary anymore, because ChargingStartEvent happened already. But assuring this nevertheless
+		removeLastDriver(event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(ChargingStartEvent event) {
-		agentsInChargerQueue.remove(event.getVehicleId());
+		removeLastDriver(event.getVehicleId());
 	}
 
 	@Override
@@ -150,7 +158,10 @@ public class VehicleChargingHandler
 		//vehiclesAtChargers should normally already contain the vehicle, but assure this nevertheless
 		vehiclesAtChargers.put(event.getVehicleId(), event.getChargerId());
 		Id<Person> driver = lastDriver.get(event.getVehicleId());
-		agentsInChargerQueue.add(driver);
+		if (driver != null){
+			//agents this set extend their activity if evCfg.enforceChargingInteractionDuration
+			agentsInChargerQueue.add(driver);
+		} // else this vehicle is driven by a DynAgent (who did not leave the vehicle for charging)
 	}
 
 	/**
@@ -161,7 +172,7 @@ public class VehicleChargingHandler
 	 */
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		//TODO only do this every <evConfig.chargeTimeStep> seconds ?? (because
+		//TODO only do this every <evConfig.chargeTimeStep> seconds ??
 
 		//not sure how we should best get the MobsimAgent in some other way
 		//as PopulationAgentSource does not provide a collection of MobsimAgents and injecting the qsim into this class did not seem like a better solution to me
@@ -193,15 +204,21 @@ public class VehicleChargingHandler
 
 	@Override
 	public void handleEvent(QuitQueueAtChargerEvent event) {
-		if(evCfg.enforceChargingInteractionDuration){
+		if (evCfg.enforceChargingInteractionDuration){
 			//this could actually happen when combining with edrt/etaxi/evrp
-			throw new RuntimeException("should currently not happen, as queue is only quit by the agent if the charging activity ended" +
+			throw new RuntimeException("should currently not happen, as this event is only triggered in case the agent quits the charger queue without charging afterwards, " +
 				" and this should not happen with fixed charging activity duration.\n" +
 				"If you run evrp together with conventional (preplanned) EV, please refer to VSP.");
 		} else {
 			//Charging has ended before activity ends
 			vehiclesAtChargers.remove(event.getVehicleId());
-			agentsInChargerQueue.remove(lastDriver.get(event.getVehicleId()));
+			removeLastDriver(event.getVehicleId());
 		}
+	}
+
+	private void removeLastDriver(Id<Vehicle> vehicleId) {
+		if (lastDriver.get(vehicleId) != null) {
+			agentsInChargerQueue.remove(lastDriver.get(vehicleId));
+		} // else this vehicle is driven by a DynAgent (who did not leave the vehicle for charging)
 	}
 }

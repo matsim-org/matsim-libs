@@ -1,6 +1,6 @@
 package org.matsim.simwrapper.viz;
 
-	import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The Tile plug-in creates an overview of important key figures.

@@ -105,8 +105,8 @@ public class SharingMetricsControlerListener implements IterationEndsListener {
                 JFreeChart chartRides = ChartFactory.createBoxAndWhiskerChart("Sharing factor", "", "Factor", sharingFactorDataset, false);
                 JFreeChart chartPooling = ChartFactory.createBoxAndWhiskerChart("Pooling rate", "", "Rate", poolingRateDataset, false);
 
-                ((BoxAndWhiskerRenderer) chartRides.getCategoryPlot().getRenderer()).setMeanVisible(true);
-                ((BoxAndWhiskerRenderer) chartPooling.getCategoryPlot().getRenderer()).setMeanVisible(true);
+                ((BoxAndWhiskerRenderer) chartRides.getCategoryPlot().getRenderer()).setMeanVisible(false);
+                ((BoxAndWhiskerRenderer) chartPooling.getCategoryPlot().getRenderer()).setMeanVisible(false);
                 ChartUtils.writeChartAsPNG(new FileOutputStream(sharingFactors), chartRides, 1500, 1500);
                 ChartUtils.writeChartAsPNG(new FileOutputStream(poolingRates), chartPooling, 1500, 1500);
             }

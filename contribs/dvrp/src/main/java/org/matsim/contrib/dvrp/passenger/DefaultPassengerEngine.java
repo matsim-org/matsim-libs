@@ -53,6 +53,8 @@ import jakarta.inject.Provider;
 public final class DefaultPassengerEngine implements PassengerEngine, PassengerRequestRejectedEventHandler {
 
 	private final String mode;
+	private final Set<String> departureModes;
+	
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 
@@ -79,9 +81,10 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<MobsimPassengerAgent>> groupDepartureStage = new LinkedHashMap<>();
 
 
-	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator,
+	DefaultPassengerEngine(String mode, Set<String> departureModes, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator,
 						   VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator, AdvanceRequestProvider advanceRequestProvider, PassengerGroupIdentifier passengerGroupIdentifier) {
 		this.mode = mode;
+		this.departureModes = departureModes;
 		this.mobsimTimer = mobsimTimer;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
@@ -197,7 +200,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
-		if (!agent.getMode().equals(mode)) {
+		if (!departureModes.contains(agent.getMode())) {
 			return false;
 		}
 
@@ -285,8 +288,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			rejectedRequestsEvents.add(event);
 		}
 	}
-
+	
 	public static Provider<PassengerEngine> createProvider(String mode) {
+		return createProvider(mode, Collections.singleton(mode));
+	}
+
+	public static Provider<PassengerEngine> createProvider(String mode, Set<String> departureModes) {
 		return new ModalProviders.AbstractProvider<>(mode, DvrpModes::mode) {
 			@Inject
 			private EventsManager eventsManager;
@@ -296,7 +303,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 			@Override
 			public DefaultPassengerEngine get() {
-				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class),
+				return new DefaultPassengerEngine(getMode(), departureModes, eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class),
 					getModalInstance(VrpOptimizer.class), getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
 					getModalInstance(AdvanceRequestProvider.class), getModalInstance(PassengerGroupIdentifier.class));
 			}

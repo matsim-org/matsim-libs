@@ -82,7 +82,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Config config;
 
 	private static boolean hasWarnedAccessEgress = false;
-	private RoutingConfigGroup.AccessEgressType accessEgressType;
+	private final RoutingConfigGroup.AccessEgressType accessEgressType;
 	private final TimeInterpretation timeInterpretation;
 
 	private final MultimodalLinkChooser multimodalLinkChooser;
@@ -102,7 +102,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final MultimodalLinkChooser multimodalLinkChooser) {
 		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
-		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
+		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
@@ -314,9 +314,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
-		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
-//		act.setMaximumDuration(0.0); // obsolete since this is hard-coded in InteractionActivity
-		return act;
+        return PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
 	}
 
 	private static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
@@ -410,9 +408,16 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime((int) path.travelTime);
+
+			double relPosOnDepartureLink = 1.0;
+			double relPosOnArrivalLink = 1.0;
+
+			double maxSpeedOnToLink = Math.min(vehicle.getType().getMaximumVelocity(),toLink.getFreespeed());
+			double travelTimeEstimateOnToLink = (toLink.getLength() / maxSpeedOnToLink) * relPosOnArrivalLink;
+			route.setTravelTime((int) (path.travelTime+travelTimeEstimateOnToLink));
+
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.filteredNetwork));
+			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;

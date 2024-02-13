@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim.qsimengine;
+package org.matsim.contrib.drt.extension.companions;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+
+import java.util.Optional;
 
 /**
- * Current state of a track.
+ * @author steffenaxer
  */
-public enum TrackState {
-	FREE,
+class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
 
-	/**
-	 * Blocked tracks that are exclusively available for trains.
-	 */
-	BLOCKED
+	@Override
+	public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent) {
+
+		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent);
+
+		if (pe instanceof Leg leg) {
+			return DrtCompanionUtils.getPassengerGroupIdentifier(leg);
+		} else {
+			return Optional.empty();
+		}
+	}
+
 }

@@ -23,9 +23,12 @@ public final class Hexagons extends Viz {
 	@JsonProperty(required = true)
 	public String projection;
 
-	public double[] center = new double[2];
+	public double[] center;
 
 	public Double zoom;
+
+	public Double radius;
+	public Double maxHeight;
 
 	/**
 	 * List of all shown aggregations
