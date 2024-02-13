@@ -37,6 +37,11 @@ public class ApplicationUtils {
 
 	private static final Logger log = LogManager.getLogger(ApplicationUtils.class);
 
+	/**
+	 * This encoding indicates command line was used to start the jar.
+	 */
+	private static final String WIN_CLI_ENCODING = "cp850";
+
 	private ApplicationUtils() {
 	}
 
@@ -77,12 +82,23 @@ public class ApplicationUtils {
 
 		if (os.toLowerCase().startsWith("windows")) {
 
-			// system prop: sun.stderr.encoding, sun.stdout.encoding not present
-			// env PROMPT not present
+			// presence of the prompt variable indicates that the jar was run from the command line
+			boolean hasPrompt = System.getenv().containsKey("PROMPT");
 
+			// this prompt is not set in power shell, so we need another check
+			if (hasPrompt)
+				return false;
+
+			// stdout.encoding from CLI are usually cp850
+			String encoding = System.getenv().getOrDefault("stdout.encoding", "none");
+			String sunEncoding = System.getenv().getOrDefault("sun.stdout.encoding", "none");
+
+			if (encoding.equals(WIN_CLI_ENCODING) || sunEncoding.equals(WIN_CLI_ENCODING))
+				return false;
+
+			// if no other cli indicates are present, we have to assume that the jar was run from the desktop
+			return true;
 		}
-
-		// TODO: test on win10 as well with GR laptop
 
 		return false;
 

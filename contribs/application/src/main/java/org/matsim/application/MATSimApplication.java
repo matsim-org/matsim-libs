@@ -382,14 +382,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
 
-		if (ApplicationUtils.isRunFromDesktop()) {
+		if (ApplicationUtils.isRunFromDesktop() && args.length == 0) {
 
 			if (defaultArgs.length > 0) {
 				String value = String.join(ARGS_DELIMITER, defaultArgs);
 				System.setProperty("MATSIM_GUI_ARGS", value);
 			}
 
-			// args should be empty when run from desktop and is not used
+			// args are empty when run from desktop and is not used
 			run(clazz, "gui");
 
 		} else {
