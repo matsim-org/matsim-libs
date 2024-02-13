@@ -85,13 +85,13 @@ public class ApplicationUtils {
 			// presence of the prompt variable indicates that the jar was run from the command line
 			boolean hasPrompt = System.getenv().containsKey("PROMPT");
 
-			// this prompt is not set in power shell, so we need another check
+			// this prompt is not set in PowerShell, so we need another check
 			if (hasPrompt)
 				return false;
 
 			// stdout.encoding from CLI are usually cp850
-			String encoding = System.getenv().getOrDefault("stdout.encoding", "none");
-			String sunEncoding = System.getenv().getOrDefault("sun.stdout.encoding", "none");
+			String encoding = System.getProperty("stdout.encoding", "none");
+			String sunEncoding = System.getProperty("sun.stdout.encoding", "none");
 
 			if (encoding.equals(WIN_CLI_ENCODING) || sunEncoding.equals(WIN_CLI_ENCODING))
 				return false;
