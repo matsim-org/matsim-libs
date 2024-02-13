@@ -248,6 +248,22 @@ public final class CommandRunner {
 	}
 
 	/**
+	 * Return the output of a command with a placeholder.
+	 * @param file file name, which must contain a %s, which will be replaced by the placeholder
+	 */
+	public Path getRequiredPath(Class<? extends MATSimAppCommand> command, String file, String placeholder) {
+		CommandSpec spec = ApplicationUtils.getSpec(command);
+		if (!ArrayUtils.contains(spec.produces(), file))
+			throw new IllegalArgumentException(String.format("Command %s does not declare output %s", command, file));
+		if (!file.contains("%s"))
+			throw new IllegalArgumentException(String.format("File %s does not contain placeholder %%s", file));
+
+		file = String.format(file, placeholder);
+
+		return buildPath(spec, command).resolve(file);
+	}
+
+	/**
 	 * Base path for the runner.
 	 */
 	public Path getOutput() {
@@ -279,8 +295,8 @@ public final class CommandRunner {
 		if (args.length != 0) {
 			String[] existing = this.args.get(command);
 			if (existing != null && existing.length > 0 && !Arrays.equals(existing, args)) {
-				throw new IllegalArgumentException(String.format("Command %s already registered with args %s, can not define different args as %s",
-					command.toString(), Arrays.toString(existing), Arrays.toString(args)));
+				throw new IllegalArgumentException(String.format("Command %s already registered with args %s, can not define different args as %s (name '%s').",
+					command.toString(), Arrays.toString(existing), Arrays.toString(args), name));
 			}
 		}
 
@@ -296,6 +312,22 @@ public final class CommandRunner {
 			if (!this.args.containsKey(depends))
 				add(depends);
 		}
+	}
+
+	/**
+	 * Insert args for an already existing command. If the command was not added, this does nothing.
+	 */
+	public void insertArgs(Class<? extends MATSimAppCommand> command, String... args) {
+
+		if (!this.args.containsKey(command))
+			return;
+
+		String[] existing = this.args.get(command);
+		String[] newArgs = new String[existing.length + args.length];
+		System.arraycopy(args, 0, newArgs, 0, args.length);
+		System.arraycopy(existing, 0, newArgs, args.length, existing.length);
+
+		this.args.put(command, newArgs);
 	}
 
 	/**

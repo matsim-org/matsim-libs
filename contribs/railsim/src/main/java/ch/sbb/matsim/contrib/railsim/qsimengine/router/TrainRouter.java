@@ -19,14 +19,16 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.router;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -44,6 +46,8 @@ public final class TrainRouter {
 	private final RailResourceManager resources;
 	private final LeastCostPathCalculator lpc;
 
+	private final DisUtility disutility = new DisUtility();
+
 	@Inject
 	public TrainRouter(QSim qsim, RailResourceManager resources) {
 		this(qsim.getScenario().getNetwork(), resources);
@@ -54,16 +58,18 @@ public final class TrainRouter {
 		this.resources = resources;
 
 		// uses the full network, which should not be slower than filtered network as long as dijkstra is used
-		this.lpc = new SpeedyALTFactory().createPathCalculator(network, new DisUtility(), new FreeSpeedTravelTime());
+		this.lpc = new DijkstraFactory().createPathCalculator(network, disutility, new FreeSpeedTravelTime());
 	}
 
 	/**
-	 * Calculate the shortest path between two links.
+	 * Calculate the shortest path between two links. This method is not thread-safe, because of mutable state in the disutility.
 	 */
-	public List<RailLink> calcRoute(RailLink from, RailLink to) {
+	public List<RailLink> calcRoute(TrainPosition position, RailLink from, RailLink to) {
 
 		Node fromNode = network.getLinks().get(from.getLinkId()).getToNode();
 		Node toNode = network.getLinks().get(to.getLinkId()).getFromNode();
+
+		disutility.setPosition(position);
 
 		LeastCostPathCalculator.Path path = lpc.calcLeastCostPath(fromNode, toNode, 0, null, null);
 
@@ -71,9 +77,17 @@ public final class TrainRouter {
 	}
 
 	private final class DisUtility implements TravelDisutility {
+
+		private TrainPosition position;
+
+		public void setPosition(TrainPosition position) {
+			this.position = position;
+		}
+
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-			return resources.hasCapacity(link.getId()) ? 0 : 1;
+			// only works with fixed block
+			return resources.hasCapacity(time, link.getId(), RailResourceManager.ANY_TRACK, position) ? 0 : 1;
 		}
 
 		@Override

@@ -31,10 +31,25 @@ public class ApplicationUtils {
 	private ApplicationUtils() {
 	}
 
+
+	/**
+	 * Merge given arguments with custom ones.
+	 *
+	 * @param args        given args, usually input from command line / main method
+	 * @param defaultArgs default arguments that will be added to existing ones.
+	 */
+	public static String[] mergeArgs(String[] args, String... defaultArgs) {
+		String[] mergedArgs = new String[args.length + defaultArgs.length];
+		System.arraycopy(args, 0, mergedArgs, 0, args.length);
+		System.arraycopy(defaultArgs, 0, mergedArgs, args.length, defaultArgs.length);
+		return mergedArgs;
+	}
+
 	/**
 	 * Extends a context (usually config location) with an relative filename.
 	 * If the results is a local file, the path will be returned. Otherwise, it will be an url.
 	 * The results can be used as input for command line parameter or {@link IOUtils#resolveFileOrResource(String)}.
+	 *
 	 * @return string with path or URL
 	 */
 	public static String resolve(URL context, String filename) {
@@ -61,9 +76,9 @@ public class ApplicationUtils {
 
 		try {
 			return Files.list(path)
-					.filter(p -> m.matches(p.getFileName()))
-					.findFirst()
-					.orElseThrow(() -> new IllegalStateException("No " + pattern + " file found."));
+				.filter(p -> m.matches(p.getFileName()))
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("No " + pattern + " file found."));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -154,11 +169,19 @@ public class ApplicationUtils {
 		boolean input = false;
 		boolean output = false;
 		for (Field field : fields) {
-			if (field.getType().equals(InputOptions.class))
+			if (field.getType().equals(InputOptions.class)) {
 				input = true;
+				CommandLine.Mixin mixin = field.getAnnotation(CommandLine.Mixin.class);
+				if (mixin == null)
+					throw new IllegalArgumentException(String.format("The command %s has no @Mixin annotation for InputOptions %s.", command, field.getName()));
+			}
 
-			if (field.getType().equals(OutputOptions.class))
+			if (field.getType().equals(OutputOptions.class)) {
 				output = true;
+				CommandLine.Mixin mixin = field.getAnnotation(CommandLine.Mixin.class);
+				if (mixin == null)
+					throw new IllegalArgumentException(String.format("The command %s has no @Mixin annotation for OutputOptions %s.", command, field.getName()));
+			}
 		}
 
 		if (!input) {
@@ -213,7 +236,7 @@ public class ApplicationUtils {
 			return path.get();
 
 		// Match more general pattern at last
-		path = matchPattern( ".+\\.[a-zA-Z0-9]*_" + name + "\\..+", dir);
+		path = matchPattern(".+\\.[a-zA-Z0-9]*_" + name + "\\..+", dir);
 		if (path.isPresent())
 			return path.get();
 
