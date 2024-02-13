@@ -25,6 +25,8 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
+import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
@@ -33,6 +35,7 @@ import org.matsim.contrib.drt.stops.*;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -104,5 +107,15 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
+
+		if (drtCfg.getDrtEstimatorParams().isPresent()) {
+			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
+
+			if (drtCfg.getDrtEstimatorParams().get().teleport) {
+				addRoutingModuleBinding(getMode()).toProvider(new EstimationRoutingModuleProvider(getMode()));// not singleton
+			}
+
+		}
+
 	}
 }

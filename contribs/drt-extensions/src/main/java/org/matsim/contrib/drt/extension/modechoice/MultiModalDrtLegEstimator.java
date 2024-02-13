@@ -1,9 +1,10 @@
-package org.matsim.contrib.drt.extension.estimator;
+package org.matsim.contrib.drt.extension.modechoice;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;

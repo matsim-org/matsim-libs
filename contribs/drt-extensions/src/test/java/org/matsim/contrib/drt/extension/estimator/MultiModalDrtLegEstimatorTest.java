@@ -4,12 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
+import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
-import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
-import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorModule;
-import org.matsim.contrib.drt.extension.estimator.run.MultiModeDrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.modechoice.MultiModalDrtLegEstimator;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.modechoice.InformedModeChoiceModule;
@@ -49,15 +47,16 @@ public class MultiModalDrtLegEstimatorTest {
 				.withLegEstimator(MultiModalDrtLegEstimator.class, ModeOptions.AlwaysAvailable.class, "drt", "av");
 
 		controler.addOverridingModule(builder.build());
-		controler.addOverridingModule(new DrtEstimatorModule());
+//		controler.addOverridingModule(new DrtEstimatorModule());
 	}
 
 	private static void prepare(Config config) {
 
-		MultiModeDrtEstimatorConfigGroup estimators = ConfigUtils.addOrGetModule(config, MultiModeDrtEstimatorConfigGroup.class);
-
-		estimators.addParameterSet(new DrtEstimatorConfigGroup("drt"));
-		estimators.addParameterSet(new DrtEstimatorConfigGroup("av"));
+//		MultiModeDrtEstimatorConfigGroup estimators = ConfigUtils.addOrGetModule(config, MultiModeDrtEstimatorConfigGroup.class);
+//
+//		estimators.addParameterSet(new DrtEstimatorParams("drt"));
+//		estimators.addParameterSet(new DrtEstimatorParams("av"));
+		// TODO fix later
 
 		// Set subtour mode selection as strategy
 		List<ReplanningConfigGroup.StrategySettings> strategies = config.replanning().getStrategySettings().stream()

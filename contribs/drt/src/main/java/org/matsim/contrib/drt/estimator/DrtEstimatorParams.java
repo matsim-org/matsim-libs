@@ -1,14 +1,11 @@
-package org.matsim.contrib.drt.extension.estimator.run;
+package org.matsim.contrib.drt.estimator;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
+public class DrtEstimatorParams extends ReflectiveConfigGroup {
 
 	/**
 	 * Type of estimator, which will be installed in {@link DrtEstimatorModule}.
@@ -27,21 +24,11 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 		CUSTOM
 	}
 
-	public static final String GROUP_NAME = "drtEstimator";
+	public static final String SET_NAME = "estimator";
 
-	public DrtEstimatorConfigGroup() {
-		super(GROUP_NAME);
+	public DrtEstimatorParams() {
+		super(SET_NAME);
 	}
-
-	public DrtEstimatorConfigGroup(String mode) {
-		super(GROUP_NAME);
-		this.mode = mode;
-	}
-
-	@Parameter
-	@Comment("Mode of the drt service to estimate.")
-	@NotBlank
-	public String mode = TransportMode.drt;
 
 	@Parameter
 	@Comment("Estimator typed to be used. In case of 'CUSTOM', guice bindings needs to be provided.")
@@ -58,15 +45,16 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	@PositiveOrZero
 	public double randomization = 0.1;
 
-	@Override
-	public String getMode() {
-		return mode;
-	}
+	// TODO think about enum, or different place / name for this option
+	@Parameter
+	@Comment("Whether drt passengers should be teleported based on estimation")
+	@Deprecated
+	public boolean teleport = false;
 
 	/**
 	 * Set estimator type and return same instance.
 	 */
-	public DrtEstimatorConfigGroup withEstimator(EstimatorType estimator) {
+	public DrtEstimatorParams withEstimator(EstimatorType estimator) {
 		this.estimator = estimator;
 		return this;
 	}

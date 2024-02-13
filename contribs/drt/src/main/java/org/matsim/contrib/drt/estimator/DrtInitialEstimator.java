@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.estimator;
+package org.matsim.contrib.drt.estimator;
 
 /**
  * This interface is used to provide an initial estimate for the drt service.

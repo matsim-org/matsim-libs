@@ -2,7 +2,9 @@ package org.matsim.contrib.drt.teleportation;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -41,15 +43,14 @@ class Test2 {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 
-
 		// install the drt routing stuff, but not the mobsim stuff!
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
 
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		DrtSpeedUpParams params = new DrtSpeedUpParams();
-		params.fractionOfIterationsSwitchOn = 0;
+		DrtEstimatorParams params = new DrtEstimatorParams();
+		params.teleport=true;
 		drtConfigGroup.addParameterSet(params);
 
 		System.out.println(config);
@@ -79,39 +80,6 @@ class Test2 {
 
 	}
 
-	private static class DrtEstimatingRoutingModule implements RoutingModule {
-
-		private final RoutingModule drtRoutingModule;
-
-		private DrtEstimatingRoutingModule(TripRouter tripRouter) {
-			this.drtRoutingModule = tripRouter.getRoutingModule("drt");
-		}
-
-
-		@Override
-		public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-			List<? extends PlanElement> route = drtRoutingModule.calcRoute(request);
-
-			DrtRouteCreator creator = null;
-			//	creator.createRoute( departureTime, accessActLink, egressActLink, person, tripAttributes, routeFactories );
-
-			DrtRouteFactory factory = null;
-			//	Route drtRoute = factory.createRoute( startLinkId, endLinkId );
-
-			// correct the attributes of the route as we need them
-
-			//	DrtInitialEstimator estimator = new DrtInitialEstimator(){
-			//	};
-
-			//		DrtEstimator.Estimate estimate = estimator.estimate( route, 12. * 3600 );
-
-			//	estimate.travelTime();
-			//	estimate.distance();
-
-			return route;
-		}
-
-	}
 
 	public record EstimatedDrtTeleportationInfo(double estTotalTravelTime, double estWaitTime, double estRideTime, double estRideDistance) {
 		// The teleportation info refers to the main DRT leg (accessLink -> egressLink, departing at departureTime)

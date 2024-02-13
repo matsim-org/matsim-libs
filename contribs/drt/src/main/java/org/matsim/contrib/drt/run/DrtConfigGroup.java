@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
@@ -235,6 +236,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private PrebookingParams prebookingParams;
 
 	@Nullable
+	private DrtEstimatorParams drtEstimatorParams;
+
+	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
@@ -279,6 +283,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
 				() -> prebookingParams,
 				params -> prebookingParams = (PrebookingParams)params);
+
+		// estimator (optional)
+		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
+			() -> drtEstimatorParams,
+			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
 	}
 
 	@Override
@@ -356,6 +366,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<PrebookingParams> getPrebookingParams() {
 		return Optional.ofNullable(prebookingParams);
+	}
+
+	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
+		return Optional.ofNullable(drtEstimatorParams);
 	}
 
 	/**

@@ -1,6 +1,6 @@
-package org.matsim.contrib.drt.extension.estimator.impl;
+package org.matsim.contrib.drt.estimator.impl;
 
-import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
+import org.matsim.contrib.drt.estimator.DrtInitialEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;

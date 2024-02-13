@@ -78,7 +78,8 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 
-		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
+		// TODO just for testing
+//		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
 		// (this is the normal routing module binding)
 
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
