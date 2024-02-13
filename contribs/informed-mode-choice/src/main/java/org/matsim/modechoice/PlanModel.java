@@ -81,6 +81,7 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	}
 
 	public Plan getPlan() {
+		// TODO: This should better be removed, memory usage by keeping these plans is increased
 		return plan;
 	}
 
