@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Mixin
 	private ScenarioOptions scenario;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
+	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter")
 	private String subpopulation;
 
 	@CommandLine.Option(names = "--top-k", description = "Use top k estimates")
@@ -103,7 +104,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		// copy the original plan, so no modifications are made
 		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			String subpop = PopulationUtils.getSubpopulation(person);
-			if (subpopulation != null && !subpop.equals(subpopulation))
+			if (subpopulation != null && !Objects.equals(subpop, subpopulation))
 				continue;
 
 			Plan selected = person.getSelectedPlan();
