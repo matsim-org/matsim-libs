@@ -77,6 +77,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author nagel, ikaddoura
@@ -1266,5 +1269,23 @@ public final class PopulationUtils {
 		return person ;
 	}
 
+	/**
+	 * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
+	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+	 */
+	public static void insertVehicleTypesIntoPersonAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType ) {
+		VehicleUtils.insertVehicleTypesIntoPersonAttributes( person, modeToVehicleType );
+	}
+	/**
+	 * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
+	 *
+	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
+	 *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
+	 *                      and provided values are merged into one map
+	 *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
+	 */
+	public static void insertVehicleIdsIntoPersonAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle ) {
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
+	}
 
 }
