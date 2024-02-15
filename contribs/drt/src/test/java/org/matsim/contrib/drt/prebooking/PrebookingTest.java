@@ -528,4 +528,90 @@ public class PrebookingTest {
 		assertEquals(2060.0, taskInfo.get(3).endTime, 1e-3); // Ending stop (260s duration)
 		assertEquals(2060.0, taskInfo.get(4).startTime, 1e-3); // Starting drive (ending stop)
 	}
+
+	@Test
+	void destinationEqualsPrebookedOrigin_twoRequests() {
+		/*-
+		 * In this test, we have two prebooked requests:
+		 * P[A] ---------> D[A]     P[B] --------> D[B]
+		 * 
+		 * The dropoff of A happens at the same place as the pickup of B. Then we dispatch a new request C 
+		 * traveling the same trip as A. Without an implemented fix, inserting the dropfof between D[A] and P[B] 
+		 * was not an option as P[B] was the same link as the destination of C. The only viable dropoff insertion 
+		 * was after P[B], which, however, was too late.
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.addRequest("requestA", 1, 1, 4, 4, 1000.0, 0.0) //
+				.addRequest("requestB", 4, 4, 8, 8, 8000.0, 1.0) //
+				.addRequest("requestC", 1, 1, 4, 4, 1000.0, 2.0) //
+				.configure(300.0, 2.0, 1800.0, 60.0) //
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(1000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(1188.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB");
+			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(8000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(8230.0, requestInfo.dropoffTime, 1e-3);
+		}
+		
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestC");
+			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(1000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(1188.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		assertEquals(4, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
+	
+	@Test
+	void destinationEqualsPrebookedOrigin_oneRequest() {
+		/*-
+		 * In this test, we aprebooked requests:
+		 * P[A] ---------> D[A]
+		 * 
+		 * Then we dispatch a new request C before A. The destination of C is the origin of A. Without an implemented fix, 
+		 * inserting the dropoff before P[A] was not allowed as it is the same link, but inserting after D[A] was too late.
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.addRequest("requestA", 4, 4, 8, 8, 4000.0, 1.0) //
+				.addRequest("requestB", 1, 1, 4, 4, 1000.0, 2.0) //
+				.configure(300.0, 2.0, 1800.0, 60.0) //
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(4000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(4230.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB");
+			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(1000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(1188.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		assertEquals(4, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
 }
