@@ -19,7 +19,7 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 	@Override
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask) {
+	public List<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask) {
 
 		if (mask == null)
 			throw new IllegalArgumentException("Mask must be provided");
