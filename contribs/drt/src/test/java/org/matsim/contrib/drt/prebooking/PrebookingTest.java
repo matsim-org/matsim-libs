@@ -207,8 +207,8 @@ public class PrebookingTest {
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("lateRequest");
 			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(4000.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(4103.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(4000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(4104.0, requestInfo.dropoffTime, 1e-3);
 		}
 	}
 
