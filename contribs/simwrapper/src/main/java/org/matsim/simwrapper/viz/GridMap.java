@@ -39,6 +39,12 @@ public class GridMap extends Viz {
 	@JsonProperty(required = false)
 	public Integer maxHeight;
 
+	/**
+	 * The valueColumn defines the column with the values. The default value is `value`.
+	 */
+	@JsonProperty(required = false)
+	public String valueColumn;
+
 	private Map<String, Object> colorRamp;
 
 	public GridMap() {

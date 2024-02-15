@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.contrib.gtfs.TransitSchedulePostProcessTools;
 import org.matsim.core.config.ConfigUtils;
@@ -216,6 +217,13 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(reRbVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(reRbVehicleType, 1.0 / 10.0); // 1s per boarding agent, distributed on 10 doors
 			VehicleUtils.setEgressTime(reRbVehicleType, 1.0 / 10.0); // 1s per alighting agent, distributed on 10 doors
+
+			EngineInformation carEngineInformation = reRbVehicleType.getEngineInformation();
+			VehicleUtils.setHbefaVehicleCategory(carEngineInformation, String.valueOf(HbefaVehicleCategory.NON_HBEFA_VEHICLE));
+			VehicleUtils.setHbefaTechnology(carEngineInformation, "average");
+			VehicleUtils.setHbefaSizeClass(carEngineInformation, "average");
+			VehicleUtils.setHbefaEmissionsConcept(carEngineInformation, "average");
+
 			scenario.getTransitVehicles().addVehicleType(reRbVehicleType);
 		}
 		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType(Id.create("S-Bahn_veh_type", VehicleType.class));

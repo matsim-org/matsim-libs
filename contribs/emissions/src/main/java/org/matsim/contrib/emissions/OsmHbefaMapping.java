@@ -97,11 +97,8 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
     @Override
     public String determineHebfaType(Link link) {
-        String roadTypeAttribute = (String) link.getAttributes().getAttribute(NetworkUtils.TYPE);
-        Object allowedSpeedAttribute = link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED);
-
-        String roadType = StringUtils.isBlank(roadTypeAttribute) ? "unclassified" : roadTypeAttribute;
-        double allowedSpeed = allowedSpeedAttribute != null ? (double) allowedSpeedAttribute : link.getFreespeed();
+        String roadType = NetworkUtils.getHighwayType(link);
+        double allowedSpeed = NetworkUtils.getAllowedSpeed(link);
 
         return getHEBFAtype(roadType, allowedSpeed);
     }
