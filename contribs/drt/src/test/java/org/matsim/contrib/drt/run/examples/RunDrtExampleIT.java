@@ -27,6 +27,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ import org.matsim.contrib.drt.util.DrtFleetExtensionHelper;
 import org.matsim.contrib.drt.util.DrtFleetExtensionHelper.DrtFleetExtensionHelperQSimModule;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
@@ -389,8 +391,10 @@ public class RunDrtExampleIT {
 		
 		// here starts the extension of the fleet
 		// at 02h00 we add two new vehicles to the fleet that are in service between 8h00 and 12h00
+		// they are removed again at 13h00
 		
-		double extensionTime = 7200.0;
+		double insertionTime = 7200.0;
+		double removalTime = 46800.0;
 		
 		FleetSpecification addedFleetSpecification = new FleetSpecificationImpl();
 		for (int i = 0; i < 3; i++) {
@@ -410,12 +414,20 @@ public class RunDrtExampleIT {
 			protected void configureQSim() {
 				addModalComponent(MobsimBeforeSimStepListener.class, modalProvider(getter -> {
 					DrtFleetExtensionHelper helper = getter.getModal(DrtFleetExtensionHelper.class);
+					Fleet fleet = getter.getModal(Fleet.class);
+					List<DvrpVehicle> vehicles = new LinkedList<>();
 					
 					return new MobsimBeforeSimStepListener() {
 						@Override
 						public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-							if (e.getSimulationTime() == extensionTime) {
-								addedFleetSpecification.getVehicleSpecifications().values().forEach(helper::addVehicle);
+							if (e.getSimulationTime() == insertionTime) {
+								for (DvrpVehicleSpecification specification : addedFleetSpecification.getVehicleSpecifications().values()) {
+									vehicles.add(helper.addVehicle(specification));
+								}
+							}
+							
+							if (e.getSimulationTime() == removalTime) {
+								vehicles.forEach(v -> fleet.removeVehicle(v.getId()));
 							}
 						}
 					};

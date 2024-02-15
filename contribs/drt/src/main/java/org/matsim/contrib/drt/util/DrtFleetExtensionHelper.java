@@ -27,8 +27,12 @@ public class DrtFleetExtensionHelper {
 		this.network = network;
 	}
 
-	public void addVehicle(DvrpVehicleSpecification specification) {
-		addVehicle(new DvrpVehicleImpl(specification, network.getLinks().get(specification.getStartLinkId())));
+	public DvrpVehicle addVehicle(DvrpVehicleSpecification specification) {
+		DvrpVehicle vehicle = new DvrpVehicleImpl(specification,
+				network.getLinks().get(specification.getStartLinkId()));
+
+		addVehicle(vehicle);
+		return vehicle;
 	}
 
 	public void addVehicle(DvrpVehicle vehicle) {
