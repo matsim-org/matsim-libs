@@ -109,7 +109,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		}
 	}
 
-	void writeTravelTimeAndDistance(String analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
 		String fileName = analysisOutputDirectory + "TimeDistance_perVehicle.tsv";
