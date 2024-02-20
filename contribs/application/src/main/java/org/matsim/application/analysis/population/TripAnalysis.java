@@ -26,11 +26,12 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
 import tech.tablesaw.selection.Selection;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
@@ -93,7 +94,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
 			.sample(false)
-			.separator(';').build());
+			.separator(detectDelimiter(input.getPath("persons.csv"))).build());
 
 		int total = persons.rowCount();
 
@@ -134,8 +135,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
 			.sample(false)
-			.separator(';').build());
-
+			.separator(detectDelimiter(input.getPath("trips.csv"))).build());
 
 		// Trip filter with start and end
 		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
@@ -186,6 +186,45 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeTripPurposes(joined);
 
 		return 0;
+	}
+
+	private Character detectDelimiter(String path) throws IOException {
+		// Create a map to count occurrences of potential delimiters
+		Map<Character, Integer> delimiterCounts = new HashMap<>();
+
+		BufferedReader reader = null;
+		try {
+			if (path.endsWith(".gz")) {
+				reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(path))));
+			} else if (path.endsWith(".csv")) {
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+			} else {
+				log.error("Usupported file format.");
+			}
+
+			String firstLine = reader.readLine();
+
+			delimiterCounts.put(',', firstLine.split(",").length);
+			delimiterCounts.put(';', firstLine.split(";").length);
+			delimiterCounts.put('\t', firstLine.split("\t").length);
+
+		} catch (FileNotFoundException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } finally {
+			reader.close();
+		}
+
+		Character delimiter = null;
+		for (Map.Entry<Character, Integer> e : delimiterCounts.entrySet()) {
+			if (e.getValue().equals(Collections.max(delimiterCounts.values()))) {
+				delimiter = e.getKey();
+				break;
+			}
+		}
+
+        return delimiter;
 	}
 
 	private void writeModeShare(Table trips, List<String> labels) {
