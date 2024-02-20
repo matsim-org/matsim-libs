@@ -36,6 +36,8 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.sharingmetrics.SharingMetricsModule;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.dvrp.analysis.FleetSizeProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.FleetSizeProfileView;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -124,6 +126,18 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
 						getter.get(QSimConfigGroup.class)))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
+		
+		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+			MatsimServices matsimServices = getter.get(MatsimServices.class);
+			String mode = drtCfg.getMode();
+			var profileView = new FleetSizeProfileView(getter.getModal(FleetSizeProfileCalculator.class));
+			return new ProfileWriter(matsimServices, mode, profileView, "fleet_size_profile", false);
+		}));
+
+		bindModal(FleetSizeProfileCalculator.class).toProvider(modalProvider(
+				getter -> new FleetSizeProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
+						getter.get(QSimConfigGroup.class)))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(FleetSizeProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(getter -> {
 			MatsimServices matsimServices = getter.get(MatsimServices.class);
