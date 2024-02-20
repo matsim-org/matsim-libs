@@ -1,1 +1,1 @@
-vehicleId 	 carrierId 	 vehicleTypeId 	 tourId 	 tourDuration[s] 	 travelDistance[m] 	 costPerSecond[EUR/s] 	 costPerMeter[EUR/m] 	 fixedCosts[EUR] 	 varCostsTime[EUR] 	 varCostsDist[EUR] 	 totalCosts[EUR]
+vehicleId 	 carrierId 	 vehicleTypeId 	 tourId 	 tourDuration[s] 	 tourDuration[h] 	travelDistance[m] 	 travelDistance[km] 	 travelTime[s] 	 travelTime[h] 	costPerSecond[EUR/s] 	 costPerMeter[EUR/m] 	 fixedCosts[EUR] 	 varCostsTime[EUR] 	 varCostsDist[EUR] 	 totalCosts[EUR]
