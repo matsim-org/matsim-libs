@@ -1,2 +1,2 @@
-vehicleTypeId 	 nuOfVehicles 	 SumOfTourDuration[s] 	 SumOfTravelDistances[m] 	 costPerSecond[EUR/s] 	 costPerMeter[EUR/m] 	 fixedCosts[EUR/veh] 	varCostsTime[EUR] 	 varCostsDist[EUR] 	 fixedCosts[EUR] 	 totalCosts[EUR]
-light	0	0.0	60000.0	0.008	4.7E-4	84.0	0.0	28.2	0.0	28.2
+vehicleTypeId 	 nuOfVehicles 	 SumOfTourDuration[s] 	 SumOfTourDuration[h] 	SumOfTravelDistances[m] 	 SumOfTravelDistances[km] 	 SumOfTravelTime[s] 	 SumOfTravelTime[h] 	costPerSecond[EUR/s] 	 costPerMeter[EUR/m] 	 fixedCosts[EUR/veh] 	varCostsTime[EUR] 	 varCostsDist[EUR] 	 fixedCosts[EUR] 	 totalCosts[EUR]
+light	0	0.0	0.0	60000.0	60.0	8040.0	2.2333333333333334	0.008	4.7E-4	84.0	0.0	28.2	0.0	28.2
