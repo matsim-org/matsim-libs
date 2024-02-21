@@ -93,10 +93,6 @@
 					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.beust</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>com.graphql-java</groupId>
 					<artifactId>*</artifactId>
 				</exclusion>
