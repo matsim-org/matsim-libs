@@ -58,6 +58,23 @@ public class FingerprintEventHandler implements BasicEventHandler {
 				stringHash += hashToAdd;
 			}
 		}
+
+		public void printFingerprint(FingerprintEventHandler.EventFingerprint fingerprint) {
+			System.out.println("Time Array:");
+			var i = 0;
+			for (Float value : fingerprint.getTimeArray()) {
+				i++;
+				if(i % 100000 == 0)
+					System.out.println(value);
+			}
+
+			System.out.println("Event Type Counter:");
+			for (Map.Entry<String, Integer> entry : fingerprint.getEventTypeCounter().entrySet()) {
+				System.out.println(entry.getKey() + ": " + entry.getValue());
+			}
+
+			System.out.println("String Hash: " + fingerprint.getStringHash());
+		}
 	}
 
 	public void addEventType(String str) {

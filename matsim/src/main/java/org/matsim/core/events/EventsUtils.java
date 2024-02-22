@@ -79,16 +79,16 @@ public final class EventsUtils {
 
 	}
 
-	public static EventsFileComparator.Result createAndCompareEventsFingerprint(String inputFingerprint, String eventFile) {
+	public static EventsFileFingerprintComparator.Result createAndCompareEventsFingerprint(String inputFingerprint, String eventFile) {
 
 		// header byte, version byte
 		// bin array time stamps
 		// event type counter map
 		// one hash (sha1?)
 
-		new EventsFileFingerprintComparator();
+		EventsFileFingerprintComparator.Result result = EventsFileFingerprintComparator.compare(inputFingerprint,eventFile);
 
-		return EventsFileComparator.Result.FILES_ARE_EQUAL;
+		return result;
 	}
 
 	public static void readEvents(EventsManager events, String filename) {

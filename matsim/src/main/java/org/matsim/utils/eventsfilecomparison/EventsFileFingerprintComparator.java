@@ -32,25 +32,22 @@ public class EventsFileFingerprintComparator {
 		FingerprintEventHandler.EventFingerprint correctFingerprint = FingerprintEventHandler.readEventFingerprintFromFile(fingerprint);
 
 
-		if (fingerprintFromEvents == fingerprintFromEvents) {
-			return Result.FILES_ARE_EQUAL;
-		}
 		if (fingerprintFromEvents == null) {
 			return Result.DIFFERENT_TIMESTEPS;
 		}
 
 		// Compare timeArray
-		if (!Objects.equals(fingerprintFromEvents.timeArray, fingerprintFromEvents.timeArray)) {
+		if (!Objects.equals(correctFingerprint.timeArray, fingerprintFromEvents.timeArray)) {
 			return Result.DIFFERENT_TIMESTEPS;
 		}
 
 		// Compare eventTypeCounter
-		if (!Objects.equals(fingerprintFromEvents.eventTypeCounter, fingerprintFromEvents.eventTypeCounter)) {
+		if (!Objects.equals(correctFingerprint.eventTypeCounter, fingerprintFromEvents.eventTypeCounter)) {
 			return Result.WRONG_EVENT_COUNT;
 		}
 
 		// Compare stringHash
-		if (!Objects.equals(fingerprintFromEvents.stringHash, fingerprintFromEvents.stringHash)) {
+		if (!Objects.equals(correctFingerprint.stringHash, fingerprintFromEvents.stringHash)) {
 			return Result.MISSING_EVENT;
 		}
 
