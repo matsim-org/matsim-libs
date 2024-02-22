@@ -406,7 +406,7 @@ public class TrafficVolumeGeneration {
 			Integer purpose, String volumeType, String originalZone) {
 		ArrayList<TrafficVolumeKey> shuffledKeys = new ArrayList<>(
 				trafficVolumePerTypeAndZone.keySet());
-		Collections.shuffle(shuffledKeys);
+		Collections.shuffle(shuffledKeys, MatsimRandom.getRandom());
 		for (TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
 			if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)
 					&& trafficVolumePerTypeAndZone.get(trafficVolumeKey).getDouble(purpose) > 0) {
