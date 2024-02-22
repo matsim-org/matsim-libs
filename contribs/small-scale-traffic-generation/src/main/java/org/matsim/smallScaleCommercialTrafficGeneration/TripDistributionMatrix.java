@@ -605,7 +605,7 @@ public class TripDistributionMatrix {
 				try {
 
 					List<String> headerRow = new ArrayList<>();
-					headerRow.add("");
+					headerRow.add("O/D");
 					headerRow.addAll(usedZones);
 					JOIN.appendTo(writer, headerRow);
 					writer.write("\n");
