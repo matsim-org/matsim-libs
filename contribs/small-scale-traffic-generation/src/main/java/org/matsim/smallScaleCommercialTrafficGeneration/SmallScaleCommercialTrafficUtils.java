@@ -273,8 +273,8 @@ public class SmallScaleCommercialTrafficUtils {
 
 			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
 
-			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, Map.of(mode, vehicleId));
-			VehicleUtils.insertVehicleTypesIntoAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
+			VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
 
 			population.addPerson(newPerson);
 		}
