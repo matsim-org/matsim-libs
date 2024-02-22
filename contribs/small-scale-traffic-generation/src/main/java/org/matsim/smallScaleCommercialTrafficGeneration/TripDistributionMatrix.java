@@ -519,16 +519,6 @@ public class TripDistributionMatrix {
 	 * @return listOfZones
 	 */
 	ArrayList<String> getListOfZones() {
-//		int count = 0;
-//		if (listOfZones.isEmpty())
-//			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
-//				count++;
-//				System.out.println(count);
-//				if (!listOfZones.contains(key.getFromZone()))
-//					listOfZones.add(key.getFromZone());
-//				if (!listOfZones.contains(key.getToZone()))
-//					listOfZones.add(key.getToZone());
-//			}
 		return listOfZones;
 	}
 
