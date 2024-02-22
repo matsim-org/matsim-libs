@@ -115,11 +115,11 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		}
 		Assertions.assertEquals(population.getPersons().size(), countedTours, 0);
 
-		for (File caculatedFile : Objects.requireNonNull(
+		for (File calculatedFile : Objects.requireNonNull(
 			Objects.requireNonNull(new File(utils.getOutputDirectory() + "calculatedData").listFiles()))) {
 			MatsimTestUtils.assertEqualFilesLineByLine(
-				utils.getPackageInputDirectory() + "calculatedData/" + caculatedFile.getName(),
-				caculatedFile.getAbsolutePath());
+				utils.getPackageInputDirectory() + "calculatedData/" + calculatedFile.getName(),
+				calculatedFile.getAbsolutePath());
 		}
 
 		// compare events
