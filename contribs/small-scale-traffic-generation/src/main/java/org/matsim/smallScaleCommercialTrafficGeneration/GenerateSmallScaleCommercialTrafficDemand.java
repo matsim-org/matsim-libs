@@ -39,6 +39,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -491,8 +492,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
-		rnd = new Random(config.global().getRandomSeed());
-
+		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
+		rnd = MatsimRandom.getRandom();
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
 		if (config.global().getCoordinateSystem() == null)
@@ -950,13 +951,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		String smallScaleCommercialTrafficType, Scenario scenario, Path output, Map<String, Map<Id<Link>, Link>> regionLinksMap)
 		throws Exception {
 
-		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-			.newInstance(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType).build();
-		List<String> listOfZones = new ArrayList<>();
+		ArrayList<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {
 			if (!listOfZones.contains(k.getZone()))
 				listOfZones.add(k.getZone());
 		});
+		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
+			.newInstance(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
 		Network network = scenario.getNetwork();
 		int count = 0;
 
@@ -968,7 +969,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			String startZone = trafficVolumeKey.getZone();
 			String modeORvehType = trafficVolumeKey.getModeORvehType();
 			for (Integer purpose : trafficVolume_start.get(trafficVolumeKey).keySet()) {
-				Collections.shuffle(listOfZones);
+				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
 						network, regionLinksMap, resistanceFactor);

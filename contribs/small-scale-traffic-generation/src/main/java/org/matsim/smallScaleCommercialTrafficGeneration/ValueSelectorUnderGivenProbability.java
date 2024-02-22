@@ -45,8 +45,8 @@ public class ValueSelectorUnderGivenProbability {
 			sum += l.getProbability();
 			cumulativeProbabilities.add(sum);
 		}
-		//Generate a random number between 0 and 1
-		double r = Math.random() * sum;
+		//Generate a random number between 0 and sum
+		double r = rnd.nextDouble(0.0, sum);
 		//Select a value based on the cumulative probabilities
 		String selectedLetter = ProbabilityDistribution.stream()
 			//Find the first value whose cumulative probability is greater than the random number

@@ -75,8 +75,10 @@ public class TripDistributionMatrixTest {
 				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+		ArrayList<String> listOfZones = new ArrayList<>( List.of("testArea1_area1", "testArea1_area2", "testArea2_area3"));
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
+				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,
+                        listOfZones).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		regionLinksMap.put("testArea1_area1", new HashMap<>());
