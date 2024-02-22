@@ -250,19 +250,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
 						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
 						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone);
-				//TODO regionLinksMap umbenennen, da es alle Links einer Zone enthält
-				Map<String, Map<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, indexZones, buildingsPerZone);
+				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
-						createCarriersAndDemand(output, scenario, resultingDataPerZone, regionLinksMap,
+						createCarriersAndDemand(output, scenario, resultingDataPerZone, linksPerZone,
 							usedSmallScaleCommercialTrafficType.toString(),
 							includeExistingModels);
 					case completeSmallScaleCommercialTraffic -> {
-						createCarriersAndDemand(output, scenario, resultingDataPerZone, regionLinksMap, "commercialPersonTraffic",
+						createCarriersAndDemand(output, scenario, resultingDataPerZone, linksPerZone, "commercialPersonTraffic",
 							includeExistingModels);
 						includeExistingModels = false; // because already included in the step before
-						createCarriersAndDemand(output, scenario, resultingDataPerZone, regionLinksMap, "goodsTraffic",
+						createCarriersAndDemand(output, scenario, resultingDataPerZone, linksPerZone, "goodsTraffic",
 							includeExistingModels);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
@@ -274,7 +273,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
 						.write(scenario.getConfig().controller().getOutputDirectory() + "/"
 							+ scenario.getConfig().controller().getRunId() + ".output_CarrierDemand.xml");
-				solveSeparatedVRPs(scenario, regionLinksMap);
+				solveSeparatedVRPs(scenario, linksPerZone);
 			}
 		}
 		if (config.controller().getRunId() == null)
@@ -438,7 +437,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private void createCarriersAndDemand(Path output, Scenario scenario,
 										 Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-										 Map<String, Map<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+										 Map<String, Map<Id<Link>, Link>> linksPerZone, String smallScaleCommercialTrafficType,
 										 boolean includeExistingModels) throws Exception {
 
 		ArrayList<String> modesORvehTypes;
@@ -458,13 +457,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
-			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
-			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, smallScaleCommercialTrafficType,
+			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, linksPerZone);
+			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
 		final TripDistributionMatrix odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
-			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output, regionLinksMap);
-		createCarriers(scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, regionLinksMap);
+			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output, linksPerZone);
+		createCarriers(scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, linksPerZone);
 	}
 
 	/**

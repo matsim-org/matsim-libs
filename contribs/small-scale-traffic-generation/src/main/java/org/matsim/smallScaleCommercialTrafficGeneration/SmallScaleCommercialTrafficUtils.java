@@ -135,11 +135,11 @@ public class SmallScaleCommercialTrafficUtils {
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
-	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> linksPerZone,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
 		double minDistance = Double.MAX_VALUE;
 		searchLink:
-		for (Link possibleLink : regionLinksMap.get(zone).values()) {
+		for (Link possibleLink : linksPerZone.get(zone).values()) {
 			if (possibleLink.getToNode().getOutLinks() == null)
 				continue;
 			if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
@@ -157,7 +157,7 @@ public class SmallScaleCommercialTrafficUtils {
 			}
 		}
 		if (newLink == null && numberOfPossibleLinks > 0) {
-			for (Link possibleLink : regionLinksMap.get(zone).values()) {
+			for (Link possibleLink : linksPerZone.get(zone).values()) {
 				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
 					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
 				if (distance < minDistance) {
@@ -314,7 +314,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * dispersedTraffic will be added additionally.
 	 */
 	static void readExistingModels(Scenario scenario, double sampleScenario,
-								   Map<String, Map<Id<Link>, Link>> regionLinksMap) throws Exception {
+								   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
 
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
@@ -515,7 +515,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 					List<String> startAreas = new ArrayList<>();
 					for (ScheduledTour tour : newCarrier.getSelectedPlan().getScheduledTours()) {
-						String tourStartZone = findZoneOfLink(tour.getTour().getStartLinkId(), regionLinksMap);
+						String tourStartZone = findZoneOfLink(tour.getTour().getStartLinkId(), linksPerZone);
 						if (!startAreas.contains(tourStartZone))
 							startAreas.add(tourStartZone);
 					}
@@ -543,9 +543,9 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Find the zone where the link is located
 	 */
-	static String findZoneOfLink(Id<Link> linkId, Map<String, Map<Id<Link>, Link>> regionLinksMap) {
-		for (String area : regionLinksMap.keySet()) {
-			if (regionLinksMap.get(area).containsKey(linkId))
+	static String findZoneOfLink(Id<Link> linkId, Map<String, Map<Id<Link>, Link>> linksPerZone) {
+		for (String area : linksPerZone.keySet()) {
+			if (linksPerZone.get(area).containsKey(linkId))
 				return area;
 		}
 		return null;
