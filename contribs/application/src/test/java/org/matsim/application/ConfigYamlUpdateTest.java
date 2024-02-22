@@ -3,10 +3,12 @@ package org.matsim.application;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
@@ -21,6 +23,32 @@ public class ConfigYamlUpdateTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	void params() {
+
+		Path input = Path.of(utils.getClassInputDirectory());
+
+		Config config = ConfigUtils.loadConfig(input.resolve("config.xml").toString());
+
+		ApplicationUtils.applyConfigUpdate(
+			config, input.resolve("params.yml")
+		);
+
+		ScoringConfigGroup scoring = ConfigUtils.addOrGetModule(config, ScoringConfigGroup.class);
+
+		assertThat(scoring.getModes())
+			.hasSize(7);
+
+		assertThat(scoring.getPerforming_utils_hr())
+			.isEqualTo(6.88);
+
+		ScoringConfigGroup.ModeParams car = scoring.getModes().get(TransportMode.car);
+
+		assertThat(car.getConstant()).isEqualTo(-0.62);
+		assertThat(car.getMarginalUtilityOfTraveling()).isEqualTo(0);
+
+	}
 
 	@Test
 	void standard() {
@@ -72,6 +100,22 @@ public class ConfigYamlUpdateTest {
 		assertThat(next.getParams().get("mode")).isEqualTo("bike");
 		assertThat(next.getParams().get("values")).isEqualTo("3.0, 4.0");
 		assertThat(next.getParams().get("extra")).isEqualTo("extra");
+	}
+
+	@Test
+	void createGroup() {
+		Config config = ConfigUtils.createConfig();
+		Path input = Path.of(utils.getClassInputDirectory());
+
+		ApplicationUtils.applyConfigUpdate(
+			config, input.resolve("multiLevel.yml")
+		);
+
+
+		TestConfigGroup test = ConfigUtils.addOrGetModule(config, TestConfigGroup.class);
+
+		assertThat(test.values).containsExactly(1, 2, 3);
+
 	}
 
 

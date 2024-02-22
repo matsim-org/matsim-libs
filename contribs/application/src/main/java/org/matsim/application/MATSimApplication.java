@@ -404,7 +404,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 				} else {
 					// Automatically add run command
 					String[] runArgs = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
-					args = ApplicationUtils.mergeArgs(defaultArgs, runArgs);
+					args = ApplicationUtils.mergeArgs(runArgs, args);
 				}
 
 			} else
