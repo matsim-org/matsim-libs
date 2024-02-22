@@ -77,12 +77,15 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates and return the Index of the zone shape.
 	 *
+	 * @param shapeFileZonePath       Path to the shape file of the zones
+	 * @param shapeCRS                CRS of the shape file
+	 * @param shapeFileZoneNameColumn Column name of the zone in the shape file
 	 * @return indexZones
 	 */
-	static Index getIndexZones(Path shapeFileZonePath, String shapeCRS) {
+	static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
-		return shpZones.createIndex(shapeCRS, "areaID");
+		return shpZones.createIndex(shapeCRS, shapeFileZoneNameColumn);
 	}
 
 	/**
@@ -107,14 +110,28 @@ public class SmallScaleCommercialTrafficUtils {
 		return shpLanduse.createIndex(shapeCRS, "type");
 	}
 
+
+	/**
+	 * Creates and return the Index of the regions shape.
+	 *
+	 * @param shapeFileRegionsPath     Path to the shape file of the regions
+	 * @param shapeCRS                 CRS of the shape file
+	 * @param regionsShapeRegionColumn Column name of the region in the shape file
+	 * @return indexRegions
+	 */
+	public static Index getIndexRegions(Path shapeFileRegionsPath, String shapeCRS, String regionsShapeRegionColumn) {
+		ShpOptions shpLanduse = new ShpOptions(shapeFileRegionsPath, shapeCRS, StandardCharsets.UTF_8);
+		return shpLanduse.createIndex(shapeCRS, regionsShapeRegionColumn);
+	}
+
 	/**
 	 * Writes a csv file with the result of the distribution per zone of the input data.
 	 */
 	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-											  Path outputFileInOutputFolder, Map<String, String> zoneIdNameConnection)
+											  Path outputFileInOutputFolder, Map<String, String> zoneIdRegionConnection)
 		throws IOException {
 
-		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdNameConnection);
+		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdRegionConnection);
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
@@ -158,11 +175,11 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
 												   Path outputFileInInputFolder,
-												   Map<String, String> zoneIdNameConnection) throws MalformedURLException {
+												   Map<String, String> zoneIdRegionConnection) throws MalformedURLException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 			StandardCharsets.UTF_8, true);
 		try {
-			String[] header = new String[]{"areaID", "areaName", "Inhabitants", "Employee", "Employee Primary Sector",
+			String[] header = new String[]{"zoneID", "region", "Inhabitants", "Employee", "Employee Primary Sector",
 				"Employee Construction", "Employee Secondary Sector Rest", "Employee Retail",
 				"Employee Traffic/Parcels", "Employee Tertiary Sector Rest"};
 			JOIN.appendTo(writer, header);
@@ -170,9 +187,9 @@ public class SmallScaleCommercialTrafficUtils {
 			for (String zone : resultingDataPerZone.keySet()) {
 				List<String> row = new ArrayList<>();
 				row.add(zone);
-				row.add(zoneIdNameConnection.get(zone));
+				row.add(zoneIdRegionConnection.get(zone));
 				for (String category : header) {
-					if (!category.equals("areaID") && !category.equals("areaName"))
+					if (!category.equals("zoneID") && !category.equals("region"))
 						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(category))));
 				}
 				JOIN.appendTo(writer, row);

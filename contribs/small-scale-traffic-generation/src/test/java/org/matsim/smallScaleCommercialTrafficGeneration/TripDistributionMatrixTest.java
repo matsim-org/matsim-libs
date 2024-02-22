@@ -59,10 +59,13 @@ public class TripDistributionMatrixTest {
 		String usedLanduseConfiguration = "useExistingDataDistribution";
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 		Network network = NetworkUtils.readNetwork(networkLocation);
+		String shapeFileZoneNameColumn = "name";
+
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
+					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone);
 
 		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
@@ -79,12 +82,12 @@ public class TripDistributionMatrixTest {
 				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
-		regionLinksMap.put("testArea1_area1", new HashMap<>());
-		regionLinksMap.get("testArea1_area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
-		regionLinksMap.put("testArea1_area2", new HashMap<>());
-		regionLinksMap.get("testArea1_area2").put(Id.createLinkId("i(2,7)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
-		regionLinksMap.put("testArea2_area3", new HashMap<>());
-		regionLinksMap.get("testArea2_area3").put(Id.createLinkId("i(2,1)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
+		regionLinksMap.put("area1", new HashMap<>());
+		regionLinksMap.get("area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
+		regionLinksMap.put("area2", new HashMap<>());
+		regionLinksMap.get("area2").put(Id.createLinkId("i(2,7)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
+		regionLinksMap.put("area3", new HashMap<>());
+		regionLinksMap.get("area3").put(Id.createLinkId("i(2,1)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
 
 		for (String startZone : resultingDataPerZone.keySet()) {
 			for (String stopZone : resultingDataPerZone.keySet()) {
@@ -92,7 +95,7 @@ public class TripDistributionMatrixTest {
 					for (Integer purpose : trafficVolumePerTypeAndZone_start
 							.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).keySet()) {
 						odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, usedTrafficType,
-								network, regionLinksMap, resistanceFactor);
+								network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
 					}
 				}
 			}
@@ -144,10 +147,12 @@ public class TripDistributionMatrixTest {
 		String usedLanduseConfiguration = "useExistingDataDistribution";
 		String networkLocation = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 		Network network = NetworkUtils.readNetwork(networkLocation);
+		String shapeFileZoneNameColumn = "name";
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					inputDataDirectory, usedLanduseConfiguration,
-					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
+					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone);
 
 		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
@@ -165,12 +170,12 @@ public class TripDistributionMatrixTest {
 				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
-		regionLinksMap.put("testArea1_area1", new HashMap<>());
-		regionLinksMap.get("testArea1_area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
-		regionLinksMap.put("testArea1_area2", new HashMap<>());
-		regionLinksMap.get("testArea1_area2").put(Id.createLinkId("i(2,7)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
-		regionLinksMap.put("testArea2_area3", new HashMap<>());
-		regionLinksMap.get("testArea2_area3").put(Id.createLinkId("i(2,1)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
+		regionLinksMap.put("area1", new HashMap<>());
+		regionLinksMap.get("area1").put(Id.createLinkId("i(8,6)"), network.getLinks().get(Id.createLinkId("i(8,6)")));
+		regionLinksMap.put("area2", new HashMap<>());
+		regionLinksMap.get("area2").put(Id.createLinkId("i(2,7)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
+		regionLinksMap.put("area3", new HashMap<>());
+		regionLinksMap.get("area3").put(Id.createLinkId("i(2,1)R"), network.getLinks().get(Id.createLinkId("i(2,7)R")));
 
 		for (String startZone : resultingDataPerZone.keySet()) {
 			for (String stopZone : resultingDataPerZone.keySet()) {
@@ -178,7 +183,7 @@ public class TripDistributionMatrixTest {
 					for (Integer purpose : trafficVolumePerTypeAndZone_start
 							.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).keySet()) {
 						odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, usedTrafficType,
-								network, regionLinksMap, resistanceFactor);
+								network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
 					}
 				}
 			}

@@ -55,7 +55,10 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String creationOption = "createNewCarrierFile";
 		String landuseConfiguration = "useExistingDataDistribution";
 		String smallScaleCommercialTrafficType = "commercialPersonTraffic";
+		String regionsShapeFileName = utils.getPackageInputDirectory() + "/shp/testRegions.shp";
+		String regionsShapeRegionColumn = "region";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
+		String zoneShapeFileNameColumn = "name";
 		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
 		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
 		String shapeCRS = "EPSG:4326";
@@ -68,7 +71,10 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 				"--landuseConfiguration", landuseConfiguration,
 				"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
 				"--includeExistingModels",
+				"--regionsShapeFileName", regionsShapeFileName,
+				"--regionsShapeRegionColumn", regionsShapeRegionColumn,
 				"--zoneShapeFileName", zoneShapeFileName,
+				"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
 				"--buildingsShapeFileName", buildingsShapeFileName,
 				"--landuseShapeFileName", landuseShapeFileName,
 				"--shapeCRS", shapeCRS);

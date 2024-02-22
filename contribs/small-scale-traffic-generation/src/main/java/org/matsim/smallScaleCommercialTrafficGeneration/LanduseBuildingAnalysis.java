@@ -56,11 +56,12 @@ public class LanduseBuildingAnalysis {
 	static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
 																			 Map<String, List<String>> landuseCategoriesAndDataConnection, Path inputDataDirectory,
 																			 String usedLanduseConfiguration, Index indexLanduse, Index indexZones,
-																			 Index indexBuildings, Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone)
+																			 Index indexBuildings, Index indexInvestigationAreaRegions,
+																			 String shapeFileZoneNameColumn, Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone)
 			throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
-		Map<String, String> zoneIdNameConnection = new HashMap<>();
+		Map<String, String> zoneIdRegionConnection = new HashMap<>();
 		Path outputFileInOutputFolder = output.resolve("calculatedData").resolve("dataDistributionPerZone.csv");
 
 		landuseCategoriesAndDataConnection.put("Inhabitants",
@@ -91,7 +92,7 @@ public class LanduseBuildingAnalysis {
 						.setSkipHeaderRecord(true).build().parse(reader);
 
 				for (CSVRecord record : parse) {
-					String zoneID = record.get("areaID");
+					String zoneID = record.get("zoneID");
 					resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
 					for (int n = 2; n < parse.getHeaderMap().size(); n++) {
 						resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
@@ -109,18 +110,18 @@ public class LanduseBuildingAnalysis {
 			log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
 
 			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
-			createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones,
+			createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones, indexInvestigationAreaRegions,
 					usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
-					buildingsPerZone, zoneIdNameConnection);
+					buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection);
 
 			Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
 			readAreaData(investigationAreaData, inputDataDirectory);
 
 			createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
-					landuseCategoriesAndDataConnection);
+					landuseCategoriesAndDataConnection, zoneIdRegionConnection);
 
 			SmallScaleCommercialTrafficUtils.writeResultOfDataDistribution(resultingDataPerZone, outputFileInOutputFolder,
-					zoneIdNameConnection);
+					zoneIdRegionConnection);
 		}
 
 		return resultingDataPerZone;
@@ -131,10 +132,10 @@ public class LanduseBuildingAnalysis {
 	 * and the original data.
 	 */
 	private static void createResultingDataForLanduseInZones(
-			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-			Map<String, Map<String, Integer>> investigationAreaData,
-			Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-			Map<String, List<String>> landuseCategoriesAndDataConnection) {
+		Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
+		Map<String, Map<String, Integer>> investigationAreaData,
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+		Map<String, List<String>> landuseCategoriesAndDataConnection, Map<String, String> zoneIdRegionConnection) {
 
 		Map<String, Object2DoubleOpenHashMap<String>> totalSquareMetersPerCategory = new HashMap<String, Object2DoubleOpenHashMap<String>>();
 		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<String, Object2DoubleOpenHashMap<String>>();
@@ -149,7 +150,7 @@ public class LanduseBuildingAnalysis {
 
 		// connects the collected landuse data with the needed categories
 		for (String zoneId : landuseCategoriesPerZone.keySet()) {
-			String investigationArea = zoneId.split("_")[0];
+			String regionOfZone = zoneIdRegionConnection.get(zoneId);
 			resultingDataPerZone.put(zoneId, new Object2DoubleOpenHashMap<>());
 			for (String categoryLanduse : landuseCategoriesPerZone.get(zoneId).keySet())
 				for (String categoryData : landuseCategoriesAndDataConnection.keySet()) {
@@ -161,7 +162,7 @@ public class LanduseBuildingAnalysis {
 						if (categoryLanduse.equals("commercial"))
 							additionalArea = additionalArea * 0.5;
 						resultingDataPerZone.get(zoneId).mergeDouble(categoryData, additionalArea, Double::sum);
-						totalSquareMetersPerCategory.get(investigationArea).mergeDouble(categoryData, additionalArea,
+						totalSquareMetersPerCategory.get(regionOfZone).mergeDouble(categoryData, additionalArea,
 								Double::sum);
 					}
 				}
@@ -176,12 +177,12 @@ public class LanduseBuildingAnalysis {
 				.forEach(c -> checkPercentages.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
 		for (String zoneId : resultingDataPerZone.keySet())
 			for (String categoryData : resultingDataPerZone.get(zoneId).keySet()) {
-				String investigationArea = zoneId.split("_")[0];
+				String regionOfZone = zoneIdRegionConnection.get(zoneId);
 				double newValue = resultingDataPerZone.get(zoneId).getDouble(categoryData)
-						/ totalSquareMetersPerCategory.get(investigationArea).getDouble(categoryData);
+						/ totalSquareMetersPerCategory.get(regionOfZone).getDouble(categoryData);
 				resultingDataPerZone.get(zoneId).replace(categoryData,
 						resultingDataPerZone.get(zoneId).getDouble(categoryData), newValue);
-				checkPercentages.get(investigationArea).mergeDouble(categoryData,
+				checkPercentages.get(regionOfZone).mergeDouble(categoryData,
 						resultingDataPerZone.get(zoneId).getDouble(categoryData), Double::sum);
 			}
 		// tests the result
@@ -193,21 +194,21 @@ public class LanduseBuildingAnalysis {
 		}
 		// calculates the data per zone and category data
 		for (String zoneId : resultingDataPerZone.keySet()) {
-			String investigationArea = zoneId.split("_")[0];
+			String regionOfZone = zoneIdRegionConnection.get(zoneId);
 			for (String categoryData : resultingDataPerZone.get(zoneId).keySet()) {
 				double percentageValue = resultingDataPerZone.get(zoneId).getDouble(categoryData);
-				int inputDataForCategory = investigationAreaData.get(investigationArea).get(categoryData);
+				int inputDataForCategory = investigationAreaData.get(regionOfZone).get(categoryData);
 				double resultingNumberPerCategory = percentageValue * inputDataForCategory;
 				resultingDataPerZone.get(zoneId).replace(categoryData, percentageValue, resultingNumberPerCategory);
-				totalEmployeesPerCategories.get(investigationArea).mergeDouble(categoryData, resultingNumberPerCategory,
+				totalEmployeesPerCategories.get(regionOfZone).mergeDouble(categoryData, resultingNumberPerCategory,
 						Double::sum);
 				if (!categoryData.equals("Inhabitants"))
-					totalEmployeesInCategoriesPerZone.get(investigationArea).mergeDouble(zoneId,
+					totalEmployeesInCategoriesPerZone.get(regionOfZone).mergeDouble(zoneId,
 							resultingNumberPerCategory, Double::sum);
 			}
-			if (totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId) != 0)
+			if (totalEmployeesInCategoriesPerZone.get(regionOfZone).getDouble(zoneId) != 0)
 				resultingDataPerZone.get(zoneId).mergeDouble("Employee",
-					totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId), Double::sum);
+					totalEmployeesInCategoriesPerZone.get(regionOfZone).getDouble(zoneId), Double::sum);
 		}
 	}
 
@@ -216,10 +217,10 @@ public class LanduseBuildingAnalysis {
 	 * the sum of this category in all zones of the zone shape file
 	 */
 	private static void createLanduseDistribution(Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-												  Index indexLanduse, Index indexZones, String usedLanduseConfiguration,
+												  Index indexLanduse, Index indexZones, Index indexInvestigationAreaRegions, String usedLanduseConfiguration,
 												  Index indexBuildings, Map<String, List<String>> landuseCategoriesAndDataConnection,
 												  Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-												  Map<String, String> zoneIdNameConnection) {
+												  String shapeFileZoneNameColumn, Map<String, String> zoneIdRegionConnection) {
 
 		List<String> neededLanduseCategories = List.of("residential", "industrial", "commercial", "retail", "farmyard",
 				"farmland", "construction");
@@ -227,12 +228,20 @@ public class LanduseBuildingAnalysis {
 		List<SimpleFeature> landuseFeatures = indexLanduse.getAllFeatures();
 		List<SimpleFeature> zonesFeatures = indexZones.getAllFeatures();
 
-
 		for (SimpleFeature singleZone : zonesFeatures) {
-			Object2DoubleMap<String> landusePerCategory = new Object2DoubleOpenHashMap<>();
-			landuseCategoriesPerZone.put((String) singleZone.getAttribute("areaID"), landusePerCategory);
-			zoneIdNameConnection.put((String) singleZone.getAttribute("areaID"),
-					(String) singleZone.getAttribute("name"));
+			// TODO comment
+			Coord middleCoordOfZone = MGC.point2Coord(((Geometry) singleZone.getDefaultGeometry()).getCentroid());
+			String regionName = indexInvestigationAreaRegions.query(middleCoordOfZone);
+			if (regionName != null) {
+				Object2DoubleMap<String> landusePerCategory = new Object2DoubleOpenHashMap<>();
+				String zoneID = (String) singleZone.getAttribute(shapeFileZoneNameColumn);
+				var previousValue = landuseCategoriesPerZone.putIfAbsent(zoneID, landusePerCategory);
+				if (previousValue != null) {
+					throw new IllegalStateException(
+						"Key " + zoneID + " already exists in the zone map. This should not happen. Please check if the data in the column " + shapeFileZoneNameColumn + " is unique.");
+				}
+				zoneIdRegionConnection.put(zoneID, regionName);
+			}
 		}
 
 		if (usedLanduseConfiguration.equals("useOSMBuildingsAndLanduse")) {
@@ -295,7 +304,7 @@ public class LanduseBuildingAnalysis {
 					if (parser.getHeaderMap().get(csvRecord) > 0)
 						lookUpTable.put(csvRecord, Integer.valueOf(record.get(csvRecord)));
 				}
-				areaData.put(record.get("Area"), lookUpTable);
+				areaData.put(record.get("Region"), lookUpTable);
 			}
 		}
 	}

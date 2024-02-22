@@ -280,23 +280,24 @@ public class TripDistributionMatrix {
 	 * Calculates the traffic volume between two zones for a specific modeORvehType
 	 * and purpose.
 	 *
-	 * @param startZone      start zone
-	 * @param stopZone       stop zone
-	 * @param modeORvehType  selected mode or vehicle type
-	 * @param purpose        selected purpose
+	 * @param startZone                       start zone
+	 * @param stopZone                        stop zone
+	 * @param modeORvehType                   selected mode or vehicle type
+	 * @param purpose                         selected purpose
 	 * @param smallScaleCommercialTrafficType goodsTraffic or commercialPersonTraffic
-	 * @param regionLinksMap links in each zone
+	 * @param regionLinksMap                  links in each zone
+	 * @param shapeFileZoneNameColumn 	   	  Name of the unique column of the name/Id of each zone in the zones shape file
 	 */
 	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String smallScaleCommercialTrafficType, Network network,
-								  Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+								  Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor, String shapeFileZoneNameColumn) {
 		double volumeStart = trafficVolume_start.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).getDouble(purpose);
 		double volumeStop = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
 		int roundedVolume;
 		if (volumeStart != 0 && volumeStop != 0) {
 
-			double resistanceValue = getResistanceFunktionValue(startZone, stopZone, network, regionLinksMap, resistanceFactor);
+			double resistanceValue = getResistanceFunktionValue(startZone, stopZone, network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
 			double gravityConstantA = getGravityConstant(stopZone, trafficVolume_start, modeORvehType, purpose, network, regionLinksMap,
-				resistanceFactor);
+				resistanceFactor, shapeFileZoneNameColumn);
 			roundingError.computeIfAbsent(stopZone, (k) -> new Object2DoubleOpenHashMap<>());
 
 			//Bisher: Gravity model mit fixem Zielverkehr
@@ -336,11 +337,13 @@ public class TripDistributionMatrix {
 	/**
 	 * Calculates the values of the resistance function between two zones.
 	 *
-	 * @param startZone      start zone
-	 * @param stopZone       stop zone
-	 * @param regionLinksMap links for each zone
+	 * @param startZone               start zone
+	 * @param stopZone                stop zone
+	 * @param regionLinksMap          links for each zone
+	 * @param shapeFileZoneNameColumn Name of the unique column of the name/Id of each zone in the zones shape file
 	 */
-	private Double getResistanceFunktionValue(String startZone, String stopZone, Network network, Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+	private Double getResistanceFunktionValue(String startZone, String stopZone, Network network, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+											  double resistanceFactor, String shapeFileZoneNameColumn) {
 
 		//if false the calculation is faster; e.g. for debugging
 		boolean useNetworkRoutesForResistanceFunction = true;
@@ -353,11 +356,11 @@ public class TripDistributionMatrix {
 		}
 		if (!resistanceFunktionCache.containsKey(makeResistanceFunktionKey(startZone, stopZone)))
 			for (SimpleFeature startZoneFeature : zonesFeatures) {
-				String zone1 = String.valueOf(startZoneFeature.getAttribute("areaID"));
+				String zone1 = String.valueOf(startZoneFeature.getAttribute(shapeFileZoneNameColumn));
 				if (!startZone.equals(zone1))
 					continue;
 				for (SimpleFeature stopZoneFeature : zonesFeatures) {
-					String zone2 = String.valueOf(stopZoneFeature.getAttribute("areaID"));
+					String zone2 = String.valueOf(stopZoneFeature.getAttribute(shapeFileZoneNameColumn));
 					if (!stopZone.equals(zone2))
 						continue;
 					double distance = Double.MAX_VALUE;
@@ -443,16 +446,17 @@ public class TripDistributionMatrix {
 	/**
 	 * Calculates the gravity constant.
 	 *
-	 * @param baseZone       base zone
-	 * @param trafficVolume  volume of the traffic
-	 * @param modeORvehType  selected mode or vehicle type
-	 * @param purpose        selected purpose
-	 * @param regionLinksMap links for each zone
+	 * @param baseZone                base zone
+	 * @param trafficVolume           volume of the traffic
+	 * @param modeORvehType           selected mode or vehicle type
+	 * @param purpose                 selected purpose
+	 * @param regionLinksMap          links for each zone
+	 * @param shapeFileZoneNameColumn Name of the unique column of the name/Id of each zone in the zones shape file
 	 * @return gravity constant
 	 */
 	private double getGravityConstant(String baseZone,
 									  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume, String modeORvehType,
-									  Integer purpose, Network network, Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+									  Integer purpose, Network network, Map<String, Map<Id<Link>, Link>> regionLinksMap, double resistanceFactor, String shapeFileZoneNameColumn) {
 
 		GravityConstantKey gravityKey = makeGravityKey(baseZone, modeORvehType, purpose);
 		if (!gravityConstantACache.containsKey(gravityKey)) {
@@ -464,7 +468,7 @@ public class TripDistributionMatrix {
 						continue;
 					else {
 						double resistanceValue = getResistanceFunktionValue(baseZone, trafficVolumeKey.getZone(), network,
-							regionLinksMap, resistanceFactor);
+							regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
 						sum = sum + (volume * resistanceValue);
 					}
 				}

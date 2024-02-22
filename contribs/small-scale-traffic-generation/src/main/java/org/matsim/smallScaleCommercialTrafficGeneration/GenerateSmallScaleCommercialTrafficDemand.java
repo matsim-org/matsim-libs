@@ -135,8 +135,17 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
 	private boolean includeExistingModels;
 
+	@CommandLine.Option(names = "--regionsShapeFileName", description = "Path of the region shape file.")
+	private Path shapeFileRegionsPath;
+
+		@CommandLine.Option(names = "--regionsShapeRegionColumn", description = "Name of the region column in the region shape file.")
+	private String regionsShapeRegionColumn;
+
 	@CommandLine.Option(names = "--zoneShapeFileName", description = "Path of the zone shape file.")
 	private Path shapeFileZonePath;
+
+	@CommandLine.Option(names = "--zoneShapeFileNameColumn", description = "Name of the unique column of the name/Id of each zone in the zones shape file.")
+	private String shapeFileZoneNameColumn;
 
 	@CommandLine.Option(names = "--buildingsShapeFileName", description = "Path of the buildings shape file")
 	private Path shapeFileBuildingsPath;
@@ -169,6 +178,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Index indexZones;
 	private Index indexBuildings;
 	private Index indexLanduse;
+	private Index indexInvestigationAreaRegions;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
@@ -225,19 +235,23 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (!Files.exists(shapeFileZonePath)) {
 					throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 				}
+				if (!Files.exists(shapeFileRegionsPath)) {
+					throw new Exception("Required regions shape file {} not found" + shapeFileRegionsPath.toString());
+				}
 				Path inputDataDirectory = Path.of(config.getContext().toURI()).getParent();
 
 				ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 
-				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS);
+				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 				indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS);
 				indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS);
+				indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS, regionsShapeRegionColumn);
 
 				Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
 						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
-						indexBuildings, buildingsPerZone);
-
+						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone);
+				//TODO regionLinksMap umbenennen, da es alle Links einer Zone enthält
 				Map<String, Map<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, indexZones, buildingsPerZone);
 
 				switch (usedSmallScaleCommercialTrafficType) {
@@ -971,7 +985,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				Collections.shuffle(listOfZones);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						network, regionLinksMap, resistanceFactor);
+						network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
 				}
 			}
 		}

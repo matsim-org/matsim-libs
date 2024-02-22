@@ -221,7 +221,7 @@ public class TrafficVolumeGeneration {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 				StandardCharsets.UTF_8, true);
 		try {
-			String[] header = new String[] { "areaID", "mode/vehType", "1", "2", "3", "4", "5" };
+			String[] header = new String[] { "zoneID", "mode/vehType", "1", "2", "3", "4", "5" };
 			JOIN.appendTo(writer, header);
 			writer.write("\n");
 			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {

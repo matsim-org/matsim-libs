@@ -59,19 +59,21 @@ public class SmallScaleCommercialTrafficUtilsTest {
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		String shapeFileZoneNameColumn = "name";
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
+				.filterLinksForZones(scenario, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(),
+                                shapeFileZoneNameColumn),
                         buildingsPerZone);
 
 		Assertions.assertEquals(3, regionLinksMap.size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(60, regionLinksMap.get("testArea1_area1").size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(41, regionLinksMap.get("testArea1_area2").size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(28, regionLinksMap.get("testArea2_area3").size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(60, regionLinksMap.get("area1").size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(41, regionLinksMap.get("area2").size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(28, regionLinksMap.get("area3").size(), MatsimTestUtils.EPSILON);
 
 		Assertions.assertNull(SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(5,4)"), regionLinksMap));
-		Assertions.assertEquals("testArea1_area1", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(6,5)R"), regionLinksMap));
-		Assertions.assertEquals("testArea1_area2", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,7)R"), regionLinksMap));
-		Assertions.assertEquals("testArea2_area3", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,2)R"), regionLinksMap));
+		Assertions.assertEquals("area1", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(6,5)R"), regionLinksMap));
+		Assertions.assertEquals("area2", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,7)R"), regionLinksMap));
+		Assertions.assertEquals("area3", SmallScaleCommercialTrafficUtils.findZoneOfLink(Id.createLinkId("j(2,2)R"), regionLinksMap));
 	}
 }
