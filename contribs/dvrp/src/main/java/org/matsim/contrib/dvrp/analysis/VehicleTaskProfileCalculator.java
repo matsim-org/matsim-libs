@@ -119,6 +119,10 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 	}
 
 	private void increment(VehicleState state, double endTime) {
+		if (state.taskType == VEHICLE_ADDED) {
+			return; // Don't count tasks that did not come from this dvrpMode
+		}
+		
 		Verify.verify(state.taskType != null);
 
 		double[] profile = taskProfiles.computeIfAbsent(state.taskType,

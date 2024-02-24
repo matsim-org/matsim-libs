@@ -166,6 +166,10 @@ public class VehicleOccupancyProfileCalculator
 	}
 
 	private void increment(VehicleState state, double endTime) {
+		if (state.taskType == VEHICLE_ADDED) {
+			return; // Don't count tasks that did not come from this dvrpMode
+		}
+		
 		Verify.verify(state.taskType != null);
 		Verify.verify(state.occupancy >= 0);
 
