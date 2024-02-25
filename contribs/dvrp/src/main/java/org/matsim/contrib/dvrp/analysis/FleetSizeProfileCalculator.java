@@ -55,14 +55,14 @@ public class FleetSizeProfileCalculator implements VehicleAddedEventHandler, Veh
 
 	@Override
 	public void handleEvent(VehicleAddedEvent event) {
-		if (event.getMode().equals(dvrpMode)) {
+		if (event.getDvrpMode().equals(dvrpMode)) {
 			increment(event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleRemovedEvent event) {
-		if (event.getMode().equals(dvrpMode)) {
+		if (event.getDvrpMode().equals(dvrpMode)) {
 			decrement(event.getTime());
 		}
 	}

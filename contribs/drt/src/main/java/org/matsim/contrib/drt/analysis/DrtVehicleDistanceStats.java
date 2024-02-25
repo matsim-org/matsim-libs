@@ -106,10 +106,10 @@ public class DrtVehicleDistanceStats
 
 	@Override
 	public void handleEvent(VehicleAddedEvent event) {
-		var state = vehicleStates.get(Id.createVehicleId(event.getVehicleId()));
+		var state = vehicleStates.get(Id.createVehicleId(event.getDvrpVehicleId()));
 		
 		if (state == null) {
-			vehicleStates.put(Id.createVehicleId(event.getVehicleId()), new VehicleState(event.getCapacity(), Double.NaN)); 
+			vehicleStates.put(Id.createVehicleId(event.getDvrpVehicleId()), new VehicleState(event.getCapacity(), Double.NaN)); 
 		} else {
 			state.active = true;
 			Verify.verify(state.maxCapacity == event.getCapacity());
@@ -118,7 +118,7 @@ public class DrtVehicleDistanceStats
 	
 	@Override
 	public void handleEvent(VehicleRemovedEvent event) {
-		Objects.requireNonNull(vehicleStates.get(Id.createVehicleId(event.getVehicleId()))).active = false;
+		Objects.requireNonNull(vehicleStates.get(Id.createVehicleId(event.getDvrpVehicleId()))).active = false;
 	}
 
 	@Override

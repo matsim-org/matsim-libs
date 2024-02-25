@@ -27,6 +27,10 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.VehicleAddedEvent;
+import org.matsim.contrib.dvrp.fleet.VehicleAddedEventHandler;
+import org.matsim.contrib.dvrp.fleet.VehicleRemovedEvent;
+import org.matsim.contrib.dvrp.fleet.VehicleRemovedEventHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
@@ -36,15 +40,15 @@ import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.config.groups.QSimConfigGroup;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 
 /**
  * Collects task profiles of DVRP vehicles. Based on {@link VehicleOccupancyProfileCalculator} but only collects tasks.
  *
  * @author nkuehnel / MOIA
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
-		TaskEndedEventHandler {
+		TaskEndedEventHandler, VehicleAddedEventHandler, VehicleRemovedEventHandler {
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
@@ -114,7 +118,11 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 	}
 
 	private void increment(VehicleState state, double endTime) {
-		Verify.verify(state.taskType != null);
+		if (state.taskType == null) {
+			// will be null if a vehicle has been added to the fleet, but the task that has
+			// ended came from a different dvrp mode
+			return;
+		}
 
 		double[] profile = taskProfiles.computeIfAbsent(state.taskType,
 						v -> new double[timeDiscretizer.getIntervalCount()]);
@@ -145,18 +153,30 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 	/* Event handling starts here */
 
 	@Override
+	public void handleEvent(VehicleAddedEvent event) {
+		if (!event.getDvrpMode().equals(dvrpMode)) {
+			return;
+		}
+		
+		vehicleStates.put(event.getDvrpVehicleId(), new VehicleState());
+	}
+
+	@Override
+	public void handleEvent(VehicleRemovedEvent event) {
+		if (!event.getDvrpMode().equals(dvrpMode)) {
+			return;
+		}
+		
+		increment(vehicleStates.remove(event.getDvrpVehicleId()), event.getTime());
+	}
+	
+	@Override
 	public void handleEvent(TaskStartedEvent event) {
 		if (!event.getDvrpMode().equals(dvrpMode)) {
 			return;
 		}
-
-		final VehicleState state;
-		if (event.getTaskIndex() == 0) {
-			state = new VehicleState();
-			vehicleStates.put(event.getDvrpVehicleId(), state);
-		} else {
-			state = vehicleStates.get(event.getDvrpVehicleId());
-		}
+		
+		VehicleState state = vehicleStates.get(event.getDvrpVehicleId());
 		state.taskType = event.getTaskType();
 		state.beginTime = event.getTime();
 	}

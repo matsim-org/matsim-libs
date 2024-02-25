@@ -23,11 +23,11 @@ public abstract class AbstractFleetEvent extends Event {
 		this.vehicleId = vehicleId;
 	}
 
-	public String getMode() {
+	public String getDvrpMode() {
 		return mode;
 	}
 
-	public Id<DvrpVehicle> getVehicleId() {
+	public Id<DvrpVehicle> getDvrpVehicleId() {
 		return vehicleId;
 	}
 
