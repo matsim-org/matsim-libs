@@ -38,8 +38,8 @@ import org.matsim.contrib.dvrp.schedule.Tasks;
 public class TaskEndedEvent extends AbstractTaskEvent {
 	public static final String EVENT_TYPE = "dvrpTaskEnded";
 
-	public TaskEndedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId, Task task) {
-		this(time, dvrpMode, dvrpVehicleId, driverId, task.getTaskType(), task.getTaskIdx(),
+	public TaskEndedEvent(double time, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId, Task task) {
+		this(time, task.getDvrpMode(), dvrpVehicleId, driverId, task.getTaskType(), task.getTaskIdx(),
 				Tasks.getEndLink(task).getId());
 	}
 

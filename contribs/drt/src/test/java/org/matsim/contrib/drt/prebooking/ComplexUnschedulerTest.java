@@ -591,7 +591,7 @@ public class ComplexUnschedulerTest {
 		private Link currentLink;
 		private double currentTime;
 
-		private final DrtTaskFactory taskFactory = new DrtTaskFactoryImpl();
+		private final DrtTaskFactory taskFactory = new DrtTaskFactoryImpl("drt");
 		private final LeastCostPathCalculator router;
 		private final TravelTime travelTime = new FreeSpeedTravelTime();
 

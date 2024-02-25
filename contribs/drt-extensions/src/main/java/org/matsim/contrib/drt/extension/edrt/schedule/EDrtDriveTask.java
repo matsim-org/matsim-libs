@@ -30,8 +30,8 @@ import org.matsim.contrib.evrp.ETask;
 public class EDrtDriveTask extends DrtDriveTask implements ETask {
 	private final double consumedEnergy;
 
-	public EDrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType, double consumedEnergy) {
-		super(path, taskType);
+	public EDrtDriveTask(String dvrpMode, VrpPathWithTravelData path, DrtTaskType taskType, double consumedEnergy) {
+		super(dvrpMode, path, taskType);
 		this.consumedEnergy = consumedEnergy;
 	}
 

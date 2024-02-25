@@ -65,7 +65,7 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 				getter.getModal(DrtTaskFactory.class), getter.get(EventsManager.class), getter.getModal(Fleet.class),
 				getter.getModal(ScheduleTimingUpdater.class))));
 
-		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
+		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl(drtCfg.getMode()));
 		
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);

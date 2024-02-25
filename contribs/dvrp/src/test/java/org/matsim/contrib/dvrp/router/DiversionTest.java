@@ -353,7 +353,7 @@ public class DiversionTest {
 					travelTime);
 
 			// ... and we add it as the first and only task to the schedule
-			DriveTask driveTask = new DefaultDriveTask(() -> "drive", path);
+			DriveTask driveTask = new DefaultDriveTask(MODE, () -> "drive", path);
 			schedule.addTask(driveTask);
 
 			// Track the initially obtained arrival time
@@ -612,7 +612,7 @@ public class DiversionTest {
 					router, travelTime);
 
 			// ... and we add it as the first and only task to the schedule
-			DriveTask driveTask = new DefaultDriveTask(() -> "drive", path);
+			DriveTask driveTask = new DefaultDriveTask(MODE, () -> "drive", path);
 			schedule.addTask(driveTask);
 
 			// Track the initially obtained arrival time

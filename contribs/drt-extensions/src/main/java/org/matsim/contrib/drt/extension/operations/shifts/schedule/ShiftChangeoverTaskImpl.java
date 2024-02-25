@@ -28,9 +28,9 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 
 	private final DrtStopTask delegate;
 
-	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, DrtShift shift, OperationFacility facility) {
-		super(TYPE, beginTime, endTime, link);
-		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
+	public ShiftChangeoverTaskImpl(String dvrpMode, double beginTime, double endTime, Link link, DrtShift shift, OperationFacility facility) {
+		super(dvrpMode, TYPE, beginTime, endTime, link);
+		this.delegate = new DefaultDrtStopTask(dvrpMode, beginTime, endTime, link);
 		this.shift = shift;
 		this.facility = facility;
 	}

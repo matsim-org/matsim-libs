@@ -28,8 +28,8 @@ import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 public class TaxiOccupiedDriveTask extends DefaultDriveTask {
 	public static final TaxiTaskType TYPE = new TaxiTaskType(OCCUPIED_DRIVE);
 
-	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, DrtRequest request) {
-		super(TYPE, path);
+	public TaxiOccupiedDriveTask(String dvrpMode, VrpPathWithTravelData path, DrtRequest request) {
+		super(dvrpMode, TYPE, path);
 		if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
 			throw new IllegalArgumentException();
 		}

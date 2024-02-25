@@ -46,8 +46,8 @@ public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 	private final Map<Id<Request>, AcceptedDrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, AcceptedDrtRequest> pickupRequests = new LinkedHashMap<>();
 
-	public DefaultDrtStopTask(double beginTime, double endTime, Link link) {
-		super(TYPE, beginTime, endTime, link);
+	public DefaultDrtStopTask(String dvrpMode, double beginTime, double endTime, Link link) {
+		super(dvrpMode, TYPE, beginTime, endTime, link);
 	}
 
 	/**

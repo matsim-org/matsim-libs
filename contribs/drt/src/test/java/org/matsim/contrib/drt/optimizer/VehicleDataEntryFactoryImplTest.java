@@ -124,7 +124,7 @@ public class VehicleDataEntryFactoryImplTest {
 	}
 
 	private Stop stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {
-		return new Stop(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, 0);
+		return new Stop(new DefaultDrtStopTask("drt", beginTime, endTime, null), latestArrivalTime, latestDepartureTime, 0);
 	}
 
 	private DvrpVehicle vehicle(double vehicleEndTime, double lastStayTaskBeginTime) {
@@ -137,7 +137,7 @@ public class VehicleDataEntryFactoryImplTest {
 				.build(), depot);
 		vehicle.getSchedule()
 				.addTask(
-						new DrtStayTask(lastStayTaskBeginTime, Math.max(lastStayTaskBeginTime, vehicleEndTime), depot));
+						new DrtStayTask("drt", lastStayTaskBeginTime, Math.max(lastStayTaskBeginTime, vehicleEndTime), depot));
 		return vehicle;
 	}
 }

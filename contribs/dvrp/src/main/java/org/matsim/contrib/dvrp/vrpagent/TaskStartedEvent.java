@@ -38,9 +38,9 @@ import org.matsim.contrib.dvrp.schedule.Tasks;
 public class TaskStartedEvent extends AbstractTaskEvent {
 	public static final String EVENT_TYPE = "dvrpTaskStarted";
 
-	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId,
+	public TaskStartedEvent(double time, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId,
 			Task task) {
-		this(time, dvrpMode, dvrpVehicleId, driverId, task.getTaskType(), task.getTaskIdx(),
+		this(time, task.getDvrpMode(), dvrpVehicleId, driverId, task.getTaskType(), task.getTaskIdx(),
 				Tasks.getBeginLink(task).getId());
 	}
 

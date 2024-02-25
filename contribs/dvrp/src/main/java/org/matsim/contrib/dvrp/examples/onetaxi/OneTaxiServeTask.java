@@ -30,9 +30,9 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 public class OneTaxiServeTask extends DefaultStayTask {
 	private final OneTaxiRequest request;
 
-	public OneTaxiServeTask(OneTaxiTaskType taskType, double beginTime, double endTime, Link link,
+	public OneTaxiServeTask(String dvrpMode, OneTaxiTaskType taskType, double beginTime, double endTime, Link link,
 			OneTaxiRequest request) {
-		super(taskType, beginTime, endTime, link);
+		super(dvrpMode, taskType, beginTime, endTime, link);
 		this.request = request;
 	}
 

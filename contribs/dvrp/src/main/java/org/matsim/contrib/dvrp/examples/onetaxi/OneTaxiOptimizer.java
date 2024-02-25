@@ -79,7 +79,7 @@ public final class OneTaxiOptimizer implements VrpOptimizer {
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.getSchedule()
-				.addTask(new DefaultStayTask(OneTaxiTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+				.addTask(new DefaultStayTask(TransportMode.taxi, OneTaxiTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 						vehicle.getStartLink()));
 	}
 
@@ -114,22 +114,22 @@ public final class OneTaxiOptimizer implements VrpOptimizer {
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,
 				travelTime);
-		schedule.addTask(new DefaultDriveTask(OneTaxiTaskType.EMPTY_DRIVE, pathToCustomer));
+		schedule.addTask(new DefaultDriveTask(TransportMode.taxi, OneTaxiTaskType.EMPTY_DRIVE, pathToCustomer));
 
 		double t1 = pathToCustomer.getArrivalTime();
 		double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
-		schedule.addTask(new OneTaxiServeTask(OneTaxiTaskType.PICKUP, t1, t2, fromLink, req));
+		schedule.addTask(new OneTaxiServeTask(TransportMode.taxi, OneTaxiTaskType.PICKUP, t1, t2, fromLink, req));
 
 		VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router, travelTime);
-		schedule.addTask(new DefaultDriveTask(OneTaxiTaskType.OCCUPIED_DRIVE, pathWithCustomer));
+		schedule.addTask(new DefaultDriveTask(TransportMode.taxi, OneTaxiTaskType.OCCUPIED_DRIVE, pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
 		double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
-		schedule.addTask(new OneTaxiServeTask(OneTaxiTaskType.DROPOFF, t3, t4, toLink, req));
+		schedule.addTask(new OneTaxiServeTask(TransportMode.taxi, OneTaxiTaskType.DROPOFF, t3, t4, toLink, req));
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
-		schedule.addTask(new DefaultStayTask(OneTaxiTaskType.WAIT, t4, tEnd, toLink));
+		schedule.addTask(new DefaultStayTask(TransportMode.taxi, OneTaxiTaskType.WAIT, t4, tEnd, toLink));
 
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),

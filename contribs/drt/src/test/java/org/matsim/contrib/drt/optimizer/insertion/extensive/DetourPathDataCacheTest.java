@@ -135,6 +135,6 @@ public class DetourPathDataCacheTest {
 	}
 
 	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask("drt", 0, 60, link), 0);
 	}
 }

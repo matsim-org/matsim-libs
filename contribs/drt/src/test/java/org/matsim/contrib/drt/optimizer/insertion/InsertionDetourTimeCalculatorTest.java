@@ -76,7 +76,7 @@ public class InsertionDetourTimeCalculatorTest {
 	void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
 		// sh 03/08/23: Changed this test, according to VehicleDataEntryFactoryImpl the start time should be end time of stop task
-		Waypoint.Start start = start(new DefaultDrtStopTask(20, 20 + STOP_DURATION, fromLink), 20 + STOP_DURATION, fromLink);
+		Waypoint.Start start = start(new DefaultDrtStopTask("drt", 20, 20 + STOP_DURATION, fromLink), 20 + STOP_DURATION, fromLink);
 		VehicleEntry entry = entry(start);
 		var detour = detourData(0., 15., Double.NaN, 0.);//toPickup/Dropoff unused
 		var insertion = insertion(entry, 0, 0, detour);
@@ -229,7 +229,7 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask("drt", beginTime, beginTime + STOP_DURATION, link), 0);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

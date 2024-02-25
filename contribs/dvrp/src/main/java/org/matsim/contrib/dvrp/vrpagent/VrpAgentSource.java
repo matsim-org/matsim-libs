@@ -60,7 +60,7 @@ public class VrpAgentSource implements AgentSource {
 			Id<DvrpVehicle> id = dvrpVehicle.getId();
 			Id<Link> startLinkId = dvrpVehicle.getStartLink().getId();
 
-			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
+			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle,
 					qSim.getEventsManager());
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
 					vrpAgentLogic);

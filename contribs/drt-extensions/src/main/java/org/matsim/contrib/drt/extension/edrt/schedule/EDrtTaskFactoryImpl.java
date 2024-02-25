@@ -33,11 +33,17 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  * @author michalm
  */
 public class EDrtTaskFactoryImpl implements DrtTaskFactory {
+	private final String dvrpMode;
+	
+	public EDrtTaskFactoryImpl(String dvrpMode) {
+		this.dvrpMode = dvrpMode;
+	}
+	
 	@Override
 	public EDrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType taskType) {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 		double totalEnergy = VrpPathEnergyConsumptions.calcTotalEnergy(ev, path, path.getDepartureTime());
-		return new EDrtDriveTask(path, taskType, totalEnergy);
+		return new EDrtDriveTask(dvrpMode, path, taskType, totalEnergy);
 	}
 
 	@Override
@@ -45,12 +51,12 @@ public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 		double auxEnergy = ev.getAuxEnergyConsumption()
 				.calcEnergyConsumption(beginTime, endTime - beginTime, link.getId());
-		return new EDrtStopTask(beginTime, endTime, link, auxEnergy);
+		return new EDrtStopTask(dvrpMode, beginTime, endTime, link, auxEnergy);
 	}
 
 	@Override
 	public EDrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return new EDrtStayTask(beginTime, endTime, link, 0);// no energy consumption during STAY
+		return new EDrtStayTask(dvrpMode, beginTime, endTime, link, 0);// no energy consumption during STAY
 	}
 
 	@Override
@@ -60,7 +66,7 @@ public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 
 	public EDrtChargingTask createChargingTask(DvrpVehicle vehicle, double beginTime, double endTime, Charger charger,
 			double totalEnergy) {
-		return new EDrtChargingTask(beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(),
+		return new EDrtChargingTask(dvrpMode, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(),
 				totalEnergy);
 	}
 }

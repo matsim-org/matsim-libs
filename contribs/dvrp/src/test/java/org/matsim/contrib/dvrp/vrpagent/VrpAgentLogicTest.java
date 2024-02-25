@@ -81,7 +81,7 @@ public class VrpAgentLogicTest {
 	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, startLink);
 
 	private final DynAgentLogic dynAgentLogic = new VrpAgentLogic(optimizer, VrpAgentLogicTest::createAction, vehicle,
-			DVRP_MODE, eventsManager);
+			eventsManager);
 	private final DynAgent dynAgent = new DynAgent(Id.createPersonId(vehicleSpecification.getId()), startLink.getId(),
 			null, dynAgentLogic);
 
@@ -98,7 +98,7 @@ public class VrpAgentLogicTest {
 	void testInitialActivity_planned() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
-		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, 90, startLink);
+		StayTask task0 = new DefaultStayTask(DVRP_MODE, TestTaskType.TYPE, 10, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
 
 		assertThat(initialActivity.getActivityType()).isEqualTo(BEFORE_SCHEDULE_ACTIVITY_TYPE);
@@ -110,7 +110,7 @@ public class VrpAgentLogicTest {
 	void testInitialActivity_started_failure() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
-		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, 90, startLink);
+		StayTask task0 = new DefaultStayTask(DVRP_MODE, TestTaskType.TYPE, 10, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
 		vehicle.getSchedule().nextTask();
 
@@ -133,7 +133,7 @@ public class VrpAgentLogicTest {
 	@Test
 	void testNextAction_planned_started() {
 		double time = 10;
-		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, time, 90, startLink);
+		StayTask task0 = new DefaultStayTask(DVRP_MODE, TestTaskType.TYPE, time, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
 
 		DynActivity nextActivity = (DynActivity)dynAgentLogic.computeNextAction(null, time);
@@ -144,9 +144,9 @@ public class VrpAgentLogicTest {
 	@Test
 	void testNextAction_started_started() {
 		double time = 50;
-		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, time, startLink);
+		StayTask task0 = new DefaultStayTask(DVRP_MODE, TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);
-		StayTask task1 = new DefaultStayTask(TestTaskType.TYPE, time, 90, startLink);
+		StayTask task1 = new DefaultStayTask(DVRP_MODE, TestTaskType.TYPE, time, 90, startLink);
 		vehicle.getSchedule().addTask(task1);
 		vehicle.getSchedule().nextTask();//current: task0
 
@@ -158,7 +158,7 @@ public class VrpAgentLogicTest {
 	@Test
 	void testNextAction_started_completed() {
 		double time = 90;
-		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, time, startLink);
+		StayTask task0 = new DefaultStayTask(DVRP_MODE, TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);
 		vehicle.getSchedule().nextTask();//current: task0
 
@@ -185,10 +185,10 @@ public class VrpAgentLogicTest {
 	}
 
 	private TaskStartedEvent taskStartedEvent(double time, Task task) {
-		return new TaskStartedEvent(time, DVRP_MODE, vehicleSpecification.getId(), dynAgent.getId(), task);
+		return new TaskStartedEvent(time, vehicleSpecification.getId(), dynAgent.getId(), task);
 	}
 
 	private TaskEndedEvent taskEndedEvent(double time, Task task) {
-		return new TaskEndedEvent(time, DVRP_MODE, vehicleSpecification.getId(), dynAgent.getId(), task);
+		return new TaskEndedEvent(time, vehicleSpecification.getId(), dynAgent.getId(), task);
 	}
 }

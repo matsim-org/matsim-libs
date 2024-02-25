@@ -33,11 +33,11 @@ public class EDrtShiftChangeoverTaskImpl extends DefaultStayTask implements Shif
 	private final DrtStopTask delegate;
 
 
-	public EDrtShiftChangeoverTaskImpl(double beginTime, double endTime, Link link,
+	public EDrtShiftChangeoverTaskImpl(String dvrpMode, double beginTime, double endTime, Link link,
                                        DrtShift shift, double consumedEnergy,
                                        ChargingTask chargingTask, OperationFacility facility) {
-		super(TYPE, beginTime, endTime, link);
-		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
+		super(dvrpMode, TYPE, beginTime, endTime, link);
+		this.delegate = new DefaultDrtStopTask(dvrpMode, beginTime, endTime, link);
 		this.shift = shift;
         this.consumedEnergy = consumedEnergy;
         this.chargingTask = chargingTask;

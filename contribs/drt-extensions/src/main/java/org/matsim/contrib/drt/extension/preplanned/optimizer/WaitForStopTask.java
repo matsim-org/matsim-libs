@@ -33,7 +33,7 @@ public class WaitForStopTask extends DefaultStayTask {
 
 	public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_STOP", STAY);
 
-	public WaitForStopTask(double beginTime, double endTime, Link link) {
-		super(TYPE, beginTime, endTime, link);
+	public WaitForStopTask(String dvrpMode, double beginTime, double endTime, Link link) {
+		super(dvrpMode, TYPE, beginTime, endTime, link);
 	}
 }

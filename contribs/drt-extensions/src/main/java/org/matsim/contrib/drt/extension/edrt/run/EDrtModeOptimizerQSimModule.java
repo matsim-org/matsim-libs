@@ -150,7 +150,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
-		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
+		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl(drtCfg.getMode()));
 
 		bindModal(EmptyVehicleRelocator.class).toProvider(
 				new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {

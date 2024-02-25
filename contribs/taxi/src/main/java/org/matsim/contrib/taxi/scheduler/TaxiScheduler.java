@@ -66,6 +66,8 @@ import com.google.common.util.concurrent.Futures;
 
 public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	protected final TaxiConfigGroup taxiCfg;
+	protected final String dvrpMode;
+	
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
@@ -90,6 +92,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		this.travelTime = travelTime;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
+		this.dvrpMode = taxiCfg.mode;
 
 		router = routerCreator.get();
 
@@ -105,7 +108,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	private void initFleet() {
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
-					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
+					.addTask(new TaxiStayTask(dvrpMode, veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
@@ -121,7 +124,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 		double pickupEndTime = Math.max(vrpPath.getArrivalTime(), request.getEarliestStartTime())
 				+ taxiCfg.pickupDuration;
-		schedule.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), pickupEndTime, request));
+		schedule.addTask(new TaxiPickupTask(dvrpMode, vrpPath.getArrivalTime(), pickupEndTime, request));
 
 		Link reqFromLink = request.getFromLink();
 		Link reqToLink = request.getToLink();
@@ -184,7 +187,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		}
 
 		if (vrpPath.getLinkCount() > 1) {
-			schedule.addTask(new TaxiEmptyDriveTask(vrpPath, taskType));
+			schedule.addTask(new TaxiEmptyDriveTask(dvrpMode, vrpPath, taskType));
 		}
 	}
 
@@ -245,11 +248,11 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	}
 
 	protected void appendOccupiedDriveAndDropoff(Schedule schedule, DrtRequest req, VrpPathWithTravelData path) {
-		schedule.addTask(new TaxiOccupiedDriveTask(path, req));
+		schedule.addTask(new TaxiOccupiedDriveTask(dvrpMode, path, req));
 
 		double arrivalTime = path.getArrivalTime();
 		double departureTime = arrivalTime + taxiCfg.dropoffDuration;
-		schedule.addTask(new TaxiDropoffTask(arrivalTime, departureTime, req));
+		schedule.addTask(new TaxiDropoffTask(dvrpMode, arrivalTime, departureTime, req));
 	}
 
 	protected VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime) {
@@ -265,7 +268,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		double tBegin = schedule.getEndTime();
 		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());// even 0-second WAIT
 		Link link = Schedules.getLastLinkInSchedule(vehicle);
-		schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
+		schedule.addTask(new TaxiStayTask(dvrpMode, tBegin, tEnd, link));
 	}
 
 	// =========================================================================================
@@ -357,7 +360,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	private void cleanupScheduleAfterTaskRemoval(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-			schedule.addTask(new TaxiStayTask(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+			schedule.addTask(new TaxiStayTask(dvrpMode, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 					vehicle.getStartLink()));
 			return;
 		}
@@ -372,7 +375,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 			case DROPOFF -> {
 				Link link = Schedules.getLastLinkInSchedule(vehicle);
-				schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
+				schedule.addTask(new TaxiStayTask(dvrpMode, tBegin, tEnd, link));
 			}
 
 			case EMPTY_DRIVE -> {

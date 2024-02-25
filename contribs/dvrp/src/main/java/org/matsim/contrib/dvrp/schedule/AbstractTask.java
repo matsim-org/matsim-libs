@@ -39,9 +39,12 @@ public abstract class AbstractTask implements Task {
 	private double endTime;
 
 	private TaskTracker taskTracker;
+	
+	private final String dvrpMode;
 
-	AbstractTask(TaskType taskType, double beginTime, double endTime) {
+	AbstractTask(String dvrpMode, TaskType taskType, double beginTime, double endTime) {
 		Preconditions.checkArgument(beginTime <= endTime, "beginTime=%s; endTime=%s", beginTime, endTime);
+		this.dvrpMode = dvrpMode;
 		this.taskType = Preconditions.checkNotNull(taskType);
 		this.beginTime = beginTime;
 		this.endTime = endTime;
@@ -97,10 +100,16 @@ public abstract class AbstractTask implements Task {
 		Preconditions.checkState(status == TaskStatus.STARTED, "Allowed only for STARTED tasks");
 		this.taskTracker = taskTracker;
 	}
+	
+	@Override
+	public String getDvrpMode() {
+		return dvrpMode;
+	}
 
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
+				.add("dvrpMode", dvrpMode)
 				.add("taskType", taskType)
 				.add("taskIdx", taskIdx)
 				.add("status", status)

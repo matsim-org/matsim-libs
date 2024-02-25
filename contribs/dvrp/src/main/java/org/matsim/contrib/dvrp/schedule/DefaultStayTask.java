@@ -29,8 +29,8 @@ import com.google.common.base.MoreObjects;
 public class DefaultStayTask extends AbstractTask implements StayTask {
 	private final Link link;
 
-	public DefaultStayTask(TaskType taskType, double beginTime, double endTime, Link link) {
-		super(taskType, beginTime, endTime);
+	public DefaultStayTask(String dvrpMode, TaskType taskType, double beginTime, double endTime, Link link) {
+		super(dvrpMode, taskType, beginTime, endTime);
 		this.link = link;
 	}
 

@@ -27,19 +27,25 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
  * @author michalm
  */
 public class DrtTaskFactoryImpl implements DrtTaskFactory {
+	private final String dvrpMode;
+	
+	public DrtTaskFactoryImpl(String dvrpMode) {
+		this.dvrpMode = dvrpMode;
+	}
+	
 	@Override
 	public DrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType taskType) {
-		return new DrtDriveTask(path, taskType);
+		return new DrtDriveTask(dvrpMode, path, taskType);
 	}
 
 	@Override
 	public DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return new DefaultDrtStopTask(beginTime, endTime, link);
+		return new DefaultDrtStopTask(dvrpMode, beginTime, endTime, link);
 	}
 
 	@Override
 	public DrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return new DrtStayTask(beginTime, endTime, link);
+		return new DrtStayTask(dvrpMode, beginTime, endTime, link);
 	}
 
 	@Override

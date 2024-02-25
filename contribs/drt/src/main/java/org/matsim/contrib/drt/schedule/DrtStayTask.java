@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 public class DrtStayTask extends DefaultStayTask {
 	public static final DrtTaskType TYPE = new DrtTaskType(STAY);
 
-	public DrtStayTask(double beginTime, double endTime, Link link) {
-		super(TYPE, beginTime, endTime, link);
+	public DrtStayTask(String dvrpMode, double beginTime, double endTime, Link link) {
+		super(dvrpMode, TYPE, beginTime, endTime, link);
 	}
 }

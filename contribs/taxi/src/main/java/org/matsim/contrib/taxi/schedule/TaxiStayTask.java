@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 public class TaxiStayTask extends DefaultStayTask {
 	public static final TaxiTaskType TYPE = new TaxiTaskType(STAY);
 
-	public TaxiStayTask(double beginTime, double endTime, Link link) {
-		super(TYPE, beginTime, endTime, link);
+	public TaxiStayTask(String dvrpMode, double beginTime, double endTime, Link link) {
+		super(dvrpMode, TYPE, beginTime, endTime, link);
 	}
 }

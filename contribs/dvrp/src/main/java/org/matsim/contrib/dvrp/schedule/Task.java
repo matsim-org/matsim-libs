@@ -86,4 +86,6 @@ public interface Task {
 	 * (TaskStatus == STARTED) can be tracked.
 	 */
 	void initTaskTracker(TaskTracker taskTracker);
+	
+	public String getDvrpMode();
 }

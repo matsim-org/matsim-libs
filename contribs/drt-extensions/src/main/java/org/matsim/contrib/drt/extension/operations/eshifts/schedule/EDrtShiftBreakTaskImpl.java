@@ -16,9 +16,9 @@ public class EDrtShiftBreakTaskImpl extends ShiftBreakTaskImpl implements ShiftB
     private final double consumedEnergy;
     private final ChargingTask chargingTask;
 
-    public EDrtShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak,
+    public EDrtShiftBreakTaskImpl(String dvrpMode, double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak,
                                   double consumedEnergy, ChargingTask chargingTask, OperationFacility facility) {
-        super(beginTime, endTime, link, shiftBreak, facility);
+        super(dvrpMode, beginTime, endTime, link, shiftBreak, facility);
         this.consumedEnergy = consumedEnergy;
         this.chargingTask = chargingTask;
     }

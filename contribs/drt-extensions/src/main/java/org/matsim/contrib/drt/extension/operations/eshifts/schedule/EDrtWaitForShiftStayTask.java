@@ -15,10 +15,10 @@ public class EDrtWaitForShiftStayTask extends WaitForShiftStayTask implements ET
 
     private final ChargingTask chargingTask;
 
-    public EDrtWaitForShiftStayTask(double beginTime, double endTime, Link link,
+    public EDrtWaitForShiftStayTask(String dvrpMode, double beginTime, double endTime, Link link,
                                     double consumedEnergy, OperationFacility facility,
                                     ChargingTask chargingTask) {
-        super(beginTime, endTime, link, facility);
+        super(dvrpMode, beginTime, endTime, link, facility);
         this.consumedEnergy = consumedEnergy;
         this.chargingTask = chargingTask;
     }

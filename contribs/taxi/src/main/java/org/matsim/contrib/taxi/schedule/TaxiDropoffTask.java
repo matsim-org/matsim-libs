@@ -31,8 +31,8 @@ public class TaxiDropoffTask extends DefaultStayTask {
 
 	private final DrtRequest request;
 
-	public TaxiDropoffTask(double beginTime, double endTime, DrtRequest request) {
-		super(TYPE, beginTime, endTime, request.getToLink());
+	public TaxiDropoffTask(String dvrpMode, double beginTime, double endTime, DrtRequest request) {
+		super(dvrpMode, TYPE, beginTime, endTime, request.getToLink());
 		this.request = request;
 	}
 

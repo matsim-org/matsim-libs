@@ -37,9 +37,9 @@ public class ChargingTaskImpl extends DefaultStayTask implements ChargingTask {
 	private Double chargingStartedTime;
 	private final double totalEnergy;
 
-	public ChargingTaskImpl(TaskType taskType, double beginTime, double endTime, Charger charger, ElectricVehicle ev,
+	public ChargingTaskImpl(String dvrpMode, TaskType taskType, double beginTime, double endTime, Charger charger, ElectricVehicle ev,
 			double totalEnergy) {
-		super(taskType, beginTime, endTime, charger.getLink());
+		super(dvrpMode, taskType, beginTime, endTime, charger.getLink());
 		Preconditions.checkArgument(totalEnergy < 0, "Total energy consumption is not negative: %s", totalEnergy);
 
 		this.chargingLogic = (ChargingWithAssignmentLogic)charger.getLogic();

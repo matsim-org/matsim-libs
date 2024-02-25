@@ -521,7 +521,7 @@ public class InsertionGeneratorTest {
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link, int outgoingOccupancy) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
+		return new Waypoint.Stop(new DefaultDrtStopTask("drt", beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

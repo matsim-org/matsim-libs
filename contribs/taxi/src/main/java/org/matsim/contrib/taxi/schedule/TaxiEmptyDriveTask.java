@@ -29,8 +29,8 @@ import com.google.common.base.Preconditions;
 public class TaxiEmptyDriveTask extends DefaultDriveTask {
 	public static final TaxiTaskType TYPE = new TaxiTaskType(EMPTY_DRIVE);
 
-	public TaxiEmptyDriveTask(VrpPathWithTravelData path, TaxiTaskType taskType) {
-		super(taskType, path);
+	public TaxiEmptyDriveTask(String dvrpMode, VrpPathWithTravelData path, TaxiTaskType taskType) {
+		super(dvrpMode, taskType, path);
 		Preconditions.checkArgument(taskType.baseType().get() == EMPTY_DRIVE);
 	}
 }

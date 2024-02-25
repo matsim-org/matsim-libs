@@ -31,8 +31,8 @@ import com.google.common.base.MoreObjects;
 public class DefaultDriveTask extends AbstractTask implements DriveTask {
 	private VrpPath path;
 
-	public DefaultDriveTask(TaskType taskType, VrpPathWithTravelData path) {
-		super(taskType, path.getDepartureTime(), path.getArrivalTime());
+	public DefaultDriveTask(String dvrpMode, TaskType taskType, VrpPathWithTravelData path) {
+		super(dvrpMode, taskType, path.getDepartureTime(), path.getArrivalTime());
 		this.path = path;
 	}
 

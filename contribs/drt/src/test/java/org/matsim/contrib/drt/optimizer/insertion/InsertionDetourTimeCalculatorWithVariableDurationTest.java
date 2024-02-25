@@ -110,7 +110,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	@Test
 	void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
-		DrtStopTask stopTask = new DefaultDrtStopTask(20, 20 + STOP_DURATION_INITIAL, fromLink);
+		DrtStopTask stopTask = new DefaultDrtStopTask("drt", 20, 20 + STOP_DURATION_INITIAL, fromLink);
 		stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
 		// sh 03/08/23: Updated this test, according to VehicleDataEntryFactoryImpl start time should be task end time
 		Waypoint.Start start = start(stopTask, 20 + STOP_DURATION_INITIAL, fromLink);
@@ -269,7 +269,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
-		DrtStopTask stopTask = new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
+		DrtStopTask stopTask = new DefaultDrtStopTask("drt", beginTime, beginTime + STOP_DURATION_INITIAL, link);
 		stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
 		return new Waypoint.Stop(stopTask, 0);
 	}

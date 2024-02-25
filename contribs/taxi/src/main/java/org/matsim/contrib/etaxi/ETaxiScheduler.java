@@ -68,7 +68,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 		double chargingEndTime = vrpPath.getArrivalTime() + ChargingEstimations.estimateMaxWaitTimeForNextVehicle(
 				charger)// TODO not precise!!!
 				+ logic.getChargingStrategy().calcRemainingTimeToCharge(ev);// TODO not precise !!! (SOC will be lower)
-		schedule.addTask(new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev,
+		schedule.addTask(new ETaxiChargingTask(dvrpMode, vrpPath.getArrivalTime(), chargingEndTime, charger, ev,
 				-logic.getChargingStrategy().calcRemainingEnergyToCharge(ev)));// TODO not precise !!! (ditto)
 		logic.assignVehicle(ev);
 
@@ -145,7 +145,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 			// the right endTime is set in TaxiScheduler.removeAwaitingRequestsImpl()
 			double chargeEndTime = lastTask.getEndTime();
 			Link chargeLink = ((ETaxiChargingTask)lastTask).getLink();
-			schedule.addTask(new TaxiStayTask(chargeEndTime, chargeEndTime, chargeLink));
+			schedule.addTask(new TaxiStayTask(dvrpMode, chargeEndTime, chargeEndTime, chargeLink));
 		}
 	}
 

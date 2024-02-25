@@ -170,7 +170,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			// otherwise we may not be able to get the request and insert it to the stop task
 			// TODO currently assuming the mobsim time step is 1 s
 			schedule.addTask(
-					new WaitForStopTask(currentTime, nextStop.preplannedRequest.earliestStartTime + 1, currentLink));
+					new WaitForStopTask(mode, currentTime, nextStop.preplannedRequest.earliestStartTime + 1, currentLink));
 		} else {
 			nonVisitedPreplannedStops.poll();//remove this stop from queue
 

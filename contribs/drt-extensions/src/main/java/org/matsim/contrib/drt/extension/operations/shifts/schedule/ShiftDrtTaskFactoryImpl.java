@@ -22,10 +22,12 @@ import java.util.stream.Collectors;
  */
 public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
+	private final String dvrpMode;
 	private final DrtTaskFactory delegate;
 	private final OperationFacilities operationFacilities;
 
-	public ShiftDrtTaskFactoryImpl(DrtTaskFactory delegate, OperationFacilities operationFacilities) {
+	public ShiftDrtTaskFactoryImpl(String dvrpMode, DrtTaskFactory delegate, OperationFacilities operationFacilities) {
+		this.dvrpMode = dvrpMode;
 		this.delegate = delegate;
 		this.operationFacilities = operationFacilities;
 	}
@@ -48,19 +50,19 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 	@Override
 	public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime,
 											   Link link, DrtShiftBreak shiftBreak, OperationFacility facility) {
-		return new ShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, facility);
+		return new ShiftBreakTaskImpl(dvrpMode, beginTime, endTime, link, shiftBreak, facility);
 	}
 
 	@Override
 	public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
 														 Link link, DrtShift shift, OperationFacility facility) {
-		return new ShiftChangeoverTaskImpl(beginTime, endTime, link, shift, facility);
+		return new ShiftChangeoverTaskImpl(dvrpMode, beginTime, endTime, link, shift, facility);
 	}
 
 	@Override
 	public WaitForShiftStayTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime,
 														   Link link, OperationFacility facility) {
-		return new WaitForShiftStayTask(beginTime, endTime, link, facility);
+		return new WaitForShiftStayTask(dvrpMode, beginTime, endTime, link, facility);
 	}
 
 	public DefaultStayTask createInitialTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {

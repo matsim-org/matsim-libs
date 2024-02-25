@@ -29,8 +29,8 @@ import org.matsim.contrib.evrp.ETask;
 public class EDrtStopTask extends DefaultDrtStopTask implements ETask {
 	private final double consumedEnergy;
 
-	public EDrtStopTask(double beginTime, double endTime, Link link, double consumedEnergy) {
-		super(beginTime, endTime, link);
+	public EDrtStopTask(String dvrpMode, double beginTime, double endTime, Link link, double consumedEnergy) {
+		super(dvrpMode, beginTime, endTime, link);
 		this.consumedEnergy = consumedEnergy;
 	}
 

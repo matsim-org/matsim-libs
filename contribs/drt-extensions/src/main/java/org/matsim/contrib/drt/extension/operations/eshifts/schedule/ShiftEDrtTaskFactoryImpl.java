@@ -35,12 +35,14 @@ import java.util.stream.Collectors;
  */
 public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
+	private final String dvrpMode;
     private final EDrtTaskFactoryImpl delegate;
 	private final OperationFacilities operationFacilities;
 
 
-	public ShiftEDrtTaskFactoryImpl(EDrtTaskFactoryImpl delegate, OperationFacilities operationFacilities) {
-        this.delegate = delegate;
+	public ShiftEDrtTaskFactoryImpl(String dvrpMode, EDrtTaskFactoryImpl delegate, OperationFacilities operationFacilities) {
+        this.dvrpMode = dvrpMode;
+		this.delegate = delegate;
 		this.operationFacilities = operationFacilities;
 
 	}
@@ -82,38 +84,38 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 	@Override
     public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
                                                DrtShiftBreak shiftBreak, OperationFacility facility) {
-        return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, 0, null, facility);
+        return new EDrtShiftBreakTaskImpl(dvrpMode, beginTime, endTime, link, shiftBreak, 0, null, facility);
     }
 
     @Override
     public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
 														 Link link, DrtShift shift, OperationFacility facility) {
-        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, 0, null, facility);
+        return new EDrtShiftChangeoverTaskImpl(dvrpMode, beginTime, endTime, link, shift, 0, null, facility);
     }
 
     @Override
     public WaitForShiftStayTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
 														   OperationFacility facility) {
-        return new EDrtWaitForShiftStayTask(beginTime, endTime, link, 0, facility, null);
+        return new EDrtWaitForShiftStayTask(dvrpMode, beginTime, endTime, link, 0, facility, null);
     }
 
     public WaitForShiftStayTask createChargingWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime,
                                                            double endTime, Link link, OperationFacility facility,
                                                            double totalEnergy, Charger charger) {
-        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
-        return new EDrtWaitForShiftStayTask(beginTime, endTime, link, totalEnergy, facility, chargingTask);
+        ChargingTask chargingTask = new ChargingTaskImpl(dvrpMode, EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
+        return new EDrtWaitForShiftStayTask(dvrpMode, beginTime, endTime, link, totalEnergy, facility, chargingTask);
     }
 
     public EDrtShiftBreakTaskImpl createChargingShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
                                                                DrtShiftBreak shiftBreak, Charger charger, double totalEnergy, OperationFacility facility) {
-        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
-        return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, totalEnergy, chargingTask, facility);
+        ChargingTask chargingTask = new ChargingTaskImpl(dvrpMode, EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
+        return new EDrtShiftBreakTaskImpl(dvrpMode, beginTime, endTime, link, shiftBreak, totalEnergy, chargingTask, facility);
     }
 
     public ShiftChangeOverTask createChargingShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
                                                                  Link link, Charger charger, double totalEnergy,
                                                                  DrtShift shift, OperationFacility facility) {
-        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
-        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, totalEnergy, chargingTask, facility);
+        ChargingTask chargingTask = new ChargingTaskImpl(dvrpMode, EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
+        return new EDrtShiftChangeoverTaskImpl(dvrpMode, beginTime, endTime, link, shift, totalEnergy, chargingTask, facility);
     }
 }

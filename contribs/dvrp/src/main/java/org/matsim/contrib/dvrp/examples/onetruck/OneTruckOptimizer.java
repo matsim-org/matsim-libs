@@ -75,7 +75,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.getSchedule()
-				.addTask(new DefaultStayTask(OneTruckTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+				.addTask(new DefaultStayTask(TransportMode.truck, OneTruckTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 						vehicle.getStartLink()));
 	}
 
@@ -109,14 +109,14 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,
 				travelTime);
-		schedule.addTask(new DefaultDriveTask(OneTruckTaskType.EMPTY_DRIVE, pathToCustomer));
+		schedule.addTask(new DefaultDriveTask(TransportMode.truck, OneTruckTaskType.EMPTY_DRIVE, pathToCustomer));
 
 		double t1 = pathToCustomer.getArrivalTime();
 		double t2 = t1 + PICKUP_DURATION;// 2 minutes for the pickup
 		schedule.addTask(new OneTruckServeTask(OneTruckTaskType.PICKUP, t1, t2, fromLink, req));
 
 		VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router, travelTime);
-		schedule.addTask(new DefaultDriveTask(OneTruckTaskType.LOADED_DRIVE, pathWithCustomer));
+		schedule.addTask(new DefaultDriveTask(TransportMode.truck, OneTruckTaskType.LOADED_DRIVE, pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
 		double t4 = t3 + DELIVERY_DURATION;// 1 minute for the delivery
@@ -124,7 +124,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
-		schedule.addTask(new DefaultStayTask(OneTruckTaskType.WAIT, t4, tEnd, toLink));
+		schedule.addTask(new DefaultStayTask(TransportMode.truck, OneTruckTaskType.WAIT, t4, tEnd, toLink));
 	}
 
 	@Override

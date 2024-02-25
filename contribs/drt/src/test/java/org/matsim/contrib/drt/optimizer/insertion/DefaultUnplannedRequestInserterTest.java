@@ -224,9 +224,9 @@ public class DefaultUnplannedRequestInserterTest {
 		double pickupEndTime = now + 20;
 		double dropoffBeginTime = now + 40;
 		RequestInsertionScheduler insertionScheduler = (request, insertion) -> {
-			var pickupTask = new DefaultDrtStopTask(pickupEndTime - 10, pickupEndTime, request1.getFromLink());
+			var pickupTask = new DefaultDrtStopTask("drt", pickupEndTime - 10, pickupEndTime, request1.getFromLink());
 			pickupTask.addPickupRequest(acceptedDrtRequest1);
-			var dropoffTask = new DefaultDrtStopTask(dropoffBeginTime, dropoffBeginTime + 10, request1.getToLink());
+			var dropoffTask = new DefaultDrtStopTask("drt", dropoffBeginTime, dropoffBeginTime + 10, request1.getToLink());
 			dropoffTask.addPickupRequest(acceptedDrtRequest1);
 			return new PickupDropoffTaskPair(pickupTask, dropoffTask);
 		};

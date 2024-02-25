@@ -27,9 +27,9 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 
 	private final DrtStopTask delegate;
 
-	public ShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak, OperationFacility facility) {
-		super(TYPE, beginTime, endTime, link);
-		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
+	public ShiftBreakTaskImpl(String dvrpMode, double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak, OperationFacility facility) {
+		super(dvrpMode, TYPE, beginTime, endTime, link);
+		this.delegate = new DefaultDrtStopTask(dvrpMode, beginTime, endTime, link);
 		this.shiftBreak = shiftBreak;
         this.facility = facility;
     }

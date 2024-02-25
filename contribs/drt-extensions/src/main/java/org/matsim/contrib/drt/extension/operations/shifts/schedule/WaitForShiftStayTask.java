@@ -16,8 +16,8 @@ public class WaitForShiftStayTask extends DefaultStayTask implements Operational
 
 	private final OperationFacility facility;
 
-    public WaitForShiftStayTask(double beginTime, double endTime, Link link, OperationFacility facility) {
-        super(TYPE, beginTime, endTime, link);
+    public WaitForShiftStayTask(String dvrpMode, double beginTime, double endTime, Link link, OperationFacility facility) {
+        super(dvrpMode, TYPE, beginTime, endTime, link);
         this.facility = facility;
     }
 
