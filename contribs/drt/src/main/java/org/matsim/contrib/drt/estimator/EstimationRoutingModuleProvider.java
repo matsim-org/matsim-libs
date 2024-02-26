@@ -36,9 +36,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
+
 public class EstimationRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpMode, EstimationRoutingModule> {
 
 	@Inject
@@ -47,6 +45,9 @@ public class EstimationRoutingModuleProvider extends ModalProviders.AbstractProv
 
 	@Inject
 	private TimeInterpretation timeInterpretation;
+
+	@Inject
+	private Map<DvrpMode, DrtEstimator> estimators;
 
 	public EstimationRoutingModuleProvider(String mode) {
 		super(mode, DvrpModes::mode);
@@ -63,6 +64,6 @@ public class EstimationRoutingModuleProvider extends ModalProviders.AbstractProv
 
 		DvrpRoutingModule routingModule = new DvrpRoutingModule(mainRouter, accessRouter, egressRouter,
 			getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), timeInterpretation);
-		return new EstimationRoutingModule(routingModule);
+		return new EstimationRoutingModule(routingModule, estimators.get(DvrpModes.mode(getMode())));
 	}
 }

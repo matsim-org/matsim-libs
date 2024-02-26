@@ -23,6 +23,7 @@ package org.matsim.core.modal;
 import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
+import com.google.inject.Binder;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;

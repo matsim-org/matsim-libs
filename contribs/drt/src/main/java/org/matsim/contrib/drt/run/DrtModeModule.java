@@ -110,11 +110,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		if (drtCfg.getDrtEstimatorParams().isPresent()) {
 			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
-
-			if (drtCfg.getDrtEstimatorParams().get().teleport) {
-				addRoutingModuleBinding(getMode()).toProvider(new EstimationRoutingModuleProvider(getMode()));// not singleton
-			}
-
 		}
 
 	}

@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.estimator;
 
+import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
@@ -9,6 +10,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 
 /**
  * Main module that needs to be installed if any estimator is to be used.
@@ -24,24 +26,22 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 		this.params = params;
 	}
 
+	public static Object bindEstimator(Binder binder, String mode){
+
+		// TODO create helper method for binding
+
+//		DvrpMode key = DvrpModes.mode(mode);
+//		binder.bind(key)
+//		ModalProviders.createProvider(mode, DvrpModes::mode);
+		return null;
+	}
+
 	@Override
 	public void install() {
 
-		// try with default injections and overwrite
-		if (params.estimator == DrtEstimatorParams.EstimatorType.BASIC) {
-			bindModal(DrtEstimator.class).toProvider(modalProvider(
-				getter -> new BasicDrtEstimator(
-					getter.getModal(DrtEventSequenceCollector.class),
-					getter.getModal(DrtInitialEstimator.class),
-					params, drtCfg
-				)
-			)).in(Singleton.class);
-		} else if (params.estimator == DrtEstimatorParams.EstimatorType.INITIAL) {
-			bindModal(DrtEstimator.class).to(modalKey(DrtInitialEstimator.class));
-		}
-
 		// TODO decide how initial estimators are defined
 		bindModal(DrtInitialEstimator.class).toInstance(new PessimisticDrtEstimator(drtCfg));
+		bindModal(DrtEstimator.class).toInstance(new PessimisticDrtEstimator(drtCfg));
 
 		// DRT Estimators will be available as Map<DvrpMode, DrtEstimator>
 		MapBinder.newMapBinder(this.binder(), DvrpMode.class, DrtEstimator.class)

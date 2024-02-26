@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -78,8 +79,10 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 
-		// TODO just for testing
-//		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
+		switch (drtCfg.simulationType){
+			case fullSimulation -> addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
+			case estimateAndTeleport -> addRoutingModuleBinding(getMode()).toProvider(new EstimationRoutingModuleProvider(getMode()));// not singleton
+		}
 		// (this is the normal routing module binding)
 
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(

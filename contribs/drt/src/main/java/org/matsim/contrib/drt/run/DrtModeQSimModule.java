@@ -65,7 +65,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		boolean teleportSpeedup = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
 				drtCfg.getDrtSpeedUpParams().get(), getConfig().controller(), getIterationNumber());
 
-		boolean teleportEstimate = drtCfg.getDrtEstimatorParams().isPresent() && drtCfg.getDrtEstimatorParams().get().teleport;
+		boolean teleportEstimate = drtCfg.getDrtEstimatorParams().isPresent() && drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport;
 
 		if (teleportSpeedup) {
 			install(new PassengerEngineQSimModule(getMode(),

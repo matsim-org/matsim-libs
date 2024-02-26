@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
@@ -217,6 +218,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
+
+	public enum SimulationType {
+		fullSimulation, estimateAndTeleport
+	}
+
+	@Parameter
+	@Comment("Whether full simulation drt is employed")
+	public SimulationType simulationType = SimulationType.fullSimulation;
+
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
@@ -333,6 +343,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+
+
+		// TODO if we teleport we need to check if estimates are present
 	}
 
 	@Override
