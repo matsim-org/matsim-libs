@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
@@ -94,7 +95,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
 			.sample(false)
-			.separator(detectDelimiter(input.getPath("persons.csv"))).build());
+			.separator(new CsvOptions().detectDelimiter(input.getPath("persons.csv"))).build());
 
 		int total = persons.rowCount();
 
@@ -135,7 +136,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
 			.sample(false)
-			.separator(detectDelimiter(input.getPath("trips.csv"))).build());
+			.separator(new CsvOptions().detectDelimiter(input.getPath("trips.csv"))).build());
 
 		// Trip filter with start and end
 		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
@@ -186,45 +187,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeTripPurposes(joined);
 
 		return 0;
-	}
-
-	private Character detectDelimiter(String path) throws IOException {
-		// Create a map to count occurrences of potential delimiters
-		Map<Character, Integer> delimiterCounts = new HashMap<>();
-
-		BufferedReader reader = null;
-		try {
-			if (path.endsWith(".gz")) {
-				reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(path))));
-			} else if (path.endsWith(".csv")) {
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-			} else {
-				log.error("Usupported file format.");
-			}
-
-			String firstLine = reader.readLine();
-
-			delimiterCounts.put(',', firstLine.split(",").length);
-			delimiterCounts.put(';', firstLine.split(";").length);
-			delimiterCounts.put('\t', firstLine.split("\t").length);
-
-		} catch (FileNotFoundException e) {
-            throw e;
-        } catch (IOException e) {
-            throw e;
-        } finally {
-			reader.close();
-		}
-
-		Character delimiter = null;
-		for (Map.Entry<Character, Integer> e : delimiterCounts.entrySet()) {
-			if (e.getValue().equals(Collections.max(delimiterCounts.values()))) {
-				delimiter = e.getKey();
-				break;
-			}
-		}
-
-        return delimiter;
 	}
 
 	private void writeModeShare(Table trips, List<String> labels) {

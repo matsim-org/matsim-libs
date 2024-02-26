@@ -3,10 +3,11 @@ package org.matsim.application.options;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang.StringUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -72,6 +73,26 @@ public final class CsvOptions {
 	 */
 	public CSVPrinter createPrinter(Path path) throws IOException {
 		return new CSVPrinter(IOUtils.getBufferedWriter(path.toUri().toURL(),  csvCharset, false), getFormat());
+	}
+
+	public Character detectDelimiter(String path) throws IOException {
+		BufferedReader reader = IOUtils.getBufferedReader(path);
+
+		String firstLine = reader.readLine();
+
+		int comma = StringUtils.countMatches(firstLine, ",");
+		int semicolon = StringUtils.countMatches(firstLine, ";");
+		int tab = StringUtils.countMatches(firstLine, "\t");
+
+		if (Math.max(comma, Math.max(semicolon, tab)) == comma) {
+			return ',';
+		} else if (Math.max(comma, Math.max(semicolon, tab)) == semicolon) {
+			return ';';
+		} else if (Math.max(comma, Math.max(semicolon, tab)) == tab) {
+			return '\t';
+		} else {
+			return null;
+		}
 	}
 
 }
