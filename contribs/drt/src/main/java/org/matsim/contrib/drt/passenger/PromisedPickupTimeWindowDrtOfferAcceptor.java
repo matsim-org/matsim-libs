@@ -4,7 +4,9 @@ import java.util.Optional;
 
 /**
  * @author nkuehnel / MOIA
+ * The function is now realized by the MaxDetourOfferAcceptor -Chengqi (luchengqi7)
  */
+@Deprecated
 public final class PromisedPickupTimeWindowDrtOfferAcceptor implements DrtOfferAcceptor {
 	private final double promisedPickupTimeWindow;
 

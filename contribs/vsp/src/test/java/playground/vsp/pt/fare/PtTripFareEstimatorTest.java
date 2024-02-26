@@ -44,7 +44,7 @@ public class PtTripFareEstimatorTest {
 	@Inject
 	private ScoringParametersForPerson params;
 	@Inject
-	private Map<String, TripEstimator<?>> tripEstimator;
+	private Map<String, TripEstimator> tripEstimator;
 	private PtTripWithDistanceBasedFareEstimator estimator;
 
 	@BeforeEach

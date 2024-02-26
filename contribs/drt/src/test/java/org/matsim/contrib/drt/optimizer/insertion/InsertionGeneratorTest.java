@@ -378,7 +378,8 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
 		Waypoint.Stop stop0 = stop(200, fromLink, 1);
 		Waypoint.Stop stop1 = stop(400, link("stop"), 0);
-		VehicleEntry entry = entry(start, stop0, stop1);
+		List<Double> precedingStayTimes = Arrays.asList(100.0, 0.0);
+		VehicleEntry entry = entry(start, precedingStayTimes, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
 			new Insertion(drtRequest, entry, 0, 0),
 			new Insertion(drtRequest, entry, 0, 1),
@@ -524,9 +525,13 @@ public class InsertionGeneratorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return entry(start, precedingStayTimes, stops);
+	}
+	
+	private VehicleEntry entry(Waypoint.Start start, List<Double> precedingStayTimes, Waypoint.Stop... stops) {
 		var slackTimes = new double[stops.length + 2];
 		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
-		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
 	}
 }

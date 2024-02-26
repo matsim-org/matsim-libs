@@ -65,7 +65,7 @@ public class DrtEventsReadersTest {
 
 	//standard dvrp events are tested in DvrpEventsReadersTest
 	private final List<Event> drtEvents = List.of(
-			new DrtRequestSubmittedEvent(0, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0),//
+			new DrtRequestSubmittedEvent(0, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0, 555),//
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
 			taskEnded(30, DefaultDrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//
