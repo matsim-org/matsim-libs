@@ -39,10 +39,6 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 
-		// TODO decide how initial estimators are defined
-		bindModal(DrtInitialEstimator.class).toInstance(new PessimisticDrtEstimator(drtCfg));
-		bindModal(DrtEstimator.class).toInstance(new PessimisticDrtEstimator(drtCfg));
-
 		// DRT Estimators will be available as Map<DvrpMode, DrtEstimator>
 		MapBinder.newMapBinder(this.binder(), DvrpMode.class, DrtEstimator.class)
 			.addBinding(DvrpModes.mode(getMode()))

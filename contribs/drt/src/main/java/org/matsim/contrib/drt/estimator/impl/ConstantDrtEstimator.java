@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.estimator.impl;
 
-import org.matsim.contrib.drt.estimator.DrtInitialEstimator;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -9,7 +9,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 /**
  * Estimates using a constant detour factor and waiting time.
  */
-public class ConstantDrtEstimator implements DrtInitialEstimator {
+public class ConstantDrtEstimator implements DrtEstimator {
 
 	private final DrtConfigGroup drtConfig;
 

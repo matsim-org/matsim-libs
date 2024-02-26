@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import it.unimi.dsi.fastutil.doubles.DoubleObjectPair;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -42,6 +43,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.modal.ModalProviders;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -63,8 +65,18 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 
 	private final InternalPassengerHandling internalPassengerHandling;
 	private final TeleportationEngine teleportationEngine;
-	private final Queue<Pair<Double, PassengerRequest>> teleportedRequests = new PriorityQueue<>(
-			Comparator.comparingDouble(Pair::getLeft));
+
+	/**
+	 * Request currently waiting for pickup.
+	 */
+	private final Queue<DoubleObjectPair<PassengerRequest>> waitingRequests = new PriorityQueue<>(
+		Comparator.comparingDouble(DoubleObjectPair::keyDouble));
+
+	/**
+	 * Request currently onboard a vehicle and waiting for drop-off.
+	 */
+	private final Queue<DoubleObjectPair<PassengerRequest>> ridingRequests = new PriorityQueue<>(
+			Comparator.comparingDouble(DoubleObjectPair::keyDouble));
 
 	private InternalInterface internalInterface;
 
@@ -103,12 +115,21 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 
 	@Override
 	public void doSimStep(double time) {
-		//first process passenger dropoff events
-		while (!teleportedRequests.isEmpty() && teleportedRequests.peek().getLeft() <= time) {
-			PassengerRequest request = teleportedRequests.poll().getRight();
+
+		// process waiting passengers
+		while (!waitingRequests.isEmpty() && waitingRequests.peek().keyDouble() <= time) {
+			PassengerRequest request = waitingRequests.poll().value();
 			for (Id<Person> passenger : request.getPassengerIds()) {
-				eventsManager.processEvent(
-						new PassengerDroppedOffEvent(time, mode, request.getId(), passenger, null));
+				//TODO: check whether to use first passenger Id
+				eventsManager.processEvent(new PassengerPickedUpEvent(time, mode, request.getId(), request.getPassengerIds().get(0), null));
+			}
+		}
+
+		//first process passenger dropoff events
+		while (!ridingRequests.isEmpty() && ridingRequests.peek().keyDouble() <= time) {
+			PassengerRequest request = ridingRequests.poll().value();
+			for (Id<Person> passenger : request.getPassengerIds()) {
+				eventsManager.processEvent(new PassengerDroppedOffEvent(time, mode, request.getId(), passenger, null));
 			}
 		}
 
@@ -137,11 +158,23 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
-			adaptLegRouteForTeleportation(List.of(passenger), leg, request, now);
 
-			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
+			double waitTime = getEstimatedWaitTime(leg);
+			double travelTime = waitTime + getEstimatedRideTime(leg);
+
+			// Set information in the route for the teleportation engine
+			leg.setTravelTime(travelTime);
+			route.setTravelTime(travelTime);
+			route.setDistance(getEstimatedRideDistance(leg));
+
+			eventsManager.processEvent(new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
+				request.getPassengerIds(), null, now, now + travelTime));
+
 			teleportationEngine.handleDeparture(now, passenger, fromLinkId);
-			teleportedRequests.add(ImmutablePair.of(now + route.getTravelTime().seconds(), request));
+
+			waitingRequests.add(DoubleObjectPair.of(now + waitTime, request));
+			ridingRequests.add(DoubleObjectPair.of(now + travelTime, request));
+
 		} else {
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
@@ -150,16 +183,6 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 		}
 
 		return true;
-	}
-
-	private void adaptLegRouteForTeleportation(List<MobsimPassengerAgent> passengers, Leg leg, PassengerRequest request, double now) {
-		Route route = leg.getRoute();
-
-		// TODO retrieve information from the leg
-
-		eventsManager.processEvent(new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
-				request.getPassengerIds(), null, now, now + route.getTravelTime().seconds()));
-
 	}
 
 	private Link getLink(Id<Link> linkId) {
@@ -210,4 +233,22 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 			}
 		};
 	}
+
+	static double getEstimatedRideTime(Attributable element) {
+		return (double) element.getAttributes().getAttribute("ride_time");
+	}
+
+	static double getEstimatedRideDistance(Attributable element){
+		return (double) element.getAttributes().getAttribute("ride_distance");
+	}
+
+	static double getEstimatedWaitTime(Attributable element){
+		return  (double) element.getAttributes().getAttribute("wait_time");
+	}
+
+	static double getEstimatedFare(Attributable element){
+		return (double) element.getAttributes().getAttribute("fare");
+	}
+
+
 }

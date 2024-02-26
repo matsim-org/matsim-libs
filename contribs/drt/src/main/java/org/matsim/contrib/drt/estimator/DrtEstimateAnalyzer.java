@@ -114,7 +114,7 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 					DrtEstimator.Estimate estimate = estimator.estimate(route, OptionalTime.defined(seq.getSubmitted().getTime()));
 
 					waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
-					travelTime.addValue(Math.abs(estimate.travelTime() - valTravelTime));
+					travelTime.addValue(Math.abs(estimate.rideTime() - valTravelTime));
 					fare.addValue(Math.abs(estimate.fare() - valFare));
 				}
 			}

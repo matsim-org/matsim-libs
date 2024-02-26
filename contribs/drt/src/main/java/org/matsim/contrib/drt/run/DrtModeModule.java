@@ -108,7 +108,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
 
-		if (drtCfg.getDrtEstimatorParams().isPresent()) {
+		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport ) {
 			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
 		}
 

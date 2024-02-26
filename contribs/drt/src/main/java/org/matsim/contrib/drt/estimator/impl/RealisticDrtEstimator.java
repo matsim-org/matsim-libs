@@ -1,12 +1,12 @@
 package org.matsim.contrib.drt.estimator.impl;
 
-import org.matsim.contrib.drt.estimator.DrtInitialEstimator;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.Random;
 
-public class RealisticDrtEstimator implements DrtInitialEstimator {
+public class RealisticDrtEstimator implements DrtEstimator {
 
 	private final DistributionGenerator distributionGenerator;
 

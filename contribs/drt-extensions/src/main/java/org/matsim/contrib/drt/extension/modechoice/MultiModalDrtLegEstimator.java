@@ -49,10 +49,10 @@ public class MultiModalDrtLegEstimator implements LegEstimator {
 
 		// By default, waiting time is scored as travel time
 		return params.constant +
-			params.marginalUtilityOfDistance_m * est.distance() +
-			params.marginalUtilityOfTraveling_s * est.travelTime() +
+			params.marginalUtilityOfDistance_m * est.rideDistance() +
+			params.marginalUtilityOfTraveling_s * est.rideTime() +
 			params.marginalUtilityOfTraveling_s * est.waitingTime() +
-			context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * est.distance() +
+			context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * est.rideDistance() +
 			context.scoring.marginalUtilityOfMoney * est.fare();
 
 	}
