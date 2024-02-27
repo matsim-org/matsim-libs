@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
@@ -47,6 +48,12 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 		if (externalInputCRS != null && targetCRS != null) {
 			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
 			ProjectionUtils.putCRS(this.counts, targetCRS);
+		} else if ( externalInputCRS==null && targetCRS==null ){
+			this.coordinateTransformation = new IdentityTransformation();
+		} else {
+			log.warn("finding a coordinate spec on one side but not on the other: inputCRS=" + externalInputCRS + "; targetCRS=" + targetCRS + ".  We are assuming that things are consistent, and are continuing anyways." );
+			this.coordinateTransformation = new IdentityTransformation();
+			// yy this is the logic that I fould.  One could alternatively fail here. kai, feb'24
 		}
 
 	}

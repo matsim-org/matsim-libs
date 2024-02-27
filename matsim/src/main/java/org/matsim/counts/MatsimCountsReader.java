@@ -24,9 +24,11 @@ import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -103,7 +105,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only counts-type is v1
 		if (COUNTS_V1.equals(doctype)) {
-			CoordinateTransformation coordinateTransformation = null;
+			CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 			if (inputCRS != null && targetCRS != null) {
 				coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS );
 			}

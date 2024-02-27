@@ -125,21 +125,23 @@ public class CountsReprojectionIOTest {
 		final Counts<Link> dumpedCounts = new Counts<>();
 		new MatsimCountsReader( dumpedCounts ).readFile( outputDirectory+"/output_counts.xml.gz" );
 
-		for ( Id<Link> id : originalCounts.getCounts().keySet() ) {
-			final Coord originalCoord = originalCounts.getCount( id ).getCoord();
-			final Coord dumpedCoord = dumpedCounts.getCount( id ).getCoord();
+//		for ( Id<Link> id : originalCounts.getCounts().keySet() ) {
+//			final Coord originalCoord = originalCounts.getCount( id ).getCoord();
+//			final Coord dumpedCoord = dumpedCounts.getCount( id ).getCoord();
+//
+//			Assertions.assertEquals(
+//					originalCoord.getX(),
+//					dumpedCoord.getX(),
+//					epsilon,
+//					"coordinates were not reprojected for dump" );
+//			Assertions.assertEquals(
+//					originalCoord.getY(),
+//					dumpedCoord.getY(),
+//					epsilon,
+//					"coordinates were not reprojected for dump" );
+//		}
+		 // (output is now in simulation coordinate system; it is no longer re-projected.  As we are also doing in other parts of matsim).  kai, feb'24
 
-			Assertions.assertEquals(
-					originalCoord.getX(),
-					dumpedCoord.getX(),
-					epsilon,
-					"coordinates were not reprojected for dump" );
-			Assertions.assertEquals(
-					originalCoord.getY(),
-					dumpedCoord.getY(),
-					epsilon,
-					"coordinates were not reprojected for dump" );
-		}
 	}
 
 	private void assertCountsAreReprojectedCorrectly(
