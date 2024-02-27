@@ -65,7 +65,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
+import static org.matsim.utils.eventsfilecomparison.ComparisonResult.FILES_ARE_EQUAL;
 
 /**
  * @author dziemke

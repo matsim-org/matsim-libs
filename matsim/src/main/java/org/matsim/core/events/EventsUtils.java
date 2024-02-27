@@ -21,12 +21,11 @@
 
 package org.matsim.core.events;
 
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-import org.matsim.utils.eventsfilecomparison.EventsFileFingerprintComparator;
-import org.matsim.utils.eventsfilecomparison.FingerprintEventHandler;
+import org.matsim.utils.eventsfilecomparison.*;
 
 public final class EventsUtils {
 
@@ -67,37 +66,46 @@ public final class EventsUtils {
 		}
 	}
 
+	/**
+	 * Create and write fingerprint file for events.
+	 */
 	public static void createEventsFingerprint(String eventFile, String outputFingerprintFile) {
 
-		EventsManager manager  = createEventsManager();
+		EventsManager manager = createEventsManager();
 		FingerprintEventHandler fingerprintEventHandler = new FingerprintEventHandler();
 		manager.addHandler(fingerprintEventHandler);
-
 		EventsUtils.readEvents(manager, eventFile);
+		manager.finishProcessing();
 
-		FingerprintEventHandler.writeEventFingerprintToFile(outputFingerprintFile,fingerprintEventHandler.eventFingerprint);
-
+		EventFingerprint.write(outputFingerprintFile, fingerprintEventHandler.eventFingerprint);
 	}
 
-	public static EventsFileFingerprintComparator.Result createAndCompareEventsFingerprint(String inputFingerprint, String eventFile) {
+
+	/**
+	 * Compares existing event file against fingerprint file. This will also create new fingerprint file along the input events.
+	 *
+	 * @return comparison results
+	 */
+	public static ComparisonResult createAndCompareEventsFingerprint(String inputFingerprint, String eventFile) {
 
 		// header byte, version byte
 		// bin array time stamps
 		// event type counter map
 		// one hash (sha1?)
 
-		EventsFileFingerprintComparator.Result result = EventsFileFingerprintComparator.compare(inputFingerprint,eventFile);
+		String baseName = FileNameUtils.getBaseName(eventFile).replace(".xml", "");
 
-		return result;
+		createEventsFingerprint(eventFile, baseName + ".fp.zst");
+
+		return EventsFileFingerprintComparator.compare(inputFingerprint, eventFile);
 	}
 
 	public static void readEvents(EventsManager events, String filename) {
 		new MatsimEventsReader(events).readFile(filename);
 	}
 
-	public static EventsFileComparator.Result compareEventsFiles(String filename1, String filename2) {
-		EventsFileComparator.Result result = EventsFileComparator.compare(filename1, filename2);
-		return result;
+	public static ComparisonResult compareEventsFiles(String filename1, String filename2) {
+		return EventsFileComparator.compare(filename1, filename2);
 	}
 
 }

@@ -1,101 +1,123 @@
 package org.matsim.utils.eventsfilecomparison;
 
-import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.floats.FloatListIterator;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.counts.algorithms.graphs.helper.Comp;
 
-import java.io.*;
-import java.security.MessageDigest;
 import java.util.*;
 
-public class FingerprintEventHandler implements BasicEventHandler {
+public final class FingerprintEventHandler implements BasicEventHandler {
 
-	public boolean ignoringCoordinates = false;
 
-	public static byte header = 1;
-	public static byte version = 1;
+	/**
+	 * Generated finger print.
+	 */
 	public final EventFingerprint eventFingerprint = new EventFingerprint();
 
+	/**
+	 * Existing fingerprint for comparison against event file. Can be null, then no comparison is performed.
+	 */
+	public final EventFingerprint compareFingerprint;
 
-	public static class EventFingerprint {
-		List<Float> timeArray = new ArrayList<>();
-		public Map<String, Integer> eventTypeCounter = new HashMap<>();
-		Integer stringHash;
+	FloatListIterator iterator = null;
 
-		public EventFingerprint(List<Float> timeArray, Map<String, Integer> eventTypeCounter, Integer stringHash) {
-			this.timeArray = timeArray;
-			this.eventTypeCounter = eventTypeCounter;
-			this.stringHash = stringHash;
-		}
 
-		public EventFingerprint() {
-			this.timeArray = timeArray;
-			this.eventTypeCounter = eventTypeCounter;
-			Hash stringHash;
-		}
+	/**
+	 * Result of the comparison.
+	 */
+	public ComparisonResult comparisonResult;
+	public String comparisonMessage;
 
-		public List<Float> getTimeArray() {
-			return timeArray;
-		}
-
-		public Map<String, Integer> getEventTypeCounter() {
-			return eventTypeCounter;
-		}
-
-		public int getStringHash() {
-			return stringHash;
-		}
-
-		public void addHashCode(String stringToAdd) {
-			if (stringToAdd == null) {
-				return;
-			}
-
-			int hashToAdd = stringToAdd.hashCode();
-			if (stringHash == null) {
-				stringHash = hashToAdd;
-			} else {
-				stringHash += hashToAdd;
-			}
-		}
-
-		public void printFingerprint(FingerprintEventHandler.EventFingerprint fingerprint) {
-			System.out.println("Time Array:");
-			var i = 0;
-			for (Float value : fingerprint.getTimeArray()) {
-				i++;
-				if(i % 100000 == 0)
-					System.out.println(value);
-			}
-
-			System.out.println("Event Type Counter:");
-			for (Map.Entry<String, Integer> entry : fingerprint.getEventTypeCounter().entrySet()) {
-				System.out.println(entry.getKey() + ": " + entry.getValue());
-			}
-
-			System.out.println("String Hash: " + fingerprint.getStringHash());
-		}
+	public FingerprintEventHandler() {
+		this.compareFingerprint = null;
 	}
 
-	public void addEventType(String str) {
-		// Increment the count for the given string
-		Map<String, Integer> eventTypeCounter = eventFingerprint.getEventTypeCounter();
-		eventTypeCounter.put(str, eventTypeCounter.getOrDefault(str, 0) + 1);
+	public FingerprintEventHandler(EventFingerprint compareFingerprint) {
+		this.compareFingerprint = compareFingerprint;
+		this.comparisonResult = null;
 	}
 
-	public int getEventCount(String str) {
-		// Get the count for the given string
-		return eventFingerprint.getEventTypeCounter().getOrDefault(str, 0);
+	public EventFingerprint getEventFingerprint() {
+		return eventFingerprint;
 	}
 
 	@Override
 	public void handleEvent(Event event) {
+		eventFingerprint.addTimeStamp(event.getTime());
 
-		addEventType(event.getEventType());
-		eventFingerprint.getTimeArray().add((float) event.getTime());
 		String lexicographicSortedString = toLexicographicSortedString(event);
-		eventFingerprint.addHashCode(lexicographicSortedString);
 
+
+
+		if (compareFingerprint != null) {
+			if(iterator== null){
+				iterator = eventFingerprint.timeArray.iterator();
+			}
+			if (this.comparisonResult == null) {
+				if(iterator.hasNext()){
+					Float entry = iterator.nextFloat();
+					if((float) event.getTime()!=entry){
+						this.comparisonResult = ComparisonResult.DIFFERENT_TIMESTEPS;
+						this.comparisonMessage = "Difference occurred in this event "+lexicographicSortedString;
+					}
+				}
+			}
+		}
+
+		eventFingerprint.addEventType(event.getEventType());
+
+		eventFingerprint.addHashCode(lexicographicSortedString);
+	}
+
+	/**
+	 * :TODO ask about function renaming. Also I don't like result name:
+	 * <p>
+	 * Finish processing of the events file and return comparison result (if compare fingerprint was present).
+	 * If the result is not equal it will generate a {@link #comparisonMessage}.
+	 */
+	ComparisonResult finishProcessing() {
+
+		byte[] hash = eventFingerprint.computeHash();
+
+		//That means that during event handling different timestampt occured
+		if (comparisonResult != null) {
+			return comparisonResult;
+		}
+
+		if (compareFingerprint == null)
+			return null;
+
+		for (Object2IntMap.Entry<String> entry1 : compareFingerprint.eventTypeCounter.object2IntEntrySet()) {
+			String key = entry1.getKey();
+			int count1 = entry1.getIntValue();
+			int count2 = eventFingerprint.eventTypeCounter.getInt(key);
+			if (count1 != count2) {
+				comparisonResult = (comparisonResult == null ? ComparisonResult.WRONG_EVENT_COUNT : comparisonResult);
+				comparisonMessage = (comparisonMessage == null ? "" : comparisonMessage) + ("\r\nCount for key '" + key + "' differs: " + count1 + " != " + count2);
+			}
+		}
+
+
+		if (!Arrays.equals(hash, compareFingerprint.hash)) {
+			comparisonResult = ComparisonResult.MISSING_EVENT;
+			comparisonMessage = "Difference occured in this hash of 2 files";
+
+			//log.warn(comparisonMessage);
+			return comparisonResult;
+		}
+
+		if (comparisonResult == null) {
+			comparisonResult = ComparisonResult.FILES_ARE_EQUAL;
+			comparisonMessage = "Seems to be equal :)";
+		}
+
+		//log.warn(comparisonMessage);
+
+		// TODO: compare and generate messages
+		return comparisonResult;
 
 	}
 
@@ -105,7 +127,7 @@ public class FingerprintEventHandler implements BasicEventHandler {
 			StringBuilder tmp = new StringBuilder();
 			final String key = e.getKey();
 
-			// dont look at cerftain attributes
+			// don't look at certain attributes
 			switch (key) {
 				case Event.ATTRIBUTE_X:
 				case Event.ATTRIBUTE_Y:
@@ -127,68 +149,5 @@ public class FingerprintEventHandler implements BasicEventHandler {
 
 		eventStr.append(" | ");
 		return eventStr.toString();
-	}
-
-
-	public static void writeEventFingerprintToFile(String filePath, EventFingerprint eventFingerprint) {
-		try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(filePath))) {
-			// Write header and version
-			dataOutputStream.writeByte(header);
-			dataOutputStream.writeByte(version);
-
-			// Write time array size and elements
-			dataOutputStream.writeInt(eventFingerprint.getTimeArray().size());
-			for (float time : eventFingerprint.getTimeArray()) {
-				dataOutputStream.writeFloat(time);
-			}
-
-			// Write event type counter map size and elements
-			dataOutputStream.writeInt(eventFingerprint.getEventTypeCounter().size());
-			for (Map.Entry<String, Integer> entry : eventFingerprint.getEventTypeCounter().entrySet()) {
-				dataOutputStream.writeUTF(entry.getKey());
-				dataOutputStream.writeInt(entry.getValue());
-			}
-
-			// Write string hash
-			dataOutputStream.writeInt(eventFingerprint.getStringHash());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static EventFingerprint readEventFingerprintFromFile(String fingerprintPath) {
-		EventFingerprint eventFingerprint = null;
-
-		try (DataInputStream dataInputStream = new DataInputStream(new FileInputStream(fingerprintPath))) {
-			// Read header and version
-			byte fileHeader = dataInputStream.readByte();
-			byte fileVersion = dataInputStream.readByte();
-
-			// Read time array
-			int timeArraySize = dataInputStream.readInt();
-			List<Float> timeArray = new ArrayList<>();
-			for (int i = 0; i < timeArraySize; i++) {
-				timeArray.add(dataInputStream.readFloat());
-			}
-
-			// Read event type counter map
-			int eventTypeCounterSize = dataInputStream.readInt();
-			Map<String, Integer> eventTypeCounter = new HashMap<>();
-			for (int i = 0; i < eventTypeCounterSize; i++) {
-				String eventType = dataInputStream.readUTF();
-				int count = dataInputStream.readInt();
-				eventTypeCounter.put(eventType, count);
-			}
-
-			// Read string hash
-			int stringHash = dataInputStream.readInt();
-
-			// Create EventFingerprint object
-			eventFingerprint = new EventFingerprint(timeArray, eventTypeCounter, stringHash);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return eventFingerprint;
 	}
 }
