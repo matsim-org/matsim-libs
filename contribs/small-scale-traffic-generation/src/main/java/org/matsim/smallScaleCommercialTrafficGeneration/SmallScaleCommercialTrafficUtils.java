@@ -135,6 +135,15 @@ public class SmallScaleCommercialTrafficUtils {
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
+	/** Finds the nearest possible link for the building polygon.
+	 * @param zone
+	 * @param noPossibleLinks
+	 * @param linksPerZone
+	 * @param newLink
+	 * @param centroidPointOfBuildingPolygon
+	 * @param numberOfPossibleLinks
+	 * @return
+	 */
 	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> linksPerZone,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
 		double minDistance = Double.MAX_VALUE;
@@ -206,7 +215,6 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String smallScaleCommercialTrafficType, Path output,
 											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 

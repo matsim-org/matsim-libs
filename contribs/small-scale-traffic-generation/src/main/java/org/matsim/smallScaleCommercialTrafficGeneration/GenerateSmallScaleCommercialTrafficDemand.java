@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.gbl.MatsimRandom;
@@ -101,6 +100,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	// Option 3: Leerkamp (nur in RVR Modell).
 
+	// Option: Add prepare class with OSM Analyse and create facility file with results
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 
 	private enum CreationOption {
