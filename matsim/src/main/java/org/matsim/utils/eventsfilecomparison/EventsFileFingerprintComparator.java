@@ -19,6 +19,7 @@ public class EventsFileFingerprintComparator {
 		EventFingerprint correctFingerprint = EventFingerprint.read(fingerprint);
 
 		FingerprintEventHandler handler = new FingerprintEventHandler(correctFingerprint);
+
 		EventsManager manager = EventsUtils.createEventsManager();
 
 		manager.addHandler(handler);
@@ -82,7 +83,7 @@ public class EventsFileFingerprintComparator {
 			log_message = String.format("Difference occurred hash codes hash of first file is %s, hash of second is %s", Arrays.toString(hash1), Arrays.toString(hash2));
 
 			log.warn(log_message);
-			return ComparisonResult.MISSING_EVENT;
+			return ComparisonResult.DIFFERENT_EVENT_ATTRIBUTES;
 		}
 
 		log_message = "Files are equal";

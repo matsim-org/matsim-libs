@@ -54,7 +54,7 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 
 		if (compareFingerprint != null) {
 			if(iterator== null){
-				iterator = eventFingerprint.timeArray.iterator();
+				this.iterator = compareFingerprint.timeArray.iterator();
 			}
 			if (this.comparisonResult == null) {
 				if(iterator.hasNext()){
@@ -73,7 +73,6 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 	}
 
 	/**
-	 * :TODO ask about function renaming. Also I don't like result name:
 	 * <p>
 	 * Finish processing of the events file and return comparison result (if compare fingerprint was present).
 	 * If the result is not equal it will generate a {@link #comparisonMessage}.
@@ -82,7 +81,9 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 
 		byte[] hash = eventFingerprint.computeHash();
 
-		//That means that during event handling different timestampt occured
+		/** Difference was found in {@link EventFingerprint#timeArray}
+		 *
+		 */
 		if (comparisonResult != null) {
 			return comparisonResult;
 		}
@@ -90,6 +91,7 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 		if (compareFingerprint == null)
 			return null;
 
+		//Handling EventTypeCounter differences
 		for (Object2IntMap.Entry<String> entry1 : compareFingerprint.eventTypeCounter.object2IntEntrySet()) {
 			String key = entry1.getKey();
 			int count1 = entry1.getIntValue();
@@ -100,14 +102,24 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 			}
 		}
 
-
-		if (!Arrays.equals(hash, compareFingerprint.hash)) {
-			comparisonResult = ComparisonResult.MISSING_EVENT;
-			comparisonMessage = "Difference occured in this hash of 2 files";
-
-			//log.warn(comparisonMessage);
+		/** Difference was found in {@link EventFingerprint#eventTypeCounter}
+		 *
+		 */
+		if (comparisonResult != null) {
 			return comparisonResult;
 		}
+
+
+		if (!Arrays.equals(hash, compareFingerprint.hash)) {
+			comparisonResult = ComparisonResult.DIFFERENT_EVENT_ATTRIBUTES;
+			comparisonMessage = "Difference occured in this hash of 2 files";
+
+			/** Difference was found in {@link EventFingerprint#hash}
+			 *
+			 */
+			return comparisonResult;
+		}
+
 
 		if (comparisonResult == null) {
 			comparisonResult = ComparisonResult.FILES_ARE_EQUAL;
