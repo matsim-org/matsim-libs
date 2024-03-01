@@ -74,8 +74,13 @@ public class RunDrtWithCompanionExampleIT {
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		int actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides).isEqualTo(706);
+		int actualRidesPax = getTotalNumberOfDrtRidesPax();
+		Assertions.assertThat(actualRidesPax).isEqualTo(706);
+
+		int actualRidesRequests = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRidesRequests).isEqualTo(378);
+
+
 	}
 
 	@Test
@@ -101,8 +106,12 @@ public class RunDrtWithCompanionExampleIT {
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		int actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides).isEqualTo(699);
+		int actualRidesPax = getTotalNumberOfDrtRidesPax();
+		Assertions.assertThat(actualRidesPax).isEqualTo(699);
+
+		int actualRidesRequests = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRidesRequests).isEqualTo(375);
+
 	}
 
 	private int getTotalNumberOfDrtRides() {
@@ -119,8 +128,27 @@ public class RunDrtWithCompanionExampleIT {
 		List<String> keys = List.of(collect.get(0).split(";"));
 		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
 
-		int index = keys.indexOf("rides");
+		int index = keys.indexOf("rides_requests");
         String value = lastIterationValues.get(index);
+		return Integer.parseInt(value);
+	}
+
+	private int getTotalNumberOfDrtRidesPax() {
+		String filename = utils.getOutputDirectory() + "/drt_customer_stats_drt.csv";
+
+		final List<String> collect;
+		try {
+			collect = Files.lines(Paths.get(filename)).collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		int size = collect.size();
+		List<String> keys = List.of(collect.get(0).split(";"));
+		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
+
+		int index = keys.indexOf("rides_pax");
+		String value = lastIterationValues.get(index);
 		return Integer.parseInt(value);
 	}
 }
