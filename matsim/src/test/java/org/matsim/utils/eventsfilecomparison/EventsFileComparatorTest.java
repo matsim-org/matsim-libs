@@ -68,8 +68,7 @@ public class EventsFileComparatorTest {
 		String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
 		String f2 = utils.getClassInputDirectory() + "/events3.xml.gz";
 		assertEquals(MISSING_EVENT, EventsFileComparator.compare(f1, f2), "return val = " + MISSING_EVENT);
-
-		assertEquals(MISSING_EVENT, EventsFileComparator.compare(f2, f1), "return val = " + MISSING_EVENT);
+		assertEquals(ADDITIONAL_EVENT, EventsFileComparator.compare(f2, f1), "return val = " + ADDITIONAL_EVENT);
 	}
 
 	@Test
