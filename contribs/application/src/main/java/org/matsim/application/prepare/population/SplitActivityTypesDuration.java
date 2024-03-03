@@ -13,6 +13,7 @@ import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	private String subpopulation;
 
 	@CommandLine.Option(names = "--exclude", description = "Activity types that won't be split", split = ",", defaultValue = "")
-	private Set<String> exclude;
+	private Set<String> exclude = new HashSet<>();
 
 
 	/**
@@ -63,6 +64,13 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 		this.activityBinSize = activityBinSize;
 		this.maxTypicalDuration = maxTypicalDuration;
 		this.endTimeToDuration = endTimeToDuration;
+	}
+
+	/**
+	 * Set activity types to be excluded from splitting.
+	 */
+	public void setExclude(Set<String> exclude) {
+		this.exclude = exclude;
 	}
 
 	public static void main(String[] args) {
