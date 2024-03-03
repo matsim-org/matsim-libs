@@ -17,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- *                                                                         
+ *
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
@@ -295,7 +295,7 @@ final class ColdEmissionAnalysisModule {
 					//if not possible, try "<technology>; average; average":
 					if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable) {
 						attribs2.setHbefaSizeClass("average");
-						attribs2.setHbefaEmConcept("average");
+						attribs2.setHbefaTechnology("average");
 						if (detailedFallbackTechAverageWarnCnt <= 1) {
 							logger.warn("did not find emission factor for efkey=" + efkey);
 							logger.warn(" re-written to " + efkey2);
@@ -359,7 +359,7 @@ final class ColdEmissionAnalysisModule {
 					//if not possible, try "<technology>; average; average":
 					if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable) {
 						attribs2.setHbefaSizeClass("average");
-						attribs2.setHbefaEmConcept("average");
+						attribs2.setHbefaTechnology("average");
 						if (detailedFallbackTechAverageWarnCnt <= 1) {
 							logger.warn("did not find emission factor for efkey=" + efkey);
 							logger.warn(" re-written to " + efkey2);
