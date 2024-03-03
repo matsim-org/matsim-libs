@@ -20,8 +20,8 @@
 
 package org.matsim.utils.geometry;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -35,56 +35,56 @@ public class CoordUtilsTest {
 	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#plus(org.matsim.api.core.v01.Coord, org.matsim.api.core.v01.Coord)}.
 	 */
 	@Test
-	public void testPlus() {
+	void testPlus() {
 		Coord coord1 = new Coord(1., 2.);
 		Coord coord2 = new Coord(3., 4.);
 		Coord result = CoordUtils.plus( coord1, coord2 ) ;
-		Assert.assertEquals( 4., result.getX(), delta) ;
-		Assert.assertEquals( 6., result.getY(), delta) ;
+		Assertions.assertEquals( 4., result.getX(), delta) ;
+		Assertions.assertEquals( 6., result.getY(), delta) ;
 	}
 
 	/**
 	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#minus(org.matsim.api.core.v01.Coord, org.matsim.api.core.v01.Coord)}.
 	 */
 	@Test
-	public void testMinus() {
+	void testMinus() {
 		Coord coord1 = new Coord(1., 2.);
 		Coord coord2 = new Coord(3., 5.);
 		Coord result = CoordUtils.minus( coord1, coord2 ) ;
-		Assert.assertEquals( -2., result.getX(), delta) ;
-		Assert.assertEquals( -3., result.getY(), delta) ;
+		Assertions.assertEquals( -2., result.getX(), delta) ;
+		Assertions.assertEquals( -3., result.getY(), delta) ;
 	}
 
 	/**
 	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#scalarMult(double, org.matsim.api.core.v01.Coord)}.
 	 */
 	@Test
-	public void testScalarMult() {
+	void testScalarMult() {
 		Coord coord1 = new Coord(1., 2.);
 		Coord result = CoordUtils.scalarMult( -0.33 , coord1 ) ;
-		Assert.assertEquals( -0.33, result.getX(), delta) ;
-		Assert.assertEquals( -0.66, result.getY(), delta) ;
+		Assertions.assertEquals( -0.33, result.getX(), delta) ;
+		Assertions.assertEquals( -0.66, result.getY(), delta) ;
 	}
 
 	/**
 	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#getCenter(org.matsim.api.core.v01.Coord, org.matsim.api.core.v01.Coord)}.
 	 */
 	@Test
-	public void testGetCenter() {
+	void testGetCenter() {
 		Coord coord1 = new Coord(1., 2.);
 		Coord coord2 = new Coord(3., 5.);
 		Coord result = CoordUtils.getCenter( coord1, coord2 ) ;
-		Assert.assertEquals( 2., result.getX(), delta) ;
-		Assert.assertEquals( 3.5, result.getY(), delta) ;
+		Assertions.assertEquals( 2., result.getX(), delta) ;
+		Assertions.assertEquals( 3.5, result.getY(), delta) ;
 	}
 
 	/**
 	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#length(org.matsim.api.core.v01.Coord)}.
 	 */
 	@Test
-	public void testLength() {
+	void testLength() {
 		Coord coord1 = new Coord(3., 2.);
 		double result = CoordUtils.length( coord1 ) ;
-		Assert.assertEquals( Math.sqrt( 9. + 4. ), result, delta) ;
+		Assertions.assertEquals( Math.sqrt( 9. + 4. ), result, delta) ;
 	}
 }

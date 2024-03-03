@@ -32,6 +32,7 @@ public class RelocationZonesReader extends MatsimXmlParser {
 	private ArrayList<Coord> coords;
 
 	public RelocationZonesReader() {
+		super(ValidationType.DTD_ONLY);
 		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder()
 				.setName("carsharing_relocation_zone")
 				.setCrs(DefaultGeographicCRS.WGS84)

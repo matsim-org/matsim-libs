@@ -20,41 +20,33 @@
 
 package playground.vsp.ev;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 
 public class UrbanEVModule extends AbstractModule {
 	static final String PLUGIN_IDENTIFIER = " plugin";
-	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGIN_IDENTIFIER );
+	public static final String PLUGIN_INTERACTION = ScoringConfigGroup.createStageActivityType( PLUGIN_IDENTIFIER );
 	static final String PLUGOUT_IDENTIFIER = " plugout";
-	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGOUT_IDENTIFIER );
-	@Inject
-	private Config config;
+	public static final String PLUGOUT_INTERACTION = ScoringConfigGroup.createStageActivityType( PLUGOUT_IDENTIFIER );
+	@Inject private Config config;
 
-	@Override
-	public void install() {
-		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup)config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
-		if (configGroup == null)
-			throw new IllegalArgumentException(
-					"no config group of type " + UrbanEVConfigGroup.GROUP_NAME + " was specified in the config");
+	@Override public void install() {
+		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
+		qsimComponentsConfig.addActiveComponent( EvModule.EV_COMPONENT );
 
-		//standard EV stuff except for ElectricFleetModule
+		//standard EV stuff
 		install(new ChargingInfrastructureModule());
 		install(new ChargingModule());
 		install(new DischargingModule());
@@ -62,45 +54,32 @@ public class UrbanEVModule extends AbstractModule {
 		install(new ElectricFleetModule());
 
 		//bind custom EVFleet stuff
-		bind(ElectricFleetUpdater.class).in(Singleton.class);
-		addControlerListenerBinding().to(ElectricFleetUpdater.class);
+		addControlerListenerBinding().to(ElectricFleetUpdater.class).in( Singleton.class );
+		// (this takes the matsim modal vehicles for each leg and gives them to the ElectricFleetSpecification.  Don't know why it has to be in
+		// this ad-hoc way.  kai, apr'23)
+
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				//this is responsible for charging vehicles according to person activity start and end events..
-				bind(UrbanVehicleChargingHandler.class);
+//				bind(UrbanVehicleChargingHandler.class);
 				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
+				// (I think that this takes the plugin/plugout activities, and actually initiates the charging.  kai, apr'23)
+				// yes it does, just like the regular VehicleChargingHandler in the ev contrib. schlenther, feb'24.
 			}
 		});
 
 		//bind urban ev planning stuff
 		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class);
-		//TODO find a better solution for this
-		Collection<String> whileChargingActTypes = configGroup.getWhileChargingActivityTypes().isEmpty() ?
-				config.planCalcScore().getActivityTypes() :
-				configGroup.getWhileChargingActivityTypes();
-		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(whileChargingActTypes,
-				configGroup.getMinWhileChargingActivityDuration_s()));
+		// (I think that this inserts the charging activities just before the mobsim starts (i.e. it is not in the plans).  kai, apr'23)
 
-		//TODO maybe move this out of this module...
-		//bind custom analysis
-		//install(new XYModule());
+		bind( ActivityWhileChargingFinder.class ).in( Singleton.class );
+
+		//bind custom analysis:
 		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
 		addMobsimListenerBinding().to(ChargerToXY.class);
 		addEventHandlerBinding().to(ActsWhileChargingAnalyzer.class).in(Singleton.class);
 		addControlerListenerBinding().to(ActsWhileChargingAnalyzer.class);
-	}
-
-	private Set<String> getOpenBerlinActivityTypes() {
-		Set<String> activityTypes = new HashSet<>();
-		for (long ii = 600; ii <= 97200; ii += 600) {
-			activityTypes.add("home_" + ii + ".0");
-			activityTypes.add("work_" + ii + ".0");
-			activityTypes.add("leisure_" + ii + ".0");
-			activityTypes.add("shopping_" + ii + ".0");
-			activityTypes.add("other_" + ii + ".0");
-		}
-		return activityTypes;
 	}
 
 }

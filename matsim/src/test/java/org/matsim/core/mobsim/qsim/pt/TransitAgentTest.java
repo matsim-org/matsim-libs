@@ -20,13 +20,13 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,7 +63,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitAgentTest {
 
-	@Test public void testAcceptLineRoute() {
+	@Test
+	void testAcceptLineRoute() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = (Network) scenario.getNetwork();
@@ -114,7 +115,8 @@ public class TransitAgentTest {
 		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null)); // offering the same line again should yield "true"
 	}
 
-	@Test public void testArriveAtStop() {
+	@Test
+	void testArriveAtStop() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = (Network) scenario.getNetwork();

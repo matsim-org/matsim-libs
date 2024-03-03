@@ -32,32 +32,32 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyRemove" />
- * 
+ *
  * @author ikaddoura
  *
  */
 public class PRStrategyRemove implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
-	
+
 	public PRStrategyRemove(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
-		
+
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );
-				
+
 		TransitActsRemoverStrategy transitActsRemoveModule = new TransitActsRemoverStrategy(controler.getConfig());
 		planStrategyDelegate.addStrategyModule(transitActsRemoveModule) ;
 
 		PRRemoveStrategyMod prRemoveMod = new PRRemoveStrategyMod(controler.getScenario());
 		planStrategyDelegate.addStrategyModule(prRemoveMod);
-		
+
 		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
-		
+
 	}
 
 	@Override

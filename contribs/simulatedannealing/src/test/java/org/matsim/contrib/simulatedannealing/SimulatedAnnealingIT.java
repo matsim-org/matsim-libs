@@ -1,8 +1,8 @@
 package org.matsim.contrib.simulatedannealing;
 
 import com.google.inject.TypeLiteral;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -19,34 +19,34 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
 import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
-import org.matsim.contrib.simulatedannealing.perturbation.ChainedPeturbatorFactory;
+import org.matsim.contrib.simulatedannealing.perturbation.ChainedPerturbatorFactory;
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class SimulatedAnnealingIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIntegratedAnnealingInQSim() {
+	void testIntegratedAnnealingInQSim() {
 
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
 		final Controler controler = new Controler(config);
 
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 
 		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		config.controler().setLastIteration(10);
+		config.controller().setLastIteration(10);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -74,7 +74,7 @@ public class SimulatedAnnealingIT {
 				addEventHandlerBinding().toInstance(costCalculator);
 
 				bind(new TypeLiteral<PerturbatorFactory<VolumeEstimator>>(){}).toInstance(
-						new ChainedPeturbatorFactory.Builder<VolumeEstimator>()
+						new ChainedPerturbatorFactory.Builder<VolumeEstimator>()
 								.add((iteration, temperature) -> current -> {
 									return new VolumeEstimator((int) (current.estimation * MatsimRandom.getRandom().nextDouble(2.)));
 								}, 1)

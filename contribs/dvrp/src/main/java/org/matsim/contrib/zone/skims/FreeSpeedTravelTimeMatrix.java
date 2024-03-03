@@ -33,7 +33,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
-			double qSimTimeStepSize) {
+		double qSimTimeStepSize) {
 		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, params, numberOfThreads, new QSimFreeSpeedTravelTime(qSimTimeStepSize));
 	}
 
@@ -48,7 +48,7 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
 		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.maxNeighborDistance,
-				params.maxNeighborTravelTime, 0);
+			params.maxNeighborTravelTime, 0).orElse(null);
 	}
 
 	@Override
@@ -56,9 +56,11 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		if (fromNode == toNode) {
 			return 0;
 		}
-		int time = freeSpeedTravelTimeSparseMatrix.get(fromNode, toNode);
-		if (time >= 0) {// value is present
-			return time;
+		if (freeSpeedTravelTimeSparseMatrix != null) {
+			int time = freeSpeedTravelTimeSparseMatrix.get(fromNode, toNode);
+			if (time >= 0) {// value is present
+				return time;
+			}
 		}
 		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
 	}

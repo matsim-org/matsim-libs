@@ -23,16 +23,16 @@ package org.matsim.core.network.algorithms.intersectionSimplifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
 public class DensityClusterTest{
-	
-	
+
+
 	/**
 	 * Tests if the following cluster pattern is clustered into two clusters:
 	 *       ___________  
@@ -46,18 +46,18 @@ public class DensityClusterTest{
 	 * 		|___________|
 	 */		
 	@Test
-	public void testDJCluster(){
+	void testDJCluster(){
 		List<Node> al = buildTestArrayList();
 		DensityCluster djc = new DensityCluster(al, false);
 		djc.clusterInput(2, 3);
 		
-		Assert.assertEquals("There should only be two clusters", 2, djc.getClusterList().size());
+		Assertions.assertEquals(2, djc.getClusterList().size(), "There should only be two clusters");
 		
 		int small = Math.min(djc.getClusterList().get(0).getPoints().size(), djc.getClusterList().get(1).getPoints().size());
 		int large = Math.max(djc.getClusterList().get(0).getPoints().size(), djc.getClusterList().get(1).getPoints().size());
 		
-		Assert.assertEquals("The small cluster must have 4 points.", 4, small);
-		Assert.assertEquals("The large cluster must have 8 points.", 8, large);
+		Assertions.assertEquals(4, small, "The small cluster must have 4 points.");
+		Assertions.assertEquals(8, large, "The large cluster must have 8 points.");
 	}
 	
 	

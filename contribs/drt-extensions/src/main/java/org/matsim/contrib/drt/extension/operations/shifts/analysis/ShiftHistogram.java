@@ -6,12 +6,12 @@ import org.matsim.contrib.drt.extension.operations.shifts.events.*;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.util.Set;
 
 /**

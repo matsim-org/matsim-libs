@@ -21,11 +21,11 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtilsTest.createNetwork;
 import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem.createFromPreparedGeometries;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -44,21 +44,21 @@ import java.util.Map;
 public class DrtZonalSystemTest {
 
 	@Test
-	public void test_cellSize100() {
+	void test_cellSize100() {
 		DrtZonalSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 100));
 		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("10");
 	}
 
 	@Test
-	public void test_cellSize700() {
+	void test_cellSize700() {
 		DrtZonalSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
 		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("2");
 	}
 
 	@Test
-	public void test_gridWithinServiceArea(){
+	void test_gridWithinServiceArea(){
 		Coordinate min = new Coordinate(-500, 500);
 		Coordinate max = new Coordinate(1500, 1500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
@@ -74,7 +74,7 @@ public class DrtZonalSystemTest {
 	}
 
 	@Test
-	public void test_noZonesWithoutLinks(){
+	void test_noZonesWithoutLinks(){
 		Coordinate min = new Coordinate(1500, 1500);
 		Coordinate max = new Coordinate(2500, 2500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);

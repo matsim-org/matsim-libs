@@ -30,12 +30,12 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 
 
@@ -67,7 +67,7 @@ class UrbanVehicleChargingHandler
 	UrbanVehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
-		this.chargersAtLinks = ChargingInfrastructures.getChargersAtLinks(chargingInfrastructure);
+		this.chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
 	}
 
 	/**

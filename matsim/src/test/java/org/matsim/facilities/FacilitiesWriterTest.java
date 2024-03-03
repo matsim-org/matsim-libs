@@ -21,8 +21,8 @@
 
  package org.matsim.facilities;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,13 +33,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-/**
+	/**
  * @author mrieser
  */
 public class FacilitiesWriterTest {
 
-    @Test
-    public void testWriteLinkId() {
+	 @Test
+	 void testWriteLinkId() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -68,23 +68,23 @@ public class FacilitiesWriterTest {
         MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
         reader.parse(inputStream);
 
-        Assert.assertEquals(3, facilities.getFacilities().size());
+        Assertions.assertEquals(3, facilities.getFacilities().size());
 
         ActivityFacility fac1b = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
-        Assert.assertEquals(Id.create("Abc", Link.class), fac1b.getLinkId());
-        Assert.assertEquals(1000, fac1b.getAttributes().getAttribute("population"));
+        Assertions.assertEquals(Id.create("Abc", Link.class), fac1b.getLinkId());
+        Assertions.assertEquals(1000, fac1b.getAttributes().getAttribute("population"));
 
         ActivityFacility fac2b = facilities.getFacilities().get(Id.create(2, ActivityFacility.class));
-        Assert.assertEquals(Id.create("Def", Link.class), fac2b.getLinkId());
-        Assert.assertEquals(1200, fac2b.getAttributes().getAttribute("population"));
+        Assertions.assertEquals(Id.create("Def", Link.class), fac2b.getLinkId());
+        Assertions.assertEquals(1200, fac2b.getAttributes().getAttribute("population"));
 
         ActivityFacility fac3b = facilities.getFacilities().get(Id.create(3, ActivityFacility.class));
-        Assert.assertNull(fac3b.getLinkId());
-        Assert.assertEquals("pepsiCo", fac3b.getAttributes().getAttribute("owner"));
+        Assertions.assertNull(fac3b.getLinkId());
+        Assertions.assertEquals("pepsiCo", fac3b.getAttributes().getAttribute("owner"));
     }
 
-    @Test
-    public void testWrite3DCoord() {
+	 @Test
+	 void testWrite3DCoord() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -107,23 +107,23 @@ public class FacilitiesWriterTest {
         MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
         reader.parse(inputStream);
 
-        Assert.assertEquals(3, facilities.getFacilities().size());
+        Assertions.assertEquals(3, facilities.getFacilities().size());
 
         ActivityFacility fac1b = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
-        Assert.assertTrue(fac1b.getCoord().hasZ());
-        Assert.assertEquals(12.3, fac1b.getCoord().getZ(), Double.MIN_NORMAL);
+        Assertions.assertTrue(fac1b.getCoord().hasZ());
+        Assertions.assertEquals(12.3, fac1b.getCoord().getZ(), Double.MIN_NORMAL);
 
         ActivityFacility fac2b = facilities.getFacilities().get(Id.create(2, ActivityFacility.class));
-        Assert.assertTrue(fac2b.getCoord().hasZ());
-        Assert.assertEquals(-4.2, fac2b.getCoord().getZ(), Double.MIN_NORMAL);
+        Assertions.assertTrue(fac2b.getCoord().hasZ());
+        Assertions.assertEquals(-4.2, fac2b.getCoord().getZ(), Double.MIN_NORMAL);
 
         ActivityFacility fac3b = facilities.getFacilities().get(Id.create(3, ActivityFacility.class));
-        Assert.assertFalse(fac3b.getCoord().hasZ());
+        Assertions.assertFalse(fac3b.getCoord().hasZ());
     }
 
-    @Test
-    // the better fix for https://github.com/matsim-org/matsim/pull/505
-    public void testFacilityDescription() {
+	 // the better fix for https://github.com/matsim-org/matsim/pull/505
+	 @Test
+	 void testFacilityDescription() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -150,15 +150,15 @@ public class FacilitiesWriterTest {
 
         // check
 
-        Assert.assertEquals(1, facilities.getFacilities().size());
+        Assertions.assertEquals(1, facilities.getFacilities().size());
         ActivityFacility fac1b = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
         String desc2 = ((ActivityFacilityImpl) fac1b).getDesc();
-        Assert.assertEquals(desc, desc2);
+        Assertions.assertEquals(desc, desc2);
     }
 
-    @Test
-    // inspired by https://github.com/matsim-org/matsim/pull/505
-    public void testFacilitiesName() {
+	 // inspired by https://github.com/matsim-org/matsim/pull/505
+	 @Test
+	 void testFacilitiesName() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ActivityFacilities facilities = scenario.getActivityFacilities();
         ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -183,7 +183,7 @@ public class FacilitiesWriterTest {
         // check
 
         String desc2 = facilities.getName();
-        Assert.assertEquals(desc, desc2);
+        Assertions.assertEquals(desc, desc2);
     }
 
 }

@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -41,8 +41,8 @@ public class InsertionCostCalculatorTest {
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
 
 	@Test
-	public void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 50 });
+	void testCalculate() {
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 });
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
@@ -71,7 +71,7 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private VehicleEntry entry(double[] slackTimes) {
-		return new VehicleEntry(null, null, null, slackTimes);
+		return new VehicleEntry(null, null, null, slackTimes, null, 0);
 	}
 
 	private Link link(String id) {

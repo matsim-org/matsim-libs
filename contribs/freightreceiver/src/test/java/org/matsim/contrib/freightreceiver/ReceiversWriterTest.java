@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freightreceiver.run.chessboard.ReceiverChessboardScenario;
 import org.matsim.testcases.MatsimTestUtils;
@@ -33,10 +33,10 @@ import java.util.Calendar;
 
 public class ReceiversWriterTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testV1() {
+	void testV1() {
 		Scenario sc = ReceiverChessboardScenario.createChessboardScenario(1L, 5, utils.getOutputDirectory(), false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
@@ -46,14 +46,14 @@ public class ReceiversWriterTest {
 			new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).writeV1(utils.getOutputDirectory() + "receivers_v1.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Should write without exception.");
+			Assertions.fail("Should write without exception.");
 		}
 
-		Assert.assertTrue("File should exist.", new File(utils.getOutputDirectory() + "receivers_v1.xml").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory() + "receivers_v1.xml").exists(), "File should exist.");
 	}
 
 	@Test
-	public void testV2() {
+	void testV2() {
 		Scenario sc = ReceiverChessboardScenario.createChessboardScenario(1L, 5,  utils.getOutputDirectory(), false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
@@ -63,10 +63,10 @@ public class ReceiversWriterTest {
 			new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).writeV2(utils.getOutputDirectory() + "receivers_v2.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Should write without exception.");
+			Assertions.fail("Should write without exception.");
 		}
 
-		Assert.assertTrue("File should exist.", new File(utils.getOutputDirectory() + "receivers_v2.xml").exists());
+		Assertions.assertTrue(new File(utils.getOutputDirectory() + "receivers_v2.xml").exists(), "File should exist.");
 	}
 
 }

@@ -20,9 +20,9 @@
 
 package org.matsim.core.utils.geometry;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -46,13 +46,13 @@ import java.util.Set;
  */
 public class GeometryUtilsTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void testIntersectingLinks() {
-		
+	final void testIntersectingLinks() {
+
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil"), "config.xml" ) ) ;
-		
+
 		final Network network = ScenarioUtils.loadScenario(config).getNetwork();
 
 		{
@@ -63,9 +63,9 @@ public class GeometryUtilsTest {
 
 			List<Id<Link>> expectedLinkIds = List.of(Id.createLinkId(1));
 
-			Assert.assertEquals(expectedLinkIds.size(), results.size()) ;
+			Assertions.assertEquals(expectedLinkIds.size(), results.size()) ;
 			for ( int ii=0 ; ii<expectedLinkIds.size() ; ii++ ) {
-				Assert.assertEquals( "wrong link id", expectedLinkIds.get(ii), results.get(ii).getId() ) ;
+				Assertions.assertEquals( expectedLinkIds.get(ii), results.get(ii).getId(), "wrong link id" ) ;
 			}
 		}
 		{
@@ -81,12 +81,12 @@ public class GeometryUtilsTest {
 
 			List<Id<Link>> expectedIds = List.of(Id.createLinkId(2), Id.createLinkId(3), Id.createLinkId(4), Id.createLinkId(5), Id.createLinkId(6));
 
-			Assert.assertEquals(expectedIds.size(), results.size());
+			Assertions.assertEquals(expectedIds.size(), results.size());
 			for (Id<Link> id : expectedIds) {
-				Assert.assertTrue("expected link " + id, intersectingLinkIds.contains(id));
+				Assertions.assertTrue(intersectingLinkIds.contains(id), "expected link " + id);
 			}
 		}
-		
+
 	}
 
 }

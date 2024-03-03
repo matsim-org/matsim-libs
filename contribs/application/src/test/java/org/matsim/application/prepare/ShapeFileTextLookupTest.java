@@ -1,8 +1,8 @@
 package org.matsim.application.prepare;
 
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
@@ -14,15 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ShapeFileTextLookupTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void main() {
+	@Test
+	void main() {
 
         Path input = Path.of(utils.getClassInputDirectory(), "verkehrszellen.csv");
         Path output = Path.of(utils.getOutputDirectory(), "output.csv");
-        Assume.assumeTrue(Files.exists(input));
+        Assumptions.assumeTrue(Files.exists(input));
 
         CommandLine cli = new CommandLine(new ShapeFileTextLookup());
         int ret = cli.execute(

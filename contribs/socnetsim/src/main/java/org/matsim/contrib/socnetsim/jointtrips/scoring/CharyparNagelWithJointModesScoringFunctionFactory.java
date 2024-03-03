@@ -66,7 +66,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 			final Set<String> typesNotToScore,
 			final Scenario scenario) {
 		log.warn( "initializing the \"CharyparNagel\" scoring function: this has no special parameters for joint modes!" );
-		this.params = new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
+		this.params = new ScoringParameters.Builder(scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters(null), scenario.getConfig().scenario()).build();
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 

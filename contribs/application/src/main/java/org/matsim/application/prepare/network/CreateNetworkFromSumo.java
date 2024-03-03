@@ -74,7 +74,7 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, shp.getShapeFile(), crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor);
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, Path.of(shp.getShapeFile()), crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor);
 
 		Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
@@ -106,6 +106,7 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 		if (crs.getTargetCRS() != null)
 			ProjectionUtils.putCRS(network, crs.getTargetCRS());
 
+		NetworkUtils.writeNetwork(network, output.toAbsolutePath().toString());
 		new NetworkWriter(network).write(output.toAbsolutePath().toString());
 		new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
 

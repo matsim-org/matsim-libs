@@ -19,15 +19,15 @@
 
 package org.matsim.contrib.carsharing.runExample;
 
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import static org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
+import static org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,10 +55,10 @@ public class RunCarsharingIT {
 
 	private final static Logger log = LogManager.getLogger(RunCarsharingIT.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void test() {
+	final void test() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new FreeFloatingConfigGroup(),
 				new OneWayCarsharingConfigGroup(),
@@ -66,8 +66,8 @@ public class RunCarsharingIT {
 				new CarsharingConfigGroup(),
 				new DvrpConfigGroup());
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		config.network().setInputFile("network.xml");
 
@@ -79,8 +79,8 @@ public class RunCarsharingIT {
 		config.facilities().setInputFile("facilities.xml");
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
+		config.routing().setRoutingRandomness(0.);
 		//		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.directWalk);
 
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule(CarsharingConfigGroup.GROUP_NAME);
@@ -99,25 +99,25 @@ public class RunCarsharingIT {
 		//		config.qsim().setNumberOfThreads(1);
 
 		{
-			ModeRoutingParams params = new ModeRoutingParams(TransportMode.non_network_walk);
+			TeleportedModeParams params = new TeleportedModeParams(TransportMode.non_network_walk);
 			params.setTeleportedModeSpeed(0.83333333333);
 			//			params.setTeleportedModeSpeed( 2.0 );
 			params.setBeelineDistanceFactor(1.3);
-			config.plansCalcRoute().addModeRoutingParams(params);
+			config.routing().addModeRoutingParams(params);
 		}
 		{
-			config.plansCalcRoute().removeModeRoutingParams(TransportMode.walk);
-			ModeRoutingParams params = new ModeRoutingParams(TransportMode.walk);
+			config.routing().removeModeRoutingParams(TransportMode.walk);
+			TeleportedModeParams params = new TeleportedModeParams(TransportMode.walk);
 			params.setTeleportedModeSpeed(0.83333333333);
 			//			params.setTeleportedModeSpeed( 2.0 );
 			params.setBeelineDistanceFactor(1.3);
-			config.plansCalcRoute().addModeRoutingParams(params);
+			config.routing().addModeRoutingParams(params);
 		}
 
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		// ---
 
@@ -162,63 +162,63 @@ public class RunCarsharingIT {
 					if (TransportMode.walk.equals(legMode)) {
 						// walk is used for access+egress to car
 						// -> number of walk legs for access+egress equals twice the number of car legs = 44
-						Assert.assertEquals(44, nOfModeLegs);
+						Assertions.assertEquals(44, nOfModeLegs);
 					} else if ("oneway_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if (TransportMode.car.equals(legMode)) {
-						Assert.assertEquals(22, nOfModeLegs);
+						Assertions.assertEquals(22, nOfModeLegs);
 					} else if ("egress_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("access_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					}
 				} else if (iteration == 10) {
 
 					if (TransportMode.walk.equals(legMode)) {
 
-						Assert.assertEquals(2, nOfModeLegs);
+						Assertions.assertEquals(2, nOfModeLegs);
 					} else if ("bike".equals(legMode)) {
-						Assert.assertEquals(2, nOfModeLegs);
+						Assertions.assertEquals(2, nOfModeLegs);
 					} else if (TransportMode.car.equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("twoway_vehicle".equals(legMode)) {
 
-						Assert.assertEquals(6, nOfModeLegs);
+						Assertions.assertEquals(6, nOfModeLegs);
 
 					} else if ("oneway_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 
 					} else if ("egress_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("access_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("egress_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("access_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("egress_walk_ff".equals(legMode)) {
-						Assert.assertEquals(2, nOfModeLegs);
+						Assertions.assertEquals(2, nOfModeLegs);
 					} else if ("access_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					}
 				} else if (iteration == 20) {
 					if (TransportMode.walk.equals(legMode)) {
-						Assert.assertEquals(5, nOfModeLegs);
+						Assertions.assertEquals(5, nOfModeLegs);
 					} else if ("bike".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("twoway_vehicle".equals(legMode)) {
-						Assert.assertEquals(6, nOfModeLegs);
+						Assertions.assertEquals(6, nOfModeLegs);
 					} else if ("freefloating_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("egress_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("access_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("access_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 
 					} else if ("egress_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 
 					}
 				}

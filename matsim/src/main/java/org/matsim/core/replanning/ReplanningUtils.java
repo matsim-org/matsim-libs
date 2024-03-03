@@ -22,13 +22,40 @@
 
 package org.matsim.core.replanning;
 
+import javax.annotation.Nullable;
+
 import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
 public final class ReplanningUtils {
 
+	static public final String INITIAl_PLAN_ATTRIBUTE = "isInitialPlan";
+
+	public static boolean isInitialPlan(Plan plan) {
+		Boolean isInitialPlan = (Boolean) plan.getAttributes().getAttribute(INITIAl_PLAN_ATTRIBUTE);
+		return isInitialPlan != null && isInitialPlan;
+	}
+
+	@Nullable
+	public static Plan getInitialPlan(Person person) {
+		for (Plan plan : person.getPlans()) {
+			if (isInitialPlan(plan)) {
+				return plan;
+			}
+		}
+
+		return null;
+	}
+
+	public static void setInitialPlan(Person person) {
+		person.getPlans().forEach(plan -> plan.getAttributes().removeAttribute(INITIAl_PLAN_ATTRIBUTE));
+		person.getSelectedPlan().getAttributes().putAttribute(INITIAl_PLAN_ATTRIBUTE, true);
+	}
+
 	/**
 	 * Return whether a strategy is innovative, i.e. is producing new plans.
-	 * */
+	 */
 	public static <P extends BasicPlan, R> boolean isInnovativeStrategy(GenericPlanStrategy<P, R> planStrategy) {
 		return !isOnlySelector(planStrategy);
 	}

@@ -7,9 +7,7 @@ import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.referencing.CRS;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.AbstractNode;
 import org.locationtech.jts.index.strtree.Boundable;
 import org.locationtech.jts.index.strtree.ItemBoundable;
@@ -18,22 +16,30 @@ import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import javax.annotation.Nullable;
 import picocli.CommandLine;
+
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Reusable class for shape file options.
@@ -42,10 +48,15 @@ import java.util.*;
  */
 public final class ShpOptions {
 
+	/**
+	 * Special value for {@link #createIndex(String, String)} to use the same crs as the shape file.
+	 */
+	public static final String SAME_CRS = "same_crs";
+
 	private static final Logger log = LogManager.getLogger(ShpOptions.class);
 
 	@CommandLine.Option(names = "--shp", description = "Optional path to shape file used for filtering", required = false)
-	private Path shp;
+	private String shp;
 
 	@CommandLine.Option(names = "--shp-crs", description = "Overwrite coordinate system of the shape file")
 	private String shpCrs;
@@ -60,22 +71,72 @@ public final class ShpOptions {
 	 * Constructor to use shape options manually.
 	 */
 	public ShpOptions(Path shp, @Nullable String shpCrs, @Nullable Charset shpCharset) {
+		this.shp = shp == null ? null : shp.toString();
+		this.shpCrs = shpCrs;
+		this.shpCharset = shpCharset;
+	}
+
+	/**
+	 * Constructor to use shape options manually.
+	 */
+	public ShpOptions(String shp, @Nullable String shpCrs, @Nullable Charset shpCharset) {
 		this.shp = shp;
 		this.shpCrs = shpCrs;
 		this.shpCharset = shpCharset;
 	}
 
 	/**
+	 * Opens datastore to a shape-file.
+	 */
+	public static ShapefileDataStore openDataStore(String shp) throws IOException {
+
+		FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
+
+		URL url = IOUtils.resolveFileOrResource(shp);
+
+		ShapefileDataStore ds;
+		if (shp.endsWith(".shp"))
+			ds = (ShapefileDataStore) factory.createDataStore(url);
+		else if (shp.endsWith(".zip")) {
+
+			// Zip files will only work with local files
+			URI uri;
+			try (ZipInputStream zip = new ZipInputStream(IOUtils.getInputStream(url))) {
+
+				ZipEntry entry;
+				while ((entry = zip.getNextEntry()) != null) {
+					if (entry.getName().endsWith(".shp"))
+						break;
+				}
+
+				if (entry == null)
+					throw new IllegalArgumentException("No .shp file found in the zip.");
+
+				log.info("Using {} from {}", entry.getName(), shp);
+				uri = new URI("jar:" + url + "!/" + entry.getName());
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException("Could not create URI for zip file: " + url, e);
+			}
+
+			ds = (ShapefileDataStore) factory.createDataStore(uri.toURL());
+		} else {
+			throw new IllegalArgumentException("Shape file must either be .zip or .shp, but was: " + shp);
+		}
+
+		return ds;
+	}
+
+	/**
 	 * Return whether a shape was set.
 	 */
 	public boolean isDefined() {
-		return shp != null && !shp.toString().isBlank();
+		return shp != null && !shp.isBlank() && !shp.equals("none");
 	}
 
 	/**
 	 * Get the provided input crs.
 	 */
-	public Path getShapeFile() {
+	public String getShapeFile() {
 		return shp;
 	}
 
@@ -94,8 +155,6 @@ public final class ShpOptions {
 	public List<SimpleFeature> readFeatures() {
 		if (shp == null)
 			throw new IllegalStateException("Shape file path not specified");
-		if (!Files.exists(shp))
-			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
 		try {
 			ShapefileDataStore ds = openDataStore(shp);
@@ -109,56 +168,32 @@ public final class ShpOptions {
 	}
 
 	/**
-	 * Opens datastore to a shape-file.
-	 */
-	public static ShapefileDataStore openDataStore(Path shp) throws IOException {
-
-		FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
-
-		ShapefileDataStore ds;
-		if (shp.toString().endsWith(".shp"))
-			ds = (ShapefileDataStore) factory.createDataStore(shp.toUri().toURL());
-		else if (shp.toString().endsWith(".zip")) {
-
-			FileSystem fs = FileSystems.newFileSystem(shp, ClassLoader.getSystemClassLoader());
-			Optional<Path> match = Files.walk(fs.getPath("/"))
-					.filter(p -> p.toString().endsWith(".shp"))
-					.findFirst();
-
-			if (match.isEmpty())
-				throw new IllegalArgumentException("No .shp file found in the zip.");
-
-			log.info("Using {} from {}", match.get(), shp);
-			ds = (ShapefileDataStore) factory.createDataStore(match.get().toUri().toURL());
-		} else {
-			throw new IllegalArgumentException("Shape file must either be .zip or .shp, but was: " + shp);
-		}
-
-		return ds;
-	}
-
-	/**
 	 * Return the union of all geometries in the shape file.
 	 */
 	public Geometry getGeometry() {
 
 		Collection<SimpleFeature> features = readFeatures();
-		if (features.size() < 1) {
+		if (features.isEmpty()) {
 			throw new IllegalStateException("There is no feature in the shape file. Aborting...");
 		}
-		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
-		if (features.size() > 1) {
-			for (SimpleFeature simpleFeature : features) {
-				if (simpleFeature.getDefaultGeometry() == null) {
-					log.warn("Features {} has no geometry", simpleFeature);
-					continue;
-				}
 
-				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
-				geometry = geometry.union(subArea);
-			}
+		if (features.size() == 1) {
+            return (Geometry) features.iterator().next().getDefaultGeometry();
 		}
-		return geometry;
+
+		GeometryFactory factory = ((Geometry) features.iterator().next().getDefaultGeometry()).getFactory();
+
+		GeometryCollection geometryCollection = (GeometryCollection) factory.buildGeometry(
+			features.stream()
+				.filter(f -> f.getDefaultGeometry() != null)
+				.map(f -> (Geometry) f.getDefaultGeometry()).toList()
+		);
+
+		if (geometryCollection.isEmpty()) {
+			throw new IllegalStateException("There are noe geometries in the shape file.");
+		}
+
+		return geometryCollection.union();
 	}
 
 	/**
@@ -170,17 +205,20 @@ public final class ShpOptions {
 	 */
 	public Index createIndex(String queryCRS, String attr, Set<String> filter) {
 
-		if (shp == null)
+		if (!isDefined())
 			throw new IllegalStateException("Shape file path not specified");
-		if (!Files.exists(shp))
-			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 		if (queryCRS == null)
-			throw new IllegalArgumentException("Input crs must not be null!");
-
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
+			throw new IllegalArgumentException("Query crs must not be null!");
 
 		try {
-			return new Index(ct, attr, filter);
+			ShapefileDataStore ds = openDataStoreAndSetCRS();
+			CoordinateTransformation ct;
+			if (queryCRS.equals(SAME_CRS))
+				ct = new IdentityTransformation();
+			else {
+				ct = TransformationFactory.getCoordinateTransformation(queryCRS, shpCrs);
+			}
+			return new Index(ct, ds, attr, filter);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -193,6 +231,15 @@ public final class ShpOptions {
 	 */
 	public Index createIndex(String queryCRS, String attr) {
 		return createIndex(queryCRS, attr, null);
+	}
+
+	/**
+	 * Create an index without a filter and the same query crs as the shape file.
+	 *
+	 * @see #createIndex(String, String)
+	 */
+	public Index createIndex(String attr) {
+		return createIndex(SAME_CRS, attr, null);
 	}
 
 	/**
@@ -221,6 +268,25 @@ public final class ShpOptions {
 	}
 
 	/**
+	 * Open the shape file for processing and set the crs if not already specified.
+	 */
+	private ShapefileDataStore openDataStoreAndSetCRS() throws IOException {
+		ShapefileDataStore ds = openDataStore(shp);
+
+		if (shpCrs == null) {
+			try {
+				CoordinateReferenceSystem crs = ds.getSchema().getCoordinateReferenceSystem();
+				shpCrs = "EPSG:" + CRS.lookupEpsgCode(crs, true);
+				log.info("Using detected crs for {}: {}", shp, shpCrs);
+			} catch (FactoryException | NullPointerException e) {
+				throw new IllegalStateException("Could not determine crs of the shape file. Try to specify it manually using --shp-crs.", e);
+			}
+		}
+
+		return ds;
+	}
+
+	/**
 	 * Create an inverse coordinate transformation from the shape file crs. Tries to autodetect the crs of the shape file.
 	 */
 	public CoordinateTransformation createInverseTransformation(String toCRS) {
@@ -242,10 +308,7 @@ public final class ShpOptions {
 		 * @param ct   coordinate transform from query to target crs
 		 * @param attr attribute for the result of {@link #query(Coord)}
 		 */
-		Index(CoordinateTransformation ct, String attr, @Nullable Set<String> filter)
-				throws IOException {
-			ShapefileDataStore ds = openDataStore(shp);
-
+		Index(CoordinateTransformation ct, ShapefileDataStore ds, String attr, @Nullable Set<String> filter) throws IOException {
 			if (shpCharset != null)
 				ds.setCharset(shpCharset);
 
@@ -278,13 +341,27 @@ public final class ShpOptions {
 		}
 
 		/**
-		 * Query the index for first feature including a certain point.
+		 * Query the index for first feature including matching the coordinate and return specified attribute.
 		 *
 		 * @return null when no features was found that contains the point
 		 */
 		@Nullable
 		@SuppressWarnings("unchecked")
-		public String query(Coord coord) {
+		public <T> T query(Coord coord) {
+			SimpleFeature ft = queryFeature(coord);
+			if (ft != null)
+				return (T) ft.getAttribute(attr);
+
+			return null;
+			// throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
+		}
+
+		/**
+		 * Query the index and return the whole feature.
+		 */
+		@Nullable
+		@SuppressWarnings("unchecked")
+		public SimpleFeature queryFeature(Coord coord) {
 			// Because we can not easily transform the feature geometry with MATSim we have to do it the other way around...
 			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
 
@@ -292,16 +369,16 @@ public final class ShpOptions {
 			for (SimpleFeature ft : result) {
 				Geometry geom = (Geometry) ft.getDefaultGeometry();
 				if (geom.contains(MGC.coordinate2Point(p)))
-					return (String) ft.getAttribute(attr);
+					return ft;
 			}
 
 			return null;
-			// throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
 		}
 
 		/**
 		 * Checks whether a coordinate is contained in any of the features.
 		 */
+		@SuppressWarnings("unchecked")
 		public boolean contains(Coord coord) {
 
 			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
@@ -316,11 +393,10 @@ public final class ShpOptions {
 			return false;
 		}
 
-
 		/**
 		 * Return all features in the index.
 		 */
-		public List<SimpleFeature> getAll() {
+		public List<SimpleFeature> getAllFeatures() {
 			List<SimpleFeature> result = new ArrayList<>();
 			itemsTree(result, index.getRoot());
 
@@ -346,6 +422,14 @@ public final class ShpOptions {
 		public int size() {
 			return index.size();
 		}
+
+		/**
+		 * Return underlying shp file. Should be used carefully.
+		 */
+		public ShpOptions getShp() {
+			return ShpOptions.this;
+		}
+
 	}
 
 }

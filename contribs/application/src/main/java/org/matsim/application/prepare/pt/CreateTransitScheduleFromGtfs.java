@@ -159,6 +159,9 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		}
 
 		new TransitScheduleWriter(ptScenario.getTransitSchedule()).writeFile(scheduleFile.getAbsolutePath());
+
+		log.info("Writing network to {}", networkPTFile.getAbsolutePath());
+
 		new NetworkWriter(ptScenario.getNetwork()).write(networkPTFile.getAbsolutePath());
 		new MatsimVehicleWriter(ptScenario.getTransitVehicles()).writeFile(transitVehiclesFile.getAbsolutePath());
 

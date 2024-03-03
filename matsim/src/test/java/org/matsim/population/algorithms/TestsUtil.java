@@ -21,7 +21,7 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,7 +34,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
-@Ignore
+@Disabled
 public class TestsUtil {
 
 	static Plan createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {

@@ -21,6 +21,7 @@ package org.matsim.contrib.socnetsim.usage.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
@@ -53,7 +53,7 @@ public class DumpSizeOfSelectedJointPlans {
 		writer.write( "personId\tsize" );
 
 		final Counter counter = new Counter( "parse joint plan # " );
-		new MatsimXmlParser( ) {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 			{
 				setValidating(false) ;
 			}
@@ -122,7 +122,7 @@ public class DumpSizeOfSelectedJointPlans {
 		final Map<Id, Integer> map = new HashMap<Id, Integer>();
 
 		final Counter counter = new Counter( "parse person # " );
-		new MatsimXmlParser() {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 			private Id<Person> currentAgent = null;
 			private int currIndex = -1;
 

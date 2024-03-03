@@ -23,8 +23,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStats;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.SlaveScoreWriter;
@@ -33,7 +31,7 @@ import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTra
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -73,8 +71,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private Config config;
     private Controler matsimControler;
     private TreeMap<Integer, SlaveHandler> slaveHandlerTreeMap;
-    private WaitTimeCalculatorSerializable waitTimeCalculator;
-    private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
+//    private WaitTimeCalculatorSerializable waitTimeCalculator;
+//    private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads = new AtomicInteger(0);
@@ -180,13 +178,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
 
         if (this.config.transit().isUseTransit()) {
-            waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), this.config.travelTimeCalculator().getTraveltimeBinSize(),
-                    (int) (this.config.qsim().getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
-            matsimControler.getEvents().addHandler(waitTimeCalculator);
-            stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                    this.config.travelTimeCalculator().getTraveltimeBinSize(), (int) (this.config.qsim()
-                    .getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
-            matsimControler.getEvents().addHandler(stopStopTimeCalculator);
+//            waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), this.config.travelTimeCalculator().getTraveltimeBinSize(),
+//                    (int) (this.config.qsim().getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
+//            matsimControler.getEvents().addHandler(waitTimeCalculator);
+//            stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+//                    this.config.travelTimeCalculator().getTraveltimeBinSize(), (int) (this.config.qsim()
+//                    .getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
+//            matsimControler.getEvents().addHandler(stopStopTimeCalculator);
             //tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
             if (fullTransitPerformanceTransmission) {
@@ -204,7 +202,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
 
 
-        matsimControler.getConfig().controler().setOverwriteFileSetting(
+        matsimControler.getConfig().controller().setOverwriteFileSetting(
                 OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 //                true ?
 //                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
@@ -223,18 +221,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
      * @param borrowingRate
      */
     private void setReplanningWeights(Config config, double masterMutationRate, double borrowingRate) {
-        int disableAfterIteration = config.controler().getLastIteration();
+        int disableAfterIteration = config.controller().getLastIteration();
         int maximumIterationForMutationDisabling = -1;
         if (borrowingRate + masterMutationRate >= 1) {
             borrowingRate = 0.9999 * borrowingRate / (masterMutationRate + borrowingRate);
             masterMutationRate = 0.9999 * masterMutationRate / (masterMutationRate + borrowingRate);
         }
-        List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
-        strategySettings.addAll(config.strategy().getStrategySettings());
+        List<ReplanningConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+        strategySettings.addAll(config.replanning().getStrategySettings());
         Map<Integer, Double> selectors = new HashMap<>();
         Map<Integer, Double> mutators = new HashMap<>();
         for (int i = 0; i < strategySettings.size(); i++) {
-            StrategyConfigGroup.StrategySettings setting = strategySettings.get(i);
+            ReplanningConfigGroup.StrategySettings setting = strategySettings.get(i);
             if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
                 selectors.put(i, setting.getWeight());
             else {
@@ -253,16 +251,16 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             strategySettings.get(entry.getKey()).setWeight(masterMutationRate * entry.getValue() / mutatorSum);
         }
         //put it back in the config
-        config.strategy().clearStrategySettings();
-        for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
-            config.strategy().addStrategySettings(strategySetting);
+        config.replanning().clearStrategySettings();
+        for (ReplanningConfigGroup.StrategySettings strategySetting : strategySettings) {
+            config.replanning().addStrategySettings(strategySetting);
         }
         // add the borrowing rate entry
-        StrategyConfigGroup.StrategySettings borrowingSetting = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings borrowingSetting = new ReplanningConfigGroup.StrategySettings();
         borrowingSetting.setWeight(borrowingRate);
         borrowingSetting.setStrategyName("ReplacePlanFromSlave");
         borrowingSetting.setDisableAfter(maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration);
-        config.strategy().addStrategySettings(borrowingSetting);
+        config.replanning().addStrategySettings(borrowingSetting);
         this.innovationEndsAtIter = maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration;
     }
 
@@ -394,7 +392,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCORES);
             waitForSlaveThreads();
         }
-        boolean isLoadBalanceIteration = event.getIteration() > config.controler().getFirstIteration() &&
+        boolean isLoadBalanceIteration = event.getIteration() > config.controller().getFirstIteration() &&
                 (event.getIteration() % loadBalanceInterval == 0 ||
                         slavesHaveRequestedShutdown() ||
                         hydra.hydraSlaves.size() > 0);
@@ -405,7 +403,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         waitForSlaveThreads();
         linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
                 config.travelTimeCalculator().getTraveltimeBinSize(),
-                config.qsim().getEndTime().seconds(),
+				(int) config.qsim().getEndTime().seconds(),
                 scenario.getNetwork().getLinks().values());
         startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
         if (SelectedSimulationMode.equals(SimulationMode.SERIAL)) {
@@ -615,7 +613,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             maxMemory[i] = maxMemory[i] - bytesPerSlaveBuffer;
             overheadMemory[i] = usedMemory[i] - (personsPerSlave[i] * bytesPerPerson);
         }
-        fastestTimePerPlan = fastestTimePerPlan > 0 && !new Double(fastestTimePerPlan).equals(Double.POSITIVE_INFINITY) ? fastestTimePerPlan : 1;
+        fastestTimePerPlan = fastestTimePerPlan > 0 && !Double.valueOf(fastestTimePerPlan).equals(Double.POSITIVE_INFINITY) ? fastestTimePerPlan : 1;
         for (int i : newSlaves)
             timesPerPlan[i] = fastestTimePerPlan;
 //        adjust numbers taking account of memory avail on slaveHandlerTreeMap
@@ -778,8 +776,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             writer.writeInt(currentIteration);
             writer.writeObject(linkTravelTimes);
             if (config.transit().isUseTransit()) {
-                writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
-                writer.writeObject(waitTimeCalculator.getWaitTimes());
+//                writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
+//                writer.writeObject(waitTimeCalculator.getWaitTimes());
                 if (fullTransitPerformanceTransmission)
                     writer.writeObject(transitPerformanceRecorder.getTransitPerformance());
             }
@@ -969,7 +967,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         slaveHandler.sendNumber(slaveIterationsPerMasterIteration);
         slaveHandler.sendNumber(slaveNumberOfPlans);
         slaveHandler.sendDouble(slaveMutationRate);
-        slaveHandler.sendNumber(config.controler().getLastIteration() * slaveIterationsPerMasterIteration);
+        slaveHandler.sendNumber(config.controller().getLastIteration() * slaveIterationsPerMasterIteration);
         slaveHandler.sendBoolean(initialRoutingOnSlaves);
         slaveHandler.sendBoolean(QuickReplanning);
         slaveHandler.sendBoolean(fullTransitPerformanceTransmission);

@@ -31,29 +31,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
+import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolExtension;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class SelectiveInsertionProviderTest {
-	@Rule
-	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
+	@RegisterExtension
+	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
 	private final BestInsertionFinder initialInsertionFinder = mock(BestInsertionFinder.class);
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder,
-				new InsertionGenerator(new DefaultIncrementalStopDurationEstimator(120), null), rule.forkJoinPool);
+				new InsertionGenerator(new DefaultStopTimeCalculator(120), null), rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertion(null, List.of())).isEmpty();
 	}
 

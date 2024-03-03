@@ -22,10 +22,11 @@ package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
@@ -47,13 +48,21 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
+		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
+			var insertionParams = (ExtensiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
+			var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
+					insertionParams.admissibleBeelineSpeedFactor, getter.getModal(TravelTimeMatrix.class),
+					getter.getModal(TravelTime.class));
+			return admissibleTimeEstimator;
+		}));
+		
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider(getter -> {
 			var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
 			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculator,
-					getter.getModal(TravelTimeMatrix.class), getter.getModal(TravelTime.class),
-					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(), getter.getModal(IncrementalStopDurationEstimator.class));
+					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
+					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
 			return new ExtensiveInsertionSearch(provider, getter.getModal(MultiInsertionDetourPathCalculator.class),
-					insertionCostCalculator, getter.getModal(IncrementalStopDurationEstimator.class));
+					insertionCostCalculator, getter.getModal(StopTimeCalculator.class));
 		})).asEagerSingleton();
 
 		addModalComponent(MultiInsertionDetourPathCalculator.class,

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="global" >
+		<param name="coordinateSystem" value="EPSG:4326" />
+		<param name="defaultDelimiter" value=";" />
+		<param name="insistingOnDeprecatedConfigVersion" value="false" />
+		<!-- "global" number of threads.  This number is used, e.g., for replanning, but NOT in QSim.  This can typically be set to as many cores as you have available, or possibly even slightly more. -->
+		<param name="numberOfThreads" value="2" />
+		<param name="randomSeed" value="4177" />
+	</module>
+	<module name="vehicles" >
+		<param name="vehiclesFile" value="vehicleTypes.xml" />
+	</module>
+	<module name="controller" >
+		<param name="firstIteration" value="0" />
+		<!-- Default=1000. Last Iteration of a simulation. -->
+		<param name="lastIteration" value="0" />
+		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim hermes
+		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
+		For 'qsim', add a module 'qsim' to the config. -->
+		<param name="mobsim" value="qsim" />
+		<param name="outputDirectory" value="test/output/org/matsim/smallScaleCommercialTrafficGeneration/RunGenerateSmallScaleCommercialTrafficTest/testMainRunAndResults/" />
+		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
+		<param name="overwriteFiles" value="overwriteExistingFiles" />
+		<!-- The type of routing (least cost path) algorithm used, may have the values: [Dijkstra, AStarLandmarks, SpeedyALT] -->
+		<param name="routingAlgorithmType" value="SpeedyALT" />
+		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
+		<param name="runId" value="test" />
+
+	</module>
+	<module name="network" >
+		<!-- The Coordinates Reference System in which the coordinates are expressed in the input file. At import, the coordinates will be converted to the coordinate system defined in "global", and willbe converted back at export. If not specified, no conversion happens. -->
+		<param name="inputCRS" value="EPSG:4326" />
+		<param name="inputChangeEventsFile" value="null" />
+		<param name="inputNetworkFile" value="https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml" />
+		<param name="laneDefinitionsFile" value="null" />
+		<param name="timeVariantNetwork" value="false" />
+	</module>
+	<module name="vspExperimental" >
+		<!-- (do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, set the following to true. -->
+		<param name="isAbleToOverwritePtInteractionParams" value="false" />
+		<param name="isGeneratingBoardingDeniedEvent" value="false" />
+		<!-- if an approximation of the opportunity cost of time is included into the radius calculation for location choice.`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility. -->
+		<param name="isUsingOpportunityCostOfTimeForLocationChoice" value="true" />
+		<param name="logitScaleParamForPlansRemoval" value="1.0" />
+		<!-- Options: | ignore | info | warn | abort | .  When violating VSP defaults, this results in nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
+		<param name="vspDefaultsCheckingLevel" value="abort" />
+		<!-- if true then writes output_events in output directory.  default is `false'. Will only work when lastIteration is multiple of events writing interval -->
+		<param name="writingOutputEvents" value="true" />
+	</module>
+
+</config>

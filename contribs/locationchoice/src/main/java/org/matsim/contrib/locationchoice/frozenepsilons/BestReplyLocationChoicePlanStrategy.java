@@ -29,7 +29,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -40,8 +39,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.Map;
 
 class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
@@ -82,18 +81,18 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 				delegate = new PlanStrategyImpl( new BestPlanSelector<>() );
 				break;
 			case "ChangeExpBeta":
-				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( config.planCalcScore().getBrainExpBeta() ) );
+				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( config.scoring().getBrainExpBeta() ) );
 				break;
 			case "SelectRandom":
 				delegate = new PlanStrategyImpl( new RandomPlanSelector() );
 				break;
 			default:
-				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( config.planCalcScore() ) );
+				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( config.scoring() ) );
 				break;
 		}
 		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities, timeInterpretation) );
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider, timeInterpretation));
-		
+
 		delegate.init(replanningContext);
 	}
 

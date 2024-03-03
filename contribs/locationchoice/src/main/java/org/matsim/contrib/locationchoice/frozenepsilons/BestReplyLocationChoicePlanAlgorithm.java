@@ -55,7 +55,7 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = LogManager.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
-	
+
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
@@ -168,15 +168,15 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		final QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get( convertedType );
 		Gbl.assertNotNull( quadTree );
 		Collection<ActivityFacilityWithIndex> list = quadTree.getDisk(center.getX(), center.getY(), maxRadius );
-		
+
 		for (ActivityFacilityWithIndex facility : list) {
 //			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
 			int facilityIndex = facility.getArrayIndex();
-			if (this.sampler.sample(facilityIndex, personIndex)) { 
-				
+			if (this.sampler.sample(facilityIndex, personIndex)) {
+
 				// only add destination if it can be reached with the chosen mode
 				String mode = PopulationUtils.getPreviousLeg( plan, actToMove ).getMode();
-				
+
 				Id<Link> linkId = null;
 				// try to get linkId from facility, else get it from act. other options not allowed!
 				if (facility.getLinkId() != null) {
@@ -186,16 +186,16 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					linkId = actToMove.getLinkId();
 				}
 				// TODO: solve this generic. for that we need info from the config, which modes are actually teleported.
-				if (this.lcContext.getScenario().getNetwork().getLinks().get(linkId).getAllowedModes().contains(mode) || 
-						mode.equals(TransportMode.bike) || 
+				if (this.lcContext.getScenario().getNetwork().getLinks().get(linkId).getAllowedModes().contains(mode) ||
+						mode.equals(TransportMode.bike) ||
 						mode.equals(TransportMode.walk) ||
 						mode.equals(TransportMode.transit_walk) ||
 						mode.equals(TransportMode.other)) {
 					cs.addDestination(facility.getId());
-				}	
+				}
 			}
 		}
-		
+
 		return cs;
 	}
 
@@ -223,14 +223,14 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 //		maxDCScore *= scale; // apply the scale factors given in the config file
 
-		/* 
+		/*
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
 		double travelSpeedCrowFly = this.dccg.getTravelSpeed_car();
-		double betaTime = this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
+		double betaTime = this.scenario.getConfig().scoring().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
-			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
+			betaTime -= this.scenario.getConfig().scoring().getPerforming_utils_hr() ;
 			// needs to be negative (I think) since AH uses this as a cost parameter. kai, jan'13
 		}
 		double maxTravelTime = Double.MAX_VALUE;
@@ -243,9 +243,10 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			// correct way.  kai, jan'13
 		}
 		// distance linear
-		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
+		double maxDistance = travelSpeedCrowFly * maxTravelTime;
 
 		// define a maximum distance choice set manually
+		// yyyy it is quite stupid to do the following at the end of this method and not at the beginning.  Can probably be moved up, but would need to be tested.  kai, jul'23
 		if ( this.dccg.getMaxDistanceDCScore() > 0.0) {
 			maxDistance = this.dccg.getMaxDistanceDCScore();
 		}

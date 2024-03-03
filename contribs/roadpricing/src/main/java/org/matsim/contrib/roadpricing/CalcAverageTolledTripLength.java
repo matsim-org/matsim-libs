@@ -22,7 +22,7 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,7 +60,7 @@ final class CalcAverageTolledTripLength implements LinkEnterEventHandler, Person
 	private final TreeMap<Id<Person>, Double> agentDistance;
 
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	
+
 	private static final Double zero = 0.0;
 
 	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme, EventsManager events) {
@@ -72,29 +72,29 @@ final class CalcAverageTolledTripLength implements LinkEnterEventHandler, Person
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
-		
+
 		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-		
+
 		// getting the (monetary? generalized?) cost of the link
 		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
-		
+
 		if (cost != null) {
 			// i.e. if there is a toll on the link
-			
+
 			Link link = this.network.getLinks().get(event.getLinkId());
 			if (link != null) {
-				
+
 				// get some distance that has been accumulated (how?) up to this point:
 				Double length = this.agentDistance.get(driverId);
-				
+
 				// if nothing has been accumlated so far, initialize this at zero:
 				if (length == null) {
 					length = zero;
 				}
-				
+
 				// add the new length to the already accumulated length:
 				length = length + link.getLength();
-				
+
 				// put the result again in the "memory":
 				this.agentDistance.put(driverId, length);
 			}
@@ -104,13 +104,13 @@ final class CalcAverageTolledTripLength implements LinkEnterEventHandler, Person
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		// at arrival of the agent ...
-		
+
 		// get the accumulated "tolled" length from the agent
 		Double length = this.agentDistance.get(event.getPersonId());
 		if (length != null) {
 			// if this is not zero, accumulate it into some global accumulated length ...
 			this.sumLength += length;
-			
+
 			// ... and reset the agent-individual accumlated length to zero:
 			this.agentDistance.put(event.getPersonId(), zero);
 			this.cntTrips++;

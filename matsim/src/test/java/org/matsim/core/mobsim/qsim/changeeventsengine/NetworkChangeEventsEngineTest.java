@@ -21,8 +21,8 @@
 
  package org.matsim.core.mobsim.qsim.changeeventsengine;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,19 +40,18 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.List;
 
-/**
+	/**
  * @author mrieser / Simunto GmbH
  */
 public class NetworkChangeEventsEngineTest {
 
-	@Test
-	public void testActivation_inactive() {
+	 @Test
+	 void testActivation_inactive() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -81,13 +80,13 @@ public class NetworkChangeEventsEngineTest {
 
 		try {
 			engine.addNetworkChangeEvent(changeEvent);
-			Assert.fail("Expected exception due to links not being time dependent, but got none.");
+			Assertions.fail("Expected exception due to links not being time dependent, but got none.");
 		} catch (Exception expected) {
 		}
 	}
 
-	@Test
-	public void testActivation_timedepOnly_freespeed() {
+	 @Test
+	 void testActivation_timedepOnly_freespeed() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -115,15 +114,15 @@ public class NetworkChangeEventsEngineTest {
 		changeEvent.addLink(link1);
 		changeEvent.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 50));
 		engine.addNetworkChangeEvent(changeEvent);
-		Assert.assertEquals("it should still be 20 now.", 20, link1.getFreespeed(30), 0);
+		Assertions.assertEquals(20, link1.getFreespeed(30), 0, "it should still be 20 now.");
 		for (int i = 30; i < 40; i++) {
 			engine.doSimStep(i);
 		}
-		Assert.assertEquals("it should be 50 now.", 50, link1.getFreespeed(40), 0);
+		Assertions.assertEquals(50, link1.getFreespeed(40), 0, "it should be 50 now.");
 	}
 
-	@Test
-	public void testActivation_timedepOnly_capacity() {
+	 @Test
+	 void testActivation_timedepOnly_capacity() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -151,11 +150,11 @@ public class NetworkChangeEventsEngineTest {
 		changeEvent.addLink(link1);
 		changeEvent.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.FACTOR, 2));
 		engine.addNetworkChangeEvent(changeEvent);
-		Assert.assertEquals("it should still be 20 now.", 20, link1.getCapacity(30), 0);
+		Assertions.assertEquals(20, link1.getCapacity(30), 0, "it should still be 20 now.");
 		for (int i = 30; i < 40; i++) {
 			engine.doSimStep(i);
 		}
-		Assert.assertEquals("it should be 40 now.", 40, link1.getCapacity(40), 0);
+		Assertions.assertEquals(40, link1.getCapacity(40), 0, "it should be 40 now.");
 	}
 
 	private static class DummyInternalInterfaceImpl implements InternalInterface {

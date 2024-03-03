@@ -19,16 +19,15 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.otfvis;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
@@ -36,25 +35,24 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 
-import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+import static org.matsim.core.config.groups.ControllerConfigGroup.*;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
  * Needs somehow a bunch of memory - please use "-Xmx630m"!
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class OTFVisIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testConvert() {
+	void testConvert() {
 		String networkFilename = "test/scenarios/equil/network.xml";
 		String eventsFilename = "test/scenarios/equil/events.xml";
 		String mviFilename = testUtils.getOutputDirectory()+"/events.mvi";
@@ -63,31 +61,31 @@ public class OTFVisIT {
 		OTFVis.main(args);
 
 		File f = new File(mviFilename);
-		Assert.assertTrue("No mvi file written!", f.exists());
+		Assertions.assertTrue(f.exists(), "No mvi file written!");
 	}
 
 	@Test
-	public void testOTFVisSnapshotWriterOnQSim() {
+	void testOTFVisSnapshotWriterOnQSim() {
 		final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(2);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.otfvis ) );
+		config.controller().setLastIteration(2);
+		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		config.controller().setMobsim("qsim");
+		config.controller().setSnapshotFormat( Collections.singletonList( SnapshotFormat.otfvis ) );
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
 	}
 
 }

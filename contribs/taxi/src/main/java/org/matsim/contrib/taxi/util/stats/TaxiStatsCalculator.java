@@ -32,7 +32,6 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector.RequestEventSequence;
 import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
-import org.matsim.contrib.util.stats.DurationStats;
 
 import com.google.common.collect.ImmutableList;
 
@@ -44,14 +43,13 @@ public class TaxiStatsCalculator {
 	private final SortedMap<Integer, TaxiStats> hourlyStats = new TreeMap<>();
 	private final TaxiStats dailyStats = new TaxiStats(DAILY_STATS_ID);
 
-	public TaxiStatsCalculator(Collection<ExecutedSchedule> executedSchedules,
-			Collection<RequestEventSequence> requestSequences) {
+	public TaxiStatsCalculator(Collection<ExecutedSchedule> executedSchedules, Collection<RequestEventSequence> requestSequences) {
 		for (ExecutedSchedule schedule : executedSchedules) {
 			DurationStats.taskDurationByTimeBinAndType(schedule.getExecutedTasks().stream(), 3600)
 					.forEach((hour, taskTypeDurations) -> updateTaxiStats(getHourlyStats(hour), taskTypeDurations));
 
-			Map<TaskType, Double> dailyTaskTypeDuration = DurationStats.taskDurationByTimeBinAndType(
-					schedule.getExecutedTasks().stream(), Integer.MAX_VALUE).entrySet().iterator().next().getValue();
+			Map<TaskType, Double> dailyTaskTypeDuration = DurationStats.taskDurationByTimeBinAndType(schedule.getExecutedTasks().stream(),
+					Integer.MAX_VALUE).entrySet().iterator().next().getValue();
 			updateTaxiStats(dailyStats, dailyTaskTypeDuration);
 		}
 
@@ -102,8 +100,7 @@ public class TaxiStatsCalculator {
 	}
 
 	private static void updateTaskDurations(TaxiStats stats, Map<TaskType, Double> taskTypeDurations) {
-		taskTypeDurations.forEach(
-				(taskType, duration) -> stats.taskTypeDurations.merge(taskType, duration, Double::sum));
+		taskTypeDurations.forEach((taskType, duration) -> stats.taskTypeDurations.merge(taskType, duration, Double::sum));
 	}
 
 	private void updatePassengerWaitTimeStats(RequestEventSequence sequence) {

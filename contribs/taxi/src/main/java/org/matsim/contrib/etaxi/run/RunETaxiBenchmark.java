@@ -72,16 +72,16 @@ public class RunETaxiBenchmark {
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
 				new DvrpConfigGroup(), new EvConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, nIterations).run();
 	}
 
 	public static Controler createControler(Config config, int runs) {
-		config.controler().setLastIteration(runs - 1);
-		config.controler().setDumpDataAtEnd(false);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setLastIteration(runs - 1);
+		config.controller().setDumpDataAtEnd(false);
+		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		config.controller().setCreateGraphs(false);
 		DvrpBenchmarks.adjustConfig(config);
 
 		Scenario scenario = createScenarioWithDrtRouteFactory(config);

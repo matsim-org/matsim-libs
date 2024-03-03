@@ -22,8 +22,8 @@ package org.matsim.contrib.emissions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -91,9 +91,9 @@ public class TestColdEmissionAnalysisModuleCase6 {
 
 	private static final double heavyGoodsFactor = -1.;
 
-	
+
 	@Test
-	public void calculateColdEmissionsAndThrowEventTest_completeData() {
+	void calculateColdEmissionsAndThrowEventTest_completeData() {
 
 		/*
 		 * six test cases with complete input data
@@ -121,7 +121,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
 
 		String message = "The expected emissions for " + testCase6.toString() + " are " + pollutants.size() * (Double) testCase6.get( 4 ) + " but were " + sumOfEmissions;
-		Assert.assertEquals( message, pollutants.size() * (Double) testCase6.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( pollutants.size() * (Double) testCase6.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON, message );
 	}
 	
 	private ColdEmissionAnalysisModule setUp() {

@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.vsp.congestion;
 
@@ -27,9 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,28 +64,28 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 /**
  * Simple scenario setup:
  * Three agents moving along a corridor with unlimited storage capacity; arriving simultaneously at the bottleneck.
- * 
+ *
  * @author ikaddoura , lkroeger
  *
  */
 
 public class MarginalCongestionHandlerFlowQueueQsimTest {
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	private EventsManager events;
-	
+
 	private Id<Person> testAgent1 = Id.create("agentA", Person.class);
 	private Id<Person> testAgent2 = Id.create("agentB", Person.class);
 	private Id<Person> testAgent3 = Id.create("agentC", Person.class);
-	
+
 	private Id<Link> linkId1 = Id.create("link1", Link.class);
 	private Id<Link> linkId2 = Id.create("link2", Link.class);
 	private Id<Link> linkId3 = Id.create("link3", Link.class);
 	private Id<Link> linkId4 = Id.create("link4", Link.class);
 	private Id<Link> linkId5 = Id.create("link5", Link.class);
-	
+
 	double avgValue1 = 0.0;
 	double avgValue2 = 0.0;
 	double avgOldValue1 = 0.0;
@@ -94,158 +94,158 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	double avgValue4 = 0.0;
 	double avgOldValue3 = 0.0;
 	double avgOldValue4 = 0.0;
-	
+
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	
+
 	/**
 	 * V3
 	 */
 	@Test
-	public final void testFlowCongestion_3agents_V3(){
-		
+	final void testFlowCongestion_3agents_V3(){
+
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
-		
+
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		final CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, sc);
-		
+
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
 			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
-			}	
+			}
 		});
-		
+
 		events.addHandler(congestionHandler);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim sim = createQSim(sc, events);
 		sim.run();
-					
+
 		for (CongestionEvent event : congestionEvents) {
-			Assert.assertEquals("here the delay should be equal to the inverse of the flow capacity", 3., event.getDelay(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "here the delay should be equal to the inverse of the flow capacity");
 		}
-		
-		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong total internalized delay", 9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+
+		Assertions.assertEquals(9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON, "wrong total delay");
+		Assertions.assertEquals(9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON, "wrong total internalized delay");
 
 	}
-	
+
 	/**
 	 * V7
 	 */
 	@Test
-	public final void testFlowCongestion_3agents_V7(){
-		
+	final void testFlowCongestion_3agents_V7(){
+
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
-		
+
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		final CongestionHandlerImplV7 congestionHandler = new CongestionHandlerImplV7(events, sc);
-		
+
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
 			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
-			}	
+			}
 		});
-		
+
 		events.addHandler(congestionHandler);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim sim = createQSim(sc, events);
 		sim.run();
-			
+
 		for (CongestionEvent event : congestionEvents) {
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
-			
+
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);					
+				Assertions.assertEquals(6., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
-			
+
 			if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);					
+				Assertions.assertEquals(6., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 		}
-		
-		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
-	
+
+		Assertions.assertEquals(9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON, "wrong total delay");
+
 		// the second agent is 3 sec delayed and charges the first agent with these 3 sec
 		// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
-		Assert.assertEquals("wrong total internalized delay", 15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON, "wrong total internalized delay");
 	}
-	
+
 	/**
 	 * V8
 	 */
 	@Test
-	public final void testFlowCongestion_3agents_V8(){
-		
+	final void testFlowCongestion_3agents_V8(){
+
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
-		
+
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		final CongestionHandlerImplV8 congestionHandler = new CongestionHandlerImplV8(events, sc);
-		
+
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
 			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
-			}	
+			}
 		});
-		
+
 		events.addHandler(congestionHandler);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim sim = createQSim(sc, events);
 		sim.run();
-			
+
 		for (CongestionEvent event : congestionEvents) {
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
-			
+
 			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
-			
+
 			if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
-				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+				Assertions.assertEquals(3., event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 			}
 		}
-		
-		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
-	
+
+		Assertions.assertEquals(9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON, "wrong total delay");
+
 		// the second agent is 3 sec delayed and charges the first agent with these 3 sec
 		// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
-		Assert.assertEquals("wrong total internalized delay", 9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON, "wrong total internalized delay");
 	}
 
 	private void setPopulation1(Scenario scenario) {
-	
+
 	Population population = scenario.getPopulation();
 	PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 	LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 	Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
-	
+
 	// leg: 1,2,3,4,5
 	Leg leg_1_5 = popFactory.createLeg("car");
 	List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
@@ -255,7 +255,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	NetworkRoute route1_5 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId5);
 	route1_5.setLinkIds(linkId1, linkIds234, linkId5);
 	leg_1_5.setRoute(route1_5);
-	
+
 	Person person1 = popFactory.createPerson(testAgent1);
 	Plan plan1 = popFactory.createPlan();
 	Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
@@ -265,7 +265,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	plan1.addActivity(workActLink5);
 	person1.addPlan(plan1);
 	population.addPerson(person1);
-	
+
 	Person person2 = popFactory.createPerson(testAgent2);
 	Plan plan2 = popFactory.createPlan();
 	Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
@@ -279,7 +279,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	plan2.addActivity(workActLink5);
 	person2.addPlan(plan2);
 	population.addPerson(person2);
-	
+
 	Person person3 = popFactory.createPerson(testAgent3);
 	Plan plan3 = popFactory.createPlan();
 	Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
@@ -296,10 +296,10 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 }
 
 	private Scenario loadScenario1() {
-		
+
 		// (0)				(1)				(2)				(3)				(4)				(5)
-		//    -----link1----   ----link2----   ----link3----   ----link4----   ----link5----   
-		
+		//    -----link1----   ----link2----   ----link3----   ----link4----   ----link5----
+
 		Config config = testUtils.createConfig();
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
@@ -308,7 +308,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
-	
+
 		Network network = (Network) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
@@ -319,7 +319,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(300., 0.));
 		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(400., 0.));
 		Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new Coord(500., 0.));
-		
+
 		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
 		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
 		Link link3 = network.getFactory().createLink(this.linkId3, node2, node3);
@@ -328,7 +328,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
-		
+
 		// link without capacity restrictions
 		link1.setAllowedModes(modes);
 		link1.setCapacity(999999);
@@ -363,7 +363,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 		link5.setFreespeed(250); // one time step
 		link5.setNumberOfLanes(100);
 		link5.setLength(500);
-		
+
 		network.addNode(node0);
 		network.addNode(node1);
 		network.addNode(node2);
@@ -384,5 +384,5 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	private QSim createQSim(Scenario sc, EventsManager events) {
 		return new QSimBuilder(sc.getConfig()).useDefaults().build(sc, events);
 	}
-	
-}
+
+}

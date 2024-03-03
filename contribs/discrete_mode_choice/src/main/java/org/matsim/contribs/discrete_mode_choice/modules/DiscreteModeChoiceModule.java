@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 /**
  * Main module of the Discrete Mode Choice extension. Should be added as an
  * overriding module before the MATSim controller is started.
- * 
+ *
  * @author sebhoerl
  */
 public class DiscreteModeChoiceModule extends AbstractModule {
@@ -24,7 +24,7 @@ public class DiscreteModeChoiceModule extends AbstractModule {
 	public void install() {
 		addPlanStrategyBinding(STRATEGY_NAME).toProvider(DiscreteModeChoiceStrategyProvider.class);
 
-		if (getConfig().strategy().getPlanSelectorForRemoval().equals(NonSelectedPlanSelector.NAME)) {
+		if (getConfig().replanning().getPlanSelectorForRemoval().equals(NonSelectedPlanSelector.NAME)) {
 			bindPlanSelectorForRemoval().to(NonSelectedPlanSelector.class);
 		}
 

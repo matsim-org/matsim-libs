@@ -28,9 +28,7 @@ import java.util.stream.Collectors;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**
- *
- * @author Steffen Axer
- *
+ * @author steffenaxer
  */
 public class DrtCompanionParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final char DEFAULT_COLLECTION_DELIMITER = ',';

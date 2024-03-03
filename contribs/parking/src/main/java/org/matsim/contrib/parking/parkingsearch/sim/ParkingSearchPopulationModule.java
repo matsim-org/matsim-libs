@@ -10,12 +10,12 @@ public class ParkingSearchPopulationModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		if (getConfig().transit().isUseTransit()) {
 			throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
-		} 
-		
+		}
+
 		bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
 		bind(ParkingPopulationAgentSource.class).asEagerSingleton();
-		
-		addNamedComponent(ParkingPopulationAgentSource.class, COMPONENT_NAME);
+
+		addQSimComponentBinding( COMPONENT_NAME ).to( ParkingPopulationAgentSource.class );
 	}
 
 }

@@ -2,8 +2,8 @@ package org.matsim.core.router;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -19,28 +19,27 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class FallbackRoutingModuleTest{
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void calcRoute(){
+	void calcRoute(){
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setLastIteration( 1 );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setLastIteration( 1 );
 
-		StrategyConfigGroup.StrategySettings sets = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings sets = new ReplanningConfigGroup.StrategySettings();
 		sets.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.ReRoute );
 		sets.setWeight( 1. );
-		config.strategy().addStrategySettings( sets );
+		config.replanning().addStrategySettings( sets );
 
 		Scenario scenario = ScenarioUtils.createScenario( config );
 

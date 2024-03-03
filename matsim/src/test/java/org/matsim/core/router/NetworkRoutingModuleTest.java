@@ -21,8 +21,8 @@ package org.matsim.core.router;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ import org.matsim.facilities.Facility;
 public class NetworkRoutingModuleTest {
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 		Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
@@ -70,14 +70,14 @@ public class NetworkRoutingModuleTest {
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
 		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 7.0*3600, person)) ;
-		Assert.assertEquals(1, result.size() );
+		Assertions.assertEquals(1, result.size() );
 		Leg leg = (Leg)result.get(0) ;
-		Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
-		Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
+		Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
+		Assertions.assertTrue(leg.getRoute() instanceof NetworkRoute);
 	}
 
 	@Test
-	public void testRouteLegWithDistance() {
+	void testRouteLegWithDistance() {
 		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -85,7 +85,7 @@ public class NetworkRoutingModuleTest {
 		fromAct.setLinkId(Id.create("1", Link.class));
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
 		toAct.setLinkId(Id.create("3", Link.class));
-		
+
 		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
@@ -103,20 +103,20 @@ public class NetworkRoutingModuleTest {
 
 			List<? extends PlanElement> results = router.calcRoute( DefaultRoutingRequest.withoutAttributes( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ),
 				  FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() ), 8.*3600, person ) ) ;
-			Assert.assertEquals( 1, results.size() );
+			Assertions.assertEquals( 1, results.size() );
 			Leg leg = (Leg) results.get(0) ;
 
-			Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
+			Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-			Assert.assertEquals(0.3333333333, route.getTravelCost(), 1e-8 ) ;
+			Assertions.assertEquals(0.3333333333, route.getTravelCost(), 1e-8 ) ;
 		}
 		// and now with a monetary distance rate different from zero:
-		
+
 		{
 			double monetaryDistanceRateCar = -1.;
-			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+			f.s.getConfig().scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
                         TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
                                         f.s.getConfig() ).createTravelDisutility(timeObject );
@@ -132,15 +132,15 @@ public class NetworkRoutingModuleTest {
 
 			List<? extends PlanElement> result = router.calcRoute( DefaultRoutingRequest.withoutAttributes( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ), FacilitiesUtils.toFacility(toAct,
 				  f.s.getActivityFacilities() ), 7.*3600, person ) ) ;
-			
-			Assert.assertEquals( 1, result.size() ) ; 
+
+			Assertions.assertEquals( 1, result.size() ) ;
 			Leg leg = (Leg) result.get(0) ;
 
-			Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
+			Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-			Assert.assertEquals(1000.3333333333, route.getTravelCost(), 1e-8 ) ;
+			Assertions.assertEquals(1000.3333333333, route.getTravelCost(), 1e-8 ) ;
 		}
 	}
 
@@ -148,7 +148,7 @@ public class NetworkRoutingModuleTest {
 		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Fixture() {
-			s.getConfig().plansCalcRoute().setRoutingRandomness( 0. );
+			s.getConfig().routing().setRoutingRandomness( 0. );
 
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

@@ -51,19 +51,28 @@ public class Depots {
 			return false;
 		}
 
+		// only if stay task is last task: with prebooking we may also idle during the day, but
+		// currently all the downstream relocation/charging logic assumes that we only stay at
+		// the end of the schedule
+		if (currentTask.getTaskIdx() < schedule.getTaskCount() - 1) {
+			return false;
+		}
+
 		// previous task was STOP
 		int previousTaskIdx = currentTask.getTaskIdx() - 1;
 		return (previousTaskIdx >= 0 && STOP.isBaseTypeOf(schedule.getTasks().get(previousTaskIdx)));
 	}
 
 	public static Link findStraightLineNearestDepot(DvrpVehicle vehicle, Set<Link> links) {
-		Link currentLink = ((DrtStayTask)vehicle.getSchedule().getCurrentTask()).getLink();
+		Link currentLink = ((DrtStayTask) vehicle.getSchedule().getCurrentTask()).getLink();
 		return links.contains(currentLink) ?
-				null /* already at a depot*/ :
-				links.stream()
-						.min(Comparator.comparing(
-								l -> DistanceUtils.calculateSquaredDistance(currentLink.getToNode().getCoord(),
-										l.getFromNode().getCoord())))
-						.get();
+			null /* already at a depot*/ :
+			links.stream().map(l -> new DepotCandidates(l, DistanceUtils.calculateSquaredDistance(currentLink.getToNode().getCoord(),
+					l.getFromNode().getCoord())))
+				.min(Comparator.comparing(DepotCandidates::distance)
+					.thenComparing(h -> h.link.getId()))
+				.get().link();
 	}
+
+	record DepotCandidates(Link link, double distance) {}
 }

@@ -20,10 +20,10 @@
 
 package org.matsim.pt.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -35,7 +35,8 @@ import org.matsim.pt.PtConstants;
 public class TransitActsRemoverTest {
 
 
-	@Test public void testNormalTransitPlan() {
+	@Test
+	void testNormalTransitPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -83,14 +84,16 @@ public class TransitActsRemoverTest {
 		assertEquals("h", ((Activity) plan.getPlanElements().get(6)).getType());
 	}
 
-	@Test public void testEmptyPlan() {
+	@Test
+	void testEmptyPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		new TransitActsRemover().run(plan);
 		assertEquals(0, plan.getPlanElements().size());
 		// this mostly checks that there is no exception
 	}
 
-	@Test public void testPlanWithoutLegs() {
+	@Test
+	void testPlanWithoutLegs() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -99,7 +102,8 @@ public class TransitActsRemoverTest {
 		// this mostly checks that there is no exception
 	}
 
-	@Test public void testWalkOnlyPlan() {
+	@Test
+	void testWalkOnlyPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -110,7 +114,8 @@ public class TransitActsRemoverTest {
 		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
 
-	@Test public void testNoTransitActPlan() {
+	@Test
+	void testNoTransitActPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));

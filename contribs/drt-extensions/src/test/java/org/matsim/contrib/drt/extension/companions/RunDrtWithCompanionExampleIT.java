@@ -24,14 +24,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -40,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -50,11 +49,12 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunDrtWithCompanionExampleIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunDrtWithCompanions() {
+	void testRunDrtWithCompanions() {
+		MatsimRandom.reset();
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());
@@ -62,20 +62,51 @@ public class RunDrtWithCompanionExampleIT {
 		// Add DrtCompanionParams with some default values into existing Drt configurations
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
 		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
-		drtWithExtensionsConfigGroup.addParameterSet(new DrtCompanionParams());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		DrtCompanionParams crtCompanionParams = new DrtCompanionParams();
+		crtCompanionParams.setDrtCompanionSamplingWeights(List.of(0.5,0.2,0.1,0.1,0.1));
+
+		drtWithExtensionsConfigGroup.addParameterSet(crtCompanionParams);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		verifyTotalNumberOfDrtRides(utils.getOutputDirectory(), 477);
+		int actualRides = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRides).isEqualTo(706);
 	}
 
-	private void verifyTotalNumberOfDrtRides(String outputDirectory, int expectedNumberOfTrips) {
+	@Test
+	void testRunDrtWithCompanionsMultiThreaded() {
+		MatsimRandom.reset();
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());
 
-		String filename = outputDirectory + "/drt_customer_stats_drt.csv";
+		// Add DrtCompanionParams with some default values into existing Drt configurations
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
+		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
+
+		DrtCompanionParams crtCompanionParams = new DrtCompanionParams();
+		crtCompanionParams.setDrtCompanionSamplingWeights(List.of(0.5,0.2,0.1,0.1,0.1));
+
+		drtWithExtensionsConfigGroup.addParameterSet(crtCompanionParams);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.qsim().setNumberOfThreads(2);
+
+		Controler controler = DrtCompanionControlerCreator.createControler(config);
+		controler.run();
+
+		int actualRides = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRides).isEqualTo(699);
+	}
+
+	private int getTotalNumberOfDrtRides() {
+		String filename = utils.getOutputDirectory() + "/drt_customer_stats_drt.csv";
 
 		final List<String> collect;
 		try {
@@ -88,12 +119,8 @@ public class RunDrtWithCompanionExampleIT {
 		List<String> keys = List.of(collect.get(0).split(";"));
 		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
 
-		Map<String, String> params = new HashMap<>();
-		for (int i = 0; i < keys.size(); i++) {
-			params.put(keys.get(i), lastIterationValues.get(i));
-		}
-
-		int actualRides = Integer.parseInt(params.get("rides"));
-		assert(actualRides == expectedNumberOfTrips);
+		int index = keys.indexOf("rides");
+        String value = lastIterationValues.get(index);
+		return Integer.parseInt(value);
 	}
 }

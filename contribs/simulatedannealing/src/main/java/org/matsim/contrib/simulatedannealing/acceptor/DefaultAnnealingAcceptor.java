@@ -8,11 +8,12 @@
  */
 package org.matsim.contrib.simulatedannealing.acceptor;
 
-import org.apache.commons.math3.random.RandomGenerator;
-import org.matsim.contrib.common.util.random.RandomUtils;
+import java.util.random.RandomGenerator;
+
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealingConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author nkuehnel / MOIA
@@ -27,7 +28,7 @@ public final class DefaultAnnealingAcceptor<T> implements Acceptor<T> {
 
 	public DefaultAnnealingAcceptor(SimulatedAnnealingConfigGroup simAnCfg) {
 		this.simAnCfg = simAnCfg;
-		this.random = RandomUtils.getLocalGenerator();
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override

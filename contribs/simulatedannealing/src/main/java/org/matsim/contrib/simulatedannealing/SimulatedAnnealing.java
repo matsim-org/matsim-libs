@@ -20,7 +20,7 @@ import org.matsim.contrib.simulatedannealing.perturbation.Perturbator;
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -103,7 +103,7 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int iteration = event.getIteration();
-		if(simAnCfg.firstIteration == event.getIteration()) {
+		if(simAnCfg.firstIteration >= event.getIteration()) {
 			return;
 		}
 		if (simAnCfg.lastIteration >= iteration && simAnCfg.lastIteration > iteration) {
@@ -122,6 +122,12 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		int iteration = event.getIteration();
+
+		if(simAnCfg.firstIteration > event.getIteration()) {
+			currentState = new SimulatedAnnealingIteration<>(bestSolution, acceptedSolution, currentSolution, currentTemperature);
+			return;
+		}
+
 		if (simAnCfg.lastIteration >= iteration) {
 			double cost = costCalculator.calculateCost(currentSolution.solution);
 			currentSolution = new Solution<>(currentSolution.solution, cost);
@@ -152,6 +158,12 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 				for (SimulatedAnnealingListener<T> listener : listeners) {
 					listener.solutionAccepted(oldSolution, acceptedSolution);
 				}
+			} else {
+				iterationsWithoutImprovement++;
+				if(iterationsWithoutImprovement >= simAnCfg.deadEndIterationReset
+						&& simAnCfg.lastResetIteration > iteration) {
+					reset(iteration, false);
+				}
 			}
 
 			if(simAnCfg.lastResetIteration == iteration) {
@@ -169,10 +181,11 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 		}
 		switch (simAnCfg.resetOption) {
 			case temperatureOnly -> startIteration = iteration;
-			case solutionOnly -> acceptedSolution = bestSolution;
+			case solutionOnly -> acceptedSolution = new Solution<>(bestSolution.solution, Double.POSITIVE_INFINITY);
 			case temperatureAndSolution -> {
 				startIteration = iteration;
-				acceptedSolution = bestSolution;
+				acceptedSolution = new Solution<>(bestSolution.solution, Double.POSITIVE_INFINITY);
+
 			}
 		}
 		for (SimulatedAnnealingListener<T> listener : listeners) {

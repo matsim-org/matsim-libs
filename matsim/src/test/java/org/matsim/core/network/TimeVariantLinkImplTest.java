@@ -20,10 +20,10 @@
 
 package org.matsim.core.network;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,14 +39,15 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TimeVariantLinkImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final double TIME_BEFORE_FIRST_CHANGE_EVENTS = -99999;//when  base (default) link properties are used
 
 	/** Tests the method {@link NetworkUtils#getFreespeedTravelTime(Link, double)}.	 */
-	@Test public void testGetFreespeedTravelTime(){
+	@Test
+	void testGetFreespeedTravelTime(){
 	    for (LinkFactory lf : linkFactories(1, 5)) {
     		final Network network = new NetworkImpl(lf);
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -86,7 +87,8 @@ public class TimeVariantLinkImplTest {
 	/**
 	 * Tests whether an absolute change in the freespeed really can be seen in the link's travel time
 	 */
-	@Test public void testFreespeedChangeAbsolute() {
+	@Test
+	void testFreespeedChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
         	final Network network = new NetworkImpl(lf);
 
@@ -128,7 +130,8 @@ public class TimeVariantLinkImplTest {
 	/**
 	 * Tests whether a relative change in the freespeed really can be seen in the link's travel time
 	 */
-	@Test public void testFreespeedChangeRelative() {
+	@Test
+	void testFreespeedChangeRelative() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
         	final Network network = new NetworkImpl(lf);
 
@@ -170,7 +173,8 @@ public class TimeVariantLinkImplTest {
 	/**
 	 * Tests how multiple freespeed changes interact with each other on the link.
 	 */
-	@Test public void testMultipleFreespeedChanges() {
+	@Test
+	void testMultipleFreespeedChanges() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
         	final Network network = new NetworkImpl(lf);
 
@@ -276,7 +280,8 @@ public class TimeVariantLinkImplTest {
 	/**
 	 * Tests whether an absolute change to the flow capacity really can be observed on the link .
 	 */
-	@Test public void testFlowCapChangeAbsolute() {
+	@Test
+	void testFlowCapChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
         	final Network network = new NetworkImpl(lf);
     		network.setCapacityPeriod(3600.0);
@@ -312,7 +317,8 @@ public class TimeVariantLinkImplTest {
 	/**
 	 * Tests whether an absolute change to the number of lanes really can be observed on the link.
 	 */
-	@Test public void testLanesChangeAbsolute() {
+	@Test
+	void testLanesChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
         	final Network network = new NetworkImpl(lf);
     		network.setCapacityPeriod(3600.0);

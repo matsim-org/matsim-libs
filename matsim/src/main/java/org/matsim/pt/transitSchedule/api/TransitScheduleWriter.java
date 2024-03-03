@@ -26,9 +26,10 @@ import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
+
+import java.io.UncheckedIOException;
 
 /**
  * Writes {@link TransitSchedule}s to file in one of the
@@ -38,7 +39,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
  */
 public class TransitScheduleWriter implements MatsimSomeWriter {
 	private static final Logger log = LogManager.getLogger( TransitScheduleWriter.class ) ;
-	
+
 	private final TransitSchedule schedule;
 	private final CoordinateTransformation transformation;
 

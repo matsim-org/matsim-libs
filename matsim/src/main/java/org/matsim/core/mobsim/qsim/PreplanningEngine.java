@@ -22,7 +22,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import static java.util.Comparator.comparing;
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivityType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,15 +97,13 @@ public final class PreplanningEngine implements MobsimEngine {
 	private final Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId ));
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private EditTrips editTrips;
 	private EditPlans editPlans;
 
 	private final TripRouter tripRouter;
 	private InternalInterface internalInterface;
 	private final TimeInterpretation timeInterpretation;
 
-	@Inject
-	PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpretation timeInterpretation) {
+	@Inject PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities();
@@ -114,8 +112,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		this.timeInterpretation = timeInterpretation;
 	}
 
-	@Override
-	public void onPrepareSim() {
+	@Override public void onPrepareSim() {
 		for (DepartureHandler departureHandler : internalInterface.getDepartureHandlers()) {
 			if (departureHandler instanceof TripInfo.Provider) {
 				String mode = ((TripInfo.Provider)departureHandler).getMode();
@@ -125,19 +122,14 @@ public final class PreplanningEngine implements MobsimEngine {
 		}
 	}
 
-	@Override
-	public void afterSim() {
-	}
+	@Override public void afterSim() { }
 
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface, timeInterpretation);
-		this.editPlans = new EditPlans(internalInterface.getMobsim(), editTrips);
+	@Override public void setInternalInterface(InternalInterface internalInterface) {
+		this.editPlans = new EditPlans(internalInterface.getMobsim(), new EditTrips( tripRouter, scenario, internalInterface, timeInterpretation ) );
 		this.internalInterface = internalInterface;
 	}
 
-	@Override
-	public void doSimStep(double time) {
+	@Override public void doSimStep(double time) {
 		//first process requests and then infos --> trips without booking required can be processed in 1 time step
 		//booking confirmation always comes later (e.g. next time step)
 
@@ -245,18 +237,22 @@ public final class PreplanningEngine implements MobsimEngine {
 		// yyyy prebooking info needs to be in plan since it will not survive in the leg.  :-(  kai, jan'20
 
 		if (prebookingOffset_s == null) {
-			log.warn("not prebooking");
+			log.warn("The " + PREBOOKING_OFFSET_ATTRIBUTE_NAME + " is not set in the agent.  No wakeup for prebooking will be generated.");
 			return Collections.emptyList();
 		}
 
 		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>();
 
 		for (String mode : new String[] { TransportMode.drt, TransportMode.taxi } ) {
+			// (only do the following for drt and taxi yyyy which means it may fail for, say, "drt2".  kai, apr'23)
+
 			for (Leg drtLeg : EditPlans.findLegsWithModeInFuture(agent, mode )) {
+				// (find the corresponding legs)
+
 				final double prebookingTime = drtLeg.getDepartureTime().seconds() - prebookingOffset_s;
 				if (prebookingTime < agent.getActivityEndTime()) {
 					// yyyy and here one sees that having this in the activity engine is not very practical
-					log.info("adding agent to wakeup list");
+					log.info("generating wakeup entry");
 					wakeups.add(new ActivityEngineWithWakeup.AgentEntry(agent, prebookingTime, (agent1, then) -> preplanLeg(agent1, then, drtLeg )) );
 				}
 
@@ -351,7 +347,6 @@ public final class PreplanningEngine implements MobsimEngine {
 			double departureTime = tripInfo.getExpectedBoardingTime() - 900.; // always depart 15min before pickup
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
 					toFacility, departureTime, null, inputTrip.getTripAttributes());
-			;
 			// not sure if this works for walk, but it should ...
 
 			result.addAll(planElements);

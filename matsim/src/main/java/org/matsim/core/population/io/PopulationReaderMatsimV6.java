@@ -54,6 +54,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
@@ -71,9 +72,9 @@ import com.google.inject.Inject;
 /* deliberately package */ class PopulationReaderMatsimV6 extends MatsimXmlParser implements MatsimReader {
     private static final Logger log = LogManager.getLogger(PopulationReaderMatsimV6.class);
 
-	private final static String POPULATION = "population";
-	private final static String PERSON = "person";
-	private final static String ATTRIBUTES = "attributes";
+	/* package */ final static String POPULATION = "population";
+	/* package */ final static String PERSON = "person";
+	/* package */ final static String ATTRIBUTES = "attributes";
 	private final static String ATTRIBUTE = "attribute";
 	private final static String PLAN = "plan";
 	private final static String ACT = "activity";
@@ -81,7 +82,7 @@ import com.google.inject.Inject;
 	private final static String ROUTE = "route";
 
 	private final static String ATTR_POPULATION_DESC = "desc";
-	private final static String ATTR_PERSON_ID = "id";
+	/* package */ final static String ATTR_PERSON_ID = "id";
 	private final static String ATTR_PLAN_SCORE = "score";
 	private final static String ATTR_PLAN_TYPE = "type";
 	private final static String ATTR_PLAN_SELECTED = "selected";
@@ -108,11 +109,11 @@ import com.google.inject.Inject;
 	// TODO: infrastructure to configure converters
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
-	private final Scenario scenario;
-	private final Population plans;
+	final Scenario scenario;
+	final Population plans;
 	private final String externalInputCRS;
 
-	private Person currperson = null;
+	Person currperson = null;
 	private Plan currplan = null;
 	private Activity curract = null;
 	private Leg currleg = null;
@@ -130,14 +131,20 @@ import com.google.inject.Inject;
             final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario) {
-		this.externalInputCRS = inputCRS;
-		this.targetCRS = targetCRS;
-		this.scenario = scenario;
-		this.plans = scenario.getPopulation();
-	    if (targetCRS != null && externalInputCRS !=null) {
-		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-		    ProjectionUtils.putCRS(this.plans, targetCRS);
-	    }
+			super(ValidationType.DTD_ONLY);
+			this.externalInputCRS = inputCRS;
+			this.targetCRS = targetCRS;
+			this.scenario = scenario;
+			this.plans = scenario.getPopulation();
+			if (targetCRS != null && externalInputCRS !=null) {
+				this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+				ProjectionUtils.putCRS(this.plans, targetCRS);
+			}
+	}
+
+	public ObjectAttributesConverter getObjectAttributesConverter()
+	{
+		return attributesReader.getObjectAttributesConverter();
 	}
 
 	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
@@ -268,7 +275,7 @@ import com.google.inject.Inject;
 		}
 		else {
 			throw new IllegalArgumentException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no', is " + sel);
 		}
 		this.routeDescription = null;
 		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
@@ -389,9 +396,9 @@ import com.google.inject.Inject;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}
@@ -448,7 +455,7 @@ import com.google.inject.Inject;
 		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
 		String routeType = atts.getValue("type");
-		
+
 		if (routeType == null) {
 			String legMode = this.currleg.getMode();
 			if ("pt".equals(legMode)) {
@@ -459,10 +466,10 @@ import com.google.inject.Inject;
 				routeType = "generic";
 			}
 		}
-		
+
 		RouteFactories factory = this.scenario.getPopulation().getFactory().getRouteFactories();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
-		
+
 		this.currRoute = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(routeClass, startLinkId == null ? null : Id.create(startLinkId, Link.class), endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);
 
@@ -488,7 +495,7 @@ import com.google.inject.Inject;
 		this.currRoute.setStartLinkId(startLinkId);
 		this.currRoute.setEndLinkId(endLinkId);
 		this.currRoute.setRouteDescription(this.routeDescription.trim());
-		
+
 		// yy I think that my intuition would be to put the following into prepareForSim. kai, dec'16
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
@@ -500,9 +507,9 @@ import com.google.inject.Inject;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}

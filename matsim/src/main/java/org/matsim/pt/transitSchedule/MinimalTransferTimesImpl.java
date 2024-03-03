@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class MinimalTransferTimesImpl implements MinimalTransferTimes {
 
-	private Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> minimalTransferTimes = new ConcurrentHashMap<>();
+	private final Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> minimalTransferTimes = new ConcurrentHashMap<>();
 
 	@Override
 	public double set(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double seconds) {
@@ -59,13 +59,19 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 	public double get(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double defaultSeconds) {
 		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.get(fromStop);
 		if (innerMap == null) {
-			return defaultSeconds;
+			return getInnerStopTransferTime(toStop,defaultSeconds);
 		}
 		Double value = innerMap.get(toStop);
 		if (value == null) {
-			return defaultSeconds;
+			return Math.max(getInnerStopTransferTime(toStop,defaultSeconds),getInnerStopTransferTime(fromStop,defaultSeconds));
 		}
 		return value;
+	}
+
+	private double getInnerStopTransferTime(Id<TransitStopFacility> stopId, double defaultSeconds){
+		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.get(stopId);
+		return innerMap!=null?innerMap.getOrDefault(stopId,defaultSeconds):defaultSeconds;
+
 	}
 
 	@Override
@@ -94,7 +100,7 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 		private double seconds = Double.NaN;
 		private boolean hasElement = false;
 
-		private Iterator<Map.Entry<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>>> outerIterator;
+		private final Iterator<Map.Entry<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>>> outerIterator;
 		private Iterator<Map.Entry<Id<TransitStopFacility>, Double>> innerIterator;
 
 		MinimalTransferTimesIteratorImpl(Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> values) {

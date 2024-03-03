@@ -134,6 +134,7 @@ public class AdjustActivityToLinkDistances implements MATSimAppCommand {
 							v = new Coord(coord.getX() - y * m, coord.getY() + x * m);
 						}
 
+						v = CoordUtils.round(v);
 
 						mapping.put(act.getCoord(), v);
 					}

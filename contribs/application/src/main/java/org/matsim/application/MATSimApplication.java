@@ -1,19 +1,13 @@
 package org.matsim.application;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.application.commands.RunScenario;
-import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -22,15 +16,12 @@ import picocli.AutoComplete;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -76,6 +67,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
 
 	private static final Logger log = LogManager.getLogger(MATSimApplication.class);
+
+	private static final String ARGS_DELIMITER = "§$";
 
 	public static final String COLOR = "@|bold,fg(81) ";
 	static final String DEFAULT_NAME = "MATSimApplication";
@@ -169,7 +162,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		Objects.requireNonNull(config);
 
 		if (specs != null)
-			applySpecs(config, specs);
+			ApplicationUtils.applyConfigUpdate(config, specs);
 
 		if (remainingArgs != null) {
 			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
@@ -177,13 +170,13 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 
 		if (iterations > -1)
-			config.controler().setLastIteration(iterations);
+			config.controller().setLastIteration(iterations);
 
 		if (output != null)
-			config.controler().setOutputDirectory(output.toString());
+			config.controller().setOutputDirectory(output.toString());
 
 		if (runId != null)
-			config.controler().setRunId(runId);
+			config.controller().setRunId(runId);
 
 		final Scenario scenario = createScenario(config);
 
@@ -199,7 +192,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		if (post != PostProcessOption.disabled) {
 
-			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controler().getOutputDirectory()), config.controler().getRunId());
+			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controller().getOutputDirectory()), config.controller().getRunId());
 
 			for (MATSimAppCommand command : commands) {
 
@@ -209,95 +202,21 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 				} catch (Exception e) {
 					log.error("Error running post-processing", e);
 				}
-
 			}
-
 		}
 
 
 		return 0;
 	}
 
-	/**
-	 * Apply given specs to config.
-	 */
-	private static void applySpecs(Config config, Path specs) {
-
-		if (!Files.exists(specs)) {
-			throw new IllegalArgumentException("Desired run config does not exist:" + specs);
-		}
-
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
-				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
-
-		try (BufferedReader reader = Files.newBufferedReader(specs)) {
-
-			JsonNode node = mapper.readTree(reader);
-
-			Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
-			while (fields.hasNext()) {
-				Map.Entry<String, JsonNode> field = fields.next();
-
-				ConfigGroup group = config.getModules().get(field.getKey());
-				if (group == null) {
-					log.warn("Config group not found: {}", field.getKey());
-					continue;
-				}
-
-				applyNodeToConfigGroup(field.getValue(), group);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	File getConfigPath() {
+		return configPath;
 	}
 
-	/**
-	 * Sets the json config into
-	 */
-	private static void applyNodeToConfigGroup(JsonNode node, ConfigGroup group) {
-
-		Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
-		while (fields.hasNext()) {
-			Map.Entry<String, JsonNode> field = fields.next();
-
-			if (field.getValue().isArray()) {
-
-				Collection<? extends ConfigGroup> params = group.getParameterSets(field.getKey());
-
-				// single node and entry merged directly
-				if (field.getValue().size() == 1 && params.size() == 1) {
-					applyNodeToConfigGroup(field.getValue().get(0), params.iterator().next());
-				} else {
-
-					for (JsonNode item : field.getValue()) {
-
-						Map.Entry<String, JsonNode> first = item.fields().next();
-						Optional<? extends ConfigGroup> m = params.stream().filter(p -> p.getParams().get(first.getKey()).equals(first.getValue().textValue())).findFirst();
-						if (m.isEmpty())
-							throw new IllegalArgumentException("Could not find matching param by key" + first);
-
-						applyNodeToConfigGroup(item, m.get());
-					}
-				}
-
-			} else {
-
-			    if (!field.getValue().isValueNode())
-			        throw new IllegalArgumentException("Received complex value type instead of primitive: " + field.getValue());
-
-
-			    if (field.getValue().isTextual())
-                    group.addParam(field.getKey(), field.getValue().textValue());
-			    else
-                    group.addParam(field.getKey(), field.getValue().toString());
-			}
-		}
+	@Nullable
+	String getDefaultScenario() {
+		return defaultScenario;
 	}
-
 
 	/**
 	 * Custom module configs that will be added to the {@link Config} object.
@@ -313,7 +232,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	protected List<ConfigGroup> getConfigurableModules() {
 		return Lists.newArrayList(
-				new ControlerConfigGroup(),
+				new ControllerConfigGroup(),
 				new GlobalConfigGroup(),
 				new QSimConfigGroup()
 		);
@@ -352,6 +271,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	/**
 	 * Preparation of {@link MATSimAppCommand} to run after the simulation has finished. The instances have to be fully constructed in this method
 	 * no further arguments are passed down to them.
+	 *
 	 * @return list of commands to run.
 	 */
 	protected List<MATSimAppCommand> preparePostProcessing(Path outputFolder, String runId) {
@@ -369,14 +289,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		else
 			postfix = "-" + option + "_" + value;
 
-		String outputDir = config.controler().getOutputDirectory();
+		String outputDir = config.controller().getOutputDirectory();
 		if (outputDir.endsWith("/")) {
-			config.controler().setOutputDirectory(outputDir.substring(0, outputDir.length() - 1) + postfix + "/");
+			config.controller().setOutputDirectory(outputDir.substring(0, outputDir.length() - 1) + postfix + "/");
 		} else
-			config.controler().setOutputDirectory(outputDir + postfix);
+			config.controller().setOutputDirectory(outputDir + postfix);
 
 		// dot should not be part of run id
-		config.controler().setRunId(config.controler().getRunId() + postfix.replace(".", ""));
+		config.controller().setRunId(config.controller().getRunId() + postfix.replace(".", ""));
 	}
 
 	/**
@@ -413,15 +333,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * This should never be used in tests and only in main methods.
 	 */
 	public static void run(Class<? extends MATSimApplication> clazz, String... args) {
-		MATSimApplication app;
-		try {
-			app = clazz.getDeclaredConstructor().newInstance();
-		} catch (ReflectiveOperationException e) {
-			System.err.println("Could not instantiate the application class");
-			e.printStackTrace();
-			System.exit(1);
-			return;
-		}
+		MATSimApplication app = newInstance(clazz, null);
 
 		// GUI does not pass any argument
 		boolean runInGUi = "true".equals(System.getenv("MATSIM_GUI"));
@@ -432,6 +344,13 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			l.addAll(Arrays.asList(args));
 
 			args = l.toArray(new String[0]);
+
+			// Pass stored args to the instance as well
+			if (System.getenv().containsKey("MATSIM_GUI_ARGS")) {
+				String[] guiArgs = System.getenv("MATSIM_GUI_ARGS").split(ARGS_DELIMITER);
+				if (guiArgs.length > 0)
+					args = ApplicationUtils.mergeArgs(args, guiArgs);
+			}
 		}
 
 		prepareArgs(args);
@@ -455,24 +374,57 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
+	 * Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
+	 * This method may also be used to predefine some default arguments.
+	 * @param clazz class of the scenario to run
+	 * @param args pass arguments from the main method
+	 * @param defaultArgs predefined default arguments that will always be present
+	 */
+	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
+
+		if (ApplicationUtils.isRunFromDesktop() && args.length == 0) {
+
+			if (defaultArgs.length > 0) {
+				String value = String.join(ARGS_DELIMITER, defaultArgs);
+				System.setProperty("MATSIM_GUI_ARGS", value);
+			}
+
+			// args are empty when run from desktop and is not used
+			run(clazz, "gui");
+
+		} else {
+			// run if no other command is present
+			if (args.length > 0) {
+				// valid command is present
+				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui") ){
+					// If this is a run command, the default args can be applied
+					if (args[0].equals("run"))
+						args = ApplicationUtils.mergeArgs(args, defaultArgs);
+
+				} else {
+					// Automatically add run command
+					String[] runArgs = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+					args = ApplicationUtils.mergeArgs(runArgs, args);
+				}
+
+			} else
+				// Automatically add run command
+				args = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+
+			log.info("Running {} with: {}", clazz.getSimpleName(), String.join(" ", args));
+
+			run(clazz, args);
+		}
+	}
+
+	/**
 	 * Calls an application class and forwards any exceptions.
 	 *
 	 * @param config input config, overwrites default given by scenario
 	 * @return return code, 0 indicates success and no errors
 	 */
 	public static int execute(Class<? extends MATSimApplication> clazz, Config config, String... args) {
-		MATSimApplication app;
-		try {
-			if (config != null)
-				app = clazz.getDeclaredConstructor(Config.class).newInstance(config);
-			else
-				app = clazz.getDeclaredConstructor().newInstance();
-
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("The scenario class must have public constructors!", e);
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException("Could not instantiate the application class", e);
-		}
+		MATSimApplication app = newInstance(clazz, config);
 
 		prepareArgs(args);
 
@@ -506,20 +458,11 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		return execute(clazz, null, args);
 	}
 
-
 	/**
 	 * Prepare and return controller without running the scenario.
 	 * This allows to configure the controller after setup has been run.
 	 */
-	public static Controler prepare(Class<? extends MATSimApplication> clazz, Config config, String... args) {
-
-		MATSimApplication app;
-		try {
-			app = clazz.getDeclaredConstructor(Config.class).newInstance(config);
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException("Could not instantiate the application class", e);
-		}
-
+	public static Controler prepare(MATSimApplication app, Config config, String... args) {
 		CommandLine cli = prepare(app);
 		CommandLine.ParseResult parseResult = cli.parseArgs(args);
 
@@ -535,7 +478,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		config = tmp != null ? tmp : config;
 
 		if (app.specs != null) {
-			applySpecs(config, app.specs);
+			ApplicationUtils.applyConfigUpdate(config, app.specs);
 		}
 
 		if (app.remainingArgs != null) {
@@ -550,6 +493,20 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		app.prepareControler(controler);
 
 		return controler;
+	}
+
+	/**
+	 * Prepare and return controller without running the scenario.
+	 * This allows to configure the controller after setup has been run.
+	 * This method tries to use one of the constructors of the given class automatically.
+	 *
+	 * @see #prepare(MATSimApplication, Config, String...)
+	 */
+	public static Controler prepare(Class<? extends MATSimApplication> clazz, Config config, String... args) {
+
+		MATSimApplication app = newInstance(clazz, config);
+
+		return prepare(app, config, args);
 	}
 
 	/**
@@ -589,6 +546,30 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 
 		return unmatched;
+	}
+
+	private static MATSimApplication newInstance(Class<? extends MATSimApplication> clazz, Config config) {
+
+		// Try constructor with config first
+		// if that fails try default constructor
+		if (config != null) {
+			try {
+				return clazz.getDeclaredConstructor(Config.class).newInstance(config);
+			} catch (NoSuchMethodException e) {
+				// Continue
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException("Could not instantiate the application class", e);
+			}
+		}
+
+		try {
+			return clazz.getDeclaredConstructor().newInstance();
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("The scenario class must have public constructors!", e);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException("Could not instantiate the application class", e);
+		}
+
 	}
 
 	private static CommandLine prepare(MATSimApplication app) {
@@ -729,7 +710,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
-	 * Option to switch post processing behavour
+	 * Option to switch post-processing behaviour
 	 */
 	public enum PostProcessOption {
 

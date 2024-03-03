@@ -19,8 +19,8 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkUtils;
 public class LanesBasedWidthCalculatorTest {
 
 	@Test
-	public void testGetWidth_laneWidthNaN() {
+	void testGetWidth_laneWidthNaN() {
 		Network net = NetworkUtils.createNetwork();
         Node n1 = net.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = net.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
@@ -44,11 +44,11 @@ public class LanesBasedWidthCalculatorTest {
 		l1.setNumberOfLanes(2.0);
 
 
-		Assert.assertEquals("The default in the Network is set to a value that is possibly not conform to the default in network_v1.dtd", 3.75, net.getEffectiveLaneWidth(), 1e-10);
+		Assertions.assertEquals(3.75, net.getEffectiveLaneWidth(), 1e-10, "The default in the Network is set to a value that is possibly not conform to the default in network_v1.dtd");
 		((Network)net).setEffectiveLaneWidth(1.0);
 		double w = new LanesBasedWidthCalculator((Network) net, 1.0).getWidth(l1);
-		Assert.assertFalse(Double.isNaN(w));
-		Assert.assertEquals(2.0, w, 1e-10);
+		Assertions.assertFalse(Double.isNaN(w));
+		Assertions.assertEquals(2.0, w, 1e-10);
 	}
 
 }

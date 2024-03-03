@@ -30,7 +30,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
 	private final RoadPricingScheme scheme;
@@ -50,7 +50,7 @@ public final class RoadPricingTravelDisutilityFactory implements TravelDisutilit
 	}
 
 	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
-		this( previousTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
+		this( previousTravelDisutilityFactory, scheme, config.scoring().getMarginalUtilityOfMoney() ) ;
 	}
 
 	@Override

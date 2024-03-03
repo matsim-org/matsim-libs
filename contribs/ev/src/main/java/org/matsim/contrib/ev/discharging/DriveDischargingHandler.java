@@ -19,10 +19,15 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -35,6 +40,9 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -44,8 +52,9 @@ import com.google.inject.Inject;
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
-public class DriveDischargingHandler
-		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler {
+public final class DriveDischargingHandler
+	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
+
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
 		private final ElectricVehicle ev;
@@ -67,12 +76,16 @@ public class DriveDischargingHandler
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 
+	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
+	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
+	private final QSim qsim;
 	@Inject
-	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
+	DriveDischargingHandler(QSim qsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+		this.qsim = qsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
-		evDrives = new HashMap<>(eVehicles.size() / 10);
+		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
 	}
 
 	@Override
@@ -86,37 +99,72 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
-		if (evDrive != null) {
-			evDrive.movedOverNodeTime = event.getTime();
+		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+			linkLeaveEvents.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
-		if (evDrive != null) {
-			evDrives.remove(evDrive.vehicleId);
+		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+			trafficLeaveEvents.add(event);
 		}
 	}
 
-	//XXX The current implementation is thread-safe because no other EventHandler modifies battery charge
-	// (for instance, AUX discharging and battery charging modifies charge outside event handling
-	// (as MobsimAfterSimStepListeners)
-	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
-	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
+	@Override
+	public void onPrepareSim() {
+	}
+
+	@Override
+	public void afterSim() {
+		// process remaining events
+		doSimStep(this.qsim.getSimTimer().getTimeOfDay());
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		handleQueuedEvents(linkLeaveEvents, time, false);
+		handleQueuedEvents(trafficLeaveEvents, time, true);
+	}
+
+	private <E extends Event & HasVehicleId & HasLinkId> void handleQueuedEvents(Queue<E> queue, double time, boolean leftTraffic) {
+		// We want to process events in the main thread (instead of the event handling threads).
+		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
+		while (!queue.isEmpty()) {
+			var event = queue.peek();
+			if (event.getTime() == time) {
+				// There is a potential race condition wrt processing events between doSimStep() and handleEvent().
+				// To ensure a deterministic behaviour, we only process events from the previous time step.
+				break;
+			}
+
+			var evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
+			if (leftTraffic) {
+				evDrives.remove(evDrive.vehicleId);
+			} else {
+				evDrive.movedOverNodeTime = event.getTime();
+			}
+			queue.remove();
+		}
+	}
+
+	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime, double now) {
 		EvDrive evDrive = evDrives.get(vehicleId);
-		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
+		if (!evDrive.isOnFirstLink()) {// skip the first link
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
-					.calcEnergyConsumption(eventTime - tt, tt, linkId);
+				.calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption may be negative on links with negative slope
 			ev.getBattery()
-					.dischargeEnergy(energy,
-							missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
-			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
+				.dischargeEnergy(energy,
+					missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(now, ev.getId(), link.getId(), missingEnergy)));
+			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(now, vehicleId, linkId, energy, ev.getBattery().getCharge()));
 		}
 		return evDrive;
 	}

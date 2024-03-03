@@ -23,18 +23,17 @@
 package org.matsim.contrib.otfvis;
 
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+import static org.matsim.core.config.groups.ControllerConfigGroup.*;
 
 public class OTFVisFileWriterModule extends AbstractModule {
 	@Override
 	public void install() {
 		ConfigUtils.addOrGetModule(getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-		if (getConfig().controler().getSnapshotFormat().contains( SnapshotFormat.otfvis )) {
+		if (getConfig().controller().getSnapshotFormat().contains( SnapshotFormat.otfvis )) {
 			addSnapshotWriterBinding().toProvider(OTFFileWriterFactory.class);
 		}
 	}

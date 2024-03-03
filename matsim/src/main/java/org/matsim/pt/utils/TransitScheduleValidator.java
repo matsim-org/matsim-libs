@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
 
 /**
  * An abstract class offering a number of static methods to validate several aspects of transit schedules.
- * 
+ *
  * @author mrieser
  */
 public abstract class TransitScheduleValidator {
@@ -58,7 +58,7 @@ public abstract class TransitScheduleValidator {
 	private TransitScheduleValidator() {
 		// this class should not be instantiated
 	}
-	
+
 	/**
 	 * Checks that the links specified for a network route really builds a complete route that can be driven along.
 	 *
@@ -177,7 +177,7 @@ public abstract class TransitScheduleValidator {
 		}
 		return result;
 	}
-	
+
 	public static ValidationResult validateOffsets(final TransitSchedule schedule) {
 		ValidationResult result = new ValidationResult();
 
@@ -185,20 +185,20 @@ public abstract class TransitScheduleValidator {
 			for (TransitRoute route : line.getRoutes().values()) {
 				ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(route.getStops());
 				int stopCount = stops.size();
-				
+
 				if (stopCount > 0) {
 					TransitRouteStop stop = stops.get(0);
 					if (stop.getDepartureOffset().isUndefined()) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
 					}
-					
+
 					for (int i = 1; i < stopCount - 1; i++) {
 						stop = stops.get(i);
 						if (stop.getDepartureOffset().isUndefined()) {
 							result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
 						}
 					}
-					
+
 					stop = stops.get(stopCount - 1);
 					if (stop.getArrivalOffset().isUndefined()) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
@@ -206,10 +206,10 @@ public abstract class TransitScheduleValidator {
 				} else {
 					result.addWarning("Transit line " + line.getId() + ", route " + route.getId() + ": The route has not stops assigned, looks suspicious.");
 				}
-				
+
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -261,7 +261,7 @@ public abstract class TransitScheduleValidator {
 		v.add(validateTransfers(schedule));
 		return v;
 	}
-	
+
 	public static void printResult(final ValidationResult result) {
 		if (result.isValid()) {
 			System.out.println("Schedule appears valid!");
@@ -293,7 +293,7 @@ public abstract class TransitScheduleValidator {
 			System.err.println("Usage: TransitScheduleValidator transitSchedule.xml [network.xml]");
 			return;
 		}
-		
+
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().transit().setUseTransit(true);
 		TransitSchedule ts = s.getTransitSchedule();
@@ -311,11 +311,11 @@ public abstract class TransitScheduleValidator {
 	public static class ValidationResult {
 
 		public enum Severity {
-			WARNING, ERROR;
+			WARNING, ERROR
 		}
 
 		public enum Type {
-			HAS_MISSING_STOP_FACILITY, HAS_NO_LINK_REF, ROUTE_HAS_UNREACHABLE_STOP, OTHER;
+			HAS_MISSING_STOP_FACILITY, HAS_NO_LINK_REF, ROUTE_HAS_UNREACHABLE_STOP, OTHER
 		}
 
 		public static class ValidationIssue<T> {

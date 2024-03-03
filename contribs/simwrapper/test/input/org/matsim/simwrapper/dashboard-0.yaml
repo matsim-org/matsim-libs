@@ -1,0 +1,82 @@
+header:
+  tab: Header Tab
+  title: Simwrapper Test Dashboard
+  description: Test All Simwrapper Plug-Ins Dashboard
+layout:
+  first:
+  - type: area
+    title: Area
+    dataset: example.csv
+    x: column with x-values
+    columns:
+    - column1
+    - column2
+    useLastRow: false
+  second:
+  - type: bubble
+    title: Bubble
+    dataset: example.csv
+  third:
+  - type: table
+    title: CalculationTable
+    configFile: example.csv
+  fourth:
+  - type: heatmap
+    title: Heatmap
+    dataset: example.csv
+    "y": column1
+    columns:
+    - column1
+    - column2
+  fifth:
+  - type: line
+    title: Line
+    dataset: example.csv
+    x: column1
+    columns:
+    - column1
+    - column2
+    useLastRow: false
+  sixth:
+  - type: links
+    title: Links
+    network: network_example.xml.gz
+    datasets:
+      csvFile: example.csv
+    display:
+      color:
+        fixedColors: red
+      width:
+        dataset: example2.csv
+        columnName: column1
+  seventh:
+  - type: pie
+    title: PieChart
+    dataset: example.csv
+  eighth:
+  - type: scatter
+    title: Scatter
+    dataset: example.csv
+  nineth:
+  - type: csv
+    title: Table
+    dataset: example.csv
+  - type: text
+    title: TextBlock
+    file: example.csv
+  - type: tile
+    title: Tile
+    dataset: example.csv
+  tenth:
+  - type: hexagons
+    title: Hexagon
+    file: drt_trips_drt.csv.gz
+    projection: EPSG:31468
+    aggregations:
+      O/D Summary:
+      - title: Origins
+        x: fromX
+        "y": fromY
+      - title: Destinations
+        x: toX
+        "y": toY

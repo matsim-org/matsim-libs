@@ -1,8 +1,8 @@
 package org.matsim.contrib.discrete_mode_choice.models.nested;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.NoFeasibleChoiceException;
 import org.matsim.contribs.discrete_mode_choice.model.nested.DefaultNest;
 import org.matsim.contribs.discrete_mode_choice.model.nested.DefaultNestStructure;
@@ -12,7 +12,7 @@ import org.matsim.contribs.discrete_mode_choice.model.nested.NestedUtilityCandid
 
 public class NestCalculatorTest {
 	@Test
-	public void testNoNesting() throws NoFeasibleChoiceException {
+	void testNoNesting() throws NoFeasibleChoiceException {
 		DefaultNestStructure structure = new DefaultNestStructure();
 
 		NestCalculator calculator = new NestCalculator(structure);
@@ -28,7 +28,7 @@ public class NestCalculatorTest {
 	}
 
 	@Test
-	public void testNoNestingRedBlue() throws NoFeasibleChoiceException {
+	void testNoNestingRedBlue() throws NoFeasibleChoiceException {
 		DefaultNestStructure structure = new DefaultNestStructure();
 
 		NestCalculator calculator = new NestCalculator(structure);
@@ -49,7 +49,7 @@ public class NestCalculatorTest {
 	}
 
 	@Test
-	public void testNestedBalancedRedBlue() throws NoFeasibleChoiceException {
+	void testNestedBalancedRedBlue() throws NoFeasibleChoiceException {
 		DefaultNestStructure structure = new DefaultNestStructure();
 		DefaultNest busNest = new DefaultNest("bus", 1.0);
 		structure.addNest(structure.getRoot(), busNest);
@@ -96,7 +96,7 @@ public class NestCalculatorTest {
 	}
 
 	@Test
-	public void testNestedUnbalancedRedBlue() throws NoFeasibleChoiceException {
+	void testNestedUnbalancedRedBlue() throws NoFeasibleChoiceException {
 		DefaultNestStructure structure = new DefaultNestStructure();
 		DefaultNest busNest = new DefaultNest("bus", 1.0);
 		structure.addNest(structure.getRoot(), busNest);

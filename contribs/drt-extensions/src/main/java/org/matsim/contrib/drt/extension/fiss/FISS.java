@@ -164,7 +164,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	}
 
 	private boolean switchOffFISS() {
-		return this.matsimServices.getConfig().controler().getLastIteration() == this.matsimServices.getIterationNumber();
+		return (this.fissConfigGroup.switchOffFISSLastIteration && this.matsimServices.getConfig().controller().getLastIteration() == this.matsimServices.getIterationNumber());
 	}
 
 	@Override

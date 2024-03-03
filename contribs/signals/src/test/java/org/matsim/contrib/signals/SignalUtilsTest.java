@@ -21,9 +21,8 @@ package org.matsim.contrib.signals;
 
 import java.util.Map;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.utils.SignalUtils;
@@ -42,7 +41,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public class SignalUtilsTest {
 
 	@Test
-	public final void testCreateAndAddSignalGroups4Signals() {
+	final void testCreateAndAddSignalGroups4Signals() {
 		Id<SignalSystem> id1 = Id.create("1", SignalSystem.class);
 		Id<SignalGroup> idSg1 = Id.create("1", SignalGroup.class);
 		Id<SignalGroup> idSg3 = Id.create("3", SignalGroup.class);
@@ -61,21 +60,21 @@ public class SignalUtilsTest {
 		SignalUtils.createAndAddSignalGroups4Signals(groups, system);
 		
 		Map<Id<SignalGroup>, SignalGroupData> system1Groups = groups.getSignalGroupDataBySignalSystemId().get(id1);
-		Assert.assertNotNull(system1Groups);
-		Assert.assertEquals(2, system1Groups.size());
+		Assertions.assertNotNull(system1Groups);
+		Assertions.assertEquals(2, system1Groups.size());
 		
-		Assert.assertTrue(system1Groups.containsKey(idSg1));
+		Assertions.assertTrue(system1Groups.containsKey(idSg1));
 		SignalGroupData group4sys = system1Groups.get(idSg1);
-		Assert.assertNotNull(group4sys);
-		Assert.assertEquals(idSg1, group4sys.getId());
-		Assert.assertNotNull(group4sys.getSignalIds());
-		Assert.assertEquals(idS1, group4sys.getSignalIds().iterator().next());
+		Assertions.assertNotNull(group4sys);
+		Assertions.assertEquals(idSg1, group4sys.getId());
+		Assertions.assertNotNull(group4sys.getSignalIds());
+		Assertions.assertEquals(idS1, group4sys.getSignalIds().iterator().next());
 		
 		group4sys = system1Groups.get(idSg3);
-		Assert.assertNotNull(group4sys);
-		Assert.assertEquals(idSg3, group4sys.getId());
-		Assert.assertNotNull(group4sys.getSignalIds());
-		Assert.assertEquals(idS3, group4sys.getSignalIds().iterator().next());
+		Assertions.assertNotNull(group4sys);
+		Assertions.assertEquals(idSg3, group4sys.getId());
+		Assertions.assertNotNull(group4sys.getSignalIds());
+		Assertions.assertEquals(idS3, group4sys.getSignalIds().iterator().next());
 		
 		
 	}

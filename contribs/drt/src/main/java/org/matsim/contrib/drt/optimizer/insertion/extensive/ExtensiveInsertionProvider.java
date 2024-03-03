@@ -28,12 +28,14 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.zone.skims.TravelTimeMatrix;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -42,13 +44,10 @@ import com.google.common.annotations.VisibleForTesting;
  */
 class ExtensiveInsertionProvider {
 	static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg, InsertionCostCalculator insertionCostCalculator,
-											 TravelTimeMatrix travelTimeMatrix, TravelTime travelTime, ForkJoinPool forkJoinPool,
-											 IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
-		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-				insertionParams.admissibleBeelineSpeedFactor, travelTimeMatrix, travelTime);
-		return new ExtensiveInsertionProvider((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(),
-				insertionCostCalculator, new InsertionGenerator(incrementalStopDurationEstimator, admissibleTimeEstimator),
+			ForkJoinPool forkJoinPool, StopTimeCalculator stopTimeCalculator,
+			DetourTimeEstimator admissibleTimeEstimator) {
+		return new ExtensiveInsertionProvider((ExtensiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams(),
+				insertionCostCalculator, new InsertionGenerator(stopTimeCalculator, admissibleTimeEstimator),
 				forkJoinPool);
 	}
 

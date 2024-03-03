@@ -137,7 +137,7 @@ public class InitRoutes {
 		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		Gbl.assertNotNull(this.plansfile);
 		plansWriter.startStreaming(this.plansfile);
-		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {

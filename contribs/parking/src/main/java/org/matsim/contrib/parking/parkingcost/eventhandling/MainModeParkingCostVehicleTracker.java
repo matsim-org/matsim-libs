@@ -36,7 +36,7 @@ import org.matsim.contrib.parking.parkingcost.config.ParkingCostConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

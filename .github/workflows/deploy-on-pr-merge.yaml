@@ -10,22 +10,22 @@ on:
 jobs:
   deploy-snapshot:
     name: deploy PR-labelled version
-    # for PR-labelled deployment -- only if closed by merging
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    # only if PR closed by merging
+    if: github.event.pull_request.merged == true
 
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'zulu'
           cache: 'maven'
-          server-id: ${{ github.event_name == 'push' && 'matsim-snapshots' || 'matsim-releases' }} #choose mvn repo
+          server-id: 'matsim-releases'
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
@@ -42,6 +42,11 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
+
+      - name: Submit Dependency Graph
+        # Generate a complete dependency graph and submit the graph to the GitHub repository.
+        # The goal is to improve security alerts from dependabot, because dependabot is not able to compute the complete dependency graph.
+        uses: advanced-security/maven-dependency-submission-action@v4
 
     env:
       MAVEN_OPTS: -Xmx2g

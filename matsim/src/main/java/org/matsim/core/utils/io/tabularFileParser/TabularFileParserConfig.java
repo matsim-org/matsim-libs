@@ -22,6 +22,7 @@ package org.matsim.core.utils.io.tabularFileParser;
 
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Configuration for a <code>TabularFileParser</code>.
@@ -50,8 +51,8 @@ public class TabularFileParserConfig {
     private String commentRegex = null;
 
     private String delimiterRegex = null;
-    
-    private Charset charset = Charset.forName("UTF8");
+
+    private Charset charset = StandardCharsets.UTF_8;
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -82,10 +83,10 @@ public class TabularFileParserConfig {
     public void setUrl(URL url) {
         this.url = url;
     }
-    
+
     /**
      * Sets the charset for the file. Defaults to UTF-8
-     * 
+     *
      * @param charset the charset used to reade the file
      */
     public void setCharset(Charset charset) {
@@ -239,7 +240,7 @@ public class TabularFileParserConfig {
     public String getDelimiterRegex() {
         return delimiterRegex;
     }
-    
+
     public Charset getCharset() {
     	return this.charset;
     }

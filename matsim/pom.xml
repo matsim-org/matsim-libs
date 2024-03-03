@@ -91,6 +91,7 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
+							<goal>test-jar</goal>
 							<goal>jar</goal>
 						</goals>
 					</execution>
@@ -117,12 +118,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.2.5</version>
 			</plugin>
 		</plugins>
 	</reporting>
 
 	<dependencies>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil-core</artifactId>
+			<version>8.5.13</version>
+		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
@@ -155,8 +161,16 @@
 			<version>1.5.4</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
@@ -188,7 +202,7 @@
 		<dependency>
 			<groupId>org.jgrapht</groupId>
 			<artifactId>jgrapht-core</artifactId>
-			<version>1.5.1</version>
+			<version>1.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
@@ -203,7 +217,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.5-1</version>
+			<version>1.5.5-11</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -214,13 +228,13 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>8.0.0.Final</version>
+			<version>8.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>8.0.0.Final</version>
+			<version>8.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -260,6 +274,10 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.woodstox</groupId>
+			<artifactId>woodstox-core</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -321,7 +339,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.5.0</version>
+						<version>3.6.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

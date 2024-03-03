@@ -25,7 +25,10 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,8 +55,8 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -69,12 +72,12 @@ public class MultiModalControlerListenerTest {
 
 	private static final Logger log = LogManager.getLogger(MultiModalControlerListenerTest.class);
 
-	@Rule 
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@SuppressWarnings("static-method")
 	@Test
-	public void testSimpleScenario() {
+	void testSimpleScenario() {
 		log.info("Run test single threaded...");
 		runSimpleScenario(1);
 
@@ -89,10 +92,10 @@ public class MultiModalControlerListenerTest {
 
 		config.qsim().setEndTime(24 * 3600);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controler().setMobsim("myMobsim");
+		config.controller().setMobsim("myMobsim");
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
 		multiModalConfigGroup.setMultiModalSimulationEnabled(true);
@@ -102,19 +105,19 @@ public class MultiModalControlerListenerTest {
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 
 		// set default bike speed; Parkin and Rotheram according to 6.01 [m/s]
 		double defaultBikeSpeed = 6.01;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
 
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
-		config.plansCalcRoute().setTeleportedModeSpeed("other", unknownModeSpeed);
+		config.routing().setTeleportedModeSpeed("other", unknownModeSpeed);
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -164,10 +167,10 @@ public class MultiModalControlerListenerTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "other"));
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
         controler.addOverridingModule(new MultiModalModule());
@@ -178,29 +181,29 @@ public class MultiModalControlerListenerTest {
 		controler.run();
 
 		// assume that the number of arrival events is correct
-		Assert.assertEquals(4, linkModeChecker.arrivalCount);
+		Assertions.assertEquals(4, linkModeChecker.arrivalCount);
 
 		// assume that the number of link left events is correct
-		Assert.assertEquals(8, linkModeChecker.linkLeftCount);
+		Assertions.assertEquals(8, linkModeChecker.linkLeftCount);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Disabled("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_singleThreaded() {
+	void testBerlinScenario_singleThreaded() {
 		log.info("Run test single threaded...");
 		runBerlinScenario(1);
 	}
 
-	@Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Disabled("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_multiThreaded_2() {
+	void testBerlinScenario_multiThreaded_2() {
 		log.info("Run test multi threaded with 2 threads...");
 		runBerlinScenario(2);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
+	@Disabled("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
-	public void testBerlinScenario_multiThreaded_4() {
+	void testBerlinScenario_multiThreaded_4() {
 		log.info("Run test multi threaded with 4 threads...");
 		runBerlinScenario(4);
 	}
@@ -211,11 +214,11 @@ public class MultiModalControlerListenerTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controler().setMobsim("myMobsim");
+		config.controller().setMobsim("myMobsim");
 
 //		config.qsim().setRemoveStuckVehicles(true); // but why?  kai, feb'16
 		config.qsim().setRemoveStuckVehicles(false);
@@ -251,10 +254,10 @@ public class MultiModalControlerListenerTest {
 		PrepareMultiModalScenario.run(scenario);
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
         controler.addOverridingModule(new MultiModalModule());
@@ -268,16 +271,16 @@ public class MultiModalControlerListenerTest {
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getScenario().getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
-		
+
 		controler.run();
-		
-		/* NOTE: When I introduced access/egress legs, nearly everything in the following (besides bikeCount) changed.   
+
+		/* NOTE: When I introduced access/egress legs, nearly everything in the following (besides bikeCount) changed.
 		 * After setting removeStuckVehicles from true to false, the counts were stable.  So with access/egress legs, a
 		 * different number of vehicles got lost ... which makes sense, because they enter/leave the traffic at different times.
-		 *  
+		 *
 		 * Also, after not losing vehicles vehicles any more, the travel times for the uncongested modes bike and walk were stable.
 		 * Predictably, the travel time for the congested mode changes.
-		 * 
+		 *
 		 * kai, feb'16
 		 */
 
@@ -285,23 +288,16 @@ public class MultiModalControlerListenerTest {
 		int carCount = linkModeChecker.leftCountPerMode.get(TransportMode.car);
 		int bikeCount = linkModeChecker.leftCountPerMode.get(TransportMode.bike);
 		int walkCount = linkModeChecker.leftCountPerMode.get(TransportMode.walk);
-		Assert.assertEquals(
-				"unexpected number of link leave events for mode car with number of threads "+numberOfThreads,
-//				513445, carCount);
-				692259, carCount);
-		Assert.assertEquals(
-				"unexpected number of link leave events for mode bike with number of threads "+numberOfThreads,
-				4577, bikeCount);
-		Assert.assertEquals(
-				"unexpected number of link leave events for mode walk with number of threads "+numberOfThreads,
-//				5834, walkCount);
-				7970, walkCount);
+		Assertions.assertEquals(
+				692259, carCount, "unexpected number of link leave events for mode car with number of threads "+numberOfThreads);
+		Assertions.assertEquals(
+				4577, bikeCount, "unexpected number of link leave events for mode bike with number of threads "+numberOfThreads);
+		Assertions.assertEquals(
+				7970, walkCount, "unexpected number of link leave events for mode walk with number of threads "+numberOfThreads);
 
 		// check the total number of link left events
-		Assert.assertEquals(
-				"unexpected total number of link leave events with number of threads "+numberOfThreads,
-//				523856, linkModeChecker.linkLeftCount);
-				704806, linkModeChecker.linkLeftCount);
+		Assertions.assertEquals(
+				704806, linkModeChecker.linkLeftCount, "unexpected total number of link leave events with number of threads "+numberOfThreads);
 
 		// check the total mode travel times
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
@@ -310,24 +306,17 @@ public class MultiModalControlerListenerTest {
 		LogManager.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
 		LogManager.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
 		LogManager.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
-		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			Assert.assertEquals(
-					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
-					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);
+		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+			Assertions.assertEquals(
+					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for car mode with number of threads "+numberOfThreads);
 		} else {
-			Assert.assertEquals(
-				"unexpected total travel time for car mode with number of threads "+numberOfThreads,
-//				5.7263255E7, carTravelTime, MatsimTestUtils.EPSILON);
-				1.11881636E8, carTravelTime, MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(
+				1.11881636E8, carTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for car mode with number of threads "+numberOfThreads);
 		}
-		Assert.assertEquals(
-				"unexpected total travel time for bike mode with number of threads "+numberOfThreads,
-//				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
-				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(
-				"unexpected total travel time for walk mode with number of threads "+numberOfThreads,
-//				3259757.0, walkTravelTime, MatsimTestUtils.EPSILON);
-				3885025.0, walkTravelTime, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(
+				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for bike mode with number of threads "+numberOfThreads);
+		Assertions.assertEquals(
+				3885025.0, walkTravelTime, MatsimTestUtils.EPSILON, "unexpected total travel time for walk mode with number of threads "+numberOfThreads);
 	}
 
 	private static Person createPerson(Scenario scenario, String id, String mode) {
@@ -407,13 +396,13 @@ public class MultiModalControlerListenerTest {
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = this.network.getLinks().get(event.getLinkId());
 			String mode = this.vehModes.get(event.getVehicleId());
-			
+
 			if (!link.getAllowedModes().contains(mode)) {
 				log.error(mode);
 			}
 
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
+			Assertions.assertEquals(true, link.getAllowedModes().contains(mode));
 
 			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;

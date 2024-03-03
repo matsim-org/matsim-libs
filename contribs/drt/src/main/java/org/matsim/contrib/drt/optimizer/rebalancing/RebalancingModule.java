@@ -54,6 +54,8 @@ public class RebalancingModule extends AbstractDvrpModeModule {
 				install(new DrtModePlusOneRebalanceModule(drtCfg));
 			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof FeedforwardRebalancingStrategyParams) {
 				install(new DrtModeFeedforwardRebalanceModule(drtCfg));
+			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof CustomRebalancingStrategyParams) {
+				// User is responsible for installing custom module
 			} else {
 				throw new RuntimeException(
 						"Unsupported rebalancingStrategyParams: " + rebalancingParams.getRebalancingStrategyParams());

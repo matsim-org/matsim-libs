@@ -41,6 +41,8 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 /**
  * @author knagel
  * @see DefaultQNetworkFactory
+ * @deprecated It would be good to migrate the configuration of this here to
+ * the way it is now done with {@link LinkSpeedCalculator} in {@link DefaultLinkSpeedCalculator}.
  */
 public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private QSimConfigGroup qsimConfig;
@@ -49,7 +51,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private Scenario scenario;
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine;
-	private Optional<LinkSpeedCalculator> linkSpeedCalculator = Optional.empty();
+	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
 	private Optional<TurnAcceptanceLogic> turnAcceptanceLogic = Optional.empty();
 	private Optional<VehicleHandler> vehicleHandler = Optional.empty();
 	private Optional<FlowEfficiencyCalculator> flowEfficiencyCalculator = Optional.empty();
@@ -87,7 +89,8 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 			flowEfficiencyCalculator.ifPresent(laneFactory::setFlowEfficiencyCalculator);
 			linkBuilder.setLaneFactory(laneFactory);
 		}
-		linkSpeedCalculator.ifPresent(linkBuilder::setLinkSpeedCalculator);
+//		linkSpeedCalculator.ifPresent(linkBuilder::setLinkSpeedCalculator);
+		linkBuilder.setLinkSpeedCalculator( this.linkSpeedCalculator );
 		vehicleHandler.ifPresent(linkBuilder::setVehicleHandler);
 
 		return linkBuilder.build(link, toQueueNode);
@@ -103,7 +106,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	}
 
 	public final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
-		this.linkSpeedCalculator = Optional.of(linkSpeedCalculator);
+		this.linkSpeedCalculator = linkSpeedCalculator;
 	}
 
 	public final void setTurnAcceptanceLogic( TurnAcceptanceLogic turnAcceptanceLogic ) {

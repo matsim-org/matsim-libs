@@ -23,8 +23,8 @@ package playground.vsp.analysis.modules.emissions;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmE
 public class TestWarmEmissionHandler {
 
 	@Test
-	public final void testEmissionPerPersonWarmEventHandler(){
+	final void testEmissionPerPersonWarmEventHandler(){
 
 		EmissionsPerPersonWarmEventHandler handler = new EmissionsPerPersonWarmEventHandler();
 
@@ -107,56 +107,56 @@ public class TestWarmEmissionHandler {
 		if(wepp.get(Id.create("v1", Person.class)).containsKey( Pollutant.CO )){
 			//		return key;
 			Double actualCO1 = wepp.get(Id.create("v1", Person.class)).get( Pollutant.CO );
-			Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, 17.1, actualCO1, MatsimTestUtils.EPSILON );
+			Assertions.assertEquals(17.1, actualCO1, MatsimTestUtils.EPSILON, "CO of vehicle 1 should be 17.1 but was "+actualCO1 );
 		}else{
-			Assert.fail("No CO values for car 1 found.");
+			Assertions.fail("No CO values for car 1 found.");
 		}
 		//NOx vehicle 1
 		//		return key;
 		if(wepp.get(Id.create("v1", Person.class)).containsKey( Pollutant.NOx )){
 			//		return key;
 			Double actualNOx1 = wepp.get(Id.create("v1", Person.class)).get( Pollutant.NOx );
-			Assert.assertEquals("NOx of vehicle 1 should be 44.1 but was "+actualNOx1, 44.1, actualNOx1, MatsimTestUtils.EPSILON );
+			Assertions.assertEquals(44.1, actualNOx1, MatsimTestUtils.EPSILON, "NOx of vehicle 1 should be 44.1 but was "+actualNOx1 );
 		}else{
-			Assert.fail("No NOx values for car 1 found.");
+			Assertions.fail("No NOx values for car 1 found.");
 		}
 		//PM vehicle 1
 		//		return key;
 		if(wepp.get(Id.create("v1", Person.class)).containsKey( Pollutant.PM )){
-			Assert.fail("There should be no PM values for car 1.");
+			Assertions.fail("There should be no PM values for car 1.");
 		}else{
 			//		return key;
-			Assert.assertNull("PM of vehicle 1 should be null.",wepp.get(Id.create("v1", Person.class)).get( Pollutant.PM ) );
+			Assertions.assertNull(wepp.get(Id.create("v1", Person.class)).get( Pollutant.PM ),"PM of vehicle 1 should be null." );
 		}
 		//CO vehicle 2
 		//		return key;
 		if(wepp.get(Id.create("v2", Person.class)).containsKey( Pollutant.CO )){
 			//		return key;
 			Double actualCO2 = wepp.get(Id.create("v2", Person.class)).get( Pollutant.CO );
-			Assert.assertEquals("CO of vehicle 2 should be 23.9", 23.9, actualCO2, MatsimTestUtils.EPSILON );
+			Assertions.assertEquals(23.9, actualCO2, MatsimTestUtils.EPSILON, "CO of vehicle 2 should be 23.9" );
 		}else{
-			Assert.fail("No CO values for car 2 found.");
+			Assertions.fail("No CO values for car 2 found.");
 		}
 		//NOx vehicle 2
 		//		return key;
 		if(wepp.get(Id.create("v2", Person.class)).containsKey( Pollutant.NOx )){
-			Assert.fail("There should be no NOx values for car 2.");
+			Assertions.fail("There should be no NOx values for car 2.");
 		}else{
 			//		return key;
-			Assert.assertNull(wepp.get(Id.create("v2", Person.class)).get( Pollutant.NOx ) );
+			Assertions.assertNull(wepp.get(Id.create("v2", Person.class)).get( Pollutant.NOx ) );
 		}
 		//PM vehicle 2
 		//		return key;
 		if(wepp.get(Id.create("v2", Person.class)).containsKey( Pollutant.PM )){
 			//		return key;
 			Double actualPM2 = wepp.get(Id.create("v2", Person.class)).get( Pollutant.PM );
-			Assert.assertEquals("PM of vehicle 2 should be 18.1", 18.1, actualPM2, MatsimTestUtils.EPSILON );
+			Assertions.assertEquals(18.1, actualPM2, MatsimTestUtils.EPSILON, "PM of vehicle 2 should be 18.1" );
 		}else{
-			Assert.fail("No PM values for car 2 found.");
+			Assertions.fail("No PM values for car 2 found.");
 		}
 		//FC
 		//		return key;
-		Assert.assertNull(wepp.get(Id.create("v1", Person.class)).get( Pollutant.FC ) );
+		Assertions.assertNull(wepp.get(Id.create("v1", Person.class)).get( Pollutant.FC ) );
 
 	}
 }

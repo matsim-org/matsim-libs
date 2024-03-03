@@ -11,6 +11,13 @@
 	<artifactId>vsp</artifactId>
 	<name>vsp</name>
 
+	<repositories>
+		<repository>
+			<id>jogl</id>
+			<url>https://jogamp.org/deployment/maven/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -64,21 +71,29 @@
 			<artifactId>analysis</artifactId>
 			<version>16.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>informed-mode-choice</artifactId>
+			<version>16.0-SNAPSHOT</version>
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.processing</groupId>-->
 <!--			<artifactId>core</artifactId>-->
 <!--			<version>3.0.1</version>-->
 <!--		</dependency>-->
-		<dependency>
-			<groupId>org.jogamp.gluegen</groupId>
-			<artifactId>gluegen-rt-main</artifactId>
-			<version>2.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jogamp.jogl</groupId>
-			<artifactId>jogl-all-main</artifactId>
-			<version>2.3.2</version>
-		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.jogamp.gluegen</groupId>-->
+<!--			<artifactId>gluegen-rt-main</artifactId>-->
+<!--			<version>2.3.2</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.jogamp.jogl</groupId>-->
+<!--			<artifactId>jogl-all-main</artifactId>-->
+<!--			<version>2.3.2</version>-->
+<!--		</dependency>-->
+<!--		(Do not repeat the jogl dependencies.  They are defined in contrib/otfvis/pom.xml (and enforced from matsim-all/pom.xml).  kai, nov'23)-->
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
@@ -97,7 +112,7 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -110,22 +125,22 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-tagfilter</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-set</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-areafilter</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -135,7 +150,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.3</version>
+			<version>5.2.5</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -169,12 +184,24 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>20</version>
+			<version>21.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>6.2</version>
+			<version>8.0</version>
+		</dependency>
+		<!-- Enforce version -->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

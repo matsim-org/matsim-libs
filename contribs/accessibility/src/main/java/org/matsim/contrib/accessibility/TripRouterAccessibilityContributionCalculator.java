@@ -38,7 +38,7 @@ import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.TripRouter;
@@ -60,7 +60,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 	private static final Logger LOG = LogManager.getLogger( TripRouterAccessibilityContributionCalculator.class );
 	private TripRouter tripRouter ;
 	private String mode;
-	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private ScoringConfigGroup scoringConfigGroup;
 	private NetworkConfigGroup networkConfigGroup;
 	private Scenario scenario;
 
@@ -79,18 +79,18 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 	private final TravelTime travelTime;
 
 
-	public TripRouterAccessibilityContributionCalculator(String mode, TripRouter tripRouter, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Scenario scenario,
-														 TravelTime travelTime, TravelDisutilityFactory travelDisutilityFactory) {
+	public TripRouterAccessibilityContributionCalculator(String mode, TripRouter tripRouter, ScoringConfigGroup scoringConfigGroup, Scenario scenario,
+																											 TravelTime travelTime, TravelDisutilityFactory travelDisutilityFactory) {
 		LOG.warn("This is currently heavliy oriented on the need of car-based computatations. Revise beofre using for other modes!");
 	    this.mode = mode;
 		this.tripRouter = tripRouter;
-		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
+		this.scoringConfigGroup = scoringConfigGroup;
 		this.networkConfigGroup = scenario.getConfig().network();
 		this.scenario = scenario;
 
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 
-		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 
 		this.travelTime = travelTime;
 		this.travelDisutilityFactory = travelDisutilityFactory;
@@ -152,21 +152,21 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 
 				// Note: The following computation where the end link length is added is only correct once the end link is removed from the route
 				// in the NetworkRoutingModule (route.setDistance(RouteUtils.calcDistance(route, 1.0, 0.0, this.network));)
-				if (this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
+				if (this.scoringConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
 					LOG.warn("A computation including a marginal utility of distance will only be correct if the route time/distance" +
 							"inconsistency in the NetworkRoutingModule is solved.");
 				}
-				utility += (leg.getRoute().getDistance() + endLinkLength) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
-				utility += (leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
-				utility += -(leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
+				utility += (leg.getRoute().getDistance() + endLinkLength) * this.scoringConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
+				utility += (leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
+				utility += -(leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getPerforming_utils_hr() / 3600.;
 			}
 
 			// Utility based on opportunities that are attached to destination node
 			double sumExpVjkWalk = destination.getSum();
 
 			// exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
-			double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-			expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (utility + modeSpecificConstant + walkUtilityMeasuringPoint2Road + congestedCarUtilityRoad2Node)) * sumExpVjkWalk;
+			double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
+			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (utility + modeSpecificConstant + walkUtilityMeasuringPoint2Road + congestedCarUtilityRoad2Node)) * sumExpVjkWalk;
 
 		}
 		return expSum;
@@ -176,7 +176,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 	@Override
 	public TripRouterAccessibilityContributionCalculator duplicate() {
 		TripRouterAccessibilityContributionCalculator tripRouterAccessibilityContributionCalculator =
-				new TripRouterAccessibilityContributionCalculator(this.mode, this.tripRouter, this.planCalcScoreConfigGroup,
+				new TripRouterAccessibilityContributionCalculator(this.mode, this.tripRouter, this.scoringConfigGroup,
 						this.scenario, this.travelTime, this.travelDisutilityFactory);
 		tripRouterAccessibilityContributionCalculator.subNetwork = this.subNetwork;
 		tripRouterAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;

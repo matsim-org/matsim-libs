@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,8 +79,8 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 						public PlanAlgorithm getPlanAlgoInstance() {
 
 							final int iteration = getReplanningContext().getIteration();
-							final int firstIteration = config.controler().getFirstIteration();
-							final double nIters = config.controler().getLastIteration() - firstIteration;
+							final int firstIteration = config.controller().getFirstIteration();
+							final double nIters = config.controller().getLastIteration() - firstIteration;
 							final double minTemp = 1;
 							final double startMin = (2 / 3.) * nIters;
 							final double progress = (iteration - firstIteration) / startMin;

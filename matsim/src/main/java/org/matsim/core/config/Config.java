@@ -37,21 +37,20 @@ import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
+import org.matsim.core.config.groups.EventsManagerConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PtCountsConfigGroup;
+import org.matsim.core.config.groups.PlanInheritanceConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -67,7 +66,7 @@ import org.matsim.run.CreateFullConfig;
 /**
  * Stores all configuration settings specified in a configuration file and
  * provides access to the settings at runtime.
- * 
+ *
  * @see CreateFullConfig
  *
  * @author mrieser
@@ -87,32 +86,7 @@ public final class Config implements MatsimExtensionPoint {
 	 */
 
 	// config groups that are in org.matsim.core.config.groups:
-	private PlanCalcScoreConfigGroup charyparNagelScoring = null;
-	private ControlerConfigGroup controler = null;
-	private CountsConfigGroup counts = null;
-	private FacilitiesConfigGroup facilities = null;
-	private GlobalConfigGroup global = null;
-	private HouseholdsConfigGroup households;
-	private NetworkConfigGroup network = null;
-	private ParallelEventHandlingConfigGroup parallelEventHandling = null;
-	private PlansCalcRouteConfigGroup plansCalcRoute = null;
-	private PlansConfigGroup plans = null;
-	private QSimConfigGroup qSimConfigGroup = null;
-	private ScenarioConfigGroup scenarioConfigGroup = null;
-	private StrategyConfigGroup strategy = null;
-	private TransitConfigGroup transit = null;
-	private TransitRouterConfigGroup transitRouter = null;
-	private LinkStatsConfigGroup linkStats = null;
-	private VspExperimentalConfigGroup vspExperimentalGroup = null;
-	private TimeAllocationMutatorConfigGroup timeAllocationMutator = null;
-	private SubtourModeChoiceConfigGroup subtourModeChoice = null;
-	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
-	private PtCountsConfigGroup ptCounts = null;
-	private VehiclesConfigGroup vehicles = null ;
-	private ChangeModeConfigGroup changeMode = null;
-	private JDEQSimConfigGroup jdeqSim = null;
-	private HermesConfigGroup hermes = null;
-	private ReplanningAnnealerConfigGroup replanningAnnealer = null;
+
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<>();
 
@@ -142,86 +116,60 @@ public final class Config implements MatsimExtensionPoint {
 	 * configuration from file.
 	 */
 	public void addCoreModules() {
-		this.global = new GlobalConfigGroup();
-		this.modules.put(GlobalConfigGroup.GROUP_NAME, this.global);
+		this.modules.put(GlobalConfigGroup.GROUP_NAME, new GlobalConfigGroup());
 
-		this.controler = new ControlerConfigGroup();
-		this.modules.put(ControlerConfigGroup.GROUP_NAME, this.controler);
+		this.modules.put(ControllerConfigGroup.GROUP_NAME, new ControllerConfigGroup());
 
-		this.qSimConfigGroup = new QSimConfigGroup();
-		this.modules.put(QSimConfigGroup.GROUP_NAME, this.qSimConfigGroup);
+		this.modules.put(QSimConfigGroup.GROUP_NAME, new QSimConfigGroup());
 
-		this.counts = new CountsConfigGroup();
-		this.modules.put(CountsConfigGroup.GROUP_NAME, this.counts);
+		this.modules.put(CountsConfigGroup.GROUP_NAME, new CountsConfigGroup());
+		this.modules.put(ScoringConfigGroup.GROUP_NAME, new ScoringConfigGroup());
 
-		this.charyparNagelScoring = new PlanCalcScoreConfigGroup();
-		this.modules.put(PlanCalcScoreConfigGroup.GROUP_NAME, this.charyparNagelScoring);
+		this.modules.put(NetworkConfigGroup.GROUP_NAME, new NetworkConfigGroup());
 
-		this.network = new NetworkConfigGroup();
-		this.modules.put(NetworkConfigGroup.GROUP_NAME, this.network);
+		this.modules.put(PlansConfigGroup.GROUP_NAME, new PlansConfigGroup());
 
-		this.plans = new PlansConfigGroup();
-		this.modules.put(PlansConfigGroup.GROUP_NAME, this.plans);
+		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, new HouseholdsConfigGroup());
 
-		this.households = new HouseholdsConfigGroup();
-		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, this.households);
+		this.modules.put(EventsManagerConfigGroup.GROUP_NAME, new EventsManagerConfigGroup() );
 
-		this.parallelEventHandling = new ParallelEventHandlingConfigGroup();
-		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, this.parallelEventHandling );
+		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, new FacilitiesConfigGroup());
 
-		this.facilities = new FacilitiesConfigGroup();
-		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, this.facilities);
+		this.modules.put(ReplanningConfigGroup.GROUP_NAME, new ReplanningConfigGroup());
 
-		this.strategy = new StrategyConfigGroup();
-		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy);
+		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, new TravelTimeCalculatorConfigGroup());
 
-		this.travelTimeCalculatorConfigGroup = new TravelTimeCalculatorConfigGroup();
-		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, this.travelTimeCalculatorConfigGroup);
+		this.modules.put(ScenarioConfigGroup.GROUP_NAME, new ScenarioConfigGroup());
 
-		this.scenarioConfigGroup = new ScenarioConfigGroup();
-		this.modules.put(ScenarioConfigGroup.GROUP_NAME, this.scenarioConfigGroup);
+		this.modules.put(RoutingConfigGroup.GROUP_NAME, new RoutingConfigGroup());
 
-		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
-		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
+		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, new TimeAllocationMutatorConfigGroup());
 
-		this.timeAllocationMutator = new TimeAllocationMutatorConfigGroup();
-		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, this.timeAllocationMutator );
-
-		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
-		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
+		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
 		
-		this.ptCounts = new PtCountsConfigGroup();
-		this.modules.put(PtCountsConfigGroup.GROUP_NAME, this.ptCounts);
 
-		this.transit = new TransitConfigGroup();
-		this.modules.put(TransitConfigGroup.GROUP_NAME, this.transit);
+		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
-		this.linkStats = new LinkStatsConfigGroup();
-		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, this.linkStats);
+		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, new LinkStatsConfigGroup());
 
-		this.transitRouter = new TransitRouterConfigGroup();
-		this.modules.put(TransitRouterConfigGroup.GROUP_NAME, this.transitRouter);
+		this.modules.put(TransitRouterConfigGroup.GROUP_NAME, new TransitRouterConfigGroup());
 
-		this.subtourModeChoice = new SubtourModeChoiceConfigGroup();
-		this.modules.put( SubtourModeChoiceConfigGroup.GROUP_NAME , this.subtourModeChoice );
-		
-		this.vehicles = new VehiclesConfigGroup() ;
-		this.modules.put( VehiclesConfigGroup.GROUP_NAME , this.vehicles ) ;
+		this.modules.put( SubtourModeChoiceConfigGroup.GROUP_NAME , new SubtourModeChoiceConfigGroup() );
 
-		this.changeMode = new ChangeModeConfigGroup();
-		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, this.changeMode);
+		this.modules.put( VehiclesConfigGroup.GROUP_NAME , new VehiclesConfigGroup() ) ;
+
+		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, new ChangeModeConfigGroup());
 
 		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
 		// only to provide error messages. kai, may'16
 
-		this.jdeqSim = new JDEQSimConfigGroup();
-		this.modules.put(JDEQSimConfigGroup.NAME, this.jdeqSim);
+		this.modules.put(JDEQSimConfigGroup.NAME, new JDEQSimConfigGroup());
 
-		this.hermes = new HermesConfigGroup();
-		this.modules.put(HermesConfigGroup.NAME, this.hermes);
+		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
-		this.replanningAnnealer = new ReplanningAnnealerConfigGroup();
-		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, this.replanningAnnealer);
+		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
+		
+		this.modules.put(PlanInheritanceConfigGroup.GROUP_NAME, new PlanInheritanceConfigGroup());
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
@@ -448,103 +396,103 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public final GlobalConfigGroup global() {
-		return this.global;
+		return (GlobalConfigGroup) this.getModule(GlobalConfigGroup.GROUP_NAME);
 	}
 
-	public final ControlerConfigGroup controler() {
-		return this.controler;
+	public final ControllerConfigGroup controller() {
+		return (ControllerConfigGroup) this.getModule(ControllerConfigGroup.GROUP_NAME);
 	}
 
 	public final CountsConfigGroup counts() {
-		return this.counts;
+		return (CountsConfigGroup) this.getModule(CountsConfigGroup.GROUP_NAME);
 	}
 
-	public final PlanCalcScoreConfigGroup planCalcScore() {
-		return this.charyparNagelScoring;
+	public final ScoringConfigGroup scoring() {
+		return (ScoringConfigGroup) this.getModule(ScoringConfigGroup.GROUP_NAME);
 	}
 
 	public final NetworkConfigGroup network() {
-		return this.network;
+		return (NetworkConfigGroup) this.getModule(NetworkConfigGroup.GROUP_NAME);
 	}
 
 	public final PlansConfigGroup plans() {
-		return this.plans;
+		return (PlansConfigGroup) this.getModule(PlansConfigGroup.GROUP_NAME);
 	}
 
 	public final HouseholdsConfigGroup households() {
-		return this.households;
+		return (HouseholdsConfigGroup) this.getModule(HouseholdsConfigGroup.GROUP_NAME);
 	}
 
 	public final FacilitiesConfigGroup facilities() {
-		return this.facilities;
+		return (FacilitiesConfigGroup) this.getModule(FacilitiesConfigGroup.GROUP_NAME);
 	}
 
-    public final StrategyConfigGroup strategy() {
-		return this.strategy;
+    public final ReplanningConfigGroup replanning() {
+		return (ReplanningConfigGroup) this.getModule(ReplanningConfigGroup.GROUP_NAME);
 	}
 
 	public TravelTimeCalculatorConfigGroup travelTimeCalculator() {
-		return this.travelTimeCalculatorConfigGroup;
+		return (TravelTimeCalculatorConfigGroup) this.getModule(TravelTimeCalculatorConfigGroup.GROUPNAME);
 	}
 
 	public ScenarioConfigGroup scenario() {
-		return this.scenarioConfigGroup;
+		return (ScenarioConfigGroup) this.getModule(ScenarioConfigGroup.GROUP_NAME);
 	}
 
-	public PlansCalcRouteConfigGroup plansCalcRoute() {
-		return this.plansCalcRoute;
+	public RoutingConfigGroup routing() {
+		return (RoutingConfigGroup) this.getModule(RoutingConfigGroup.GROUP_NAME);
 	}
 
 	public VspExperimentalConfigGroup vspExperimental() {
-		return this.vspExperimentalGroup;
+		return (VspExperimentalConfigGroup) this.getModule(VspExperimentalConfigGroup.GROUP_NAME);
 	}
 
 	public QSimConfigGroup qsim() {
-		return this.qSimConfigGroup;
-	}
-
-	public PtCountsConfigGroup ptCounts() {
-		return this.ptCounts;
+		return (QSimConfigGroup) this.getModule(QSimConfigGroup.GROUP_NAME);
 	}
 
 	public TransitConfigGroup transit() {
-		return this.transit;
+		return (TransitConfigGroup) this.getModule(TransitConfigGroup.GROUP_NAME);
 	}
 
 	public TransitRouterConfigGroup transitRouter() {
-		return this.transitRouter;
+		return (TransitRouterConfigGroup) this.getModule(TransitRouterConfigGroup.GROUP_NAME);
 	}
 
 	public LinkStatsConfigGroup linkStats() {
-		return this.linkStats;
+		return (LinkStatsConfigGroup) this.getModule(LinkStatsConfigGroup.GROUP_NAME);
 	}
 
 	public TimeAllocationMutatorConfigGroup timeAllocationMutator() {
-		return this.timeAllocationMutator;
+		return (TimeAllocationMutatorConfigGroup) this.getModule(TimeAllocationMutatorConfigGroup.GROUP_NAME);
 	}
 
-	public ParallelEventHandlingConfigGroup parallelEventHandling() {
-		return this.parallelEventHandling;
+	public EventsManagerConfigGroup eventsManager() {
+		return (EventsManagerConfigGroup) this.getModule(EventsManagerConfigGroup.GROUP_NAME);
 	}
 
 	public SubtourModeChoiceConfigGroup subtourModeChoice() {
-		return this.subtourModeChoice;
+		return (SubtourModeChoiceConfigGroup) this.getModule(SubtourModeChoiceConfigGroup.GROUP_NAME);
 	}
 
 	public ChangeModeConfigGroup changeMode() {
-		return this.changeMode;
+		return (ChangeModeConfigGroup) this.getModule(ChangeModeConfigGroup.CONFIG_MODULE);
 	}
 
 	public JDEQSimConfigGroup jdeqSim() {
-		return this.jdeqSim;
+		return (JDEQSimConfigGroup) this.getModule(JDEQSimConfigGroup.NAME);
 	}
 
 	public HermesConfigGroup hermes() {
-		return this.hermes;
+		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
 
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
-		return replanningAnnealer;
+		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
+	}
+	
+	public PlanInheritanceConfigGroup planInheritance() {
+		return (PlanInheritanceConfigGroup) this.getModule(PlanInheritanceConfigGroup.GROUP_NAME);
 	}
 
 	// other:
@@ -594,9 +542,9 @@ public final class Config implements MatsimExtensionPoint {
 	}
 
 	public final VehiclesConfigGroup vehicles() {
-		return vehicles;
+		return (VehiclesConfigGroup) this.getModule(VehiclesConfigGroup.GROUP_NAME);
 	}
-	
+
 	public void setContext(URL context) {
 		if ( this.context==null  ||  !(context.toString().equals( this.context.toString() ) ) ) {
 			log.info("setting context to [" + context + "]");

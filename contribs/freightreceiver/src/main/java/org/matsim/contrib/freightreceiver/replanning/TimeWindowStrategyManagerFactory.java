@@ -42,7 +42,7 @@ class TimeWindowStrategyManagerFactory implements Provider<ReceiverStrategyManag
 			GenericPlanStrategyImpl<ReceiverPlan, Receiver> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanChanger.Factory<ReceiverPlan, Receiver>().setBetaValue(10.).build());
 			strategy.addStrategyModule(new TimeWindowUpperBoundMutator(Time.parseTime("01:00:00")));
 			strategyManager.addStrategy(strategy, null, 0.3);
-			strategyManager.addChangeRequest((int) (sc.getConfig().controler().getLastIteration() * 0.9), strategy, null, 0.0);
+			strategyManager.addChangeRequest((int) (sc.getConfig().controller().getLastIteration() * 0.9), strategy, null, 0.0);
 		}
 
 		/* Replanning for grand coalition receivers. TODO Ignored for now */

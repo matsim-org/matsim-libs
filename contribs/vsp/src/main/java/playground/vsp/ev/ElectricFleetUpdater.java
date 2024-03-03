@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripStructureUtils;
@@ -53,10 +53,9 @@ class ElectricFleetUpdater implements IterationStartsListener {
 	}
 
 	private void registerEVs(Plan plan) {
-		var evs = TripStructureUtils.getLegs(plan)
-				.stream()
+		var modalVehicles = TripStructureUtils.getLegs(plan).stream()
 				.map(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
 				.toList();
-		ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification, evs);
+		ElectricFleetUtils.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification, modalVehicles );
 	}
 }

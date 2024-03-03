@@ -1,11 +1,11 @@
 package org.matsim.core.replanning.choosers;
 
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 public class ForceInnovationStrategyChooserTest {
 
@@ -16,7 +16,7 @@ public class ForceInnovationStrategyChooserTest {
 	 * Shows how numbers are selected and permuted every iteration.
 	 */
 	@Test
-	public void permutation() {
+	void permutation() {
 
 		List<Integer> collected = new ArrayList<>();
 
