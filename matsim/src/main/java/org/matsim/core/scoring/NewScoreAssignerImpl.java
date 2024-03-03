@@ -53,7 +53,7 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 					* scoringConfigGroup.getFractionOfIterationsToStartScoreMSA() + controllerConfigGroup.getFirstIteration());
 		}
 		learningRate = scoringConfigGroup.getLearningRate();
-		explainScores = planCalcScoreConfigGroup.isExplainScores();
+		explainScores = scoringConfigGroup.isExplainScores();
 	}
 
 	public void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population) {
