@@ -70,7 +70,7 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 			if (explainScores) {
 				explanation.setLength(0);
 				sf.explainScore(explanation);
-				plan.getAttributes().putAttribute(ScoringFunction.SCORE_EXPLANATION, explanation.toString());
+				plan.getAttributes().putAttribute(ScoringFunction.SCORE_EXPLANATION_ATTR, explanation.toString());
 			}
 
 			if (oldScore == null) {

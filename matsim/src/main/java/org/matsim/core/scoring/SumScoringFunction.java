@@ -22,6 +22,7 @@
  package org.matsim.core.scoring;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,14 +87,14 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	private static final  Logger log = LogManager.getLogger(SumScoringFunction.class);
 
-	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
-	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();
-	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
-	private ArrayList<ScoreScoring> scoreScoringFunctions = new ArrayList<>();
-	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<>();
-	private ArrayList<TripScoring> tripScoringFunctions = new ArrayList<>();
-	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
-	private ArrayList<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>() ;
+	private final List<BasicScoring> basicScoringFunctions = new ArrayList<>();
+	private final List<ActivityScoring> activityScoringFunctions = new ArrayList<>();
+	private final List<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
+	private final List<ScoreScoring> scoreScoringFunctions = new ArrayList<>();
+	private final List<LegScoring> legScoringFunctions = new ArrayList<>();
+	private final List<TripScoring> tripScoringFunctions = new ArrayList<>();
+	private final List<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
+	private final List<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>() ;
 
 	@Override
 	public final void handleActivity(Activity activity) {

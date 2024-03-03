@@ -122,6 +122,6 @@ public interface ScoringFunction {
 	/**
 	 * The attribute that will be used for the score explanation.
 	 */
-	String SCORE_EXPLANATION = "scoreExplanation";
+	String SCORE_EXPLANATION_ATTR = "scoreExplanation";
 
 }
