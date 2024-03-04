@@ -97,7 +97,7 @@ public abstract class EmissionUtils {
 				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
-			} else { // person in map, but some emissions are not set; setting these to 0.0 
+			} else { // person in map, but some emissions are not set; setting these to 0.0
 				emissionType2Value = totalEmissions.get(personId);
 				for (Pollutant pollutant : emissionType2Value.keySet()) {
 					// else do nothing
@@ -395,48 +395,48 @@ public abstract class EmissionUtils {
 		HbefaVehicleAttributes attribs2 = new HbefaVehicleAttributes();
 
 		// technology is copied:
-		attribs2.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+		attribs2.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
 
 		// size class is "not specified":
 		attribs2.setHbefaSizeClass("not specified");
 
-		// em concept is re-written with different dashes:
-		switch (vehicleInformationTuple.getSecond().getHbefaEmConcept()) {
+		// technology is re-written with different dashes:
+		switch (vehicleInformationTuple.getSecond().getHbefaTechnology()) {
 			case "PC-P-Euro-1":
-				attribs2.setHbefaEmConcept("PC P Euro-1");
+				attribs2.setHbefaTechnology("PC P Euro-1");
 				break;
 			case "PC-P-Euro-2":
-				attribs2.setHbefaEmConcept("PC P Euro-2");
+				attribs2.setHbefaTechnology("PC P Euro-2");
 				break;
 			case "PC-P-Euro-3":
-				attribs2.setHbefaEmConcept("PC P Euro-3");
+				attribs2.setHbefaTechnology("PC P Euro-3");
 				break;
 			case "PC-P-Euro-4":
-				attribs2.setHbefaEmConcept("PC P Euro-4");
+				attribs2.setHbefaTechnology("PC P Euro-4");
 				break;
 			case "PC-P-Euro-5":
-				attribs2.setHbefaEmConcept("PC P Euro-5");
+				attribs2.setHbefaTechnology("PC P Euro-5");
 				break;
 			case "PC-P-Euro-6":
-				attribs2.setHbefaEmConcept("PC P Euro-6");
+				attribs2.setHbefaTechnology("PC P Euro-6");
 				break;
 			case "PC-D-Euro-1":
-				attribs2.setHbefaEmConcept("PC D Euro-1");
+				attribs2.setHbefaTechnology("PC D Euro-1");
 				break;
 			case "PC-D-Euro-2":
-				attribs2.setHbefaEmConcept("PC D Euro-2");
+				attribs2.setHbefaTechnology("PC D Euro-2");
 				break;
 			case "PC-D-Euro-3":
-				attribs2.setHbefaEmConcept("PC D Euro-3");
+				attribs2.setHbefaTechnology("PC D Euro-3");
 				break;
 			case "PC-D-Euro-4":
-				attribs2.setHbefaEmConcept("PC D Euro-4");
+				attribs2.setHbefaTechnology("PC D Euro-4");
 				break;
 			case "PC-D-Euro-5":
-				attribs2.setHbefaEmConcept("PC D Euro-5");
+				attribs2.setHbefaTechnology("PC D Euro-5");
 				break;
 			case "PC-D-Euro-6":
-				attribs2.setHbefaEmConcept("PC D Euro-6");
+				attribs2.setHbefaTechnology("PC D Euro-6");
 				break;
 		}
 		return attribs2;
