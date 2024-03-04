@@ -22,9 +22,11 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -34,17 +36,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.assertTrue;
-
 public class SamplerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private DestinationChoiceContext context;
     private Scenario scenario;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new FrozenTastesConfigGroup() );
         ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
@@ -53,8 +53,8 @@ public class SamplerTest {
         this.context.init();
     }
 
-    @Test
-    public void testSampler() {
+	@Test
+	void testSampler() {
         DestinationSampler sampler = new DestinationSampler(
                 context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ) ;
         assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(1, Person.class))));

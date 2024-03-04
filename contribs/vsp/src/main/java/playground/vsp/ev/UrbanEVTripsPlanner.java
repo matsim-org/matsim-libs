@@ -54,14 +54,11 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.*;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -196,7 +193,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			Plan modifiablePlan = WithinDayAgentUtils.getModifiablePlan(mobsimagent);
 			TripRouter tripRouter = tripRouterProvider.get();
 			Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
-			modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+			modesWithVehicles.addAll(scenario.getConfig().routing().getNetworkModes());
 
 			for (Id<Vehicle> ev : selectedEVPlans.get(plan)) {
 				//only replan cnt times per vehicle and person. otherwise, there might be a leg which is just too long and we end up in an infinity loop...
@@ -208,8 +205,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				 */
 				ElectricVehicleSpecification evSpec = electricFleetSpecification.getVehicleSpecifications().get(Id.create(ev, Vehicle.class));
 				Leg legWithCriticalSOC;
-				ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(evSpec, driveConsumptionFactory, auxConsumptionFactory,
-						chargingPowerFactory);
+				ElectricVehicle pseudoVehicle = ElectricFleetUtils.create(evSpec, driveConsumptionFactory, auxConsumptionFactory,
+						chargingPowerFactory );
 				//TODO: erase hardcoding of car mode!
 				List<Leg> evCarLegs = TripStructureUtils.getLegs(modifiablePlan)
 						.stream()
@@ -350,7 +347,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Double chargingBegin = null;
 
 		Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
-		modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+		modesWithVehicles.addAll(scenario.getConfig().routing().getNetworkModes());
 
 		Leg lastLegWithVehicle = null;
 
@@ -451,7 +448,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
 		{    //some consistency checks.. //TODO consider to put in a JUnit test..
-			int offset = config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ? 1 : 3;
+			int offset = config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ? 1 : 3;
 
 			Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
 			Preconditions.checkState(!pluginTripOrigin.equals(actWhileCharging),

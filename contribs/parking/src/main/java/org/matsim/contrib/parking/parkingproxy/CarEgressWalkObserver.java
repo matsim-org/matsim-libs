@@ -54,6 +54,11 @@ class CarEgressWalkObserver implements BeforeMobsimListener {
 		this.penaltyFunction = penaltyFunction;
 		this.iter0PenaltyCalculator = iter0PenaltyCalculator;
 	}
+	
+	@Override
+	public double priority() {
+		return 50;
+	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

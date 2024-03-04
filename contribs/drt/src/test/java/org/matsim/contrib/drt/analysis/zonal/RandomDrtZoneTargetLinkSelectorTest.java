@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.fakes.FakeLink;
@@ -44,7 +44,7 @@ public class RandomDrtZoneTargetLinkSelectorTest {
 	private final Link link3 = new FakeLink(Id.createLinkId("3"));
 
 	@Test
-	public void testSelectTargetLink_fourLinks() {
+	void testSelectTargetLink_fourLinks() {
 		DrtZone zone = DrtZone.createDummyZone("zone", List.of(link0, link1, link2, link3), null);
 
 		//fake random sequence

@@ -23,12 +23,11 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.collections.ArrayMap;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,9 +45,9 @@ public class ScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfMoney;
 	public final double abortedPlanScore;
 	public final boolean scoreActs;
-	
+
 	public final boolean usingOldScoringBelowZeroUtilityDuration ;
-	
+
 	public final double simulationPeriodInDays;
 
 	private ScoringParameters(
@@ -110,8 +109,8 @@ public class ScoringParameters implements MatsimParameters {
 				final Scenario scenario,
 				final Person person ) {
 			this(
-					scenario.getConfig().planCalcScore(),
-					scenario.getConfig().planCalcScore().getScoringParameters( PopulationUtils.getSubpopulation( person ) ),
+					scenario.getConfig().scoring(),
+					scenario.getConfig().scoring().getScoringParameters( PopulationUtils.getSubpopulation( person ) ),
 					scenario.getConfig().scenario() );
 		}
 
@@ -125,11 +124,11 @@ public class ScoringParameters implements MatsimParameters {
 		 */
 		@Deprecated
 		public Builder(
-				final PlanCalcScoreConfigGroup configGroup,
-				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
+				final ScoringConfigGroup configGroup,
+				final ScoringConfigGroup.ScoringParameterSet scoringParameterSet,
 				final ScenarioConfigGroup scenarioConfig) {
 			this.simulationPeriodInDays = scenarioConfig.getSimulationPeriodInDays();
-			
+
 			this.usingOldScoringBelowZeroUtilityDuration = configGroup.isUsingOldScoringBelowZeroUtilityDuration() ;
 
 			marginalUtilityOfWaiting_s = scoringParameterSet.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
@@ -149,9 +148,9 @@ public class ScoringParameters implements MatsimParameters {
 			}
 
 			modeParams = new TreeMap<>() ;
-			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
+			Map<String, ScoringConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
-			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
+			for (Map.Entry<String, ScoringConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
 				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() / 3600. );
@@ -179,8 +178,8 @@ public class ScoringParameters implements MatsimParameters {
 		 * @param scenarioConfig
 		 */
 		public Builder(
-				final PlanCalcScoreConfigGroup configGroup,
-				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
+				final ScoringConfigGroup configGroup,
+				final ScoringConfigGroup.ScoringParameterSet scoringParameterSet,
 				Map<String, ActivityUtilityParameters> activityParams,
 				final ScenarioConfigGroup scenarioConfig) {
 			this.simulationPeriodInDays = scenarioConfig.getSimulationPeriodInDays();
@@ -200,9 +199,9 @@ public class ScoringParameters implements MatsimParameters {
 			utilParams = activityParams;
 
 			modeParams = new TreeMap<>() ;
-			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
+			Map<String, ScoringConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
-			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
+			for (Map.Entry<String, ScoringConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
 				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() / 3600. );

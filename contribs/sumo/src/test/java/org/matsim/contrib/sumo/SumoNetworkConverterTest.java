@@ -1,7 +1,7 @@
 package org.matsim.contrib.sumo;
 
 import com.google.common.io.Resources;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -22,8 +22,8 @@ import java.util.SortedMap;
 public class SumoNetworkConverterTest {
 
 
-    @Test
-    public void convert() throws Exception {
+	@Test
+	void convert() throws Exception {
 
         Path input = Files.createTempFile("sumo", ".xml");
         Path output = Files.createTempFile("matsim", ".xml");

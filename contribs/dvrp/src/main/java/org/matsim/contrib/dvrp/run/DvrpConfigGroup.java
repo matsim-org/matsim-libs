@@ -37,7 +37,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
-public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
+public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final Logger log = LogManager.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";
@@ -143,7 +143,7 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
 		}
-		if (!config.parallelEventHandling().getSynchronizeOnSimSteps()) {
+		if (!config.eventsManager().getSynchronizeOnSimSteps()) {
 			throw new RuntimeException("Synchronization on sim steps is required");
 		}
 	}

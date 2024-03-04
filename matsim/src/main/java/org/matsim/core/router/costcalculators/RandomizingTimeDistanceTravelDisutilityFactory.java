@@ -23,7 +23,7 @@ package org.matsim.core.router.costcalculators;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -50,15 +50,15 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 
 	private final String mode;
 	private final double sigma;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	private final ScoringConfigGroup cnScoringGroup;
 
 	public RandomizingTimeDistanceTravelDisutilityFactory( final String mode, Config config ) {
 		// NOTE: It is difficult to get rid of this constructor completely, since "mode" needs to be passed in.  One could still get all other
 		// material from injection, but there are many uses of this class outside injection.
 
 		this.mode = mode;
-		this.cnScoringGroup = config.planCalcScore();
-		this.sigma = config.plansCalcRoute().getRoutingRandomness();
+		this.cnScoringGroup = config.scoring();
+		this.sigma = config.routing().getRoutingRandomness();
 	}
 
 	@Override
@@ -69,14 +69,14 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		// a warning.  However, we know by now that few people think about such warnings. kai, mar'20
 		logWarningsIfNecessary( cnScoringGroup );
 
-		final PlanCalcScoreConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
+		final ScoringConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
 		if ( params == null ) {
 			throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getModes().keySet() );
 		}
 
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
 		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() 
+		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney()
 				- params.getMarginalUtilityOfDistance() ;
 
 		double normalization = 1;
@@ -95,7 +95,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 				sigma);
 	}
 
-	private void logWarningsIfNecessary(final PlanCalcScoreConfigGroup cnScoringGroup) {
+	private void logWarningsIfNecessary(final ScoringConfigGroup cnScoringGroup) {
 		if ( wrnCnt.getAndIncrement() < 1 ) {
 			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
 				log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
@@ -108,12 +108,12 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 						" The routing disutility will only consider the ones of the default subpopulation.");
 				log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
 			}
-			
+
 			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() == 0. && this.sigma != 0. ) {
 				log.warn("There will be no routing randomness. The randomization of the travel disutility requires the monetary distance rate "
 						+ "to be different than zero. Continuing anyway.") ;
 			}
-			
+
 			if ( (cnScoringGroup.getModes().get( mode ).getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
 				log.warn("There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate "
 						+ "to be different than zero. Continuing anyway.") ;

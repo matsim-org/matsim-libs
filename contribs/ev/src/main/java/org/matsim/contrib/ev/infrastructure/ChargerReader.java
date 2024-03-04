@@ -28,12 +28,13 @@ import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-public class ChargerReader extends MatsimXmlParser {
+public final class ChargerReader extends MatsimXmlParser {
 	private final static String CHARGER = "charger";
 
 	private final ChargingInfrastructureSpecification chargingInfrastructure;
 
 	public ChargerReader(ChargingInfrastructureSpecification chargingInfrastructure) {
+		super(ValidationType.DTD_ONLY);
 		this.chargingInfrastructure = chargingInfrastructure;
 	}
 

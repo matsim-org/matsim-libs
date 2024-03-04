@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -54,7 +54,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 		this.network = network ;
 	}
 
-	public PathSizeLogitSelector(final PlanCalcScoreConfigGroup config, final Network network) {
+	public PathSizeLogitSelector(final ScoringConfigGroup config, final Network network) {
 		this( config.getPathSizeLogitBeta(), config.getBrainExpBeta(), network ) ;
 	}
 
@@ -62,19 +62,19 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 	@Override
 	protected Map<Plan,Double> calcWeights(final List<? extends Plan> plans ) {
 		// ("plans" is the list of plans of a single person)
-		
+
 		Map<Plan,Double> weights = new HashMap<Plan,Double>() ;
 
 		double maxScore = Double.NEGATIVE_INFINITY;
 
 		HashMap<Id<Link>, ArrayList<Double>> linksInTime = new HashMap<>();
 		// (a data structure that memorizes possible leg start times for link utilization (??))
-		
+
 		HashMap<Integer,Double> planLength = new HashMap<Integer, Double>();
 		// (a data structure that memorizes the total travel distance of each plan)
 		// (yyyy is it obvious that no two plans can have the same hash code?  what happens if they do?  kai, oct'12)
 		// (why not just <Plan,Double>?????)
-		
+
 		//this gets the choice sets C_n
 		//TODO [GL] since the lack of information in Route(),
 		//the very first and the very last link of a path will be ignored - gl
@@ -96,7 +96,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 
 					pathSize += RouteUtils.calcDistanceExcludingStartEndLink(r, network);
 					// (i.e. pathSize will be the sum over all routes of the plan)
-					
+
 					for (Id<Link> linkId : r.getLinkIds()){
 						ArrayList<Double> lit = linksInTime.get(linkId);
 						if (lit == null){
@@ -140,17 +140,17 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 			// tmp is now a number that contains the ``reduced'' travel distance of the plan.  Divide it by the full travel distance
 			// of the plan, and take to the power of this.beta:
 			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.pathSizeLogitExponent);
-			
+
 			double weight;
 			if (Double.isInfinite(maxScore)) {
-				// (isInfinite(x) also returns true when x==-Infinity) 
-				
+				// (isInfinite(x) also returns true when x==-Infinity)
+
 				// likely that wc.maxScore == -Infinity, and thus plan.getScoreAsPrimitiveType() also == -Infinity, handle it like any other case where getScore() == maxScore
 				// I do not understand the line above.  kai, oct'12
-				
+
 				weight = PSi;
-				// (yy I do not understand.  Presumably, wc.maxScore may be -Infinity, in which case ALL plan scores are -Infinity 
-				// (or NaN or null or something similar).  In this case, plans are simply weighted by their PSi, so that 
+				// (yy I do not understand.  Presumably, wc.maxScore may be -Infinity, in which case ALL plan scores are -Infinity
+				// (or NaN or null or something similar).  In this case, plans are simply weighted by their PSi, so that
 				// overlapping plans get less weight than very different plans. kai, oct'12)
 			} else {
 				weight = Math.exp(this.logitScaleFactor * (plan.getScore() - maxScore))*PSi;
@@ -159,12 +159,12 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 			}
 
 			if (weight <= 0.0) weight = 0;
-			// (yy how can weight become negative?? kai, oct'12) 
+			// (yy how can weight become negative?? kai, oct'12)
 
 			// the weight is memorized; the sum of all weights in computed.  Choice will be based on those weights
 			weights.put( plan, weight) ;
 		}
-		
+
 		return weights ;
 	}
 

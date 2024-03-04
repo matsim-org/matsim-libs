@@ -4,6 +4,8 @@ import static org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.Passen
 
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 
+import java.util.Optional;
+
 /**
  * dvrp needs {@link PassengerHandler} bound to something.  It is first bound to a {@link PassengerEngine} so it can also do stuff on its own.  Then,
  * {@link PassengerEngine} is bound to one of the existing implementations.
@@ -27,6 +29,8 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	@Override
 	protected void configureQSim() {
 		bindModal(PassengerHandler.class).to(modalKey(PassengerEngine.class));
+		bindModal(PassengerGroupIdentifier.class).toInstance(agent -> Optional.empty());
+
 		// (PassengerEngine is a more powerful interface.)
 
 		addMobsimScopeEventHandlerBinding().to(modalKey(PassengerEngine.class));

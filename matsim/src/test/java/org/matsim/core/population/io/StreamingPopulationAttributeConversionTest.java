@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * PopulationAttributeConversionTest.java
@@ -26,9 +25,9 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -41,11 +40,11 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class StreamingPopulationAttributeConversionTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDefaults() {
+	void testDefaults() {
 		final String path = utils.getOutputDirectory() + "/plans.xml";
 
 		testWriteAndRereadStreaming((w, persons) -> {
@@ -62,11 +61,15 @@ public class StreamingPopulationAttributeConversionTest {
 		final Population population = scenario.getPopulation();
 		final PopulationFactory populationFactory = population.getFactory();
 
-		final Id<Person> personId = Id.createPersonId("Gaston");
-		final Person person = populationFactory.createPerson(personId);
+		final Id<Person> personId0 = Id.createPersonId("Gaston0");
 		final CustomClass attribute = new CustomClass("homme à tout faire");
-		person.getAttributes().putAttribute("job", attribute);
-		population.addPerson(person);
+		// create 10 test persons so we can actually test parallelism better
+		for (int i = 0; i < 10; i++) {
+			final Id<Person> personId = Id.createPersonId("Gaston" + i);
+			final Person person = populationFactory.createPerson(personId);
+			person.getAttributes().putAttribute("job", attribute);
+			population.addPerson(person);
+		}
 
 		final StreamingPopulationWriter writer = new StreamingPopulationWriter();
 		writer.putAttributeConverter(CustomClass.class, new CustomClassConverter());
@@ -79,13 +82,13 @@ public class StreamingPopulationAttributeConversionTest {
 		reader.putAttributeConverter(CustomClass.class, new CustomClassConverter());
 		readMethod.accept(reader);
 
-		final Person readPerson = readScenario.getPopulation().getPersons().get(personId);
+		final Person readPerson = readScenario.getPopulation().getPersons().get(personId0);
 		final Object readAttribute = readPerson.getAttributes().getAttribute("job");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
+		Assertions.assertEquals(
 				attribute,
-				readAttribute);
+				readAttribute,
+				"unexpected read attribute");
 	}
 
 	private static class CustomClass {

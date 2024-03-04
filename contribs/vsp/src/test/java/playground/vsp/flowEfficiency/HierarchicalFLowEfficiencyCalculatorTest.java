@@ -1,11 +1,10 @@
 package playground.vsp.flowEfficiency;
 
 import com.google.inject.Provides;
-import com.google.inject.name.Names;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -26,7 +25,6 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -63,35 +61,34 @@ import java.util.Set;
  */
 public class HierarchicalFLowEfficiencyCalculatorTest {
 
-
-	public @Rule
-	MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 	private FlowEfficiencyHandler handler;
 
 	@Test
-	public void testThatDrtAVMoveFaster(){
+	void testThatDrtAVMoveFaster(){
 
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(260)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
+		Assertions.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
+		Assertions.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));
+		Assertions.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(260)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
 
-		Assert.assertEquals(7238, handler.lastArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON); //car drivers
-		Assert.assertEquals(1845, handler.lastArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON); //drt drivers
-		Assert.assertEquals(5440, handler.lastArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON); //mixed (car - drt -car - drt - ....)
+		Assertions.assertEquals(7238, handler.lastArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON); //car drivers
+		Assertions.assertEquals(1845, handler.lastArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON); //drt drivers
+		Assertions.assertEquals(5440, handler.lastArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON); //mixed (car - drt -car - drt - ....)
 
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON);
 
 	}
 
-	@Before
+	@BeforeEach
 	public void simulate(){
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"eight_shared_taxi_config.xml");
 
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new MultiModeDrtConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.qsim().setEndTime(4*3600);
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);

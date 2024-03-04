@@ -37,4 +37,11 @@ import org.matsim.core.controler.Controler;
  */
 public interface ControlerListener extends EventListener, MatsimExtensionPoint {
 
+	/**
+	 * Return the priority of this listener. Listeners with higher priority are executed first. The default priority is 0.
+	 */
+	default double priority() {
+		return 0;
+	}
+
 }

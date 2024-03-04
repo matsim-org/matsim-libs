@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.oneagent;
 
-import org.junit.Assert;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -32,7 +31,6 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
@@ -50,27 +48,27 @@ import org.matsim.testcases.utils.EventsLogger;
  *
  */
 public class ControlerTest {
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	/**
 	 * Tests the setup with a traffic light that shows all the time green in the 0th iteration.
 	 * After the mobsim is run the signal settings are changed thus in the 1st iteration
 	 * the signal should be red in sec [0,99] and green in [100,2000]
 	 */
 	@Test
-	public void testModifySignalControlDataOnsetOffset() {
+	void testModifySignalControlDataOnsetOffset() {
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);
-		scenario.getConfig().controler().setFirstIteration(0);
-		scenario.getConfig().controler().setLastIteration(1);
-		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
-		scenario.getConfig().controler().setWriteEventsInterval(1);
-		
+		scenario.getConfig().controller().setFirstIteration(0);
+		scenario.getConfig().controller().setLastIteration(1);
+		scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+		scenario.getConfig().controller().setWriteEventsInterval(1);
+
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controller().setCreateGraphs(false);
         controler.addControlerListener(new AfterMobsimListener() {
 
 			@Override
@@ -82,7 +80,7 @@ public class ControlerTest {
 					((SignalsData) scenario
 						.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalControlData()
 						.getSignalSystemControllerDataBySystemId().values()) {
-					
+
 					for (SignalPlanData plan : intersectionSignal.getSignalPlanData().values()) {
 						plan.setCycleTime(2000);
 						for (SignalGroupSettingsData data : plan.getSignalGroupSettingsDataByGroupId().values()) {
@@ -93,7 +91,7 @@ public class ControlerTest {
 				}
 			}
 		});
-		
+
 		controler.addControlerListener((IterationStartsListener)event -> {
 			event.getServices().getEvents().addHandler(new EventsLogger());
 
@@ -108,11 +106,11 @@ public class ControlerTest {
 				event.getServices().getEvents().addHandler(signalsHandler0);
 			}
 		});
-		
+
 		controler.run();
 	}
-	
-	
+
+
 	private static final class TestSignalGroupStateChangedHandler implements
 			SignalGroupStateChangedEventHandler {
 
@@ -122,10 +120,10 @@ public class ControlerTest {
 		@Override
 		public void handleEvent(SignalGroupStateChangedEvent e) {
 			if (e.getNewState().equals(SignalGroupState.RED)){
-				Assert.assertEquals(0.0, e.getTime(), 1e-7);
+				Assertions.assertEquals(0.0, e.getTime(), 1e-7);
 			}
 			else if (e.getNewState().equals(SignalGroupState.GREEN)) {
-				Assert.assertEquals(100.0, e.getTime(), 1e-7);
+				Assertions.assertEquals(100.0, e.getTime(), 1e-7);
 			}
 		}
 	}
@@ -139,9 +137,9 @@ public class ControlerTest {
 		@Override
 		public void handleEvent(LinkEnterEvent e){
 			if (e.getLinkId().equals(linkId2)) {
-				Assert.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
 			}
 		}
 	}
-	
+
 }

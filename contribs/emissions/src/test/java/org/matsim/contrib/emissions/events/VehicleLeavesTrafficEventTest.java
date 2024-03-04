@@ -1,8 +1,8 @@
 package org.matsim.contrib.emissions.events;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.VspHbefaRoadTypeMapping;
@@ -36,10 +36,10 @@ import java.net.URL;
  */
 public class VehicleLeavesTrafficEventTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public final void testRareEventsFromBerlinScenario (){
+	@Test
+	final void testRareEventsFromBerlinScenario(){
 
 		final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
 		final String resultingEvents = utils.getOutputDirectory() + emissionEventsFileName;
@@ -82,7 +82,7 @@ public class VehicleLeavesTrafficEventTest {
         }
 		final String expected = utils.getClassInputDirectory() + emissionEventsFileName;
 		EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, resultingEvents);
-        Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+        Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
     }
 
 }

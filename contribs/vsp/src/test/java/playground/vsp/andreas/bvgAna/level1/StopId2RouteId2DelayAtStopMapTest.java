@@ -1,7 +1,7 @@
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -15,7 +15,7 @@ import org.matsim.vehicles.Vehicle;
 public class StopId2RouteId2DelayAtStopMapTest {
 
 	@Test
-	public void testStopId2RouteId2DelayAtStopMap() {
+	void testStopId2RouteId2DelayAtStopMap() {
 
 //	    assign Ids to routes, vehicles and agents to be used in Test
 
@@ -57,11 +57,11 @@ public class StopId2RouteId2DelayAtStopMapTest {
 //
 //	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getLineId());
 
-	    Assert.assertEquals(transitLineId1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getLineId());
+	    Assertions.assertEquals(transitLineId1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getLineId());
 
-	    Assert.assertEquals(transitRouteId1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getRouteId());
+	    Assertions.assertEquals(transitRouteId1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getRouteId());
 
-	    Assert.assertEquals(1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getRealizedDepartures().size());
+	    Assertions.assertEquals(1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getRealizedDepartures().size());
 
 
 

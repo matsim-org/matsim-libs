@@ -3,10 +3,12 @@ package org.matsim.simwrapper;
 import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
+import scala.util.parsing.combinator.testing.Str;
 
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,6 +148,33 @@ public final class Data {
 
 		resources.put(resolved, resource);
 		return this.getUnixPath(this.path.getParent().relativize(resolved));
+	}
+
+	/**
+	 * Copies an input file (which can be local or an url) to the output directory. This method is intended to copy input for analysis classes.
+	 */
+	public String copyInput(URL file, String baseFolder) {
+
+		String baseName = FilenameUtils.getName(file.getPath());
+
+		Path baseDir;
+		if (currentContext.getName().isBlank())
+			baseDir = this.path.resolve(baseFolder);
+		else
+			baseDir = this.path.resolve(baseFolder + "-" + currentContext.getName());
+
+		Path resolved = baseDir.resolve(baseName);
+
+		try {
+			if (resources.containsKey(resolved) && !resources.get(resolved).toURI().equals(file.toURI()))
+				throw new IllegalArgumentException(String.format("File '%s' was already mapped to url '%s'. ", file, resources.get(resolved)));
+
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("Illegal URL", e);
+		}
+
+		resources.put(resolved, file);
+		return Paths.get("").relativize(resolved).toString();
 	}
 
 	/**

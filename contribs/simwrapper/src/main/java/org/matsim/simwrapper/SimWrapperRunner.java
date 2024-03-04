@@ -24,11 +24,15 @@ public class SimWrapperRunner implements MATSimAppCommand {
 	@CommandLine.Parameters(arity = "1..*", description = "Path to folders for which dashboards should be generated.")
 	private List<Path> inputPaths;
 
-	@CommandLine.Option(names = "--config", description = "Path to MATSim config that used be used. If not given tries to use output config.", required = false)
+	@CommandLine.Option(names = "--config", description = "Path to MATSim config that should be used. If not given tries to use output config.", required = false)
 	private String configPath;
 
 	@CommandLine.Option(names = "--exclude", split = ",", description = "Exclusion that will be added to the config.")
 	private Set<String> exclude;
+
+	public static void main(String[] args) {
+		new SimWrapperRunner().execute(args);
+	}
 
 	@Override
 	public Integer call() throws Exception {

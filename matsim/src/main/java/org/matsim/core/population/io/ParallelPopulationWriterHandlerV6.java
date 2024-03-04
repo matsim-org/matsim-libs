@@ -29,7 +29,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -41,6 +40,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -152,10 +152,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		}
 		// pass on potential exceptions
 		if (runnerException != null) {
-			throw new UncheckedIOException(runnerException);
+			throw new UncheckedIOException(new IOException(runnerException));
 		}
 		if (writerException != null) {
-			throw new UncheckedIOException(writerException);
+			throw new UncheckedIOException(new IOException(writerException));
 		}
 	}
 

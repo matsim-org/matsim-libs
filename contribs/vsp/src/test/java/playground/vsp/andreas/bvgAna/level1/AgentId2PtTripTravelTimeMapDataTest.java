@@ -22,8 +22,8 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -38,7 +38,7 @@ import playground.vsp.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMapData;
 public class AgentId2PtTripTravelTimeMapDataTest {
 
 	@Test
-	public void testAgentId2PtTripTravelTimeMapData() {
+	void testAgentId2PtTripTravelTimeMapData() {
 		
 		Set<Id<Person>> idSet = new TreeSet<>();
   	for (int ii=0; ii<15; ii++){
@@ -71,9 +71,9 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 		System.out.println("Number of Transfers should be: 1 and are: "+test.getNumberOfTransfers());	
 		System.out.println("Total travel time should be: "+(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime())+" and is: "+test.getTotalTripTravelTime()); 
 				
-		Assert.assertEquals(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
+		Assertions.assertEquals(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
 		
-		Assert.assertEquals(1, test.getNumberOfTransfers());
+		Assertions.assertEquals(1, test.getNumberOfTransfers());
 		
 
 		

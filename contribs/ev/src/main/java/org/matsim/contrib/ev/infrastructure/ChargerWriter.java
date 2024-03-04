@@ -29,7 +29,7 @@ import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class ChargerWriter extends MatsimXmlWriter {
+public final class ChargerWriter extends MatsimXmlWriter {
 	private final Stream<? extends ChargerSpecification> chargerSpecifications;
 
 	public ChargerWriter(Stream<? extends ChargerSpecification> chargerSpecifications) {

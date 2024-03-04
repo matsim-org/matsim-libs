@@ -41,7 +41,7 @@ class OrderFrequencyStrategyManager implements Provider<ReceiverStrategyManager>
 			GenericPlanStrategyImpl<ReceiverPlan, Receiver> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger.Factory<ReceiverPlan, Receiver>().setBetaValue(10.0).build() );
 			strategy.addStrategyModule(new OrderSizeMutator(true));
 			strategyManager.addStrategy(strategy, null, 0.15);
-			strategyManager.addChangeRequest((int) (sc.getConfig().controler().getLastIteration()*0.9), strategy, null, 0.0);
+			strategyManager.addChangeRequest((int) (sc.getConfig().controller().getLastIteration()*0.9), strategy, null, 0.0);
 		}
 
 		/*
@@ -52,7 +52,7 @@ class OrderFrequencyStrategyManager implements Provider<ReceiverStrategyManager>
 			GenericPlanStrategyImpl<ReceiverPlan, Receiver> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger.Factory<ReceiverPlan, Receiver>().setBetaValue(10.0).build() );
 			strategy.addStrategyModule(new OrderSizeMutator(false));
 			strategyManager.addStrategy(strategy, null, 0.15);
-			strategyManager.addChangeRequest((int) (sc.getConfig().controler().getLastIteration()*0.9), strategy, null, 0.0);
+			strategyManager.addChangeRequest((int) (sc.getConfig().controller().getLastIteration()*0.9), strategy, null, 0.0);
 		}
 
 	/* Replanning for grand coalition receivers. TODO Removed for now. */

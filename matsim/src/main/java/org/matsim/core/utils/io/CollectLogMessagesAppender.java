@@ -45,7 +45,6 @@ public class CollectLogMessagesAppender extends AbstractAppender {
 				Controler.DEFAULTLOG4JLAYOUT,
 				false,
 				new Property[0]);
-		this.logEvents = logEvents;
 	}
 
 	@Override

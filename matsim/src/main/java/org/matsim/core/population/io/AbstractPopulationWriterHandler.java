@@ -77,7 +77,6 @@ abstract class AbstractPopulationWriterHandler implements PopulationWriterHandle
 		}
 		this.endPerson(writer);
 		this.writeSeparator(writer);
-		writer.flush();
 	}
 
 	public abstract void startPerson(final Person person, final BufferedWriter out) throws IOException;

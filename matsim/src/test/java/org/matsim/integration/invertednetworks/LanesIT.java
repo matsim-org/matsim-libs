@@ -23,9 +23,9 @@ import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -56,21 +56,21 @@ public class LanesIT {
 
 	private static final Logger log = LogManager.getLogger(LanesIT.class);
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testLanes(){
+	void testLanes(){
 		String configFilename = testUtils.getClassInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFilename);
 		config.network().setInputFile("network.xml");
 		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
-		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
+		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "output");
 		final int lastIteration = 50;
-		config.controler().setLastIteration(lastIteration);
-		config.controler().setCreateGraphs(false);
+		config.controller().setLastIteration(lastIteration);
+		config.controller().setCreateGraphs(false);
 		config.vspExperimental().setWritingOutputEvents(false);
 		config.travelTimeCalculator().setSeparateModes( false );
 		// ---
@@ -82,12 +82,12 @@ public class LanesIT {
 				addMobsimListenerBinding().toInstance(new MobsimInitializedListener() {
 					@Override
 					public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-						Assert.assertTrue(e.getQueueSimulation() instanceof QSim);
+						Assertions.assertTrue(e.getQueueSimulation() instanceof QSim);
 						QSim qsim = (QSim) e.getQueueSimulation();
 						NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(Id.create("23", Link.class));
-						Assert.assertTrue(link instanceof QLinkLanesImpl);
+						Assertions.assertTrue(link instanceof QLinkLanesImpl);
 						QLinkLanesImpl link23 = (QLinkLanesImpl) link;
-						Assert.assertNotNull(link23.getQueueLanes());
+						Assertions.assertNotNull(link23.getQueueLanes());
 						//			for (QLane lane : link23.getQueueLanes()){
 						//				Assert.assertNotNull(lane);
 						//				log.error("lane " + lane.getId() + " flow " + lane.getSimulatedFlowCapacity());
@@ -139,9 +139,9 @@ public class LanesIT {
 			log.info( "link36:" + percent36 );
 
 			// The lanes attached to link 23 should distribute the 3600 veh/h capacity as follows:
-			Assert.assertEquals("lane to link 34 should have approx. 600 veh/h, i.e. 16.6% of the total flow", 16.6, percent34, 1);
-			Assert.assertEquals("lane to link 35 should have approx. 1200 veh/h, i.e. 33.3% of the total flow", 33.3, percent35, 1);
-			Assert.assertEquals("lane to link 36 should have approx. 1800 veh/h, i.e. 50.0% of the total flow", 50.0, percent36, 1);
+			Assertions.assertEquals(16.6, percent34, 1, "lane to link 34 should have approx. 600 veh/h, i.e. 16.6% of the total flow");
+			Assertions.assertEquals(33.3, percent35, 1, "lane to link 35 should have approx. 1200 veh/h, i.e. 33.3% of the total flow");
+			Assertions.assertEquals(50.0, percent36, 1, "lane to link 36 should have approx. 1800 veh/h, i.e. 50.0% of the total flow");
 		}
 	}
 

@@ -1,7 +1,7 @@
 package org.matsim.facilities;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
@@ -11,7 +11,7 @@ import java.io.ByteArrayInputStream;
 public class StreamingActivityFacilitiesTest {
 
 	@Test
-	public void testFacilityIsComplete() {
+	void testFacilityIsComplete() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 				"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
 				"<facilities name=\"test facilities for triangle network\">\n" +
@@ -45,30 +45,30 @@ public class StreamingActivityFacilitiesTest {
 		boolean[] foundFacilities = new boolean[3];
 		StreamingActivityFacilities streamingFacilities = new StreamingActivityFacilities(f -> {
 			if (f.getId().toString().equals("1")) {
-				Assert.assertEquals(60.0, f.getCoord().getX(), 1e-7);
-				Assert.assertTrue(f.getActivityOptions().containsKey("home"));
-				Assert.assertEquals(1000, ((Integer) f.getAttributes().getAttribute("population")).intValue());
+				Assertions.assertEquals(60.0, f.getCoord().getX(), 1e-7);
+				Assertions.assertTrue(f.getActivityOptions().containsKey("home"));
+				Assertions.assertEquals(1000, ((Integer) f.getAttributes().getAttribute("population")).intValue());
 				foundFacilities[0] = true;
 			}
 			if (f.getId().toString().equals("10")) {
-				Assert.assertEquals(110.0, f.getCoord().getX(), 1e-7);
-				Assert.assertTrue(f.getActivityOptions().containsKey("education"));
-				Assert.assertTrue(f.getAttributes().isEmpty());
+				Assertions.assertEquals(110.0, f.getCoord().getX(), 1e-7);
+				Assertions.assertTrue(f.getActivityOptions().containsKey("education"));
+				Assertions.assertTrue(f.getAttributes().isEmpty());
 				foundFacilities[1] = true;
 			}
 			if (f.getId().toString().equals("20")) {
-				Assert.assertEquals(120.0, f.getCoord().getX(), 1e-7);
-				Assert.assertTrue(f.getActivityOptions().containsKey("shop"));
-				Assert.assertTrue(f.getAttributes().isEmpty());
+				Assertions.assertEquals(120.0, f.getCoord().getX(), 1e-7);
+				Assertions.assertTrue(f.getActivityOptions().containsKey("shop"));
+				Assertions.assertTrue(f.getAttributes().isEmpty());
 				foundFacilities[2] = true;
 			}
 		});
 		MatsimFacilitiesReader reader = new MatsimFacilitiesReader(null, null, streamingFacilities);
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
-		Assert.assertTrue(foundFacilities[0]);
-		Assert.assertTrue(foundFacilities[1]);
-		Assert.assertTrue(foundFacilities[2]);
+		Assertions.assertTrue(foundFacilities[0]);
+		Assertions.assertTrue(foundFacilities[1]);
+		Assertions.assertTrue(foundFacilities[2]);
 	}
 
 }

@@ -32,6 +32,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -140,7 +143,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		paramFields = getParamFields();
 		registeredParams = Sets.union(stringGetters.keySet(), paramFields.keySet());
 
-		checkModuleConsistency(setters.keySet().equals(stringGetters.keySet()), "setters and getters inconsistent");
+		// Each parameter which has a setter must have a getter. But there can be parameters which have a getter but no setter in order
+		// to provide backwards compatibility.
+		checkModuleConsistency(setters.keySet().containsAll(stringGetters.keySet()), "setters and getters inconsistent");
 		checkModuleConsistency(paramFields.keySet().stream().noneMatch(setters::containsKey),
 				"Use either StringGetter/Setter or Parameter annotations");
 	}
@@ -234,10 +239,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 	private static final Set<Class<?>> ALLOWED_PARAMETER_TYPES = Set.of(String.class, Float.class, Double.class,
 			Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class, Float.TYPE, Double.TYPE,
-			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);
+			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE, LocalTime.class,
+			LocalDate.class, LocalDateTime.class);
 
 	private static final String HINT = " Valid types are String, primitive types and their wrapper classes,"
-			+ " enumerations, List<String> and Set<String>."
+			+ " enumerations, List<String> and Set<String>, LocalTime, LocalDate, LocalDateTime"
 			+ " Other types are fine as parameters, but you will need to implement conversion strategies"
 			+ " in corresponding StringGetters andStringSetters.";
 
@@ -279,14 +285,29 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return;
 		}
 
-		Preconditions.checkArgument(storeUnknownParameters, "Module %s of type %s doesn't accept unknown parameters."
-						+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), param_name,
-				setters.keySet());
+		this.handleAddUnknownParam(param_name, value);
+	}
+
+	/**
+	 * This method is designed to be overwritten if a config group wants to provide
+	 * custom handling for unknown parameters, e.g. for improved backwards compatibility.
+	 * For example: It allows to convert (old-named) parameter values to different units and
+	 * store them with the new name (old parameter could be km/h, new parameter could be m/s).
+	 *
+	 * The default implementation in {@link ReflectiveConfigGroup} will either store the
+	 * unknown parameter or throw an exception, depending on the value of {@link #storeUnknownParameters}.
+	 *
+	 * If the method is overwritten, it might make sense to also overwrite {@link #handleGetUnknownValue(String)}.
+	 */
+	public void handleAddUnknownParam(final String paramName, final String value) {
+		Preconditions.checkArgument(this.storeUnknownParameters, "Module %s of type %s doesn't accept unknown parameters."
+				+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), paramName,
+			this.setters.keySet());
 
 		log.warn(
-				"Unknown parameter {} for group {}. Here are the valid parameter names: {}. Only the string value will be remembered.",
-				param_name, getName(), registeredParams);
-		super.addParam(param_name, value);
+			"Unknown parameter {} for group {}. Here are the valid parameter names: {}. Only the string value will be remembered.",
+			paramName, getName(), this.registeredParams);
+		super.addParam(paramName, value);
 	}
 
 	private void invokeSetter(final Method setter, final String value) {
@@ -342,6 +363,12 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return null;
 		} else if (type.equals(String.class)) {
 			return value;
+		} else if (type.equals(LocalTime.class)) {
+			return LocalTime.parse(value);
+		} else if (type.equals(LocalDate.class)) {
+			return LocalDate.parse(value);
+		} else if (type.equals(LocalDateTime.class)) {
+			return LocalDateTime.parse(value);
 		} else if (type.equals(Float.class) || type.equals(Float.TYPE)) {
 			return Float.parseFloat(value);
 		} else if (type.equals(Double.class) || type.equals(Double.TYPE)) {
@@ -426,13 +453,22 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		if (field != null) {
 			return getParamField(field);
 		}
+		return this.handleGetUnknownValue(param_name);
+	}
 
-		Preconditions.checkArgument(storeUnknownParameters, "Module %s of type %s doesn't store unknown parameters."
-						+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), param_name,
-				registeredParams);
+	/**
+	 * This method is designed to be overwritten if a config group wants to provide
+	 * custom handling for unknown parameters, e.g. for improved backwards compatibility.
+	 *
+	 * Also see {@link #handleAddUnknownParam(String, String)}
+	 */
+	public String handleGetUnknownValue(final String paramName) {
+		Preconditions.checkArgument(this.storeUnknownParameters, "Module %s of type %s doesn't store unknown parameters."
+						+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), paramName,
+				this.registeredParams);
 
-		log.warn("no getter found for param {}: trying parent method", param_name);
-		return super.getValue(param_name);
+		log.warn("no getter found for param {}: trying parent method", paramName);
+		return super.getValue(paramName);
 	}
 
 	private String invokeGetter(Method getter) {

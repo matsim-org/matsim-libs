@@ -24,10 +24,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -47,17 +46,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * Tests specific to the 'probability-for-random-single-trip-mode' parameter.
- * 
+ *
  * @author ikaddoura based on thibautd
  */
-@RunWith(Parameterized.class)
 public class ChooseRandomLegModeForSubtourDiffModesTest {
-	
+
 	private static final String[] MODES = new String[]{TransportMode.pt, TransportMode.car, TransportMode.walk};
 	private static final String[] CHAIN_BASED_MODES = new String[]{TransportMode.car};
-	
-	private final double probaForRandomSingleTripMode;
-	
+
 	// /////////////////////////////////////////////////////////////////////////
 	// Fixtures
 	// /////////////////////////////////////////////////////////////////////////
@@ -75,7 +71,7 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 				final Id<Link> id3 = Id.create( 3, Link.class );
 
 				final Plan plan = fact.createPlan();
-				
+
 				plan.addActivity( fact.createActivityFromLinkId( "h" , id1 ) );
 
 				plan.addLeg( fact.createLeg( TransportMode.walk ) );
@@ -90,7 +86,7 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 			}
 		};
 	}
-	
+
 	private static Collection<Fixture> createFixtures() {
 		return Arrays.asList(
 				createOneTourFixture());
@@ -102,16 +98,9 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
-	@Parameterized.Parameters(name = "{index}: probaForChooseRandomSingleTripMode == {0}")
-	public static Collection<Object> createTests() {
-		return Arrays.asList(0., 1.0);
-	}
-	public ChooseRandomLegModeForSubtourDiffModesTest( double proba ) {
-		this.probaForRandomSingleTripMode = proba ;
-	}
-	
-	@Test
-	public void testMutatedTrips() {
+	@ParameterizedTest
+	@ValueSource(doubles = {0., 1.})
+	void testMutatedTrips(double probaForRandomSingleTripMode) {
 		Config config = ConfigUtils.createConfig();
 		config.subtourModeChoice().setModes(MODES);
 		config.subtourModeChoice().setConsiderCarAvailability(false);
@@ -132,18 +121,18 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 				testee.run( plan );
 
 				final List<Trip> newTrips = TripStructureUtils.getTrips( plan );
-				
-				Assert.assertEquals(
-						"number of trips changed with mode mutation!?",
+
+				Assertions.assertEquals(
 						initNTrips,
-						newTrips.size());
+						newTrips.size(),
+						"number of trips changed with mode mutation!?");
 
 				final Collection<Subtour> newSubtours = TripStructureUtils.getSubtours( plan );
 
-				Assert.assertEquals(
-						"number of subtours changed with mode mutation!?",
+				Assertions.assertEquals(
 						initSubtours.size(),
-						newSubtours.size());
+						newSubtours.size(),
+						"number of subtours changed with mode mutation!?");
 
 				final List<Subtour> mutated = new ArrayList<Subtour>();
 				for ( Subtour newSubtour : newSubtours ) {
@@ -152,9 +141,9 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 					}
 				}
 
-				Assert.assertFalse(
-						"no mutated subtours",
-						mutated.isEmpty() );
+				Assertions.assertFalse(
+						mutated.isEmpty(),
+						"no mutated subtours" );
 
 				int nMutatedWithoutMutatedFather = 0;
 				for ( Subtour s : mutated ) {
@@ -163,22 +152,22 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 					}
 
 					for ( Trip t : s.getTrips() ) {
-						Assert.assertEquals(
-								"unexpected mutated trip length",
+						Assertions.assertEquals(
 								1,
-								t.getTripElements().size());
+								t.getTripElements().size(),
+								"unexpected mutated trip length");
 					}
 				}
 
-				Assert.assertEquals(
-						"unexpected number of roots in mutated subtours",
+				Assertions.assertEquals(
 						1,
-						nMutatedWithoutMutatedFather);
-				
-				
+						nMutatedWithoutMutatedFather,
+						"unexpected number of roots in mutated subtours");
+
+
 				for ( Subtour subtour : newSubtours ) {
 					if (subtour.getChildren().isEmpty()) {
-						checkSubtour(subtour);
+						checkSubtour(subtour, probaForRandomSingleTripMode);
 					} else {
 						throw new RuntimeException("This test is not (yet) made for subtours with children.");
 					}
@@ -186,8 +175,8 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 			}
 		}
 	}
-	
-	private void checkSubtour(Subtour subtour) {
+
+	private void checkSubtour(Subtour subtour, double probaForRandomSingleTripMode) {
 		boolean atLeastOneSubtourWithDifferentNonChainBasedModes = false;
 		boolean atLeastOneSubtourWithDifferentChainBasedModes = false;
 
@@ -195,22 +184,22 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 			String modePreviousTripSameSubtour = null;
 
 			for (Trip trip: subtour.getTrips()) {
-				
+
 				for (Leg leg : trip.getLegsOnly()) {
-										
+
 					if (modePreviousTripSameSubtour == null) {
 						// first trip during this subtour
 					} else {
 						if (leg.getMode().equals(modePreviousTripSameSubtour)) {
-							// same mode 
-							
+							// same mode
+
 						} else {
 							// different modes, should only occur for non-chain-based modes
-														
+
 							if (isChainBasedMode(leg.getMode()) || isChainBasedMode(modePreviousTripSameSubtour)) {
 								// one of the two different modes is a chain-based mode which shouldn't just fall from the sky
 								atLeastOneSubtourWithDifferentChainBasedModes = true;
-								
+
 							} else {
 								// not a chain-based mode
 								atLeastOneSubtourWithDifferentNonChainBasedModes = true;
@@ -221,18 +210,18 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 				}
 			}
 		}
-		
+
 		if (atLeastOneSubtourWithDifferentChainBasedModes) {
-			Assert.fail("Two different modes during one subtour where one of the two different modes is a chain-based mode.");
+			Assertions.fail("Two different modes during one subtour where one of the two different modes is a chain-based mode.");
 		}
-						
-		if (this.probaForRandomSingleTripMode > 0.) {
+
+		if (probaForRandomSingleTripMode > 0.) {
 			if (atLeastOneSubtourWithDifferentNonChainBasedModes == false) {
-				Assert.fail("There is not a single subtour with different non-chain-based modes even though the probability for random single trip mode is " + this.probaForRandomSingleTripMode);
+				Assertions.fail("There is not a single subtour with different non-chain-based modes even though the probability for random single trip mode is " + probaForRandomSingleTripMode);
 			}
 		} else {
 			if (atLeastOneSubtourWithDifferentNonChainBasedModes == true) {
-				Assert.fail("There is at least one subtour with different non-chain-based modes even though the probability for random single trip mode is " + this.probaForRandomSingleTripMode);
+				Assertions.fail("There is at least one subtour with different non-chain-based modes even though the probability for random single trip mode is " + probaForRandomSingleTripMode);
 			}
 		}
 	}

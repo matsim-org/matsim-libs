@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.vsp.congestion.handlers;
 
@@ -54,7 +54,7 @@ import playground.vsp.congestion.events.CongestionEvent;
 /**
  * This class provides the basic functionality to calculate congestion effects which may be used for internalization.
  * One of the main tasks is to keep track of the queues on each link.
- * 
+ *
  * @author ikaddoura
  *
  */
@@ -84,7 +84,7 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 			log.warn("Capacity period is other than 3600.");
 		}
 
-		if ( this.scenario.getConfig().parallelEventHandling().getNumberOfThreads()!= null) {
+		if ( this.scenario.getConfig().eventsManager().getNumberOfThreads()!= null) {
 			log.warn("Parallel event handling is not tested. It should not work properly.");
 		}
 
@@ -103,7 +103,7 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 		this.totalDelay = 0.;
 		this.delayNotInternalized_roundingErrors = 0.;
 		this.totalInternalizedDelay = 0.;
-		
+
 		veh2DriverDelegate.reset(iteration);
 	}
 
@@ -127,9 +127,9 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
-			
+
 			this.carPersonIDs.add(event.getPersonId());
-			
+
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
 			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() )
@@ -144,11 +144,11 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 	public final void handleEvent(LinkEnterEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())) {
 			// skip pt vehicles
-		} else { // car! 
+		} else { // car!
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
 			Id<Person> driverId = veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
-			
+
 			if (this.carPersonIDs.contains(driverId)) {
 				// the driver is a car user
 				AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( driverId ).setLinkId( event.getLinkId() )
@@ -161,8 +161,8 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		// yy My preference would be if we found a solution where the basic bookkeeping (e.g. update flow and
-		// delay queues) is done here.  However, delegation does not allow to have custom code in between 
-		// standard code (as was the case before with calculateCongestion).  We need to consider if it is possible to 
+		// delay queues) is done here.  However, delegation does not allow to have custom code in between
+		// standard code (as was the case before with calculateCongestion).  We need to consider if it is possible to
 		// rather have the standard code in one go and embed it in the delegated class.  In the sense of
 		// class MyCongestionHandlerImpl {
 		//    ... handleEvent( LinkLeaveEvent event ) {
@@ -170,15 +170,15 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 		//             delegate.handleEvent( event ) ;
 		//             ... // more custom code
 		//    ...
-		
+
 		// coming here ...
-		
+
 		if (this.ptVehicleIDs.contains(event.getVehicleId())) {
 			// skip pt vehicles
-		} else { // car! 
-			
+		} else { // car!
+
 			Id<Person> personId = veh2DriverDelegate.getDriverOfVehicle( event.getVehicleId() ) ;
-			
+
 			if (this.carPersonIDs.contains(personId)) {
 				// this person is a car user
 				LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), this.getLinkId2congestionInfo(), scenario);
@@ -198,44 +198,44 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 				// global book-keeping:
 				this.totalDelay += ( event.getTime() - delayInfo.freeSpeedLeaveTime );
 			}
-		}		
+		}
 	}
 
 	@Override
 	public final void handleEvent( PersonArrivalEvent event ) {
-		
+
 		if (event.getLegMode().equals(TransportMode.car)) {
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario) ;
 			linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
-			
+
 			this.carPersonIDs.remove(event.getPersonId());
 		}
 	}
 
 	public final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
-		
+
 		double delay = time - delayInfo.freeSpeedLeaveTime;
 
-		if ( delay < 1.0 ) { 
-			linkInfo.getFlowQueue().clear(); 
+		if ( delay < 1.0 ) {
+			linkInfo.getFlowQueue().clear();
 			return ; // should be ok but not tested (*)
-		} 
-		
+		}
+
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
-			
+
 			// seems like this should never be called when (*) is used, but in practice it happens, i.e. tests fail when the above if condition
 			// is commented out.  maybe initialization?  kai, apr'16
 		} else {
 			double earliestLeaveTimeAfterVehicleAhead = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			if ( time > earliestLeaveTimeAfterVehicleAhead + 1.) {
 				// Vehicle is delayed by more than 1/cap.  That is, we must be spill-back delayed.
-				
-				double freeSpeedLeaveTimeGap = delayInfo.freeSpeedLeaveTime - linkInfo.getFlowQueue().getLast().freeSpeedLeaveTime ; 
+
+				double freeSpeedLeaveTimeGap = delayInfo.freeSpeedLeaveTime - linkInfo.getFlowQueue().getLast().freeSpeedLeaveTime ;
 
 				if(freeSpeedLeaveTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()){
 					// we are ALSO flow delayed.  Therefore, we consider the bottleneck still active
-					
+
 				} else {
 					// we are NOT also flow delayed.  The bottleneck is now inactive:
 					linkInfo.getFlowQueue().clear();
@@ -259,7 +259,7 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 	 * <p>
 	 * Charging the agents that are in the flow queue.
 	 */
-	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {		
+	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {
 
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId );
 
@@ -273,9 +273,9 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 
 			double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-			CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", causingAgentDelayInfo.personId, 
+			CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", causingAgentDelayInfo.personId,
 					affectedAgentDelayInfo.personId, allocatedDelay, linkId, causingAgentDelayInfo.linkEnterTime );
-			this.events.processEvent(congestionEvent); 
+			this.events.processEvent(congestionEvent);
 
 			this.totalInternalizedDelay += allocatedDelay ;
 
@@ -292,7 +292,7 @@ class CongestionHandlerBaseImpl implements CongestionHandler {
 
 		return remainingDelay;
 	}
-	
+
 	@Override
 	public double getTotalDelay() {
 		return this.totalDelay ;

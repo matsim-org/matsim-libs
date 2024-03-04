@@ -40,7 +40,7 @@ public class PersonLinkMoneyEventsReader extends MatsimXmlParser{
 	private final EventsManager eventsManager;
 
 	public PersonLinkMoneyEventsReader(EventsManager events) {
-		super();
+		super(ValidationType.NO_VALIDATION);
 		this.eventsManager = events;
 		setValidating(false);
 	}
@@ -58,7 +58,7 @@ public class PersonLinkMoneyEventsReader extends MatsimXmlParser{
 
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
-		
+
 	}
 
 	private void startEvent(final Attributes attributes){
@@ -72,7 +72,7 @@ public class PersonLinkMoneyEventsReader extends MatsimXmlParser{
 			Double amount = 0.0;
 			Double relevantTime = 0.0;
 			String description = "";
-			
+
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
 					time = Double.parseDouble(attributes.getValue(i));

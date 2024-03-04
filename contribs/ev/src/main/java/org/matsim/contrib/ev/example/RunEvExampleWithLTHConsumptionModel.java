@@ -24,7 +24,6 @@ package org.matsim.contrib.ev.example;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +33,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.discharging.VehicleTypeSpecificDriveEnergyConsumptionFactory;
@@ -46,7 +44,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -79,7 +76,7 @@ public class RunEvExampleWithLTHConsumptionModel {
 
 	public void run( String[] args ) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// ===
 
@@ -92,7 +89,7 @@ public class RunEvExampleWithLTHConsumptionModel {
 			VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
 			var vehicleType = Id.create( "EV_65.0kWh", VehicleType.class );
 			driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory( vehicleType,
-					new LTHConsumptionModelReader( vehicleType ).readURL( ConfigGroup.getInputFileURL( config.getContext(), "MidCarMap.csv" ) ) );
+					new LTHConsumptionModelReader().readURL( ConfigGroup.getInputFileURL( config.getContext(), "MidCarMap.csv" ) ) );
 
 			controler.addOverridingModule( new EvModule() );
 			controler.addOverridingModule( new AbstractModule(){
@@ -108,6 +105,7 @@ public class RunEvExampleWithLTHConsumptionModel {
 				}
 			} );
 		}
+
 
 		controler.run();
 	}

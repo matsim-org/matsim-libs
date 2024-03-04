@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.vsp.congestion.handlers;
 
@@ -37,7 +37,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  * This handler calculates agent money events based on marginal congestion events.
  * The causing agent has to pay a toll depending on the number of affected agents and the external delay in sec.
  * The delay is monetized using the behavioral parameters from the scenario.
- * 
+ *
  * @author ikaddoura
  *
  */
@@ -49,19 +49,19 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	private final Scenario scenario;
 	private final double vtts_car;
 	private final double factor;
-	
+
 	private double amountSum = 0.;
 
 	public MarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario) {
 		this(eventsManager, scenario, 1.0);
 	}
-	
+
 	public MarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario, double factor) {
 		this.events = eventsManager;
 		this.scenario = scenario;
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().scoring().getPerforming_utils_hr()) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
 		this.factor = factor;
-		
+
 		log.info("Using the toll factor " + factor);
 		log.info("Using the same VTTS for each agent to translate delays into monetary units.");
 		log.info("VTTS_car: " + vtts_car);
@@ -74,13 +74,13 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 
 	@Override
 	public void handleEvent(CongestionEvent event) {
-		
+
 		double amount = this.factor * event.getDelay() / 3600 * this.vtts_car;
 		this.amountSum = this.amountSum + amount;
-		
+
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "congestionPricing", null);
 		this.events.processEvent(moneyEvent);
-		
+
 		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getEmergenceTime(), "congestion");
 		this.events.processEvent(linkMoneyEvent);
 	}
@@ -88,5 +88,5 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	public double getAmountSum() {
 		return amountSum;
 	}
-	
+
 }

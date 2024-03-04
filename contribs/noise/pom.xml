@@ -40,9 +40,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis-xml</artifactId>
-			<version>0.48.3</version>
+            <groupId>org.openstreetmap.osmosis</groupId>
+            <artifactId>osmosis-core</artifactId>
+            <version>${osmosis.version}</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -51,6 +51,11 @@
 					<artifactId>xml-apis</artifactId>
 				</exclusion>
 			</exclusions>
+        </dependency>
+        <dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-xml</artifactId>
+			<version>${osmosis.version}</version>
 		</dependency>
     </dependencies>
 </project>

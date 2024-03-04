@@ -131,14 +131,15 @@ import com.google.inject.Inject;
             final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario) {
-		this.externalInputCRS = inputCRS;
-		this.targetCRS = targetCRS;
-		this.scenario = scenario;
-		this.plans = scenario.getPopulation();
-	    if (targetCRS != null && externalInputCRS !=null) {
-		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-		    ProjectionUtils.putCRS(this.plans, targetCRS);
-	    }
+			super(ValidationType.DTD_ONLY);
+			this.externalInputCRS = inputCRS;
+			this.targetCRS = targetCRS;
+			this.scenario = scenario;
+			this.plans = scenario.getPopulation();
+			if (targetCRS != null && externalInputCRS !=null) {
+				this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+				ProjectionUtils.putCRS(this.plans, targetCRS);
+			}
 	}
 
 	public ObjectAttributesConverter getObjectAttributesConverter()
@@ -274,7 +275,7 @@ import com.google.inject.Inject;
 		}
 		else {
 			throw new IllegalArgumentException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no', is " + sel);
 		}
 		this.routeDescription = null;
 		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
@@ -395,9 +396,9 @@ import com.google.inject.Inject;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}
@@ -506,9 +507,9 @@ import com.google.inject.Inject;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}

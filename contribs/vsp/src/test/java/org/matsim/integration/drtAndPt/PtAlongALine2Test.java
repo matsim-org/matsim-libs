@@ -1,7 +1,6 @@
 package org.matsim.integration.drtAndPt;
 
 import static java.util.stream.Collectors.toList;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,10 +9,10 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,9 +36,9 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -51,6 +50,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -64,12 +64,11 @@ import com.google.inject.Singleton;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 
-//@RunWith(Parameterized.class)
 public class PtAlongALine2Test {
 	private static final Logger log = LogManager.getLogger(PtAlongALine2Test.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	enum DrtMode {none, teleportBeeline, teleportBasedOnNetworkRoute, full, withPrebooking}
 
@@ -96,7 +95,7 @@ public class PtAlongALine2Test {
 	// !! otfvis does not run within parameterized test :-( !!
 
 	@Test
-	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
+	void testPtAlongALineWithRaptorAndDrtServiceArea() {
 		// Towards some understanding of what is going on here:
 		// * In many situations, a good solution is that drt drives to some transit stop, and from there directly to the destination.  The swiss rail
 		// raptor will return a cost "infinity" of such a solution, in which case the calling method falls back onto transit_walk.
@@ -107,28 +106,28 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		if (drtMode == DrtMode.teleportBeeline) {// (configure teleportation router)
-			config.plansCalcRoute()
+			config.routing()
 					.addModeRoutingParams(
-							new ModeRoutingParams().setMode(TransportMode.drt).setTeleportedModeSpeed(100. / 3.6));
+							new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
 			if (drt2) {
-				config.plansCalcRoute()
+				config.routing()
 						.addModeRoutingParams(
-								new ModeRoutingParams().setMode("drt2").setTeleportedModeSpeed(100. / 3.6));
+								new RoutingConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			if (drt3) {
-				config.plansCalcRoute()
+				config.routing()
 						.addModeRoutingParams(
-								new ModeRoutingParams().setMode("drt3").setTeleportedModeSpeed(100. / 3.6));
+								new RoutingConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if (drtMode == DrtMode.teleportBasedOnNetworkRoute) {// (route as network route)
@@ -140,15 +139,15 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				networkModes.add("drt3");
 			}
-			config.plansCalcRoute().setNetworkModes(networkModes);
+			config.routing().setNetworkModes(networkModes);
 		}
 
-		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams().setMode("walk").setTeleportedModeSpeed(5. / 3.6));
+		config.routing()
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// set up walk2 so we don't need walk in raptor:
-		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams().setMode("walk2").setTeleportedModeSpeed(5. / 3.6));
+		config.routing()
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// === RAPTOR: ===
 		{
@@ -196,21 +195,21 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 
-		double margUtlTravPt = config.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		double margUtlTravPt = config.scoring().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
-			config.planCalcScore()
+			config.scoring()
 					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			if (drt2) {
-				config.planCalcScore()
+				config.scoring()
 						.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 			if (drt3) {
-				config.planCalcScore()
+				config.scoring()
 						.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
-		config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+		config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 
 		// === QSIM: ===
 
@@ -235,7 +234,6 @@ public class PtAlongALine2Test {
 				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
 				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
-				drtConfigGroup.advanceRequestPlanningHorizon = 99999;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
@@ -269,7 +267,7 @@ public class PtAlongALine2Test {
 			}
 
 			for (DrtConfigGroup drtConfigGroup : mm.getModalElements()) {
-				DrtConfigs.adjustDrtConfig(drtConfigGroup, config.planCalcScore(), config.plansCalcRoute());
+				DrtConfigs.adjustDrtConfig(drtConfigGroup, config.scoring(), config.routing());
 			}
 		}
 
@@ -419,6 +417,13 @@ public class PtAlongALine2Test {
 			// !! does not work together with parameterized tests :-( !!
 		}
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
+
 		controler.run();
 
 		/*
@@ -463,9 +468,9 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 1", planLegCase1.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 1", planLegCase1.get(1).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 1", planLegCase1.get(2).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase1.get(0).getMode().contains("walk"), "Incorrect Mode, case 1");
+		Assertions.assertTrue(planLegCase1.get(1).getMode().equals("pt"), "Incorrect Mode, case 1");
+		Assertions.assertTrue(planLegCase1.get(2).getMode().contains("walk"), "Incorrect Mode, case 1");
 
 		/**
 		 * Case 2a: Agent starts at Link "50-51". This is within the drt service area. Agent is expected use drt as
@@ -482,11 +487,11 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(1).getMode().equals("drt"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(2).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(3).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 2a", planLegCase2a.get(4).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase2a.get(0).getMode().contains("walk"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(1).getMode().equals("drt"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(2).getMode().contains("walk"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(3).getMode().equals("pt"), "Incorrect Mode, case 2a");
+		Assertions.assertTrue(planLegCase2a.get(4).getMode().contains("walk"), "Incorrect Mode, case 2a");
 
 		/**
 		 * Case 2b: Agent starts at Link "300-301". This is within the drt service area. Agent is expected use drt as
@@ -502,11 +507,11 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(1).getMode().equals("drt"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(2).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(3).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 2b", planLegCase2b.get(4).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase2b.get(0).getMode().contains("walk"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(1).getMode().equals("drt"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(2).getMode().contains("walk"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(3).getMode().equals("pt"), "Incorrect Mode, case 2b");
+		Assertions.assertTrue(planLegCase2b.get(4).getMode().contains("walk"), "Incorrect Mode, case 2b");
 
 		/**
 		 * Case 2c: Agent starts at Link "550-551". This is within the drt3 service area. Agent is expected use drt3 as
@@ -522,11 +527,11 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(1).getMode().equals("drt3"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(2).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(3).getMode().equals("pt"));
-		Assert.assertTrue("Incorrect Mode, case 2c", planLegCase2c.get(4).getMode().contains("walk"));
+		Assertions.assertTrue(planLegCase2c.get(0).getMode().contains("walk"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(1).getMode().equals("drt3"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(2).getMode().contains("walk"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(3).getMode().equals("pt"), "Incorrect Mode, case 2c");
+		Assertions.assertTrue(planLegCase2c.get(4).getMode().contains("walk"), "Incorrect Mode, case 2c");
 
 		/**
 		 * Case 3a: Agent starts at Link "690-691". This is not within any drt service areas. Agent is expected to use
@@ -542,7 +547,7 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 3a", planLegCase3a.get(0).getMode().equals("walk"));
+		Assertions.assertTrue(planLegCase3a.get(0).getMode().equals("walk"), "Incorrect Mode, case 3a");
 
 		/**
 		 * Case 3b: Agent starts at Link "800-801". This is within the drt2 service area. Agent is NOT expected to utilize
@@ -559,12 +564,12 @@ public class PtAlongALine2Test {
 				.filter(pe -> pe instanceof Leg)
 				.map(pe -> (Leg)pe)
 				.collect(toList());
-		Assert.assertTrue("Incorrect Mode, case 3b", planLegCase3b.get(0).getMode().equals("walk"));
+		Assertions.assertTrue(planLegCase3b.get(0).getMode().equals("walk"), "Incorrect Mode, case 3b");
 
 	}
 
 	@Test
-	public void intermodalAccessEgressPicksWrongVariant() {
+	void intermodalAccessEgressPicksWrongVariant() {
 		// outdated comment:
 		// this test fails because it picks a
 		//    drt-nonNetworkWalk-nonNetworkWalk-drt
@@ -586,22 +591,22 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
-		config.plansCalcRoute().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
+		config.routing().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		config.plansCalcRoute().addModeRoutingParams(new ModeRoutingParams("walk2").setTeleportedModeSpeed(5. / 3.6));
+		config.routing().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
 
-		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(0.));
+		config.routing()
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
 		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
 		// === RAPTOR: ===
@@ -640,14 +645,14 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 		{
-			double margUtlTravPt = config.planCalcScore()
+			double margUtlTravPt = config.scoring()
 					.getModes()
 					.get(TransportMode.pt)
 					.getMarginalUtilityOfTraveling();
-			config.planCalcScore()
+			config.scoring()
 					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.planCalcScore().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 		}
 		// === QSIM: ===
 
@@ -721,7 +726,7 @@ public class PtAlongALine2Test {
 									break;
 								}
 							}
-							Assert.assertFalse(problem);
+							Assertions.assertFalse(problem);
 
 						}
 					}
@@ -729,34 +734,42 @@ public class PtAlongALine2Test {
 			}
 		});
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
+
 		controler.run();
 	}
 
+	// this test is failing because raptor treats "walk" in a special way.  kai, jul'19
 	@Test
-	@Ignore // this test is failing because raptor treats "walk" in a special way.  kai, jul'19
-	public void networkWalkDoesNotWorkWithRaptor() {
+	@Disabled
+	void networkWalkDoesNotWorkWithRaptor() {
 		// test fails with null pointer exception
 
 		Config config = PtAlongALineTest.createConfig(utils.getOutputDirectory());
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		// remove teleportation walk router:
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.walk);
+		config.routing().removeModeRoutingParams(TransportMode.walk);
 
 		// add network walk router:
-		Set<String> networkModes = new HashSet<>(config.plansCalcRoute().getNetworkModes());
+		Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 		networkModes.add(TransportMode.walk);
-		config.plansCalcRoute().setNetworkModes(networkModes);
+		config.routing().setNetworkModes(networkModes);
 
 		// === RAPTOR: ===
 		{
@@ -794,6 +807,13 @@ public class PtAlongALine2Test {
 
 		// This will start otfvis.  Comment out if not needed.
 		//		controler.addOverridingModule( new OTFVisLiveModule() );
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
 
 		controler.run();
 	}

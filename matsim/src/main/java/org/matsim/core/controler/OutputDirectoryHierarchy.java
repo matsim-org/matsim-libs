@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
 import jakarta.inject.Inject;
@@ -53,12 +53,12 @@ public final class OutputDirectoryHierarchy {
 
 	private final String outputPath;
 
-	private final ControlerConfigGroup.CompressionType defaultCompressionType;
+	private final ControllerConfigGroup.CompressionType defaultCompressionType;
 
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
-	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+	OutputDirectoryHierarchy(ControllerConfigGroup config) {
 
 		this(config.getOutputDirectory(),
 				config.getRunId(),
@@ -72,14 +72,14 @@ public final class OutputDirectoryHierarchy {
 	 * @param config
 	 */
 	public OutputDirectoryHierarchy( Config config ) {
-		this( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting(), config.controler().getCompressionType() );
+		this( config.controller().getOutputDirectory(), config.controller().getRunId(), config.controller().getOverwriteFileSetting(), config.controller().getCompressionType() );
 	}
 
-	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
+	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControllerConfigGroup.CompressionType defaultCompressionType) {
 		this(outputPath, null, overwriteFiles, true, defaultCompressionType);
 	}
 
-	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, ControllerConfigGroup.CompressionType defaultCompressionType) {
 		this(outputPath, runId, overwriteFiles, true, defaultCompressionType);
 	}
 	/**
@@ -89,7 +89,7 @@ public final class OutputDirectoryHierarchy {
 	 * @param outputPath the path to the output directory
 	 * @param createDirectories create the directories or abort if they exist
 	 */
-	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories, ControlerConfigGroup.CompressionType compressionType){
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories, ControllerConfigGroup.CompressionType compressionType){
 		this.overwriteFiles = overwriteFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
@@ -144,11 +144,18 @@ public final class OutputDirectoryHierarchy {
 		return s.toString();
 	}
 
+	public String getIterationFilename(int iteration, String filename, ControllerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getIterationFilename(iteration, filename);
+		}
+		return getIterationFilename(iteration, filename + compression.fileEnding);
+	}
+
 	public final String getIterationFilename(int iteration, Controler.DefaultFiles file) {
 		return getIterationFilename(iteration, file, this.defaultCompressionType);
 	}
 
-	public final String getIterationFilename(int iteration, Controler.DefaultFiles file, ControlerConfigGroup.CompressionType compression) {
+	public final String getIterationFilename(int iteration, Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
 		if (compression == null) {
 			return getIterationFilename(iteration, file.filename);
 		}
@@ -173,6 +180,13 @@ public final class OutputDirectoryHierarchy {
 		return s.toString();
 	}
 
+	public String getOutputFilename(String filename, ControllerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getOutputFilename(filename);
+		}
+		return getOutputFilename(filename + compression.fileEnding);
+	}
+
 	public final String getOutputFilenameWithOutputPrefix(final String filename) {
 		return getOutputFilename(Controler.OUTPUT_PREFIX + filename);
 	}
@@ -181,7 +195,7 @@ public final class OutputDirectoryHierarchy {
 		return getOutputFilename(file, this.defaultCompressionType);
 	}
 
-	public final String getOutputFilename(Controler.DefaultFiles file, ControlerConfigGroup.CompressionType compression) {
+	public final String getOutputFilename(Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
 		if (compression == null) {
 			return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename);
 		}

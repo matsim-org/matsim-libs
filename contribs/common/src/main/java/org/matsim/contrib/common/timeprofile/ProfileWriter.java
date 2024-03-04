@@ -48,7 +48,7 @@ public class ProfileWriter implements IterationEndsListener {
 
 	public interface ProfileView {
 		// times at which profile samples were collected
-		int[] times();
+		double[] times();
 
 		// map of sampled time profiles
 		ImmutableMap<String, double[]> profiles();
@@ -77,7 +77,8 @@ public class ProfileWriter implements IterationEndsListener {
 		String file = filename(outputFile);
 		String timeFormat = Time.TIMEFORMAT_HHMMSS;
 
-		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
+		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"),
+			matsimServices.getConfig().global().getDefaultDelimiter().charAt(0))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
 			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
 			for (int i = 0; i < times.length; i++) {
@@ -86,7 +87,8 @@ public class ProfileWriter implements IterationEndsListener {
 			}
 		}
 
-		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
+		int createGraphsInterval = this.matsimServices.getConfig().controller().getCreateGraphsInterval();
+		if (createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0) {
 			DefaultTableXYDataset xyDataset = createXYDataset(times, profiles);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
@@ -97,12 +99,12 @@ public class ProfileWriter implements IterationEndsListener {
 		return profiles.values().stream().map(profile -> profile[idx] + "");
 	}
 
-	private DefaultTableXYDataset createXYDataset(int[] times, Map<String, double[]> profiles) {
+	private DefaultTableXYDataset createXYDataset(double[] times, Map<String, double[]> profiles) {
 		List<XYSeries> seriesList = new ArrayList<>(profiles.size());
 		profiles.forEach((name, profile) -> {
 			XYSeries series = new XYSeries(name, true, false);
 			for (int i = 0; i < times.length; i++) {
-				series.add((double)times[i] / 3600, profile[i]);
+				series.add((double) times[i] / 3600, profile[i]);
 			}
 			seriesList.add(series);
 		});
@@ -114,7 +116,7 @@ public class ProfileWriter implements IterationEndsListener {
 
 	private void generateImage(DefaultTableXYDataset xyDataset, TimeProfileCharts.ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(xyDataset, chartType);
-		String runID = matsimServices.getConfig().controler().getRunId();
+		String runID = matsimServices.getConfig().controller().getRunId();
 		if (runID != null) {
 			chart.setTitle(runID + " " + chart.getTitle().getText());
 		}

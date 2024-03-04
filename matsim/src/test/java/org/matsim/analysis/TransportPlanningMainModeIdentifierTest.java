@@ -1,14 +1,14 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -23,11 +23,11 @@ public class TransportPlanningMainModeIdentifierTest {
 
 	private final List<String> modeHierarchy = new ArrayList<>();
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControlerListener() {
 
 		modeHierarchy.add(TransportMode.non_network_walk);
 		modeHierarchy.add("undefined");
@@ -98,6 +98,6 @@ public class TransportPlanningMainModeIdentifierTest {
 
 	private void validateValues(Plan plan, String mainMode) {
 		String mainModeIdentified = identifyMainMode(plan.getPlanElements());
-		Assert.assertEquals(mainModeIdentified, mainMode);
+		Assertions.assertEquals(mainModeIdentified, mainMode);
 	}
 }

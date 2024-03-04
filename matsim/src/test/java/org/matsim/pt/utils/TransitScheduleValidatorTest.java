@@ -21,9 +21,8 @@
 
 package org.matsim.pt.utils;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,19 +38,21 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TransitScheduleValidatorTest {
 
 	@Test
-	public void testPtTutorial() {
+	void testPtTutorial() {
 		Scenario scenario = ScenarioUtils.loadScenario(
 				ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(
 				scenario.getTransitSchedule(), scenario.getNetwork());
-		Assertions.assertThat(validationResult.getIssues()).isEmpty();
+		assertThat(validationResult.getIssues()).isEmpty();
 	}
 
 	@Test
-	public void testPtTutorialWithError() {
+	void testPtTutorialWithError() {
 		Scenario scenario = ScenarioUtils.loadScenario(
 				ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitLine transitLine = scenario.getTransitSchedule()
@@ -65,7 +66,7 @@ public class TransitScheduleValidatorTest {
 				scenario.getTransitSchedule(), scenario.getNetwork());
 		System.out.println(validationResult);
 
-		Assertions.assertThat(validationResult.getIssues()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(validationResult.getIssues()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(new TransitScheduleValidator.ValidationResult.ValidationIssue<>(
 						TransitScheduleValidator.ValidationResult.Severity.ERROR,
 						"Transit line Blue Line, route 3to1: Stop 2b cannot be reached along network route.",
@@ -74,7 +75,7 @@ public class TransitScheduleValidatorTest {
 	}
 
 	@Test
-	public void testValidator_Transfers_implausibleTime() {
+	void testValidator_Transfers_implausibleTime() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory factory = schedule.getFactory();
@@ -89,15 +90,15 @@ public class TransitScheduleValidatorTest {
 
 		schedule.getMinimalTransferTimes().set(id1, id2, 120);
 		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertTrue(result.getIssues().isEmpty());
+		Assertions.assertTrue(result.getIssues().isEmpty());
 
 		schedule.getMinimalTransferTimes().set(id1, id2, 0);
 		result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertEquals("Should warn against implausible transfer time.", 1, result.getIssues().size());
+		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against implausible transfer time.");
 	}
 
 	@Test
-	public void testValidator_Transfers_missingStop() {
+	void testValidator_Transfers_missingStop() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory factory = schedule.getFactory();
@@ -112,14 +113,14 @@ public class TransitScheduleValidatorTest {
 
 		schedule.getMinimalTransferTimes().set(id1, id3, 120);
 		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertEquals("Should warn against missing stop3.", 1, result.getIssues().size());
-		Assert.assertTrue("Message should contain hint about stop3 being missing. " + result.getIssues().get(0).getMessage(), result.getIssues().get(0).getMessage().contains("stop3"));
+		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against missing stop3.");
+		Assertions.assertTrue(result.getIssues().get(0).getMessage().contains("stop3"), "Message should contain hint about stop3 being missing. " + result.getIssues().get(0).getMessage());
 		schedule.getMinimalTransferTimes().remove(id1, id3);
 
 		schedule.getMinimalTransferTimes().set(id4, id2, 120);
 		result = TransitScheduleValidator.validateTransfers(schedule);
-		Assert.assertEquals("Should warn against missing stop4.", 1, result.getIssues().size());
-		Assert.assertTrue("Message should contain hint about stop4 being missing. " + result.getIssues().get(0).getMessage(), result.getIssues().get(0).getMessage().contains("stop4"));
+		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against missing stop4.");
+		Assertions.assertTrue(result.getIssues().get(0).getMessage().contains("stop4"), "Message should contain hint about stop4 being missing. " + result.getIssues().get(0).getMessage());
 	}
 
 }

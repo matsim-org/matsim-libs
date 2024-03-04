@@ -4,18 +4,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="JDEQSim" >
-		<param name="carSize" value="7.5" />
-		<param name="endTime" value="undefined" />
-		<param name="flowCapacityFactor" value="1.0" />
-		<param name="gapTravelSpeed" value="15.0" />
-		<param name="minimumInFlowCapacity" value="1800.0" />
-		<param name="squeezeTime" value="1800.0" />
-		<param name="storageCapacityFactor" value="1.0" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="TimeAllocationMutator" >
 		<param name="mutationAffectsDuration" value="true" />
 
@@ -55,7 +43,7 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="1000" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
+		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
 		For 'qsim', add a module 'qsim' to the config. -->
 		<param name="mobsim" value="qsim" />
@@ -65,7 +53,7 @@
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="failIfDirectoryExists" />
 
-		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
+		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, SpeedyALT -->
 		<param name="routingAlgorithmType" value="Dijkstra" />
 
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
@@ -234,7 +222,7 @@
 				<!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
 				<param name="typicalDurationScoreComputation" value="uniform" />
 			</parameterset>
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="w" />
 				<param name="closingTime" value="undefined" />
@@ -509,35 +497,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="ptCounts" >
-
-		<!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
-		<param name="countsScaleFactor" value="1.0" />
-
-		<!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
-		<param name="distanceFilter" value="null" />
-
-		<!-- node id for center node of distance filter -->
-		<param name="distanceFilterCenterNode" value="null" />
-
-		<!-- input file containing the alighting (getting off) counts for pt -->
-		<param name="inputAlightCountsFile" value="null" />
-
-		<!-- input file containing the boarding (getting on) counts for pt -->
-		<param name="inputBoardCountsFile" value="null" />
-
-		<!-- input file containing the occupancy counts for pt -->
-		<param name="inputOccupancyCountsFile" value="null" />
-
-		<!-- possible values: `html', `kml', `txt', `all' -->
-		<param name="outputformat" value="null" />
-
-		<!-- every how many iterations (starting with 0) counts comparisons are generated -->
-		<param name="ptCountsInterval" value="10" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="qsim" >
 		<param name="endTime" value="undefined" />
 		<param name="flowCapacityFactor" value="1.0" />
@@ -650,7 +609,7 @@
 
 		<!-- strategyName of PlanSelector for plans removal.  Possible defaults: WorstPlanSelector SelectRandom SelectExpBetaForRemoval ChangeExpBetaForRemoval PathSizeLogitSelectorForRemoval . The current default, WorstPlanSelector is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
 		<param name="planSelectorForRemoval" value="WorstPlanSelector" />
-		
+
 		<parameterset type="strategysettings" >
 			<!-- iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...). Normally, better use fractionOfIterationsToDisableInnovation -->
 			<param name="disableAfterIteration" value="-1" />
@@ -663,7 +622,7 @@
 			<!-- weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight -->
 			<param name="weight" value="0.9" />
 		</parameterset>
-		
+
 		<parameterset type="strategysettings" >
 			<!-- iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...). Normally, better use fractionOfIterationsToDisableInnovation -->
 			<param name="disableAfterIteration" value="-1" />
@@ -759,9 +718,6 @@
 
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="900" />
-
-		<!-- possible values: nullTravelTimeCalculatorArray TravelTimeCalculatorHashMap  -->
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />

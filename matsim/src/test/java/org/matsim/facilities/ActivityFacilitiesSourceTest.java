@@ -19,11 +19,11 @@
 
 package org.matsim.facilities;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,88 +43,76 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Created by amit on 05.02.18.
  */
 
-@RunWith(Parameterized.class)
 public class ActivityFacilitiesSourceTest {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	//    private static final String outDir = "test/output/"+ActivityFacilitiesSourceTest.class.getCanonicalName().replace('.','/')+"/";
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	private final FacilitiesConfigGroup.FacilitiesSource facilitiesSource;
-	private final boolean facilitiesWithCoordOnly ;
-
-	public ActivityFacilitiesSourceTest(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
-		this.facilitiesSource = facilitiesSource;
-		this.facilitiesWithCoordOnly = facilitiesWithCoordOnly;
-	}
-
-	@Parameterized.Parameters(name = "{index}: FacilitiesSource - {0}; facilitiesWithCoordOnly - {1}")
-	public static Collection<Object[]> parametersForFacilitiesSourceTest() {
+	public static Stream<Arguments> arguments() {
 		// it is not clear to me why/how this works.  The documentation of JUnitParamsRunner says that such
 		// implicit behavior ("dirty tricks") should no longer be necessary when using it.  kai, jul'18
-		return Arrays.asList(
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.none, true} // true/false doen't matter here
-				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.fromFile, true}// true/false doen't matter here
-				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, true}
-				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, false}
-				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile, true} // true/false doen't matter here
-				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, true} // true/false doen't matter here
+		return Stream.of(
+				Arguments.of(FacilitiesConfigGroup.FacilitiesSource.none, true), // true/false doen't matter here
+				Arguments.of(FacilitiesConfigGroup.FacilitiesSource.fromFile, true),// true/false doen't matter here
+				Arguments.of(FacilitiesConfigGroup.FacilitiesSource.setInScenario, true),
+				Arguments.of(FacilitiesConfigGroup.FacilitiesSource.setInScenario, false),
+			 	Arguments.of(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile, true), // true/false doen't matter here
+			 	Arguments.of(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, true) // true/false doen't matter here
 		);
 	}
 
-	@Test
-	public void test(){
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void test(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly){
 		String outDir = utils.getOutputDirectory() ;
 		String testOutDir = outDir + "/" + facilitiesSource.toString() + "_facilitiesWithCoordOnly_" + String.valueOf(facilitiesWithCoordOnly) + "/";
 		new File(testOutDir).mkdirs();
 
-		Scenario scenario = prepareScenario();
-		scenario.getConfig().controler().setOutputDirectory(testOutDir);
-		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		Scenario scenario = prepareScenario(facilitiesSource, facilitiesWithCoordOnly);
+		scenario.getConfig().controller().setOutputDirectory(testOutDir);
+		scenario.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		// (overwriteExistingFiles is needed here for the parameterized test since otherwise all output directories except for
 		// the last test will be deleted and thus not available for debugging. kai, sep'19)
 		new Controler(scenario).run();
 
 		// checks
-		ActivityFacilities activityFacilities = getFacilities(scenario.getConfig().controler().getOutputDirectory());
-		switch (this.facilitiesSource) {
+		ActivityFacilities activityFacilities = getFacilities(scenario.getConfig().controller().getOutputDirectory());
+		switch (facilitiesSource) {
 			case none:
 				break;
 			case fromFile:
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNotNull(af.getLinkId());
+					Assertions.assertNotNull(af.getLinkId());
 				}
 				break;
 			case setInScenario:
-				Assert.assertEquals("wrong number of facilities", 2, activityFacilities.getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(2, activityFacilities.getFacilities().size(), MatsimTestUtils.EPSILON, "wrong number of facilities");
 				if (facilitiesWithCoordOnly) {
 					for (ActivityFacility af : activityFacilities.getFacilities().values()){
-						Assert.assertNotNull(af.getLinkId());
+						Assertions.assertNotNull(af.getLinkId());
 					}
 				} else {
 					for (ActivityFacility af : activityFacilities.getFacilities().values()){
-						Assert.assertNull(af.getCoord());
+						Assertions.assertNull(af.getCoord());
 					}
 				}
 				break;
 			case onePerActivityLinkInPlansFile:
-				Assert.assertEquals("wrong number of facilities", 4, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(4, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON, "wrong number of facilities");
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNotNull(af.getLinkId());
+					Assertions.assertNotNull(af.getLinkId());
 				}
 				break;
 			case onePerActivityLocationInPlansFile:
-				Assert.assertEquals("wrong number of facilities", 2, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(2, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON, "wrong number of facilities");
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNotNull(af.getCoord());
-					Assert.assertNotNull(af.getLinkId());
+					Assertions.assertNotNull(af.getCoord());
+					Assertions.assertNotNull(af.getLinkId());
 				}
 				break;
 		}
@@ -136,13 +124,13 @@ public class ActivityFacilitiesSourceTest {
 		return scenario.getActivityFacilities();
 	}
 
-	
+
 	// create basic scenario
-	private Scenario prepareScenario() {
+	private Scenario prepareScenario(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile(null);
-		config.controler().setLastIteration(0);
-		
+		config.controller().setLastIteration(0);
+
 		switch (facilitiesSource) {
 			case fromFile:
 				break;
@@ -158,11 +146,11 @@ public class ActivityFacilitiesSourceTest {
 //				config.facilities().setAssigningLinksToFacilitiesIfMissing(false);
 				break;
 		}
-		
+
 		config.facilities().setFacilitiesSource(facilitiesSource);
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		if (facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario)) {
 			ActivityFacilities facilities = scenario.getActivityFacilities();
 			ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -182,7 +170,7 @@ public class ActivityFacilitiesSourceTest {
 						Id.createLinkId("20")));
 			}
 		}
-		
+
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
 		String mode = TransportMode.car;
@@ -213,7 +201,7 @@ public class ActivityFacilitiesSourceTest {
 		}
 
 		// activity from link only
-		if (! this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
+		if (! facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
 			Person person = populationFactory.createPerson(Id.createPersonId("1"));
 			Plan plan = populationFactory.createPlan();
 			Activity home = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
@@ -250,7 +238,7 @@ public class ActivityFacilitiesSourceTest {
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
 
-			if ( this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
+			if (facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
 				work.setCoord(new Coord(10000.0, 0.0));
 			}
 
@@ -297,7 +285,7 @@ public class ActivityFacilitiesSourceTest {
 		}
 		return scenario;
 	}
-	
+
 	private boolean assignFacilityIdToActivity(FacilitiesConfigGroup.FacilitiesSource facilitiesSource) {
 		return facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario) || facilitiesSource.equals(
 				FacilitiesConfigGroup.FacilitiesSource.fromFile);

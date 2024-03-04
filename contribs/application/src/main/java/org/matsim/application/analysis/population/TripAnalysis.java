@@ -92,6 +92,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
+			.sample(false)
 			.separator(';').build());
 
 		int total = persons.rowCount();
@@ -100,7 +101,6 @@ public class TripAnalysis implements MATSimAppCommand {
 			log.info("Using id filter {}", matchId);
 			persons = persons.where(persons.textColumn("person").matchesRegex(matchId));
 		}
-
 
 		// Home filter by standard attribute
 		if (shp.isDefined() && filter == LocationFilter.home) {
@@ -133,6 +133,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
+			.sample(false)
 			.separator(';').build());
 
 

@@ -21,7 +21,6 @@
 package org.matsim.deprecated.scoring.functions;
 
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.MoneyScoring;
 
 /**
@@ -38,13 +37,13 @@ public class CharyparNagelMoneyScoring implements MoneyScoring {
 	private double score;
 
 	private final double marginalUtilityOfMoney;
-	
+
 	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelMoneyScoring(final ScoringParameters params) {
 		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 		this.reset();
 	}
-	
+
 	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;

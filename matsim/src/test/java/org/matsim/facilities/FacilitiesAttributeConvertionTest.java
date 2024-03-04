@@ -21,9 +21,9 @@
 
  package org.matsim.facilities;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,26 +34,26 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class FacilitiesAttributeConvertionTest {
-	@Rule
+	public class FacilitiesAttributeConvertionTest {
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDefaults() {
+	 @Test
+	 void testDefaults() {
 		final String path = utils.getOutputDirectory()+"/facilities.xml";
 
 		testWriteAndReread(w -> w.write(path), w -> w.readFile(path));
 	}
 
-	@Test
-	public void testV1() {
+	 @Test
+	 void testV1() {
 		final String path = utils.getOutputDirectory()+"/facilities.xml";
 
 		testWriteAndReread(w -> w.writeV1(path), w -> w.readFile(path));
 	}
 
-	@Test
-	public void testDefaultsStream() {
+	 @Test
+	 void testDefaultsStream() {
 		final String path = utils.getOutputDirectory()+"/facilities.xml";
 
 		testWriteAndReread(w -> w.write(IOUtils.getOutputStream(IOUtils.getFileUrl(path), false)), w -> w.readFile(path));
@@ -80,10 +80,10 @@ public class FacilitiesAttributeConvertionTest {
 		final ActivityFacilities readFacilities = readScenario.getActivityFacilities();
 		final Object readAttribute = readFacilities.getAttributes().getAttribute("attribute");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
+		Assertions.assertEquals(
 				attribute,
-				readAttribute);
+				readAttribute,
+				"unexpected read attribute");
 	}
 
 	private static class CustomClass {

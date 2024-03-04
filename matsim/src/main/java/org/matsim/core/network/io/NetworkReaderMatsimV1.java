@@ -53,7 +53,7 @@ final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private final static String LINK = "link";
 
 	private final Network network;
-	
+
 	private boolean hasElevation = false;
 	private boolean hasNoElevation = false;
 
@@ -69,6 +69,7 @@ final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	public NetworkReaderMatsimV1(
 			final CoordinateTransformation transformation,
 			final Network network) {
+		super(ValidationType.DTD_ONLY);
 		this.transformation = transformation;
 		this.network = network;
 	}
@@ -92,7 +93,7 @@ final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		/* FIXME Note: I would like this to rather crash here (jwjoubert, Sep'16) */
 		if(NODES.equals(name)){
 			if(hasElevation && hasNoElevation){
-				log.warn("There is a mixture of nodes WITH and WITHOUT elevation! " + 
+				log.warn("There is a mixture of nodes WITH and WITHOUT elevation! " +
 						  "You will likely run into problems when doing coordinate calculations.");
 			}
 		}
@@ -162,14 +163,14 @@ final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 					Double.parseDouble(atts.getValue("y"))));
 			hasNoElevation = true;
 		}
-		
+
 		final Node node =
 				this.network.getFactory().createNode(
 						Id.create(atts.getValue("id"), Node.class), c);
 		this.network.addNode(node);
 
 		NetworkUtils.setType(node,atts.getValue("type"));
-		// (did not have a null check when I found it.  kai, jul'16) 
+		// (did not have a null check when I found it.  kai, jul'16)
 
 		if (atts.getValue("origid") != null) {
 			NetworkUtils.setOrigId( node, atts.getValue("origid") ) ;

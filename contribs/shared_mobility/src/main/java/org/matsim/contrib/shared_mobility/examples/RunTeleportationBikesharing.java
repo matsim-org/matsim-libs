@@ -13,13 +13,13 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 
 /**
- * 
+ *
  * This is an example of a station-based bike-sharing service
  * siouxfalls-2014 can be used to run the simulation with the provided example
  * input file
@@ -34,16 +34,16 @@ public class RunTeleportationBikesharing {
 		Config config = ConfigUtils.loadConfig(cmd.getOptionStrict("config-path"));
 
 		// We define bike to be routed based on Euclidean distance.
-		ModeRoutingParams bikeRoutingParams = new ModeRoutingParams("bike");
+		RoutingConfigGroup.TeleportedModeParams bikeRoutingParams = new RoutingConfigGroup.TeleportedModeParams("bike");
 		bikeRoutingParams.setTeleportedModeSpeed(5.0);
 		bikeRoutingParams.setBeelineDistanceFactor(1.3);
-		config.plansCalcRoute().addModeRoutingParams(bikeRoutingParams);
+		config.routing().addTeleportedModeParams(bikeRoutingParams);
 
 		// Walk is deleted by adding bike here, we need to re-add it ...
-		ModeRoutingParams walkRoutingParams = new ModeRoutingParams("walk");
+		RoutingConfigGroup.TeleportedModeParams walkRoutingParams = new RoutingConfigGroup.TeleportedModeParams("walk");
 		walkRoutingParams.setTeleportedModeSpeed(2.0);
 		walkRoutingParams.setBeelineDistanceFactor(1.3);
-		config.plansCalcRoute().addModeRoutingParams(walkRoutingParams);
+		config.routing().addTeleportedModeParams(walkRoutingParams);
 
 		// By default, "bike" will be simulated using teleportation.
 
@@ -79,24 +79,24 @@ public class RunTeleportationBikesharing {
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(pickupParams);
+		config.scoring().addActivityParams(pickupParams);
 
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(dropoffParams);
-		
+		config.scoring().addActivityParams(dropoffParams);
+
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(bookingParams);
+		config.scoring().addActivityParams(bookingParams);
 
 		// We need to score bike
 		ModeParams bikeScoringParams = new ModeParams("bike");
-		config.planCalcScore().addModeParams(bikeScoringParams);
+		config.scoring().addModeParams(bikeScoringParams);
 
 		// Write out all events (DEBUG)
-		config.controler().setWriteEventsInterval(1);
-		config.controler().setWritePlansInterval(1);
-		config.controler().setLastIteration(10);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setWritePlansInterval(1);
+		config.controller().setLastIteration(10);
 
 		// Set up controller (no specific settings needed for scenario)
 		Controler controller = new Controler(config);

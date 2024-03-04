@@ -19,27 +19,22 @@
 
 package org.matsim.contrib.drt.extension.companions;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
-import com.google.inject.Inject;
-
 /**
- *
- * @author Steffen Axer
- *
+ * @author steffenaxer
  */
 public class MultiModeDrtCompanionModule extends AbstractModule {
-	@Inject
-	private MultiModeDrtConfigGroup multiModeDrtCfg;
-
 	@Override
 	public void install() {
+		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(getConfig());
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			if (drtCfg instanceof DrtWithExtensionsConfigGroup && ((DrtWithExtensionsConfigGroup) drtCfg).getDrtCompanionParams().isPresent()) {
-			    DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) drtCfg;
+			if (drtCfg instanceof DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup && ((DrtWithExtensionsConfigGroup) drtCfg).getDrtCompanionParams().isPresent()) {
+				drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) drtCfg;
 				install(new DrtCompanionModule(drtCfg.getMode(), drtWithExtensionsConfigGroup));
 			}
 		}

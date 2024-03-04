@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 
 /**
@@ -27,8 +27,8 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
  */
 public final class TravelDisutilityUtils {
 	private TravelDisutilityUtils(){} // do not instantiate
-	
-	public static TravelDisutility createFreespeedTravelTimeAndDisutility(PlanCalcScoreConfigGroup cnScoringGroup) {
+
+	public static TravelDisutility createFreespeedTravelTimeAndDisutility(ScoringConfigGroup cnScoringGroup) {
 		return new FreespeedTravelTimeAndDisutility(cnScoringGroup) ;
 	}
 

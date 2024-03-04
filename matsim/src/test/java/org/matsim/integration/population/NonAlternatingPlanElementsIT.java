@@ -22,9 +22,9 @@ package org.matsim.integration.population;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,21 +55,21 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * Tests that a simple simulation can be run with plans where
  * activities and legs are not always alternating.
- * 
+ *
  * @author mrieser / senozon
  */
 public class NonAlternatingPlanElementsIT {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_Controler_QSim_Routechoice_acts() {
+	void test_Controler_QSim_Routechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(10);
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(10);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
-		config.strategy().addParam("Module_2", "ReRoute");
-		config.strategy().addParam("ModuleProbability_2", "1.0");		
+		config.replanning().addParam("Module_2", "ReRoute");
+		config.replanning().addParam("ModuleProbability_2", "1.0");
 		config.transit().setUseTransit(true);
 
 		// a scenario is created to take only network from config file; rest inputs are ignored;
@@ -87,21 +87,21 @@ public class NonAlternatingPlanElementsIT {
 		scenario.getPopulation().addPerson(person);
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
         controler.run();
 
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
 	@Test
-	public void test_Controler_QSim_Routechoice_legs() {
+	void test_Controler_QSim_Routechoice_legs() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(10);
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(10);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
-		config.strategy().addParam("Module_2", "ReRoute");
-		config.strategy().addParam("ModuleProbability_2", "1.0");
+		config.replanning().addParam("Module_2", "ReRoute");
+		config.replanning().addParam("ModuleProbability_2", "1.0");
 		config.transit().setUseTransit(true);
 
 		// a scenario is created to take only network from config file; rest inputs are ignored;
@@ -119,19 +119,19 @@ public class NonAlternatingPlanElementsIT {
 		scenario.getPopulation().addPerson(person);
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
         controler.run();
 
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
 	// TODO: make more complicated plans when testing subtour mode choice
 	private static Plan createPlanWithConsecutiveLegsForEquilNet(final Scenario scenario) {
 		PopulationFactory pf = scenario.getPopulation().getFactory();
-		
+
 		Plan plan = pf.createPlan();
-		
+
 		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x1 = -17000;
 		((Activity) home1).setCoord(new Coord(x1, (double) 500));
@@ -161,7 +161,7 @@ public class NonAlternatingPlanElementsIT {
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x = -17000;
 		((Activity) home2).setCoord(new Coord(x, (double) 500));
-		
+
 		plan.addActivity(home1);
 		plan.addLeg(leg1);
 		plan.addLeg(leg2);
@@ -169,15 +169,15 @@ public class NonAlternatingPlanElementsIT {
 		plan.addActivity(work);
 		plan.addLeg(leg4);
 		plan.addActivity(home2);
-		
+
 		return plan;
 	}
 
 	private static Plan createPlanWithConsecutiveActivitiesForEquilNet(final Scenario scenario) {
 		PopulationFactory pf = scenario.getPopulation().getFactory();
-		
+
 		Plan plan = pf.createPlan();
-		
+
 		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x3 = -17000;
 		((Activity) home1).setCoord(new Coord(x3, (double) 500));
@@ -214,7 +214,7 @@ public class NonAlternatingPlanElementsIT {
 		Activity home4 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x = -17000;
 		((Activity) home2).setCoord(new Coord(x, (double) 500));
-		
+
 		plan.addActivity(home1);
 		plan.addLeg(leg1);
 		plan.addActivity(work);
@@ -223,12 +223,12 @@ public class NonAlternatingPlanElementsIT {
 		plan.addActivity(home2);
 		plan.addActivity(home3);
 		plan.addActivity(home4);
-		
+
 		return plan;
 	}
 
 	private void addSimpleTransitServices(Scenario scenario) {
-		
+
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
 		final double x = -6000;
@@ -239,7 +239,7 @@ public class NonAlternatingPlanElementsIT {
 		stopFacility2.setLinkId(Id.create(21, Link.class));
 		schedule.addStopFacility(stopFacility1);
 		schedule.addStopFacility(stopFacility2);
-		
+
 		TransitLine line1 = f.createTransitLine(Id.create(1, TransitLine.class));
 		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -248,11 +248,11 @@ public class NonAlternatingPlanElementsIT {
 		TransitRoute route1 = f.createTransitRoute(Id.create(1, TransitRoute.class), netRoute, stops, "bus");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
-		
+
 		for (int i = 0; i < 20; i++) {
 			route1.addDeparture(f.createDeparture(Id.create(i, Departure.class), 6.0 * 3600 + i * 600));
 		}
-		
+
 		new CreateVehiclesForSchedule(schedule, scenario.getTransitVehicles()).run();
 	}
 

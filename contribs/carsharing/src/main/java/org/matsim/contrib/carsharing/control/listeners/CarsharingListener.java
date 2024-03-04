@@ -69,7 +69,7 @@ public class CarsharingListener implements IterationEndsListener {
 			e.printStackTrace();
 		}
 
-		if (event.getIteration() == controler.getConfig().controler().getLastIteration()) {
+		if (event.getIteration() == controler.getConfig().controller().getLastIteration()) {
 			final BufferedWriter outLinkStats = IOUtils
 					.getBufferedWriter(this.controler.getControlerIO().getOutputFilename("CS.txt"));
 			try {

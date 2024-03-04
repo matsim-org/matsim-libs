@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,6 +26,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.core.events.MobsimScopeEventHandler;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This strategy is based on the Plus One Rebalancing Algorithm in AMoDeus.
  * At each rebalancing period, the algorithm will send idling vehicles to the departure places of the request departed
@@ -32,68 +36,77 @@ import org.matsim.core.events.MobsimScopeEventHandler;
  * @author Chengqi Lu
  */
 public class PlusOneRebalancingStrategy
-		implements RebalancingStrategy, PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
-		PassengerRequestRejectedEventHandler, MobsimScopeEventHandler {
+	implements RebalancingStrategy, PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler,
+	MobsimScopeEventHandler {
 	private static final Logger log = LogManager.getLogger(PlusOneRebalancingStrategy.class);
 
 	private final String mode;
 	private final Network network;
 	private final LinkBasedRelocationCalculator linkBasedRelocationCalculator;
 
-	private final List<Id<Link>> targetLinkIdList = new ArrayList<>();
-	private final Map<Id<Request>, Id<Link>> potentialDrtTripMap = new HashMap<>();
+	private record Target(Id<Link> link, double scheduledTime) {
+	}
 
-	public PlusOneRebalancingStrategy(String mode, Network network,
-			LinkBasedRelocationCalculator linkBasedRelocationCalculator) {
+	private final Queue<Target> targets = new ConcurrentLinkedQueue<>();
+	private final Map<Id<Request>, Id<Link>> potentialTargetLinks = new HashMap<>();
+
+	public PlusOneRebalancingStrategy(String mode, Network network, LinkBasedRelocationCalculator linkBasedRelocationCalculator) {
 		this.mode = mode;
 		this.network = network;
 		this.linkBasedRelocationCalculator = linkBasedRelocationCalculator;
 	}
 
+	private double lastCalculationTime = Double.NEGATIVE_INFINITY;
+
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		List<? extends DvrpVehicle> rebalancableVehicleList = rebalancableVehicles.collect(toList());
+		var targetLinks = new ArrayList<Link>();
+		double prevTime = lastCalculationTime;
 
-		final List<Id<Link>> copiedTargetLinkIdList;
-		synchronized (this) {
-			//may happen in parallel to handling PassengerRequestScheduledEvent emitted by UnplannedRequestInserter
-			copiedTargetLinkIdList = new ArrayList<>(targetLinkIdList);
-			targetLinkIdList.clear(); // clear the target map for next rebalancing cycle
+		// Because events can be received at the same time we calculate relocations, we want to only consider target links from events that are older
+		// than the current time
+		while (!targets.isEmpty() && targets.peek().scheduledTime < time) {
+			var targetLink = targets.poll();
+
+			// These state checks are meant to ensure we correctly reason about concurrency:
+			// 1. ensure all old target links (from previous rebalancing calculations are processed)
+			Preconditions.checkState(targetLink.scheduledTime >= lastCalculationTime);
+			// 2. ensure target links are sorted by scheduled time
+			Preconditions.checkState(targetLink.scheduledTime >= prevTime);
+
+			targetLinks.add(network.getLinks().get(targetLink.link));
+			prevTime = targetLink.scheduledTime;
 		}
 
-		final List<Link> targetLinkList = copiedTargetLinkIdList.stream()
-				.map(network.getLinks()::get)
-				.collect(toList());
+		lastCalculationTime = time;
 
-		log.debug("There are in total " + targetLinkList.size() + " rebalance targets at this time period");
+		log.debug("There are in total " + targetLinks.size() + " rebalance targets at this time period");
+		var rebalancableVehicleList = rebalancableVehicles.collect(toList());
 		log.debug("There are " + rebalancableVehicleList.size() + " vehicles that can be rebalanced");
 
 		// calculate the matching result
-		return linkBasedRelocationCalculator.calcRelocations(targetLinkList, rebalancableVehicleList);
+		return linkBasedRelocationCalculator.calcRelocations(targetLinks, rebalancableVehicleList);
 	}
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
 		if (event.getMode().equals(mode)) {
-			potentialDrtTripMap.put(event.getRequestId(), event.getFromLinkId());
+			potentialTargetLinks.put(event.getRequestId(), event.getFromLinkId());
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		if (event.getMode().equals(mode)) {
-			Id<Link> linkId = potentialDrtTripMap.remove(event.getRequestId());
-			synchronized (this) {
-				// event was emitted by UnplannedRequestInserter, it may arrive during calcRelocations()
-				targetLinkIdList.add(linkId);
-			}
+			Id<Link> linkId = potentialTargetLinks.remove(event.getRequestId());
+			targets.add(new Target(linkId, event.getTime()));
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
 		if (event.getMode().equals(mode)) {
-			potentialDrtTripMap.remove(event.getRequestId());
+			potentialTargetLinks.remove(event.getRequestId());
 		}
 	}
 }

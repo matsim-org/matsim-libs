@@ -164,10 +164,9 @@ public class VehicleOccupancyProfileCalculator
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
 		Verify.verify(state.occupancy >= 0);
+		Verify.verify(state.occupancy <= maxCapacity);
 
-		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType);
-		Verify.verify(servingPassengers || state.occupancy == 0,
-				"Vehicles not serving passengers must not be occupied");
+		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || state.occupancy > 0;
 
 		double[] profile = servingPassengers ?
 				vehicleOccupancyProfiles.get(state.occupancy) :
@@ -182,7 +181,7 @@ public class VehicleOccupancyProfileCalculator
 		}
 		endTime = Math.min(endTime, analysisEndTime);
 
-		int timeInterval = timeDiscretizer.getTimeInterval();
+		double timeInterval = timeDiscretizer.getTimeInterval();
 		int fromIdx = timeDiscretizer.getIdx(beginTime);
 		int toIdx = timeDiscretizer.getIdx(endTime);
 

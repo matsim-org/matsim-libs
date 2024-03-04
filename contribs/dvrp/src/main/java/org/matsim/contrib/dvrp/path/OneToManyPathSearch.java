@@ -61,7 +61,7 @@ public class OneToManyPathSearch {
 
 		public PathData(Path path, double firstAndLastLinkTT) {
 			this.pathSupplier = null;
-			this.path = new Path(null, ImmutableList.copyOf(path.links), path.travelTime, path.travelCost);
+			this.path = new Path(path.nodes!= null ? ImmutableList.copyOf(path.nodes) : null, ImmutableList.copyOf(path.links), path.travelTime, path.travelCost);
 			this.travelTime = path.travelTime + firstAndLastLinkTT;
 		}
 
@@ -75,7 +75,7 @@ public class OneToManyPathSearch {
 		}
 
 		//package visibility only (path.nodes is null)
-		Path getPath() {
+		public Path getPath() {
 			if (path == null) {
 				path = pathSupplier.get();
 			}

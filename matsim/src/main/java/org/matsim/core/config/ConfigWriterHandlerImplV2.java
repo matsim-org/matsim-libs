@@ -20,20 +20,18 @@
 package org.matsim.core.config;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -57,16 +55,16 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	// paths.  If someone feels like doing that, please go ahead.  kai, jun'18
 
 	private String newline = "\n";
-	
+
 	/**
 	 * So we can write only what deviates from the default.
 	 * Implementation of this functionality unfortunately became quite messy.
 	 * kai, may'18
 	 */
 	private final Verbosity verbosity;
-	
+
 	private final Set<String> commentsAlreadyWritten = new HashSet<>() ;
-	
+
 	ConfigWriterHandlerImplV2( Verbosity verbosity ) {
 		this.verbosity = verbosity ;
 	}
@@ -83,10 +81,10 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		Map<String, String> comments = module.getComments();
 
 		try {
-			
+
 			// first write the regular config entries (key,value pairs)
 			boolean headerHasBeenWritten = writeRegularEntries(writer, indent, moduleTag, moduleNameAtt, moduleName, comparisonModule, params, comments);
-			
+
 			// can't say what this is for:
 			if ( moduleName.equals("thisAintNoFlat") ) {
 				LogManager.getLogger(this.getClass()).warn("here") ;
@@ -94,7 +92,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 
 			// then process the parameter sets (which will recursively call the current method again):
 			headerHasBeenWritten = processParameterSets(writer, indent, moduleTag, moduleNameAtt, moduleName, module, comparisonModule, headerHasBeenWritten);
-			
+
 			if ( headerHasBeenWritten ) {
 				writer.write(indent);
 				writer.write("\t</" + moduleTag + ">");
@@ -105,14 +103,14 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			throw new UncheckedIOException(e);
 		}
 	}
-	
+
 	private Boolean processParameterSets(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt, String moduleName,
 							 ConfigGroup module, ConfigGroup comparisonModule, Boolean headerHasBeenWritten) throws IOException {
 		for ( Entry<String, ? extends Collection<? extends ConfigGroup>> entry : module.getParameterSets().entrySet() ) {
 			Collection<? extends ConfigGroup> comparisonSets = new ArrayList<>() ;
 			if ( comparisonModule != null ) {
 				comparisonSets = comparisonModule.getParameterSets(entry.getKey());
-			};
+			}
 			for ( ConfigGroup pSet : entry.getValue() ) {
 				ConfigGroup comparisonPSet = null ;
 				for ( ConfigGroup cg : comparisonSets ) {
@@ -127,13 +125,13 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 //				}
 				if ( verbosity== Verbosity.minimal && comparisonPSet==null ) {
 					if ( pSet instanceof ScoringParameterSet) {
-						comparisonPSet = ((PlanCalcScoreConfigGroup) comparisonModule).getOrCreateScoringParameters(((ScoringParameterSet) pSet).getSubpopulation());
+						comparisonPSet = ((ScoringConfigGroup) comparisonModule).getOrCreateScoringParameters(((ScoringParameterSet) pSet).getSubpopulation());
 					} else if ( pSet instanceof ModeParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateModeParams(((ModeParams) pSet).getMode());
 					} else if ( pSet instanceof ActivityParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateActivityParams(((ActivityParams) pSet).getActivityType());
-					} else if ( pSet instanceof ModeRoutingParams ) {
-						comparisonPSet = ((PlansCalcRouteConfigGroup) comparisonModule).getOrCreateModeRoutingParams(((ModeRoutingParams) pSet).getMode()) ;
+					} else if ( pSet instanceof RoutingConfigGroup.TeleportedModeParams ) {
+						comparisonPSet = ((RoutingConfigGroup) comparisonModule).getOrCreateModeRoutingParams(((RoutingConfigGroup.TeleportedModeParams) pSet).getMode() ) ;
 					} else {
 						try {
 							comparisonPSet = pSet.getClass().newInstance();
@@ -157,13 +155,13 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		}
 		return headerHasBeenWritten;
 	}
-	
+
 	private Boolean writeRegularEntries(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt,
 							String moduleName, ConfigGroup comparisonModule, Map<String, String> params,
 							Map<String, String> comments) throws IOException {
 		boolean headerHasBeenWritten = false ;
 		for (Entry<String, String> entry : params.entrySet()) {
-			
+
 			final String actual = entry.getValue();
 			if ( verbosity== Verbosity.minimal ) {
 				if ( comparisonModule!=null ) {
@@ -190,7 +188,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 //					}
 				}
 			}
-			
+
 			if ( !headerHasBeenWritten ) {
 				headerHasBeenWritten = true ;
 				writeHeader(writer, indent, moduleTag, moduleNameAtt, moduleName, newline);
@@ -217,7 +215,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		}
 		return headerHasBeenWritten;
 	}
-	
+
 	private static void writeHeader(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt, String moduleName, String newline) throws IOException {
 		//			writer.write( this.newline );
 		writer.write( indent );
@@ -225,14 +223,14 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
 		writer.write( newline );
 	}
-	
+
 	private static boolean sameType(ConfigGroup pSet, ConfigGroup cg) {
 		if ( ! ( pSet.getName().equals( cg.getName() ) ) ) {
 			return false;
 		}
-		if ( pSet instanceof ModeRoutingParams ) {
+		if ( pSet instanceof RoutingConfigGroup.TeleportedModeParams ) {
 			// (these are the "teleportedRouteParameters" in config.xml)
-			if ( ((ModeRoutingParams)pSet).getMode().equals( ((ModeRoutingParams)cg).getMode() ) ) {
+			if ( ((RoutingConfigGroup.TeleportedModeParams)pSet).getMode().equals( ((RoutingConfigGroup.TeleportedModeParams)cg).getMode() ) ) {
 				return true ;
 			}
 		}
@@ -255,7 +253,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		}
 		return false ;
 	}
-	
+
 	@Override
 	 void startConfig(
 			final Config config,
@@ -266,7 +264,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		
+
 	}
 
 	@Override
@@ -278,7 +276,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			out.write( this.newline );
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		}	
+		}
 	}
 
 	@Override
@@ -287,14 +285,14 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			final BufferedWriter out) {
 		if ( ! (module instanceof ChangeLegModeConfigGroup) ) {
 			// yyyy special case to provide error message; may be removed eventually.  kai, may'16
-			
-			
+
+
 			ConfigGroup comparisonConfig = null ;
 			if ( verbosity==Verbosity.minimal) {
 				comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
 				// preference to generate this here multiple times to avoid having it as a field. kai, may'18
 			}
-			
+
 			writeModule(
 					out,
 					"",

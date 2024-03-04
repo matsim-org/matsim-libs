@@ -1,17 +1,17 @@
 package org.matsim.contrib.analysis.spatial;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 
 public class GridTest {
 
-    @Test
-    public void initializeSquareGrid() {
+	@Test
+	void initializeSquareGrid() {
 
         final String testValue = "Test-value";
         Grid<String> grid = new SquareGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
@@ -23,8 +23,8 @@ public class GridTest {
         values.forEach(value -> assertEquals(testValue, value.getValue()));
     }
 
-    @Test
-    public void initializeHexagonalGrid() {
+	@Test
+	void initializeHexagonalGrid() {
 
         final String testValue = "test-value";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
@@ -38,8 +38,8 @@ public class GridTest {
         values.forEach(value -> assertEquals(testValue, value.getValue()));
     }
 
-    @Test
-    public void getArea_squareGrid() {
+	@Test
+	void getArea_squareGrid() {
 
         final double horizontalDistance = 2;
         final double expected = 2 * 2; // area of square is d^2
@@ -49,8 +49,8 @@ public class GridTest {
         assertEquals(expected, grid.getCellArea(), 0.0001);
     }
 
-    @Test
-    public void getArea_HexagonalGrid() {
+	@Test
+	void getArea_HexagonalGrid() {
 
         // actually area of hexagon is r^2 * sqrt(3)/2
         final double horizontalDistance = 2;
@@ -65,8 +65,8 @@ public class GridTest {
         assertEquals(expected5, grid5.getCellArea(), 0.0001);
     }
 
-    @Test
-    public void getValue_withExactCoord() {
+	@Test
+	void getValue_withExactCoord() {
 
         final String testValue = "initialValue";
         final Coordinate expectedCoordinate = new Coordinate(2, 1+Math.sqrt(3));
@@ -77,8 +77,8 @@ public class GridTest {
         assertEquals(expectedCoordinate, result.getCoordinate());
     }
 
-    @Test
-    public void getValue_closeCoordinate() {
+	@Test
+	void getValue_closeCoordinate() {
 
         final String testValue = "initialValue";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
@@ -89,8 +89,8 @@ public class GridTest {
         assertEquals(new Coordinate(2, 1+Math.sqrt(3)), result.getCoordinate());
     }
 
-    @Test
-    public void getValue_coordOutsideOfGrid() {
+	@Test
+	void getValue_coordOutsideOfGrid() {
 
         final String testValue = "initialValue";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
@@ -100,8 +100,8 @@ public class GridTest {
         assertEquals(new Coordinate(8, 1 + 5*Math.sqrt(3)), result.getCoordinate());
     }
 
-    @Test
-    public void getValues() {
+	@Test
+	void getValues() {
 
         final String testValue = "initialValue";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
