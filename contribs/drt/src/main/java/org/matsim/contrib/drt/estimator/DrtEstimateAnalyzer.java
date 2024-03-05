@@ -115,7 +115,8 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 
 					waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
 					travelTime.addValue(Math.abs(estimate.rideTime() - valTravelTime));
-					fare.addValue(Math.abs(estimate.fare() - valFare));
+					// TODO add fare estimator?
+//					fare.addValue(Math.abs(estimate.fare() - valFare));
 				}
 			}
 		}

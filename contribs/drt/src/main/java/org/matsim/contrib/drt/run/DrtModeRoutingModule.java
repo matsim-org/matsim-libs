@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
@@ -124,7 +125,9 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			public DefaultDrtRouteUpdater get() {
 				var network = getModalInstance(Network.class);
 				var routeCreatorProvider = getModalProvider(DefaultMainLegRouter.RouteCreator.class);
-				return new DefaultDrtRouteUpdater(drtCfg, network, population, config, routeCreatorProvider::get);
+				DrtEstimator drtEstimator = drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport?
+					getModalInstance(DrtEstimator.class) : null;
+				return new DefaultDrtRouteUpdater(drtCfg, network, population, config, routeCreatorProvider::get, drtEstimator);
 			}
 		}).asEagerSingleton();
 

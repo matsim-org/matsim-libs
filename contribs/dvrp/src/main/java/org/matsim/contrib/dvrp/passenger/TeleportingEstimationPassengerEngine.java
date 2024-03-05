@@ -235,20 +235,15 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 	}
 
 	static double getEstimatedRideTime(Attributable element) {
-		return (double) element.getAttributes().getAttribute("ride_time");
+		return (double) element.getAttributes().getAttribute("est_ride_time");
 	}
 
 	static double getEstimatedRideDistance(Attributable element){
-		return (double) element.getAttributes().getAttribute("ride_distance");
+		return (double) element.getAttributes().getAttribute("est_ride_distance");
 	}
 
 	static double getEstimatedWaitTime(Attributable element){
-		return  (double) element.getAttributes().getAttribute("wait_time");
+		return  (double) element.getAttributes().getAttribute("est_wait_time");
 	}
-
-	static double getEstimatedFare(Attributable element){
-		return (double) element.getAttributes().getAttribute("fare");
-	}
-
 
 }

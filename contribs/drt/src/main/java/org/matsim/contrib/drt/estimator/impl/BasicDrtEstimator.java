@@ -40,7 +40,6 @@ public class BasicDrtEstimator implements DrtOnlineEstimator, IterationEndsListe
 	 * Currently valid estimates.
 	 */
 	private GlobalEstimate currentEst;
-	private RegressionResults fare;
 
 	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimator initial,
 							 DrtEstimatorParams config, DrtConfigGroup drtConfig) {
@@ -92,8 +91,6 @@ public class BasicDrtEstimator implements DrtOnlineEstimator, IterationEndsListe
 		if (n <= 3)
 			return;
 
-		fare = est.fare.regress();
-
 		double rejectionRate = (double) nRejections / nSubmitted;
 
 		if (currentEst == null) {
@@ -122,18 +119,10 @@ public class BasicDrtEstimator implements DrtOnlineEstimator, IterationEndsListe
 			return initial.estimate(route, departureTime);
 		}
 
-		double fare = 0;
-		if (this.fare != null)
-			fare = this.fare.getParameterEstimate(0) + this.fare.getParameterEstimate(1) * route.getDistance();
-
-		if (drtConfig.getDrtFareParams().isPresent()) {
-			fare = Math.max(fare, drtConfig.getDrtFareParams().get().minFarePerTrip);
-		}
-
 		double detour = Math.max(1, rnd.nextGaussian(currentEst.meanDetour, config.randomization * currentEst.stdDetour));
 		double waitTime = Math.max(0, rnd.nextGaussian(currentEst.meanWait, config.randomization * currentEst.stdWait));
 
-		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, fare, currentEst.rejectionRate);
+		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, currentEst.rejectionRate);
 	}
 
 	/**

@@ -23,7 +23,7 @@ public class RealisticDrtEstimator implements DrtEstimator {
 		double rideDistance = distributionGenerator.generateRideDistance(rideTime, directRideTIme, directDistance);
 		double acceptanceRate = distributionGenerator.generateAcceptanceRate();
 
-		return new Estimate(rideDistance, waitTime + rideTime, waitTime, 0, acceptanceRate);
+		return new Estimate(rideDistance, waitTime + rideTime, waitTime, acceptanceRate);
 	}
 
 

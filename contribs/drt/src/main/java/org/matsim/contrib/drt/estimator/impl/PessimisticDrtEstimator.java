@@ -34,7 +34,7 @@ public class PessimisticDrtEstimator implements DrtEstimator {
 		}
 
 		// for distance, also use the max travel time alpha
-		return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, fare, 0);
+		return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, 0);
 	}
 
 }

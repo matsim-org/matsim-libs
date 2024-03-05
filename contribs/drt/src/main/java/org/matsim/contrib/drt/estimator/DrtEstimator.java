@@ -27,10 +27,10 @@ public interface DrtEstimator extends ControlerListener {
 	 * @param rideDistance  travel distance in meter
 	 * @param rideTime      ride time in seconds
 	 * @param waitingTime   waiting time in seconds
-	 * @param fare          money, which is negative if the customer needs to pay it
+//	 * @param fare          money, which is negative if the customer needs to pay it
 	 * @param rejectionRate probability of a trip being rejected
 	 */
-	record Estimate(double rideDistance, double rideTime, double waitingTime, double fare, double rejectionRate) {
+	record Estimate(double rideDistance, double rideTime, double waitingTime, double rejectionRate) {
 
 	}
 
@@ -38,11 +38,9 @@ public interface DrtEstimator extends ControlerListener {
 	 * Write estimate information into the leg attributes.
 	 */
 	static void setEstimateAttributes(Leg leg, Estimate estimate) {
-		leg.getAttributes().putAttribute("ride_time", estimate.rideTime());
-		leg.getAttributes().putAttribute("ride_distance", estimate.rideDistance());
-		leg.getAttributes().putAttribute("wait_time", estimate.waitingTime());
-		// TODO: fare might not be needed
-		leg.getAttributes().putAttribute("fare", estimate.fare());
+		leg.getAttributes().putAttribute("est_ride_time", estimate.rideTime());
+		leg.getAttributes().putAttribute("est_ride_distance", estimate.rideDistance());
+		leg.getAttributes().putAttribute("est_wait_time", estimate.waitingTime());
 	}
 
 }

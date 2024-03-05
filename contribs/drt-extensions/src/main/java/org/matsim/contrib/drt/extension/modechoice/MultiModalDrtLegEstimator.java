@@ -52,8 +52,9 @@ public class MultiModalDrtLegEstimator implements LegEstimator {
 			params.marginalUtilityOfDistance_m * est.rideDistance() +
 			params.marginalUtilityOfTraveling_s * est.rideTime() +
 			params.marginalUtilityOfTraveling_s * est.waitingTime() +
-			context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * est.rideDistance() +
-			context.scoring.marginalUtilityOfMoney * est.fare();
+			context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * est.rideDistance();
+		// TODO: add a new fare estimator?
+//			context.scoring.marginalUtilityOfMoney * est.fare();
 
 	}
 }

@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.estimator.impl;
 
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -31,20 +30,8 @@ public class ConstantDrtEstimator implements DrtEstimator {
 
 	@Override
 	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
-
 		double distance = route.getDistance() * detourFactor;
 		double travelTime = route.getDirectRideTime() * detourFactor;
-
-		double fare = 0;
-		if (drtConfig.getDrtFareParams().isPresent()) {
-			DrtFareParams fareParams = drtConfig.getDrtFareParams().get();
-			fare = fareParams.distanceFare_m * distance
-				+ fareParams.timeFare_h * travelTime / 3600.0
-				+ fareParams.baseFare;
-
-			fare = Math.max(fare, fareParams.minFarePerTrip);
-		}
-
-		return new Estimate(distance, travelTime, waitingTime, fare, 0);
+		return new Estimate(distance, travelTime, waitingTime, 0);
 	}
 }
