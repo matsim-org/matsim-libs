@@ -119,7 +119,7 @@ public class ApplicationUtils {
 	public static void applyConfigUpdate(Config config, Path yaml) {
 
 		if (!Files.exists(yaml)) {
-			throw new IllegalArgumentException("Desired run config does not exist:" + yaml);
+			throw new IllegalArgumentException("Given config yaml does not exist: " + yaml);
 		}
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
@@ -139,8 +139,8 @@ public class ApplicationUtils {
 				String configGroupName = aliases.resolveAlias(field.getKey(), emptyStack);
 				ConfigGroup group = config.getModules().get(configGroupName);
 				if (group == null) {
-					log.warn("Config group not found: {}", configGroupName);
-					continue;
+					group = new ConfigGroup(configGroupName);
+					config.addModule(group);
 				}
 
 				applyNodeToConfigGroup(field.getValue(), group);
@@ -168,7 +168,17 @@ public class ApplicationUtils {
 				List<? extends ConfigGroup> params = new ArrayList<>(group.getParameterSets(field.getKey()));
 
 				for (JsonNode item : field.getValue()) {
-					applyNodeAsParameterSet(field.getKey(), item, group, params);
+
+
+					// Special case of parameter sets that have only one entry
+					if (field.getValue().size() == 1 && params.size() == 1 && field.getValue().get(0).isObject()) {
+
+						applyNodeToConfigGroup(field.getValue().get(0), params.get(0));
+
+					} else {
+
+						applyNodeAsParameterSet(field.getKey(), item, group, params);
+					}
 				}
 			} else {
 

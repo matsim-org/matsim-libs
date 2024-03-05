@@ -94,6 +94,12 @@ public abstract class AbstractNetworkWriterReaderTest {
 	protected abstract void readNetwork(final Scenario scenario, final InputStream stream);
 
 	@Test
+	void testAllowedModes_manyUnsortedModes() {
+		doTestAllowedModes(createHashSet("train", "drt", "car", "bus", "walk", "freight"),
+				utils.getOutputDirectory() + "network.xml");
+	}
+
+	@Test
 	void testAllowedModes_multipleModes() {
 		doTestAllowedModes(createHashSet("bus", "train"), utils.getOutputDirectory() + "network.xml");
 	}
@@ -245,6 +251,19 @@ public abstract class AbstractNetworkWriterReaderTest {
 		Set<String> modes2 = link1.getAllowedModes();
 		assertEquals(modes.size(), modes2.size(), "wrong number of allowed modes.");
 		assertTrue(modes2.containsAll(modes), "wrong mode.");
+
+		assertModesSorted(modes2);
+	}
+
+	private static void assertModesSorted(Set<String> modes) {
+		List<String> originalModes = new ArrayList<>(modes);
+		List<String> sortedModes = new ArrayList<>(modes);
+		Collections.sort(sortedModes);
+
+		for (int i = 0; i < originalModes.size(); i++) {
+			assertEquals(sortedModes.get(i), originalModes.get(i),
+					"modes are not sorted. expected '" + sortedModes + "'' but got '" + originalModes + "'");
+		}
 	}
 
 	private static <T> Set<T> createHashSet(T... mode) {
