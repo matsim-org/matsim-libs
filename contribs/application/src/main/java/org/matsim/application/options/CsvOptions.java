@@ -7,7 +7,8 @@ import org.apache.commons.lang.StringUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -41,24 +42,49 @@ public final class CsvOptions {
 		this.csvFormat = csvFormat;
 	}
 
-    /**
-     * Constructor with all available options.
-     */
-    public CsvOptions(CSVFormat.Predefined csvFormat, Character csvDelimiter, Charset csvCharset) {
-        this.csvFormat = csvFormat;
-        this.csvDelimiter = csvDelimiter;
-        this.csvCharset = csvCharset;
-    }
+	/**
+	 * Constructor with all available options.
+	 */
+	public CsvOptions(CSVFormat.Predefined csvFormat, Character csvDelimiter, Charset csvCharset) {
+		this.csvFormat = csvFormat;
+		this.csvDelimiter = csvDelimiter;
+		this.csvCharset = csvCharset;
+	}
 
-    /**
+	/**
+	 * Detects possibly used delimiter from the header of a csv or tsv file.
+	 */
+	public static Character detectDelimiter(String path) throws IOException {
+        try (BufferedReader reader = IOUtils.getBufferedReader(path)) {
+			String firstLine = reader.readLine();
+
+			int comma = StringUtils.countMatches(firstLine, ",");
+			int semicolon = StringUtils.countMatches(firstLine, ";");
+			int tab = StringUtils.countMatches(firstLine, "\t");
+
+			if (comma == 0 && semicolon == 0 && tab == 0) {
+				throw new IllegalArgumentException("No delimiter found in the first line of the file.");
+			}
+
+			// Comma is preferred as the more likely format
+			if (comma >= semicolon && comma >= tab) {
+				return ',';
+			} else if (tab >= semicolon)
+				return '\t';
+			else
+				return ';';
+        }
+	}
+
+	/**
 	 * Get the CSV format defined by the options.
 	 */
 	public CSVFormat getFormat() {
-		CSVFormat format = this.csvFormat.getFormat().withFirstRecordAsHeader();
+		CSVFormat.Builder format = this.csvFormat.getFormat().builder().setSkipHeaderRecord(true);
 		if (csvDelimiter != null)
-			format = format.withDelimiter(csvDelimiter);
+			format = format.setDelimiter(csvDelimiter);
 
-		return format;
+		return format.build();
 	}
 
 	/**
@@ -72,27 +98,7 @@ public final class CsvOptions {
 	 * Creates a new csv writer.
 	 */
 	public CSVPrinter createPrinter(Path path) throws IOException {
-		return new CSVPrinter(IOUtils.getBufferedWriter(path.toUri().toURL(),  csvCharset, false), getFormat());
-	}
-
-	public Character detectDelimiter(String path) throws IOException {
-		BufferedReader reader = IOUtils.getBufferedReader(path);
-
-		String firstLine = reader.readLine();
-
-		int comma = StringUtils.countMatches(firstLine, ",");
-		int semicolon = StringUtils.countMatches(firstLine, ";");
-		int tab = StringUtils.countMatches(firstLine, "\t");
-
-		if (Math.max(comma, Math.max(semicolon, tab)) == comma) {
-			return ',';
-		} else if (Math.max(comma, Math.max(semicolon, tab)) == semicolon) {
-			return ';';
-		} else if (Math.max(comma, Math.max(semicolon, tab)) == tab) {
-			return '\t';
-		} else {
-			return null;
-		}
+		return new CSVPrinter(IOUtils.getBufferedWriter(path.toUri().toURL(), csvCharset, false), getFormat());
 	}
 
 }

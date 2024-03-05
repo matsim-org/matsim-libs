@@ -42,7 +42,7 @@ public class CsvOptionsTest {
 			assertThat(tmp)
 				.hasContent("header" + delimiter + "column\n1" + delimiter + "2");
 
-			assertThat(delimiter).isEqualTo(csv.detectDelimiter(tmp.toString()).toString());
+			assertThat(delimiter).isEqualTo(CsvOptions.detectDelimiter(tmp.toString()).toString());
 		}
 	}
 }

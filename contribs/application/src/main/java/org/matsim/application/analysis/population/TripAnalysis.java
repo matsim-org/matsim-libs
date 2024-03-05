@@ -136,7 +136,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
 			.sample(false)
-			.separator(new CsvOptions().detectDelimiter(input.getPath("trips.csv"))).build());
+			.separator(CsvOptions.detectDelimiter(input.getPath("trips.csv"))).build());
 
 		// Trip filter with start and end
 		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
