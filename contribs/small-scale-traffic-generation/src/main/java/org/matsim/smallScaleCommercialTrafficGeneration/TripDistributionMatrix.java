@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.options.ShpOptions.Index;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
@@ -60,7 +61,7 @@ public class TripDistributionMatrix {
 	private static final Logger log = LogManager.getLogger(TripDistributionMatrix.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
-	private final ArrayList<String> listOfZones = new ArrayList<>();
+	private final ArrayList<String> listOfZones;
 	private final ArrayList<String> listOfModesORvehTypes = new ArrayList<>();
 	private final ArrayList<Integer> listOfPurposes = new ArrayList<>();
 	private final List<SimpleFeature> zonesFeatures;
@@ -238,23 +239,25 @@ public class TripDistributionMatrix {
 		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
 		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 		private final String smallScaleCommercialTrafficType;
+		private final ArrayList<String> listOfZones;
 
 		public static Builder newInstance(Index indexZones,
 										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
-										  String smallScaleCommercialTrafficType) {
-			return new Builder(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType);
+										  String smallScaleCommercialTrafficType, ArrayList<String> listOfZones) {
+			return new Builder(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones);
 		}
 
 		private Builder(Index indexZones,
 						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
-						String smallScaleCommercialTrafficType) {
+						String smallScaleCommercialTrafficType, ArrayList<String> listOfZones) {
 			super();
 			this.zonesFeatures = indexZones.getAllFeatures();
 			this.trafficVolume_start = trafficVolume_start;
 			this.trafficVolume_stop = trafficVolume_stop;
 			this.smallScaleCommercialTrafficType = smallScaleCommercialTrafficType;
+			this.listOfZones = new ArrayList<>(listOfZones);
 		}
 
 		public TripDistributionMatrix build() {
@@ -267,6 +270,7 @@ public class TripDistributionMatrix {
 		trafficVolume_start = builder.trafficVolume_start;
 		trafficVolume_stop = builder.trafficVolume_stop;
 		smallScaleCommercialTrafficType = builder.smallScaleCommercialTrafficType;
+		listOfZones = builder.listOfZones;
 	}
 
 	private final ConcurrentHashMap<TripDistributionMatrixKey, Integer> matrixCache = new ConcurrentHashMap<>();
@@ -309,10 +313,6 @@ public class TripDistributionMatrix {
 				roundedVolume++;
 				roundingError.get(stopZone).merge((modeORvehType + "_" + purpose), -1, Double::sum);
 			}
-			if (!listOfZones.contains(startZone))
-				listOfZones.add(startZone);
-			if (!listOfZones.contains(stopZone))
-				listOfZones.add(stopZone);
 		} else
 			roundedVolume = 0;
 		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
@@ -412,7 +412,7 @@ public class TripDistributionMatrix {
 								smallScaleCommercialTrafficType);
 						} else {
 							ArrayList<String> shuffledZones = new ArrayList<>(getListOfZones());
-							Collections.shuffle(shuffledZones);
+							Collections.shuffle(shuffledZones, MatsimRandom.getRandom());
 							for (String startZone : shuffledZones) {
 								TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType,
 										purpose, smallScaleCommercialTrafficType);
@@ -519,16 +519,6 @@ public class TripDistributionMatrix {
 	 * @return listOfZones
 	 */
 	ArrayList<String> getListOfZones() {
-//		int count = 0;
-//		if (listOfZones.isEmpty())
-//			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
-//				count++;
-//				System.out.println(count);
-//				if (!listOfZones.contains(key.getFromZone()))
-//					listOfZones.add(key.getFromZone());
-//				if (!listOfZones.contains(key.getToZone()))
-//					listOfZones.add(key.getToZone());
-//			}
 		return listOfZones;
 	}
 

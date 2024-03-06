@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -39,6 +40,30 @@ public class ShpOptionsTest {
 		assertThat(ft)
 				.isNotEmpty();
 
+	}
+
+	@Test
+	void get() {
+
+		Path input = Path.of(utils.getClassInputDirectory()
+				.replace("ShpOptionsTest", "CreateLandUseShpTest")
+				.replace("options", "prepare"))
+			.resolve("andorra-latest-free.shp.zip");
+
+		Assumptions.assumeTrue(Files.exists(input));
+
+		ShpOptions shp = new ShpOptions(input, null, null);
+
+		ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "name");
+
+		SimpleFeature result = index.queryFeature(new Coord(1.5333461, 42.555388));
+
+		assertThat(result)
+			.isNotNull();
+
+		String name = index.query(new Coord(1.5333461, 42.555388));
+		assertThat(name)
+			.isEqualTo("Museu de la Miniatura");
 	}
 
 	@Test
