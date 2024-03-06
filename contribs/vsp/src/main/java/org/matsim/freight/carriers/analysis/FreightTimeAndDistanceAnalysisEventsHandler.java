@@ -21,6 +21,8 @@
 
 package org.matsim.freight.carriers.analysis;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -236,6 +238,91 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
 				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
 				"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
+		bw1.newLine();
+
+		for (VehicleType vehicleType : vehicleTypesMap.values()) {
+			long nuOfVehicles = vehicleId2VehicleType.values().stream().filter(vehType -> vehType.getId() == vehicleType.getId()).count();
+
+			final Double costRatePerSecond = vehicleType.getCostInformation().getCostsPerSecond();
+			final Double costRatePerMeter = vehicleType.getCostInformation().getCostsPerMeter();
+			final Double fixedCostPerVeh = vehicleType.getCostInformation().getFixedCosts();
+
+			final Double sumOfTourDurationInSeconds = vehicleTypeId2SumOfTourDuration.getOrDefault(vehicleType.getId(), 0.);
+			final Double sumOfDistanceInMeters = vehicleTypeId2Mileage.getOrDefault(vehicleType.getId(), 0.);
+			final Double sumOfTravelTimeInSeconds = vehicleTypeId2TravelTime.getOrDefault(vehicleType.getId(), 0.);
+
+			final double sumOfVarCostsTime = sumOfTourDurationInSeconds * costRatePerSecond;
+			final double sumOfVarCostsDistance = sumOfDistanceInMeters * costRatePerMeter;
+			final double sumOfFixCosts = nuOfVehicles * fixedCostPerVeh;
+
+			bw1.write(vehicleType.getId().toString());
+
+			bw1.write("\t" + nuOfVehicles);
+			bw1.write("\t" + sumOfTourDurationInSeconds);
+			bw1.write("\t" + sumOfTourDurationInSeconds / 3600);
+			bw1.write("\t" + sumOfDistanceInMeters);
+			bw1.write("\t" + sumOfDistanceInMeters / 1000);
+			bw1.write("\t" + sumOfTravelTimeInSeconds);
+			bw1.write("\t" + sumOfTravelTimeInSeconds / 3600);
+			bw1.write("\t" + costRatePerSecond);
+			bw1.write("\t" + costRatePerMeter);
+			bw1.write("\t" + fixedCostPerVeh);
+			bw1.write("\t" + sumOfVarCostsTime);
+			bw1.write("\t" + sumOfVarCostsDistance);
+			bw1.write("\t" + sumOfFixCosts);
+			bw1.write("\t" + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
+
+			bw1.newLine();
+		}
+
+		bw1.close();
+		log.info("Output written to " + fileName);
+	}
+
+
+	void writeTravelTimeAndDistancePerTruckSize(String analysisOutputDirectory, Scenario scenario) throws IOException {
+		log.info("Writing out Time & Distance & Costs ... perVehicleType");
+
+		TreeMap<Id<VehicleType>, String > vehicleType2vehicleSize = new TreeMap<>();
+		var vehicleTypeIds = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().keySet();
+
+		final String truck7_5 = "7.5t light";
+		final String truck18 = "18t medium";
+		final String truck26 = "26t heavy";
+		final String truck40 = "40t heavy";
+
+		for (Id<VehicleType> vehicleTypeId : vehicleTypeIds) {
+			var vehIdString = vehicleTypeId.toString();
+			if(vehIdString.startsWith("light8t")){
+				vehicleType2vehicleSize.put(vehicleTypeId, truck7_5);
+			} else if (vehIdString.startsWith("medium18t")) {
+				vehicleType2vehicleSize.put(vehicleTypeId, truck18);
+			} else if (vehIdString.startsWith("heavy26t")) {
+				vehicleType2vehicleSize.put(vehicleTypeId, truck26);
+			} else if (vehIdString.startsWith("heavy40t")) {
+				vehicleType2vehicleSize.put(vehicleTypeId, truck40);
+			}
+		}
+
+		var listOfSizes = new LinkedList<>(List.of(truck7_5, truck18, truck26, truck40));
+
+		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
+		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
+		//For the case that there are additional vehicle types found in the events.
+		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {
+			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
+		}
+
+		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
+
+		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
+		//Write headline:
+		bw1.write("vehicleTypeId \t nuOfVehicles \t " +
+			"SumOfTourDuration[s] \t SumOfTourDuration[h] \t" +
+			"SumOfTravelDistances[m] \t SumOfTravelDistances[km] \t " +
+			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
+			"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
+			"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
 
 		for (VehicleType vehicleType : vehicleTypesMap.values()) {
