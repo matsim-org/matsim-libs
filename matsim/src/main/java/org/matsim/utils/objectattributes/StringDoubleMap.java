@@ -1,4 +1,4 @@
-package org.matsim.utils.objectattributes.attributeconverters;
+package org.matsim.utils.objectattributes;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
