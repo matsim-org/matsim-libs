@@ -121,7 +121,7 @@ public class RunDrtWithCompanionExampleIT {
 		List<String> keys = List.of(collect.get(0).split(";"));
 		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
 
-		int ridesRequestIndex = keys.indexOf("rides_requests");
+		int ridesRequestIndex = keys.indexOf("rides");
         int ridesRequest = Integer.parseInt(lastIterationValues.get(ridesRequestIndex));
 
 		int ridesPaxIndex = keys.indexOf("rides_pax");

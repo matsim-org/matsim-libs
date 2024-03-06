@@ -119,7 +119,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 	}
 
 	private static void printDemandKPICSV(Table customerStats, Table tableSupplyKPI, Path output) throws IOException {
-		double rides = getLastDoubleValue(customerStats, "rides_requests");
+		double rides = getLastDoubleValue(customerStats, "rides");
 		double rejections = getLastDoubleValue(customerStats, "rejections");
 		double requests = rides + rejections;
 
@@ -180,7 +180,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		Path customerStatsPath = ApplicationUtils.matchInput("drt_customer_stats_" + drtMode + ".csv", input.getRunDirectory());
 		Table customerStats = Table.read().csv(CsvReadOptions.builder(customerStatsPath.toFile())
 			.columnTypesPartial(Map.of(
-				"rides_requests", ColumnType.DOUBLE,
+				"rides", ColumnType.DOUBLE,
 				"wait_average", ColumnType.DOUBLE,
 				"wait_p95", ColumnType.DOUBLE,
 				"inVehicleTravelTime_mean", ColumnType.DOUBLE,
