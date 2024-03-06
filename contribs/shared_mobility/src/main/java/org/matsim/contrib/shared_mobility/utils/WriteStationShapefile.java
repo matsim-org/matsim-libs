@@ -16,7 +16,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -57,6 +57,6 @@ public class WriteStationShapefile {
 					null));
 		}
 
-		ShapeFileWriter.writeGeometries(features, cmd.getOptionStrict("output-path"));
+		GeoFileWriter.writeGeometries(features, cmd.getOptionStrict("output-path"));
 	}
 }

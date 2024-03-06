@@ -22,9 +22,13 @@ package org.matsim.core.utils.gis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.geopkg.GeoPkgDataStoreFactory;
+import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -34,34 +38,48 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This is a simple utility class that provides methods to write Feature instances
- * of the geotools framework to an ESRI shape file.
+ * of the geotools framework to an ESRI shape or geopackage file.
  *
  * @author glaemmel
+ * @author nkuehnel / MOIA // add gpkg support
  */
-public class ShapeFileWriter implements MatsimSomeWriter {
+public class GeoFileWriter implements MatsimSomeWriter {
 
-	private static final Logger log = LogManager.getLogger(ShapeFileWriter.class);
+	private static final Logger log = LogManager.getLogger(GeoFileWriter.class);
 
 	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
 		if (features.isEmpty()) {
 			throw new UncheckedIOException(new IOException("Cannot write empty collection"));
 		}
-		log.info("Writing shapefile to " + filename);
-		try {
-			URL fileURL = (new File(filename)).toURI().toURL();
 
-			ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
+		try {
+			DataStore datastore;
+			if(filename.endsWith(".shp")) {
+				log.info("Writing shapefile to " + filename);
+				URL fileURL = (new File(filename)).toURI().toURL();
+        	    datastore = new ShapefileDataStore(fileURL);
+        	} else if(filename.endsWith(".gpkg")){
+				Map<String, Object> map = new HashMap<>();
+				map.put(GeoPkgDataStoreFactory.DBTYPE.key, GeoPkgDataStoreFactory.DBTYPE.sample);
+				map.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
+				map.put(JDBCDataStoreFactory.BATCH_INSERT_SIZE.key, 50);
+				datastore = DataStoreFinder.getDataStore(map);
+			} else {
+				throw new RuntimeException("Unsupported file type.");
+			}
+
 			SimpleFeature feature = features.iterator().next();
 			datastore.createSchema(feature.getFeatureType());
 
 			DefaultFeatureCollection coll = new DefaultFeatureCollection();
 			coll.addAll(features);
 
-			SimpleFeatureType featureType = features.iterator().next().getFeatureType();
-			datastore.createSchema(featureType);
-			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource();
+			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource(datastore.getNames().get(0));
 			featureSource.addFeatures(coll);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

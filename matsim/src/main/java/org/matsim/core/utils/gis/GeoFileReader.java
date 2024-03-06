@@ -23,12 +23,15 @@ package org.matsim.core.utils.gis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.geopkg.GeoPkgDataStoreFactory;
+import org.geotools.jdbc.JDBCDataStore;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
@@ -41,17 +44,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author glaemmel
  * @author dgrether
  * @author mrieser // switch to GeoTools 2.7.3
+ * @author nkuehnel / MOIA // add gpkg suuport
  */
-public class ShapeFileReader implements MatsimSomeReader {
-    	private static final Logger log = LogManager.getLogger(ShapeFileReader.class);
+public class GeoFileReader implements MatsimSomeReader {
+    	private static final Logger log = LogManager.getLogger(GeoFileReader.class);
 
 	private SimpleFeatureSource featureSource = null;
 
@@ -69,10 +71,22 @@ public class ShapeFileReader implements MatsimSomeReader {
 
 	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
 		try {
-			File dataFile = new File(filename);
-			log.info( "will try to read from " + dataFile.getAbsolutePath() ) ;
-			Gbl.assertIf( dataFile.exists() );
-			return getSimpleFeatures(FileDataStoreFinder.getDataStore(dataFile));
+			DataStore dataStore;
+			if(filename.endsWith(".shp")) {
+				File dataFile = new File(filename);
+				log.info("will try to read from " + dataFile.getAbsolutePath());
+				Gbl.assertIf(dataFile.exists());
+                dataStore = FileDataStoreFinder.getDataStore(dataFile);
+            } else if(filename.endsWith(".gpkg")){
+				Map<String, Object> params = new HashMap<>();
+				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
+				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
+				params.put("read-only", true);
+				dataStore = DataStoreFinder.getDataStore(params);
+			} else {
+				throw new RuntimeException("Unsupported file type.");
+			}
+			return getSimpleFeatures(dataStore);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -91,8 +105,8 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * Read all simple features from a data store. This method makes sure the store is closed afterwards.
 	 * @return list of contained features.
 	 */
-	public static List<SimpleFeature> getSimpleFeatures(FileDataStore dataStore) throws IOException {
-		SimpleFeatureSource featureSource = dataStore.getFeatureSource();
+	public static List<SimpleFeature> getSimpleFeatures(DataStore dataStore) throws IOException {
+		SimpleFeatureSource featureSource = dataStore.getFeatureSource(dataStore.getNames().get(0));
 
 		SimpleFeatureIterator it = featureSource.getFeatures().features();
 		List<SimpleFeature> featureSet = new ArrayList<>();
@@ -110,7 +124,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 */
 	public Collection<SimpleFeature> readFileAndInitialize(final String filename) throws UncheckedIOException {
 		try {
-			this.featureSource = ShapeFileReader.readDataFile(filename);
+			this.featureSource = GeoFileReader.readDataFile(filename);
 			this.init();
 			SimpleFeature ft = null;
 			SimpleFeatureIterator it = this.featureSource.getFeatures().features();
@@ -135,16 +149,16 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * <p></p>
 	 * There are many ways to use that class in a wrong way. The safe way is the following:
 	 * <p></p>
-	 * <pre> ShapeFileReader shapeFileReader = new ShapeFileReader();
-	 * shapeFileReader.readFileAndInitialize(zonesShapeFile); </pre>
+	 * <pre> GeoFileReader geoFileReader = new GeoFileReader();
+	 * geoFileReader.readFileAndInitialize(geoFile); </pre>
 	 * <p></p>
 	 * Then, get the features by
 	 * <p></p>
-	 * <pre> Set<{@link Feature}> features = shapeFileReader.getFeatureSet(); </pre>
+	 * <pre> Set<{@link Feature}> features = geoFileReader.getFeatureSet(); </pre>
 	 * <p></p>
 	 * If you need metadata you can use
 	 * <p></p>
-	 * <pre> FeatureSource fs = shapeFileReader.getFeatureSource(); </pre>
+	 * <pre> FeatureSource fs = geoFileReader.getFeatureSource(); </pre>
 	 * <p></p>
 	 * to get access to the feature source.<br>
 	 * <em>BUT NEVER CALL <code>fs.getFeatures();</code> !!! It can happen that you will read from disk again!!! </em>
@@ -157,22 +171,36 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * The following old doc is kept here:
 	 * </p>
 	 * <p></p>
-	 * Provides access to a shape file and returns a <code>FeatureSource</code> containing all features.
+	 * Provides access to a shape or geopackage file and returns a <code>FeatureSource</code> containing all features.
 	 * Take care access means on disk access, i.e. the FeatureSource is only a pointer to the information
 	 * stored in the file. This can be horribly slow if invoked many times and throw exceptions if two many read
 	 * operations to the same file are performed. In those cases it is recommended to use the method readDataFileToMemory
 	 * of this class.
 	 *
-	 * @param filename File name of a shape file (ending in <code>*.shp</code>)
+	 * @param filename File name of a shape or geopackage file (ending in <code>*.shp</code> or <code>*.gpkg</code>)
 	 * @return FeatureSource containing all features.
 	 * @throws UncheckedIOException if the file cannot be found or another error happens during reading
 	 */
 	public static SimpleFeatureSource readDataFile(final String filename) throws UncheckedIOException {
 		try {
 			log.warn("Unsafe method! store.dispose() is not called from within this method");
-			File dataFile = new File(filename);
-			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
-			return store.getFeatureSource();
+			SimpleFeatureSource featureSource;
+			if(filename.endsWith(".shp")) {
+				File dataFile = new File(filename);
+				FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
+                featureSource = store.getFeatureSource();
+            } else if(filename.endsWith(".gpkg")) {
+				Map<String, Object> params = new HashMap<>();
+				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
+				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
+				params.put("read-only", true);
+
+				DataStore datastore = DataStoreFinder.getDataStore(params);
+				featureSource = datastore.getFeatureSource(datastore.getNames().get(0));
+			} else {
+				throw new RuntimeException("Unsupported file type.");
+			}
+			return featureSource;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
