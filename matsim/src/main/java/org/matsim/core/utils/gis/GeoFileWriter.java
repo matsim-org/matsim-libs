@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.FileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -58,28 +59,30 @@ public class GeoFileWriter implements MatsimSomeWriter {
 		}
 
 		try {
-			DataStore datastore;
+			SimpleFeatureStore featureSource;
+			SimpleFeatureType featureType = features.iterator().next().getFeatureType();
+
 			if(filename.endsWith(".shp")) {
 				log.info("Writing shapefile to " + filename);
 				URL fileURL = (new File(filename)).toURI().toURL();
-        	    datastore = new ShapefileDataStore(fileURL);
+        	    FileDataStore datastore = new ShapefileDataStore(fileURL);
+				datastore.createSchema(featureType);
+				featureSource = (SimpleFeatureStore) datastore.getFeatureSource();
         	} else if(filename.endsWith(".gpkg")){
 				Map<String, Object> map = new HashMap<>();
 				map.put(GeoPkgDataStoreFactory.DBTYPE.key, GeoPkgDataStoreFactory.DBTYPE.sample);
 				map.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
 				map.put(JDBCDataStoreFactory.BATCH_INSERT_SIZE.key, 50);
-				datastore = DataStoreFinder.getDataStore(map);
-			} else {
+				DataStore datastore = DataStoreFinder.getDataStore(map);
+				datastore.createSchema(featureType);
+				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(featureType.getName());
+            } else {
 				throw new RuntimeException("Unsupported file type.");
 			}
-
-            SimpleFeatureType featureType = features.iterator().next().getFeatureType();
-			datastore.createSchema(featureType);
 
 			DefaultFeatureCollection coll = new DefaultFeatureCollection();
 			coll.addAll(features);
 
-			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource(featureType.getName());
 			featureSource.addFeatures(coll);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
