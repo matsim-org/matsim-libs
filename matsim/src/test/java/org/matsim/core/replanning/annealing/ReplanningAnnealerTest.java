@@ -40,7 +40,7 @@ public class ReplanningAnnealerTest {
                     "9;0.0500;0.0250;0.0250;0.9500\n" +
                     "10;0.0000;0.0000;0.0000;1.0000\n";
 
-	private String getExpectedLinearAnnealMultipleSubpopulations = "it;globalInnovationRate_otherAnnealer;ChangeExpBeta_otherAnnealer;TimeAllocationMutator_otherAnnealer;globalInnovationRate_subpop;ReRoute_subpop;SubtourModeChoice_subpop;ChangeExpBeta_subpop\n" +
+	private String expectedLinearAnnealMultipleSubpopulations = "it;globalInnovationRate_otherAnnealer;ChangeExpBeta_otherAnnealer;TimeAllocationMutator_otherAnnealer;globalInnovationRate_subpop;ReRoute_subpop;SubtourModeChoice_subpop;ChangeExpBeta_subpop\n" +
 		"0;0.8000;0.2000;0.8000;0.5000;0.2500;0.2500;0.5000\n" +
 		"1;0.7200;0.2800;0.7200;0.4500;0.2250;0.2250;0.5500\n" +
 		"2;0.6400;0.3600;0.6400;0.4000;0.2000;0.2000;0.6000\n" +
@@ -404,7 +404,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(getExpectedLinearAnnealMultipleSubpopulations, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedLinearAnnealMultipleSubpopulations, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(targetSubpop);
@@ -413,5 +413,25 @@ public class ReplanningAnnealerTest {
         Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
         Assertions.assertEquals(1.0, weights2.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
+
+	@Test
+	void testNullSubpopulationAnneal() throws IOException {
+		String targetSubpop = null;
+		this.saConfigVar.setAnnealType("linear");
+		this.saConfigVar.setEndValue(0.0);
+		this.saConfigVar.setStartValue(0.5);
+		this.saConfigVar.setDefaultSubpopulation(targetSubpop);
+		this.config.replanning().getStrategySettings().forEach(s -> s.setSubpopulation(targetSubpop));
+
+		Controler controler = new Controler(this.scenario);
+		controler.run();
+
+		Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+
+		StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
+		List<Double> weights = sm.getWeights(targetSubpop);
+
+		Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+	}
 
 }
