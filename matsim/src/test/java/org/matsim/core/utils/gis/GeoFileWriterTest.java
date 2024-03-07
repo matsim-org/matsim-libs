@@ -29,6 +29,7 @@ import java.util.List;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -80,7 +81,7 @@ public class GeoFileWriterTest {
 		String inFile = "src/test/resources/" + utils.getInputDirectory() + "test.gpkg";
 
 		String outFile = utils.getOutputDirectory() + "/test.gpkg";
-		SimpleFeatureSource s = GeoFileReader.readDataFile(inFile);
+		SimpleFeatureSource s = GeoFileReader.readDataFile(inFile, new NameImpl("test"));
 		SimpleFeatureCollection fts = s.getFeatures();
 		SimpleFeatureIterator it = fts.features();
 		SimpleFeature ft = it.next();
@@ -89,7 +90,7 @@ public class GeoFileWriterTest {
 		fc.add(ft);
 		GeoFileWriter.writeGeometries(fc, outFile);
 
-		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile, new NameImpl("test"));
 		SimpleFeatureCollection fts1 = s1.getFeatures();
 		SimpleFeatureIterator it1 = fts1.features();
 		SimpleFeature ft1 = it1.next();
@@ -154,7 +155,7 @@ public class GeoFileWriterTest {
 
 		GeoFileWriter.writeGeometries(features, outFile);
 
-		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile, new NameImpl("EvacuationArea"));
 		SimpleFeatureCollection fts1 = s1.getFeatures();
 		SimpleFeatureIterator it1 = fts1.features();
 		SimpleFeature ft1 = it1.next();

@@ -75,7 +75,7 @@ public class GeoFileWriter implements MatsimSomeWriter {
 				map.put(JDBCDataStoreFactory.BATCH_INSERT_SIZE.key, 50);
 				DataStore datastore = DataStoreFinder.getDataStore(map);
 				datastore.createSchema(featureType);
-				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(featureType.getName());
+				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(featureType.getTypeName());
             } else {
 				throw new RuntimeException("Unsupported file type.");
 			}
