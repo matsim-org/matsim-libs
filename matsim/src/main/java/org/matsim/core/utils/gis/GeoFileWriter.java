@@ -28,11 +28,13 @@ import org.geotools.data.FileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.NameImpl;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +56,11 @@ public class GeoFileWriter implements MatsimSomeWriter {
 	private static final Logger log = LogManager.getLogger(GeoFileWriter.class);
 
 	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
+		writeGeometries(features, filename, null);
+	}
+
+
+	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename, Name layerName) {
 		if (features.isEmpty()) {
 			throw new UncheckedIOException(new IOException("Cannot write empty collection"));
 		}
@@ -75,7 +82,10 @@ public class GeoFileWriter implements MatsimSomeWriter {
 				map.put(JDBCDataStoreFactory.BATCH_INSERT_SIZE.key, 50);
 				DataStore datastore = DataStoreFinder.getDataStore(map);
 				datastore.createSchema(featureType);
-				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(featureType.getTypeName());
+				if(layerName == null) {
+					layerName = new NameImpl(featureType.getTypeName());
+				}
+				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(layerName);
             } else {
 				throw new RuntimeException("Unsupported file type.");
 			}
