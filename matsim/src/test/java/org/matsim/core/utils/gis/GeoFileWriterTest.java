@@ -134,7 +134,7 @@ public class GeoFileWriterTest {
 
 	@Test
 	void testGeopackageFileWriterWithSelfCreatedContent() throws IOException {
-		String outFile = utils.getOutputDirectory() + "/test.gpkg";
+		String outFile = utils.getOutputDirectory() + "/test2.gpkg";
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("EvacuationArea");
 		b.setCRS(DefaultGeographicCRS.WGS84);

@@ -24,6 +24,7 @@ package org.matsim.core.utils.gis;
 import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.feature.NameImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -54,7 +55,7 @@ public class GeoFileReaderTest {
 	@Test
 	void testGpkg() throws IOException {
 		String filename = "src/test/resources/" + utils.getInputDirectory() + "test+test.gpkg";
-		FeatureSource fs = GeoFileReader.readDataFile(filename);
+		FeatureSource fs = GeoFileReader.readDataFile(filename, new NameImpl("testtest"));
 		Assertions.assertEquals(3, fs.getFeatures().size());
 	}
 }

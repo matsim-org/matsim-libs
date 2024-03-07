@@ -73,13 +73,13 @@ public class GeoFileWriter implements MatsimSomeWriter {
 				throw new RuntimeException("Unsupported file type.");
 			}
 
-			SimpleFeature feature = features.iterator().next();
-			datastore.createSchema(feature.getFeatureType());
+            SimpleFeatureType featureType = features.iterator().next().getFeatureType();
+			datastore.createSchema(featureType);
 
 			DefaultFeatureCollection coll = new DefaultFeatureCollection();
 			coll.addAll(features);
 
-			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource(datastore.getNames().get(0));
+			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource(featureType.getName());
 			featureSource.addFeatures(coll);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
