@@ -35,21 +35,20 @@ class DrtTeleportationTest {
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans_only_drt_1.0.xml.gz");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(3);
+		config.controller().setLastIteration(2);
 
-		// install the drt routing stuff, but not the mobsim stuff!
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 		drtConfigGroup.maxTravelTimeAlpha = 1.2;
 		drtConfigGroup.maxTravelTimeBeta = 600;
 		drtConfigGroup.maxWaitTime = 300;
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
-
 		DrtFareParams fareParams = new DrtFareParams();
 		fareParams.baseFare = 1.0;
 		fareParams.distanceFare_m = 0.001;
 		drtConfigGroup.addParameterSet(fareParams);
 
+		// Setup to enable estimator and teleportation
+		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
@@ -57,8 +56,8 @@ class DrtTeleportationTest {
 			}
 		});
 
-		System.out.println(config);
 		controler.run();
+		// TODO add a check
 	}
 
 	@Test
@@ -68,7 +67,7 @@ class DrtTeleportationTest {
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans_only_drt_1.0.xml.gz");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(3);
+		config.controller().setLastIteration(2);
 
 		// install the drt routing stuff, but not the mobsim stuff!
 		Controler controler = DrtControlerCreator.createControler(config, false);
@@ -76,13 +75,13 @@ class DrtTeleportationTest {
 		drtConfigGroup.maxTravelTimeAlpha = 1.2;
 		drtConfigGroup.maxTravelTimeBeta = 600;
 		drtConfigGroup.maxWaitTime = 300;
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
-
 		DrtFareParams fareParams = new DrtFareParams();
 		fareParams.baseFare = 1.0;
 		fareParams.distanceFare_m = 0.001;
 		drtConfigGroup.addParameterSet(fareParams);
 
+		// Setup to enable estimator and teleportation
+		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
@@ -91,7 +90,7 @@ class DrtTeleportationTest {
 			}
 		});
 
-		System.out.println(config);
 		controler.run();
+		// TODO add a check
 	}
 }

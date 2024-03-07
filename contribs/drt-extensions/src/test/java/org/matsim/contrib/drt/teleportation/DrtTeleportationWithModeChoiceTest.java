@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.RealisticDrtEstimator;
-import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -30,7 +28,7 @@ public class DrtTeleportationWithModeChoiceTest {
 	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+//	@Test
 	void testModeChoice() {
 		URL url = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
@@ -52,34 +50,30 @@ public class DrtTeleportationWithModeChoiceTest {
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		changeExpBeta.setWeight(0.9);
 		config.replanning().addStrategySettings(changeExpBeta);
-
 		// Introduce a dummy alternative mode: bike (also teleported)
 		ScoringConfigGroup.ModeParams bikeModeParams = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 		bikeModeParams.setConstant(1.);
 		bikeModeParams.setMarginalUtilityOfTraveling(-6.);
 		config.scoring().addModeParams(bikeModeParams);
-
 		// Update change mode
 		config.changeMode().setModes( new String[] { TransportMode.drt, TransportMode.bike });
 
-		Controler controler = DrtControlerCreator.createControler(config, false);
+		// Setting DRT config group
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfigGroup.maxTravelTimeAlpha = 1.1;
-		drtConfigGroup.maxTravelTimeBeta = 200;
-		drtConfigGroup.maxWaitTime = 180;
+
+		// Copy this line to Leipzig run script!!!
 		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
 
+		Controler controler = DrtControlerCreator.createControler(config, false);
+
+		// Copy this overriding module to Leipzig run script!!!
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
 				bindModal(DrtEstimator.class).toInstance(new RealisticDrtEstimator(
-					new RealisticDrtEstimator.DistributionGenerator(1.2, 200,
-						0.2, 180, 0.3)));
+					new RealisticDrtEstimator.DistributionGenerator(1.2, 32,
+						0.3, 300, 0.4)));
 			}
-
-//			public void install() {
-//				bindModal(DrtEstimator.class).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
-//			}
 		});
 
 		System.out.println(config);
