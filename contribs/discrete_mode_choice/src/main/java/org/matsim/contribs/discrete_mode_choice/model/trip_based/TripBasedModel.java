@@ -78,7 +78,7 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 					TripCandidate candidate = estimator.estimateTrip(person, mode, trip, tripCandidates);
 
 					if (!Double.isFinite(candidate.getUtility())) {
-						logger.warn(buildIllegalUtilityMessage(tripIndex, person));
+						logger.warn(buildIllegalUtilityMessage(tripIndex, person, candidate));
 						continue;
 					}
 
@@ -139,8 +139,8 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 				person.getId().toString(), appendix);
 	}
 
-	private String buildIllegalUtilityMessage(int tripIndex, Person person) {
-		return String.format("Received illegal utility for trip %d of agent %s. Continuing with next candidate.",
-				tripIndex, person.getId().toString());
+	private String buildIllegalUtilityMessage(int tripIndex, Person person, TripCandidate candidate) {
+		return String.format("Received illegal utility for trip %d (%s) of agent %s. Continuing with next candidate.",
+				tripIndex, candidate.getMode(), person.getId().toString());
 	}
 }

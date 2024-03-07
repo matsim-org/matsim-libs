@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.matsim.utils.objectattributes.StringDoubleMap;
 
 public class StringDoubleMapConverter implements AttributeConverter<StringDoubleMap> {
     private static final Logger LOG = LogManager.getLogger(StringDoubleMapConverter.class);
