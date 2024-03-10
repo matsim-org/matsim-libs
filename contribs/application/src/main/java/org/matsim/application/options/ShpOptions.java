@@ -18,7 +18,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -161,7 +161,7 @@ public final class ShpOptions {
 			if (shpCharset != null)
 				ds.setCharset(shpCharset);
 
-			return ShapeFileReader.getSimpleFeatures(ds);
+			return GeoFileReader.getSimpleFeatures(ds);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

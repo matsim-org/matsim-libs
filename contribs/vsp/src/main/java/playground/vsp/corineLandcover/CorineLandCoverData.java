@@ -31,7 +31,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -57,7 +57,7 @@ public class CorineLandCoverData {
     public CorineLandCoverData( String corineLandCoverShapeFile, boolean simplifyGeometries, boolean combiningGeom) {
 
         LOGGER.info("Reading CORINE landcover shape file . . .");
-        Collection<SimpleFeature> landCoverFeatures = ShapeFileReader.getAllFeatures(corineLandCoverShapeFile);
+        Collection<SimpleFeature> landCoverFeatures = GeoFileReader.getAllFeatures(corineLandCoverShapeFile);
 
         this.simplifyGeometries = simplifyGeometries;
         if (this.simplifyGeometries) LOGGER.warn("Geometries will be simplified such that number of vertices in each geometry is less than 1000. " +
