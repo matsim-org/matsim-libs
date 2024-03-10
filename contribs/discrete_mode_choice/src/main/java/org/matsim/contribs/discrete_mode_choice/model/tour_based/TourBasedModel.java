@@ -93,7 +93,7 @@ public class TourBasedModel implements DiscreteModeChoiceModel {
 					TourCandidate candidate = estimator.estimateTour(person, tourModes, tourTrips, tourCandidates);
 
 					if (!Double.isFinite(candidate.getUtility())) {
-						logger.warn(buildIllegalUtilityMessage(tripIndex, person));
+						logger.warn(buildIllegalUtilityMessage(tripIndex, person, candidate));
 						continue;
 					}
 
@@ -173,9 +173,11 @@ public class TourBasedModel implements DiscreteModeChoiceModel {
 				tripIndex, person.getId().toString(), appendix);
 	}
 
-	private String buildIllegalUtilityMessage(int tripIndex, Person person) {
+	private String buildIllegalUtilityMessage(int tripIndex, Person person, TourCandidate candidate) {
+		TripCandidate trip = candidate.getTripCandidates().get(tripIndex);
+		
 		return String.format(
-				"Received illegal utility for for tour starting at trip %d of agent %s. Continuing with next candidate.",
-				tripIndex, person.getId().toString());
+				"Received illegal utility for for tour starting at trip %d (%s) of agent %s. Continuing with next candidate.",
+				tripIndex, trip.getMode(), person.getId().toString());
 	}
 }
