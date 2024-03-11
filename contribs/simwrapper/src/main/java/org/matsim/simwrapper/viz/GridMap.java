@@ -10,6 +10,18 @@ import java.util.Map;
 public class GridMap extends Viz {
 
 	/**
+	 * The center of the map.
+	 */
+	@JsonProperty(required = false)
+	public Double zoom;
+
+	/**
+	 * The center of the map.
+	 */
+	@JsonProperty(required = false)
+	public double[] center;
+
+	/**
 	 * The filepath containing the data.
 	 */
 	@JsonProperty(required = true)
