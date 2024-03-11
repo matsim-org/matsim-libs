@@ -29,6 +29,7 @@ import java.util.List;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -45,7 +46,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-public class ShapeFileWriterTest {
+public class GeoFileWriterTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -55,22 +56,47 @@ public class ShapeFileWriterTest {
 		String inFile = "src/test/resources/" + utils.getInputDirectory() + "test.shp";
 
 		String outFile = utils.getOutputDirectory() + "/test.shp";
-		SimpleFeatureSource s = ShapeFileReader.readDataFile(inFile);
+		SimpleFeatureSource s = GeoFileReader.readDataFile(inFile);
 			SimpleFeatureCollection fts = s.getFeatures();
 			SimpleFeatureIterator it = fts.features();
 			SimpleFeature ft = it.next();
 			Geometry g = (Geometry) ft.getDefaultGeometry();
 			List<SimpleFeature> fc = new ArrayList<>();
 			fc.add(ft);
-			ShapeFileWriter.writeGeometries(fc, outFile);
+			GeoFileWriter.writeGeometries(fc, outFile);
 
-			SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+			SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
 			SimpleFeatureCollection fts1 = s1.getFeatures();
 			SimpleFeatureIterator it1 = fts1.features();
 			SimpleFeature ft1 = it1.next();
 			Geometry g1 = (Geometry) ft1.getDefaultGeometry();
 
 			Assertions.assertEquals(g.getCoordinates().length, g1.getCoordinates().length);
+
+	}
+
+	@Test
+	void testGeopackageFileWriter() throws IOException{
+
+		String inFile = "src/test/resources/" + utils.getInputDirectory() + "test.gpkg";
+
+		String outFile = utils.getOutputDirectory() + "/test.gpkg";
+		SimpleFeatureSource s = GeoFileReader.readDataFile(inFile, new NameImpl("test"));
+		SimpleFeatureCollection fts = s.getFeatures();
+		SimpleFeatureIterator it = fts.features();
+		SimpleFeature ft = it.next();
+		Geometry g = (Geometry) ft.getDefaultGeometry();
+		List<SimpleFeature> fc = new ArrayList<>();
+		fc.add(ft);
+		GeoFileWriter.writeGeometries(fc, outFile);
+
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile, new NameImpl("test"));
+		SimpleFeatureCollection fts1 = s1.getFeatures();
+		SimpleFeatureIterator it1 = fts1.features();
+		SimpleFeature ft1 = it1.next();
+		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
+
+		Assertions.assertEquals(g.getCoordinates().length, g1.getCoordinates().length);
 
 	}
 
@@ -94,9 +120,42 @@ public class ShapeFileWriterTest {
 
 		Geometry g0 = (Geometry) features.iterator().next().getDefaultGeometry();
 
-		ShapeFileWriter.writeGeometries(features, outFile);
+		GeoFileWriter.writeGeometries(features, outFile);
 
-		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
+		SimpleFeatureCollection fts1 = s1.getFeatures();
+		SimpleFeatureIterator it1 = fts1.features();
+		SimpleFeature ft1 = it1.next();
+		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
+
+		Assertions.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+
+
+	}
+
+	@Test
+	void testGeopackageFileWriterWithSelfCreatedContent() throws IOException {
+		String outFile = utils.getOutputDirectory() + "/test2.gpkg";
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("EvacuationArea");
+		b.setCRS(DefaultGeographicCRS.WGS84);
+		b.add("the_geom", MultiPolygon.class);
+		b.add("name", String.class);
+		SimpleFeatureType ft = b.buildFeatureType();
+
+		GeometryFactory geofac = new GeometryFactory();
+		LinearRing lr = geofac.createLinearRing(new Coordinate[]{new Coordinate(0,0),new Coordinate(0,1),new Coordinate(1,1),new Coordinate(0,0)});
+		Polygon p = geofac.createPolygon(lr,null);
+		MultiPolygon mp = geofac.createMultiPolygon(new Polygon[]{p});
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		features.add(SimpleFeatureBuilder.build(ft, new Object[]{mp,"test_name"},"fid"));
+
+
+		Geometry g0 = (Geometry) features.iterator().next().getDefaultGeometry();
+
+		GeoFileWriter.writeGeometries(features, outFile);
+
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile, new NameImpl("EvacuationArea"));
 		SimpleFeatureCollection fts1 = s1.getFeatures();
 		SimpleFeatureIterator it1 = fts1.features();
 		SimpleFeature ft1 = it1.next();
@@ -125,9 +184,9 @@ public class ShapeFileWriterTest {
 
 		Geometry g0 = (Geometry) f.getDefaultGeometry();
 
-		ShapeFileWriter.writeGeometries(features, outFile);
+		GeoFileWriter.writeGeometries(features, outFile);
 
-		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
 		SimpleFeatureCollection fts1 = s1.getFeatures();
 		SimpleFeatureIterator it1 = fts1.features();
 		SimpleFeature ft1 = it1.next();
@@ -154,9 +213,9 @@ public class ShapeFileWriterTest {
 
 		Geometry g0 = (Geometry) f.getDefaultGeometry();
 
-		ShapeFileWriter.writeGeometries(features, outFile);
+		GeoFileWriter.writeGeometries(features, outFile);
 
-		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
 		SimpleFeatureCollection fts1 = s1.getFeatures();
 		SimpleFeatureIterator it1 = fts1.features();
 		SimpleFeature ft1 = it1.next();
@@ -182,9 +241,9 @@ public class ShapeFileWriterTest {
 
 		Geometry g0 = (Geometry) f.getDefaultGeometry();
 
-		ShapeFileWriter.writeGeometries(features, outFile);
+		GeoFileWriter.writeGeometries(features, outFile);
 
-		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureSource s1 = GeoFileReader.readDataFile(outFile);
 		SimpleFeatureCollection fts1 = s1.getFeatures();
 		SimpleFeatureIterator it1 = fts1.features();
 		SimpleFeature ft1 = it1.next();
