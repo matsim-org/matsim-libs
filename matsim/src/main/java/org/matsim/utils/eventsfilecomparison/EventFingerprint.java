@@ -107,7 +107,10 @@ public final class EventFingerprint {
 			}
 
 			// Write byte hash
-			dataOutputStream.write(eventFingerprint.computeHash());
+			assert !Arrays.equals(eventFingerprint.hash, new byte[20]): "Hash was not computed";
+
+			dataOutputStream.write(eventFingerprint.hash);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

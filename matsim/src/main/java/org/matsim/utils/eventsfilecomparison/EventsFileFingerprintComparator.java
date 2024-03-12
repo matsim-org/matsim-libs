@@ -1,24 +1,29 @@
 package org.matsim.utils.eventsfilecomparison;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.Arrays;
 
-public class EventsFileFingerprintComparator {
+public final class EventsFileFingerprintComparator {
 
 	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
 
+	private EventsFileFingerprintComparator() {
 
-	public static ComparisonResult compare(final String fingerprint, final String eventsfile) {
+	}
 
-		EventFingerprint correctFingerprint = EventFingerprint.read(fingerprint);
 
-		FingerprintEventHandler handler = new FingerprintEventHandler(correctFingerprint);
+	/**
+	 * Create and compare event fingerprints and return the handler holding resulting information.
+	 */
+	public static FingerprintEventHandler createFingerprintHandler(final String eventsfile, @Nullable String compareFingerprint) {
+
+		FingerprintEventHandler handler = new FingerprintEventHandler(compareFingerprint != null ? EventFingerprint.read(compareFingerprint) : null);
 
 		EventsManager manager = EventsUtils.createEventsManager();
 
@@ -27,33 +32,28 @@ public class EventsFileFingerprintComparator {
 		EventsUtils.readEvents(manager, eventsfile);
 
 		manager.finishProcessing();
+		handler.finishProcessing();
 
-		ComparisonResult result = handler.finishProcessing();
-
-		log.warn(handler.comparisonMessage);
-
-		// All fields are equal
-		return result;
+		return handler;
 	}
 
 	public static ComparisonResult compareFingerprints(final String fp1, final String fp2) {
 
-
 		EventFingerprint fingerprint1 = EventFingerprint.read(fp1);
 		EventFingerprint fingerprint2 = EventFingerprint.read(fp2);
 
-		String log_message = "";
+		String logMessage = "";
 		//Check if time array size is the same
-		if(fingerprint1.timeArray.size()!=fingerprint2.timeArray.size()){
-			log_message = "Different number of timesteps";
-			log.warn(log_message);
+		if (fingerprint1.timeArray.size() != fingerprint2.timeArray.size()) {
+			logMessage = "Different number of timesteps";
+			log.warn(logMessage);
 			return ComparisonResult.DIFFERENT_NUMBER_OF_TIMESTEPS;
 		}
 
 		//Check if both time arrays have the same timesteps
-		if(!Arrays.equals(fingerprint1.timeArray.toFloatArray(),fingerprint2.timeArray.toFloatArray())){
-			log_message = "Different timesteps";
-			log.warn(log_message);
+		if (!Arrays.equals(fingerprint1.timeArray.toFloatArray(), fingerprint2.timeArray.toFloatArray())) {
+			logMessage = "Different timesteps";
+			log.warn(logMessage);
 			return ComparisonResult.DIFFERENT_TIMESTEPS;
 		}
 
@@ -66,11 +66,11 @@ public class EventsFileFingerprintComparator {
 			int count2 = fingerprint2.eventTypeCounter.getInt(key);
 			if (count1 != count2) {
 				countDiffers = true;
-				log_message = log_message + ("\r\nCount for key '" + key + "' differs: " + count1 + " != " + count2);
+				logMessage += "\r\nCount for event type '%s' differs: %d != %d".formatted(key, count1, count2);
 			}
 		}
-		if(countDiffers){
-			log.warn(log_message);
+		if (countDiffers) {
+			log.warn(logMessage);
 			return ComparisonResult.WRONG_EVENT_COUNT;
 		}
 
@@ -78,18 +78,14 @@ public class EventsFileFingerprintComparator {
 		//Check if total hash is the same
 		byte[] hash1 = fingerprint1.hash;
 		byte[] hash2 = fingerprint2.hash;
-		if(!Arrays.equals(hash1, hash2)){
+		if (!Arrays.equals(hash1, hash2)) {
 
-			log_message = String.format("Difference occurred hash codes hash of first file is %s, hash of second is %s", Arrays.toString(hash1), Arrays.toString(hash2));
+			logMessage = String.format("Difference occurred hash codes hash of first file is %s, hash of second is %s", Arrays.toString(hash1), Arrays.toString(hash2));
 
-			log.warn(log_message);
+			log.warn(logMessage);
 			return ComparisonResult.DIFFERENT_EVENT_ATTRIBUTES;
 		}
 
-		log_message = "Files are equal";
-		log.warn(log_message);
-
-		// TODO: compare and generate messages
 		return ComparisonResult.FILES_ARE_EQUAL;
 
 	}
