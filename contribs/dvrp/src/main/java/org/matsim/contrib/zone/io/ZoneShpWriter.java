@@ -51,6 +51,6 @@ public class ZoneShpWriter {
 			features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));
 		}
 
-		ShapeFileWriter.writeGeometries(features, shpFile);
+		GeoFileWriter.writeGeometries(features, shpFile);
 	}
 }

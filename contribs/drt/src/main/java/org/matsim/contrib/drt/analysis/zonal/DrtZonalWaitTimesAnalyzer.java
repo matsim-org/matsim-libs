@@ -49,7 +49,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -162,7 +162,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		String fileName = event.getServices()
 				.getControlerIO()
 				.getOutputFilename("drt_waitStats" + "_" + drtCfg.getMode() + "_zonal.shp");
-		ShapeFileWriter.writeGeometries(features, fileName);
+		GeoFileWriter.writeGeometries(features, fileName);
 	}
 
 	private Collection<SimpleFeature> convertGeometriesToSimpleFeatures(String targetCoordinateSystem) {

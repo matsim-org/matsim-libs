@@ -11,8 +11,8 @@ import java.nio.file.Path;
 import java.util.Set;
 
 @CommandLine.Command(
-		name = "clean-network",
-		description = "Ensures that all links in the network are strongly connected."
+	name = "clean-network",
+	description = "Ensures that all links in the network are strongly connected."
 )
 public class CleanNetwork implements MATSimAppCommand {
 
@@ -22,7 +22,7 @@ public class CleanNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", description = "Output path", required = true)
 	private Path output;
 
-	@CommandLine.Option(names = "--modes", description = "List of modes to clean", defaultValue = TransportMode.car)
+	@CommandLine.Option(names = "--modes", description = "List of modes to clean", split = ",", defaultValue = TransportMode.car)
 	private Set<String> modes;
 
 	@Override
