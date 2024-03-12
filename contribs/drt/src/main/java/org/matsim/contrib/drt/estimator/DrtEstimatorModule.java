@@ -53,17 +53,17 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtEstimatorParams.class).toInstance(params);
 
-		// Needs to run before estimators
-		bindModal(DrtEstimateAnalyzer.class)
-			.toProvider(
-				modalProvider(getter -> new DrtEstimateAnalyzer(getter.getModal(DrtEstimator.class),
-					getter.getModal(DrtEventSequenceCollector.class), getMode()))
-			)
-			.in(Singleton.class);
+		// Analyze quality of estimates, this is only useful if an online estimator is used
+		// TODO: updating estimation as in drt speed up is not fully implemented yet
+		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.fullSimulation) {
+			bindModal(DrtEstimateAnalyzer.class)
+				.toProvider(
+					modalProvider(getter -> new DrtEstimateAnalyzer(getter.getModal(DrtEstimator.class),
+						getter.getModal(DrtEventSequenceCollector.class), getMode()))
+				)
+				.in(Singleton.class);
 
-		addControlerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
-
+			addControlerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
+		}
 	}
-
-
 }

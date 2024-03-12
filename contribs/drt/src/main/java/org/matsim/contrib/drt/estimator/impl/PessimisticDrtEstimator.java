@@ -23,16 +23,6 @@ public class PessimisticDrtEstimator implements DrtEstimator {
 		double travelTime = Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
 			route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha);
 
-		double fare = 0;
-		if (drtConfig.getDrtFareParams().isPresent()) {
-			DrtFareParams fareParams = drtConfig.getDrtFareParams().get();
-			fare = fareParams.distanceFare_m * route.getDistance()
-				+ fareParams.timeFare_h * route.getDirectRideTime() / 3600.0
-				+ fareParams.baseFare;
-
-			fare = Math.max(fare, fareParams.minFarePerTrip);
-		}
-
 		// for distance, also use the max travel time alpha
 		return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, 0);
 	}

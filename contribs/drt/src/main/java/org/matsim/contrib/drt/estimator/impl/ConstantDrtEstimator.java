@@ -10,9 +10,7 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public class ConstantDrtEstimator implements DrtEstimator {
 
-	private final DrtConfigGroup drtConfig;
-
-	/**
+    /**
 	 * Detour factor for the estimate. 1.0 means no detour, 2.0 means twice the distance.
 	 */
 	private final double detourFactor;
@@ -22,9 +20,8 @@ public class ConstantDrtEstimator implements DrtEstimator {
 	 */
 	private final double waitingTime;
 
-	public ConstantDrtEstimator(DrtConfigGroup drtConfig, double detourFactor, double waitingTime) {
-		this.drtConfig = drtConfig;
-		this.detourFactor = detourFactor;
+	public ConstantDrtEstimator(double detourFactor, double waitingTime) {
+        this.detourFactor = detourFactor;
 		this.waitingTime = waitingTime;
 	}
 
