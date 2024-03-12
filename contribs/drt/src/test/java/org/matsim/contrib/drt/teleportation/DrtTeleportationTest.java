@@ -1,10 +1,10 @@
 package org.matsim.contrib.drt.teleportation;
 
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.RealisticDrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -13,15 +13,19 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DrtTeleportationTest {
 
@@ -29,13 +33,13 @@ class DrtTeleportationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void testPessimisticEstimator() {
+	void testTeleportationEngine() throws IOException {
 		URL url = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans_only_drt_1.0.xml.gz");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(2);
+		config.controller().setLastIteration(1);
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
@@ -57,40 +61,18 @@ class DrtTeleportationTest {
 		});
 
 		controler.run();
-		// TODO add a check
-	}
 
-	@Test
-	void testRealisticEstimator() {
-		URL url = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.network().setInputFile("network.xml");
-		config.plans().setInputFile("plans_only_drt_1.0.xml.gz");
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(2);
+		List<String> csv = Files.readAllLines(Path.of(utils.getOutputDirectory()).resolve("drt_customer_stats_drt.csv"));
+		String[] columns = csv.get(csv.size() - 1).split(";");
 
-		// install the drt routing stuff, but not the mobsim stuff!
-		Controler controler = DrtControlerCreator.createControler(config, false);
-		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfigGroup.maxTravelTimeAlpha = 1.2;
-		drtConfigGroup.maxTravelTimeBeta = 600;
-		drtConfigGroup.maxWaitTime = 300;
-		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.baseFare = 1.0;
-		fareParams.distanceFare_m = 0.001;
-		drtConfigGroup.addParameterSet(fareParams);
+		double waitAvg = Double.parseDouble(columns[3]);
 
-		// Setup to enable estimator and teleportation
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
-		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
-			@Override
-			public void install() {
-				bindModal(DrtEstimator.class).toInstance(new RealisticDrtEstimator(
-					new RealisticDrtEstimator.DistributionGenerator(1.2, 150, 0.1, 180, 0.2)));
-			}
-		});
+		assertThat(waitAvg).isEqualTo(drtConfigGroup.maxWaitTime);
 
-		controler.run();
-		// TODO add a check
+		double distMean = Double.parseDouble(columns[11]);
+		double directDistMean = Double.parseDouble(columns[12]);
+
+		assertThat(distMean / directDistMean).isCloseTo(drtConfigGroup.maxTravelTimeAlpha, Offset.offset(0.0001));
+
 	}
 }

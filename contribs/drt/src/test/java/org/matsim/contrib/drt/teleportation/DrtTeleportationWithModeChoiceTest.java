@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.teleportation;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,7 +29,8 @@ public class DrtTeleportationWithModeChoiceTest {
 	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-//	@Test
+	@Disabled("This test is for example purposes only")
+	@Test
 	void testModeChoice() {
 		URL url = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(url, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
@@ -61,12 +63,10 @@ public class DrtTeleportationWithModeChoiceTest {
 		// Setting DRT config group
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		// Copy this line to Leipzig run script!!!
 		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
-		// Copy this overriding module to Leipzig run script!!!
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
