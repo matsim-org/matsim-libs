@@ -220,7 +220,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 
 	public enum SimulationType {
-		fullSimulation, drtSpeedup, estimateAndTeleport
+		fullSimulation, estimateAndTeleport
 	}
 
 	@Parameter
@@ -344,7 +344,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
 
-		// TODO: check for new speed up params
+		if (simulationType == SimulationType.estimateAndTeleport) {
+			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
+				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
+		}
 	}
 
 	@Override

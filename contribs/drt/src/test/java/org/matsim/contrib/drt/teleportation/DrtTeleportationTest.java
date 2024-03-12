@@ -3,16 +3,16 @@ package org.matsim.contrib.drt.teleportation;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -53,10 +53,12 @@ class DrtTeleportationTest {
 
 		// Setup to enable estimator and teleportation
 		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
-		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
+
+		// This uses the helper method to bind an estimator. Alternatively a separate modal module could also be created.
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindModal(DrtEstimator.class).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
+				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.mode).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
 			}
 		});
 
