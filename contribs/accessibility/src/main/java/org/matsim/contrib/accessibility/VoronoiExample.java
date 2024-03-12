@@ -28,17 +28,17 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author dziemke
  */
 class VoronoiExample {
-		
+
 	public static void main(String[] args) {
 		GeometryFactory geometryFactory = new GeometryFactory();
-		
+
 		Collection<Coordinate> sites = new ArrayList<>();
 		sites.add(new Coordinate(70, 70));
 		sites.add(new Coordinate(50, 150));
@@ -48,16 +48,16 @@ class VoronoiExample {
 		sites.add(new Coordinate(250, 150));
 		sites.add(new Coordinate(350, 50));
 		sites.add(new Coordinate(370, 170));
-		
+
 		VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-		voronoiDiagramBuilder.setSites(sites);		
-				
+		voronoiDiagramBuilder.setSites(sites);
+
 		List<Polygon> polygons = voronoiDiagramBuilder.getSubdivision().getVoronoiCellPolygons(geometryFactory);
-		
+
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(0, 0, 400, 200);
 		Polygon boundingPolygon = VoronoiGeometryUtils.createBoundingPolygon(boundingBox);
 		Collection<Geometry> cutGeometries = VoronoiGeometryUtils.cutPolygonsByBoundary(polygons, boundingPolygon);
 		Collection<SimpleFeature> features = VoronoiGeometryUtils.createFeaturesFromPolygons(cutGeometries);
-	    ShapeFileWriter.writeGeometries(features, "/Users/dominik/voronoi_test.shp");
+	    GeoFileWriter.writeGeometries(features, "/Users/dominik/voronoi_test.shp");
 	}
 }

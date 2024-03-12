@@ -25,14 +25,16 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import java.io.File;
 import java.util.Objects;
@@ -59,6 +61,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
 		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
 		String shapeCRS = "EPSG:4326";
+		String resultPopulation = "testPopulation.xml.gz";
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 				inputDataDirectory,
@@ -71,36 +74,25 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 				"--zoneShapeFileName", zoneShapeFileName,
 				"--buildingsShapeFileName", buildingsShapeFileName,
 				"--landuseShapeFileName", landuseShapeFileName,
-				"--shapeCRS", shapeCRS);
+				"--shapeCRS", shapeCRS,
+				"--nameOutputPopulation", resultPopulation,
+				"--pathOutput", output);
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
 		Scenario scenarioWOSolution = ScenarioUtils.createScenario(config);
 		Scenario scenarioWSolution = ScenarioUtils.createScenario(config);
-		File outputFolder = Objects.requireNonNull(new File(output).listFiles())[0];
-		Population population = null;
-		String carriersWOSolutionFileLocation = null;
-		String carriersWSolutionFileLocation = null;
+		Population population = PopulationUtils.readPopulation(utils.getOutputDirectory() + "testPopulation.xml.gz");
+		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_CarrierDemand.xml";
+		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_CarrierDemandWithPlans.xml";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-
-		for (File outputFiles : Objects.requireNonNull(Objects.requireNonNull(outputFolder.listFiles())[0].listFiles())) {
-
-			if (outputFiles.getName().contains("pct_plans.xml.gz"))
-				population = PopulationUtils.readPopulation(outputFiles.getPath());
-			if (outputFiles.getName().contains("output_CarrierDemand.xml"))
-				carriersWOSolutionFileLocation = outputFiles.getPath();
-			if (outputFiles.getName().contains("output_CarrierDemandWithPlans.xml"))
-				carriersWSolutionFileLocation = outputFiles.getPath();
-			if (outputFiles.getName().contains("output_carriersVehicleTypes.xml.gz"))
-				freightCarriersConfigGroup.setCarriersVehicleTypesFile(outputFiles.getPath());
-		}
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_carriersVehicleTypes.xml.gz");
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
 		freightCarriersConfigGroup.setCarriersFile(carriersWSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWSolution);
 
-		assert population != null;
 		for (Person person : population.getPersons().values()) {
 			Assertions.assertNotNull(person.getSelectedPlan());
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
@@ -116,5 +108,18 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			countedTours += carrier_withSolution.getSelectedPlan().getScheduledTours().size();
 		}
 		Assertions.assertEquals(population.getPersons().size(), countedTours, 0);
+
+		for (File caculatedFile : Objects.requireNonNull(
+			Objects.requireNonNull(new File(utils.getOutputDirectory() + "calculatedData").listFiles()))) {
+			MatsimTestUtils.assertEqualFilesLineByLine(
+				utils.getPackageInputDirectory() + "calculatedData/" + caculatedFile.getName(),
+				caculatedFile.getAbsolutePath());
+		}
+
+		// compare events
+		String expected = utils.getPackageInputDirectory() + "test.output_events.xml.gz" ;
+		String actual = utils.getOutputDirectory() + "test.output_events.xml.gz" ;
+		EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
+		Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
 	}
 }
