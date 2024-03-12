@@ -53,7 +53,14 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	public static boolean isTeleportDrtUsers(DrtSpeedUpParams drtSpeedUpParams, ControllerConfigGroup controlerConfig,
 			int iteration) {
-		return true;
+		int lastIteration = controlerConfig.getLastIteration();
+		if (iteration < drtSpeedUpParams.fractionOfIterationsSwitchOn * lastIteration
+				|| iteration >= drtSpeedUpParams.fractionOfIterationsSwitchOff * lastIteration) {
+			return false; // full drt simulation
+		}
+
+		//full drt simulation only with a defined interval
+		return iteration % drtSpeedUpParams.intervalDetailedIteration != 0;
 	}
 
 	private final String mode;
