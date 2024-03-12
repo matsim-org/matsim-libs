@@ -6,12 +6,21 @@ import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.Random;
 
-public class RealisticDrtEstimator implements DrtEstimator {
+/**
+ * A simple DRT estimator that uses normal distributions to estimate the ride time, wait time, ride distance and acceptance.
+ */
+public final class DetourBasedDrtEstimator implements DrtEstimator {
 
-	private final DistributionGenerator distributionGenerator;
+	private final NormalDistributionGenerator distributionGenerator;
 
-	public RealisticDrtEstimator(DistributionGenerator distributionGenerator) {
-		this.distributionGenerator = distributionGenerator;
+	private DetourBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta, double rideTimeStd, double estMeanWaitTime,
+								   double waitTimeStd) {
+		this.distributionGenerator = new NormalDistributionGenerator(estRideTimeAlpha, estRideTimeBeta, rideTimeStd, estMeanWaitTime, waitTimeStd);
+	}
+
+	public static DetourBasedDrtEstimator normalDistributed(double estRideTimeAlpha, double estRideTimeBeta, double rideTimeStd, double estMeanWaitTime,
+																	  double waitTimeStd) {
+		return new DetourBasedDrtEstimator(estRideTimeAlpha, estRideTimeBeta, rideTimeStd, estMeanWaitTime, waitTimeStd);
 	}
 
 	@Override
@@ -26,8 +35,7 @@ public class RealisticDrtEstimator implements DrtEstimator {
 		return new Estimate(rideDistance, waitTime + rideTime, waitTime, acceptanceRate);
 	}
 
-
-	public static class DistributionGenerator {
+	private static class NormalDistributionGenerator {
 		private final Random random = new Random(4711);
 		private final double estRideTimeAlpha;
 		private final double estRideTimeBeta;
@@ -35,17 +43,13 @@ public class RealisticDrtEstimator implements DrtEstimator {
 		private final double estMeanWaitTime;
 		private final double waitTimeStd;
 
-		public DistributionGenerator(double estRideTimeAlpha, double estRideTimeBeta, double rideTimeStd, double estMeanWaitTime,
+		public NormalDistributionGenerator(double estRideTimeAlpha, double estRideTimeBeta, double rideTimeStd, double estMeanWaitTime,
 									 double waitTimeStd) {
 			this.estRideTimeAlpha = estRideTimeAlpha;
 			this.estRideTimeBeta = estRideTimeBeta;
 			this.rideTimeStd = rideTimeStd;
 			this.estMeanWaitTime = estMeanWaitTime;
 			this.waitTimeStd = waitTimeStd;
-		}
-
-		public DistributionGenerator generateExampleDistributionGenerator() {
-			return new DistributionGenerator(1.5, 300, 0.2, 300, 0.4);
 		}
 
 		public double generateRideTime(double directRideTime) {
@@ -66,7 +70,7 @@ public class RealisticDrtEstimator implements DrtEstimator {
 		}
 
 		public double generateAcceptanceRate() {
-			return random.nextDouble();
+			return 1;
 		}
 	}
 }

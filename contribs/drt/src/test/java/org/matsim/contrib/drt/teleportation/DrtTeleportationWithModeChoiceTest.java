@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.RealisticDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.DetourBasedDrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -70,9 +70,8 @@ public class DrtTeleportationWithModeChoiceTest {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
-				bindModal(DrtEstimator.class).toInstance(new RealisticDrtEstimator(
-					new RealisticDrtEstimator.DistributionGenerator(1.2, 32,
-						0.3, 300, 0.4)));
+				bindModal(DrtEstimator.class).toInstance(DetourBasedDrtEstimator.normalDistributed(1.2, 32,
+						0.3, 300, 0.4));
 			}
 		});
 
