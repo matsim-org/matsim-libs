@@ -1,5 +1,9 @@
 package org.matsim.contrib.drt.teleportation;
 
+import com.google.common.collect.Iterables;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -21,9 +25,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,17 +66,23 @@ class DrtTeleportationTest {
 
 		controler.run();
 
-		List<String> csv = Files.readAllLines(Path.of(utils.getOutputDirectory()).resolve("drt_customer_stats_drt.csv"));
-		String[] columns = csv.get(csv.size() - 1).split(";");
+		Path csvPath = Path.of(utils.getOutputDirectory()).resolve("drt_customer_stats_drt.csv");
 
-		double waitAvg = Double.parseDouble(columns[3]);
+		try (CSVParser csv = new CSVParser(IOUtils.getBufferedReader(csvPath.toString()),
+			CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).setDelimiter(';').build())) {
 
-		assertThat(waitAvg).isEqualTo(drtConfigGroup.maxWaitTime);
+			CSVRecord row = Iterables.getLast(csv);
 
-		double distMean = Double.parseDouble(columns[11]);
-		double directDistMean = Double.parseDouble(columns[12]);
+			double waitAvg = Double.parseDouble(row.get("wait_average"));
 
-		assertThat(distMean / directDistMean).isCloseTo(drtConfigGroup.maxTravelTimeAlpha, Offset.offset(0.0001));
+			assertThat(waitAvg).isEqualTo(drtConfigGroup.maxWaitTime);
+
+			double distMean = Double.parseDouble(row.get("distance_m_mean"));
+			double directDistMean = Double.parseDouble(row.get("directDistance_m_mean"));
+
+			assertThat(distMean / directDistMean).isCloseTo(drtConfigGroup.maxTravelTimeAlpha, Offset.offset(0.0001));
+
+		}
 
 	}
 }
