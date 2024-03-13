@@ -193,4 +193,12 @@ public final class EventsFileComparator {
 		}
 	}
 
+	/**
+	 * Don't use this enum. See deprecation message.
+	 * @deprecated Use {@link ComparisonResult} instead. This enum is not used anymore and empty now.
+	 */
+	@Deprecated
+	public enum Result {
+	}
+
 }
