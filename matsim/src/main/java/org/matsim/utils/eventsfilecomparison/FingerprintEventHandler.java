@@ -57,8 +57,16 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 		return comparisonResult;
 	}
 
+	void setComparisonResult(ComparisonResult comparisonResult) {
+		this.comparisonResult = comparisonResult;
+	}
+
 	public String getComparisonMessage() {
 		return comparisonMessage;
+	}
+
+	void setComparisonMessage(String comparisonMessage) {
+		this.comparisonMessage = comparisonMessage;
 	}
 
 	@Override

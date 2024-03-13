@@ -7,6 +7,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 
 /**
@@ -25,7 +27,19 @@ public final class EventsFileFingerprintComparator {
 	 */
 	public static FingerprintEventHandler createFingerprintHandler(final String eventsfile, @Nullable String compareFingerprint) {
 
-		FingerprintEventHandler handler = new FingerprintEventHandler(compareFingerprint != null ? EventFingerprint.read(compareFingerprint) : null);
+		EventFingerprint fp = null;
+		Exception err = null;
+		if (compareFingerprint != null) {
+			try {
+				fp = EventFingerprint.read(compareFingerprint);
+			} catch (Exception e) {
+				log.warn("Could not read compare fingerprint from file: {}", compareFingerprint, e);
+				fp = new EventFingerprint();
+				err = e;
+			}
+		}
+
+		FingerprintEventHandler handler = new FingerprintEventHandler(fp);
 
 		EventsManager manager = EventsUtils.createEventsManager();
 
@@ -36,15 +50,27 @@ public final class EventsFileFingerprintComparator {
 		manager.finishProcessing();
 		handler.finishProcessing();
 
+		// File error overwrite any other error
+		if (err != null) {
+			handler.setComparisonResult(ComparisonResult.FILE_ERROR);
+			handler.setComparisonMessage(err.getMessage());
+		}
+
 		return handler;
 	}
 
 	public static ComparisonResult compareFingerprints(final String fp1, final String fp2) {
 
-		EventFingerprint fingerprint1 = EventFingerprint.read(fp1);
-		EventFingerprint fingerprint2 = EventFingerprint.read(fp2);
+        EventFingerprint fingerprint1;
+		EventFingerprint fingerprint2;
+        try {
+            fingerprint1 = EventFingerprint.read(fp1);
+			fingerprint2 = EventFingerprint.read(fp2);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
-		String logMessage = "";
+        String logMessage = "";
 		//Check if time array size is the same
 		if (fingerprint1.timeArray.size() != fingerprint2.timeArray.size()) {
 			logMessage = "Different number of timesteps";

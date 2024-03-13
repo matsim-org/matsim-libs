@@ -91,7 +91,7 @@ public final class EventFingerprint {
 		}
 	}
 
-	public static EventFingerprint read(String fingerprintPath) {
+	public static EventFingerprint read(String fingerprintPath) throws IOException {
 		EventFingerprint eventFingerprint;
 
 		try (DataInputStream dataInputStream = new DataInputStream(IOUtils.getInputStream(IOUtils.getFileUrl(fingerprintPath)))) {
@@ -123,8 +123,6 @@ public final class EventFingerprint {
 
 			// Create EventFingerprint object
 			eventFingerprint = new EventFingerprint(timeArray, eventTypeCounter, hash);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
 		}
 
 		return eventFingerprint;
