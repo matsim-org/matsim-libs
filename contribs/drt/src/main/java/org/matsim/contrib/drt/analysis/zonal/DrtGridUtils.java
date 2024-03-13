@@ -74,21 +74,18 @@ public class DrtGridUtils {
 	}
 
 	/**
-	 * First creates a grid based on the network bounding box. Then removes all zones that do not intersect the service area.
+	 * Takes an existing grid and removes all zones that do not intersect the service area.
 	 * Result may contain zones that are barely included in the service area. But as passengers may walk into the service area,
 	 * it seems appropriate that the DrtZonalSystem, which is used for demand estimation, is larger than the service area.
 	 * The {@code cellsize} indirectly determines, how much larger the DrtZonalSystem may get.
 	 *
-	 * @param network
-	 * @param cellsize
+	 * @param grid a pre-computed grid of zones
 	 * @param serviceAreaGeoms geometries that define the service area
 	 * @return
 	 */
-	public static Map<String, PreparedGeometry> createGridFromNetworkWithinServiceArea(Network network, double cellsize,
-			List<PreparedGeometry> serviceAreaGeoms) {
-		Map<String, PreparedGeometry> grid = createGridFromNetwork(network, cellsize);
-		log.info("total number of created grid zones = " + grid.size());
-
+	public static Map<String, PreparedGeometry> filterGridWithinServiceArea(Map<String, PreparedGeometry> grid,
+																			List<PreparedGeometry> serviceAreaGeoms) {
+		log.info("total number of initial grid zones = " + grid.size());
 		log.info("searching for grid zones within the drt service area...");
 		Counter counter = new Counter("dealt with zone ");
 		Map<String, PreparedGeometry> zonesWithinServiceArea = EntryStream.of(grid)

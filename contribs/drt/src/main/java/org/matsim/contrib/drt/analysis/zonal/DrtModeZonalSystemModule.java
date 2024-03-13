@@ -21,11 +21,12 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
-import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetworkWithinServiceArea;
+import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.filterGridWithinServiceArea;
 import static org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedGeometries;
 
 import java.util.List;
+import java.util.Map;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
@@ -66,11 +67,14 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 				case GridFromNetwork:
 					Preconditions.checkNotNull(params.cellSize);
-					var gridZones = drtCfg.operationalScheme == OperationalScheme.serviceAreaBased ?
-							createGridFromNetworkWithinServiceArea(network, params.cellSize,
-									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
-											drtCfg.drtServiceAreaShapeFile))) :
-							createGridFromNetwork(network, params.cellSize);
+					Map<String, PreparedGeometry> gridFromNetwork = createGridFromNetwork(network, params.cellSize);
+					var gridZones =
+                    switch (drtCfg.operationalScheme) {
+                        case stopbased, door2door -> gridFromNetwork;
+                        case serviceAreaBased -> filterGridWithinServiceArea(gridFromNetwork,
+                            loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
+                                drtCfg.drtServiceAreaShapeFile)));
+                    };
 					return DrtZonalSystem.createFromPreparedGeometries(network, gridZones);
 
 				default:

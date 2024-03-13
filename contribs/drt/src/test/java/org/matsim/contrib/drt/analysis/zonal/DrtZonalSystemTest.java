@@ -62,7 +62,7 @@ public class DrtZonalSystemTest {
 		Coordinate min = new Coordinate(-500, 500);
 		Coordinate max = new Coordinate(1500, 1500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
-		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
 		DrtZonalSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
 				grid);
 
@@ -70,7 +70,7 @@ public class DrtZonalSystemTest {
 
 		//link 'da' is outside of the service area
 		Id<Link> id = Id.createLinkId("da");
-		assertThat(zonalSystem.getZoneForLinkId(id) == null);
+		assertThat(zonalSystem.getZoneForLinkId(id) == null).isTrue();
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class DrtZonalSystemTest {
 		Coordinate min = new Coordinate(1500, 1500);
 		Coordinate max = new Coordinate(2500, 2500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
-		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
 		DrtZonalSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
 				grid);
 
