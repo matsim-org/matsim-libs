@@ -149,7 +149,11 @@ public final class FingerprintEventHandler implements BasicEventHandler {
 				comparisonMessage = comparisonMessage == null ? "" : comparisonMessage;
 
 				comparisonResult = (comparisonResult == null ? ComparisonResult.WRONG_EVENT_COUNT : comparisonResult);
-				comparisonMessage += "\nCount for event type '%s' differs: %d (in fingerprint) != %d (in events)".formatted(key, count1, count2);
+
+				if (!comparisonMessage.isEmpty())
+					comparisonMessage += "\n";
+
+				comparisonMessage += "Count for event type '%s' differs: %d (in fingerprint) != %d (in events)".formatted(key, count1, count2);
 			}
 		}
 

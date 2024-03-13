@@ -68,7 +68,11 @@ public final class EventsFileFingerprintComparator {
 			int count2 = fingerprint2.eventTypeCounter.getInt(key);
 			if (count1 != count2) {
 				countDiffers = true;
-				logMessage += "\r\nCount for event type '%s' differs: %d != %d".formatted(key, count1, count2);
+
+				if (!logMessage.isEmpty())
+					logMessage += "\n";
+
+				logMessage += "Count for event type '%s' differs: %d != %d".formatted(key, count1, count2);
 			}
 		}
 		if (countDiffers) {
