@@ -6,12 +6,27 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.matsim.core.utils.io.IOUtils;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 
+/**
+ * Class holding reduced information about an events file.
+ * If two such fingerprint are different, one can conclude that the event files are semantically different.
+ * <p>
+ * The fingerprint is based on the following information:
+ * - Array of all timestamps
+ * - Counts of each event type
+ * - Hash of string concatenation of all event strings
+ *
+ * Note: Events with the same timestamp are allowed to occur in any order.
+ */
 public final class EventFingerprint {
 
 	/**
@@ -35,7 +50,7 @@ public final class EventFingerprint {
 		this.digest = null;
 	}
 
-	public EventFingerprint() {
+	EventFingerprint() {
 		this.timeArray = new FloatArrayList();
 		this.eventTypeCounter = new Object2IntOpenHashMap<>();
 		this.hash = new byte[20];
@@ -45,47 +60,6 @@ public final class EventFingerprint {
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalStateException("Hashing not supported;");
 		}
-	}
-
-	public void addTimeStamp(double timestamp) {
-		timeArray.add((float) timestamp);
-	}
-
-	public void addEventType(String str) {
-		// Increment the count for the given string
-		eventTypeCounter.mergeInt(str, 1, Integer::sum);
-	}
-
-	public void addHashCode(String stringToAdd) {
-		if (stringToAdd == null) {
-			return;
-		}
-
-		digest.update(stringToAdd.getBytes(StandardCharsets.UTF_8));
-	}
-
-	byte[] computeHash() {
-		if (this.digest == null)
-			throw new IllegalStateException("Hash was from from input and can not be computed");
-
-		byte[] digest = this.digest.digest();
-		System.arraycopy(digest, 0, hash, 0, hash.length);
-		return hash;
-	}
-
-	public static void printFingerprint(EventFingerprint fingerprint) {
-		System.out.println("Time Array:");
-		var i = 0;
-		for (Float value : fingerprint.timeArray) {
-			System.out.print(value);
-		}
-
-		System.out.println("Event Type Counter:");
-		for (Map.Entry<String, Integer> entry : fingerprint.eventTypeCounter.entrySet()) {
-			System.out.println(entry.getKey() + ": " + entry.getValue());
-		}
-
-		System.out.println("String Hash: " + Arrays.toString(fingerprint.hash));
 	}
 
 	public static void write(String filePath, EventFingerprint eventFingerprint) {
@@ -106,22 +80,27 @@ public final class EventFingerprint {
 				dataOutputStream.writeInt(entry.getValue());
 			}
 
-			// Write byte hash
-			assert !Arrays.equals(eventFingerprint.hash, new byte[20]): "Hash was not computed";
+			// Hash should always be computed at this point
+			assert !Arrays.equals(eventFingerprint.hash, new byte[20]) : "Hash was not computed";
 
+			// Write byte hash
 			dataOutputStream.write(eventFingerprint.hash);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	public static EventFingerprint read(String fingerprintPath) {
-		EventFingerprint eventFingerprint = null;
+		EventFingerprint eventFingerprint;
 
 		try (DataInputStream dataInputStream = new DataInputStream(IOUtils.getInputStream(IOUtils.getFileUrl(fingerprintPath)))) {
 			// Read header and version
 			int fileHeader = dataInputStream.readInt();
+
+			if (fileHeader != EventFingerprint.HEADER_V1) {
+				throw new IllegalArgumentException("Invalid fingerprint file header");
+			}
 
 			// Read time array
 			int timeArraySize = dataInputStream.readInt();
@@ -149,5 +128,40 @@ public final class EventFingerprint {
 		}
 
 		return eventFingerprint;
+	}
+
+	void addTimeStamp(double timestamp) {
+		timeArray.add((float) timestamp);
+	}
+
+	void addEventType(String str) {
+		// Increment the count for the given string
+		eventTypeCounter.mergeInt(str, 1, Integer::sum);
+	}
+
+	void addHashCode(String stringToAdd) {
+		if (stringToAdd == null) {
+			return;
+		}
+
+		digest.update(stringToAdd.getBytes(StandardCharsets.UTF_8));
+	}
+
+	byte[] computeHash() {
+		if (this.digest == null)
+			throw new IllegalStateException("Hash was from from input and can not be computed");
+
+		byte[] digest = this.digest.digest();
+		System.arraycopy(digest, 0, hash, 0, hash.length);
+		return hash;
+	}
+
+	@Override
+	public String toString() {
+		return "EventFingerprint{" +
+			"timeArray=" + timeArray.size() +
+			", eventTypeCounter=" + eventTypeCounter +
+			", hash=" + Arrays.toString(hash) +
+			'}';
 	}
 }

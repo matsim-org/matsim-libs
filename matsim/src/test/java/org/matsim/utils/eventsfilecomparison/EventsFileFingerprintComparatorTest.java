@@ -15,15 +15,18 @@ class EventsFileFingerprintComparatorTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-
 	@Test
 	void testEqual() {
 
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events_correct.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 
+		// Check if file has been created
+		assertThat(new File(utils.getClassInputDirectory(), "events_correct.fp.zst"))
+			.exists()
+			.size().isGreaterThan(0);
 
 	}
 
@@ -31,8 +34,8 @@ class EventsFileFingerprintComparatorTest {
 	void testDiffTimesteps() {
 
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.diff-num-timestamps.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.diff-num-timestamps.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.DIFFERENT_TIMESTEPS);
 
 
@@ -42,8 +45,8 @@ class EventsFileFingerprintComparatorTest {
 	void testDiffCounts() {
 
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.diff-type-count.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.diff-type-count.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.WRONG_EVENT_COUNT);
 
 	}
@@ -51,52 +54,50 @@ class EventsFileFingerprintComparatorTest {
 	@Test
 	void testDiffContent() {
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.diff-hash.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.diff-hash.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.DIFFERENT_EVENT_ATTRIBUTES);
 	}
 
 	@Test
 	void testAdditionalEvent() {
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.one-more-event.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.one-more-event.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.DIFFERENT_TIMESTEPS);
 	}
 
 	@Test
 	void testAttributeOrder() {
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.attribute-order.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.attribute-order.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 	}
 
 	@Test
 	void testEventOrder() {
 		assertThat(EventsUtils.compareEventsFiles(
-				new File(utils.getClassInputDirectory(), "output_events.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.event-order-wrong_logic.xml").toString()
+				new File(utils.getClassInputDirectory(), "events_correct.xml").toString(),
+				new File(utils.getClassInputDirectory(), "events.event-order-wrong_logic.xml").toString()
 		)).isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 
 		assertThat(EventsUtils.createAndCompareEventsFingerprint(
-				new File(utils.getClassInputDirectory(), "output_events.event-order-wrong_logic.xml").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.event-order-wrong_logic.xml"),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 
 	}
 
 
-	// TODO: add tests comparing only fingerprints
-
 	@Test
 	void testEqualFingerprints() {
 
-		EventsUtils.createEventsFingerprint(new File(utils.getClassInputDirectory(), "output_events.xml").toString(), new File(utils.getClassInputDirectory(), "output_events.fp.zst").toString());
+		EventsUtils.createEventsFingerprint(new File(utils.getClassInputDirectory(), "events_correct.xml").toString(), new File(utils.getClassInputDirectory(), "events.fp.zst").toString());
 
 		assertThat(EventsFileFingerprintComparator.compareFingerprints(
-				new File(utils.getClassInputDirectory(), "output_events.fp.zst").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.fp.zst").toString(),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 
 
@@ -106,8 +107,8 @@ class EventsFileFingerprintComparatorTest {
 	void testDiffTimestepsFingerprints() {
 
 		assertThat(EventsFileFingerprintComparator.compareFingerprints(
-				new File(utils.getClassInputDirectory(), "output_events.diff-num-timestamps.fp.zst").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.diff-num-timestamps.fp.zst").toString(),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.DIFFERENT_NUMBER_OF_TIMESTEPS);
 
 
@@ -117,8 +118,8 @@ class EventsFileFingerprintComparatorTest {
 	void testDiffCountsFingerprints() {
 
 		assertThat(EventsFileFingerprintComparator.compareFingerprints(
-				new File(utils.getClassInputDirectory(), "output_events.diff-type-count.fp.zst").toString(),
-				new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+				new File(utils.getClassInputDirectory(), "events.diff-type-count.fp.zst").toString(),
+				new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 		)).isEqualTo(ComparisonResult.WRONG_EVENT_COUNT);
 
 	}
@@ -128,8 +129,8 @@ class EventsFileFingerprintComparatorTest {
 
 		AssertionError err = assertThrows(AssertionError.class, () -> {
 			EventsUtils.assertEqualEventsFingerprint(
-					new File(utils.getClassInputDirectory(), "output_events.diff-num-timestamps.xml").toString(),
-					new File(utils.getClassInputDirectory(), "output_events.correct.fp.zst").toString()
+					new File(utils.getClassInputDirectory(), "events.diff-num-timestamps.xml"),
+					new File(utils.getClassInputDirectory(), "correct.fp.zst").toString()
 			);
 		});
 

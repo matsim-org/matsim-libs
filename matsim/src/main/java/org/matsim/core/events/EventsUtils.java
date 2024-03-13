@@ -21,7 +21,6 @@
 
 package org.matsim.core.events;
 
-import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -56,6 +55,11 @@ public final class EventsUtils {
 		return events;
 	}
 
+	public static void readEvents(EventsManager events, String filename) {
+		new MatsimEventsReader(events).readFile(filename);
+	}
+
+
 	/**
 	 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
 	 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
@@ -89,16 +93,16 @@ public final class EventsUtils {
 	/**
 	 * Compares existing event file against fingerprint file. This will also create new fingerprint file along the input events.
 	 *
+	 * @param eventFile local events file
+	 * @param compareFingerprintFile path or uri to fingerprint file
+	 *
 	 * @return comparison results
 	 */
-	public static ComparisonResult createAndCompareEventsFingerprint(String eventFile, String compareFingerprint) {
+	public static ComparisonResult createAndCompareEventsFingerprint(File eventFile, String compareFingerprintFile) {
 
+		String path = eventFile.getPath().replaceFirst("\\.xml[.a-zA-z0-9]*$", "");
 
-		File file = new File(eventFile);
-
-		String path = file.getPath().replace(".xml", "");
-
-		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile, compareFingerprint);
+		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile.toString(), compareFingerprintFile);
 		EventFingerprint.write(path + ".fp.zst", handler.getEventFingerprint());
 
 		if (handler.getComparisonMessage() != null)
@@ -107,26 +111,23 @@ public final class EventsUtils {
 		return handler.getComparisonResult();
 	}
 
-	public static void assertEqualEventsFingerprint(String eventFile, String compareFingerprint) {
+	/**
+	 * Compares existing event file against fingerprint file. This will also create new fingerprint file along the input events.
+	 *
+	 * @throws AssertionError if comparison fails
+	 * @see #createAndCompareEventsFingerprint(File, String)
+	 */
+	public static void assertEqualEventsFingerprint(File eventFile, String compareFingerprintFile) {
 
-		// TODO: execute event comparison
-		// if not equal, throw this error, with error message from com
+		String path = eventFile.getPath().replaceFirst("\\.xml[.a-zA-z0-9]*$", "");
 
-		File file = new File(eventFile);
-
-		String path = file.getPath().replace(".xml", "");
-
-		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile, compareFingerprint);
+		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile.toString(), compareFingerprintFile);
 		EventFingerprint.write(path + ".fp.zst", handler.getEventFingerprint());
 
 
 		if (handler.getComparisonResult() != ComparisonResult.FILES_ARE_EQUAL)
 			throw new AssertionError(handler.getComparisonMessage());
 
-	}
-
-	public static void readEvents(EventsManager events, String filename) {
-		new MatsimEventsReader(events).readFile(filename);
 	}
 
 	public static ComparisonResult compareEventsFiles(String filename1, String filename2) {

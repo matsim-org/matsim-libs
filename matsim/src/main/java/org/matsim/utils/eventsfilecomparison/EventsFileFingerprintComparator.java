@@ -9,12 +9,14 @@ import org.matsim.core.events.EventsUtils;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
+/**
+ * Utility class for comparing events and fingerprints.
+ */
 public final class EventsFileFingerprintComparator {
 
 	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
 
 	private EventsFileFingerprintComparator() {
-
 	}
 
 
