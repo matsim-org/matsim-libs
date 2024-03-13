@@ -26,6 +26,11 @@ public class EstimationRoutingModule implements RoutingModule {
 
 		List<? extends PlanElement> route = delegate.calcRoute(request);
 
+		if (route == null) {
+			// no suitable DRT connection found (e.g., can't find DRT stops nearby), will fall back to walk mode.
+			return null;
+		}
+
 		for (PlanElement el : route) {
 			if (el instanceof Leg leg) {
 				if (leg.getRoute() instanceof DrtRoute drtRoute) {
