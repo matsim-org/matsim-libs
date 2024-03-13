@@ -51,7 +51,7 @@ public class DemandReaderFromCSVTest {
 		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
 		for (Person person :  population.getPersons().values()) {
-			DemandReaderFromCSV.findLinksForPersons(scenario, nearestLinkPerPerson, person);
+			DemandReaderFromCSV.findLinksForPerson(scenario, nearestLinkPerPerson, person);
 		}
 		Assertions.assertEquals("j(1,8)",nearestLinkPerPerson.get(Id.createPersonId("person1")).values().iterator().next());
 		Assertions.assertEquals("j(3,3)",nearestLinkPerPerson.get(Id.createPersonId("person2")).values().iterator().next());
@@ -78,9 +78,10 @@ public class DemandReaderFromCSVTest {
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
 		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
-		String shapeCategory = "Ortsteil";
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
+		String shapeCategory = "Ortsteil";
+		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
@@ -90,10 +91,10 @@ public class DemandReaderFromCSVTest {
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
 		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightCarriersConfigGroup,
-				polygonsInShape, 1, null);
+			indexShape, 1, null);
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
-		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape, shapeCategory);
-		DemandReaderFromCSV.createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, false,
+		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
+		DemandReaderFromCSV.createDemandForCarriers(scenario, indexShape, demandInformation, population, false,
 				null);
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
 		Assertions.assertTrue(
@@ -142,10 +143,10 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfServiceElement : locationsPerServiceElement.get("serviceElement1")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfServiceElement));
 			Assertions.assertTrue(
-					FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, null, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
+					FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
+			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
 					new String[] { "area1" }, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
+			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
 					new String[] { "area2" }, null));
 		}
 		Assertions.assertEquals(4, locationsPerServiceElement.get("serviceElement2").size());
@@ -230,10 +231,10 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmenElement1_delivery")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
 			Assertions.assertTrue(
-					FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, null, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
+					FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
+			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
 					new String[] { "area1" }, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
+			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
 					new String[] { "area2" }, null));
 		}
 	}

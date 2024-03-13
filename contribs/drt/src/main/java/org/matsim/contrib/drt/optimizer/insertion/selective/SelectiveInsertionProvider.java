@@ -25,13 +25,13 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
-import org.matsim.contrib.zone.skims.TravelTimeMatrix;
-import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -39,12 +39,9 @@ import com.google.common.annotations.VisibleForTesting;
  * @author michalm
  */
 class SelectiveInsertionProvider {
-	public static SelectiveInsertionProvider create(DrtConfigGroup drtCfg,
-			InsertionCostCalculator insertionCostCalculator, TravelTimeMatrix travelTimeMatrix, TravelTime travelTime,
-			ForkJoinPool forkJoinPool, StopTimeCalculator stopTimeCalculator) {
-		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-				insertionParams.restrictiveBeelineSpeedFactor, travelTimeMatrix, travelTime);
+	public static SelectiveInsertionProvider create(InsertionCostCalculator insertionCostCalculator,
+			ForkJoinPool forkJoinPool, StopTimeCalculator stopTimeCalculator,
+			DetourTimeEstimator restrictiveDetourTimeEstimator) {
 		return new SelectiveInsertionProvider(new BestInsertionFinder(insertionCostCalculator),
 				new InsertionGenerator(stopTimeCalculator, restrictiveDetourTimeEstimator), forkJoinPool);
 	}

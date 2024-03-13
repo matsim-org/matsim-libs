@@ -18,7 +18,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -161,7 +161,7 @@ public final class ShpOptions {
 			if (shpCharset != null)
 				ds.setCharset(shpCharset);
 
-			return ShapeFileReader.getSimpleFeatures(ds);
+			return GeoFileReader.getSimpleFeatures(ds);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -341,13 +341,27 @@ public final class ShpOptions {
 		}
 
 		/**
-		 * Query the index for first feature including a certain point.
+		 * Query the index for first feature including matching the coordinate and return specified attribute.
 		 *
 		 * @return null when no features was found that contains the point
 		 */
 		@Nullable
 		@SuppressWarnings("unchecked")
-		public String query(Coord coord) {
+		public <T> T query(Coord coord) {
+			SimpleFeature ft = queryFeature(coord);
+			if (ft != null)
+				return (T) ft.getAttribute(attr);
+
+			return null;
+			// throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
+		}
+
+		/**
+		 * Query the index and return the whole feature.
+		 */
+		@Nullable
+		@SuppressWarnings("unchecked")
+		public SimpleFeature queryFeature(Coord coord) {
 			// Because we can not easily transform the feature geometry with MATSim we have to do it the other way around...
 			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
 
@@ -355,16 +369,16 @@ public final class ShpOptions {
 			for (SimpleFeature ft : result) {
 				Geometry geom = (Geometry) ft.getDefaultGeometry();
 				if (geom.contains(MGC.coordinate2Point(p)))
-					return (String) ft.getAttribute(attr);
+					return ft;
 			}
 
 			return null;
-			// throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
 		}
 
 		/**
 		 * Checks whether a coordinate is contained in any of the features.
 		 */
+		@SuppressWarnings("unchecked")
 		public boolean contains(Coord coord) {
 
 			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));

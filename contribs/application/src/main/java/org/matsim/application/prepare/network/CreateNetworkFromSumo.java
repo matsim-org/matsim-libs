@@ -74,7 +74,15 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, Path.of(shp.getShapeFile()), crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor);
+//		since ShpOptions.getShapeFile() no longer is a path but a string, we have to check if it is defined before creating SumoNetworkConverter to
+//		preserve the possibility to run the converter without a shp file, otherwise, when calling Path.of(shp.getShapeFile) a NullPointerException is caused -sme0324
+		Path path = null;
+
+		if (shp.isDefined()) {
+			path = Path.of(shp.getShapeFile());
+		}
+
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, path, crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor);
 
 		Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();

@@ -33,7 +33,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -74,7 +74,7 @@ public class Links2ESRIShape {
 			features.add(this.featureGenerator.getFeature(link));
 		}
 		log.info("writing features to shape file... " + this.filename);
-		ShapeFileWriter.writeGeometries(features, this.filename);
+		GeoFileWriter.writeGeometries(features, this.filename);
 		log.info("done writing shape file.");
 	}
 

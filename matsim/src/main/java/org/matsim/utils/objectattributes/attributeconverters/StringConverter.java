@@ -21,6 +21,7 @@ package org.matsim.utils.objectattributes.attributeconverters;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.utils.objectattributes.AttributeConverter;
 
@@ -29,7 +30,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  * @author mrieser
  */
 public class StringConverter implements AttributeConverter<String> {
-	private final Map<String, String> stringCache = new HashMap<String, String>(1000);
+	private final Map<String, String> stringCache = new ConcurrentHashMap<>(1000);
 	@Override
 	public String convert(String value) {
 		String s = this.stringCache.get(value);

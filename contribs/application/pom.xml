@@ -79,12 +79,25 @@
 			<artifactId>gtfs2matsim</artifactId>
 			<version>master-33809c4f0f-1</version>
 			<exclusions>
+				<!-- Exclude unneeded dependencies and these with known CVE -->
 				<exclusion>
 					<groupId>org.geotools</groupId>
 					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.matsim</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.amazonaws</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.graphql-java</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.postgresql</groupId>
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
