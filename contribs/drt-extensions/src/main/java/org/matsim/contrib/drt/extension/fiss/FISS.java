@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -94,13 +95,16 @@ public class FISS implements DepartureHandler, MobsimEngine {
 						Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
 						Gbl.assertIf(this.fissConfigGroup.sampledModes.contains(currentLeg.getMode()));
 						NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
+						Person person = planAgent.getCurrentPlan().getPerson();
+						Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
+								.get(networkRoute.getVehicleId());
 
 						// update travel time with travel times of last iteration
 						double newTravelTime = 0.0;
 						// start and end link are not consideres in NetworkRoutingModule for travel time
 						for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
 							newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-									now + newTravelTime, null, null);
+									now + newTravelTime, person, vehicle);
 						}
 						LOG.debug("New travelTime: {}, was {}", newTravelTime,
 								networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
