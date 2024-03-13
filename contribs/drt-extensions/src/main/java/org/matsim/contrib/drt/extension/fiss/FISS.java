@@ -101,7 +101,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 
 						// update travel time with travel times of last iteration
 						double newTravelTime = 0.0;
-						// start and end link are not consideres in NetworkRoutingModule for travel time
+						// start and end link are not considered in NetworkRoutingModule for travel time
 						for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
 							newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
 									now + newTravelTime, person, vehicle);
@@ -112,8 +112,8 @@ public class FISS implements DepartureHandler, MobsimEngine {
 					}
 					// remove vehicle of teleported agent from parking spot
 					QVehicle removedVehicle = null;
-					if (agent instanceof MobsimDriverAgent) {
-						Id<Vehicle> vehicleId = ((MobsimDriverAgent) agent).getPlannedVehicleId();
+					if (agent instanceof MobsimDriverAgent driverAgent) {
+						Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
 						QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 						QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 						removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
