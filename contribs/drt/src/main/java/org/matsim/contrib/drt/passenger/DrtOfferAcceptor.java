@@ -26,6 +26,7 @@ import java.util.Optional;
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtOfferAcceptor {
+	@Deprecated
 	DrtOfferAcceptor DEFAULT_ACCEPTOR = (request, departureTime, arrivalTime) -> Optional.of(
 			AcceptedDrtRequest.createFromOriginalRequest(request));
 
