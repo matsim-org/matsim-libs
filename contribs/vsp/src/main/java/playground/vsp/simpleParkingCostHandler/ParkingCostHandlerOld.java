@@ -39,7 +39,7 @@ import java.util.Set;
 * @author ikaddoura
 */
 
-final class ParkingCostHandlerCopy implements TransitDriverStartsEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
+final class ParkingCostHandlerOld implements TransitDriverStartsEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Map<Id<Person>, Double> personId2lastLeaveVehicleTime = new HashMap<>();
 	private final Map<Id<Person>, String> personId2previousActivity = new HashMap<>();
@@ -209,5 +209,28 @@ final class ParkingCostHandlerCopy implements TransitDriverStartsEventHandler, A
 		}
 	}
 
+	public Map<Id<Person>, Double> getPersonId2lastLeaveVehicleTime() {
+		return personId2lastLeaveVehicleTime;
+	}
+
+	public Map<Id<Person>, String> getPersonId2previousActivity() {
+		return personId2previousActivity;
+	}
+
+	public Map<Id<Person>, Id<Link>> getPersonId2relevantModeLinkId() {
+		return personId2relevantModeLinkId;
+	}
+
+	public Map<Id<Person>, Id<Link>> getPersonId2homeLinkId() {
+		return personId2homeLinkId;
+	}
+
+	public Set<Id<Person>> getPtDrivers() {
+		return ptDrivers;
+	}
+
+	public Set<Id<Person>> getHasAlreadyPaidDailyResidentialParkingCosts() {
+		return hasAlreadyPaidDailyResidentialParkingCosts;
+	}
 }
 
