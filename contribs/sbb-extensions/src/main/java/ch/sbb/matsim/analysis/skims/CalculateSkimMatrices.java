@@ -70,7 +70,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.StringUtils;
@@ -233,7 +233,7 @@ public class CalculateSkimMatrices {
 
     public final void selectSamplingPoints(List<WeightedCoord> locations, int numberOfPointsPerZone, String zonesShapeFilename, String zonesIdAttributeName, Random r) throws IOException {
         log.info("loading zones from " + zonesShapeFilename);
-        Collection<SimpleFeature> zones = new ShapeFileReader().readFileAndInitialize(zonesShapeFilename);
+        Collection<SimpleFeature> zones = new GeoFileReader().readFileAndInitialize(zonesShapeFilename);
         SpatialIndex zonesQt = new Quadtree();
         for (SimpleFeature zone : zones) {
             Envelope envelope = ((Geometry) (zone.getDefaultGeometry())).getEnvelopeInternal();

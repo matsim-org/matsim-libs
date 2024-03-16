@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * Aggregate class for informed-mode-choice that makes sure to invoke the correct estimator for each drt mode.
  */
-public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability> {
+public class MultiModalDrtLegEstimator implements LegEstimator {
 
 	private static final Logger log = LogManager.getLogger(MultiModalDrtLegEstimator.class);
 

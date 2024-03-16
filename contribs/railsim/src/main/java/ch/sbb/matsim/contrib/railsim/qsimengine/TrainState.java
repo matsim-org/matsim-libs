@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -31,7 +32,7 @@ import java.util.List;
 /**
  * Stores the mutable current state of a train.
  */
-final class TrainState {
+final class TrainState implements TrainPosition {
 
 	/**
 	 * Driver of the train.
@@ -103,9 +104,19 @@ final class TrainState {
 	double headPosition;
 
 	/**
-	 * * Distance in meters away from the {@code tailLink}s {@code fromNode}.
+	 * Distance in meters away from the {@code tailLink}s {@code fromNode}.
 	 */
 	double tailPosition;
+
+	/**
+	 * Distance in meters, which are approved by dispatcher.
+	 */
+	double approvedDist;
+
+	/**
+	 * Speed in m/s, which is approved after reaching {@link #approvedDist}.
+	 */
+	double approvedSpeed;
 
 	/**
 	 * Speed in m/s.
@@ -140,6 +151,7 @@ final class TrainState {
 			", allowedMaxSpeed=" + allowedMaxSpeed +
 			", headPosition=" + headPosition +
 			", tailPosition=" + tailPosition +
+			", approvedDist=" + approvedDist +
 			", speed=" + speed +
 			", acceleration=" + acceleration +
 			'}';
@@ -150,10 +162,8 @@ final class TrainState {
 		return routeIdx >= route.size();
 	}
 
-	/**
-	 * Check whether to stop at certain link.
-	 */
-	boolean isStop(Id<Link> link) {
+	@Override
+	public boolean isStop(Id<Link> link) {
 		return nextStop != null && nextStop.getLinkId().equals(link);
 	}
 
@@ -164,4 +174,71 @@ final class TrainState {
 			speed, acceleration, targetSpeed);
 	}
 
+	@Override
+	public MobsimDriverAgent getDriver() {
+		return driver;
+	}
+
+	@Override
+	@Nullable
+	public RailsimTransitDriverAgent getPt() {
+		return pt;
+	}
+
+	@Override
+	public TrainInfo getTrain() {
+		return train;
+	}
+
+	@Override
+	public Id<Link> getHeadLink() {
+		return headLink;
+	}
+
+	@Override
+	public Id<Link> getTailLink() {
+		return tailLink;
+	}
+
+	@Override
+	public double getHeadPosition() {
+		return headPosition;
+	}
+
+	@Override
+	public double getTailPosition() {
+		return tailPosition;
+	}
+
+	@Override
+	public int getRouteIndex() {
+		return routeIdx;
+	}
+
+	@Override
+	public int getRouteSize() {
+		return route.size();
+	}
+
+	@Override
+	public RailLink getRoute(int idx) {
+		return route.get(idx);
+	}
+
+	@Override
+	public List<RailLink> getRoute(int from, int to) {
+		return route.subList(from, to);
+	}
+
+	@Override
+	public List<RailLink> getRouteUntilNextStop() {
+		int from = routeIdx;
+
+		for (int i = 0; i < route.size(); i++) {
+			if (isStop(route.get(i).getLinkId())) {
+				return route.subList(from, i + 1);
+			}
+		}
+		return route.subList(from, route.size());
+	}
 }

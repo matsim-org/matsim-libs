@@ -313,8 +313,13 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			// prebooking case when we are already at the stop location, but next stop task happens in the future
 			Task afterPickupTask = insertWait(vehicleEntry.vehicle, pickupStopTask, nextBeginTime);
 
-			scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, afterPickupTask.getTaskIdx() + 1,
-					afterPickupTask.getEndTime());
+			// update timings
+			if (pickupIdx != dropoffIdx) {
+				// update schedule when inserting the dropoff, otherwise we will illegally shift
+				// the begin time of a following prebooked stop if there is one
+				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, afterPickupTask.getTaskIdx() + 1,
+						afterPickupTask.getEndTime());
+			}
 		} else {
 			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink, pickupStopTask.getEndTime(),
 					detourData.detourFromPickup, travelTime);
@@ -323,9 +328,12 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			Task afterPickupTask = insertDriveWithWait(vehicleEntry.vehicle, pickupStopTask, vrpPath, nextBeginTime);
 
 			// update timings
-			// TODO should be enough to update the timeline only till dropoffIdx...
-			scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, afterPickupTask.getTaskIdx() + 1,
-					afterPickupTask.getEndTime());
+			if (pickupIdx != dropoffIdx) {
+				// update schedule when inserting the dropoff, otherwise we will illegally shift
+				// the begin time of a following prebooked stop if there is one
+				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, afterPickupTask.getTaskIdx() + 1,
+						afterPickupTask.getEndTime());
+			}
 		}
 
 		return pickupStopTask;

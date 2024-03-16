@@ -61,12 +61,12 @@
 
 		<link id="ab" from="A" to="B" length="400" freespeed="5" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
 		<link id="bc" from="B" to="C" length="5000" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
@@ -81,25 +81,25 @@
 
 		<link id="gj" from="G" to="J" length="3000" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
 		<link id="jk" from="J" to="K" length="400" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
 
 		<link id="hl" from="H" to="L" length="3000" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
 		<link id="lm" from="L" to="M" length="400" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
 

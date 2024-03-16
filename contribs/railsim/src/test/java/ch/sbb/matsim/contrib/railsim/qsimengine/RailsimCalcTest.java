@@ -147,4 +147,24 @@ public class RailsimCalcTest {
 			.isCloseTo(1000, Offset.offset(0.0001));
 
 	}
+
+	@Test
+	public void testCalcRequiredTime() {
+
+		TrainState state = new TrainState(null, null, 0, null, null);
+
+		state.speed = 0;
+		state.acceleration = 0;
+
+		assertThat(RailsimCalc.calcRequiredTime(state, 1000))
+			.isEqualTo(Double.POSITIVE_INFINITY);
+
+		state.speed = 10;
+		state.acceleration = -1;
+
+		// Comes to stop after 10s
+		assertThat(RailsimCalc.calcRequiredTime(state, 10000))
+			.isEqualTo(10);
+
+	}
 }

@@ -35,7 +35,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -56,11 +56,11 @@ public class Nodes2ESRIShape {
 	private final String filename;
 	private SimpleFeatureBuilder builder;
 
-	
+
 	public Nodes2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
 		this(network, filename, MGC.getCRS(coordinateSystem));
 	}
-	
+
 	public Nodes2ESRIShape(Network network, String filename, CoordinateReferenceSystem crs) {
 		this.network = network;
 		this.filename = filename;
@@ -72,7 +72,7 @@ public class Nodes2ESRIShape {
 		for (Node node : NetworkUtils.getSortedNodes(this.network)) {
 			features.add(getFeature(node));
 		}
-		ShapeFileWriter.writeGeometries(features, this.filename);
+		GeoFileWriter.writeGeometries(features, this.filename);
 
 	}
 
