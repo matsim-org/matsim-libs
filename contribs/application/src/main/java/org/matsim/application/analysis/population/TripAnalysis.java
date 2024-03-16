@@ -27,12 +27,11 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
 import tech.tablesaw.selection.Selection;
 
-import java.io.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
@@ -49,6 +48,9 @@ public class TripAnalysis implements MATSimAppCommand {
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
 	@CommandLine.Mixin
 	private OutputOptions output = OutputOptions.ofCommand(TripAnalysis.class);
+
+	@CommandLine.Option(names = "--input-ref-data", description = "Optional path to reference data", required = false)
+	private String refData;
 
 	@CommandLine.Option(names = "--match-id", description = "Pattern to filter agents by id")
 	private String matchId;
@@ -156,6 +158,12 @@ public class TripAnalysis implements MATSimAppCommand {
 			trips = trips.where(Selection.with(idx.toIntArray()));
 		}
 
+		TripByGroupAnalysis groups = null;
+		if (refData != null) {
+			groups = new TripByGroupAnalysis(refData);
+			groups.groupPersons(persons);
+		}
+
 		// Use longest_distance_mode where main_mode is not present
 		trips.stringColumn("main_mode")
 			.set(trips.stringColumn("main_mode").isMissing(),
@@ -179,6 +187,10 @@ public class TripAnalysis implements MATSimAppCommand {
 		joined.addColumns(dist_group);
 
 		writeModeShare(joined, labels);
+
+		if (groups != null) {
+			groups.analyzeModeShare(joined, labels);
+		}
 
 		writePopulationStats(persons, joined);
 
@@ -370,8 +382,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		TextColumn purpose = trips.textColumn("end_activity_type");
 
 		// Remove suffix durations like _345
-		Selection withDuration = purpose.matchesRegex("^.+_[0-9]+$");
-		purpose.set(withDuration, purpose.where(withDuration).replaceAll("_[0-9]+$", ""));
+		purpose.set(Selection.withRange(0, purpose.size()), purpose.replaceAll("_[0-9]{2,}$", ""));
 
 		Table tArrival = trips.summarize("trip_id", count).by("end_activity_type", "arrival_h");
 
