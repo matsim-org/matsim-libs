@@ -41,7 +41,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	private final OutputOptions output = OutputOptions.ofCommand(ApplyNetworkParams.class);
 
 	@CommandLine.Parameters(arity = "1..*", description = "Type of parameters to apply. Available: ${COMPLETION-CANDIDATES}")
-	private Set<Parameter> params;
+	private Set<NetworkAttribute> params;
 
 	@CommandLine.Option(names = "--input-params", description = "Path to parameter json")
 	private String inputParams;
@@ -53,7 +53,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	private double[] speedFactorBounds;
 
 	private NetworkModel model;
-	private NetworkParamsOpt.Request paramsOpt;
+	private NetworkParams paramsOpt;
 
 	private int warn = 0;
 
@@ -88,8 +88,10 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
 
-		try (BufferedReader in = IOUtils.getBufferedReader(inputParams)) {
-			paramsOpt = mapper.readValue(in, NetworkParamsOpt.Request.class);
+		if (inputParams != null) {
+			try (BufferedReader in = IOUtils.getBufferedReader(inputParams)) {
+				paramsOpt = mapper.readValue(in, NetworkParams.class);
+			}
 		}
 
 		Map<Id<Link>, Feature> features = NetworkParamsOpt.readFeatures(input.getPath("features.csv"), network.getLinks().size());
@@ -115,7 +117,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 		boolean modified = false;
 
-		if (params.contains(Parameter.capacity)) {
+		if (params.contains(NetworkAttribute.capacity)) {
 
 			FeatureRegressor capacity = model.capacity(junctionType);
 
@@ -140,11 +142,10 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 			}
 
 			link.setCapacity(link.getNumberOfLanes() * perLane);
-
 		}
 
 
-		if (params.contains(Parameter.freespeed)) {
+		if (params.contains(NetworkAttribute.freespeed)) {
 
 			double speedFactor = 1.0;
 			FeatureRegressor speedModel = model.speedFactor(junctionType);

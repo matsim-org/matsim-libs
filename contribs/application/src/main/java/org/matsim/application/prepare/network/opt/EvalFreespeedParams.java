@@ -85,7 +85,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 	static Result applyAndEvaluateParams(
 		Network network, NetworkModel model, Object2DoubleMap<SampleValidationRoutes.FromToNodes> validationSet, Map<Id<Link>, Feature> features,
-		double[] speedFactorBounds, Request request, String save) throws IOException {
+		double[] speedFactorBounds, NetworkParams request, String save) throws IOException {
 
 		Map<Id<Link>, double[]> attributes = new HashMap<>();
 
@@ -169,13 +169,13 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 
 		log.info("Model score:");
-		Result r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds, new Request(0), save(getParamsName(null)));
+		Result r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds, new NetworkParams(0), save(getParamsName(null)));
 		writeResult(csv, null, r);
 
 		if (params != null) {
 			log.info("Model with parameter score:");
 			r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds,
-				mapper.readValue(params.toFile(), Request.class), save(getParamsName(params)));
+				mapper.readValue(params.toFile(), NetworkParams.class), save(getParamsName(params)));
 			writeResult(csv, params, r);
 		}
 
@@ -210,12 +210,12 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 		String networkName = FilenameUtils.getName(input.getNetworkPath());
 
-		Request best = null;
+		NetworkParams best = null;
 		double bestScore = Double.POSITIVE_INFINITY;
 		double[] bounds = {0, 1};
 
 		for (int i = 25; i <= 100; i++) {
-			Request req = new Request(i / 100d);
+			NetworkParams req = new NetworkParams(i / 100d);
 			Result res = applyAndEvaluateParams(network, model, validationSet, features, bounds, req, null);
 			csv.printRecord(networkName, i / 100d, res.mae(), res.rmse());
 			if (best == null || res.mae() < bestScore) {

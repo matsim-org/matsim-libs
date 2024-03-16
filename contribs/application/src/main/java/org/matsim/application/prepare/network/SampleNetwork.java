@@ -25,7 +25,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.router.FastDijkstraFactory;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -293,7 +293,7 @@ public class SampleNetwork implements MATSimAppCommand {
 	private LeastCostPathCalculator createRandomizedRouter(Network network, TravelTime tt) {
 
 		OnlyTimeDependentTravelDisutility util = new OnlyTimeDependentTravelDisutility(tt);
-		return new FastDijkstraFactory(false).createPathCalculator(network, util, tt);
+		return new DijkstraFactory(false).createPathCalculator(network, util, tt);
 	}
 
 	private static final class RandomizedTravelTime implements TravelTime {

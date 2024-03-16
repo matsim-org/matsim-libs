@@ -278,7 +278,8 @@ public class SumoNetworkHandler extends DefaultHandler {
 
 				// aggregate edges split by sumo again
 				String from = attributes.getValue("from");
-				Junction j = junctions.get(edges.get(from).to);
+				Edge fromEdge = edges.get(from);
+				Junction j = fromEdge != null ? junctions.get(fromEdge.to) : null;
 
 				Connection conn = new Connection(from, attributes.getValue("to"),
 					Integer.parseInt(attributes.getValue("fromLane")),

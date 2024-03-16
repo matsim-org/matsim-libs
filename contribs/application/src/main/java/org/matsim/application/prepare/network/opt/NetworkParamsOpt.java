@@ -1,8 +1,5 @@
 package org.matsim.application.prepare.network.opt;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -18,7 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes;
-import org.matsim.core.router.FastDijkstraFactory;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -33,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Private helper class with utility functions.
@@ -120,7 +116,7 @@ class NetworkParamsOpt {
 	static Result evaluate(Network network, Object2DoubleMap<SampleValidationRoutes.FromToNodes> validationSet, Map<Id<Link>, Feature> features, Map<Id<Link>, double[]> attributes, String save) throws IOException {
 		FreeSpeedTravelTime tt = new FreeSpeedTravelTime();
 		OnlyTimeDependentTravelDisutility util = new OnlyTimeDependentTravelDisutility(tt);
-		LeastCostPathCalculator router = new FastDijkstraFactory(false).createPathCalculator(network, util, tt);
+		LeastCostPathCalculator router = new DijkstraFactory(false).createPathCalculator(network, util, tt);
 
 		SummaryStatistics rmse = new SummaryStatistics();
 		SummaryStatistics mse = new SummaryStatistics();
@@ -172,50 +168,6 @@ class NetworkParamsOpt {
 			csv.close();
 
 		return new Result(rmse.getMean(), mse.getMean(), data);
-	}
-
-	/**
-	 * JSON request containing desired parameters.
-	 */
-	static final class Request {
-
-		double f;
-
-		@JsonIgnore
-		Map<String, double[]> params = new HashMap<>();
-
-		/**
-		 * Used by jackson
-		 */
-		public Request() {
-		}
-
-		public Request(double f) {
-			this.f = f;
-		}
-
-		@JsonAnyGetter
-		public double[] getParams(String type) {
-			return params.get(type);
-		}
-
-		@JsonAnySetter
-		public void setParams(String type, double[] params) {
-			this.params.put(type, params);
-		}
-
-		public boolean hasParams() {
-			return !params.isEmpty();
-		}
-
-		@Override
-		public String toString() {
-			if (f == 0)
-				return "Request{" + params.entrySet().stream()
-					.map(e -> e.getKey() + "=" + e.getValue().length).collect(Collectors.joining(",")) + '}';
-
-			return "Request{f=" + f + "}";
-		}
 	}
 
 	record Feature(String junctionType, Object2DoubleMap<String> features) {

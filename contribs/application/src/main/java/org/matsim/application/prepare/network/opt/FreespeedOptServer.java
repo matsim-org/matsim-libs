@@ -23,7 +23,6 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.prepare.network.opt.NetworkParamsOpt.Feature;
-import org.matsim.application.prepare.network.opt.NetworkParamsOpt.Request;
 import org.matsim.application.prepare.network.opt.NetworkParamsOpt.Result;
 import picocli.CommandLine;
 
@@ -122,7 +121,7 @@ public class FreespeedOptServer implements MATSimAppCommand {
 		return 0;
 	}
 
-	private Result applyAndEvaluateParams(Request request, String save) throws IOException {
+	private Result applyAndEvaluateParams(NetworkParams request, String save) throws IOException {
 		return EvalFreespeedParams.applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds,
 			request, save);
 	}
@@ -132,7 +131,7 @@ public class FreespeedOptServer implements MATSimAppCommand {
 		@Override
 		public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws IOException {
 
-			Request req = mapper.readValue(request.getEntity().getContent(), Request.class);
+			NetworkParams req = mapper.readValue(request.getEntity().getContent(), NetworkParams.class);
 
 			Result stats = applyAndEvaluateParams(req, null);
 
