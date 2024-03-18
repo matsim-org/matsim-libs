@@ -78,7 +78,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch";
 
-	private static final String EXPLAIN_SCORES = "explainScores";
+	private static final String WRITE_SCORE_EXPLANATIONS = "writeScoreExplanations";
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 
@@ -420,7 +420,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		map.put(WRITE_EXPERIENCED_PLANS,
 				"write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
 
-		map.put(EXPLAIN_SCORES,
+		map.put(WRITE_SCORE_EXPLANATIONS,
 				 "Write detailed score composition into plan attributes after execution.");
 
 		return map;
@@ -694,11 +694,11 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public void setExplainScores(boolean value) {
-		delegate.setExplainScores(value);
+		delegate.setWriteScoreExplanations(value);
 	}
 
-	public boolean isExplainScores() {
-		return delegate.isExplainScores();
+	public boolean isWriteScoreExplanations() {
+		return delegate.isWriteScoreExplanations();
 	}
 
 	public double getPathSizeLogitBeta() {
@@ -1674,13 +1674,13 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
-		@StringSetter(EXPLAIN_SCORES)
-		public void setExplainScores(boolean explainScores) {
+		@StringSetter(WRITE_SCORE_EXPLANATIONS)
+		public void setWriteScoreExplanations(boolean explainScores) {
 			this.explainScores = explainScores;
 		}
 
-		@StringGetter(EXPLAIN_SCORES)
-		public boolean isExplainScores() {
+		@StringGetter(WRITE_SCORE_EXPLANATIONS)
+		public boolean isWriteScoreExplanations() {
 			return explainScores;
 		}
 	}

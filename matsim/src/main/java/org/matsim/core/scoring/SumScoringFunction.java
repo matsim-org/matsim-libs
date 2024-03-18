@@ -193,7 +193,7 @@ public final class SumScoringFunction implements ScoringFunction {
 		for (BasicScoring s : basicScoringFunctions) {
 
 			// If something was already written, a delimiter needs to be placed
-			if (out.length() != 0)
+			if (!out.isEmpty())
 				out.append(SCORE_DELIMITER);
 
 			s.explainScore(out);
