@@ -43,6 +43,6 @@ public final class ScoreEventScoring implements SumScoringFunction.ScoreScoring 
 
 	@Override
 	public void explainScore(StringBuilder out) {
-		out.append("scoreEvents=").append(score);
+		out.append("scoreEvents_util=").append(score);
 	}
 }

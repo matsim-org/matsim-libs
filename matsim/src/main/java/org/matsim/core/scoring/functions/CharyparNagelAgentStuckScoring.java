@@ -61,6 +61,6 @@ public final class CharyparNagelAgentStuckScoring implements org.matsim.core.sco
 
 	@Override
 	public void explainScore(StringBuilder out) {
-		out.append("agentStuck=").append(this.score);
+		out.append("agentStuck_util=").append(this.score);
 	}
 }
