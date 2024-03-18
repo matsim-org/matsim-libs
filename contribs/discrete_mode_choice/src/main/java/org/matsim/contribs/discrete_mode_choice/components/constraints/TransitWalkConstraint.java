@@ -13,6 +13,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraint;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraintFactory;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.RoutedTripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 /**
  * This contraint forbids "pt" trips that only consist of walk legs, i.e. there
@@ -29,7 +30,7 @@ public class TransitWalkConstraint extends AbstractTripConstraint {
 				// Go through all plan elments
 				for (PlanElement element : ((RoutedTripCandidate) candidate).getRoutedPlanElements()) {
 					if (element instanceof Leg) {
-						if (((Leg) element).getMode().equals(TransportMode.pt)) {
+						if (((Leg) element).getRoute() instanceof TransitPassengerRoute) {
 							// If we find at least one pt leg, we're good
 							return true;
 						}
