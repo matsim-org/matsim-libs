@@ -1,11 +1,11 @@
-package org.matsim.application.prepare.network.opt.ref;
+package org.matsim.application.prepare.network.params.ref;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import org.matsim.application.prepare.network.opt.FeatureRegressor;
-import org.matsim.application.prepare.network.opt.NetworkModel;
+import org.matsim.application.prepare.network.params.FeatureRegressor;
+import org.matsim.application.prepare.network.params.NetworkModel;
 
 /**
- * Reference model with a manual combining decision tree using priority, road type and speed.
+ * Reference model with a manually defined decision tree using priority, road type and speed.
  */
 public final class DecisionTreeParams implements NetworkModel {
 

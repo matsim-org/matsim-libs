@@ -1,5 +1,5 @@
-package org.matsim.application.prepare.network.opt.ref;
-import org.matsim.application.prepare.network.opt.FeatureRegressor;
+package org.matsim.application.prepare.network.params.ref;
+import org.matsim.application.prepare.network.params.FeatureRegressor;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 
 /**

@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.network.opt;
+package org.matsim.application.prepare.network.params;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;

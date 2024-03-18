@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.network.opt;
+package org.matsim.application.prepare.network.params;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.matsim.application.prepare.network.opt.NetworkParamsOpt.*;
+import static org.matsim.application.prepare.network.params.NetworkParamsOpt.*;
 
 @CommandLine.Command(
 	name = "eval-network-params", description = "Evaluate network params"

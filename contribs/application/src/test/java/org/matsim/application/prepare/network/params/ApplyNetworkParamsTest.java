@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.network.opt;
+package org.matsim.application.prepare.network.params;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;

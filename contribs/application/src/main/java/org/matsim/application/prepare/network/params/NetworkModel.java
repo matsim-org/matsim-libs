@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.network.opt;
+package org.matsim.application.prepare.network.params;
 
 /**
  * A model for estimating network parameters.

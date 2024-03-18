@@ -1,7 +1,7 @@
-package org.matsim.application.prepare.network.opt.ref;
+package org.matsim.application.prepare.network.params.ref;
 
-import org.matsim.application.prepare.network.opt.FeatureRegressor;
-import org.matsim.application.prepare.network.opt.NetworkModel;
+import org.matsim.application.prepare.network.params.FeatureRegressor;
+import org.matsim.application.prepare.network.params.NetworkModel;
 
 /**
  * Model trained on three region types in germany (metropole, city, rural).
