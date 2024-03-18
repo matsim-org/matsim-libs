@@ -2,11 +2,22 @@ package org.matsim.contrib.drt.passenger;
 
 import java.util.Optional;
 
-public class MaxDetourOfferAcceptor implements DrtOfferAcceptor{
+public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 	private final double maxAllowedPickupDelay;
 
-	public MaxDetourOfferAcceptor(double maxAllowedPickupDelay) {
+	/**
+	 * Generate Default offer acceptor with max allowed pickup delay.
+	 * @param maxAllowedPickupDelay: maximum allowed delay since the initially assigned pickup time.
+	 */
+	public DefaultOfferAcceptor(double maxAllowedPickupDelay) {
 		this.maxAllowedPickupDelay = maxAllowedPickupDelay;
+	}
+
+	/**
+	 * Generate Default offer acceptor. 
+	 */
+	public DefaultOfferAcceptor() {
+		this.maxAllowedPickupDelay = Double.POSITIVE_INFINITY;
 	}
 
 	@Override

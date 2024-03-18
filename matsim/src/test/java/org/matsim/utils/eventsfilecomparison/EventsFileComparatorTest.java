@@ -20,7 +20,7 @@
 package org.matsim.utils.eventsfilecomparison;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.*;
+import static org.matsim.utils.eventsfilecomparison.ComparisonResult.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
