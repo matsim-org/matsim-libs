@@ -24,13 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
@@ -159,10 +153,12 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	public void notifyShutdown(ShutdownEvent event) {
 		String crs = event.getServices().getConfig().global().getCoordinateSystem();
 		Collection<SimpleFeature> features = convertGeometriesToSimpleFeatures(crs);
-		String fileName = event.getServices()
+		if(!features.isEmpty()) {
+			String fileName = event.getServices()
 				.getControlerIO()
-				.getOutputFilename("drt_waitStats" + "_" + drtCfg.getMode() + "_zonal.shp");
-		GeoFileWriter.writeGeometries(features, fileName);
+				.getOutputFilename("drt_waitStats" + "_" + drtCfg.getMode() + "_zonal.gpkg");
+			GeoFileWriter.writeGeometries(features, fileName);
+		}
 	}
 
 	private Collection<SimpleFeature> convertGeometriesToSimpleFeatures(String targetCoordinateSystem) {
@@ -172,9 +168,10 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		} catch (IllegalArgumentException e) {
 			log.warn("Coordinate reference system \""
 					+ targetCoordinateSystem
-					+ "\" is unknown. Please set a crs in config global. Will try to create drt_waitStats_"
+					+ "\" is unknown. Please set a crs in config global. Will not create drt_waitStats_"
 					+ drtCfg.getMode()
-					+ "_zonal.shp anyway.");
+					+ "_zonal.gpkg.");
+			return Collections.emptyList();
 		}
 
 		simpleFeatureBuilder.setName("drtZoneFeature");
