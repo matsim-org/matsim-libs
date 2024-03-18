@@ -31,7 +31,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class runs a server that receives model parameters for free speed
+ * This class runs a server that receives model parameters for free speed.
+ * The corresponding optimizer is part of `matsim-python-tools` package.
+ * See <a href="https://github.com/matsim-vsp/matsim-python-tools/blob/v0.0.18/matsim/scenariogen/network/run_opt_freespeed.py">this code</a>.
+ * More about the method can be found in the paper "Road network free flow speed estimation using microscopic simulation and point-to-point travel times"; ABMTRANS 2024.
  */
 @CommandLine.Command(
 	name = "freespeed-opt-server",
