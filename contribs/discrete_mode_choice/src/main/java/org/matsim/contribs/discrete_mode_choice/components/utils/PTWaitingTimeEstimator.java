@@ -1,5 +1,8 @@
 package org.matsim.contribs.discrete_mode_choice.components.utils;
 
+import java.util.List;
+
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.pt.routes.TransitPassengerRoute;
 
 /**
@@ -11,5 +14,9 @@ import org.matsim.pt.routes.TransitPassengerRoute;
  * @author sebhoerl
  */
 public interface PTWaitingTimeEstimator {
+
 	double estimateWaitingTime(double departureTime, TransitPassengerRoute route);
+
+	double estimateWaitingTime(List<? extends PlanElement> elements);
+
 }

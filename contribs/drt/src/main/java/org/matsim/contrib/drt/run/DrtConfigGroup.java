@@ -133,7 +133,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment(
 		"Defines the maximum delay allowed from the initial scheduled pick up time. Once the initial pickup time is offered, the latest promised"
 			+ "pickup time is calculated based on initial scheduled pickup time + maxAllowedPickupDelay. "
-			+ "By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
+			+ "By default, this limit is disabled. If enabled, a value between 0 and 240 is a good choice.")
 	@PositiveOrZero
 	public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
 
@@ -323,6 +323,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+
+		if ((maxDetourAlpha != Double.POSITIVE_INFINITY && maxDetourBeta != Double.POSITIVE_INFINITY) || maxAbsoluteDetour != Double.POSITIVE_INFINITY) {
+			Verify.verify(maxAllowedPickupDelay != Double.POSITIVE_INFINITY, "Detour constraints are activated, " +
+				"maxAllowedPickupDelay must be specified! A value between 0 and 240 seconds can be a good choice for maxAllowedPickupDelay.");
+		}
+
 	}
 
 	@Override
