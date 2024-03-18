@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	public enum PassengerEngineType {
-		DEFAULT, WITH_PREBOOKING, TELEPORTING
+		DEFAULT, WITH_PREBOOKING, TELEPORTING_SPEED_UP, TELEPORTING_ESTIMATION
 	}
 
 	private final PassengerEngineType type;
@@ -36,19 +36,10 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 		addMobsimScopeEventHandlerBinding().to(modalKey(PassengerEngine.class));
 
 		switch( type ){
-			case DEFAULT -> {
-				addModalComponent( PassengerEngine.class, DefaultPassengerEngine.createProvider( getMode() ) );
-				return;
-			}
-			case WITH_PREBOOKING -> {
-				addModalComponent( PassengerEngine.class, PassengerEngineWithPrebooking.createProvider( getMode() ) );
-				return;
-			}
-			case TELEPORTING -> {
-				addModalComponent( PassengerEngine.class, TeleportingPassengerEngine.createProvider( getMode() ) );
-				return;
-			}
-			default -> throw new IllegalStateException( "Type: " + type + " is not supported" );
+			case DEFAULT -> addModalComponent( PassengerEngine.class, DefaultPassengerEngine.createProvider( getMode() ) );
+			case WITH_PREBOOKING -> addModalComponent( PassengerEngine.class, PassengerEngineWithPrebooking.createProvider( getMode() ) );
+			case TELEPORTING_SPEED_UP -> addModalComponent( PassengerEngine.class, TeleportingPassengerEngine.createProvider( getMode() ) );
+			case TELEPORTING_ESTIMATION -> addModalComponent( PassengerEngine.class, TeleportingEstimationPassengerEngine.createProvider( getMode() ));
 		}
 	}
 }

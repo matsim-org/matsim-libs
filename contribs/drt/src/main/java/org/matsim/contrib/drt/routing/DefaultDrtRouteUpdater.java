@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
@@ -50,13 +52,15 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final DrtConfigGroup drtCfg;
 	private final Network network;
 	private final Population population;
+	private final DrtEstimator drtEstimator;
 	private final ExecutorServiceWithResource<? extends RouteCreator> executorService;
 
 	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, Population population, Config config,
-			Supplier<RouteCreator> drtRouteCreatorSupplier) {
+								  Supplier<RouteCreator> drtRouteCreatorSupplier, DrtEstimator drtEstimator) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.population = population;
+		this.drtEstimator = drtEstimator;
 
 		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
@@ -86,8 +90,16 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
 		RouteFactories routeFactories = population.getFactory().getRouteFactories();
-		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, person,
-				tripAttributes, routeFactories));
+
+		Route drtRoute = drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, person,
+			tripAttributes, routeFactories);
+		drtLeg.setRoute(drtRoute);
+
+		// update DRT estimate
+		if (drtEstimator != null) {
+			DrtEstimator.Estimate estimate = drtEstimator.estimate((DrtRoute) drtRoute, drtLeg.getDepartureTime());
+			DrtEstimator.setEstimateAttributes(drtLeg, estimate);
+		}
 	}
 
 	@Override

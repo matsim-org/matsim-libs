@@ -62,14 +62,21 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		boolean teleportDrtUsers = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
+		boolean teleportSpeedup = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
 				drtCfg.getDrtSpeedUpParams().get(), getConfig().controller(), getIterationNumber());
-		if (teleportDrtUsers) {
+
+		boolean teleportEstimate = drtCfg.getDrtEstimatorParams().isPresent() && drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport;
+
+		if (teleportSpeedup) {
 			install(new PassengerEngineQSimModule(getMode(),
-					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING));
+					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING_SPEED_UP));
 			bindModal(TeleportedRouteCalculator.class).toProvider(
 					modalProvider(getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
 					.asEagerSingleton();
+		} else if (teleportEstimate) {
+
+			install(new PassengerEngineQSimModule(getMode(), PassengerEngineQSimModule.PassengerEngineType.TELEPORTING_ESTIMATION));
+
 		} else {
 			install(new VrpAgentSourceQSimModule(getMode()));
 			install(new PassengerEngineQSimModule(getMode()));
@@ -94,7 +101,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				return new DrtRequestCreator(getMode(), events);
 			}
 		}).asEagerSingleton();
-		
+
 		// this is not the actual selection which DynActionCreator is used, see
 		// DrtModeOptimizerQSimModule
 		bindModal(DrtActionCreator.class)

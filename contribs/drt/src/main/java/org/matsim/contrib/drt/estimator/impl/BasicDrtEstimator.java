@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.estimator.impl;
+package org.matsim.contrib.drt.estimator.impl;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.regression.RegressionResults;
@@ -9,9 +9,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
-import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
-import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
+import org.matsim.contrib.drt.estimator.DrtOnlineEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
@@ -26,24 +26,23 @@ import java.util.SplittableRandom;
  * Estimates drt trips based only daily averages. No spatial or temporal differentiation is taken into account for the estimate.
  * This estimator is suited for small scenarios with few vehicles and trips and consequently few data points.
  */
-public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
+public class BasicDrtEstimator implements DrtOnlineEstimator, IterationEndsListener {
 
 	private static final Logger log = LogManager.getLogger(BasicDrtEstimator.class);
 
 	private final DrtEventSequenceCollector collector;
-	private final DrtEstimatorConfigGroup config;
+	private final DrtEstimatorParams config;
 	private final DrtConfigGroup drtConfig;
-	private final DrtInitialEstimator initial;
+	private final DrtEstimator initial;
 
 	private final SplittableRandom rnd = new SplittableRandom();
 	/**
 	 * Currently valid estimates.
 	 */
 	private GlobalEstimate currentEst;
-	private RegressionResults fare;
 
-	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtInitialEstimator initial,
-							 DrtEstimatorConfigGroup config, DrtConfigGroup drtConfig) {
+	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimator initial,
+							 DrtEstimatorParams config, DrtConfigGroup drtConfig) {
 		//zones = injector.getModal(DrtZonalSystem.class);
 		this.collector = collector;
 		this.initial = initial;
@@ -92,8 +91,6 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		if (n <= 3)
 			return;
 
-		fare = est.fare.regress();
-
 		double rejectionRate = (double) nRejections / nSubmitted;
 
 		if (currentEst == null) {
@@ -122,18 +119,10 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 			return initial.estimate(route, departureTime);
 		}
 
-		double fare = 0;
-		if (this.fare != null)
-			fare = this.fare.getParameterEstimate(0) + this.fare.getParameterEstimate(1) * route.getDistance();
-
-		if (drtConfig.getDrtFareParams().isPresent()) {
-			fare = Math.max(fare, drtConfig.getDrtFareParams().get().minFarePerTrip);
-		}
-
 		double detour = Math.max(1, rnd.nextGaussian(currentEst.meanDetour, config.randomization * currentEst.stdDetour));
 		double waitTime = Math.max(0, rnd.nextGaussian(currentEst.meanWait, config.randomization * currentEst.stdWait));
 
-		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, fare, currentEst.rejectionRate);
+		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, currentEst.rejectionRate);
 	}
 
 	/**

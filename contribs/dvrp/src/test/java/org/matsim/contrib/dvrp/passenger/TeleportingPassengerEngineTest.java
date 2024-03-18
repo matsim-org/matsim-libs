@@ -102,7 +102,7 @@ public class TeleportingPassengerEngineTest {
 	private QSim createQSim(TeleportedRouteCalculator teleportedRouteCalculator,
 			PassengerRequestValidator requestValidator) {
 		return new QSimBuilder(fixture.config).useDefaults()
-				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineType.TELEPORTING))
+				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineType.TELEPORTING_SPEED_UP))
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {
 					@Override
 					protected void configureQSim() {
