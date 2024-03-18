@@ -24,6 +24,7 @@ package org.matsim.core.utils.gis;
 import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.feature.NameImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,8 +32,9 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser / senozon
+ * @author nkuehnel / MOIA // add gpkg test
  */
-public class ShapeFileReaderTest {
+public class GeoFileReaderTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -41,9 +43,19 @@ public class ShapeFileReaderTest {
 	 * @throws IOException
 	 */
 	@Test
-	void testPlusInFilename() throws IOException {
+	void testShp() throws IOException {
 		String filename = "src/test/resources/" + utils.getInputDirectory() + "test+test.shp";
-		FeatureSource fs = ShapeFileReader.readDataFile(filename);
+		FeatureSource fs = GeoFileReader.readDataFile(filename);
+		Assertions.assertEquals(3, fs.getFeatures().size());
+	}
+
+	/**
+	 * @throws IOException
+	 */
+	@Test
+	void testGpkg() throws IOException {
+		String filename = "src/test/resources/" + utils.getInputDirectory() + "test+test.gpkg";
+		FeatureSource fs = GeoFileReader.readDataFile(filename, new NameImpl("testtest"));
 		Assertions.assertEquals(3, fs.getFeatures().size());
 	}
 }

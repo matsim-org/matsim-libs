@@ -30,8 +30,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileReader;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
@@ -207,9 +207,9 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		if (areaFile != null) {
 			// create copy of shp file so that it is accessible for sim wrapper
-			Collection<SimpleFeature> allFeatures = ShapeFileReader.getAllFeatures(areaFile);
+			Collection<SimpleFeature> allFeatures = GeoFileReader.getAllFeatures(areaFile);
 			//do not convert coordinates! all MATSim output should be in the same CRS. if input was not in correct CRS, simulation would have crashed...
-			ShapeFileWriter.writeGeometries(allFeatures, output.getPath("serviceArea.shp").toString());
+			GeoFileWriter.writeGeometries(allFeatures, output.getPath("serviceArea.shp").toString());
 			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
 			tableSupplyKPI.addColumns(DoubleColumn.create("Number of areas", new Integer[]{allFeatures.size()}));
 		}

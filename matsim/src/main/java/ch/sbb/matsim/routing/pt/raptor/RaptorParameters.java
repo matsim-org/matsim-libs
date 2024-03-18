@@ -65,6 +65,8 @@ public class RaptorParameters {
     private double transferPenaltyPerTravelTimeHour = 0.0;
     private double transferPenaltyMinimum = Double.NEGATIVE_INFINITY;
     private double transferPenaltyMaximum = Double.POSITIVE_INFINITY;
+    
+    private boolean useTransportModeUtilities = false;
 
     private final SwissRailRaptorConfigGroup config;
 
@@ -158,6 +160,14 @@ public class RaptorParameters {
 
     public void setTransferPenaltyMaximum(double transferPenaltyMaximum) {
         this.transferPenaltyMaximum = transferPenaltyMaximum;
+    }
+    
+    public boolean isUseTransportModeUtilities() {
+    	return useTransportModeUtilities;
+    }
+    
+    public void setUseTransportModeUtilities(boolean useTransportModeUtilities) {
+    	this.useTransportModeUtilities = useTransportModeUtilities;
     }
 
 }
