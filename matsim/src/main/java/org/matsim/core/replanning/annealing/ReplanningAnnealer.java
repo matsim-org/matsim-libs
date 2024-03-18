@@ -57,7 +57,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	private final ReplanningAnnealerConfigGroup saConfig;
 	private final int innovationStop;
 	private final String sep;
-	private final EnumMap<AnnealParameterOption, Double> currentValues;
+	private final EnumMap<AnnealParameterOption,Map<String, Double>> currentValuesPerSubpopulation;
 	private int currentIter;
 	private List<String> header;
 	@Inject
@@ -67,7 +67,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	public ReplanningAnnealer(Config config) {
 		this.config = config;
 		this.saConfig = ConfigUtils.addOrGetModule(config, ReplanningAnnealerConfigGroup.class);
-		this.currentValues = new EnumMap<>(AnnealParameterOption.class);
+		this.currentValuesPerSubpopulation = new EnumMap<>(AnnealParameterOption.class);
 		this.innovationStop = getInnovationStop(config);
 		this.sep = config.global().getDefaultDelimiter();
 	}
@@ -83,17 +83,19 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		header = new ArrayList<>();
-		for (AnnealingVariable av : this.saConfig.getAnnealingVariables().values()) {
+		for (AnnealingVariable av : this.saConfig.getAllAnnealingVariables()) {
 			if (!av.getAnnealType().equals(AnnealOption.disabled)) {
 				// check and fix initial value if needed
 				checkAndFixStartValue(av, event);
 
-				this.currentValues.put(av.getAnnealParameter(), av.getStartValue());
-				header.add(av.getAnnealParameter().name());
+				var mapPerSubpopulation = this.currentValuesPerSubpopulation.computeIfAbsent(av.getAnnealParameter(),a-> new HashMap<>());
+				mapPerSubpopulation.put(av.getSubpopulation(),av.getStartValue());
+				String subpopulationString = av.getSubpopulation()!=null? "_"+av.getSubpopulation() :"";
+				header.add(av.getAnnealParameter().name()+subpopulationString);
 				if (av.getAnnealParameter().equals(AnnealParameterOption.globalInnovationRate)) {
 					header.addAll(this.config.replanning().getStrategySettings().stream()
-							.filter(s -> Objects.equals(av.getDefaultSubpopulation(), s.getSubpopulation()))
-							.map(ReplanningConfigGroup.StrategySettings::getStrategyName)
+							.filter(s -> Objects.equals(av.getSubpopulation(), s.getSubpopulation()))
+							.map(strategySettings -> strategySettings.getStrategyName()+subpopulationString)
 							.collect(Collectors.toList()));
 				}
 			} else { // if disabled, better remove it
@@ -114,34 +116,35 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.currentIter = event.getIteration() - this.config.controller().getFirstIteration();
 		Map<String, String> annealStats = new HashMap<>();
-		for (AnnealingVariable av : this.saConfig.getAnnealingVariables().values()) {
+		List<AnnealingVariable> allVariables  = this.saConfig.getAllAnnealingVariables();
+		for (AnnealingVariable av : allVariables) {
 			if (this.currentIter > 0) {
 				switch (av.getAnnealType()) {
 					case geometric:
-						this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
+						this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).compute(av.getSubpopulation(), (k, v) ->
 								v * av.getShapeFactor());
 						break;
 					case exponential:
 						int halfLifeIter = av.getHalfLife() <= 1.0 ?
 								(int) (av.getHalfLife() * this.innovationStop) : (int) av.getHalfLife();
-						this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
+						this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).compute(av.getSubpopulation(), (k, v) ->
 								av.getStartValue() / Math.exp((double) this.currentIter / halfLifeIter));
 						break;
 					case msa:
-						this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
+						this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).compute(av.getSubpopulation(), (k, v) ->
 								av.getStartValue() / Math.pow(this.currentIter, av.getShapeFactor()));
 						break;
 					case sigmoid:
 						halfLifeIter = av.getHalfLife() <= 1.0 ?
 								(int) (av.getHalfLife() * this.innovationStop) : (int) av.getHalfLife();
-						this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
+						this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).compute(av.getSubpopulation(), (k, v) ->
 								av.getEndValue() + (av.getStartValue() - av.getEndValue()) /
 										(1 + Math.exp(av.getShapeFactor() * (this.currentIter - halfLifeIter))));
 						break;
 					case linear:
 						double slope = (av.getStartValue() - av.getEndValue())
 								/ (this.config.controller().getFirstIteration() - this.innovationStop);
-						this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
+						this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).compute(av.getSubpopulation(), (k, v) ->
 								this.currentIter * slope + av.getStartValue());
 						break;
 					case disabled:
@@ -150,14 +153,16 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 						throw new IllegalArgumentException();
 				}
 
-				log.info("Annealling will be performed on parameter " + av.getAnnealParameter() +
-						". Value: " + this.currentValues.get(av.getAnnealParameter()));
+				log.info("Annealling will be performed on parameter " + av.getAnnealParameter() +". Subpopulation: "+av.getSubpopulation()+
+						". Value: " +this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).get(av.getSubpopulation()));
 
-				this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
+				this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).compute(av.getSubpopulation(), (k, v) ->
 						Math.max(v, av.getEndValue()));
 			}
-			double annealValue = this.currentValues.get(av.getAnnealParameter());
-			annealStats.put(av.getAnnealParameter().name(), String.format(Locale.US, "%.4f", annealValue));
+			double annealValue = this.currentValuesPerSubpopulation.get(av.getAnnealParameter()).get(av.getSubpopulation());
+			String subpopulationString = av.getSubpopulation()!=null? "_"+av.getSubpopulation() :"";
+
+			annealStats.put(av.getAnnealParameter().name()+subpopulationString, String.format(Locale.US, "%.4f", annealValue));
 			anneal(event, av, annealValue, annealStats);
 		}
 
@@ -178,6 +183,8 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	}
 
 	private void anneal(IterationStartsEvent event, AnnealingVariable av, double annealValue, Map<String, String> annealStats) {
+		String subpopulationString = av.getSubpopulation()!=null? "_"+av.getSubpopulation() :"";
+
 		switch (av.getAnnealParameter()) {
 			case BrainExpBeta:
 				this.config.scoring().setBrainExpBeta(annealValue);
@@ -193,16 +200,17 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 					annealValue = 0.0;
 				}
 				List<Double> annealValues = annealReplanning(annealValue,
-						event.getServices().getStrategyManager(), av.getDefaultSubpopulation());
+						event.getServices().getStrategyManager(), av.getSubpopulation());
 				int i = 0;
 				for (ReplanningConfigGroup.StrategySettings ss : this.config.replanning().getStrategySettings()) {
-					if (Objects.equals(ss.getSubpopulation(), av.getDefaultSubpopulation())) {
-						annealStats.put(ss.getStrategyName(), String.format(Locale.US, "%.4f", annealValues.get(i)));
+					if (Objects.equals(ss.getSubpopulation(), av.getSubpopulation())) {
+						annealStats.put(ss.getStrategyName()+subpopulationString, String.format(Locale.US, "%.4f", annealValues.get(i)));
 						i++;
 					}
 				}
-				annealStats.put(av.getAnnealParameter().name(), String.format(Locale.US, "%.4f", // update value in case of switchoff
-						getStrategyWeights(event.getServices().getStrategyManager(), av.getDefaultSubpopulation(), StratType.allInnovation)));
+
+				annealStats.put(av.getAnnealParameter().name()+subpopulationString, String.format(Locale.US, "%.4f", // update value in case of switchoff
+						getStrategyWeights(event.getServices().getStrategyManager(), av.getSubpopulation(), StratType.allInnovation)));
 				break;
 			default:
 				throw new IllegalArgumentException();
@@ -328,14 +336,14 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 				configValue = this.config.scoring().getLearningRate();
 				break;
 			case globalInnovationRate:
-				double innovationWeights = getStrategyWeights(this.config, av.getDefaultSubpopulation(), StratType.allInnovation);
-				double selectorWeights = getStrategyWeights(this.config, av.getDefaultSubpopulation(), StratType.allSelectors);
+				double innovationWeights = getStrategyWeights(this.config, av.getSubpopulation(), StratType.allInnovation);
+				double selectorWeights = getStrategyWeights(this.config, av.getSubpopulation(), StratType.allSelectors);
 				if (innovationWeights + selectorWeights != 1.0) {
 					log.warn("Initial sum of strategy weights different from 1.0. Rescaling.");
 					double innovationStartValue = av.getStartValue() == null ? innovationWeights : av.getStartValue();
-					rescaleStartupWeights(innovationStartValue, this.config, event.getServices().getStrategyManager(), av.getDefaultSubpopulation());
+					rescaleStartupWeights(innovationStartValue, this.config, event.getServices().getStrategyManager(), av.getSubpopulation());
 				}
-				configValue = getStrategyWeights(this.config, av.getDefaultSubpopulation(), StratType.allInnovation);
+				configValue = getStrategyWeights(this.config, av.getSubpopulation(), StratType.allInnovation);
 				break;
 			default:
 				throw new IllegalArgumentException();
