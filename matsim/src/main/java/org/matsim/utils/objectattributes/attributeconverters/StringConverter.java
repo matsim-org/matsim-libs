@@ -31,14 +31,10 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  */
 public class StringConverter implements AttributeConverter<String> {
 	private final Map<String, String> stringCache = new ConcurrentHashMap<>(1000);
+
 	@Override
 	public String convert(String value) {
-		String s = this.stringCache.get(value);
-		if (s == null) {
-			s = value;
-			this.stringCache.put(s, s);
-		}
-		return s;
+		return stringCache.computeIfAbsent(value, k -> k);
 	}
 
 	@Override
