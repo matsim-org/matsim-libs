@@ -2,8 +2,6 @@ package org.matsim.contribs.discrete_mode_choice.components.utils;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.pt.routes.TransitPassengerRoute;
 
@@ -19,16 +17,6 @@ public interface PTWaitingTimeEstimator {
 
 	double estimateWaitingTime(double departureTime, TransitPassengerRoute route);
 
-	default double estimateWaitingTime(List<? extends PlanElement> elements) {
-		double totalWaitingTime = 0.0;
+	double estimateWaitingTime(List<? extends PlanElement> elements);
 
-		for (PlanElement element : elements) {
-			if (element instanceof Leg leg && leg.getMode().equals(TransportMode.pt)) {
-				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
-				totalWaitingTime += this.estimateWaitingTime(leg.getDepartureTime().seconds(), route);
-			}
-		}
-
-		return totalWaitingTime;
-	}
 }
