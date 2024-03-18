@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -58,8 +61,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Double.NaN;
 	private final Set<String> ptModes;
-
-	private Set<String> modesAlreadyConsideredForDailyConstants;
+	private final Set<String> modesAlreadyConsideredForDailyConstants;
+	private final DoubleList legScores;
 
 	private final double marginalUtilityOfMoney;
 
@@ -67,7 +70,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		this.params = params;
 		this.network = network;
 		this.ptModes = ptModes;
-		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.legScores = new DoubleArrayList();
 		this.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney;
 	}
 
@@ -78,7 +82,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		this.params = params;
 		this.network = network;
 		this.ptModes = ptModes;
-		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.legScores = new DoubleArrayList();
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 	}
 
@@ -101,7 +106,14 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void explainScore(StringBuilder out) {
-		out.append("leg_util=").append(score);
+		out.append("legs_util=").append(score);
+
+		// Store for each leg
+		if (!legScores.isEmpty()) {
+			for (int i = 0; i < legScores.size(); i++) {
+				out.append(ScoringFunction.SCORE_DELIMITER).append(" legs_").append(i).append("_util=").append(legScores.getDouble(i));
+			}
+		}
 	}
 
 	private static int ccc=0 ;
@@ -203,5 +215,6 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 			throw new RuntimeException("score is NaN") ;
 		}
 		this.score += legScore;
+		this.legScores.add(legScore);
 	}
 }
