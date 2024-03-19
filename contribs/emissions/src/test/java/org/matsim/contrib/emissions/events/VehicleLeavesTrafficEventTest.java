@@ -19,7 +19,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.net.URL;
 
@@ -81,8 +81,8 @@ public class VehicleLeavesTrafficEventTest {
 			throw new RuntimeException(e) ;
         }
 		final String expected = utils.getClassInputDirectory() + emissionEventsFileName;
-		EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, resultingEvents);
-        Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+		ComparisonResult result = EventsUtils.compareEventsFiles(expected, resultingEvents);
+        Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result);
     }
 
 }

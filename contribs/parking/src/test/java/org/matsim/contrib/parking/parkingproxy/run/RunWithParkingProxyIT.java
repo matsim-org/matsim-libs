@@ -30,7 +30,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class RunWithParkingProxyIT {
         private static final Logger log = LogManager.getLogger(RunWithParkingProxyIT.class);
@@ -50,8 +50,8 @@ public class RunWithParkingProxyIT {
                 {
                         String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
                         String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-                        Result result = EventsUtils.compareEventsFiles( expected, actual );
-                        if(!result.equals(Result.FILES_ARE_EQUAL)) {
+                        ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+                        if(!result.equals(ComparisonResult.FILES_ARE_EQUAL)) {
                         	throw new RuntimeException("Events comparison ended with result " + result.name());
                         }
                 }

@@ -47,7 +47,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -74,7 +74,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		this.pushing2Geoserver = pushing2Geoserver;
 		this.createQGisOutput = createQGisOutput;
 	}
-	
+
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
@@ -95,16 +95,16 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		SimpleFeatureTypeBuilder featureTypeBuilder = createFeatureTypeBuilder();
 		SimpleFeatureType featureType = featureTypeBuilder.buildFeatureType();
 		DefaultFeatureCollection featureCollection = createFeatureCollection(geometryFactory, featureType);
-		
+
 		if (outputDirectory != null) {
 			File file = new File(outputDirectory);
 			file.mkdirs();
 		}
-		
+
 		if (createQGisOutput) {
-			ShapeFileWriter.writeGeometries(featureCollection, outputDirectory + "/result.shp");
+			GeoFileWriter.writeGeometries(featureCollection, outputDirectory + "/result.shp");
 		}
-	    
+
 		if (pushing2Geoserver) {
 			updateOnGeoserver(featureType, featureCollection);
 		}
@@ -130,7 +130,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		LOG.info("Start creating features from accessibility data.");
 		DefaultFeatureCollection featureCollection = new DefaultFeatureCollection("internal", featureType);
 		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
-		
+
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(this.crs, TransformationFactory.WGS84);
 
 		for (Entry<Tuple<ActivityFacility, Double>, Map<String, Double>> entry : accessibilitiesMap.entrySet()) {
@@ -145,10 +145,10 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 				i++;
 			}
 			featureBuilder.add(geometryFactory.createPolygon(transformedCoordinates));
-			
+
 			featureBuilder.add(Integer.parseInt(entry.getKey().getFirst().getId().toString()));
 			featureBuilder.add(entry.getKey().getSecond());
-			
+
 			for (Modes4Accessibility modeEnum : Modes4Accessibility.values()) {
 				String mode = modeEnum.toString();
 				Double accessibility = entry.getValue().get(mode);
@@ -188,14 +188,14 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			// There have been errors with the data store if the dependency "gt-jdbc-postgis", version 13.0 was missing!
 			DataStore dataStore = DataStoreFinder.getDataStore(params);
 			LOG.info("dataStore = " + dataStore);
-			
+
 			// Remove schema in case it already exists
 			try {
 				dataStore.removeSchema(name);
 			} catch (IllegalArgumentException e) {
 				LOG.warn("Could not remove schema. Probably, it has not existed yet.");
 			}
-			
+
 			dataStore.createSchema(featureType);
 			SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource(name);
 			featureStore.addFeatures(featureCollection);

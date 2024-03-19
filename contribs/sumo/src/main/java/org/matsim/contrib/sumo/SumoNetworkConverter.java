@@ -18,7 +18,7 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.*;
 import org.xml.sax.SAXException;
@@ -121,7 +121,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
      */
     private static Geometry calculateNetworkArea(Path shapeFile) {
         // only the first feature is used
-        return ((Geometry) ShapeFileReader.getAllFeatures(shapeFile.toString()).iterator().next().getDefaultGeometry());
+        return ((Geometry) GeoFileReader.getAllFeatures(shapeFile.toString()).iterator().next().getDefaultGeometry());
     }
 
     /**
@@ -155,10 +155,28 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
         writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv"));
 
+		writeFeatures(handler, output.toAbsolutePath().toString().replace(".xml", "-ft.csv"));
+
         return 0;
     }
 
-    /**
+	/**
+	 * Write csv with link properties.
+	 */
+	public void writeFeatures(SumoNetworkHandler handler, String output) {
+
+		SumoNetworkFeatureExtractor props = new SumoNetworkFeatureExtractor(handler);
+
+		try (CSVPrinter out = new CSVPrinter(IOUtils.getBufferedWriter(output), CSVFormat.DEFAULT)) {
+			out.printRecord(props.getHeader());
+			props.print(out);
+
+		} catch (IOException e) {
+			log.warn("Could not write property file.", e);
+		}
+	}
+
+	/**
      * Calculates lane capacities, according to {@link LanesUtils}.
      */
     public void calculateLaneCapacities(Network network, Lanes lanes) {

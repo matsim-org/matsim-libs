@@ -40,7 +40,7 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -136,8 +136,8 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		// compare events
 		String expected = utils.getPackageInputDirectory() + "test.output_events.xml.gz";
 		String actual = utils.getOutputDirectory() + "test.output_events.xml.gz" ;
-		EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+		ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
 	}
 
 	/**

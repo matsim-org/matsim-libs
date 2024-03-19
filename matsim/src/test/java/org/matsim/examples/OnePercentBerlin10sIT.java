@@ -41,6 +41,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class OnePercentBerlin10sIT {
 
@@ -92,7 +93,7 @@ public class OnePercentBerlin10sIT {
 		writer.closeFile();
 
 		System.out.println("reffile: " + referenceEventsFileName);
-		assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL,
+		assertEquals( ComparisonResult.FILES_ARE_EQUAL,
 				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ),
 				"different event files" );
 
@@ -137,7 +138,7 @@ public class OnePercentBerlin10sIT {
 
 		writer.closeFile();
 
-		assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL,
+		assertEquals( ComparisonResult.FILES_ARE_EQUAL,
 				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ),
 				"different event files" );
 

@@ -26,7 +26,7 @@ import java.util.Map;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 public class ZoneShpReader {
@@ -41,7 +41,7 @@ public class ZoneShpReader {
 	}
 
 	public void readZones(URL url, String idHeader) {
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(url);
+		Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(url);
 		if (features.size() != zones.size()) {
 			throw new RuntimeException("Features#: " + features.size() + "; zones#: " + zones.size());
 		}
