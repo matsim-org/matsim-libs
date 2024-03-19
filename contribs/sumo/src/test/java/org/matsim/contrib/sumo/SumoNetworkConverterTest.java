@@ -25,37 +25,41 @@ public class SumoNetworkConverterTest {
 	@Test
 	void convert() throws Exception {
 
-        Path input = Files.createTempFile("sumo", ".xml");
-        Path output = Files.createTempFile("matsim", ".xml");
+		Path input = Files.createTempFile("sumo", ".xml");
+		Path output = Files.createTempFile("matsim", ".xml");
 
-        Files.copy(Resources.getResource("osm.net.xml").openStream(), input, StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(Resources.getResource("osm.net.xml").openStream(), input, StandardCopyOption.REPLACE_EXISTING);
 
-        SumoNetworkConverter converter = SumoNetworkConverter.newInstance(List.of(input), output, "EPSG:4326", "EPSG:4326");
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(List.of(input), output, "EPSG:4326", "EPSG:4326");
 
-        converter.call();
+		converter.call();
 
-        Network network = NetworkUtils.readNetwork(output.toString());
+		Network network = NetworkUtils.readNetwork(output.toString());
 
-        assert network.getNodes().size() == 21 : "Must contain 21 nodes";
-        assert network.getNodes().containsKey(Id.createNodeId("251106770")) : "Must contain specific id";
+		assert network.getNodes().size() == 21 : "Must contain 21 nodes";
+		assert network.getNodes().containsKey(Id.createNodeId("251106770")) : "Must contain specific id";
 
-        Path lanes = Path.of(output.toString().replace(".xml", "-lanes.xml"));
+		Path lanes = Path.of(output.toString().replace(".xml", "-lanes.xml"));
 
-        Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
 
-        LanesReader reader = new LanesReader(scenario);
-        reader.readFile(lanes.toString());
+		LanesReader reader = new LanesReader(scenario);
+		reader.readFile(lanes.toString());
 
-        SortedMap<Id<Link>, LanesToLinkAssignment> l2l = scenario.getLanes().getLanesToLinkAssignments();
+		SortedMap<Id<Link>, LanesToLinkAssignment> l2l = scenario.getLanes().getLanesToLinkAssignments();
 
-        System.out.println(l2l);
+		System.out.println(l2l);
 
-        assert l2l.containsKey(Id.createLinkId("-160346478#3")) : "Must contain link id";
+		assert l2l.containsKey(Id.createLinkId("-160346478#3")) : "Must contain link id";
 
-        Path geometry = Path.of(output.toString().replace(".xml", "-linkGeometries.csv"));
+		Path geometry = Path.of(output.toString().replace(".xml", "-linkGeometries.csv"));
 
-        assert Files.exists(geometry) : "Geometries must exist";
+		assert Files.exists(geometry) : "Geometries must exist";
 
-    }
+		Path fts = Path.of(output.toString().replace(".xml", "-ft.csv"));
+
+		assert Files.exists(fts) : "Features must exists";
+
+	}
 }

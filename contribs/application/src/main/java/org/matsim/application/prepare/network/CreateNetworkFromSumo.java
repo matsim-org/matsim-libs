@@ -120,6 +120,8 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 
 		converter.writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv").replace(".gz", ""));
 
+		converter.writeFeatures(handler, output.toAbsolutePath().toString().replace(".xml", "-ft.csv"));
+
 		return 0;
 	}
 
