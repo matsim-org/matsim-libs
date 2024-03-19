@@ -71,7 +71,7 @@ public class DrtZonalSystemTest {
 
 		//link 'da' is outside of the service area
 		Id<Link> id = Id.createLinkId("da");
-		Assertions.assertThat(zonalSystem.getZoneForLinkId(id) == null).isTrue();
+		Assertions.assertThat(zonalSystem.getZoneForLinkId(id)).isNull();
 	}
 
 	@Test
