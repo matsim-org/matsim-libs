@@ -227,9 +227,8 @@ public class LanduseBuildingAnalysis {
 
 		List<SimpleFeature> landuseFeatures = indexLanduse.getAllFeatures();
 		List<SimpleFeature> zonesFeatures = indexZones.getAllFeatures();
-
 		for (SimpleFeature singleZone : zonesFeatures) {
-			// TODO comment
+			// get the region of the zone
 			Coord middleCoordOfZone = MGC.point2Coord(((Geometry) singleZone.getDefaultGeometry()).getCentroid());
 			String regionName = indexInvestigationAreaRegions.query(middleCoordOfZone);
 			if (regionName != null) {
