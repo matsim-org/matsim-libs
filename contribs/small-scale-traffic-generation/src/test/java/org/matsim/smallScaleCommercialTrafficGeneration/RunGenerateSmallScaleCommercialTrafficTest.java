@@ -72,7 +72,9 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String zoneShapeFileNameColumn = "name";
 		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
+		String shapeFileBuildingTypeColumn = "type";
 		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
+		String shapeFileLanduseTypeColumn = "fclass";
 		String shapeCRS = "EPSG:4326";
 		String resultPopulation = "testPopulation.xml.gz";
 
@@ -89,7 +91,9 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 				"--zoneShapeFileName", zoneShapeFileName,
 				"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
 				"--buildingsShapeFileName", buildingsShapeFileName,
+				"--shapeFileBuildingTypeColumn", shapeFileBuildingTypeColumn,
 				"--landuseShapeFileName", landuseShapeFileName,
+				"--shapeFileLanduseTypeColumn", shapeFileLanduseTypeColumn,
 				"--shapeCRS", shapeCRS,
 				"--nameOutputPopulation", resultPopulation,
 				"--pathOutput", output);
