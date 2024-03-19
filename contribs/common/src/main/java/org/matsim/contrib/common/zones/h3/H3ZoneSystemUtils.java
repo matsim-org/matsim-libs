@@ -32,10 +32,8 @@ public class H3ZoneSystemUtils {
 	static final Logger log = LogManager.getLogger(H3ZoneSystemUtils.class);
 
 
-	public static ZoneSystem createFromPreparedGeometries(Network network,
-														  Map<String, PreparedGeometry> geometries,
-														  String crs,
-														  int resolution) {
+	public static ZoneSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries,
+														  String crs, int resolution) {
 
 		//geometries without links are skipped
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(crs, TransformationFactory.WGS84);

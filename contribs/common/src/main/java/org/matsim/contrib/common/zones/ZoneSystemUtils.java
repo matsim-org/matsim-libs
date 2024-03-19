@@ -21,8 +21,7 @@ public final class ZoneSystemUtils {
 
 	private ZoneSystemUtils() {}
 
-	public static ZoneSystem createFromPreparedGeometries(Network network,
-														  Map<String, PreparedGeometry> geometries) {
+	public static ZoneSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries) {
 
 		//geometries without links are skipped
 		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
