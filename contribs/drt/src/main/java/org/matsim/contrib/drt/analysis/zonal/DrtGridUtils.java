@@ -82,8 +82,7 @@ public class DrtGridUtils {
 	 * @param serviceAreaGeoms geometries that define the service area
 	 * @return
 	 */
-	public static Map<String, PreparedGeometry> filterGridWithinServiceArea(Map<String, PreparedGeometry> grid,
-																			List<PreparedGeometry> serviceAreaGeoms) {
+	public static Map<String, PreparedGeometry> filterGridWithinServiceArea(Map<String, PreparedGeometry> grid, List<PreparedGeometry> serviceAreaGeoms) {
 		log.info("total number of initial grid zones = " + grid.size());
 		log.info("searching for grid zones within the drt service area...");
 		Counter counter = new Counter("dealt with zone ");
