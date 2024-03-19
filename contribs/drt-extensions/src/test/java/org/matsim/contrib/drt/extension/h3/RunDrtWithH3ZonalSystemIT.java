@@ -4,12 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
-import org.matsim.contrib.drt.extension.h3.drtZone.H3ModeZonalSystemModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -46,16 +45,17 @@ public class RunDrtWithH3ZonalSystemIT {
 
 		MultiModeDrtConfigGroup drtConfigs = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		for (DrtConfigGroup drtConfig : drtConfigs.getModalElements()) {
+			drtConfig.getZonalSystemParams().get().h3Resolution = 9;
+			drtConfig.getZonalSystemParams().get().zonesGeneration = DrtZonalSystemParams.ZoneGeneration.H3;
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					install(new H3ModeZonalSystemModule(drtConfig, config.global().getCoordinateSystem(), 9));
 					install(new AbstractDvrpModeModule(drtConfig.mode) {
 						@Override
 						public void install() {
 							bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
 								getter -> new DrtZonalWaitTimesAnalyzer(drtConfig, getter.getModal(DrtEventSequenceCollector.class),
-									getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+									getter.getModal(ZoneSystem.class)))).asEagerSingleton();
 							addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 						}
 					});

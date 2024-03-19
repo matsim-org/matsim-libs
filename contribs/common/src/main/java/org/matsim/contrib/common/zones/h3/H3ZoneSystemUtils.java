@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.h3.drtZone;
+package org.matsim.contrib.common.zones.h3;
 
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.LatLng;
@@ -7,10 +7,13 @@ import one.util.streamex.StreamEx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -24,15 +27,15 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author nkuehnel / MOIA
  */
-public final class H3ZonalSystem {
+public class H3ZoneSystemUtils {
 
-	static final Logger log = LogManager.getLogger(H3ZonalSystem.class);
+	static final Logger log = LogManager.getLogger(H3ZoneSystemUtils.class);
 
 
-	public static DrtZonalSystem createFromPreparedGeometries(Network network,
-															  Map<String, PreparedGeometry> geometries,
-															  String crs,
-															  int resolution) {
+	public static ZoneSystem createFromPreparedGeometries(Network network,
+														  Map<String, PreparedGeometry> geometries,
+														  String crs,
+														  int resolution) {
 
 		//geometries without links are skipped
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(crs, TransformationFactory.WGS84);
@@ -45,11 +48,12 @@ public final class H3ZonalSystem {
 			+ network.getLinks().size() + " links and " + network.getNodes().size() + " nodes.");
 
 		//the zonal system contains only zones that have at least one link
-		List<DrtZone> zones = EntryStream.of(linksByGeometryId)
-			.mapKeyValue((id, links) -> new DrtZone(id, geometries.get(id), links))
+		List<Zone> zones = EntryStream.of(linksByGeometryId)
+			.mapKeyValue((id, links) -> new ZoneImpl(Id.create(id, Zone.class), geometries.get(id), links) {
+			})
 			.collect(toList());
 
-		return new DrtZonalSystem(zones);
+		return new ZoneSystemImpl(zones);
 	}
 
 	/**

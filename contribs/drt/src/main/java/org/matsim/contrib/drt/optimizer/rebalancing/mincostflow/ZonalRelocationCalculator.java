@@ -18,13 +18,13 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import java.util.List;
-import java.util.Map;
-
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author michalm
@@ -36,5 +36,5 @@ public interface ZonalRelocationCalculator {
 	 * @return vehicle relocations
 	 */
 	List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
+			Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }

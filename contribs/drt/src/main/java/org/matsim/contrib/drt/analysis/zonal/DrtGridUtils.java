@@ -22,10 +22,7 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import one.util.streamex.EntryStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
@@ -37,7 +34,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import one.util.streamex.EntryStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author jbischoff

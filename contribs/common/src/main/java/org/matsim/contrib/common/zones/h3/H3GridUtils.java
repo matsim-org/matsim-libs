@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.h3.drtZone;
+package org.matsim.contrib.common.zones.h3;
 
 import com.uber.h3core.AreaUnit;
 import com.uber.h3core.H3Core;
@@ -13,7 +13,6 @@ import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;

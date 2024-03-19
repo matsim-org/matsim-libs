@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.h3.drtZone;
+package org.matsim.contrib.common.zones.h3;
 
 import com.uber.h3core.H3Core;
 
@@ -11,7 +11,7 @@ public final class H3Utils {
 
 	private static H3Core h3;
 
-	public final static int MAX_RES = 15;
+	public final static int MAX_RES = 16;
 
 
 	public static H3Core getInstance() {
