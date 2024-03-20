@@ -55,7 +55,7 @@ final class RailsimEngine implements Steppable {
 	 * Additional safety distance in meter that is added to the reservation distance.
 	 * Ensure that trains always have enough distance to progress.
 	 */
-	private static double SAFETY_DIST = 10;
+	private static final double SAFETY_DIST = 10;
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
@@ -193,7 +193,7 @@ final class RailsimEngine implements Steppable {
 		updatePosition(time, event);
 
 		if (!blockLinkTracks(time, state)) {
-
+			// train needs to stop
 			decideTargetSpeed(event, state);
 
 			event.checkReservation = time + config.pollInterval;
@@ -388,7 +388,7 @@ final class RailsimEngine implements Steppable {
 			return;
 		}
 
-		// Train stopped and reserves next links
+		// Train stopped exactly at the end of the link and tries to enter the next link
 		if (FuzzyUtils.equals(state.speed, 0) && !blockLinkTracks(time, state)) {
 
 			RailLink currentLink = state.route.get(state.routeIdx);
@@ -766,6 +766,7 @@ final class RailsimEngine implements Steppable {
 
 		double maxSpeed = resources.getLink(state.headLink).getAllowedFreespeed(state.driver);
 
+		// get minium allowed speed on all links occupied by the train
 		for (int i = state.routeIdx - 1; i >= 0; i--) {
 			RailLink link = state.route.get(i);
 			maxSpeed = Math.min(maxSpeed, link.getAllowedFreespeed(state.driver));
@@ -780,7 +781,7 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Remove all trains from simulation and generate events at the end of the day.
 	 *
-	 * @param now end of day time
+	 * @param now end of daytime
 	 */
 	void clearTrains(double now) {
 

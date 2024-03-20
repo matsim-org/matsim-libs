@@ -55,6 +55,9 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		this.unblockLink = null;
 	}
 
+	/**
+	 * Update event to unblock a link after minimum headway time.
+	 */
 	UpdateEvent(TrainState state, RailLink unblockLink, double time) {
 		this.state = state;
 		this.unblockLink = unblockLink;
