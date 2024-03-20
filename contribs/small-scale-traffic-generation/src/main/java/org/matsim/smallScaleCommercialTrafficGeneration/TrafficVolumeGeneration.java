@@ -221,7 +221,7 @@ public class TrafficVolumeGeneration {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 				StandardCharsets.UTF_8, true);
 		try {
-			String[] header = new String[] { "areaID", "mode/vehType", "1", "2", "3", "4", "5" };
+			String[] header = new String[] { "zoneID", "mode/vehType", "1", "2", "3", "4", "5" };
 			JOIN.appendTo(writer, header);
 			writer.write("\n");
 			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
@@ -267,13 +267,13 @@ public class TrafficVolumeGeneration {
 	 * Reduces the traffic volumes based on the added existing models.
 	 *
 	 * @param scenario scenario
-	 * @param regionLinksMap links for each zone
+	 * @param linksPerZone links for each zone
 	 * @param smallScaleCommercialTrafficType used trafficType (commercialPersonTraffic or goodsTraffic)
 	 * @param trafficVolumePerTypeAndZone_start trafficVolume for start potentials for each zone
 	 * @param trafficVolumePerTypeAndZone_stop trafficVolume for stop potentials for each zone
 	 */
 	static void reduceDemandBasedOnExistingCarriers(Scenario scenario,
-			Map<String, Map<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+			Map<String, Map<Id<Link>, Link>> linksPerZone, String smallScaleCommercialTrafficType,
 			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 
@@ -290,11 +290,11 @@ public class TrafficVolumeGeneration {
 			if (carrier.getSelectedPlan() != null) {
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 					String startZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(tour.getTour().getStartLinkId(),
-							regionLinksMap);
+							linksPerZone);
 					for (TourElement tourElement : tour.getTour().getTourElements()) {
 						if (tourElement instanceof ServiceActivity service) {
 							String stopZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(service.getLocation(),
-									regionLinksMap);
+									linksPerZone);
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 										trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -306,9 +306,9 @@ public class TrafficVolumeGeneration {
 						}
 						if (tourElement instanceof Pickup pickup) {
 							startZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(pickup.getShipment().getFrom(),
-									regionLinksMap);
+									linksPerZone);
 							String stopZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(pickup.getShipment().getTo(),
-									regionLinksMap);
+									linksPerZone);
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 										trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -325,13 +325,13 @@ public class TrafficVolumeGeneration {
 					List<String> possibleStartAreas = new ArrayList<>();
 					for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 						possibleStartAreas
-								.add(SmallScaleCommercialTrafficUtils.findZoneOfLink(vehicle.getLinkId(), regionLinksMap));
+								.add(SmallScaleCommercialTrafficUtils.findZoneOfLink(vehicle.getLinkId(), linksPerZone));
 					}
 					for (CarrierService service : carrier.getServices().values()) {
 						String startZone = (String) possibleStartAreas.toArray()[MatsimRandom.getRandom()
 								.nextInt(possibleStartAreas.size())];
 						String stopZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(service.getLocationLinkId(),
-								regionLinksMap);
+								linksPerZone);
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -344,9 +344,9 @@ public class TrafficVolumeGeneration {
 				} else if (!carrier.getShipments().isEmpty()) {
 					for (CarrierShipment shipment : carrier.getShipments().values()) {
 						String startZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(shipment.getFrom(),
-								regionLinksMap);
+								linksPerZone);
 						String stopZone = SmallScaleCommercialTrafficUtils.findZoneOfLink(shipment.getTo(),
-								regionLinksMap);
+								linksPerZone);
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
