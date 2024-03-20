@@ -186,7 +186,8 @@ public class InsertionGenerator {
 					// task here on the same link (maybe a pickup followed by its dropoff) but much
 					// earlier. In that case it is actually a valid insertion.
 
-					if (drtRequest.getEarliestStartTime() < nextStop.getArrivalTime()) {
+					boolean viableSameLink = vEntry.getPrecedingStayTime(i) > 0.0;
+					if (viableSameLink && drtRequest.getEarliestStartTime() < nextStop.getArrivalTime()) {
 						// the new request wants to depart before the start of the next stop, which may
 						// be a viable insertion. Note that if the requested wanted to depart after the
 						// start of the next stop, but before its end, this is a special case that is
@@ -235,6 +236,16 @@ public class InsertionGenerator {
 				addInsertion(insertions,
 						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 								j));
+			} else {
+				// special case: inserting dropoff before prebooked task on the same link
+				// see the reasoning in generateInsertions
+				
+				boolean viableSameLink = vEntry.getPrecedingStayTime(j) > 0.0;
+				if (viableSameLink && earliestPickupStartTime + fromPickupTT < nextStop(vEntry, j).getArrivalTime()) {
+					addInsertion(insertions,
+							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+									j));
+				}
 			}
 		}
 
@@ -274,6 +285,16 @@ public class InsertionGenerator {
 				addInsertion(insertions,
 						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 								j));
+			} else {
+				// special case: inserting dropoff before prebooked task on the same link
+				// see the reasoning in generateInsertions
+				
+				boolean viableSameLink = vEntry.getPrecedingStayTime(j) > 0.0;
+				if (viableSameLink && earliestPickupStartTime + fromPickupTT < nextStop(vEntry, j).getArrivalTime()) {
+					addInsertion(insertions,
+							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+									j));
+				}
 			}
 		}
 

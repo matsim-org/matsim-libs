@@ -25,6 +25,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
@@ -65,6 +66,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
 				drtCfg.changeStartLinkToLastLinkInSchedule));
+		install(new DrtModeZonalSystemModule(drtCfg));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
 

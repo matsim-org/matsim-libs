@@ -39,7 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.facilities.*;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -225,7 +225,7 @@ public class AccessibilityUtils {
 
 
 	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
-		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		GeoFileReader shapeFileReader = new GeoFileReader();
 		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(shapeFileName);
 
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("DensitiyFacilities");

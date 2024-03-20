@@ -39,6 +39,7 @@ public class DrtRequest implements PassengerRequest {
 	private final double earliestStartTime;
 	private final double latestStartTime;
 	private final double latestArrivalTime;
+	private final double maxRideDuration;
 
 	private final List<Id<Person>> passengerIds = new ArrayList<>();
 	private final String mode;
@@ -52,6 +53,7 @@ public class DrtRequest implements PassengerRequest {
 		earliestStartTime = builder.earliestStartTime;
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
+		maxRideDuration = builder.maxRideDuration;
 		passengerIds.addAll(builder.passengerIds);
 		mode = builder.mode;
 		fromLink = builder.fromLink;
@@ -69,6 +71,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.earliestStartTime = copy.getEarliestStartTime();
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
+		builder.maxRideDuration = copy.getMaxRideDuration();
 		builder.passengerIds = new ArrayList<>(copy.getPassengerIds());
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
@@ -98,6 +101,10 @@ public class DrtRequest implements PassengerRequest {
 
 	public double getLatestArrivalTime() {
 		return latestArrivalTime;
+	}
+
+	public double getMaxRideDuration() {
+		return maxRideDuration;
 	}
 
 	@Override
@@ -133,6 +140,7 @@ public class DrtRequest implements PassengerRequest {
 				.add("earliestStartTime", earliestStartTime)
 				.add("latestStartTime", latestStartTime)
 				.add("latestArrivalTime", latestArrivalTime)
+				.add("maxRideDuration", maxRideDuration)
 				.add("passengerIds", passengerIds.stream().map(Object::toString).collect(Collectors.joining(",")))
 				.add("mode", mode)
 				.add("fromLink", fromLink)
@@ -146,6 +154,7 @@ public class DrtRequest implements PassengerRequest {
 		private double earliestStartTime;
 		private double latestStartTime;
 		private double latestArrivalTime;
+		private double maxRideDuration;
 		private List<Id<Person>> passengerIds = new ArrayList<>();
 		private String mode;
 		private Link fromLink;
@@ -176,6 +185,11 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder latestArrivalTime(double val) {
 			latestArrivalTime = val;
+			return this;
+		}
+
+		public Builder maxRideDuration(double maxRideDuration) {
+			this.maxRideDuration = maxRideDuration;
 			return this;
 		}
 

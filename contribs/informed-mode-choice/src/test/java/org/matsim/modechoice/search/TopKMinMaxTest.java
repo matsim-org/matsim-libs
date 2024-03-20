@@ -209,7 +209,7 @@ public class TopKMinMaxTest {
 					FacilitiesUtils.createActivityFacilities(),
 					TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes)));
 
-			MapBinder<String, ModeOptions<?>> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
+			MapBinder<String, ModeOptions> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
 			optionBinder.addBinding(TransportMode.car).toInstance(new ModeOptions.AlwaysAvailable());
 			optionBinder.addBinding(TransportMode.walk).toInstance(new ModeOptions.AlwaysAvailable());
 
@@ -217,20 +217,20 @@ public class TopKMinMaxTest {
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
 
-			MapBinder<String, FixedCostsEstimator<?>> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, FixedCostsEstimator> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			fcBinder.addBinding(TransportMode.car).toInstance((context, mode, option) -> -1);
 
-			MapBinder<String, LegEstimator<?>> legBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, LegEstimator> legBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			legBinder.addBinding(TransportMode.walk).toInstance((context, mode, leg, option) -> -0.5);
 
 
-			MapBinder<String, TripEstimator<?>> tripBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, TripEstimator> tripBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
@@ -251,7 +251,7 @@ public class TopKMinMaxTest {
 	}
 
 	// Provides fixed estimates for testing
-	private class CarTripEstimator implements TripEstimator<ModeAvailability> {
+	private class CarTripEstimator implements TripEstimator {
 
 		@Override
 		public MinMaxEstimate estimate(EstimatorContext context, String mode, PlanModel plan, List<Leg> trip, ModeAvailability option) {

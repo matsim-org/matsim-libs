@@ -29,7 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -52,7 +52,7 @@ public class MatricesToXY {
         String xyCsvOutputFilename = args[3]; // path to the csv-file to be written, e.g. /path/to/skim-data.csv
 
         log.info("loading zones from " + zonesShapeFilename);
-        Collection<SimpleFeature> zones = new ShapeFileReader().readFileAndInitialize(zonesShapeFilename);
+        Collection<SimpleFeature> zones = new GeoFileReader().readFileAndInitialize(zonesShapeFilename);
         Map<String, SimpleFeature> zonesById = new HashMap<>();
         for (SimpleFeature zone : zones) {
             String zoneId = zone.getAttribute(zonesIdAttributeName).toString();

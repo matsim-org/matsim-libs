@@ -52,10 +52,11 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
+		double maxRideDuration = drtRoute.getMaxRideTime();
 
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
-						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime));
+						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration));
 
 		DrtRequest request = DrtRequest.newBuilder()
 				.id(id)
@@ -66,6 +67,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.earliestStartTime(departureTime)
 				.latestStartTime(latestDepartureTime)
 				.latestArrivalTime(latestArrivalTime)
+				.maxRideDuration(maxRideDuration)
 				.submissionTime(submissionTime)
 				.build();
 
