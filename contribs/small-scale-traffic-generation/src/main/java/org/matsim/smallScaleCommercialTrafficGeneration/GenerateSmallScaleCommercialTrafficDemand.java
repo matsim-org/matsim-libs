@@ -36,25 +36,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
-import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ProjectionUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.*;
-import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -64,10 +56,17 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.controler.*;
+import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -77,7 +76,6 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -101,6 +99,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	// Option 3: Leerkamp (nur in RVR Modell).
 
+	// Option: Add prepare class with OSM Analyse and create facility file with results
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 
 	private enum CreationOption {
@@ -117,6 +116,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
 	private Path configPath;
+
+	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data")
+	private Path pathToInvestigationAreaData;
+
+	@CommandLine.Option(names = "--pathToExistingDataDistributionToZones", description = "Path to the existing data distribution to zones. This is only needed if the option useExistingDataDistribution is selected.")
+	private Path pathToExistingDataDistributionToZones;
 
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
@@ -136,14 +141,29 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
 	private boolean includeExistingModels;
 
+	@CommandLine.Option(names = "--regionsShapeFileName", description = "Path of the region shape file.")
+	private Path shapeFileRegionsPath;
+
+		@CommandLine.Option(names = "--regionsShapeRegionColumn", description = "Name of the region column in the region shape file.")
+	private String regionsShapeRegionColumn;
+
 	@CommandLine.Option(names = "--zoneShapeFileName", description = "Path of the zone shape file.")
 	private Path shapeFileZonePath;
+
+	@CommandLine.Option(names = "--zoneShapeFileNameColumn", description = "Name of the unique column of the name/Id of each zone in the zones shape file.")
+	private String shapeFileZoneNameColumn;
 
 	@CommandLine.Option(names = "--buildingsShapeFileName", description = "Path of the buildings shape file")
 	private Path shapeFileBuildingsPath;
 
+	@CommandLine.Option(names = "--shapeFileBuildingTypeColumn", description = "Name of the unique column of the building type in the buildings shape file.")
+	private String shapeFileBuildingTypeColumn;
+
 	@CommandLine.Option(names = "--landuseShapeFileName", description = "Path of the landuse shape file")
 	private Path shapeFileLandusePath;
+
+	@CommandLine.Option(names = "--shapeFileLanduseTypeColumn", description = "Name of the unique column of the landuse type in the landuse shape file.")
+	private String shapeFileLanduseTypeColumn;
 
 	@CommandLine.Option(names = "--shapeCRS", description = "CRS of the three input shape files (zones, landuse, buildings")
 	private String shapeCRS;
@@ -170,6 +190,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Index indexZones;
 	private Index indexBuildings;
 	private Index indexLanduse;
+	private Index indexInvestigationAreaRegions;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
@@ -226,29 +247,32 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (!Files.exists(shapeFileZonePath)) {
 					throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 				}
-				Path inputDataDirectory = Path.of(config.getContext().toURI()).getParent();
+				if (!Files.exists(shapeFileRegionsPath)) {
+					throw new Exception("Required regions shape file {} not found" + shapeFileRegionsPath.toString());
+				}
 
-				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS);
-				indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS);
-				indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS);
+				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
+				indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS, shapeFileBuildingTypeColumn);
+				indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS, shapeFileLanduseTypeColumn);
+				indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS, regionsShapeRegionColumn);
 
 				Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
+					.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
-						indexBuildings, buildingsPerZone);
-
-				Map<String, Map<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, indexZones, buildingsPerZone);
+						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData,
+						pathToExistingDataDistributionToZones);
+				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
-						createCarriersAndDemand(output, scenario, resultingDataPerZone, regionLinksMap,
+						createCarriersAndDemand(output, scenario, resultingDataPerZone, linksPerZone,
 							usedSmallScaleCommercialTrafficType.toString(),
 							includeExistingModels);
 					case completeSmallScaleCommercialTraffic -> {
-						createCarriersAndDemand(output, scenario, resultingDataPerZone, regionLinksMap, "commercialPersonTraffic",
+						createCarriersAndDemand(output, scenario, resultingDataPerZone, linksPerZone, "commercialPersonTraffic",
 							includeExistingModels);
 						includeExistingModels = false; // because already included in the step before
-						createCarriersAndDemand(output, scenario, resultingDataPerZone, regionLinksMap, "goodsTraffic",
+						createCarriersAndDemand(output, scenario, resultingDataPerZone, linksPerZone, "goodsTraffic",
 							includeExistingModels);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
@@ -260,7 +284,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
 						.write(scenario.getConfig().controller().getOutputDirectory() + "/"
 							+ scenario.getConfig().controller().getRunId() + ".output_CarrierDemand.xml");
-				solveSeparatedVRPs(scenario, regionLinksMap);
+				solveSeparatedVRPs(scenario, linksPerZone);
 			}
 		}
 		if (config.controller().getRunId() == null)
@@ -424,7 +448,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private void createCarriersAndDemand(Path output, Scenario scenario,
 										 Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-										 Map<String, Map<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+										 Map<String, Map<Id<Link>, Link>> linksPerZone, String smallScaleCommercialTrafficType,
 										 boolean includeExistingModels) throws Exception {
 
 		ArrayList<String> modesORvehTypes;
@@ -444,13 +468,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
-			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
-			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, smallScaleCommercialTrafficType,
+			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, linksPerZone);
+			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
 		final TripDistributionMatrix odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
-			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output, regionLinksMap);
-		createCarriers(scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, regionLinksMap);
+			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output, linksPerZone);
+		createCarriers(scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, linksPerZone);
 	}
 
 	/**
@@ -970,7 +994,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						network, regionLinksMap, resistanceFactor);
+						network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
 				}
 			}
 		}
