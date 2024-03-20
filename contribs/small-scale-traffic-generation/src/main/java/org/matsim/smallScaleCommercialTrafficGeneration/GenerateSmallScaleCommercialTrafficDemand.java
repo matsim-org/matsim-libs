@@ -117,6 +117,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
 	private Path configPath;
 
+	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data")
+	private Path pathToInvestigationAreaData;
+
+	@CommandLine.Option(names = "--pathToExistingDataDistributionToZones", description = "Path to the existing data distribution to zones. This is only needed if the option useExistingDataDistribution is selected.")
+	private Path pathToExistingDataDistributionToZones;
+
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
 
@@ -244,7 +250,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (!Files.exists(shapeFileRegionsPath)) {
 					throw new Exception("Required regions shape file {} not found" + shapeFileRegionsPath.toString());
 				}
-				Path inputDataDirectory = Path.of(config.getContext().toURI()).getParent();
 
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 				indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS, shapeFileBuildingTypeColumn);
@@ -252,9 +257,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS, regionsShapeRegionColumn);
 
 				Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
+					.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
-						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone);
+						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData,
+						pathToExistingDataDistributionToZones);
 				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone);
 
 				switch (usedSmallScaleCommercialTrafficType) {

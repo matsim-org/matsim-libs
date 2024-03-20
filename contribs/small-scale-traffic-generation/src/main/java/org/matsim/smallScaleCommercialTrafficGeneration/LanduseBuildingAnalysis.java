@@ -54,11 +54,14 @@ public class LanduseBuildingAnalysis {
 	 * used OSM data.
 	 */
 	static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
-																			 Map<String, List<String>> landuseCategoriesAndDataConnection, Path inputDataDirectory,
+																			 Map<String, List<String>> landuseCategoriesAndDataConnection,
 																			 String usedLanduseConfiguration, Index indexLanduse, Index indexZones,
 																			 Index indexBuildings, Index indexInvestigationAreaRegions,
-																			 String shapeFileZoneNameColumn, Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone)
-			throws IOException {
+																			 String shapeFileZoneNameColumn,
+																			 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+																			 Path pathToInvestigationAreaData,
+																			 Path pathToExistingDataDistributionToZones)
+		throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
 		Map<String, String> zoneIdRegionConnection = new HashMap<>();
@@ -81,13 +84,12 @@ public class LanduseBuildingAnalysis {
 				Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
 
 		if (usedLanduseConfiguration.equals("useExistingDataDistribution")) {
-			Path existingDataDistribution = inputDataDirectory.resolve("dataDistributionPerZone.csv");
 
-			if (!Files.exists(existingDataDistribution)) {
-				log.error("Required data per zone file {} not found", existingDataDistribution);
+			if (!Files.exists(pathToExistingDataDistributionToZones)) {
+				log.error("Required data per zone file {} not found", pathToExistingDataDistributionToZones);
 			}
 
-			try (BufferedReader reader = IOUtils.getBufferedReader(existingDataDistribution.toString())) {
+			try (BufferedReader reader = IOUtils.getBufferedReader(pathToExistingDataDistributionToZones.toString())) {
 				CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 						.setSkipHeaderRecord(true).build().parse(reader);
 
@@ -101,8 +103,8 @@ public class LanduseBuildingAnalysis {
 				}
 			}
 			log.info("Data distribution for " + resultingDataPerZone.size() + " zones was imported from " +
-					existingDataDistribution);
-			Files.copy(existingDataDistribution, outputFileInOutputFolder, StandardCopyOption.COPY_ATTRIBUTES);
+				pathToExistingDataDistributionToZones);
+			Files.copy(pathToExistingDataDistributionToZones, outputFileInOutputFolder, StandardCopyOption.COPY_ATTRIBUTES);
 		}
 
 		else {
@@ -115,7 +117,7 @@ public class LanduseBuildingAnalysis {
 					buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection);
 
 			Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
-			readAreaData(investigationAreaData, inputDataDirectory);
+			readAreaData(investigationAreaData, pathToInvestigationAreaData);
 
 			createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
 					landuseCategoriesAndDataConnection, zoneIdRegionConnection);
@@ -287,14 +289,13 @@ public class LanduseBuildingAnalysis {
 	/**
 	 * Reads the input data for certain areas from the csv file.
 	 */
-	private static void readAreaData(Map<String, Map<String, Integer>> areaData, Path inputDataDirectory)
+	private static void readAreaData(Map<String, Map<String, Integer>> areaData, Path pathToInvestigationAreaData)
 			throws IOException {
 
-		Path areaDataPath = inputDataDirectory.resolve("investigationAreaData.csv");
-		if (!Files.exists(areaDataPath)) {
-			log.error("Required input data file {} not found", areaDataPath);
+		if (!Files.exists(pathToInvestigationAreaData)) {
+			log.error("Required input data file {} not found", pathToInvestigationAreaData);
 		}
-		try (CSVParser parser = new CSVParser(Files.newBufferedReader(areaDataPath),
+		try (CSVParser parser = new CSVParser(Files.newBufferedReader(pathToInvestigationAreaData),
 				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build())) {
 
 			for (CSVRecord record : parser) {

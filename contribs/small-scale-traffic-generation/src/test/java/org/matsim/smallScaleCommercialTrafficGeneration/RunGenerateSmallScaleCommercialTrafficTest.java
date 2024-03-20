@@ -45,6 +45,7 @@ import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -60,7 +61,9 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 
 	@Test
 	void testMainRunAndResults() {
-		String inputDataDirectory = utils.getPackageInputDirectory() + "config_demand.xml";
+		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
+		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
+		Path pathToExistingDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		String output = utils.getOutputDirectory();
 		String sample = "0.1";
 		String jspritIterations = "2";
@@ -79,7 +82,9 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String resultPopulation = "testPopulation.xml.gz";
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
-				inputDataDirectory,
+				pathToConfig,
+				"--pathToInvestigationAreaData", pathToInvestigationAreaData.toString(),
+				"--pathToExistingDataDistributionToZones", pathToExistingDataDistributionToZones.toString(),
 				"--sample", sample,
 				"--jspritIterations", jspritIterations,
 				"--creationOption", creationOption,
