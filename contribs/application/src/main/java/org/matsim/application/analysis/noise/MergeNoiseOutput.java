@@ -1,7 +1,15 @@
 package org.matsim.application.analysis.noise;
 
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatFloatPair;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
@@ -16,8 +24,10 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Merges noise data from multiple files into one file.
@@ -28,9 +38,9 @@ final class MergeNoiseOutput {
 	private final String[] inputPath;
 	private final Path outputDirectory;
 	private final String[] labels = {"immission", "emission"};
-	private final double minTime = 3600.;
-	private double maxTime = 24. * 3600.;
-	private boolean createCSVFileForImmissions = true;
+	private final int minTime = 3600;
+	private int maxTime = 24 * 3600;
+	private boolean createCSVFileForImmissions = false;
 
 	MergeNoiseOutput(String[] inputPath, Path outputDirectory) {
 		this.inputPath = inputPath;
@@ -63,7 +73,7 @@ final class MergeNoiseOutput {
 	 *
 	 * @param maxTime value
 	 */
-	public void setMaxTime(double maxTime) {
+	public void setMaxTime(int maxTime) {
 		this.maxTime = maxTime;
 	}
 
@@ -101,6 +111,7 @@ final class MergeNoiseOutput {
 	private void writeAvro(XYTData xytData, File output) {
 		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
 		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
 			dataFileWriter.create(xytData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(output.toString()), false));
 			dataFileWriter.append(xytData);
 		} catch (IOException e) {
@@ -152,20 +163,19 @@ final class MergeNoiseOutput {
 	 */
 	private void mergeImissionsAvro(String pathParameter, String label) {
 
-		Object2DoubleMap<Coord> mergedData = new Object2DoubleOpenHashMap<>();
-
-		Set<Float> xCoords = new HashSet<>();
-		Set<Float> yCoords = new HashSet<>();
-		List<Integer> times = new ArrayList<>();
-		List<Float> values = new ArrayList<>();
-		Map<CharSequence, List<Float>> valuesMap = new HashMap<>();
-
+		// data per time step, maps coord to value
+		Int2ObjectMap<Object2FloatMap<FloatFloatPair>> data = new Int2ObjectOpenHashMap<>();
 
 		// Loop over all files
-		for (double time = minTime; time <= maxTime; time += 3600.) {
+		for (int time = minTime; time <= maxTime; time += 3600) {
 
-			times.add((int) time);
 			String path = pathParameter + label + "_" + round(time, 1) + ".csv";
+			Object2FloatOpenHashMap<FloatFloatPair> values = new Object2FloatOpenHashMap<>();
+
+			if (!Files.exists(Path.of(path))) {
+				log.warn("File {} does not exist", path);
+				continue;
+			}
 
 			// Read the file
 			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
@@ -178,56 +188,70 @@ final class MergeNoiseOutput {
 				float x = row.getFloat("x");
 				float y = row.getFloat("y");
 				float value = (float) row.getDouble(1); // 1
-				Coord coord = new Coord(x, y);
-
-				xCoords.add(x);
-				yCoords.add(y);
-				values.add(value);
-
-				mergedData.mergeDouble(coord, value, Double::max);
+				FloatFloatPair coord = FloatFloatPair.of(x, y);
+				values.put(coord, value);
 			}
+
+			data.put(time, values);
 		}
-		valuesMap.put("imissions", values);
 
 		// hour data
 		XYTData xytHourData = new XYTData();
 
-		xytHourData.setTimestamps(times);
-		xytHourData.setXCoords(new ArrayList<>(xCoords));
-		xytHourData.setYCoords(new ArrayList<>(yCoords));
-		xytHourData.setData(valuesMap);
+		xytHourData.setTimestamps(data.keySet().intStream().boxed().toList());
+		List<Float> xCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::firstFloat)).distinct().sorted().collect(Collectors.toList());
+		List<Float> yCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::secondFloat)).distinct().sorted().collect(Collectors.toList());
+
+		xytHourData.setXCoords(xCoords);
+		xytHourData.setYCoords(yCoords);
+
+		FloatList raw = new FloatArrayList();
+
+		Object2FloatMap<FloatFloatPair> perDay = new Object2FloatOpenHashMap<>();
+
+		for (Integer ts : xytHourData.getTimestamps()) {
+			Object2FloatMap<FloatFloatPair> d = data.get((int) ts);
+
+			for (Float x : xytHourData.getXCoords()) {
+				for (Float y : xytHourData.getYCoords()) {
+					FloatFloatPair coord = FloatFloatPair.of(x, y);
+					float v = d.getOrDefault(coord, 0);
+					raw.add(v);
+					if (v > 0)
+						perDay.mergeFloat(coord, v, Float::sum);
+				}
+			}
+		}
+
+		// TODO: hardcoded CRSs
+		xytHourData.setData(Map.of("imissions", raw));
 		xytHourData.setCrs("EPSG:25832");
 
-		File out = outputDirectory.getParent().resolve(label + "_per_hour.avro.gz").toFile();
+		File out = outputDirectory.getParent().resolve(label + "_per_hour.avro").toFile();
 
 		writeAvro(xytHourData, out);
 
+		raw = new FloatArrayList();
 		// day data
 		XYTData xytDayData = new XYTData();
-		Set<Float> xCoordsDay = new HashSet<>();
-		Set<Float> yCoordsDay = new HashSet<>();
-		List<Float> valuesDay = new ArrayList<>();
-		List<Integer> timesDay = new ArrayList<>();
-		Map<CharSequence, List<Float>> valuesMapDay = new HashMap<>();
 
-		// Create the merged data
-		for (Object2DoubleMap.Entry<Coord> entry : mergedData.object2DoubleEntrySet()) {
-			xCoordsDay.add((float) entry.getKey().getX());
-			yCoordsDay.add((float) entry.getKey().getY());
-			valuesDay.add((float) entry.getDoubleValue());
+		for (Float x : xytHourData.getXCoords()) {
+			for (Float y : xytHourData.getYCoords()) {
+				FloatFloatPair coord = FloatFloatPair.of(x, y);
+				float v = perDay.getOrDefault(coord, 0);
+				raw.add(v);
+			}
 		}
 
-		timesDay.add(0);
-
-		valuesMapDay.put("imissions_day", valuesDay);
-		xytDayData.setTimestamps(timesDay);
-		xytDayData.setXCoords(new ArrayList<>(xCoordsDay));
-		xytDayData.setYCoords(new ArrayList<>(yCoordsDay));
-		xytDayData.setData(valuesMapDay);
+		xytDayData.setTimestamps(List.of(0));
+		xytDayData.setXCoords(xCoords);
+		xytDayData.setYCoords(yCoords);
+		xytDayData.setData(Map.of("imissions", raw));
 		xytDayData.setCrs("EPSG:25832");
-		File outDay = outputDirectory.getParent().resolve(label + "_per_day.avro.gz").toFile();
-		writeAvro(xytDayData, outDay);
 
+		File outDay = outputDirectory.getParent().resolve(label + "_per_day.avro").toFile();
+
+		writeAvro(xytDayData, outDay);
 	}
 
 	// Merges the immissions data
