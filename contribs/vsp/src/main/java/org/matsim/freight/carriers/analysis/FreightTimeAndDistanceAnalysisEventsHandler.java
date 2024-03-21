@@ -169,7 +169,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		bw1.write("vehicleId \t carrierId \t vehicleTypeId \t tourId \t "
 			+ "tourDuration[s] \t tourDuration[h] \t"
 			+ "travelDistance[m] \t travelDistance[km] \t " +
-				"travelTime[s] \t travelTime[h] \t" +
+			"travelTime[s] \t travelTime[h] \t" +
 			"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR] \t varCostsTime[EUR] \t varCostsDist[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
 
@@ -233,91 +233,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 		//Write headline:
 		bw1.write("vehicleTypeId \t nuOfVehicles \t " +
-			 "SumOfTourDuration[s] \t SumOfTourDuration[h] \t" +
-			 "SumOfTravelDistances[m] \t SumOfTravelDistances[km] \t " +
-			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
-				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
-				"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
-		bw1.newLine();
-
-		for (VehicleType vehicleType : vehicleTypesMap.values()) {
-			long nuOfVehicles = vehicleId2VehicleType.values().stream().filter(vehType -> vehType.getId() == vehicleType.getId()).count();
-
-			final Double costRatePerSecond = vehicleType.getCostInformation().getCostsPerSecond();
-			final Double costRatePerMeter = vehicleType.getCostInformation().getCostsPerMeter();
-			final Double fixedCostPerVeh = vehicleType.getCostInformation().getFixedCosts();
-
-			final Double sumOfTourDurationInSeconds = vehicleTypeId2SumOfTourDuration.getOrDefault(vehicleType.getId(), 0.);
-			final Double sumOfDistanceInMeters = vehicleTypeId2Mileage.getOrDefault(vehicleType.getId(), 0.);
-			final Double sumOfTravelTimeInSeconds = vehicleTypeId2TravelTime.getOrDefault(vehicleType.getId(), 0.);
-
-			final double sumOfVarCostsTime = sumOfTourDurationInSeconds * costRatePerSecond;
-			final double sumOfVarCostsDistance = sumOfDistanceInMeters * costRatePerMeter;
-			final double sumOfFixCosts = nuOfVehicles * fixedCostPerVeh;
-
-			bw1.write(vehicleType.getId().toString());
-
-			bw1.write("\t" + nuOfVehicles);
-			bw1.write("\t" + sumOfTourDurationInSeconds);
-			bw1.write("\t" + sumOfTourDurationInSeconds / 3600);
-			bw1.write("\t" + sumOfDistanceInMeters);
-			bw1.write("\t" + sumOfDistanceInMeters / 1000);
-			bw1.write("\t" + sumOfTravelTimeInSeconds);
-			bw1.write("\t" + sumOfTravelTimeInSeconds / 3600);
-			bw1.write("\t" + costRatePerSecond);
-			bw1.write("\t" + costRatePerMeter);
-			bw1.write("\t" + fixedCostPerVeh);
-			bw1.write("\t" + sumOfVarCostsTime);
-			bw1.write("\t" + sumOfVarCostsDistance);
-			bw1.write("\t" + sumOfFixCosts);
-			bw1.write("\t" + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
-
-			bw1.newLine();
-		}
-
-		bw1.close();
-		log.info("Output written to " + fileName);
-	}
-
-
-	void writeTravelTimeAndDistancePerTruckSize(String analysisOutputDirectory, Scenario scenario) throws IOException {
-		log.info("Writing out Time & Distance & Costs ... perVehicleType");
-
-		TreeMap<Id<VehicleType>, String > vehicleType2vehicleSize = new TreeMap<>();
-		var vehicleTypeIds = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().keySet();
-
-		final String truck7_5 = "7.5t light";
-		final String truck18 = "18t medium";
-		final String truck26 = "26t heavy";
-		final String truck40 = "40t heavy";
-
-		for (Id<VehicleType> vehicleTypeId : vehicleTypeIds) {
-			var vehIdString = vehicleTypeId.toString();
-			if(vehIdString.startsWith("light8t")){
-				vehicleType2vehicleSize.put(vehicleTypeId, truck7_5);
-			} else if (vehIdString.startsWith("medium18t")) {
-				vehicleType2vehicleSize.put(vehicleTypeId, truck18);
-			} else if (vehIdString.startsWith("heavy26t")) {
-				vehicleType2vehicleSize.put(vehicleTypeId, truck26);
-			} else if (vehIdString.startsWith("heavy40t")) {
-				vehicleType2vehicleSize.put(vehicleTypeId, truck40);
-			}
-		}
-
-		var listOfSizes = new LinkedList<>(List.of(truck7_5, truck18, truck26, truck40));
-
-		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
-		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
-		//For the case that there are additional vehicle types found in the events.
-		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {
-			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
-		}
-
-		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
-
-		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
-		//Write headline:
-		bw1.write("vehicleTypeId \t nuOfVehicles \t " +
 			"SumOfTourDuration[s] \t SumOfTourDuration[h] \t" +
 			"SumOfTravelDistances[m] \t SumOfTravelDistances[km] \t " +
 			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
@@ -362,5 +277,122 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 
 		bw1.close();
 		log.info("Output written to " + fileName);
+	}
+
+
+	void writeTravelTimeAndDistancePerTruckSize(String analysisOutputDirectory, Scenario scenario) throws IOException {
+		log.info("Writing out Time & Distance & Costs ... perVehicleType summerized by sizes");
+
+		TreeMap<Id<VehicleType>, String > vehicleType2vehicleSize = new TreeMap<>();
+		var vehicleTypeIds = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().keySet();
+
+		//This will include all types of this size,
+		final String truck7_5 = "7.5t light";
+		final String truck18 = "18t medium";
+		final String truck26 = "26t heavy";
+		final String truck40 = "40t heavy";
+
+		//Todo: Electric fleet in own summery?
+		final String truck7_5e = "7.5t light electric";
+		final String truck18e = "18t medium electric";
+		final String truck26e = "26t heavy electric";
+		final String truck40e = "40t heavy electric";
+
+		for (Id<VehicleType> vehicleTypeId : vehicleTypeIds) {
+			var vehIdString = vehicleTypeId.toString();
+			if(vehIdString.startsWith("light8t")){
+				vehicleType2vehicleSize.put(vehicleTypeId, truck7_5);
+			} else if (vehIdString.startsWith("medium18t")) {
+				vehicleType2vehicleSize.put(vehicleTypeId, truck18);
+			} else if (vehIdString.startsWith("heavy26t")) {
+				vehicleType2vehicleSize.put(vehicleTypeId, truck26);
+			} else if (vehIdString.startsWith("heavy40t")) {
+				vehicleType2vehicleSize.put(vehicleTypeId, truck40);
+			}
+		}
+
+		var listOfSizes = new LinkedList<>(List.of(truck7_5, truck18, truck26, truck40));
+		var listOfSizesWithBev = new LinkedList<>(List.of(truck7_5, truck7_5e, truck18, truck18e, truck26, truck26e, truck40, truck40e));
+
+		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
+		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
+		//For the case that there are additional vehicle types found in the events.
+		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {
+			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
+		}
+
+		//TODO: Werte aufsummieren, sodass diese dann in den Writern genutzt werden können.
+
+
+		{
+			String fileNameSize = analysisOutputDirectory + "TimeDistance_perVehicleType_Size.tsv";
+			BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileNameSize));
+			statsPerSize_writeHeadline(bw1);
+			statsPerSize_WriteContent(vehicleTypesMap, bw1);
+			statsPerSize_CloseWriter(bw1, fileNameSize);
+		}
+
+		{
+			String fileNameSizeWBev = analysisOutputDirectory + "TimeDistance_perVehicleType_SizeWBev.tsv";
+			BufferedWriter bw2 = new BufferedWriter(new FileWriter(fileNameSizeWBev));
+			statsPerSize_writeHeadline(bw2);
+			statsPerSize_WriteContent(vehicleTypesMap, bw2);
+			statsPerSize_CloseWriter(bw2, fileNameSizeWBev);
+		}
+
+		log.info("DONE.");
+	}
+
+	private void statsPerSize_WriteContent(TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap, BufferedWriter bw) throws IOException {
+		//Todo: Rausschreiben über neue Map... (die dann noch zu den Daten passen muss)
+		for (VehicleType vehicleType : vehicleTypesMap.values()) {
+			long nuOfVehicles = vehicleId2VehicleType.values().stream().filter(vehType -> vehType.getId() == vehicleType.getId()).count();
+
+			final Double costRatePerSecond = vehicleType.getCostInformation().getCostsPerSecond();
+			final Double costRatePerMeter = vehicleType.getCostInformation().getCostsPerMeter();
+			final Double fixedCostPerVeh = vehicleType.getCostInformation().getFixedCosts();
+
+			final Double sumOfTourDurationInSeconds = vehicleTypeId2SumOfTourDuration.getOrDefault(vehicleType.getId(), 0.);
+			final Double sumOfDistanceInMeters = vehicleTypeId2Mileage.getOrDefault(vehicleType.getId(), 0.);
+			final Double sumOfTravelTimeInSeconds = vehicleTypeId2TravelTime.getOrDefault(vehicleType.getId(), 0.);
+
+			final double sumOfVarCostsTime = sumOfTourDurationInSeconds * costRatePerSecond;
+			final double sumOfVarCostsDistance = sumOfDistanceInMeters * costRatePerMeter;
+			final double sumOfFixCosts = nuOfVehicles * fixedCostPerVeh;
+
+			bw.write(vehicleType.getId().toString());
+
+			bw.write("\t" + nuOfVehicles);
+			bw.write("\t" + sumOfTourDurationInSeconds);
+			bw.write("\t" + sumOfTourDurationInSeconds / 3600);
+			bw.write("\t" + sumOfDistanceInMeters);
+			bw.write("\t" + sumOfDistanceInMeters / 1000);
+			bw.write("\t" + sumOfTravelTimeInSeconds);
+			bw.write("\t" + sumOfTravelTimeInSeconds / 3600);
+			bw.write("\t" + costRatePerSecond);
+			bw.write("\t" + costRatePerMeter);
+			bw.write("\t" + fixedCostPerVeh);
+			bw.write("\t" + sumOfVarCostsTime);
+			bw.write("\t" + sumOfVarCostsDistance);
+			bw.write("\t" + sumOfFixCosts);
+			bw.write("\t" + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
+
+			bw.newLine();
+		}
+	}
+
+	private static void statsPerSize_CloseWriter(BufferedWriter bw, String fileName) throws IOException {
+		bw.close();
+		log.info("Output written to " + fileName);
+	}
+
+	private static void statsPerSize_writeHeadline(BufferedWriter bw) throws IOException {
+		bw.write("vehicleSize \t nuOfVehicles \t " +
+			"SumOfTourDuration[s] \t SumOfTourDuration[h] \t" +
+			"SumOfTravelDistances[m] \t SumOfTravelDistances[km] \t " +
+			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
+			"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
+			"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
+		bw.newLine();
 	}
 }
