@@ -283,8 +283,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	void writeTravelTimeAndDistancePerTruckSize(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType summerized by sizes");
 
-		TreeMap<Id<VehicleType>, String > vehicleType2vehicleSize = new TreeMap<>();
-		TreeMap<Id<VehicleType>, String > vehicleType2vehicleSizeWBev = new TreeMap<>();
+		TreeMap<Id<VehicleType>, String > vehicleTypeId2vehicleSize = new TreeMap<>();
+		TreeMap<Id<VehicleType>, String > vehicleTypeId2vehicleSizeWBev = new TreeMap<>();
 		var vehicleTypeIds = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().keySet();
 
 		//This will include all types of this size,
@@ -302,31 +302,31 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			var vehIdString = vehicleTypeId.toString();
 			if(vehIdString.startsWith("light8t")){
 				if (vehIdString.endsWith("_electro")){
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck7_5e);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck7_5e);
 				} else {
-					vehicleType2vehicleSize.put(vehicleTypeId, truck7_5);
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck7_5);
+					vehicleTypeId2vehicleSize.put(vehicleTypeId, truck7_5);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck7_5);
 				}
 			} else if (vehIdString.startsWith("medium18t")) {
 				if (vehIdString.endsWith("_electro")){
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck18e);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck18e);
 				} else {
-					vehicleType2vehicleSize.put(vehicleTypeId, truck18);
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck18);
+					vehicleTypeId2vehicleSize.put(vehicleTypeId, truck18);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck18);
 				}
 			} else if (vehIdString.startsWith("heavy26t")) {
 				if (vehIdString.endsWith("_electro")){
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck26e);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck26e);
 				} else {
-					vehicleType2vehicleSize.put(vehicleTypeId, truck26);
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck26);
+					vehicleTypeId2vehicleSize.put(vehicleTypeId, truck26);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck26);
 				}
 			} else if (vehIdString.startsWith("heavy40t")) {
 				if (vehIdString.endsWith("_electro")){
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck40e);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck40e);
 				} else {
-					vehicleType2vehicleSize.put(vehicleTypeId, truck40);
-					vehicleType2vehicleSizeWBev.put(vehicleTypeId, truck40);
+					vehicleTypeId2vehicleSize.put(vehicleTypeId, truck40);
+					vehicleTypeId2vehicleSizeWBev.put(vehicleTypeId, truck40);
 				}
 			}
 		}
@@ -346,7 +346,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			String fileNameSize = analysisOutputDirectory + "TimeDistance_perVehicleType_Size.tsv";
 			BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileNameSize));
 			statsPerSize_writeHeadline(bw1);
-			statsPerSize_WriteContent(vehicleTypesMap, vehicleType2vehicleSize, listOfSizes, bw1);
+			statsPerSize_WriteContent(vehicleTypesMap, vehicleTypeId2vehicleSize, listOfSizes, bw1);
 			statsPerSize_CloseWriter(bw1, fileNameSize);
 		}
 
@@ -354,7 +354,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			String fileNameSizeWBev = analysisOutputDirectory + "TimeDistance_perVehicleType_SizeWBev.tsv";
 			BufferedWriter bw2 = new BufferedWriter(new FileWriter(fileNameSizeWBev));
 			statsPerSize_writeHeadline(bw2);
-			statsPerSize_WriteContent(vehicleTypesMap,vehicleType2vehicleSizeWBev, listOfSizesWithBev, bw2);
+			statsPerSize_WriteContent(vehicleTypesMap,vehicleTypeId2vehicleSizeWBev, listOfSizesWithBev, bw2);
 			statsPerSize_CloseWriter(bw2, fileNameSizeWBev);
 		}
 
@@ -364,13 +364,13 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 /**
 *
  * @param vehicleTypesMap
- * @param vehicleType2vehicleSize
+ * @param vehicleTypeId2vehicleSize
  * @param listOfSizes Sorted list with sizes, as they should be in the output...
  * @param bw The buffered writer
  * @throws IOException
 */
 	private void statsPerSize_WriteContent(TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap,
-										   TreeMap<Id<VehicleType>, String > vehicleType2vehicleSize,
+										   TreeMap<Id<VehicleType>, String > vehicleTypeId2vehicleSize,
 										   LinkedList<String> listOfSizes,
 										   BufferedWriter bw) throws IOException {
 		//Todo: Rausschreiben über neue Map... (die dann noch zu den Daten passen muss)
