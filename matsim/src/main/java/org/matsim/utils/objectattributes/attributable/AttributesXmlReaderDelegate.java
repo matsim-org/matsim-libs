@@ -40,8 +40,8 @@ public class AttributesXmlReaderDelegate {
 	private String currentAttribute = null;
 	private String currentAttributeClass = null;
 
-	/*package*/ final static String TAG_ATTRIBUTES = "attributes";
-	/*package*/ final static String TAG_ATTRIBUTE = "attribute";
+	/*package*/ public final static String TAG_ATTRIBUTES = "attributes";
+	/*package*/ public final static String TAG_ATTRIBUTE = "attribute";
 	/*package*/ final static String ATTR_ATTRIBUTENAME = "name";
 	/*package*/ final static String ATTR_ATTRIBUTECLASS = "class";
 
