@@ -54,10 +54,17 @@ public class DrtTeleportedRouteCalculator implements TeleportedRouteCalculator {
 		final Coord toActCoord = endLink.getToNode().getCoord();
 		double dist = CoordUtils.calcEuclideanDistance(fromActCoord, toActCoord);
 		Route route = new GenericRouteImpl(startLink.getId(), endLink.getId());
-		//TODO move wait time outside the route (handle it explicitly by the TeleportingPassengerEngine)
+		//wait time has to be included in route travel time because TeleportingPassengerEngine delegates to DefaulTeleportationEngine for the TeleportationArrivalEvent
+		//but TeleportingPassengerEngine then accounts for the waiting time separataly
 		int travTime = (int)(averageWaitingTime + (dist / averageInVehicleBeelineSpeed));
 		route.setTravelTime(travTime);
 		route.setDistance(dist);
 		return route;
 	}
+
+	@Override
+	public double getAverageWaitingTime() {
+		return averageWaitingTime;
+	}
+
 }

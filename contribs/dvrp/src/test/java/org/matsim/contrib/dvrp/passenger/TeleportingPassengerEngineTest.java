@@ -55,17 +55,26 @@ public class TeleportingPassengerEngineTest {
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		double travelTime = 999;
+		double waitTime = 1;
 		double travelDistance = 555;
-		TeleportedRouteCalculator teleportedRouteCalculator = request -> {
-			Route route = new GenericRouteImpl(request.getFromLink().getId(), request.getToLink().getId());
-			route.setTravelTime(travelTime);
-			route.setDistance(travelDistance);
-			return route;
+		TeleportedRouteCalculator teleportedRouteCalculator = new TeleportedRouteCalculator() {
+			@Override
+			public Route calculateRoute(PassengerRequest request) {
+				Route route = new GenericRouteImpl(request.getFromLink().getId(), request.getToLink().getId());
+				route.setTravelTime(travelTime);
+				route.setDistance(travelDistance);
+				return route;
+			}
+
+			@Override
+			public double getAverageWaitingTime() {
+				return waitTime;
+			}
 		};
 		PassengerRequestValidator requestValidator = request -> Set.of();//valid
 		createQSim(teleportedRouteCalculator, requestValidator).run();
 
-		double arrivalTime = departureTime + travelTime;
+		double arrivalTime = departureTime + waitTime + travelTime;
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
 				Collections.singleton(fixture.PERSON_ID),
@@ -73,7 +82,8 @@ public class TeleportingPassengerEngineTest {
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerWaitingEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID)),
 				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID), null, departureTime,
-						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null),
+						arrivalTime),
+				new PassengerPickedUpEvent(departureTime + waitTime, MODE, requestId, fixture.PERSON_ID, null),
 				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, fixture.PERSON_ID, null),
 				new TeleportationArrivalEvent(arrivalTime, fixture.PERSON_ID, travelDistance, MODE),
 				new PersonArrivalEvent(arrivalTime, fixture.PERSON_ID, fixture.linkBA.getId(), MODE),
@@ -85,7 +95,18 @@ public class TeleportingPassengerEngineTest {
 		double departureTime = 0;
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
-		TeleportedRouteCalculator teleportedRouteCalculator = request -> null; // unused
+		TeleportedRouteCalculator teleportedRouteCalculator = new TeleportedRouteCalculator() {
+			// unused
+			@Override
+			public Route calculateRoute(PassengerRequest request) {
+				return null;
+			}
+
+			@Override
+			public double getAverageWaitingTime() {
+				return 0;
+			}
+		};
 		PassengerRequestValidator requestValidator = request -> Set.of("invalid");
 		createQSim(teleportedRouteCalculator, requestValidator).run();
 
