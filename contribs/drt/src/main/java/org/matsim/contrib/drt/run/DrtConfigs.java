@@ -32,18 +32,19 @@ public class DrtConfigs {
 	private static final Logger LOGGER = LogManager.getLogger(DrtControlerCreator.class);
 
 	public static void adjustMultiModeDrtConfig(MultiModeDrtConfigGroup multiModeDrtCfg,
-																							ScoringConfigGroup planCalcScoreCfg, RoutingConfigGroup plansCalcRouteCfg) {
+						    ScoringConfigGroup planCalcScoreCfg, RoutingConfigGroup plansCalcRouteCfg) {
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg, plansCalcRouteCfg);
 		}
 	}
 
 	public static void adjustDrtConfig(DrtConfigGroup drtCfg, ScoringConfigGroup planCalcScoreCfg,
-			RoutingConfigGroup plansCalcRouteCfg) {
+					   RoutingConfigGroup plansCalcRouteCfg) {
 		String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtCfg.getMode());
 		if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
 			addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
 		}
+		// yyyy I think that the above functionality could/should be moved into the config consistency checker.  kai, feb'24
 	}
 
 	private static void addDrtStageActivityParams(ScoringConfigGroup planCalcScoreCfg, String stageActivityType) {
