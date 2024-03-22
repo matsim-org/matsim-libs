@@ -74,7 +74,7 @@ final class TripByGroupAnalysis {
 			for (List<String> group : groups) {
 				for (String g : group) {
 					if (!this.categories.containsKey(g)) {
-						this.categories.put(g, new Category(ref.column(g)));
+						this.categories.put(g, new Category(ref.column(g).asStringColumn().removeMissing().asSet()));
 					}
 				}
 			}
@@ -141,116 +141,6 @@ final class TripByGroupAnalysis {
 	}
 
 	private record Group(List<String> columns, Table data) {
-	}
-
-	private static final class Category {
-
-		/**
-		 * Unique values of the category.
-		 */
-		private final Set<String> values;
-
-		/**
-		 * Groups of values that have been subsumed under a single category.
-		 * These are values separated by ,
-		 */
-		private final Map<String, String> grouped;
-
-		/**
-		 * Range categories.
-		 */
-		private final List<Range> ranges;
-
-		public Category(Column<?> data) {
-			this.values = data.asStringColumn().unique()
-				.removeMissing()
-				.asSet();
-
-			this.grouped = new HashMap<>();
-			for (String v : values) {
-				if (v.contains(",")) {
-					String[] grouped = v.split(",");
-					for (String g : grouped) {
-						this.grouped.put(g, v);
-					}
-				}
-			}
-
-			boolean range = this.values.stream().allMatch(v -> v.contains("-") || v.contains("+"));
-			if (range) {
-				ranges = new ArrayList<>();
-				for (String value : this.values) {
-					if (value.contains("-")) {
-						String[] parts = value.split("-");
-						ranges.add(new Range(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), value));
-					} else if (value.contains("+")) {
-						ranges.add(new Range(Double.parseDouble(value.replace("+", "")), Double.POSITIVE_INFINITY, value));
-					}
-				}
-
-				ranges.sort(Comparator.comparingDouble(r -> r.left));
-			} else
-				ranges = null;
-		}
-
-		/**
-		 * Categorize a single value.
-		 */
-		public String categorize(Object value) {
-
-			if (value == null)
-				return null;
-
-			// TODO: handle booleans
-
-			if (value instanceof Number) {
-				return categorizeNumber((Number) value);
-			} else {
-				String v = value.toString();
-				if (values.contains(v))
-					return v;
-				else if (grouped.containsKey(v))
-					return grouped.get(v);
-
-				try {
-					double d = Double.parseDouble(v);
-					return categorizeNumber(d);
-				} catch (NumberFormatException e) {
-					return null;
-				}
-			}
-		}
-
-		private String categorizeNumber(Number value) {
-
-			if (ranges != null) {
-				for (Range r : ranges) {
-					if (value.doubleValue() >= r.left && value.doubleValue() < r.right)
-						return r.label;
-				}
-			}
-
-			// Match string representation
-			// TODO: int and float could be represented differently
-			String v = value.toString();
-			if (values.contains(v))
-				return v;
-			else if (grouped.containsKey(v))
-				return grouped.get(v);
-
-			return null;
-		}
-
-	}
-
-	/**
-	 * @param left  Left bound of the range.
-	 * @param right Right bound of the range. (exclusive)
-	 * @param label Label of this group.
-	 */
-	private record Range(double left, double right, String label) {
-
-
 	}
 
 }
