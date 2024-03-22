@@ -43,11 +43,14 @@ public class VehicleStartLinkToLastLinkUpdater implements IterationEndsListener 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		executedScheduleCollector.getExecutedSchedules().forEach(schedule -> {
 			var currentSpecification = fleetSpecification.getVehicleSpecifications().get(schedule.vehicleId);
-			var tasks = schedule.getExecutedTasks();
-			var updatedSpecification = ImmutableDvrpVehicleSpecification.newBuilder(currentSpecification)
-					.startLinkId(tasks.get(tasks.size() - 1).endLinkId) // update start link to last link
-					.build();
-			fleetSpecification.replaceVehicleSpecification(updatedSpecification);
+			
+			if (currentSpecification != null) {
+				var tasks = schedule.getExecutedTasks();
+				var updatedSpecification = ImmutableDvrpVehicleSpecification.newBuilder(currentSpecification)
+						.startLinkId(tasks.get(tasks.size() - 1).endLinkId) // update start link to last link
+						.build();
+				fleetSpecification.replaceVehicleSpecification(updatedSpecification);
+			}
 		});
 	}
 }

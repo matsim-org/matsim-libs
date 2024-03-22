@@ -20,13 +20,17 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.END_ACTIVITY;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.MODE;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.START_ACTIVITY;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -38,9 +42,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiActionCreator;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -58,8 +62,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 
 /**
@@ -76,7 +80,17 @@ public class DefaultPassengerEngineTest {
 			.startLinkId(fixture.linkAB.getId())
 			.capacity(1)
 			.build(), fixture.linkAB);
-	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
+	
+	private final Fleet fleet = createFleet();
+	private Fleet createFleet() {
+		IdMap<DvrpVehicle, DvrpVehicle> vehicles = new IdMap<>(DvrpVehicle.class);
+		vehicles.put(oneTaxi.getId(), oneTaxi);
+		
+		Fleet fleet = Mockito.mock(Fleet.class);
+		Mockito.when(fleet.getVehicles()).thenReturn(vehicles);
+		
+		return fleet;
+	}
 
 	@Test
 	void test_valid_served() {

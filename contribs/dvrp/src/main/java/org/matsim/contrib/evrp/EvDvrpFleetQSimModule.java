@@ -22,13 +22,13 @@ package org.matsim.contrib.evrp;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetCreator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.core.modal.ModalProviders;
 
 import com.google.inject.Inject;
 
@@ -42,12 +42,12 @@ public class EvDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	public void configureQSim() {
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+		bindModal(FleetCreator.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Inject
 			private ElectricFleet evFleet;
 
 			@Override
-			public Fleet get() {
+			public FleetCreator get() {
 				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
 				Network network = getModalInstance(Network.class);
 				return Fleets.createCustomFleet(fleetSpecification,

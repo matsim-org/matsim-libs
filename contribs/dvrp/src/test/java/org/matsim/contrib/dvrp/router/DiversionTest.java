@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -16,8 +17,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.FleetCreator;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.Fleets;
@@ -187,6 +190,7 @@ public class DiversionTest {
 
 		// Add bindings for test case
 		controller.addOverridingModule(new TestModeModule(testTracker));
+		controller.addOverridingModule(new FleetModule(MODE, null));
 		controller.addOverridingQSimModule(new TestModeQSimModule(fleetSpecification, testTracker));
 
 		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(MODE) {
@@ -283,11 +287,9 @@ public class DiversionTest {
 			/*
 			 * Bind the fleet and agent source
 			 */
-			bindModal(Fleet.class).toProvider(modalProvider(getter -> {
+			bindModal(FleetCreator.class).toProvider(modalProvider(getter -> {
 				return Fleets.createDefaultFleet(fleetSpecification, getter.getModal(Network.class).getLinks()::get);
 			})).in(Singleton.class);
-
-			bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
 
 			install(new VrpAgentSourceQSimModule(getMode()));
 
@@ -514,6 +516,7 @@ public class DiversionTest {
 
 		// Add bindings for test case
 		controller.addOverridingModule(new TestModeModule(testTracker));
+		controller.addOverridingModule(new FleetModule(MODE, null));
 		controller.addOverridingQSimModule(new TestModeQSimModule(fleetSpecification, testTracker));
 
 		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(MODE) {

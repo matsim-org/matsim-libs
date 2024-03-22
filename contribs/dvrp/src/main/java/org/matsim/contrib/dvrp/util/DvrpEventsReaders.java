@@ -23,6 +23,8 @@ package org.matsim.contrib.dvrp.util;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.matsim.contrib.dvrp.fleet.VehicleAddedEvent;
+import org.matsim.contrib.dvrp.fleet.VehicleRemovedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -45,8 +47,10 @@ public class DvrpEventsReaders {
 				PassengerWaitingEvent.EVENT_TYPE, PassengerWaitingEvent::convert,//
 				PassengerPickedUpEvent.EVENT_TYPE, PassengerPickedUpEvent::convert, //
 				PassengerDroppedOffEvent.EVENT_TYPE, PassengerDroppedOffEvent::convert,//
-				TaskStartedEvent.EVENT_TYPE, e -> TaskStartedEvent.convert(e, stringToTaskTypeConverter),
-				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter));
+				TaskStartedEvent.EVENT_TYPE, e -> TaskStartedEvent.convert(e, stringToTaskTypeConverter),//
+				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter), //
+				VehicleAddedEvent.EVENT_NAME, VehicleAddedEvent::convert,//
+				VehicleRemovedEvent.EVENT_NAME, VehicleRemovedEvent::convert);
 	}
 
 	public static MatsimEventsReader createEventsReader(EventsManager eventsManager,

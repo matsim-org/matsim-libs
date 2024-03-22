@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -92,9 +94,23 @@ public class FleetModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(Fleet.class).toProvider(modalProvider(
+				bindModal(FleetCreator.class).toProvider(modalProvider(
 						getter -> Fleets.createDefaultFleet(getter.getModal(FleetSpecification.class),
 								getter.getModal(Network.class).getLinks()::get))).asEagerSingleton();
+				
+				bindModal(Fleet.class).toProvider(modalProvider(getter -> {
+					EventsManager eventsManager = getter.get(EventsManager.class);
+					MobsimTimer mobsimTimer = getter.get(MobsimTimer.class);
+					DvrpVehicleLookup lookup = getter.get(DvrpVehicleLookup.class);
+					
+					Fleet fleet = new Fleet(getMode(), eventsManager, mobsimTimer, lookup);
+					
+					// use the FleetCreator to initialize the vehicles in Fleet
+					FleetCreator fleetCreator = getter.getModal(FleetCreator.class);
+					fleetCreator.createFleet(fleet);
+					
+					return fleet; 
+				})).asEagerSingleton();
 			}
 		});
 

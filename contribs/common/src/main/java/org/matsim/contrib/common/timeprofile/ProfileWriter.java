@@ -61,12 +61,18 @@ public class ProfileWriter implements IterationEndsListener {
 	private final String mode;
 	private final ProfileView view;
 	private final String outputFile;
+	private final boolean createdStacked;
 
 	public ProfileWriter(MatsimServices matsimServices, String mode, ProfileView profileView, String fileName) {
+		this(matsimServices, mode, profileView, fileName, true);
+	}
+	
+	public ProfileWriter(MatsimServices matsimServices, String mode, ProfileView profileView, String fileName, boolean createdStacked) {
 		this.matsimServices = matsimServices;
 		this.mode = mode;
 		this.view = profileView;
 		this.outputFile = fileName;
+		this.createdStacked = createdStacked;
 	}
 
 	@Override
@@ -91,7 +97,10 @@ public class ProfileWriter implements IterationEndsListener {
 		if (createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0) {
 			DefaultTableXYDataset xyDataset = createXYDataset(times, profiles);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
-			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
+			
+			if (createdStacked) {
+				generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
+			}
 		}
 	}
 
