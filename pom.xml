@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.0.0-jre</version>
+                <version>33.1.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -342,6 +342,12 @@
 				<groupId>tech.tablesaw</groupId>
 				<artifactId>tablesaw-jsplot</artifactId>
 				<version>0.43.1</version>
+			</dependency>
+
+			<dependency>
+			    <groupId>com.google.j2objc</groupId>
+			    <artifactId>j2objc-annotations</artifactId>
+			    <version>3.0.0</version>
 			</dependency>
 
 			<dependency>
