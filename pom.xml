@@ -345,6 +345,12 @@
 			</dependency>
 
 			<dependency>
+			    <groupId>com.google.j2objc</groupId>
+			    <artifactId>j2objc-annotations</artifactId>
+			    <version>3.0.0</version>
+			</dependency>
+
+			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
 				<version>1.14.12</version>
