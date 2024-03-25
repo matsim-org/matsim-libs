@@ -21,6 +21,8 @@
 package org.matsim.freight.logistics.io;
 
 import static org.matsim.freight.logistics.LSPConstants.*;
+import static org.matsim.utils.objectattributes.attributable.AttributesUtils.ATTRIBUTE;
+import static org.matsim.utils.objectattributes.attributable.AttributesUtils.ATTRIBUTES;
 
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
@@ -167,9 +169,9 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
                 Id.create(vehicleId, Vehicle.class),
                 Id.create(depotLinkId, Link.class),
                 vehicleType);
-        String startTime = atts.getValue(VEHICLE_EARLIEST_START);
+        String startTime = atts.getValue(EARLIEST_START);
         if (startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
-        String endTime = atts.getValue(VEHICLE_LATEST_END);
+        String endTime = atts.getValue(LATEST_END);
         if (endTime != null) vehicleBuilder.setLatestEnd(parseTimeToDouble(endTime));
 
         CarrierVehicle vehicle = vehicleBuilder.build();
