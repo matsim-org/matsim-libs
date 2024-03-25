@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.matsim.api.core.v01.population.BasicPlan.UNDEFINED_PLAN_TYPE;
+
 /**
  * <p>Selects the worst plan of a person (most likely for removal), but respects
  * the set plan types in a way the no plan is selected that is the last one of
@@ -41,8 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GenericWorstPlanForRemovalSelector<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
-	public static final String UNDEFINED_TYPE = "undefined";
-
 	@Override
 	public T selectPlan(HasPlansAndId<T, I> person) {
 
@@ -53,7 +53,7 @@ public class GenericWorstPlanForRemovalSelector<T extends BasicPlan, I> implemen
 		for (T plan : person.getPlans()) {
 			String type = plan.getType();
 			if ( type==null ) {
-				type = UNDEFINED_TYPE ;
+				type = UNDEFINED_PLAN_TYPE;
 			}
 			typeCounts.merge( type, 1, ( a, b ) -> a + b );
 		}
@@ -64,7 +64,7 @@ public class GenericWorstPlanForRemovalSelector<T extends BasicPlan, I> implemen
 
 			String type = plan.getType();
 			if ( type==null ) {
-				type = UNDEFINED_TYPE;
+				type = UNDEFINED_PLAN_TYPE;
 			}
 			if ( typeCounts.get( type ) > 1) {
 				// (if we have more than one plan of the same type:)
