@@ -4,10 +4,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
@@ -17,26 +16,16 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * evenly in sequence across the logistics chains. Requirements: There must be at least one
  * logisticChain in the plan
  */
-class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner {
+class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   // map of logistic chains and their number of assigned shipments in order of addition
   Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
-  private LSP lsp;
 
   RoundRobinLogisticChainShipmentAssigner() {}
 
   @Override
-  public LSP getLSP() {
-    throw new RuntimeException("not implemented");
-  }
-
-  public void setLSP(LSP lsp) {
-    this.lsp = lsp;
-  }
-
-  @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-    Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
+    Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     // prepare the map if empty for the first time with each number of assigned shipments being zero
     if (shipmentCountByChain.isEmpty()) {
       for (LogisticChain chain : lspPlan.getLogisticChains()) {

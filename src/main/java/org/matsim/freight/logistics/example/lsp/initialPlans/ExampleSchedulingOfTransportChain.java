@@ -36,7 +36,7 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
@@ -99,13 +99,13 @@ import org.matsim.vehicles.VehicleType;
     // The first reloading adapter i.e. the Resource is created
     Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
     Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
-    TranshipmentHubUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder =
-        TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+    TransshipmentHubBuilder firstTransshipmentHubBuilder =
+        ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
             firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 
     // The scheduler for the first reloading point is created
     final LSPResourceScheduler firstHubScheduler =
-        TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+        ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
             .setCapacityNeedFixed(10)
             .setCapacityNeedLinear(1)
             .build();
@@ -169,13 +169,13 @@ import org.matsim.vehicles.VehicleType;
 
     // The scheduler for the second reloading point is created
     LSPResourceScheduler secondHubScheduler =
-        TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+        ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
             .setCapacityNeedFixed(10)
             .setCapacityNeedLinear(1)
             .build();
 
     LSPResource secondTransshipmentHubResource =
-        TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+        ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                 secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario)
             .setTransshipmentHubScheduler(secondHubScheduler)
             .build();
@@ -256,9 +256,9 @@ import org.matsim.vehicles.VehicleType;
     // The initial plan of the lsp is generated and the assigner and the solution from above are
     // added
     LSPPlan completePlan = LSPUtils.createLSPPlan();
-    ShipmentAssigner assigner =
+    InitialShipmentAssigner assigner =
         ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
-    completePlan.setAssigner(assigner);
+    completePlan.setInitialShipmentAssigner(assigner);
     completePlan.addLogisticChain(completeSolution);
 
     LSPUtils.LSPBuilder completeLSPBuilder =

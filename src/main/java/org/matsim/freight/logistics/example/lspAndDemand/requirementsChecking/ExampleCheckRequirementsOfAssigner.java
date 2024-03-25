@@ -135,7 +135,7 @@ class ExampleCheckRequirementsOfAssigner {
     // plan.
     LSPPlan plan =
         LSPUtils.createLSPPlan()
-            .setAssigner(new RequirementsAssigner())
+            .setInitialShipmentAssigner(new RequirementsAssigner())
             .addLogisticChain(redSolution)
             .addLogisticChain(blueSolution);
 

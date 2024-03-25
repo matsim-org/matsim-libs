@@ -33,6 +33,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlanWriter;
 import org.matsim.freight.carriers.Carriers;
@@ -53,12 +54,16 @@ class LSPControlerListener
   private final Scenario scenario;
   private final List<EventHandler> registeredHandlers = new ArrayList<>();
 
+  private static int addListenerCnt = 0;
+  private  static final int maxAddListenerCnt = 1;
+
   @Inject private EventsManager eventsManager;
   @Inject private MatsimServices matsimServices;
   @Inject private LSPScorerFactory lspScoringFunctionFactory;
   @Inject @Nullable private LSPStrategyManager strategyManager;
   @Inject private OutputDirectoryHierarchy controlerIO;
   @Inject private CarrierAgentTracker carrierAgentTracker;
+
 
   @Inject
   LSPControlerListener(Scenario scenario) {
@@ -109,15 +114,20 @@ class LSPControlerListener
         hasSimulationTrackers.getSimulationTrackers()) {
       // ... register them ...
       if (!registeredHandlers.contains(simulationTracker)) {
-        log.warn("adding eventsHandler: " + simulationTracker);
+        log.info("adding eventsHandler: " + simulationTracker);
         eventsManager.addHandler(simulationTracker);
         registeredHandlers.add(simulationTracker);
         matsimServices.addControlerListener(simulationTracker);
         simulationTracker.setEventsManager(eventsManager);
-      } else {
+      } else if ( addListenerCnt < maxAddListenerCnt ){
         log.warn("not adding eventsHandler since already added: " + simulationTracker);
+        addListenerCnt++;
+        if (addListenerCnt == maxAddListenerCnt) {
+          log.warn(Gbl.FUTURE_SUPPRESSED);
+        }
       }
     }
+
   }
 
   @Override

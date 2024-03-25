@@ -25,19 +25,19 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 /**
  * Takes an {@link LSPShipment} and normally assigns it to something that belongs to an {@link LSP}.
  * <br>
+ * After changes in fall 2023 (see master thesis of nrichter), the assingment is
+ * there to be done one time initially.
  * <br>
- * If there are several {@link LogisticChain}s, the {@link LSP} has to assign each {@link
- * LSPShipment} to the suitable one. For this purpose, each LSPPlan contains a pluggable strategy
- * that is contained in classes implementing the interface {@link ShipmentAssigner}. <br>
+ * If there are several {@link LogisticChain}s in a {@link LSPPlan}, the {@link LSP} has to assign each {@link
+ * LSPShipment} to the suitable {@link LogisticChain}. For this purpose, each {@link LSPPlan}
+ * (or only the LSP? - kmt'jan'24), contains a pluggable strategy
+ * that is contained in classes implementing the interface {@link InitialShipmentAssigner}. <br>
  * <br>
- * Discussion points:
- *
- * <ul>
- *   <li>yyyy Shipments are normally assigned to the selected plan only. I am not sure if this is
- *       what I would expect from the outside. kai, may'22
- * </ul>
+ * During iterations, it can happen that the {@link LSPShipment} should be moved to another
+ * {@link LogisticChain} of the same {@link LSPPlan}. This is now (since fall 2023; see master
+ * thesis of nrichter) part of the (innovative) **Replanning** strategies.
  */
-public interface ShipmentAssigner extends KnowsLSP {
+public interface InitialShipmentAssigner {
 
   void assignToPlan(LSPPlan lspPlan, LSPShipment shipment);
 }

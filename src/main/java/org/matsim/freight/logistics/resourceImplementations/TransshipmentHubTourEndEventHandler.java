@@ -1,4 +1,25 @@
 /*
+  *********************************************************************** *
+  * project: org.matsim.*
+  *                                                                         *
+  * *********************************************************************** *
+  *                                                                         *
+  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
+  *                   LICENSE and WARRANTY file.                            *
+  * email           : info at matsim dot org                                *
+  *                                                                         *
+  * *********************************************************************** *
+  *                                                                         *
+  *   This program is free software; you can redistribute it and/or modify  *
+  *   it under the terms of the GNU General Public License as published by  *
+  *   the Free Software Foundation; either version 2 of the License, or     *
+  *   (at your option) any later version.                                   *
+  *   See also COPYING, LICENSE and WARRANTY file                           *
+  *                                                                         *
+  * ***********************************************************************
+ */
+
+/*
  *  *********************************************************************** *
  *  * project: org.matsim.*
  *  * *********************************************************************** *
@@ -18,7 +39,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
+package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,13 +59,16 @@ import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.events.HandlingInHubStartsEvent;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.*;
 
 public class TransshipmentHubTourEndEventHandler
     implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, CarrierTourEndEventHandler {
   // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
   // to do the junit testing. kmt jun'23
+
+  //This class *should* also get merged into {@link LSPTourEndEventHandler}.
+  //Currently, this is not possible very easyily, because of missing injection (of the scenario.)
+  //KMT, KN (Jan'24)
 
   private final Scenario scenario;
   private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;

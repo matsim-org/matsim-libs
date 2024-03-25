@@ -33,8 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
+import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubResource;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
@@ -122,12 +121,12 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         double capacityNeedFixed = Double.parseDouble(atts.getValue(CAPACITY_NEED_FIXED));
         double capacityNeedLinear = Double.parseDouble(atts.getValue(CAPACITY_NEED_LINEAR));
         hubResource =
-            TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+            ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                     Id.create(currentHubId, LSPResource.class),
                     Id.createLinkId(currentHubLocation),
                     null)
                 .setTransshipmentHubScheduler(
-                    TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+                    ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
                         .setCapacityNeedFixed(
                             capacityNeedFixed) // Time needed, fixed (for Scheduler)
                         .setCapacityNeedLinear(

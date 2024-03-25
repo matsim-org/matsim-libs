@@ -16,6 +16,9 @@ import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 class RebalancingStrategyFactory {
+  //This is ok so as long as it is **non-public**.
+  //Before making it public, it should be configurable either via config or Injection.
+  //KMT, KN (Jan'24)
 
   private RebalancingStrategyFactory() {} // class contains only static methods; do not instantiate
 

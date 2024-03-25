@@ -29,7 +29,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * In the class SimpleForwardSolutionScheduler two tasks are performed:
  *
  * <p>1.) the {@link LSPShipment}s that were assigned to the suitable {@link LogisticChain} by the
- * {@link ShipmentAssigner} in a previous step are handed over to the first {@link
+ * {@link InitialShipmentAssigner} in a previous step are handed over to the first {@link
  * LogisticChainElement}.
  *
  * <p>2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler

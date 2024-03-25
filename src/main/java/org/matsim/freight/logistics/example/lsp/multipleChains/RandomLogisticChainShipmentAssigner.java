@@ -8,7 +8,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.ShipmentAssigner;
+import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
@@ -16,24 +16,13 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  * plan are collected in a list. The chain to which the shipment is to be assigned is selected by a
  * seeded random index. Requirements: There must be at least one logisticChain in the plan.
  */
-class RandomLogisticChainShipmentAssigner implements ShipmentAssigner {
-
-  private LSP lsp;
+class RandomLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   RandomLogisticChainShipmentAssigner() {}
 
   @Override
-  public LSP getLSP() {
-    throw new RuntimeException("not implemented");
-  }
-
-  public void setLSP(LSP lsp) {
-    this.lsp = lsp;
-  }
-
-  @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-    Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
+    Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     List<LogisticChain> logisticChains = new ArrayList<>(lspPlan.getLogisticChains());
     Random rand = MatsimRandom.getRandom();
     int index = rand.nextInt(logisticChains.size());

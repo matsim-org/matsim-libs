@@ -18,6 +18,9 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 final class ProximityStrategyFactory {
+  //This is ok so as long as it is **non-public**.
+  //Before making it public, it should be configurable either via config or Injection.
+  //KMT, KN (Jan'24)
 
   // yyyy This factory class contains a long anonymous class.  It seems that it should be the other way round: The anonymous class should be a proper
   // class, and the factory method (or maybe just normal constructor) should be contained in the class.  At some point, try to exchange.  kmt & kai, mar'24

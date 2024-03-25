@@ -116,9 +116,9 @@ public class CollectionLSPReplanningTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-		collectionPlan.setAssigner(assigner);
+		collectionPlan.setInitialShipmentAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
@@ -189,8 +189,7 @@ public class CollectionLSPReplanningTest {
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager manager = new LSPStrategyManagerImpl();
 					{
-						ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-						maybeTodayAssigner.setLSP( collectionLSP );
+						InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
 						final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
 						// (a factory makes sense if it is passed around; in this case it feels like overkill.  kai, jul'22)
 						manager.addStrategy( strategy, null, 1 );

@@ -94,9 +94,9 @@ public class AssignerRequirementsTest {
 				.build();
 		redChain.getAttributes().putAttribute("color", "red");
 
-		ShipmentAssigner assigner = new RequirementsAssigner();
+		InitialShipmentAssigner assigner = new RequirementsAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-		collectionPlan.setAssigner(assigner);
+		collectionPlan.setInitialShipmentAssigner(assigner);
 		collectionPlan.addLogisticChain(redChain);
 
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);

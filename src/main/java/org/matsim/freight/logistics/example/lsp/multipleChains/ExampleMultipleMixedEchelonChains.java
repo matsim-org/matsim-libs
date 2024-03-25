@@ -25,7 +25,6 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -34,7 +33,6 @@ final class ExampleMultipleMixedEchelonChains {
 
   static final double HUBCOSTS_FIX = 100;
   private static final Logger log = LogManager.getLogger(ExampleMultipleMixedEchelonChains.class);
-  private static final AssignerSetting assignerSetting = AssignerSetting.primary;
   private static final double TOLL_VALUE = 1000;
   private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
   private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
@@ -124,10 +122,8 @@ final class ExampleMultipleMixedEchelonChains {
       }
       ConfigUtils.applyCommandline(config, args);
     } else {
-      config
-          .controller()
-          .setOutputDirectory("output/multipleMixedEchelonChains_" + assignerSetting);
-      config.controller().setLastIteration(0);
+      config.controller().setOutputDirectory("output/multipleMixedEchelonChains_twoPlans");
+      config.controller().setLastIteration(2);
     }
     config
         .network()
@@ -165,6 +161,93 @@ final class ExampleMultipleMixedEchelonChains {
   private static LSP createLSP(Scenario scenario) {
     log.info("create LSP");
     Network network = scenario.getNetwork();
+
+    LSPPlan singleTwoEchelonChainPlan;
+    {
+      LogisticChain hubChain1;
+      {
+        Carrier mainCarrier1 = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+        mainCarrier1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+        CarriersUtils.addCarrierVehicle(
+            mainCarrier1,
+            CarrierVehicle.newInstance(
+                Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+        LSPResource mainCarrierResource1 =
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
+                    mainCarrier1, network)
+                .setFromLinkId(DEPOT_LINK_ID)
+                .setMainRunCarrierScheduler(
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                .setToLinkId(HUB_LINK_ID)
+                .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
+                .build();
+
+        LogisticChainElement mainCarrierElement1 =
+            LSPUtils.LogisticChainElementBuilder.newInstance(
+                    Id.create("mainCarrierElement", LogisticChainElement.class))
+                .setResource(mainCarrierResource1)
+                .build();
+
+        LSPResourceScheduler hubScheduler1 =
+            ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
+                .setCapacityNeedFixed(10)
+                .setCapacityNeedLinear(1)
+                .build();
+
+        LSPResource hubResource1 =
+            ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
+                    Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
+                .setTransshipmentHubScheduler(hubScheduler1)
+                .build();
+        LSPUtils.setFixedCost(hubResource1, HUBCOSTS_FIX);
+
+        LogisticChainElement hubElement1 =
+            LSPUtils.LogisticChainElementBuilder.newInstance(
+                    Id.create("HubElement", LogisticChainElement.class))
+                .setResource(hubResource1)
+                .build();
+
+        Carrier distributionCarrier1 =
+            CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+        distributionCarrier1
+            .getCarrierCapabilities()
+            .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+        CarriersUtils.addCarrierVehicle(
+            distributionCarrier1,
+            CarrierVehicle.newInstance(
+                Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_05));
+        LSPResource distributionCarrierResource1 =
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
+                    distributionCarrier1, network)
+                .setDistributionScheduler(
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                .build();
+
+        LogisticChainElement distributionCarrierElement1 =
+            LSPUtils.LogisticChainElementBuilder.newInstance(
+                    Id.create("distributionCarrierElement", LogisticChainElement.class))
+                .setResource(distributionCarrierResource1)
+                .build();
+
+        mainCarrierElement1.connectWithNextElement(hubElement1);
+        hubElement1.connectWithNextElement(distributionCarrierElement1);
+
+        hubChain1 =
+            LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))
+                .addLogisticChainElement(mainCarrierElement1)
+                .addLogisticChainElement(hubElement1)
+                .addLogisticChainElement(distributionCarrierElement1)
+                .build();
+      }
+
+      singleTwoEchelonChainPlan =
+          LSPUtils.createLSPPlan()
+              .addLogisticChain(hubChain1)
+              .setInitialShipmentAssigner(
+                  MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner());
+    }
 
     // A plan with a direct chain and a hub chain is created
     LSPPlan multipleMixedEchelonChainsPlan;
@@ -208,7 +291,8 @@ final class ExampleMultipleMixedEchelonChains {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource =
-            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
+                    mainCarrier, network)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
                     ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
@@ -223,13 +307,13 @@ final class ExampleMultipleMixedEchelonChains {
                 .build();
 
         LSPResourceScheduler hubScheduler =
-            TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+            ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
                 .setCapacityNeedFixed(10)
                 .setCapacityNeedLinear(1)
                 .build();
 
         LSPResource hubResource =
-            TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(
+            ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
                     Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
                 .setTransshipmentHubScheduler(hubScheduler)
                 .build();
@@ -275,28 +359,21 @@ final class ExampleMultipleMixedEchelonChains {
                 .build();
       }
 
-      ShipmentAssigner assigner;
-
-      switch (assignerSetting) {
-        case primary -> assigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
-        case roundRobin -> assigner =
-            MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
-        default -> throw new IllegalStateException("Unexpected value: " + assignerSetting);
-      }
-
       multipleMixedEchelonChainsPlan =
           LSPUtils.createLSPPlan()
               .addLogisticChain(hubChain)
               .addLogisticChain(directChain)
-              .setAssigner(assigner);
+              .setInitialShipmentAssigner(
+                  MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner());
     }
 
     List<LSPPlan> lspPlans = new ArrayList<>();
+    lspPlans.add(singleTwoEchelonChainPlan);
     lspPlans.add(multipleMixedEchelonChainsPlan);
 
     LSP lsp =
         LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-            .setInitialPlan(multipleMixedEchelonChainsPlan)
+            .setInitialPlan(singleTwoEchelonChainPlan)
             .setLogisticChainScheduler(
                 ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
                     createResourcesListFromLSPPlans(lspPlans)))
