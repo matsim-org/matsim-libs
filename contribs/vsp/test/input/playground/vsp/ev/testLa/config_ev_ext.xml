@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+<!--     <module name="ev">
+        <param name="auxDischargeTimeStep" value="10"/>
+        <param name="chargeTimeStep" value="5"/>
+        <param name="chargersFile" value="D:\MATSim\LA_large\EV_extension\input\chargers.xml"/>
+        <param name="timeProfiles" value="true"/>
+	</module> -->
+<!-- 	<module name="TimeAllocationMutator" >
+		<param name="mutationRange" value="1800.0" />
+		<param name="mutationAffectsDuration" value="true" />
+	</module> -->
+	<module name="controler" >
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="2" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="runId" value="ten_pct" />
+		<param name="outputDirectory" value="test/output/playground/vsp/ev/RunEVLAExample" />
+		<!--D:\\MATSim\\LA_large\\gondola\\test-->
+		<param name="writeEventsInterval" value="1" />
+		<param name="writePlansInterval" value="1" />
+		<!-- <param name="routingAlgorithmType" value="FastAStarLandmarks" /> -->
+	</module>
+	<module name="global" >
+		<param name="coordinateSystem" value="EPSG:6423" />
+		<param name="insistingOnDeprecatedConfigVersion" value="false" />
+		<param name="numberOfThreads" value="32" />
+	</module>
+	<module name="network" >
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+	<module name="plans" >
+		<!-- D:\\MATSim\\LA_large\\pop_2035_truck_updated.xml C:\\Users\\JiaqiMaGroup\\PycharmProjects\\PopSampler\\populationfile_10k.xml -->
+		<param name="inputPlansFile" value="ev_population.xml" /> <!--test_pop_truck_distinct.xml \ten_pct.0.plans.xml.gz  Should be set depending on the sample size. test_pop.xml-->
+		<!--D:\\MATSim\\LA_large\\gondola\\pop.xml-->
+		<!-- <param name="removingUnnecessaryPlanAttributes" value="true" /> -->
+		<!-- D:\\MATSim\\LA_large\\id_2035_truck_updated.xml C:\\Users\\JiaqiMaGroup\\PycharmProjects\\PopSampler\\objectattributesfile_10k.xml-->
+<!-- 		<param name="inputPersonAttributesFile" value="D:\\MATSim\\LA_large\\test_id_new_truck_distinct.xml" />
+		<param name="insistingOnUsingDeprecatedPersonAttributeFile" value = "true"/> -->
+		<!--param name="subpopulationAttributeName" value="D:\\MATSim\\LA_large\\subpop_orla.xml" /-->
+		<!--param name="inputCRS" value="EPSG:3498"  /-->
+	</module>
+<!-- 	<module name="vehicles" >
+		<param name="vehiclesFile" value="D:\MATSim\LA_large\EV_extension\input\test500\ev_veh_type_test500.xml" />
+	</module> -->
+<!-- 	<module name="transit" >
+		<param name="transitScheduleFile" value="D:\MATSim\LA_large\SignalSim\lametro\novateur\calib_with_ride_30_iter\input\schedule_230901.xml" />
+		<param name="useTransit" value="true" />
+		<param name="vehiclesFile" value="D:\\MATSim\\LA_large\\fareless transit\\final_vehicle.xml" />
+		<param name="usingTransitInMobsim" value="false" />
+		<param name="transitModes" value="pt" />
+	</module> -->
+	<module name="planscalcroute" >
+		<param name="networkModes" value="car,truck" />
+		<!--param name="clearDefaultTeleportedModeParams" value="true" /-->
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.4" />
+			<param name="mode" value="bike" />
+			<param name="teleportedModeSpeed" value="3.1388889" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.4" />
+			<param name="mode" value="walk" />
+			<param name="teleportedModeSpeed" value="1.0555556" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.4" />
+			<param name="mode" value="school_bus" />
+			<param name="teleportedModeSpeed" value="8.16667" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.4" />
+			<param name="mode" value="taxi" />
+			<param name="teleportedModeSpeed" value="8.16667" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.4" />
+			<param name="mode" value="ride" />
+			<param name="teleportedModeFreespeedFactor" value="1.0" />
+			<param name="teleportedModeSpeed" value="null" />
+		</parameterset>
+
+	</module>
+
+	<module name="strategy" >
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
+		<param name="maxAgentPlanMemorySize" value="5" />
+		<param name="planSelectorForRemoval" value="WorstPlanSelector" />
+
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ChangeExpBeta" />
+			<param name="subpopulation" value="person" />
+			<param name="weight" value="0.70" />
+		</parameterset>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ReRoute" />
+			<param name="subpopulation" value="person" />
+			<param name="weight" value="0.10" />
+		</parameterset>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="SubtourModeChoice" />
+			<param name="subpopulation" value="person" />
+			<param name="weight" value="0.10" />
+		</parameterset>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="TimeAllocationMutator" />
+			<param name="subpopulation" value="person" />
+			<param name="weight" value="0.10" />
+		</parameterset>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ChangeExpBeta" />
+			<param name="subpopulation" value="freight" />
+			<param name="weight" value="0.95" />
+		</parameterset>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ReRoute" />
+			<param name="subpopulation" value="freight" />
+			<param name="weight" value="0.05" />
+		</parameterset>
+	</module>
+	<module name="subtourModeChoice" >
+		<param name="chainBasedModes" value="car,bike" />
+		<param name="modes" value="car,pt,bike,walk,taxi,ride" />
+
+	</module>
+	<module name="travelTimeCalculator" >
+		<param name="analyzedModes" value="car" />
+		<param name="separateModes" value="true" />
+	</module>
+	<!--module name="vspExperimental" >
+		<param name="vspDefaultsCheckingLevel" value="abort" />
+	</module-->
+	<module name="planCalcScore" >
+		<param name="writeExperiencedPlans" value="true" />
+		<param name="fractionOfIterationsToStartScoreMSA" value="0.8" />
+		<parameterset type="scoringParameters" >
+			<param name="performing" value="1.5" />
+			<param name="waitingPt" value="-2.28" />
+			<param name="utilityOfLineSwitch" value="-0.25" />
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Home" />
+				<param name="typicalDuration" value="08:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Work" />
+				<param name="typicalDuration" value="08:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="School" />
+				<param name="typicalDuration" value="08:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Escort" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Shop" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Maintenance" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Eatout" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Visiting" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="Discretionary" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="SpecialEvent" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="freight" />
+				<param name="typicalDuration" value="1:00:00" />
+				<param name="openingTime" value="1:00:00" />
+				<param name="latestStartTime" value="23:00:00" />
+				<param name="closingTime" value="30:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="University" />
+				<param name="typicalDuration" value="01:00:00" />
+				<param name="openingTime" value="07:00:00" />
+				<param name="latestStartTime" value="11:00:00" />
+				<param name="closingTime" value="20:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="pt interaction" />
+				<param name="closingTime" value="undefined" />
+				<param name="earliestEndTime" value="undefined" />
+				<param name="latestStartTime" value="undefined" />
+				<param name="minimalDuration" value="undefined" />
+				<param name="openingTime" value="undefined" />
+				<param name="priority" value="1.0" />
+				<param name="scoringThisActivityAtAll" value="false" />
+				<param name="typicalDuration" value="undefined" />
+				<param name="typicalDurationScoreComputation" value="relative" />
+			</parameterset>
+
+        <parameterset type="activityParams">
+            <param name="activityType" value="h"/>
+            <param name="typicalDuration" value="22:00:00"/>
+            <param name="typicalDurationScoreComputation" value="relative"/>
+            <param name="scoringThisActivityAtAll" value="true"/>
+
+        </parameterset>
+
+        <parameterset type="activityParams">
+            <param name="activityType" value="car charging interaction"/>
+            <param name="typicalDuration" value="01:30:00"/>
+            <param name="openingTime" value="07:30:00"/>
+            <param name="closingTime" value="21:30:00"/>
+            <param name="typicalDurationScoreComputation" value="relative"/>
+            <param name="scoringThisActivityAtAll" value="false"/>
+
+        </parameterset>
+
+			<parameterset type="modeParams" >
+				<param name="constant" value="20.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+				<param name="mode" value="car" />
+				<param name="monetaryDistanceRate" value="0.0" />
+				<!--param name="dailyMonetaryConstant" value="-15.47" -0.000104/>
+				<param name="dailyUtilityConstant" value="10.0" /-->
+			</parameterset>
+
+
+			<parameterset type="modeParams" >
+				<param name="constant" value="-20.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-3.4" />
+				<param name="mode" value="ride" />
+				<!--param name="monetaryDistanceRate" value="-0.000104" />
+				<param name="dailyMonetaryConstant" value="-0.0" /-->
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="constant" value="-12.0" />  <!---2.46-->
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.8" />
+				<param name="mode" value="pt" />
+				<!--param name="dailyMonetaryConstant" value="-7.0" /-->
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="constant" value="-9.84" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-4.5" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="mode" value="bike" />
+			</parameterset>
+			<!--parameterset type="modeParams" >
+				<param name="constant" value="-9.84" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+				<param name="monetaryDistanceRate" value="-0.000104" />
+				<param name="mode" value="access_egress_pt" />
+			</parameterset-->
+			<parameterset type="modeParams" >
+				<param name="constant" value="-4.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-2.4" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="mode" value="walk" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="constant" value="-3.85" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.2" />
+				<param name="mode" value="taxi" />
+				<param name="monetaryDistanceRate" value="-0.0025" />
+				<!--param name="dailyMonetaryConstant" value="-0.0" /-->
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="constant" value="-2.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-3.0" />
+				<param name="mode" value="school_bus" />
+				<param name="monetaryDistanceRate" value="-0.0" />
+				<!--param name="dailyMonetaryConstant" value="-0.0" /-->
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="marginalUtilityOfTraveling_util_hr" value="0" />
+				<param name="mode" value="truck" />
+				<param name="monetaryDistanceRate" value="0" />
+			</parameterset>
+			<parameterset type="modeParams" >
+			<!-- This parameter set should never actually be used. It is only here to let ModeStatsControlerListener include "pt_with_access_egress_pt" until ModeStats is fixed for that. -->
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+				<param name="mode" value="pt_with_access_egress_pt" />
+			</parameterset>
+		</parameterset>
+	</module>
+	<!--module name="swissRailRaptor" >
+		<param name="intermodalAccessEgressModeSelection" value="CalcLeastCostModePerStop" />
+		<param name="useIntermodalAccessEgress" value="true" />
+		<parameterset type="intermodalAccessEgress" >
+			<param name="initialSearchRadius" value="1500.0" />
+			<param name="linkIdAttribute" value="null" />
+			<param name="maxRadius" value="100000.0" />
+			<param name="mode" value="car" />
+			<param name="searchExtensionRadius" value="1000.0" />
+			<param name="stopFilterAttribute" value="null" />
+			<param name="stopFilterValue" value="null" />
+		</parameterset>
+		<parameterset type="intermodalAccessEgress" >
+			<param name="initialSearchRadius" value="1500.0" />
+			<param name="linkIdAttribute" value="null" />
+			<param name="maxRadius" value="100000.0" />
+			<param name="mode" value="access_egress_pt" />
+			<param name="searchExtensionRadius" value="1000.0" />
+			<param name="stopFilterAttribute" value="null" />
+			<param name="stopFilterValue" value="null" />
+		</parameterset>
+	</module-->
+
+	<!--module name="SBBPt" >
+  		<param name="deterministicServiceModes" value="rail,tram,subway,bus" />
+  		<param name="createLinkEventsInterval" value="10" />
+	</module-->
+	<module name="parallelEventHandling" >
+		<!-- Estimated number of events during mobsim run. An optional optimization hint for the framework. -->
+		<param name="estimatedNumberOfEvents" value="null" />
+		<!-- Number of threads for parallel events handler. _null_ means the framework decides by itself. 0 is currently not possible. -->
+		<param name="numberOfThreads" value="16" />
+		<!-- If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the numberOfThreads option! This feature is still experimental! -->
+		<param name="oneThreadPerHandler" value="false" />
+		<!-- If enabled, it is ensured that all events that are created during a time step of the mobility simulation are processed before the next time step is simulated. E.g. neccessary when within-day replanning is used. -->
+		<param name="synchronizeOnSimSteps" value="true" />
+	</module>
+</config>

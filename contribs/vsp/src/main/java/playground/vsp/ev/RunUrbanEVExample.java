@@ -43,7 +43,6 @@ package playground.vsp.ev;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -51,16 +50,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -78,15 +73,14 @@ import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
  */
 public class RunUrbanEVExample {
 
-	static final double CAR_BATTERY_CAPACITY_kWh = 20.;
-	static final double CAR_INITIAL_SOC = 0.5;
+	static final double CAR_BATTERY_CAPACITY_kWh = 60.;
+	static final double CAR_INITIAL_SOC = 0.8;
 
 	public static void main(String[] args) {
-//		String pathToConfig = args.length > 0 ?
-//				args[0] :
-//				"contribs/vsp/test/input/playground/vsp/ev/chessboard-config.xml";
-
-		Config config = prepareConfig( args );
+		String pathToConfig = args.length > 0 ?
+				args[0] :
+				"contribs/vsp/test/input/playground/vsp/ev/testLa/config_ev_ext.xml";
+		Config config = prepareConfig(pathToConfig);
 
 		Scenario scenario = prepareScenario( config );
 
@@ -99,7 +93,7 @@ public class RunUrbanEVExample {
 		createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		return scenario;
 	}
-	private static Config prepareConfig( String[] args ){
+	private static Config prepareConfig(String args ){
 		Config config = ConfigUtils.loadConfig( args );
 		EvConfigGroup evConfigGroup = ConfigUtils.addOrGetModule( config, EvConfigGroup.class );
 		evConfigGroup.timeProfiles = true;
@@ -111,6 +105,7 @@ public class RunUrbanEVExample {
 //		config.addModule(urbanEVConfi );
 		UrbanEVConfigGroup urbanEVConfig = ConfigUtils.addOrGetModule( config, UrbanEVConfigGroup.class );
 		urbanEVConfig.setCriticalSOC(0.4);
+		urbanEVConfig.setMaxDistanceBetweenActAndCharger_m(2000);
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none );

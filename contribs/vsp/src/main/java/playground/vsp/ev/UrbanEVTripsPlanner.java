@@ -609,6 +609,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				.stream()
 				.filter(charger -> vehicleSpecification.getChargerTypes().contains(charger.getChargerType()))
 				.collect(Collectors.toList());
+		System.out.println("FLAG: There are chargers of"+ chargerList.size());
 
 		StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(1, l -> l.getToNode().getCoord(),
 				s -> network.getLinks().get(s.getLinkId()).getToNode().getCoord()); //TODO get closest X chargers and choose randomly?
