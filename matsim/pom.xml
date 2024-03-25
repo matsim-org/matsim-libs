@@ -127,7 +127,7 @@
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil-core</artifactId>
-			<version>8.5.12</version>
+			<version>8.5.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -142,6 +142,11 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-shapefile</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geopkg</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
@@ -339,7 +344,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.6.0</version>
+						<version>3.7.1</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

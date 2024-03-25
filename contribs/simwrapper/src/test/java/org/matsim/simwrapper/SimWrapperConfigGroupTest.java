@@ -19,13 +19,10 @@ public class SimWrapperConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 		SimWrapperConfigGroup sw = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
-		sw.defaultParams().sampleSize = 0.5;
+		sw.sampleSize = 0.5;
 
 		SimWrapperConfigGroup.ContextParams p = sw.get("new");
 		p.set("dynamic", "value");
-
-		Assertions.assertThat(p.sampleSize)
-			.isEqualTo(0.5);
 
 		String path = utils.getOutputDirectory() + "/config.xml";
 

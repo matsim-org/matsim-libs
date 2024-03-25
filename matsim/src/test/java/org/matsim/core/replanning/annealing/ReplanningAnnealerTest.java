@@ -39,6 +39,19 @@ public class ReplanningAnnealerTest {
                     "8;0.1000;0.0500;0.0500;0.9000\n" +
                     "9;0.0500;0.0250;0.0250;0.9500\n" +
                     "10;0.0000;0.0000;0.0000;1.0000\n";
+
+	private String expectedLinearAnnealMultipleSubpopulations = "it;globalInnovationRate_otherAnnealer;ChangeExpBeta_otherAnnealer;TimeAllocationMutator_otherAnnealer;globalInnovationRate_subpop;ReRoute_subpop;SubtourModeChoice_subpop;ChangeExpBeta_subpop\n" +
+		"0;0.8000;0.2000;0.8000;0.5000;0.2500;0.2500;0.5000\n" +
+		"1;0.7200;0.2800;0.7200;0.4500;0.2250;0.2250;0.5500\n" +
+		"2;0.6400;0.3600;0.6400;0.4000;0.2000;0.2000;0.6000\n" +
+		"3;0.5600;0.4400;0.5600;0.3500;0.1750;0.1750;0.6500\n" +
+		"4;0.4800;0.5200;0.4800;0.3000;0.1500;0.1500;0.7000\n" +
+		"5;0.4000;0.6000;0.4000;0.2500;0.1250;0.1250;0.7500\n" +
+		"6;0.3200;0.6800;0.3200;0.2000;0.1000;0.1000;0.8000\n" +
+		"7;0.2400;0.7600;0.2400;0.1500;0.0750;0.0750;0.8500\n" +
+		"8;0.1600;0.8400;0.1600;0.1000;0.0500;0.0500;0.9000\n" +
+		"9;0.0800;0.9200;0.0800;0.0500;0.0250;0.0250;0.9500\n" +
+		"10;0.0000;1.0000;0.0000;0.0000;0.0000;0.0000;1.0000\n";
     private String expectedMsaAnneal =
             "it;globalInnovationRate;ReRoute;SubtourModeChoice;ChangeExpBeta\n" +
                     "0;0.5000;0.2500;0.2500;0.5000\n" +
@@ -360,21 +373,65 @@ public class ReplanningAnnealerTest {
         this.saConfigVar.setStartValue(0.5);
         this.saConfigVar.setDefaultSubpopulation(targetSubpop);
         this.config.replanning().getStrategySettings().forEach(s -> s.setSubpopulation(targetSubpop));
-        ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
-        s.setStrategyName("TimeAllocationMutator");
-        s.setWeight(0.25);
-        s.setSubpopulation("noAnneal");
-        this.config.replanning().addStrategySettings(s);
+
+		String otherAnnealerSubpopulation = "otherAnnealer";
+		String othertargetSubpop = otherAnnealerSubpopulation;
+		ReplanningAnnealerConfigGroup.AnnealingVariable saConfigVar2 = new ReplanningAnnealerConfigGroup.AnnealingVariable();
+        saConfigVar2.setAnnealType("linear");
+        saConfigVar2.setEndValue(0.0);
+        saConfigVar2.setStartValue(0.8);
+        saConfigVar2.setDefaultSubpopulation(othertargetSubpop);
+		this.config.replanningAnnealer().addParameterSet(saConfigVar2);
+
+		ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
+		s.setStrategyName("TimeAllocationMutator");
+		s.setWeight(0.25);
+		s.setSubpopulation(otherAnnealerSubpopulation);
+		ReplanningConfigGroup.StrategySettings s2 = new ReplanningConfigGroup.StrategySettings();
+		s2.setStrategyName("ChangeExpBeta"); // shouldn't be affected
+		s2.setWeight(0.5);
+		s2.setSubpopulation(otherAnnealerSubpopulation);
+		this.config.replanning().addStrategySettings(s2);
+		this.config.replanning().addStrategySettings(s);
+
+
+		ReplanningConfigGroup.StrategySettings noAnnealSettings = new ReplanningConfigGroup.StrategySettings();
+        noAnnealSettings.setStrategyName("TimeAllocationMutator");
+        noAnnealSettings.setWeight(0.25);
+        noAnnealSettings.setSubpopulation("noAnneal");
+        this.config.replanning().addStrategySettings(noAnnealSettings);
 
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedLinearAnnealMultipleSubpopulations, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(targetSubpop);
+        List<Double> weights2 = sm.getWeights(otherAnnealerSubpopulation);
 
         Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+        Assertions.assertEquals(1.0, weights2.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
     }
+
+	@Test
+	void testNullSubpopulationAnneal() throws IOException {
+		String targetSubpop = null;
+		this.saConfigVar.setAnnealType("linear");
+		this.saConfigVar.setEndValue(0.0);
+		this.saConfigVar.setStartValue(0.5);
+		this.saConfigVar.setDefaultSubpopulation(targetSubpop);
+		this.config.replanning().getStrategySettings().forEach(s -> s.setSubpopulation(targetSubpop));
+
+		Controler controler = new Controler(this.scenario);
+		controler.run();
+
+		Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+
+		StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
+		List<Double> weights = sm.getWeights(targetSubpop);
+
+		Assertions.assertEquals(1.0, weights.stream().mapToDouble(Double::doubleValue).sum(), 1e-4);
+	}
 
 }

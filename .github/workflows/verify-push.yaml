@@ -75,7 +75,7 @@ jobs:
       - name: Detect changes against master
         # we only want to build matsim (module) if changes are not limited to contribs
         id: detect-changes
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         if: ${{matrix.module == 'matsim'}}
         with:
           filters: |

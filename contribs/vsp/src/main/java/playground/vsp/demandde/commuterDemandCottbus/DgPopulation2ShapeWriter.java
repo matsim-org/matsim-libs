@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -44,7 +44,7 @@ import org.opengis.referencing.operation.MathTransform;
  */
 public class DgPopulation2ShapeWriter {
 
-	
+
 	private Population pop;
 	private CoordinateReferenceSystem popCrs;
 
@@ -53,7 +53,7 @@ public class DgPopulation2ShapeWriter {
 		this.pop = pop;
 		this.popCrs = crs;
 	}
-	
+
 	public void write(String activityType, String filename, CoordinateReferenceSystem targetCrs){
 		try {
 			MathTransform transformation = CRS.findMathTransform(this.popCrs, targetCrs, true);
@@ -66,7 +66,7 @@ public class DgPopulation2ShapeWriter {
 					addAttribute("start_time", Double.class).
 					addAttribute("end_time", Double.class).
 					create();
-			
+
 			List<SimpleFeature> features = new ArrayList<SimpleFeature>();
 			SimpleFeature f = null;
 			for (Person p : this.pop.getPersons().values()){
@@ -75,7 +75,7 @@ public class DgPopulation2ShapeWriter {
 					if (pe instanceof Activity){
 						Activity activity = (Activity) pe;
 						if (activity.getType().compareTo(activityType) == 0){
-							
+
 							String id = p.getId().toString();
 							String type = activity.getType();
 							Double startTime = activity.getStartTime().seconds();
@@ -83,20 +83,20 @@ public class DgPopulation2ShapeWriter {
 
 							Coordinate actCoordinate = MGC.coord2Coordinate(activity.getCoord());
 							actCoordinate = JTS.transform(actCoordinate, actCoordinate, transformation);
-							
+
 							f = factory.createPoint(actCoordinate, new Object[] {id, type, startTime, endTime}, null);
 							features.add(f);
 						}
 					}
 				}
 			}
-			
-			ShapeFileWriter.writeGeometries(features, filename);
+
+			GeoFileWriter.writeGeometries(features, filename);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-	
+
 	}
-	
+
 }

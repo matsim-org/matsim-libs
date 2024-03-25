@@ -2,13 +2,14 @@ package org.matsim.modechoice.estimators;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.modechoice.EstimatorContext;
+import org.matsim.modechoice.ModeAvailability;
 
 /**
  * Estimator for a single leg.
  *
  * @param <T> enumeration of possible ownerships
  */
-public interface LegEstimator<T extends Enum<?>> {
+public interface LegEstimator {
 
 	/**
 	 * Calculate an estimate of utility íf this mode would be used.
@@ -20,7 +21,7 @@ public interface LegEstimator<T extends Enum<?>> {
 	 * @param option  used mode availability
 	 * @return Estimated utility
 	 */
-	double estimate(EstimatorContext context, String mode, Leg leg, T option);
+	double estimate(EstimatorContext context, String mode, Leg leg, ModeAvailability option);
 
 
 

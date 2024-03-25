@@ -7,6 +7,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -204,8 +207,8 @@ public class PrebookingTest {
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("lateRequest");
 			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(4000.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(4103.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(4000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(4104.0, requestInfo.dropoffTime, 1e-3);
 		}
 	}
 
@@ -478,5 +481,137 @@ public class PrebookingTest {
 
 		// Three stops, 2x pickup, 1x dropoff
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
+
+	@Test
+	void interactionTimes() {
+		/*-
+		 * Here we test prebookings in combination with non-zero interaction times for pickup and dropoff
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				// 1800 indicated but only departing 2000
+				.addRequest("personA", 0, 0, 5, 5, 2000.0, 0.0, 2000.0 - 200.0) //
+				.configure(600.0, 1.3, 600.0, 60.0) //
+				.endTime(10.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(PassengerStopDurationProvider.class)
+						.toInstance(StaticPassengerStopDurationProvider.of(60.0, 30.0));
+			}
+		});
+
+		controller.run();
+
+		RequestInfo requestInfo = environment.getRequestInfo().get("personA");
+		assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+		assertEquals(2060.0, requestInfo.pickupTime, 1e-3);
+		assertEquals(2301.0, requestInfo.dropoffTime, 1e-3);
+
+		var taskInfo = environment.getTaskInfo().get("vehicleA");
+		assertEquals("STAY", taskInfo.get(0).type);
+		assertEquals("DRIVE", taskInfo.get(1).type);
+		assertEquals("STAY", taskInfo.get(2).type);
+		assertEquals("STOP", taskInfo.get(3).type);
+		assertEquals("DRIVE", taskInfo.get(4).type);
+		assertEquals("STOP", taskInfo.get(5).type);
+
+		assertEquals(1.0, taskInfo.get(1).startTime, 1e-3); // Pickup drive
+		assertEquals(86.0, taskInfo.get(2).startTime, 1e-3); // Starting to wait
+		assertEquals(1800.0, taskInfo.get(3).startTime, 1e-3); // Starting stop
+		assertEquals(2060.0, taskInfo.get(3).endTime, 1e-3); // Ending stop (260s duration)
+		assertEquals(2060.0, taskInfo.get(4).startTime, 1e-3); // Starting drive (ending stop)
+	}
+
+	@Test
+	void destinationEqualsPrebookedOrigin_twoRequests() {
+		/*-
+		 * In this test, we have two prebooked requests:
+		 * P[A] ---------> D[A]     P[B] --------> D[B]
+		 * 
+		 * The dropoff of A happens at the same place as the pickup of B. Then we dispatch a new request C 
+		 * traveling the same trip as A. Without an implemented fix, inserting the dropfof between D[A] and P[B] 
+		 * was not an option as P[B] was the same link as the destination of C. The only viable dropoff insertion 
+		 * was after P[B], which, however, was too late.
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.addRequest("requestA", 1, 1, 4, 4, 1000.0, 0.0) //
+				.addRequest("requestB", 4, 4, 8, 8, 8000.0, 1.0) //
+				.addRequest("requestC", 1, 1, 4, 4, 1000.0, 2.0) //
+				.configure(300.0, 2.0, 1800.0, 60.0) //
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(1000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(1188.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB");
+			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(8000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(8230.0, requestInfo.dropoffTime, 1e-3);
+		}
+		
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestC");
+			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(1000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(1188.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		assertEquals(4, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
+	
+	@Test
+	void destinationEqualsPrebookedOrigin_oneRequest() {
+		/*-
+		 * In this test, we aprebooked requests:
+		 * P[A] ---------> D[A]
+		 * 
+		 * Then we dispatch a new request C before A. The destination of C is the origin of A. Without an implemented fix, 
+		 * inserting the dropoff before P[A] was not allowed as it is the same link, but inserting after D[A] was too late.
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.addRequest("requestA", 4, 4, 8, 8, 4000.0, 1.0) //
+				.addRequest("requestB", 1, 1, 4, 4, 1000.0, 2.0) //
+				.configure(300.0, 2.0, 1800.0, 60.0) //
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(4000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(4230.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB");
+			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(1000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(1188.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		assertEquals(4, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
 	}
 }

@@ -141,9 +141,9 @@ public final class VehicleUtils {
 		var personVehicles = (PersonVehicles) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
 		if (personVehicles == null) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() +
-					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-					"a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
-					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
+								   ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+								   "a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
+								   "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
 		}
 		return personVehicles.getModeVehicles();
 	}
@@ -167,15 +167,29 @@ public final class VehicleUtils {
 		Map<String, Id<Vehicle>> vehicleIds = getVehicleIds(person);
 		if (!vehicleIds.containsKey(mode)) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
-					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-					"a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
-					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
+								   ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+								   "a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
+								   "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
 			);
 		}
 		return vehicleIds.get(mode);
 	}
 
-    /**
+	/**
+	 * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
+	 *
+	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
+	 *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
+	 *                      and provided values are merged into one map
+	 *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
+	 *
+	 * @deprecated inline to more expressive method
+	 */
+	@Deprecated
+	public static void insertVehicleIdsIntoAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle){
+		insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
+	}
+	/**
 	 * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
 	 *
 	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
@@ -183,7 +197,7 @@ public final class VehicleUtils {
 	 *                      and provided values are merged into one map
 	 *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
 	 */
-	public static void insertVehicleIdsIntoAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
+	public static void insertVehicleIdsIntoPersonAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
 		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
 		// copy in case it's a UnmodifiableMap
 		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
@@ -200,8 +214,17 @@ public final class VehicleUtils {
 	/**
 	 * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
 	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+	 * @deprecated please inline to more expressive method name
 	 */
+	@Deprecated
 	public static void insertVehicleTypesIntoAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType) {
+		insertVehicleTypesIntoPersonAttributes( person, modeToVehicleType );
+	}
+	/**
+	 * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
+	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+	 */
+	public static void insertVehicleTypesIntoPersonAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType) {
 		Object attr = person.getAttributes().getAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY);
 
 		Map<String, Id<VehicleType>> modeToTypesCopy = new HashMap<>(modeToVehicleType);
@@ -273,7 +296,7 @@ public final class VehicleUtils {
 	}
 
 	public static void setFuelConsumption(VehicleType vehicleType, double literPerMeter) {
-    	setFuelConsumption(vehicleType.getEngineInformation(), literPerMeter);
+		setFuelConsumption(vehicleType.getEngineInformation(), literPerMeter);
 	}
 
 	//******** EngineInformation attributes ************
@@ -307,11 +330,11 @@ public final class VehicleUtils {
 	}
 
 	public static Double getEnergyConsumptionKWhPerMeter(EngineInformation engineInformation) {
-    	return (Double) engineInformation.getAttributes().getAttribute(ENERGYCONSUMPTION);
- 	}
+		return (Double) engineInformation.getAttributes().getAttribute(ENERGYCONSUMPTION);
+	}
 
 	public static void setEnergyConsumptionKWhPerMeter(EngineInformation engineInformation, double energyConsumptionKWhPerMeter) {
-		 engineInformation.getAttributes().putAttribute(ENERGYCONSUMPTION, energyConsumptionKWhPerMeter);
+		engineInformation.getAttributes().putAttribute(ENERGYCONSUMPTION, energyConsumptionKWhPerMeter);
 	}
 
 	public static Double getEnergyCapacity(EngineInformation engineInformation) {

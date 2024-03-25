@@ -39,7 +39,7 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.network.io.NetworkReaderTeleatlas;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -171,7 +171,7 @@ public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRun
 		NetworkExpandNode neModule = new NetworkExpandNode(network, expansionRadius, this.linkSeparation);
 
 		TreeMap<String, TreeMap<Integer,Id<Link>>> mSequences = new TreeMap<>();
-		
+
 		try (FileInputStream fis = new FileInputStream(this.mpDbfFileName)) {
 			DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
 			// get header indices
@@ -190,7 +190,7 @@ public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRun
 			log.trace("    "+MP_ID_NAME+"-->"+mpIdNameIndex);
 			log.trace("    "+MP_SEQNR_NAME+"-->"+mpSeqNrNameIndex);
 			log.trace("    "+MP_TRPELID_NAME+"-->"+mpTrpelIDNameIndex);
-	
+
 			// create mp data structure
 			// TreeMap<mpId,TreeMap<mpSeqNr,linkId>>
 			log.info("  parsing meneuver paths dbf file...");
@@ -218,7 +218,7 @@ public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRun
 		// TreeMap<NodeId,ArrayList<Tuple<MnId,MnFeatType>>>
 		log.info("  parsing meneuver shape file...");
 		TreeMap<Id<Node>, ArrayList<Tuple<String, Integer>>> maneuvers = new TreeMap<>();
-		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.mnShpFileName);
+		SimpleFeatureSource fs = GeoFileReader.readDataFile(this.mnShpFileName);
 		SimpleFeatureIterator fIt = fs.getFeatures().features();
 		while (fIt.hasNext()) {
 			SimpleFeature f = fIt.next();
@@ -256,8 +256,8 @@ public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRun
 		int virtualLinksCnt = 0;
 		for (Map.Entry<Id<Node>, ArrayList<Tuple<String, Integer>>> entry : maneuvers.entrySet()) {
 			Id<Node> nodeId = entry.getKey();
-			if (network.getNodes().get(nodeId) == null) { 
-				log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); 
+			if (network.getNodes().get(nodeId) == null) {
+				log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway...");
 				nodesIgnoredCnt++;
 			} else {
 				// node found
@@ -282,7 +282,7 @@ public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRun
 							inLink = n.getInLinks().get(Id.create(firstLinkid+"TF", Link.class));
 						}
 						Link outLink = n.getOutLinks().get(Id.create(otherLinkId+"FT", Link.class));
-						if (outLink == null) { 
+						if (outLink == null) {
 							outLink = n.getOutLinks().get(Id.create(otherLinkId+"TF", Link.class));
 						}
 						if ((inLink != null) && (outLink != null)) {

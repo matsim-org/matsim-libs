@@ -244,6 +244,11 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
+	void testMicroTrainFollowingFixedVsMovingBlock() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
+	}
+
+	@Test
 	void testMicroStationSameLink() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
 	}

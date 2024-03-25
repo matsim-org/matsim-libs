@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -161,7 +161,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 			}
 		}
 		try{
-			ShapeFileWriter.writeGeometries(features, file);
+			GeoFileWriter.writeGeometries(features, file);
 		}catch(ServiceConfigurationError e){
 			e.printStackTrace();
 		} catch (UncheckedIOException e) {
