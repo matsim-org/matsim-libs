@@ -20,6 +20,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
@@ -93,7 +94,7 @@ final class ExampleGroceryDeliveryMultipleChains {
                       // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
                       //					strategyManager.setMaxPlansPerAgent(5);
                       strategyManager.setPlanSelectorForRemoval(
-                          new LSPWorstPlanForRemovalSelector());
+                          new GenericWorstPlanForRemovalSelector<>());
                       return strategyManager;
                     });
           }
