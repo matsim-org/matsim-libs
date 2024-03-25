@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GenericWorstPlanForRemovalSelector<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
-	private static final String UNDEFINED_TYPE = "undefined";
+	public static final String UNDEFINED_TYPE = "undefined";
 
 	@Override
 	public T selectPlan(HasPlansAndId<T, I> person) {
