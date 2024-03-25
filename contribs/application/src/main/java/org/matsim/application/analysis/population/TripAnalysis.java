@@ -38,7 +38,8 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 @CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
-	produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv"}
+	produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
+				"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv"}
 )
 public class TripAnalysis implements MATSimAppCommand {
 
@@ -189,7 +190,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeModeShare(joined, labels);
 
 		if (groups != null) {
-			groups.analyzeModeShare(joined, labels);
+			groups.analyzeModeShare(joined, labels, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
 		writePopulationStats(persons, joined);

@@ -11,7 +11,9 @@ import tech.tablesaw.selection.Selection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
@@ -82,7 +84,7 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void analyzeModeShare(Table trips, List<String> dists) {
+	void analyzeModeShare(Table trips, List<String> dists, Function<String, Path> output) {
 
 		for (Group group : groups) {
 
@@ -114,9 +116,8 @@ final class TripByGroupAnalysis {
 					.toArray(String[]::new)
 			);
 
-			// TODO: write trip analysis, obtain output path from TripAnalysis
-//			aggr.write().csv(output.getPath("mode_share_per_dist.csv").toFile());
-
+			String name = String.join("_", group.columns);
+			aggr.write().csv(output.apply(name).toFile());
 		}
 	}
 

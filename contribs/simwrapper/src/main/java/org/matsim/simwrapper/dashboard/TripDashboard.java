@@ -26,6 +26,8 @@ public class TripDashboard implements Dashboard {
 	@Nullable
 	private final String modeUsersRefCsv;
 
+	private String groupedRefData;
+
 	private String[] args;
 
 	/**
@@ -52,6 +54,14 @@ public class TripDashboard implements Dashboard {
 	}
 
 	/**
+	 * Set grouped reference data. Will enable additional tab with analysis for subgroups of the population.
+	 */
+	public TripDashboard withGroupedRefData(String groupedRefData) {
+		this.groupedRefData = groupedRefData;
+		return this;
+	}
+
+	/**
 	 * Set argument that will be passed to the analysis script. See {@link TripAnalysis}.
 	 */
 	public TripDashboard setAnalysisArgs(String... args) {
@@ -64,6 +74,15 @@ public class TripDashboard implements Dashboard {
 
 		header.title = "Trips";
 		header.description = "General information about modal share and trip distributions.";
+
+		String[] args = new String[this.groupedRefData == null ? this.args.length: this.args.length + 2];
+		System.arraycopy(this.args, 0, args, 0, this.args.length);
+
+		// Add ref data to the argument if set
+		if (groupedRefData != null) {
+			args[this.args.length] = "--input-ref-data";
+			args[this.args.length + 1] = groupedRefData;
+		}
 
 		Layout.Row first = layout.row("first");
 		first.el(Plotly.class, (viz, data) -> {
@@ -226,5 +245,10 @@ public class TripDashboard implements Dashboard {
 
 		});
 
+		if (groupedRefData != null) {
+
+			// TODO create the additional tab
+
+		}
 	}
 }
