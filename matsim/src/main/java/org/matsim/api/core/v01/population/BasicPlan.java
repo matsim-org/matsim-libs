@@ -21,10 +21,19 @@
 
  package org.matsim.api.core.v01.population;
 
+import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+
 public interface BasicPlan {
 
-	public abstract void setScore(Double score);
+	void setScore( Double score );
 
-	public abstract Double getScore();
+	Double getScore();
+
+	/**
+	 * Plan type, which may be used to ensure there is at least one plan of a certain type.
+	 */
+	default String getType() {
+		return GenericWorstPlanForRemovalSelector.UNDEFINED_TYPE;
+	}
 	
 }
