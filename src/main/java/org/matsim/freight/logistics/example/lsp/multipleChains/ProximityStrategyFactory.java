@@ -22,14 +22,17 @@ final class ProximityStrategyFactory {
   //Before making it public, it should be configurable either via config or Injection.
   //KMT, KN (Jan'24)
 
+  // yyyy This factory class contains a long anonymous class.  It seems that it should be the other way round: The anonymous class should be a proper
+  // class, and the factory method (or maybe just normal constructor) should be contained in the class.  At some point, try to exchange.  kmt & kai, mar'24
+
+  // @formatter:off
+
   private ProximityStrategyFactory() {} // class contains only static methods; do not instantiate
 
   static GenericPlanStrategy<LSPPlan, LSP> createStrategy(Network network) {
 
-    GenericPlanStrategyImpl<LSPPlan, LSP> strategy =
-        new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
-    GenericPlanStrategyModule<LSPPlan> randomModule =
-        new GenericPlanStrategyModule<>() {
+    GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
+    GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {
 
           @Override
           public void prepareReplanning(ReplanningContext replanningContext) {}

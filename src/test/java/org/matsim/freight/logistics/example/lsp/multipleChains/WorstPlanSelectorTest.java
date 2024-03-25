@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -21,6 +21,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -249,7 +250,7 @@ public class WorstPlanSelectorTest {
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
 					strategyManager.addStrategy( RandomDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(2);
-					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
+					strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>() );
 					return strategyManager;
 				});
 			}
