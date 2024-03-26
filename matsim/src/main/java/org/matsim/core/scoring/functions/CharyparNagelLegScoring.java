@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -58,19 +61,20 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Double.NaN;
 	private final Set<String> ptModes;
-	
-	private Set<String> modesAlreadyConsideredForDailyConstants;
-	
+	private final Set<String> modesAlreadyConsideredForDailyConstants;
+	private final DoubleList legScores;
+
 	private final double marginalUtilityOfMoney;
-	
+
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
 		this.ptModes = ptModes;
-		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.legScores = new DoubleArrayList();
 		this.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney;
 	}
-	
+
 	/**
 	 * Scoring with person-specific marginal utility of money
 	 */
@@ -78,7 +82,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		this.params = params;
 		this.network = network;
 		this.ptModes = ptModes;
-		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.legScores = new DoubleArrayList();
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 	}
 
@@ -99,11 +104,23 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		return this.score;
 	}
 
+	@Override
+	public void explainScore(StringBuilder out) {
+		out.append("legs_util=").append(score);
+
+		// Store for each leg
+		if (!legScores.isEmpty()) {
+			for (int i = 0; i < legScores.size(); i++) {
+				out.append(ScoringFunction.SCORE_DELIMITER).append(" legs_").append(i).append("_util=").append(legScores.getDouble(i));
+			}
+		}
+	}
+
 	private static int ccc=0 ;
-	
+
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
-		double travelTime = arrivalTime - departureTime; // travel time in seconds	
+		double travelTime = arrivalTime - departureTime; // travel time in seconds
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
 			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.non_network_walk )
@@ -136,7 +153,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
-		
+
 		// account for the daily constants
 		if (!modesAlreadyConsideredForDailyConstants.contains(leg.getMode())) {
 			tmpScore += modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * this.marginalUtilityOfMoney;
@@ -144,10 +161,10 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		}
 		// yyyy the above will cause problems if we ever decide to differentiate pt mode into bus, tram, train, ...
 		// Might have to move the MainModeIdentifier then.  kai, sep'18
-		
+
 		return tmpScore;
 	}
-	
+
 	@Override
 	public void handleEvent(Event event) {
 		if ( event instanceof ActivityEndEvent ) {
@@ -162,7 +179,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		if ( event instanceof PersonEntersVehicleEvent && currentLegIsPtLeg ) {
 			if ( !this.nextEnterVehicleIsFirstOfTrip ) {
 				// all vehicle entering after the first triggers the disutility of line switch:
-				this.score  += params.utilityOfLineSwitch ;
+				this.score += params.utilityOfLineSwitch ;
 			}
 			this.nextEnterVehicleIsFirstOfTrip = false ;
 			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
@@ -171,7 +188,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 		if ( event instanceof PersonDepartureEvent ) {
 			String mode = ((PersonDepartureEvent)event).getLegMode();
-			
+
 			this.currentLegIsPtLeg = this.ptModes.contains(mode);
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
@@ -198,5 +215,6 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 			throw new RuntimeException("score is NaN") ;
 		}
 		this.score += legScore;
+		this.legScores.add(legScore);
 	}
 }

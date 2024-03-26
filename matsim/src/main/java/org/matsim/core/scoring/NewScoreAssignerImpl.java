@@ -41,6 +41,7 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 	private Map<Plan,Integer> msaContributions = new HashMap<>() ;
 	private Integer scoreMSAstartsAtIteration;
 	private final double learningRate;
+	private final boolean explainScores;
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 
@@ -52,16 +53,26 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 					* scoringConfigGroup.getFractionOfIterationsToStartScoreMSA() + controllerConfigGroup.getFirstIteration());
 		}
 		learningRate = scoringConfigGroup.getLearningRate();
+		explainScores = scoringConfigGroup.isWriteScoreExplanations();
 	}
 
 	public void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population) {
 		log.info("it: " + iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
+
+		StringBuilder explanation = new StringBuilder();
 
 		for (Person person : population.getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
 			double score = sf.getScore();
 			Plan plan = person.getSelectedPlan();
 			Double oldScore = plan.getScore();
+
+			if (explainScores) {
+				explanation.setLength(0);
+				sf.explainScore(explanation);
+				plan.getAttributes().putAttribute(ScoringFunction.SCORE_EXPLANATION_ATTR, explanation.toString());
+			}
+
 			if (oldScore == null) {
 				plan.setScore(score);
 				if ( plan.getScore().isNaN() ) {

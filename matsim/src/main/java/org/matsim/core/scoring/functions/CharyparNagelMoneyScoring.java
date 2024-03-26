@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring.functions;
 
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
@@ -30,7 +31,7 @@ import org.matsim.core.scoring.SumScoringFunction;
  */
 public final class CharyparNagelMoneyScoring implements SumScoringFunction.MoneyScoring {
 
-	private double score;
+	private double price;
 
 	private final double marginalUtilityOfMoney;
 
@@ -44,7 +45,7 @@ public final class CharyparNagelMoneyScoring implements SumScoringFunction.Money
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score += amount * this.marginalUtilityOfMoney ; // linear mapping of money to score
+		this.price += amount;
 	}
 
 	@Override
@@ -53,7 +54,13 @@ public final class CharyparNagelMoneyScoring implements SumScoringFunction.Money
 
 	@Override
 	public double getScore() {
-		return this.score;
+		// linear mapping of money to score
+		return this.price * this.marginalUtilityOfMoney;
 	}
 
+	@Override
+	public void explainScore(StringBuilder out) {
+		out.append("money_util=").append(getScore()).append(ScoringFunction.SCORE_DELIMITER);
+		out.append("money_price=").append(price);
+	}
 }

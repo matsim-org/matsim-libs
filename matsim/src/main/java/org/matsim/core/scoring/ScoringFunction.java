@@ -46,7 +46,7 @@ public interface ScoringFunction {
 	 * the agent is in when the simulation starts will have a startTime
 	 * of Time.getUndefinedTime(). The Activity which the agent is in when
 	 * the simulation ends will have an endTime of Time.getUndefinedTime().
-	 * It is up to the implementation what to make of this, 
+	 * It is up to the implementation what to make of this,
 	 * especially to "wrap" it "around".
 	 * @param activity
 	 */
@@ -103,10 +103,25 @@ public interface ScoringFunction {
 	double getScore();
 
 	void handleEvent( Event event ) ;
-	
+
 	default void handleTrip( TripStructureUtils.Trip trip ) {
 		// empty default implementation, since older implementations of the interface
 		// don't have this method, and work happily without. kai, sep'18
 	}
+
+	/**
+	 * Write detailed score explanation into the output {@code out}. Multiple value should be separated with {@link #SCORE_DELIMITER}.
+	 */
+	default void explainScore(StringBuilder out) {
+	}
+
+	/**
+	 * Delimiter used to separate scores in explanation string.
+	 */
+	String SCORE_DELIMITER = ";";
+	/**
+	 * The attribute that will be used for the score explanation.
+	 */
+	String SCORE_EXPLANATION_ATTR = "scoreExplanation";
 
 }
