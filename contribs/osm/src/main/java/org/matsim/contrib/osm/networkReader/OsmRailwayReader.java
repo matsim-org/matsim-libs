@@ -98,7 +98,7 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 		
 		@Override
 		OsmRailwayReader createInstance() {
-			OsmRailwayParser parser = new OsmRailwayParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
+			OsmNetworkParser parser = new OsmNetworkParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool(), OsmTags.RAILWAY);
 			return new OsmRailwayReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated, freeSpeedFactor, adjustCapacityLength, storeOriginalGeometry);
 		}
 	}
