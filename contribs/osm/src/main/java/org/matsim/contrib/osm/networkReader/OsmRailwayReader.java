@@ -15,6 +15,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
+	
+	private static final double FALLBACK_MAX_SPEED = 100.;
 
 	public OsmRailwayReader(OsmNetworkParser parser,
 							Predicate<Long> preserveNodeWithId,
@@ -57,6 +59,8 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 		
 		if (tags.containsKey(OsmTags.MAXSPEED)) {
 			link.getAttributes().putAttribute(OsmTags.MAXSPEED, tags.get(OsmTags.MAXSPEED));
+		} else {
+			link.getAttributes().putAttribute(OsmTags.MAXSPEED, FALLBACK_MAX_SPEED);
 		}
 		
 		if (tags.containsKey(OsmTags.ETCS)) {
@@ -86,12 +90,12 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 		public Builder() {
 			ConcurrentMap<String, LinkProperties> linkProperties = new ConcurrentHashMap<>();
 			linkProperties.put(OsmTags.RAIL, new LinkProperties(1, 1, 30., 1000., false));
-			linkProperties.put(OsmTags.NARROW_GAUGE, new LinkProperties(2, 1, 30., 1000., false));
-			linkProperties.put(OsmTags.LIGHT_RAIL, new LinkProperties(3, 1, 30., 1000., false));
-			linkProperties.put(OsmTags.MONORAIL, new LinkProperties(4, 1, 30., 1000., false));
-			linkProperties.put(OsmTags.FUNICULAR, new LinkProperties(5, 1, 30., 1000., false));
-			linkProperties.put(OsmTags.SUBWAY, new LinkProperties(6, 1, 30., 1000., false));
-			linkProperties.put(OsmTags.TRAM, new LinkProperties(7, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.NARROW_GAUGE, new LinkProperties(1, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.LIGHT_RAIL, new LinkProperties(1, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.MONORAIL, new LinkProperties(1, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.FUNICULAR, new LinkProperties(1, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.SUBWAY, new LinkProperties(1, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.TRAM, new LinkProperties(1, 1, 30., 1000., false));
 			
 			setLinkProperties(linkProperties);
 		}
