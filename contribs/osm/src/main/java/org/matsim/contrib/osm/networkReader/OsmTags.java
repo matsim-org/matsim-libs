@@ -52,4 +52,10 @@ public class OsmTags {
 	public static final String LIGHT_RAIL = "light_rail";
 	public static final String MONORAIL = "monorail";
 	public static final String USAGE = "usage";
+	public static final String GAUGE = "gauge";
+	public static final String ELECTRIFIED = "electrified";
+	public static final String ETCS = "etcs";
+	public static final String OPERATOR = "operator";
+
+
 }

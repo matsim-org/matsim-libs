@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -28,25 +30,49 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 		link.getAttributes().putAttribute("osm_way_type", "railway");
 		link.getAttributes().putAttribute(NetworkUtils.TYPE, railwayType);
 		
-		for (String tag : tags.keySet()) {
-			link.getAttributes().putAttribute(tag, tags.get(tag));
-		}
-		
+		setAttributes(link, tags);
 		setAllowedModes(link, tags);
+		setSpeed(link, tags);
 		
 		outfacingCallback.accept(link, tags, direction);
 	}
 
-	private static void setAllowedModes(Link link, Map<String, String> tags) {
-		if (tags.containsKey(OsmTags.SERVICE) && tags.get(OsmTags.SERVICE).equals("yard")) {
-			Set<String> allowedModes = new HashSet<>();
-			link.setAllowedModes(allowedModes);
-		} else {
-			// everything else should be allowed for rail
-			Set<String> allowedModes = new HashSet<>();
-			allowedModes.add("rail");
-			link.setAllowedModes(allowedModes);
+	private static void setSpeed(Link link, Map<String, String> tags) {
+		
+	}
+
+	private static void setAttributes(Link link, Map<String, String> tags) {
+		
+		if (tags.containsKey(OsmTags.USAGE)) {
+			link.getAttributes().putAttribute(OsmTags.USAGE, tags.get(OsmTags.USAGE));
 		}
+		
+		if (tags.containsKey(OsmTags.GAUGE)) {
+			link.getAttributes().putAttribute(OsmTags.GAUGE, tags.get(OsmTags.GAUGE));
+		}
+		
+		if (tags.containsKey(OsmTags.ELECTRIFIED)) {
+			link.getAttributes().putAttribute(OsmTags.ELECTRIFIED, tags.get(OsmTags.ELECTRIFIED));
+		}
+		
+		if (tags.containsKey(OsmTags.MAXSPEED)) {
+			link.getAttributes().putAttribute(OsmTags.MAXSPEED, tags.get(OsmTags.MAXSPEED));
+		}
+		
+		if (tags.containsKey(OsmTags.ETCS)) {
+			link.getAttributes().putAttribute(OsmTags.ETCS, tags.get(OsmTags.ETCS));
+		}
+		
+		if (tags.containsKey(OsmTags.OPERATOR)) {
+			link.getAttributes().putAttribute(OsmTags.OPERATOR, tags.get(OsmTags.OPERATOR));
+		}
+		
+	}
+
+	private static void setAllowedModes(Link link, Map<String, String> tags) {
+		Set<String> allowedModes = new HashSet<>();
+		allowedModes.add(tags.get(OsmTags.RAILWAY));
+		link.setAllowedModes(allowedModes);
 	}
 
 	@Override
@@ -57,6 +83,19 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 
 	public static class Builder extends AbstractBuilder<OsmRailwayReader> {
 
+		public Builder() {
+			ConcurrentMap<String, LinkProperties> linkProperties = new ConcurrentHashMap<>();
+			linkProperties.put(OsmTags.RAIL, new LinkProperties(1, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.NARROW_GAUGE, new LinkProperties(2, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.LIGHT_RAIL, new LinkProperties(3, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.MONORAIL, new LinkProperties(4, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.FUNICULAR, new LinkProperties(5, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.SUBWAY, new LinkProperties(6, 1, 30., 1000., false));
+			linkProperties.put(OsmTags.TRAM, new LinkProperties(7, 1, 30., 1000., false));
+			
+			setLinkProperties(linkProperties);
+		}
+		
 		@Override
 		OsmRailwayReader createInstance() {
 			OsmRailwayParser parser = new OsmRailwayParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
