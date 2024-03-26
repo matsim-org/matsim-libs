@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -203,7 +204,7 @@ public final class ShpOptions {
 	 * @param attr     the attribute to query from the shape file
 	 * @param filter   filter features by attribute values
 	 */
-	public Index createIndex(String queryCRS, String attr, Set<String> filter) {
+	public Index createIndex(String queryCRS, String attr, Predicate<SimpleFeature> filter) {
 
 		if (!isDefined())
 			throw new IllegalStateException("Shape file path not specified");
@@ -308,7 +309,7 @@ public final class ShpOptions {
 		 * @param ct   coordinate transform from query to target crs
 		 * @param attr attribute for the result of {@link #query(Coord)}
 		 */
-		Index(CoordinateTransformation ct, ShapefileDataStore ds, String attr, @Nullable Set<String> filter) throws IOException {
+		Index(CoordinateTransformation ct, ShapefileDataStore ds, String attr, @Nullable Predicate<SimpleFeature> filter) throws IOException {
 			if (shpCharset != null)
 				ds.setCharset(shpCharset);
 
@@ -321,7 +322,7 @@ public final class ShpOptions {
 					continue;
 				}
 
-				if (filter != null && !filter.contains(ft.getAttribute(attr)))
+				if (filter != null && !filter.test(ft))
 					continue;
 
 				Geometry geom = (Geometry) ft.getDefaultGeometry();
