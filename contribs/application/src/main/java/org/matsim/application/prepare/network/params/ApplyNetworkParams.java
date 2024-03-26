@@ -98,7 +98,13 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 		for (Link link : network.getLinks().values()) {
 			Feature ft = features.get(link.getId());
-			applyChanges(link, ft.junctionType(), ft.features());
+
+			try {
+				applyChanges(link, ft.junctionType(), ft.features());
+			} catch (IllegalArgumentException e) {
+				warn++;
+				log.warn("Error processing link {}", link.getId(), e);
+			}
 		}
 
 		log.warn("Observed {} warnings out of {} links", warn, network.getLinks().size());
@@ -132,7 +138,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 				case "right_before_left" -> 0.6;
 				// Motorways are kept at their max theoretical capacity
 				case "priority" -> type.startsWith("motorway") ? 1 : 0.8;
-				default -> throw new IllegalArgumentException("Unknown type: " + junctionType);
+				default -> 0;
 			};
 
 			if (perLane < cap * threshold) {
