@@ -117,7 +117,7 @@ final class TripByGroupAnalysis {
 			);
 
 			String name = String.join("_", group.columns);
-			aggr.write().csv(output.apply(name).toFile());
+			joined.write().csv(output.apply(name).toFile());
 		}
 	}
 
