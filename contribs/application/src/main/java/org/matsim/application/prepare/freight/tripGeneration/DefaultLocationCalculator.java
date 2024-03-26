@@ -56,7 +56,10 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
                 }
             }
         }
-        ShpOptions.Index index = shp.createIndex("EPSG:25832", "NUTS_ID", relevantNutsIds); // network CRS: EPSG:25832
+
+		// network CRS: EPSG:25832
+		ShpOptions.Index index = shp.createIndex("EPSG:25832", "NUTS_ID",
+			ft -> relevantNutsIds.contains(Objects.toString(ft.getAttribute("NUTS_ID"))));
 
         logger.info("Reading land use data...");
         ShpOptions.Index landIndex = landUse.getIndex("EPSG:25832"); //TODO
