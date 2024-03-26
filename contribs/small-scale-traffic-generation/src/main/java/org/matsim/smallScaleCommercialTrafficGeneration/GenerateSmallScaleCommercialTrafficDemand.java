@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +61,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controler.*;
@@ -82,6 +82,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
 
 /**
  * Tool to generate small scale commercial traffic for a selected area. The needed input data are: employee information for the area and three shapes files (zones, buildings, landuse). These data should be available with OSM.
@@ -106,10 +107,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution
 	}
 
-	private enum LanduseConfiguration {
-		useOnlyOSMLanduse, useOSMBuildingsAndLanduse, useExistingDataDistribution
-	}
-
 	private enum SmallScaleCommercialTrafficType {
 		commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic
 	}
@@ -117,11 +114,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
 	private Path configPath;
 
-	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data")
-	private Path pathToInvestigationAreaData;
+	@CommandLine.Option(names = "--pathToDataDistributionToZones", description = "Path to the data distribution to zones")
+	private Path pathToDataDistributionToZones;
 
-	@CommandLine.Option(names = "--pathToExistingDataDistributionToZones", description = "Path to the existing data distribution to zones. This is only needed if the option useExistingDataDistribution is selected.")
-	private Path pathToExistingDataDistributionToZones;
+	@CommandLine.Option(names = "--pathToCommercialFacilities", description = "Path to the commercial facilities.")
+	private Path pathToCommercialFacilities;
 
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
@@ -184,13 +181,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Path output;
 
 	private Random rnd;
-	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-	private final Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
 	private Index indexZones;
-	private Index indexBuildings;
-	private Index indexLanduse;
-	private Index indexInvestigationAreaRegions;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
@@ -237,31 +230,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				solveSeparatedVRPs(scenario, null);
 			}
 			default -> {
-				if (!Files.exists(shapeFileLandusePath)) {
-					throw new Exception("Required landuse shape file not found:" + shapeFileLandusePath.toString());
-				}
-				if (!Files.exists(shapeFileBuildingsPath)) {
-					throw new Exception(
-						"Required OSM buildings shape file {} not found" + shapeFileBuildingsPath.toString());
-				}
 				if (!Files.exists(shapeFileZonePath)) {
 					throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 				}
-				if (!Files.exists(shapeFileRegionsPath)) {
-					throw new Exception("Required regions shape file {} not found" + shapeFileRegionsPath.toString());
-				}
-
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
-				indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS, shapeFileBuildingTypeColumn);
-				indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS, shapeFileLanduseTypeColumn);
-				indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS, regionsShapeRegionColumn);
 
-				Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-					.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
-						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData,
-						pathToExistingDataDistributionToZones);
-				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone);
+				Map<String, Object2DoubleMap<String>> resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
+				filterFacilitiesForZones(scenario, facilitiesPerZone);
+				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, facilitiesPerZone);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
@@ -311,11 +287,24 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return 0;
 	}
 
+	/** Creates
+	 * @param scenario
+	 * @param facilitiesPerZone
+	 */
+	private void filterFacilitiesForZones(Scenario scenario, Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone) {
+		scenario.getActivityFacilities().getFacilities().values().forEach((activityFacility -> {
+			activityFacility.getActivityOptions().values().forEach(activityOption -> {
+				facilitiesPerZone.computeIfAbsent((String) activityFacility.getAttributes().getAttribute("zone"), k -> new HashMap<>())
+					.computeIfAbsent(activityOption.getType(), k -> new ArrayList<>()).add(activityFacility);
+			});
+		}));
+	}
+
 	/**
 	 * @param originalScenario complete Scenario
-	 * @param regionLinksMap   list with Links for each region
+	 * @param linksPerZone   list with Links for each region
 	 */
-	private void solveSeparatedVRPs(Scenario originalScenario, Map<String, Map<Id<Link>, Link>> regionLinksMap) throws Exception {
+	private void solveSeparatedVRPs(Scenario originalScenario, Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
 
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
@@ -432,11 +421,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(solvedCarriers);
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
-			if (regionLinksMap != null && !carrier.getAttributes().getAsMap().containsKey("tourStartArea")) {
+			if (linksPerZone != null && !carrier.getAttributes().getAsMap().containsKey("tourStartArea")) {
 				List<String> startAreas = new ArrayList<>();
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 					String tourStartZone = SmallScaleCommercialTrafficUtils
-						.findZoneOfLink(tour.getTour().getStartLinkId(), regionLinksMap);
+						.findZoneOfLink(tour.getTour().getStartLinkId(), linksPerZone);
 					if (!startAreas.contains(tourStartZone))
 						startAreas.add(tourStartZone);
 				}
@@ -498,7 +487,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
 		config.counts().setInputFile(null);
-
+		config.facilities().setInputFile(pathToCommercialFacilities.toString());
 		// Set flow and storage capacity to a high value
 		config.qsim().setFlowCapFactor(sample * 4);
 		config.qsim().setStorageCapFactor(sample * 4);
@@ -553,7 +542,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private void createCarriers(Scenario scenario, TripDistributionMatrix odMatrix,
 								Map<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
-								Map<String, Map<Id<Link>, Link>> regionLinksMap) {
+								Map<String, Map<Id<Link>, Link>> linksPerZone) {
 		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
 			* odMatrix.getListOfModesOrVehTypes().size();
 		int createdCarrier = 0;
@@ -689,7 +678,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							purpose, smallScaleCommercialTrafficType) / occupancyRate));
 						createNewCarrierAndAddVehicleTypes(scenario, purpose, startZone,
 							selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
-							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, smallScaleCommercialTrafficType,
+							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, linksPerZone, smallScaleCommercialTrafficType,
 							tourStartTimeSelector, tourDurationTimeSelector);
 						log.info("Create services for carrier: " + carrierName);
 						for (String stopZone : odMatrix.getListOfZones()) {
@@ -712,7 +701,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
 								24 * 3600); //TODO eventuell anpassen wegen veränderter Tourzeiten
 							createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
-								numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, regionLinksMap);
+								numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, linksPerZone);
 						}
 					}
 				}
@@ -739,13 +728,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createServices(Scenario scenario, ArrayList<String> noPossibleLinks,
 								String selectedStopCategory, String carrierName, int numberOfJobs, String[] serviceArea,
 								Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
-								Map<String, Map<Id<Link>, Link>> regionLinksMap) {
+								Map<String, Map<Id<Link>, Link>> linksPerZone) {
 
 		String stopZone = serviceArea[0];
 
 		for (int i = 0; i < numberOfJobs; i++) {
 
-			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, regionLinksMap);
+			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, linksPerZone, scenario.getActivityFacilities());
 			Id<CarrierService> idNewService = Id.create(carrierName + "_" + linkId + "_" + rnd.nextInt(10000),
 				CarrierService.class);
 
@@ -764,7 +753,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													String selectedStartCategory, String carrierName,
 													List<String> vehicleTypes, int numberOfDepots, FleetSize fleetSize,
 													int fixedNumberOfVehiclePerTypeAndLocation,
-													List<String> vehicleDepots, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+													List<String> vehicleDepots, Map<String, Map<Id<Link>, Link>> linksPerZone,
 													String smallScaleCommercialTrafficType,
 													ValueSelectorUnderGivenProbability tourStartTimeSelector,
 													ValueSelectorUnderGivenProbability tourDurationTimeSelector) {
@@ -788,7 +777,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		carriers.addCarrier(thisCarrier);
 
 		while (vehicleDepots.size() < numberOfDepots) {
-			Id<Link> link = findPossibleLink(startZone, selectedStartCategory, null, regionLinksMap);
+			Id<Link> link = findPossibleLink(startZone, selectedStartCategory, null, linksPerZone, scenario.getActivityFacilities());
 			vehicleDepots.add(link.toString());
 		}
 
@@ -877,31 +866,25 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Finds a possible link for a service or the vehicle location.
 	 */
 	private Id<Link> findPossibleLink(String zone, String selectedCategory, List<String> noPossibleLinks,
-									  Map<String, Map<Id<Link>, Link>> regionLinksMap) {
+									  Map<String, Map<Id<Link>, Link>> linksPerZone, ActivityFacilities activityFacilities) {
 
-		if (buildingsPerZone.isEmpty()) {
-			List<SimpleFeature> buildingsFeatures = indexBuildings.getAllFeatures();
-			LanduseBuildingAnalysis.analyzeBuildingType(buildingsFeatures, buildingsPerZone,
-				landuseCategoriesAndDataConnection, indexLanduse, indexZones);
-		}
 		Id<Link> newLink = null;
-		for (int a = 0; newLink == null && a < buildingsPerZone.get(zone).get(selectedCategory).size() * 2; a++) {
+		for (int a = 0; newLink == null && a < facilitiesPerZone.get(zone).get(selectedCategory).size() * 2; a++) {
 
-			SimpleFeature possibleBuilding = buildingsPerZone.get(zone).get(selectedCategory)
-				.get(rnd.nextInt(buildingsPerZone.get(zone).get(selectedCategory).size()));
-			Coord centroidPointOfBuildingPolygon = MGC
-				.point2Coord(((Geometry) possibleBuilding.getDefaultGeometry()).getCentroid());
+			ActivityFacility possibleBuilding = facilitiesPerZone.get(zone).get(selectedCategory)
+				.get(rnd.nextInt(facilitiesPerZone.get(zone).get(selectedCategory).size())); //TODO Wkt für die Auswahl anpassen
+			Coord centroidPointOfBuildingPolygon = possibleBuilding.getCoord();
 
-			int numberOfPossibleLinks = regionLinksMap.get(zone).size();
+			int numberOfPossibleLinks = linksPerZone.get(zone).size();
 
 			// searches and selects the nearest link of the possible links in this zone
-			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, regionLinksMap, newLink,
+			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, linksPerZone, newLink,
 				centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)
 			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory + "' in zone '"
-				+ zone + "' found. buildings in category: " + buildingsPerZone.get(zone).get(selectedCategory)
-				+ "; possibleLinks in zone: " + regionLinksMap.get(zone).size());
+				+ zone + "' found. buildings in category: " + facilitiesPerZone.get(zone).get(selectedCategory)
+				+ "; possibleLinks in zone: " + linksPerZone.get(zone).size());
 		return newLink;
 	}
 
@@ -909,8 +892,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Filters links by used mode "car" and creates Map with all links in each zone
 	 */
 	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
-																	Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
-		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
+																Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone) throws URISyntaxException {
+		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
 		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
 
@@ -932,30 +915,29 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		links.forEach(l -> l.getAttributes().putAttribute("zone",
 			indexZones.query((Coord) l.getAttributes().getAttribute("newCoord"))));
 		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).collect(Collectors.toList());
-		links.forEach(l -> regionLinksMap
+		links.forEach(l -> linksPerZone
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 			.put(l.getId(), l));
-		if (regionLinksMap.size() != indexZones.size())
-			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, indexZones, buildingsPerZone);
+		if (linksPerZone.size() != indexZones.size())
+			findNearestLinkForZonesWithoutLinks(networkToChange, linksPerZone, indexZones, facilitiesPerZone);
 
-		return regionLinksMap;
+		return linksPerZone;
 	}
 
 	/**
 	 * Finds for areas without links the nearest Link if the area contains any building.
 	 */
-	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> linksPerZone,
 															Index shpZones,
-															Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) {
+															Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone) {
 		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
 			String zoneID = (String) singleArea.getAttribute("areaID");
-			if (!regionLinksMap.containsKey(zoneID) && buildingsPerZone.get(zoneID) != null) {
-				for (List<SimpleFeature> buildingList : buildingsPerZone.get(zoneID).values()) {
-					for (SimpleFeature building : buildingList) {
-						Link l = NetworkUtils.getNearestLink(networkToChange,
-							MGC.point2Coord(((Geometry) building.getDefaultGeometry()).getCentroid()));
+			if (!linksPerZone.containsKey(zoneID) && facilitiesPerZone.get(zoneID) != null) {
+				for (List<ActivityFacility> buildingList : facilitiesPerZone.get(zoneID).values()) {
+					for (ActivityFacility building : buildingList) {
+						Link l = NetworkUtils.getNearestLink(networkToChange, building.getCoord());
                         assert l != null;
-                        regionLinksMap
+                        linksPerZone
 							.computeIfAbsent(zoneID, (k) -> new HashMap<>())
 							.put(l.getId(), l);
 					}
@@ -970,7 +952,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private TripDistributionMatrix createTripDistribution(
 		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
-		String smallScaleCommercialTrafficType, Scenario scenario, Path output, Map<String, Map<Id<Link>, Link>> regionLinksMap)
+		String smallScaleCommercialTrafficType, Scenario scenario, Path output, Map<String, Map<Id<Link>, Link>> linksPerZone)
 		throws Exception {
 
 		ArrayList<String> listOfZones = new ArrayList<>();
@@ -994,7 +976,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
+						network, linksPerZone, resistanceFactor, shapeFileZoneNameColumn);
 				}
 			}
 		}

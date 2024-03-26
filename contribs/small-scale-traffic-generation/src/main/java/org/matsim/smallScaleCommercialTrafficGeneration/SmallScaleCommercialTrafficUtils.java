@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import com.google.common.base.Joiner;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.SolutionCostCalculator;
@@ -28,6 +27,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.BreakActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -40,24 +40,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Pickup;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,7 +71,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class SmallScaleCommercialTrafficUtils {
 
 	private static final Logger log = LogManager.getLogger(SmallScaleCommercialTrafficUtils.class);
-	private static final Joiner JOIN = Joiner.on("\t");
 
 	/**
 	 * Creates and return the Index of the zone shape.
@@ -82,7 +80,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * @param shapeFileZoneNameColumn Column name of the zone in the shape file
 	 * @return indexZones
 	 */
-	static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
+	public static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpZones.readFeatures().iterator().next().getAttribute(shapeFileZoneNameColumn) == null)
@@ -98,7 +96,7 @@ public class SmallScaleCommercialTrafficUtils {
      * @param shapeFileLanduseTypeColumn 	Column name of the landuse in the shape file
      * @return indexLanduse
 	 */
-	 static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
+	 public static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
 		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpLanduse.readFeatures().iterator().next().getAttribute(shapeFileLanduseTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileLanduseTypeColumn + "' does not exist in the landuse shape file. Please check the input.");
@@ -113,7 +111,7 @@ public class SmallScaleCommercialTrafficUtils {
      * @param shapeFileBuildingTypeColumn 	Column name of the building in the shape file
      * @return indexBuildings
 	 */
-	static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
+	public static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
 		ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpBuildings.readFeatures().iterator().next().getAttribute(shapeFileBuildingTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileBuildingTypeColumn + "' does not exist in the building shape file. Please check the input.");
@@ -134,17 +132,6 @@ public class SmallScaleCommercialTrafficUtils {
 		if (shpRegions.readFeatures().iterator().next().getAttribute(regionsShapeRegionColumn) == null)
 			throw new NullPointerException("The column '" + regionsShapeRegionColumn + "' does not exist in the region shape file. Please check the input.");
 		return shpRegions.createIndex(shapeCRS, regionsShapeRegionColumn);
-	}
-
-	/**
-	 * Writes a csv file with the result of the distribution per zone of the input data.
-	 */
-	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-											  Path outputFileInOutputFolder, Map<String, String> zoneIdRegionConnection)
-		throws IOException {
-
-		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdRegionConnection);
-		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
 	/** Finds the nearest possible link for the building polygon.
@@ -189,39 +176,6 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 
 		return newLink;
-	}
-
-	/**
-	 * Writer of data distribution data.
-	 */
-	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-												   Path outputFileInInputFolder,
-												   Map<String, String> zoneIdRegionConnection) throws MalformedURLException {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
-			StandardCharsets.UTF_8, true);
-		try {
-			String[] header = new String[]{"zoneID", "region", "Inhabitants", "Employee", "Employee Primary Sector",
-				"Employee Construction", "Employee Secondary Sector Rest", "Employee Retail",
-				"Employee Traffic/Parcels", "Employee Tertiary Sector Rest"};
-			JOIN.appendTo(writer, header);
-			writer.write("\n");
-			for (String zone : resultingDataPerZone.keySet()) {
-				List<String> row = new ArrayList<>();
-				row.add(zone);
-				row.add(zoneIdRegionConnection.get(zone));
-				for (String category : header) {
-					if (!category.equals("zoneID") && !category.equals("region"))
-						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(category))));
-				}
-				JOIN.appendTo(writer, row);
-				writer.write("\n");
-			}
-
-			writer.close();
-
-		} catch (IOException e) {
-			log.error("Could not write the csv file with the data distribution data.", e);
-		}
 	}
 
 	/**
@@ -569,6 +523,37 @@ public class SmallScaleCommercialTrafficUtils {
 				return area;
 		}
 		return null;
+	}
+
+
+	/** TODO
+	 * @param pathToDataDistributionToZones
+	 * @return
+	 * @throws IOException
+	 */
+	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
+		if (!Files.exists(pathToDataDistributionToZones)) {
+			log.error("Required data per zone file {} not found", pathToDataDistributionToZones);
+		}
+
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
+		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
+			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
+
+			for (CSVRecord record : parse) {
+				String zoneID = record.get("zoneID");
+				resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
+				for (int n = 2; n < parse.getHeaderMap().size(); n++) {
+					resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
+						Double.parseDouble(record.get(n)), Double::sum);
+				}
+			}
+		}
+		log.info("Data distribution for " + resultingDataPerZone.size() + " zones was read from " +
+			pathToDataDistributionToZones);
+		return resultingDataPerZone;
+
 	}
 
 	/**

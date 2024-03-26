@@ -17,8 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.smallScaleCommercialTrafficGeneration;
+package org.matsim.smallScaleCommercialTrafficGeneration.prepare;
 
+import com.google.common.base.Joiner;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
@@ -34,11 +35,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
@@ -48,85 +50,64 @@ import java.util.*;
 public class LanduseBuildingAnalysis {
 
 	private static final Logger log = LogManager.getLogger(LanduseBuildingAnalysis.class);
+	private static final Joiner JOIN = Joiner.on("\t");
+	static Map<String, Object2DoubleMap<String>> resultingSumsForZones = new HashMap<>();
 
 	/**
 	 * Creates a distribution of the given input data for each zone based on the
 	 * used OSM data.
 	 */
-	static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
-																			 Map<String, List<String>> landuseCategoriesAndDataConnection,
-																			 String usedLanduseConfiguration, Index indexLanduse, Index indexZones,
-																			 Index indexBuildings, Index indexInvestigationAreaRegions,
-																			 String shapeFileZoneNameColumn,
-																			 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-																			 Path pathToInvestigationAreaData,
-																			 Path pathToExistingDataDistributionToZones)
+	public static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
+																					Map<String, List<String>> landuseCategoriesAndDataConnection,
+																					String usedLanduseConfiguration, Index indexLanduse,
+																					Index indexZones,
+																					Index indexBuildings, Index indexInvestigationAreaRegions,
+																					String shapeFileZoneNameColumn,
+																					Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+																					Path pathToInvestigationAreaData)
 		throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
 		Map<String, String> zoneIdRegionConnection = new HashMap<>();
-		Path outputFileInOutputFolder = output.resolve("calculatedData").resolve("dataDistributionPerZone.csv");
+		// aufgrund des separaten Aufbaus der Ordnerstruktur wird der Pfad angepasst
+//		Path outputFileInOutputFolder = output.resolve("calculatedData").resolve("dataDistributionPerZone.csv");
+		Path outputFileInOutputFolder = output.resolve("dataDistributionPerZone.csv");
 
-		landuseCategoriesAndDataConnection.put("Inhabitants",
-				new ArrayList<String>(Arrays.asList("residential", "apartments", "dormitory", "dwelling_house", "house",
-						"retirement_home", "semidetached_house", "detached")));
-		landuseCategoriesAndDataConnection.put("Employee Primary Sector", new ArrayList<String>(
-				Arrays.asList("farmyard", "farmland", "farm", "farm_auxiliary", "greenhouse", "agricultural")));
-		landuseCategoriesAndDataConnection.put("Employee Construction",
-				new ArrayList<String>(List.of("construction")));
-		landuseCategoriesAndDataConnection.put("Employee Secondary Sector Rest",
-				new ArrayList<String>(Arrays.asList("industrial", "factory", "manufacture", "bakehouse")));
-		landuseCategoriesAndDataConnection.put("Employee Retail",
-				new ArrayList<String>(Arrays.asList("retail", "kiosk", "mall", "shop", "supermarket")));
-		landuseCategoriesAndDataConnection.put("Employee Traffic/Parcels", new ArrayList<String>(
-				Arrays.asList("commercial", "post_office", "storage", "storage_tank", "warehouse")));
-		landuseCategoriesAndDataConnection.put("Employee Tertiary Sector Rest", new ArrayList<String>(
-				Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
+		log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
+		Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
+		createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones, indexInvestigationAreaRegions,
+			usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
+			buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection);
 
-		if (usedLanduseConfiguration.equals("useExistingDataDistribution")) {
+		Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
+		readAreaData(investigationAreaData, pathToInvestigationAreaData);
 
-			if (!Files.exists(pathToExistingDataDistributionToZones)) {
-				log.error("Required data per zone file {} not found", pathToExistingDataDistributionToZones);
-			}
+		createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
+			landuseCategoriesAndDataConnection, zoneIdRegionConnection);
 
-			try (BufferedReader reader = IOUtils.getBufferedReader(pathToExistingDataDistributionToZones.toString())) {
-				CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-						.setSkipHeaderRecord(true).build().parse(reader);
+		writeResultOfDataDistribution(resultingDataPerZone, outputFileInOutputFolder,
+			zoneIdRegionConnection);
 
-				for (CSVRecord record : parse) {
-					String zoneID = record.get("zoneID");
-					resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
-					for (int n = 2; n < parse.getHeaderMap().size(); n++) {
-						resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
-								Double.parseDouble(record.get(n)), Double::sum);
-					}
-				}
-			}
-			log.info("Data distribution for " + resultingDataPerZone.size() + " zones was imported from " +
-				pathToExistingDataDistributionToZones);
-			Files.copy(pathToExistingDataDistributionToZones, outputFileInOutputFolder, StandardCopyOption.COPY_ATTRIBUTES);
-		}
-
-		else {
-
-			log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
-
-			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
-			createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones, indexInvestigationAreaRegions,
-					usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
-					buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection);
-
-			Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
-			readAreaData(investigationAreaData, pathToInvestigationAreaData);
-
-			createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
-					landuseCategoriesAndDataConnection, zoneIdRegionConnection);
-
-			SmallScaleCommercialTrafficUtils.writeResultOfDataDistribution(resultingDataPerZone, outputFileInOutputFolder,
-					zoneIdRegionConnection);
-		}
 
 		return resultingDataPerZone;
+	}
+
+	public static void createDefaultDataConnectionForOSM(Map<String, List<String>> landuseCategoriesAndDataConnection) {
+		landuseCategoriesAndDataConnection.put("Inhabitants",
+                new ArrayList<>(Arrays.asList("residential", "apartments", "dormitory", "dwelling_house", "house",
+                        "retirement_home", "semidetached_house", "detached")));
+		landuseCategoriesAndDataConnection.put("Employee Primary Sector", new ArrayList<>(
+                Arrays.asList("farmyard", "farmland", "farm", "farm_auxiliary", "greenhouse", "agricultural")));
+		landuseCategoriesAndDataConnection.put("Employee Construction",
+                new ArrayList<>(List.of("construction")));
+		landuseCategoriesAndDataConnection.put("Employee Secondary Sector Rest",
+                new ArrayList<>(Arrays.asList("industrial", "factory", "manufacture", "bakehouse")));
+		landuseCategoriesAndDataConnection.put("Employee Retail",
+                new ArrayList<>(Arrays.asList("retail", "kiosk", "mall", "shop", "supermarket")));
+		landuseCategoriesAndDataConnection.put("Employee Traffic/Parcels", new ArrayList<>(
+                Arrays.asList("commercial", "post_office", "storage", "storage_tank", "warehouse")));
+		landuseCategoriesAndDataConnection.put("Employee Tertiary Sector Rest", new ArrayList<>(
+                Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
 	}
 
 	/**
@@ -169,7 +150,9 @@ public class LanduseBuildingAnalysis {
 					}
 				}
 		}
-
+		for (Map.Entry<String, Object2DoubleMap<String>> entry : resultingDataPerZone.entrySet()) {
+			resultingSumsForZones.put(entry.getKey(), new Object2DoubleOpenHashMap<>(entry.getValue()));
+		}
 		/*
 		 * creates the percentages of each category and zones based on the sum in this
 		 * category
@@ -257,13 +240,7 @@ public class LanduseBuildingAnalysis {
 						for (SimpleFeature building : buildingsPerZone.get(zone).get(category)) {
 							String[] buildingTypes = ((String) building.getAttribute("type")).split(";");
 							for (String singleCategoryOfBuilding : buildingTypes) {
-								double buildingLevels;
-								if (building.getAttribute("levels") == null)
-									buildingLevels = 1;
-								else
-									buildingLevels = (long) building.getAttribute("levels")
-											/ (double) buildingTypes.length;
-								double area = (int) (long) building.getAttribute("area") * buildingLevels;
+								int area = calculateAreaPerBuildingCategory(building, buildingTypes);
 								landuseCategoriesPerZone.get(zone).mergeDouble(singleCategoryOfBuilding, area,
 										Double::sum);
 							}
@@ -278,12 +255,31 @@ public class LanduseBuildingAnalysis {
 				for (SimpleFeature singleZone : zonesFeatures)
 					if (((Geometry) singleZone.getDefaultGeometry()).contains(centroidPointOfLandusePolygon)) {
 						landuseCategoriesPerZone
-								.get((String) singleZone.getAttribute("region") + "_"
-										+ (String) singleZone.getAttribute("id"))
+								.get(singleZone.getAttribute("region") + "_"
+										+ singleZone.getAttribute("id"))
 								.mergeDouble((String) singleLanduseFeature.getAttribute("fclass"),
 										(double) singleLanduseFeature.getAttribute("area"), Double::sum);
 					}
 			}
+		else {
+			throw new RuntimeException("The used landuse configuration is not known.");
+
+		}
+	}
+
+	/** Calculates the area for each usage category of a building based on the number of levels and the area.
+	 * @param building 			the building to be analyzed
+	 * @param buildingTypes 	the types of the building
+	 * @return
+	 */
+	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
+		double buildingLevels;
+		if (building.getAttribute("levels") == null)
+			buildingLevels = 1;
+		else
+			buildingLevels = (long) building.getAttribute("levels")
+					/ (double) buildingTypes.length;
+        return (int) ((long) building.getAttribute("area") * buildingLevels);
 	}
 
 	/**
@@ -358,9 +354,58 @@ public class LanduseBuildingAnalysis {
 			if (singleZone != null) {
 				categoriesOfBuilding.forEach(c -> buildingsPerZone
 						.computeIfAbsent(singleZone, k -> new HashMap<>())
-						.computeIfAbsent(c, k -> new ArrayList<SimpleFeature>()).add(singleBuildingFeature));
+						.computeIfAbsent(c, k -> new ArrayList<>()).add(singleBuildingFeature));
 			}
 		}
 		log.info("Finished analyzing buildings types.");
+	}
+
+
+	/**
+	 * Writes a csv file with the result of the distribution per zone of the input data.
+	 */
+	private static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+											  Path outputFileInOutputFolder, Map<String, String> zoneIdRegionConnection)
+		throws IOException {
+
+		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdRegionConnection);
+		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
+	}
+
+	/**
+	 * Writer of data distribution data.
+	 */
+	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+												   Path outputFileInInputFolder,
+												   Map<String, String> zoneIdRegionConnection) throws MalformedURLException {
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
+			StandardCharsets.UTF_8, true);
+		try {
+			String[] header = new String[]{"zoneID", "region", "Inhabitants", "Employee", "Employee Primary Sector",
+				"Employee Construction", "Employee Secondary Sector Rest", "Employee Retail",
+				"Employee Traffic/Parcels", "Employee Tertiary Sector Rest"};
+			JOIN.appendTo(writer, header);
+			writer.write("\n");
+			for (String zone : resultingDataPerZone.keySet()) {
+				List<String> row = new ArrayList<>();
+				row.add(zone);
+				row.add(zoneIdRegionConnection.get(zone));
+				for (String category : header) {
+					if (!category.equals("zoneID") && !category.equals("region"))
+						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(category))));
+				}
+				JOIN.appendTo(writer, row);
+				writer.write("\n");
+			}
+
+			writer.close();
+
+		} catch (IOException e) {
+			log.error("Could not write the csv file with the data distribution data.", e);
+		}
+	}
+
+	static double getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(String zone, int area, String category){
+		return area / resultingSumsForZones.get(zone).getDouble(category);
 	}
 }
