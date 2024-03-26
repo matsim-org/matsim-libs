@@ -284,8 +284,17 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
             SumoNetworkHandler.Type type = sumoHandler.types.get(edge.type);
 
-            if (type.allow.contains("bicycle") || (type.allow.isEmpty() && !type.disallow.contains("bicycle")))
+			// Determine allowed modes
+			if (!isModeAllowed("passenger", edge, type)) {
+				modes.remove(TransportMode.car);
+				modes.remove(TransportMode.ride);
+			}
+
+            if (isModeAllowed("bicycle", edge, type))
                 modes.add(TransportMode.bike);
+
+			if (isModeAllowed("truck", edge, type))
+				modes.add(TransportMode.truck);
 
             link.setAllowedModes(modes);
             link.setLength(edge.getLength());
@@ -406,6 +415,22 @@ public class SumoNetworkConverter implements Callable<Integer> {
         log.info("Removed {} superfluous lanes, total={}", removed, lanes.getLanesToLinkAssignments().size());
         return sumoHandler;
     }
+
+	/**
+	 * Determine if a mode is allowed on a link.
+	 */
+	private static boolean isModeAllowed(String mode, SumoNetworkHandler.Edge edge, SumoNetworkHandler.Type type) {
+
+		// Check edge attributes first
+		if (edge.lanes.stream().anyMatch(l -> l.allow != null && l.allow.contains(mode)))
+			return true;
+
+		if (edge.lanes.stream().allMatch(l -> l.disallow != null && l.disallow.contains(mode)))
+			return false;
+
+		// Type allows this mode
+		return type.allow.contains(mode) || (type.allow.isEmpty() && !type.disallow.contains(mode));
+	}
 
     private void writeInductionLoops(File file, SumoNetworkHandler other) throws IOException {
         Path loops = Path.of(file.getAbsolutePath().replace(".xml", "_loops.xml"));

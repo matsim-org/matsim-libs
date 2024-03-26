@@ -99,7 +99,7 @@ public class SumoNetworkHandler extends DefaultHandler {
 	/**
 	 * Merges another sumo network into this one.
 	 * To work properly, this requires that edge und junction ids are the same in both networks.
-	 * This function does not clean left over edges, when using this, a network cleaner should be user afterwards.
+	 * This function does not clean left over edges, when using this, a network cleaner should be used afterward.
 	 *
 	 * @param other other network to merge into this one
 	 * @param ct    coordinate transformation to apply
@@ -165,6 +165,20 @@ public class SumoNetworkHandler extends DefaultHandler {
 		return new Coord(xy[0] - netOffset[0], xy[1] - netOffset[1]);
 	}
 
+	/**
+	 * Parse mode list from attribute.
+	 */
+	private static Set<String> parseModes(String modes) {
+		if (modes == null)
+			return null;
+
+		return Arrays.stream(modes.split(" "))
+			.filter(s -> !s.isEmpty())
+			.map(String::trim)
+			.map(String::intern)
+			.collect(Collectors.toSet());
+	}
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
@@ -216,7 +230,9 @@ public class SumoNetworkHandler extends DefaultHandler {
 					attributes.getValue("id"),
 					Integer.parseInt(attributes.getValue("index")),
 					Double.parseDouble(attributes.getValue("length")),
-					Double.parseDouble(attributes.getValue("speed"))
+					Double.parseDouble(attributes.getValue("speed")),
+					parseModes(attributes.getValue("allow")),
+					parseModes(attributes.getValue("disallow"))
 				);
 
 				tmpEdge.lanes.add(lane);
@@ -385,15 +401,25 @@ public class SumoNetworkHandler extends DefaultHandler {
 		final double length;
 		final double speed;
 
-		Lane(String id, int index, double length, double speed) {
+		/**
+		 * Allowed vehicle types on this lane.
+		 */
+		@Nullable
+		final Set<String> allow;
+		@Nullable
+		final Set<String> disallow;
+
+		Lane(String id, int index, double length, double speed, @Nullable Set<String> allow, @Nullable Set<String> disallow) {
 			this.id = id;
 			this.index = index;
 			this.length = length;
 			this.speed = speed;
+			this.allow = allow;
+			this.disallow = disallow;
 		}
 
 		Lane withLength(double newLength) {
-			return new Lane(id, index, newLength, speed);
+			return new Lane(id, index, newLength, speed, allow, disallow);
 		}
 	}
 
