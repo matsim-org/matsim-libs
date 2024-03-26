@@ -49,11 +49,11 @@ public class RunFreightExample {
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
 			config.plans().setInputFile( null ); // remove passenger input
-			config.controller().setOutputDirectory( "./output/freight" );
+			config.controller().setOutputDirectory( "./output/freight_services" );
 			config.controller().setLastIteration( 0 );  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
 
 			FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
-      freightConfigGroup.setCarriersFile("singleCarrierFiveActivitiesWithoutRoutes_Shipments.xml");
+      freightConfigGroup.setCarriersFile("singleCarrierFiveActivitiesWithoutRoutes.xml");
 			freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml" );
 		} else {
 			config = ConfigUtils.loadConfig( args, new FreightCarriersConfigGroup() );

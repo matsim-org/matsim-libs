@@ -12,6 +12,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class RunFreightExampleTest{
@@ -42,8 +43,8 @@ public class RunFreightExampleTest{
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
-				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+				Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
 			}
 
 		} catch( Exception ee ){
