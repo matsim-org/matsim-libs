@@ -80,6 +80,20 @@ public class SumoNetworkHandler extends DefaultHandler {
 		return bitSet;
 	}
 
+	/**
+	 * Parse mode list from attribute.
+	 */
+	private static Set<String> parseModes(String modes) {
+		if (modes == null)
+			return null;
+
+		return Arrays.stream(modes.split(" "))
+			.filter(s -> !s.isEmpty())
+			.map(String::trim)
+			.map(String::intern)
+			.collect(Collectors.toSet());
+	}
+
 	public Map<String, Junction> getJunctions() {
 		return junctions;
 	}
@@ -163,20 +177,6 @@ public class SumoNetworkHandler extends DefaultHandler {
 
 	Coord createCoord(double[] xy) {
 		return new Coord(xy[0] - netOffset[0], xy[1] - netOffset[1]);
-	}
-
-	/**
-	 * Parse mode list from attribute.
-	 */
-	private static Set<String> parseModes(String modes) {
-		if (modes == null)
-			return null;
-
-		return Arrays.stream(modes.split(" "))
-			.filter(s -> !s.isEmpty())
-			.map(String::trim)
-			.map(String::intern)
-			.collect(Collectors.toSet());
 	}
 
 	@Override
