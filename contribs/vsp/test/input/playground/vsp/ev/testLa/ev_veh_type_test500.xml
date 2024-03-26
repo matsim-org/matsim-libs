@@ -47,2500 +47,2500 @@
 			<attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
 		</attributes>
 	</vehicle>
-<!--<vehicle id="14827722" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14677973" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8590781" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4804716" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8279090" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18489455" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12279899" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10663412" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12835739" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7241331" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17158168" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7260888" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6744625" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9314011" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17257362" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8652779" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1301611" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17118415" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16269253" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10198155" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13960871" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10660873" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11361703" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16966137" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7575573" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11197119" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="357053" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9498439" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14738191" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8219555" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10168368" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4404636" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9993862" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17048679" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12605349" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15864479" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14916697" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16442130" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3586221" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16344424" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3072291" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8774338" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13660356" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2198201" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2901149" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18087630" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16133687" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2245980" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18274531" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7880444" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1640413" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4344654" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2526484" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18367322" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1356811" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14306263" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11343196" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12589996" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10582413" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13068295" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9906805" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11851108" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11661206" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11880654" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15924194" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7919827" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16431622" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="471451" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3484287" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4896632" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11238552" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11522579" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14350130" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18006401" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="167828" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5137117" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14232100" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9498111" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12894390" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16766554" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9621680" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10824872" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9956390" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18705839" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9981115" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14743091" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10592832" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12427876" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5272960" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9298125" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11516580" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17154131" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18514699" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3846730" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17881596" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16025754" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13677770" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13343192" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6079102" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8889714" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17716158" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17576450" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2493925" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3587469" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1004497" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16790587" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1265229" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15587964" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17585315" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8370198" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11005163" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14633039" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15876563" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4557670" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5117239" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10652133" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16036685" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14040746" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18258416" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12962096" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9273435" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="610087" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6656113" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12727726" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8401868" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10208494" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14310494" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5661147" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18670872" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1394404" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6475657" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15428993" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13285809" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15386720" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6511704" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6989053" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17861118" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14213814" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12978154" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10164411" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12558449" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11205302" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5419352" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15983268" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12849066" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2416305" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9504235" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4367047" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9419246" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13964257" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12394741" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5322645" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16382954" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2487554" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11311239" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12331288" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9345591" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12243631" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="367545" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16783085" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6894141" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8977311" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15438473" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18274613" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11847626" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8031196" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9808268" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="641576" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9737738" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16852751" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13248812" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5681147" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3938781" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11858480" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9276109" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11933203" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15118630" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2523346" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17989960" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18016811" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12054478" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11765585" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5718476" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8833401" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7870925" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7927588" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14729611" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11745297" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3514424" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16506446" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13356504" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4668136" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15064051" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14321324" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9634144" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12015339" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10356318" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16008729" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10067884" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13326105" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14691606" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16697040" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9925481" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16727137" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10811019" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16433082" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17863388" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8330706" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17755619" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7203743" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8168470" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16744399" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11565711" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="978819" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5848240" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="516472" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10867455" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12782633" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16701636" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10836217" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="470955" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15841655" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13737932" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8042740" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9153000" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16382886" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4767959" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2338447" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="880075" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13324359" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6571568" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12181066" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11047705" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1487016" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14423330" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11034364" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12992382" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17001194" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5380025" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13882687" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14932019" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17660121" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11813068" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15859129" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="926552" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14516427" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10183922" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10693213" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9397519" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13563575" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1298897" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9879349" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13052805" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12179059" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9070920" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2641996" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10964661" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12881783" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9794196" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16918921" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6455371" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10229280" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5072742" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11297260" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17770734" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8183784" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12126674" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16928193" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18506308" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2826517" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1200267" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17409371" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1990858" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16622072" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15676032" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17512486" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11744608" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16495614" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16930760" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="837966" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10206425" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12654299" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7979602" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15273581" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10668127" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15226620" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6195727" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="586193" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15419499" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16360306" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4698366" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="287785" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15316360" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18737505" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5949714" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15862600" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8728095" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="615270" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1530331" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13371847" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4572262" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6069235" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2536096" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9567514" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1637330" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16083176" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10727296" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15060840" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15792387" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7645028" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12432248" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16448258" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14322480" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15163424" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13057042" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5846993" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4092197" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6105325" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14674098" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11913470" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8705340" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9320058" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12300763" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10118744" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14431632" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2889334" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8161838" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12159746" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14294162" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14002938" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16292601" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14929446" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13370231" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17311407" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9474914" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6600292" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2372917" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11621953" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10586357" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="253128" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11081491" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4829140" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11666286" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14546938" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12078915" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6803746" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15857406" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2196362" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15798797" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15171540" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1887872" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16926990" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12178441" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13906161" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7691297" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16453718" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11049629" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1931713" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8253950" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16920287" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14073227" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11160255" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16290992" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8952006" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16813520" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14264512" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2598147" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7846180" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7260976" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9895852" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11014406" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15018449" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2149759" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13102438" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13223381" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1977821" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14189929" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9907581" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8033155" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2058808" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10762433" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3479745" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9592385" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9921177" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8343700" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13178746" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6066418" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16191531" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15155638" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14864502" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9056437" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17911800" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12707204" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2006291" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15288691" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16320565" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9594263" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10329825" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17313201" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13170877" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7441535" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="3361154" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15028064" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15057569" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10652997" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18601468" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12978152" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="896191" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14731094" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12915727" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16245309" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5221285" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13923941" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14794627" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16398286" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7763815" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4109265" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17552462" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10005018" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14404145" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13780896" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12512614" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16473804" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2330812" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14477027" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12500933" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15709610" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7086153" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11230297" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10751691" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1766176" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14854567" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12792365" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15140865" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11338033" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16137758" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12958313" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11103816" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13013001" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2059256" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1452450" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1032323" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14046400" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="7704180" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10351584" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17168849" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="4699391" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13647162" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11658178" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15110902" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12512181" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8882934" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16648387" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9782257" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9297621" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="18455981" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10117392" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12855168" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9182343" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1608416" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14227027" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13685619" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11161920" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13324965" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11665381" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="2036768" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14141475" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="17227985" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1007868" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8294181" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12900010" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16291548" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12930187" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13189306" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11310687" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14685681" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13651068" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="754249" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16877576" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12367894" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="1036268" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5281320" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9519182" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="10339970" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="16378066" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="8771953" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11397308" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="253695" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="11843016" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="9920418" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13158957" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="13693754" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="15701087" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12969259" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="63290" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="12679679" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="14684674" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="5800875" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
-<!--<vehicle id="6248519" type="EV">-->
-<!--    <attributes>-->
-<!--        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>-->
-<!--    </attributes>-->
-<!--</vehicle>-->
+<vehicle id="14827722" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14677973" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8590781" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4804716" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8279090" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18489455" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12279899" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10663412" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12835739" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7241331" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17158168" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7260888" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6744625" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9314011" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17257362" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8652779" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1301611" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17118415" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16269253" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10198155" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13960871" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10660873" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11361703" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16966137" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7575573" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11197119" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="357053" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9498439" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14738191" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8219555" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10168368" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4404636" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9993862" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17048679" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12605349" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15864479" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14916697" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16442130" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3586221" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16344424" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3072291" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8774338" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13660356" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2198201" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2901149" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18087630" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16133687" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2245980" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18274531" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7880444" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1640413" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4344654" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2526484" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18367322" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1356811" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14306263" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11343196" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12589996" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10582413" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13068295" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9906805" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11851108" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11661206" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11880654" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15924194" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7919827" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16431622" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="471451" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3484287" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4896632" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11238552" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11522579" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14350130" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18006401" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="167828" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5137117" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14232100" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9498111" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12894390" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16766554" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9621680" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10824872" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9956390" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18705839" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9981115" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14743091" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10592832" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12427876" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5272960" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9298125" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11516580" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17154131" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18514699" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3846730" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17881596" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16025754" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13677770" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13343192" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6079102" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8889714" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17716158" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17576450" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2493925" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3587469" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1004497" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16790587" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1265229" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15587964" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17585315" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8370198" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11005163" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14633039" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15876563" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4557670" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5117239" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10652133" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16036685" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14040746" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18258416" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12962096" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9273435" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="610087" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6656113" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12727726" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8401868" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10208494" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14310494" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5661147" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18670872" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1394404" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6475657" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15428993" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13285809" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15386720" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6511704" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6989053" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17861118" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14213814" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12978154" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10164411" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12558449" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11205302" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5419352" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15983268" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12849066" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2416305" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9504235" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4367047" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9419246" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13964257" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12394741" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5322645" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16382954" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2487554" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11311239" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12331288" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9345591" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12243631" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="367545" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16783085" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6894141" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8977311" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15438473" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18274613" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11847626" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8031196" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9808268" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="641576" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9737738" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16852751" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13248812" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5681147" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3938781" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11858480" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9276109" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11933203" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15118630" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2523346" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17989960" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18016811" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12054478" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11765585" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5718476" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8833401" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7870925" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7927588" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14729611" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11745297" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3514424" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16506446" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13356504" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4668136" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15064051" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14321324" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9634144" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12015339" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10356318" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16008729" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10067884" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13326105" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14691606" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16697040" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9925481" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16727137" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10811019" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16433082" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17863388" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8330706" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17755619" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7203743" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8168470" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16744399" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11565711" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="978819" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5848240" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="516472" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10867455" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12782633" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16701636" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10836217" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="470955" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15841655" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13737932" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8042740" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9153000" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16382886" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4767959" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2338447" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="880075" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13324359" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6571568" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12181066" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11047705" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1487016" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14423330" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11034364" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12992382" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17001194" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5380025" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13882687" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14932019" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17660121" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11813068" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15859129" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="926552" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14516427" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10183922" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10693213" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9397519" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13563575" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1298897" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9879349" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13052805" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12179059" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9070920" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2641996" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10964661" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12881783" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9794196" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16918921" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6455371" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10229280" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5072742" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11297260" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17770734" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8183784" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12126674" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16928193" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18506308" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2826517" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1200267" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17409371" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1990858" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16622072" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15676032" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17512486" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11744608" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16495614" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16930760" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="837966" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10206425" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12654299" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7979602" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15273581" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10668127" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15226620" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6195727" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="586193" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15419499" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16360306" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4698366" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="287785" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15316360" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18737505" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5949714" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15862600" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8728095" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="615270" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1530331" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13371847" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4572262" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6069235" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2536096" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9567514" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1637330" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16083176" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10727296" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15060840" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15792387" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7645028" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12432248" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16448258" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14322480" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15163424" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13057042" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5846993" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4092197" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6105325" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14674098" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11913470" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8705340" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9320058" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12300763" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10118744" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14431632" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2889334" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8161838" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12159746" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14294162" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14002938" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16292601" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14929446" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13370231" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17311407" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9474914" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6600292" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2372917" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11621953" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10586357" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="253128" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11081491" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4829140" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11666286" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14546938" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12078915" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6803746" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15857406" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2196362" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15798797" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15171540" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1887872" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16926990" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12178441" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13906161" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7691297" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16453718" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11049629" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1931713" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8253950" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16920287" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14073227" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11160255" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16290992" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8952006" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16813520" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14264512" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2598147" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7846180" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7260976" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9895852" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11014406" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15018449" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2149759" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13102438" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13223381" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1977821" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14189929" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9907581" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8033155" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2058808" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10762433" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3479745" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9592385" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9921177" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8343700" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13178746" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6066418" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16191531" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15155638" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14864502" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9056437" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17911800" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12707204" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2006291" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15288691" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16320565" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9594263" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10329825" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17313201" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13170877" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7441535" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="3361154" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15028064" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15057569" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10652997" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18601468" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12978152" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="896191" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14731094" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12915727" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16245309" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5221285" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13923941" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14794627" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16398286" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7763815" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4109265" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17552462" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10005018" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14404145" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13780896" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12512614" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16473804" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2330812" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14477027" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12500933" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15709610" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7086153" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11230297" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10751691" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1766176" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14854567" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12792365" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15140865" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11338033" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16137758" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12958313" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11103816" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13013001" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2059256" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1452450" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1032323" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14046400" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="7704180" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10351584" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17168849" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="4699391" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13647162" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11658178" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15110902" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12512181" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8882934" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16648387" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9782257" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9297621" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="18455981" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10117392" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12855168" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9182343" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1608416" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14227027" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13685619" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11161920" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13324965" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11665381" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="2036768" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14141475" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="17227985" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1007868" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8294181" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12900010" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16291548" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12930187" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13189306" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11310687" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14685681" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13651068" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="754249" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16877576" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12367894" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="1036268" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5281320" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9519182" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="10339970" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="16378066" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="8771953" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11397308" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="253695" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="11843016" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="9920418" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13158957" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="13693754" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="15701087" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12969259" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="63290" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="12679679" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="14684674" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="5800875" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
+<vehicle id="6248519" type="EV">
+    <attributes>
+        <attribute name="initialSoc" class="java.lang.Double">0.2</attribute>
+    </attributes>
+</vehicle>
 
 </vehicleDefinitions>

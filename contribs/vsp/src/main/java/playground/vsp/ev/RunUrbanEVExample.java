@@ -104,8 +104,8 @@ public class RunUrbanEVExample {
 //		UrbanEVConfigGroup urbanEVConfi = new UrbanEVConfigGroup();
 //		config.addModule(urbanEVConfi );
 		UrbanEVConfigGroup urbanEVConfig = ConfigUtils.addOrGetModule( config, UrbanEVConfigGroup.class );
-		urbanEVConfig.setCriticalSOC(0.4);
-		urbanEVConfig.setMaxDistanceBetweenActAndCharger_m(2000);
+		urbanEVConfig.setCriticalSOC(0.2);
+		urbanEVConfig.setMaxDistanceBetweenActAndCharger_m(8000);
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none );
