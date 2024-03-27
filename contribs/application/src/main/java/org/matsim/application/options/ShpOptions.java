@@ -369,8 +369,15 @@ public final class ShpOptions {
 			List<SimpleFeature> result = index.query(new Envelope(p));
 			for (SimpleFeature ft : result) {
 				Geometry geom = (Geometry) ft.getDefaultGeometry();
-				if (geom.contains(MGC.coordinate2Point(p)))
-					return ft;
+
+				// Catch Exception for invalid, too complex geometries
+				try {
+					if (geom.contains(MGC.coordinate2Point(p)))
+						return ft;
+				} catch (TopologyException e) {
+					if (geom.convexHull().contains(MGC.coordinate2Point(p)))
+						return ft;
+				}
 			}
 
 			return null;
@@ -381,17 +388,7 @@ public final class ShpOptions {
 		 */
 		@SuppressWarnings("unchecked")
 		public boolean contains(Coord coord) {
-
-			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
-
-			List<SimpleFeature> result = index.query(new Envelope(p));
-			for (SimpleFeature ft : result) {
-				Geometry geom = (Geometry) ft.getDefaultGeometry();
-				if (geom.contains(MGC.coordinate2Point(p)))
-					return true;
-			}
-
-			return false;
+			return queryFeature(coord) != null;
 		}
 
 		/**
