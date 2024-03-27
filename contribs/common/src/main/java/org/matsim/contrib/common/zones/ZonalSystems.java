@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone;
+package org.matsim.contrib.common.zones;
 
 import static java.util.stream.Collectors.*;
 
@@ -36,14 +36,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.common.collect.Maps;
 
 //TODO add zone indexing?
 public class ZonalSystems {
-	public static Set<Zone> filterZonesWithNodes(Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
-		return nodes.stream().map(zonalSystem::getZone).collect(toSet());
+	public static Set<Zone> filterZonesWithNodes(Collection<? extends Node> nodes, ZoneSystem zoneSystem) {
+		return nodes.stream().map(zoneSystem::getZoneForNode).collect(toSet());
 	}
 
 	public static List<Node> selectNodesWithinArea(Collection<? extends Node> nodes, List<PreparedGeometry> areaGeoms) {
@@ -53,14 +54,14 @@ public class ZonalSystems {
 		}).collect(toList());
 	}
 
-	public static Map<Zone, Node> computeMostCentralNodes(Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
+	public static Map<Zone, Node> computeMostCentralNodes(Collection<? extends Node> nodes, ZoneSystem zoneSystem) {
 		BinaryOperator<Node> chooseMoreCentralNode = (n1, n2) -> {
-			Zone zone = zonalSystem.getZone(n1);
+			Zone zone = zoneSystem.getZoneForNode(n1);
 			return DistanceUtils.calculateSquaredDistance(n1, zone) <= DistanceUtils.calculateSquaredDistance(n2,
 					zone) ? n1 : n2;
 		};
 		return nodes.stream()
-				.map(n -> Pair.of(n, zonalSystem.getZone(n)))
+				.map(n -> Pair.of(n, zoneSystem.getZoneForNode(n)))
 				.collect(toMap(Pair::getValue, Pair::getKey, chooseMoreCentralNode));
 	}
 

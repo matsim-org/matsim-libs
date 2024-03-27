@@ -1,6 +1,6 @@
 package org.matsim.contrib.common.zones;
 
-import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,20 +13,20 @@ public class ZoneImpl implements Zone {
 
 	private final Id<Zone> id;
 	@Nullable
-	private final PreparedGeometry preparedGeometry; //null for virtual/dummy zones
-	private final List<Link> links;
+	private PreparedPolygon preparedGeometry; //null for virtual/dummy zones
 	private final Coord centroid;
+	private String type;
 
-	public ZoneImpl(Id<Zone> id, PreparedGeometry preparedGeometry, List<Link> links) {
-		this(id, preparedGeometry, links, MGC.point2Coord(preparedGeometry.getGeometry().getCentroid()));
+	public ZoneImpl(Id<Zone> id, PreparedPolygon preparedGeometry, @Nullable String type) {
+		this(id, preparedGeometry, MGC.point2Coord(preparedGeometry.getGeometry().getCentroid()), type);
 	}
 
-	private ZoneImpl(Id<Zone> id, @Nullable PreparedGeometry preparedGeometry, List<Link> links, Coord centroid) {
+	public ZoneImpl(Id<Zone> id, @Nullable PreparedPolygon preparedGeometry, Coord centroid, @Nullable String type) {
 		this.id = id;
 		this.preparedGeometry = preparedGeometry;
-		this.links = links;
 		this.centroid = centroid;
-	}
+        this.type = type;
+    }
 
 	@Override
 	public Id<Zone> getId() {
@@ -40,7 +40,7 @@ public class ZoneImpl implements Zone {
 
 	@Override
 	@Nullable
-	public PreparedGeometry getPreparedGeometry() {
+	public PreparedPolygon getPreparedGeometry() {
 		return preparedGeometry;
 	}
 
@@ -50,16 +50,21 @@ public class ZoneImpl implements Zone {
 	}
 
 	@Override
-	public List<Link> getLinks() {
-		return links;
+	public String getType() {
+		return type;
 	}
 
 	boolean isDummy() {
 		return preparedGeometry == null;
 	}
 
-	public static ZoneImpl createDummyZone(Id<Zone> id, List<Link> links, Coord centroid) {
-		return new ZoneImpl(id, null, links, centroid);
+	public void setGeometry(PreparedPolygon preparedPolygon) {
+		this.preparedGeometry = preparedPolygon;
+	}
+
+
+	public static ZoneImpl createDummyZone(Id<Zone> id, Coord centroid) {
+		return new ZoneImpl(id, null, centroid, null);
 	}
 
 }

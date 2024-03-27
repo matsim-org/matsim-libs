@@ -1,14 +1,15 @@
-package org.matsim.contrib.zone.io;
+package org.matsim.contrib.common.zones.io;
+
+import org.matsim.api.core.v01.Id;
+
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class ZoneXmlWriter extends MatsimXmlWriter {
 	private final Map<Id<Zone>, Zone> zones;

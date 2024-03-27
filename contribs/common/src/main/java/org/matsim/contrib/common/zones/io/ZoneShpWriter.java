@@ -17,34 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone;
+package org.matsim.contrib.common.zones.io;
 
-import java.io.File;
-import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.GeoFileWriter;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.io.ZoneShpReader;
-import org.matsim.contrib.zone.io.ZoneXmlReader;
+public class ZoneShpWriter {
+	public static final String ID_HEADER = "ID";
 
-public class Zones {
-	public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile) {
-		try {
-			return readZones(new File(zonesXmlFile).toURI().toURL(), new File(zonesShpFile).toURI().toURL());
-		} catch (MalformedURLException e) {
-			throw new UncheckedIOException(e);
-		}
+	private final Map<Id<Zone>, Zone> zones;
+	private final String coordinateSystem;
+
+	public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem) {
+		this.zones = zones;
+		this.coordinateSystem = coordinateSystem;
 	}
 
-	public static Map<Id<Zone>, Zone> readZones(URL zonesXmlUrl, URL zonesShpUrl) {
-		ZoneXmlReader xmlReader = new ZoneXmlReader();
-		xmlReader.readURL(zonesXmlUrl);
-		Map<Id<Zone>, Zone> zones = xmlReader.getZones();
+	public void write(String shpFile) {
+		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
 
-		ZoneShpReader shpReader = new ZoneShpReader(zones);
-		shpReader.readZones(zonesShpUrl);
-		return zones;
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().addAttribute(ID_HEADER, String.class)
+				.setCrs(crs).setName("zone").create();
+
+		List<SimpleFeature> features = new ArrayList<>();
+		for (Zone z : zones.values()) {
+			String id = z.getId() + "";
+			features.add(factory.createPolygon(z.getPreparedGeometry().getGeometry().getCoordinates(), new Object[] { id }, id));
+		}
+
+		GeoFileWriter.writeGeometries(features, shpFile);
 	}
 }

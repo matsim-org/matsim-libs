@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.common.zones.Zone;
 
 /**
  * Based on FloatMatrix from sbb-matsim-extensions

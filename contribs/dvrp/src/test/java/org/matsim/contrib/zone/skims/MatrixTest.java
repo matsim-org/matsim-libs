@@ -28,17 +28,18 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class MatrixTest {
-	private final Zone unknownZone = new Zone(Id.create("?", Zone.class), null);
+	private final Zone unknownZone = new ZoneImpl(Id.create("?", Zone.class), null, null, null);
 
-	private final Zone zoneA = new Zone(Id.create("A", Zone.class), null);
-	private final Zone zoneB = new Zone(Id.create("B", Zone.class), null);
-	private final Zone zoneC = new Zone(Id.create("C", Zone.class), null);
+	private final Zone zoneA = new ZoneImpl(Id.create("A", Zone.class), null, null, null);
+	private final Zone zoneB = new ZoneImpl(Id.create("B", Zone.class), null, null, null);
+	private final Zone zoneC = new ZoneImpl(Id.create("C", Zone.class), null, null, null);
 
 	private final Set<Zone> zones = Set.of(zoneA, zoneB, zoneC);
 	private final Matrix matrix = new Matrix(zones);

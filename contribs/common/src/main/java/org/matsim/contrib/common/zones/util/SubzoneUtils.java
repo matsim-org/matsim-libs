@@ -17,38 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone.util;
+package org.matsim.contrib.common.zones.util;
+
+import org.geotools.geometry.jts.GeometryCollector;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.TopologyException;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
+import org.locationtech.jts.geom.util.PolygonExtracter;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.zones.Zone;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.geometry.jts.GeometryCollector;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.TopologyException;
-import org.locationtech.jts.geom.util.PolygonExtracter;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
-import org.opengis.feature.simple.SimpleFeature;
-
 public class SubzoneUtils {
 	public static Map<Id<Zone>, List<Polygon>> extractSubzonePolygons(Map<Id<Zone>, Zone> zones,
-			Collection<SimpleFeature> subzonePattern) {
+																	  Collection<SimpleFeature> subzonePattern) {
 		Map<Id<Zone>, List<Polygon>> polygonsByZone = new HashMap<>();
 		int topologyExceptionCount = 0;
 
 		for (Zone z : zones.values()) {
-			MultiPolygon zoneMultiPoly = z.getMultiPolygon();
+			PreparedPolygon zonePoly = z.getPreparedGeometry();
 			GeometryCollector geometryCollector = new GeometryCollector();
 
 			for (SimpleFeature f : subzonePattern) {
 				Geometry featureGeometry = (Geometry)f.getDefaultGeometry();
 
 				try {
-					geometryCollector.add(zoneMultiPoly.intersection(featureGeometry));
+					geometryCollector.add(zonePoly.getGeometry().intersection(featureGeometry));
 				} catch (TopologyException e) {
 					topologyExceptionCount++;
 				}

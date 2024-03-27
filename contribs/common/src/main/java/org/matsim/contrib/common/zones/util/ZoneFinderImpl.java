@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone.util;
+package org.matsim.contrib.common.zones.util;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.quadtree.Quadtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class ZoneFinderImpl implements ZoneFinder {
@@ -39,7 +39,14 @@ public class ZoneFinderImpl implements ZoneFinder {
 		this.expansionDistance = expansionDistance;
 
 		for (Zone z : zones.values()) {
-			quadTree.insert(z.getMultiPolygon().getEnvelopeInternal(), z);
+			quadTree.insert(z.getPreparedGeometry().getGeometry().getEnvelopeInternal(), z);
+		}
+	}
+	public ZoneFinderImpl(Map<Id<Zone>, Zone> zones) {
+		this.expansionDistance = Double.MIN_VALUE;
+
+		for (Zone z : zones.values()) {
+			quadTree.insert(z.getPreparedGeometry().getGeometry().getEnvelopeInternal(), z);
 		}
 	}
 
@@ -71,8 +78,8 @@ public class ZoneFinderImpl implements ZoneFinder {
 		Zone smallestZone = null;
 
 		for (Zone z : zones) {
-			if (z.getMultiPolygon().contains(point)) {
-				double area = z.getMultiPolygon().getArea();
+			if (z.getPreparedGeometry().contains(point)) {
+				double area = z.getPreparedGeometry().getGeometry().getArea();
 				if (area < minArea) {
 					minArea = area;
 					smallestZone = z;
@@ -92,7 +99,7 @@ public class ZoneFinderImpl implements ZoneFinder {
 		Zone nearestZone = null;
 
 		for (Zone z : zones) {
-			double distance = z.getMultiPolygon().distance(point);
+			double distance = z.getPreparedGeometry().getGeometry().distance(point);
 			if (distance <= expansionDistance) {
 				if (distance < minDistance) {
 					minDistance = distance;

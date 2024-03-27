@@ -1,4 +1,4 @@
-package org.matsim.contrib.common.zones.h3;
+package org.matsim.contrib.common.zones.systems.h3;
 
 import com.uber.h3core.AreaUnit;
 import com.uber.h3core.H3Core;
@@ -9,8 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
@@ -28,7 +27,7 @@ public class H3GridUtils {
 
 	static final Logger log = LogManager.getLogger(H3GridUtils.class);
 
-	public static Map<String, PreparedGeometry> createH3GridFromNetwork(Network network, int resolution, String crs) {
+	public static Map<String, PreparedPolygon> createH3GridFromNetwork(Network network, int resolution, String crs) {
 
 		H3Core h3 = H3Utils.getInstance();
 
@@ -45,8 +44,6 @@ public class H3GridUtils {
 		double maxY = boundingbox[3];
 
 		GeometryFactory gf = new GeometryFactory();
-		PreparedGeometryFactory preparedGeometryFactory = new PreparedGeometryFactory();
-		Map<String, PreparedGeometry> grid = new HashMap<>();
 		CoordinateTransformation toLatLong = TransformationFactory.getCoordinateTransformation(crs, TransformationFactory.WGS84);
 		CoordinateTransformation fromLatLong = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, crs);
 
@@ -81,7 +78,7 @@ public class H3GridUtils {
 
 		log.info("Obtained " + h3Grid.size() + " H3 cells in " + (System.currentTimeMillis() - millis) + " ms.");
 
-
+		Map<String, PreparedPolygon> grid = new HashMap<>();
 		for (String h3Id : h3Grid) {
 			List<Coordinate> coordinateList = h3.cellToBoundary(h3Id)
 				.stream()
@@ -93,7 +90,7 @@ public class H3GridUtils {
 			}
 
 			Polygon polygon = new Polygon(gf.createLinearRing(coordinateList.toArray(new Coordinate[0])), null, gf);
-			grid.put(h3Id, preparedGeometryFactory.create(polygon));
+			grid.put(h3Id, new PreparedPolygon(polygon));
 		}
 
 		log.info("finished creating H3 grid from network.");
