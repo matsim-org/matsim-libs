@@ -51,7 +51,7 @@ public final class CountsOptions {
 		return manualMatchedCounts;
 	}
 
-	private void readMapping() {
+	private synchronized void readMapping() {
 
 		// Already read
 		if (manualMatchedCounts != null)
@@ -59,6 +59,10 @@ public final class CountsOptions {
 
 		manualMatchedCounts = new HashMap<>();
 		ignoredCounts = new HashSet<>();
+
+		// No input file
+		if (input == null)
+			return;
 
 		try (var reader = IOUtils.getBufferedReader(input)) {
 			CSVFormat format = CSVFormat.Builder.create()
