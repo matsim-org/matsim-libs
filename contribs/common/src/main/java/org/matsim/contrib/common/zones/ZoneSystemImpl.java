@@ -1,36 +1,69 @@
 package org.matsim.contrib.common.zones;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdCollectors;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.util.NetworkWithZonesUtils;
+import org.matsim.contrib.common.zones.util.ZoneFinder;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ZoneSystemImpl implements ZoneSystem {
 
 	private final Map<Id<Zone>, Zone> zones = new IdMap<>(Zone.class);
 	private final IdMap<Link, Zone> link2zone = new IdMap<>(Link.class);
 
+	private final IdMap<Node, Zone> nodeToZoneMap = new IdMap<>(Node.class);
+
+	private final IdMap<Zone, List<Link>> zoneToLinksMap = new IdMap<>(Zone.class);
+
 	public ZoneSystemImpl(Collection<Zone> zones) {
 		zones.forEach(zone -> this.zones.put(zone.getId(), zone));
-		zones.stream()
-			.flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
-			.forEach(idZonePair -> link2zone.put(idZonePair.getKey(), idZonePair.getValue()));
+	}
+
+	public ZoneSystemImpl(Collection<Zone> zones, ZoneFinder zoneFinder, Network network) {
+		zones.forEach(zone -> this.zones.put(zone.getId(), zone));
+
+		IdMap<Node, Zone> nodeToZoneMap = NetworkWithZonesUtils.createNodeToZoneMap(network, zoneFinder);
+		IdMap<Link, Zone> linkToZoneMap = NetworkWithZonesUtils.createLinkToZoneMap(network, zoneFinder);
+		this.nodeToZoneMap.putAll(nodeToZoneMap);
+		this.link2zone.putAll(linkToZoneMap);
+
+		for (Link link : network.getLinks().values()) {
+			Zone zone = zoneFinder.findZone(link.getToNode().getCoord());
+			if(zone != null) {
+                List<Link> links = zoneToLinksMap.computeIfAbsent(zone.getId(), zoneId1 -> new ArrayList<>());
+				links.add(link);
+			}
+		}
 	}
 
 	/**
-	 * @param linkId
+	 * @param link
 	 * @return the the {@code DrtZone} that contains the {@code linkId}. If the given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
 	 * Result may be null in case the given link is outside of the service area.
 	 */
 	@Override
 	@Nullable
-	public Zone getZoneForLinkId(Id<Link> linkId) {
-		return link2zone.get(linkId);
+	public Zone getZoneForLink(Id<Link> link) {
+		return link2zone.get(link);
+	}
+
+	@Override
+	public Zone getZoneForNode(Node node) {
+		return nodeToZoneMap.get(node.getId());
+	}
+
+	@Override
+	public List<Link> getLinksForZone(Id<Zone> zone) {
+		return zoneToLinksMap.getOrDefault(zone, Collections.emptyList());
 	}
 
 	/**

@@ -17,15 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone;
+package org.matsim.contrib.common.zones.systems.grid;
 
-import java.util.Collection;
-
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 
-import com.google.common.base.Preconditions;
+import java.util.Collection;
 
 public class SquareGrid {
 	public static final double EPSILON = 1;
@@ -93,7 +94,7 @@ public class SquareGrid {
 			int r = bin(coord.getY(), minY);
 			int c = bin(coord.getX(), minX);
 			Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
-			zone = new Zone(Id.create(index, Zone.class), "square", centroid);
+			zone = new ZoneImpl(Id.create(index, Zone.class), null, centroid, "square");
 			zones[index] = zone;
 		}
 		return zone;

@@ -72,7 +72,7 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 				.values()
 				.stream()
 				.map(person -> (Activity)person.getSelectedPlan().getPlanElements().get(0))
-				.map(activity -> zonalSystem.getZoneForLinkId(activity.getLinkId()))
+				.map(activity -> zonalSystem.getZoneForLink(activity.getLinkId()))
 				.filter(Objects::nonNull)
 				.collect(Collectors.groupingBy(zone -> zone, collectingAndThen(counting(), Long::intValue)));
 	}

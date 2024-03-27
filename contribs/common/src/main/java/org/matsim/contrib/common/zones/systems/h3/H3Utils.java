@@ -1,4 +1,4 @@
-package org.matsim.contrib.common.zones.h3;
+package org.matsim.contrib.common.zones.systems.h3;
 
 import com.uber.h3core.H3Core;
 

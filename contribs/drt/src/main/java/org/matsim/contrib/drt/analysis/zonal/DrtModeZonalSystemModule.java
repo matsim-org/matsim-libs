@@ -22,12 +22,12 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import com.google.common.base.Preconditions;
 import one.util.streamex.EntryStream;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
-import org.matsim.contrib.common.zones.h3.H3GridUtils;
-import org.matsim.contrib.common.zones.h3.H3ZoneSystemUtils;
+import org.matsim.contrib.common.zones.systems.h3.H3GridUtils;
+import org.matsim.contrib.common.zones.systems.h3.H3ZoneSystemUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -40,6 +40,7 @@ import java.util.Map;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.filterGridWithinServiceArea;
 import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedGeometries;
+import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedPolygons;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -62,7 +63,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 				Network network = getter.getModal(Network.class);
 				switch (params.zonesGeneration) {
 					case ShapeFile: {
-						final List<PreparedGeometry> preparedGeometries = loadPreparedGeometries(
+						final List<PreparedPolygon> preparedGeometries = loadPreparedPolygons(
 							ConfigGroup.getInputFileURL(getConfig().getContext(), params.zonesShapeFile));
 						return ZoneSystemUtils.createFromPreparedGeometries(network,
 							EntryStream.of(preparedGeometries).mapKeys(i -> (i + 1) + "").toMap());
@@ -70,7 +71,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 					case GridFromNetwork: {
 						Preconditions.checkNotNull(params.cellSize);
-						Map<String, PreparedGeometry> gridFromNetwork = createGridFromNetwork(network, params.cellSize);
+						Map<String, PreparedPolygon> gridFromNetwork = createGridFromNetwork(network, params.cellSize);
 						var gridZones =
 							switch (drtCfg.operationalScheme) {
 								case stopbased, door2door -> gridFromNetwork;
@@ -84,7 +85,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 					case H3:
 						Preconditions.checkNotNull(params.h3Resolution);
 						String crs = getConfig().global().getCoordinateSystem();
-						Map<String, PreparedGeometry> gridFromNetwork = H3GridUtils.createH3GridFromNetwork(network, params.h3Resolution, crs);
+						Map<String, PreparedPolygon> gridFromNetwork = H3GridUtils.createH3GridFromNetwork(network, params.h3Resolution, crs);
 						var gridZones =
 							switch (drtCfg.operationalScheme) {
 								case stopbased, door2door -> gridFromNetwork;
@@ -104,7 +105,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 					case mostCentral:
 						return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(ZoneSystem.class));
 					case random:
-						return new RandomDrtZoneTargetLinkSelector();
+						return new RandomDrtZoneTargetLinkSelector(getter.getModal(ZoneSystem.class));
 					default:
 						throw new RuntimeException(
 							"Unsupported target link selection = " + params.targetLinkSelection);

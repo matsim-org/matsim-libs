@@ -27,6 +27,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.zones.ZoneSystem;
@@ -48,14 +49,14 @@ public class DrtZonalSystemTest {
 	void test_cellSize100() {
 		ZoneSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 100));
-		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId().toString()).isEqualTo("10");
+		Assertions.assertThat(drtZonalSystem.getZoneForLink(Id.createLinkId("ab")).getId().toString()).isEqualTo("10");
 	}
 
 	@Test
 	void test_cellSize700() {
 		ZoneSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
-		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId().toString()).isEqualTo("2");
+		Assertions.assertThat(drtZonalSystem.getZoneForLink(Id.createLinkId("ab")).getId().toString()).isEqualTo("2");
 	}
 
 	@Test
@@ -63,7 +64,7 @@ public class DrtZonalSystemTest {
 		Coordinate min = new Coordinate(-500, 500);
 		Coordinate max = new Coordinate(1500, 1500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
-		Map<String, PreparedGeometry> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
+		Map<String, PreparedPolygon> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
 		ZoneSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
 				grid);
 
@@ -71,7 +72,7 @@ public class DrtZonalSystemTest {
 
 		//link 'da' is outside of the service area
 		Id<Link> id = Id.createLinkId("da");
-		Assertions.assertThat(zonalSystem.getZoneForLinkId(id)).isNull();
+		Assertions.assertThat(zonalSystem.getZoneForLink(id)).isNull();
 	}
 
 	@Test
@@ -79,7 +80,7 @@ public class DrtZonalSystemTest {
 		Coordinate min = new Coordinate(1500, 1500);
 		Coordinate max = new Coordinate(2500, 2500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
-		Map<String, PreparedGeometry> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
+		Map<String, PreparedPolygon> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
 		ZoneSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
 				grid);
 

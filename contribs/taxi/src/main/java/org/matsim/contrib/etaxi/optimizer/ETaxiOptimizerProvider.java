@@ -20,6 +20,7 @@
 package org.matsim.contrib.etaxi.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
@@ -36,8 +37,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.zone.SquareGridSystem;
-import org.matsim.contrib.zone.ZonalSystem;
+import org.matsim.contrib.common.zones.systems.grid.SquareGridSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -100,10 +100,10 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	}
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
-		ZonalSystem zonalSystem = new SquareGridSystem(network.getNodes().values(), params.cellSize);
-		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem,
+		ZoneSystem zoneSystem = new SquareGridSystem(network, params.cellSize);
+		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zoneSystem,
 				eScheduler.getScheduleInquiry());
-		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
+		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zoneSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);
 	}
 }
