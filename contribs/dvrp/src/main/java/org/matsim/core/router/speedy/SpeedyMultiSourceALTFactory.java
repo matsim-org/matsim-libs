@@ -37,7 +37,7 @@ public class SpeedyMultiSourceALTFactory {
 
 	public SpeedyMultiSourceALT createPathCalculator(Network network, TravelDisutility travelCosts,
 			TravelTime travelTimes) {
-		SpeedyGraph graph = this.graphs.computeIfAbsent(network, SpeedyGraph::new);
+		SpeedyGraph graph = this.graphs.computeIfAbsent(network, SpeedyGraphBuilder::build);
 
 		var graphTravelCostsPair = Pair.of(graph, travelCosts);
 		int landmarksCount = Math.min(16, graph.nodeCount);

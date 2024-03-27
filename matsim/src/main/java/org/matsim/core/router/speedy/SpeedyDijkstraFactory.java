@@ -20,7 +20,7 @@ public class SpeedyDijkstraFactory implements LeastCostPathCalculatorFactory {
 	public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
 		SpeedyGraph graph = graphs.get(network);
 		if (graph == null) {
-			graph = new SpeedyGraph(network);
+			graph = SpeedyGraphBuilder.build(network);
 			graphs.put(network, graph);
 		}
 		return new SpeedyDijkstra(graph, travelTimes, travelCosts);
