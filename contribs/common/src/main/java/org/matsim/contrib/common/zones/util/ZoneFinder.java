@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone.io;
+package org.matsim.contrib.common.zones.util;
 
-import java.util.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.common.zones.Zone;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-
-public class ZoneXmlReader extends MatsimXmlParser {
-	private final static String ZONE = "zone";
-
-	private final Map<Id<Zone>, Zone> zones = new LinkedHashMap<>();
-
-	public Map<Id<Zone>, Zone> getZones() {
-		return zones;
-	}
-
-	public ZoneXmlReader() {
-		super(ValidationType.DTD_ONLY);
-	}
-
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (ZONE.equals(name)) {
-			startZone(atts);
-		}
-	}
-
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-	}
-
-	private void startZone(Attributes atts) {
-		Id<Zone> id = Id.create(atts.getValue("id"), Zone.class);
-		String type = atts.getValue("type");
-		zones.put(id, new Zone(id, type));
-	}
+public interface ZoneFinder {
+	Zone findZone(Coord coord);
 }

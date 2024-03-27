@@ -22,9 +22,9 @@ package org.matsim.contrib.zone.skims;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
-import org.matsim.contrib.zone.SquareGridSystem;
-import org.matsim.contrib.zone.ZonalSystems;
-import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.systems.grid.SquareGridSystem;
+import org.matsim.contrib.common.zones.ZonalSystems;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 										TravelTimeMatrix freeSpeedMatrix, double alpha) {
 		this.alpha = alpha;
 		this.numberOfBins = numberOfBins(maxTime);
-		this.gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.cellSize);
+		this.gridSystem = new SquareGridSystem(dvrpNetwork, params.cellSize);
 		this.centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
 		this.timeDependentMatrix = IntStream.range(0, numberOfBins).mapToObj(i -> new Matrix(centralNodes.keySet()))
 				.toList();
@@ -113,7 +113,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		if (sparseValue != null) {
 			return sparseValue;
 		}
-		return this.timeDependentMatrix.get(bin).get(this.gridSystem.getZone(fromNode), this.gridSystem.getZone(toNode));
+		return this.timeDependentMatrix.get(bin).get(this.gridSystem.getZoneForNode(fromNode), this.gridSystem.getZoneForNode(toNode));
 	}
 
 	int getBin(double departureTime) {
@@ -135,7 +135,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		} else {
 			double currentTravelTimeEstimate = this.getTravelTime(fromNode, toNode, departureTime);
 			double value = getUpdatedValue(currentTravelTimeEstimate, routeEstimate, this.alpha);
-			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZone(fromNode), this.gridSystem.getZone(toNode),
+			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZoneForNode(fromNode), this.gridSystem.getZoneForNode(toNode),
 					value);
 		}
 

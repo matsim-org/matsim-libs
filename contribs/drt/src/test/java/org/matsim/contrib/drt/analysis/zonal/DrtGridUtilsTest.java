@@ -1,13 +1,9 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,12 +11,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class DrtGridUtilsTest {
 
 	@Test
 	void test() {
 		Network network = createNetwork();
-		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
+		Map<String, PreparedPolygon> grid = DrtGridUtils.createGridFromNetwork(network, 100);
 
 		assertThat(grid).hasSize(100);
 

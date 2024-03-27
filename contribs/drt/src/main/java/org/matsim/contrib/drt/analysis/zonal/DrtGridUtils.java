@@ -29,7 +29,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -45,7 +45,7 @@ public class DrtGridUtils {
 
 	static final Logger log = LogManager.getLogger(DrtGridUtils.class);
 
-	public static Map<String, PreparedGeometry> createGridFromNetwork(Network network, double cellsize) {
+	public static Map<String, PreparedPolygon> createGridFromNetwork(Network network, double cellsize) {
 		log.info("start creating grid from network");
 		double[] boundingbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 		double minX = (Math.floor(boundingbox[0] / cellsize) * cellsize);
@@ -53,8 +53,7 @@ public class DrtGridUtils {
 		double minY = (Math.floor(boundingbox[1] / cellsize) * cellsize);
 		double maxY = (Math.ceil(boundingbox[3] / cellsize) * cellsize);
 		GeometryFactory gf = new GeometryFactory();
-		PreparedGeometryFactory preparedGeometryFactory = new PreparedGeometryFactory();
-		Map<String, PreparedGeometry> grid = new HashMap<>();
+		Map<String, PreparedPolygon> grid = new HashMap<>();
 		int cell = 0;
 		for (double lx = minX; lx < maxX; lx += cellsize) {
 			for (double by = minY; by < maxY; by += cellsize) {
@@ -65,7 +64,7 @@ public class DrtGridUtils {
 				Coordinate p4 = new Coordinate(lx, by + cellsize);
 				Coordinate[] ca = { p1, p2, p3, p4, p1 };
 				Polygon polygon = new Polygon(gf.createLinearRing(ca), null, gf);
-				grid.put(cell + "", preparedGeometryFactory.create(polygon));
+				grid.put(cell + "", new PreparedPolygon(polygon));
 			}
 		}
 		log.info("finished creating grid from network");
@@ -82,11 +81,11 @@ public class DrtGridUtils {
 	 * @param serviceAreaGeoms geometries that define the service area
 	 * @return
 	 */
-	public static Map<String, PreparedGeometry> filterGridWithinServiceArea(Map<String, PreparedGeometry> grid, List<PreparedGeometry> serviceAreaGeoms) {
+	public static Map<String, PreparedPolygon> filterGridWithinServiceArea(Map<String, PreparedPolygon> grid, List<PreparedGeometry> serviceAreaGeoms) {
 		log.info("total number of initial grid zones = " + grid.size());
 		log.info("searching for grid zones within the drt service area...");
 		Counter counter = new Counter("dealt with zone ");
-		Map<String, PreparedGeometry> zonesWithinServiceArea = EntryStream.of(grid)
+		Map<String, PreparedPolygon> zonesWithinServiceArea = EntryStream.of(grid)
 				.peekKeys(id -> counter.incCounter())
 				.filterValues(cell -> serviceAreaGeoms.stream()
 						.anyMatch(serviceArea -> serviceArea.intersects(cell.getGeometry())))

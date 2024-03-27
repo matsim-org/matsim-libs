@@ -139,7 +139,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		for (EventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
 			for (Map.Entry<Id<Person>, EventSequence.PersonEvents> entry : seq.getPersonEvents().entrySet()) {
 				if(entry.getValue().getPickedUp().isPresent()) {
-					Zone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+					Zone zone = zones.getZoneForLink(seq.getSubmitted().getFromLinkId());
 					final Id<Zone> zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
 					double waitTime = entry.getValue().getPickedUp().get() .getTime() - seq.getSubmitted().getTime();
 					zoneStats.get(zoneStr).addValue(waitTime);

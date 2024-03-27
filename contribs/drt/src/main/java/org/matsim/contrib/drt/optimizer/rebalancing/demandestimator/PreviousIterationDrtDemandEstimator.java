@@ -69,7 +69,7 @@ public final class PreviousIterationDrtDemandEstimator implements ZonalDemandEst
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(mode)) {
-			Zone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+			Zone zone = zonalSystem.getZoneForLink(event.getLinkId());
 			if (zone == null) {
 				//might be that somebody walks into the service area or that service area is larger/different than DrtZonalSystem...
 				logger.warn("No zone found for linkId " + event.getLinkId().toString());

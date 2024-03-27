@@ -21,7 +21,7 @@
 package org.matsim.contrib.zone;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.matsim.contrib.zone.SquareGrid.EPSILON;
+import static org.matsim.contrib.common.zones.systems.grid.SquareGrid.EPSILON;
 
 import java.util.List;
 
@@ -29,6 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
+import org.matsim.contrib.common.zones.systems.grid.SquareGrid;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -62,7 +65,7 @@ public class SquareGridTest {
 		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
 
 		Coord coord = new Coord(0, 0);
-		Zone zone = new Zone(Id.create(0, Zone.class), "square", new Coord(49, 49));
+		Zone zone = new ZoneImpl(Id.create(0, Zone.class), null, new Coord(49, 49), "square");
 		assertThat(grid.getZone(coord)).isNull();
 		assertThat(grid.getOrCreateZone(coord)).isEqualToComparingFieldByField(zone);
 		assertThat(grid.getZone(coord)).isEqualToComparingFieldByField(zone);
@@ -75,11 +78,11 @@ public class SquareGridTest {
 		SquareGrid grid = new SquareGrid(List.of(node_0_0, node_150_150), 100);
 
 		Coord coord0 = new Coord(100 - 2 * EPSILON, 100 - 2 * EPSILON);
-		Zone zone0 = new Zone(Id.create(0, Zone.class), "square", new Coord(49, 49));
+		Zone zone0 = new ZoneImpl(Id.create(0, Zone.class), null, new Coord(49, 49), "square");
 		assertThat(grid.getOrCreateZone(coord0)).isEqualToComparingFieldByField(zone0);
 
 		Coord coord1 = new Coord(100 - EPSILON, 100 - EPSILON);
-		Zone zone1 = new Zone(Id.create(3, Zone.class), "square", new Coord(149, 149));
+		Zone zone1 = new ZoneImpl(Id.create(3, Zone.class), null, new Coord(149, 149), "square");
 		assertThat(grid.getOrCreateZone(coord1)).isEqualToComparingFieldByField(zone1);
 	}
 
