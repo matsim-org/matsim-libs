@@ -15,15 +15,14 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
+import org.matsim.core.network.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.lanes.*;
 import org.xml.sax.SAXException;
 import picocli.CommandLine;
 
@@ -36,8 +35,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-
-import static org.matsim.lanes.LanesUtils.calculateAndSetCapacity;
 
 /**
  * Converter for sumo networks
@@ -54,9 +51,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	@CommandLine.Option(names = "--output", description = "Output xml file", required = true)
 	private Path output;
 
-	@CommandLine.Option(names = "--shp", description = "Optional shape file used for filtering")
-	private Path shapeFile;
-
 	@CommandLine.Option(names = "--from-crs", description = "Coordinate system of input data", required = true)
 	private String fromCRS;
 
@@ -66,14 +60,18 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	@CommandLine.Option(names = "--free-speed-factor", description = "Free-speed reduction for urban links", defaultValue = "0.9")
 	private double freeSpeedFactor = LinkProperties.DEFAULT_FREESPEED_FACTOR;
 
-	private SumoNetworkConverter(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS, double freeSpeedFactor) {
+	@CommandLine.Option(names = "--lane-restrictions", description = "Define how restricted lanes are handled: ${COMPLETION-CANDIDATES}", defaultValue = "IGNORE")
+	private LaneRestriction laneRestriction = LaneRestriction.IGNORE;
+
+	private SumoNetworkConverter(List<Path> input, Path output, String fromCRS, String toCRS, double freeSpeedFactor,
+								 LaneRestriction laneRestriction) {
 		this.input = input;
 		this.output = output;
-		this.shapeFile = shapeFile;
 		this.fromCRS = fromCRS;
 		this.toCRS = toCRS;
 		this.freeSpeedFactor = freeSpeedFactor;
-	}
+        this.laneRestriction = laneRestriction;
+    }
 
 	private SumoNetworkConverter() {
 	}
@@ -87,26 +85,27 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @param toCRS   desired coordinate system of network
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String fromCRS, String toCRS) {
-		return new SumoNetworkConverter(input, output, null, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR);
+		return new SumoNetworkConverter(input, output, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR, LaneRestriction.IGNORE);
 	}
 
+
 	/**
-	 * Creates a new converter instance, with a shape file for filtering.
+	 * Creates a new instance.
 	 *
-	 * @param shapeFile only include links in this shape file.
-	 * @see #newInstance(List, Path, String, String)
+	 * @see #newInstance(List, Path, String, String, double)
 	 */
-	public static SumoNetworkConverter newInstance(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS) {
-		return new SumoNetworkConverter(input, output, shapeFile, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR);
+	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS, double freeSpeedFactor) {
+		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, LaneRestriction.IGNORE);
 	}
 
 	/**
 	 * Creates a new instance.
 	 *
-	 * @see #newInstance(List, Path, Path, String, String, double)
+	 * @see #newInstance(List, Path, String, String, double)
 	 */
-	public static SumoNetworkConverter newInstance(List<Path> input, Path output, Path shapeFile, String inputCRS, String targetCRS, double freeSpeedFactor) {
-		return new SumoNetworkConverter(input, output, shapeFile, inputCRS, targetCRS, freeSpeedFactor);
+	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS,
+												   double freeSpeedFactor, LaneRestriction laneRestriction) {
+		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, laneRestriction);
 	}
 
 	/**
@@ -147,31 +146,19 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	/**
 	 * Execute the converter, which includes conversion and writing the files
 	 *
-	 * @see #convert(Network, Lanes) .
+	 * @see #convert(Network).
 	 */
 	@Override
 	public Integer call() throws Exception {
 
 		Network network = NetworkUtils.createNetwork();
-		Lanes lanes = LanesUtils.createLanesContainer();
 
-		SumoNetworkHandler handler = convert(network, lanes);
-
-		calculateLaneCapacities(network, lanes);
-
-		// This needs to run without errors, otherwise network is broken
-		network.getLinks().values().forEach(link -> {
-			LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
-			if (l2l != null)
-				LanesUtils.createLanes(link, l2l);
-		});
+		SumoNetworkHandler handler = convert(network);
 
 		if (toCRS != null)
 			ProjectionUtils.putCRS(network, toCRS);
 
 		NetworkUtils.writeNetwork(network, output.toAbsolutePath().toString());
-
-		new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
 
 		writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv"));
 
@@ -193,19 +180,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 		} catch (IOException e) {
 			log.warn("Could not write property file.", e);
-		}
-	}
-
-	/**
-	 * Calculates lane capacities, according to {@link LanesUtils}.
-	 */
-	public void calculateLaneCapacities(Network network, Lanes lanes) {
-		for (LanesToLinkAssignment l2l : lanes.getLanesToLinkAssignments().values()) {
-			Link link = network.getLinks().get(l2l.getLinkId());
-			for (Lane lane : l2l.getLanes().values()) {
-				calculateAndSetCapacity(lane,
-					lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty(), link, network);
-			}
 		}
 	}
 
@@ -252,10 +226,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * Perform the actual conversion on given input data.
 	 *
 	 * @param network results will be added into this network.
-	 * @param lanes   resulting lanes are added into this object.
 	 * @return internal handler used for conversion
 	 */
-	public SumoNetworkHandler convert(Network network, Lanes lanes) throws ParserConfigurationException, SAXException, IOException {
+	public SumoNetworkHandler convert(Network network) throws ParserConfigurationException, SAXException, IOException {
 
 		log.info("Parsing SUMO network");
 
@@ -276,7 +249,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		}
 
 		NetworkFactory f = network.getFactory();
-		LanesFactory lf = lanes.getFactory();
 
 		Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
 
@@ -299,7 +271,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 			link.getAttributes().putAttribute(NetworkUtils.TYPE, edge.type);
 
-			link.setNumberOfLanes(edge.lanes.size());
 			Set<String> modes = Sets.newHashSet(TransportMode.car, TransportMode.ride);
 
 			SumoNetworkHandler.Type type = sumoHandler.types.get(edge.type);
@@ -318,14 +289,25 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 			link.setAllowedModes(modes);
 			link.setLength(edge.getLength());
-			LanesToLinkAssignment l2l = lf.createLanesToLinkAssignment(link.getId());
 
-			for (SumoNetworkHandler.Lane lane : edge.lanes) {
-				Lane mLane = lf.createLane(Id.create(lane.id, Lane.class));
-				mLane.setAlignment(lane.index);
-				mLane.setStartsAtMeterFromLinkEnd(lane.length);
-				l2l.addLane(mLane);
+			if (laneRestriction == LaneRestriction.REDUCE_CAR_LANES) {
+
+				int size = edge.lanes.size();
+
+				SumoNetworkHandler.Lane lane = edge.lanes.get(0);
+				edge.lanes.removeIf(l -> l.allow != null && !l.allow.contains("passenger"));
+
+				// Keep at least one lane
+				if (edge.lanes.isEmpty())
+					edge.lanes.add(lane);
+
+				int restricted = size - edge.lanes.size();
+				if (restricted > 0) {
+					link.getAttributes().putAttribute("restricted_lanes", restricted);
+				}
 			}
+
+			link.setNumberOfLanes(edge.lanes.size());
 
 			// set link prop based on MATSim defaults
 			LinkProperties prop = linkProperties.get(type.highway);
@@ -333,13 +315,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 			// incoming lane connected to the others
 			// this is needed by matsim for lanes to work properly
-			if (edge.lanes.size() >= 1) {
-				Lane inLane = lf.createLane(Id.create(link.getId() + "_in", Lane.class));
-				inLane.setStartsAtMeterFromLinkEnd(link.getLength());
-				inLane.setAlignment(0);
-				l2l.getLanes().keySet().forEach(inLane::addToLaneId);
-				l2l.addLane(inLane);
-
+			if (!edge.lanes.isEmpty()) {
 				double laneSpeed = edge.lanes.get(0).speed;
 				if (!Double.isNaN(laneSpeed) && laneSpeed > 0) {
 					// use speed info of first lane
@@ -358,81 +334,44 @@ public class SumoNetworkConverter implements Callable<Integer> {
 			link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(speed, freeSpeedFactor));
 			link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), prop) * link.getNumberOfLanes());
 
-			lanes.addLanesToLinkAssignment(l2l);
 			network.addLink(link);
-		}
-
-		if (shapeFile != null) {
-			Geometry shp = calculateNetworkArea(shapeFile);
-
-			// remove lanes outside survey area
-			for (Node node : network.getNodes().values()) {
-				if (!shp.contains(MGC.coord2Point(node.getCoord()))) {
-					node.getOutLinks().keySet().forEach(l -> lanes.getLanesToLinkAssignments().remove(l));
-					node.getInLinks().keySet().forEach(l -> lanes.getLanesToLinkAssignments().remove(l));
-				}
-			}
 		}
 
 		// clean up network
 		new NetworkCleaner().run(network);
 
-		// also clean lanes
-		lanes.getLanesToLinkAssignments().keySet().removeIf(l2l -> !network.getLinks().containsKey(l2l));
+		Set<Id<Link>> ignored = new HashSet<>();
 
-		for (List<SumoNetworkHandler.Connection> connections : sumoHandler.connections.values()) {
-			for (SumoNetworkHandler.Connection conn : connections) {
+		for (Map.Entry<String, List<SumoNetworkHandler.Connection>> kv : sumoHandler.connections.entrySet()) {
 
-				Id<Link> fromLink = Id.createLinkId(conn.from);
-				Id<Link> toLink = Id.createLinkId(conn.to);
+			Link link = network.getLinks().get(Id.createLinkId(kv.getKey()));
 
-				LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(fromLink);
+			if (link != null) {
+				Set<Id<Link>> outLinks = link.getToNode().getOutLinks().keySet();
+				Set<Id<Link>> allowed = kv.getValue().stream().map(c -> Id.createLinkId(c.to)).collect(Collectors.toSet());
 
-				// link was removed
-				if (l2l == null)
-					continue;
+				Sets.SetView<Id<Link>> diff = Sets.difference(outLinks, allowed);
 
-				Lane lane = l2l.getLanes().values().stream().filter(l -> l.getAlignment() == conn.fromLane).findFirst().orElse(null);
-				if (lane == null) {
-					log.warn("Could not find from lane in network for {}", conn);
+				if (outLinks.size() == diff.size()) {
+					ignored.add(link.getId());
 					continue;
 				}
 
-				lane.addToLinkId(toLink);
-			}
-		}
+				if (!diff.isEmpty()) {
+					DisallowedNextLinks disallowed = new DisallowedNextLinks();
+					for (Id<Link> id : diff) {
+						disallowed.addDisallowedLinkSequence(TransportMode.car, List.of(id));
+					}
 
-		int removed = 0;
-
-		Iterator<LanesToLinkAssignment> it = lanes.getLanesToLinkAssignments().values().iterator();
-
-		// lanes needs to have a target, if missing we need to chose one
-		while (it.hasNext()) {
-			LanesToLinkAssignment l2l = it.next();
-
-			for (Lane lane : l2l.getLanes().values()) {
-				if (lane.getToLinkIds() == null && lane.getToLaneIds() == null) {
-					// chose first reachable link from this lane
-					Collection<? extends Link> out = network.getLinks().get(l2l.getLinkId()).getToNode().getOutLinks().values();
-					out.forEach(l -> lane.addToLinkId(l.getId()));
-
-					log.warn("No target for lane {}, chosen {}", lane.getId(), out);
+					NetworkUtils.setDisallowedNextLinks(link, disallowed);
 				}
 			}
-
-			Set<Id<Link>> targets = l2l.getLanes().values().stream()
-				.filter(l -> l.getToLinkIds() != null)
-				.map(Lane::getToLinkIds).flatMap(List::stream)
-				.collect(Collectors.toSet());
-
-			// remove superfluous lanes (both pointing to same link with not alternative)
-			if (targets.size() == 1 && network.getLinks().get(l2l.getLinkId()).getToNode().getOutLinks().size() <= 1) {
-				it.remove();
-				removed++;
-			}
 		}
 
-		log.info("Removed {} superfluous lanes, total={}", removed, lanes.getLanesToLinkAssignments().size());
+		if (!ignored.isEmpty()) {
+			log.warn("Ignored turn restrictions for {} links with no connections: {}", ignored.size(), ignored);
+		}
+
 		return sumoHandler;
 	}
 
@@ -478,6 +417,13 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 		network.addNode(node);
 		return node;
+	}
+
+	/**
+	 * How restricted lanes should be handled.
+	 */
+	public enum LaneRestriction {
+		IGNORE, REDUCE_CAR_LANES
 	}
 
 }
