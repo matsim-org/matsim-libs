@@ -908,8 +908,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Filters links by used mode "car" and creates Map with all links in each zone
 	 */
-	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
-																	Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
+	Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
+														 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -944,11 +944,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Finds for areas without links the nearest Link if the area contains any building.
 	 */
-	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
-															Index shpZones,
-															Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) {
+	private void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+													 Index shpZones,
+													 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) {
 		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
-			String zoneID = (String) singleArea.getAttribute("areaID");
+			String zoneID = (String) singleArea.getAttribute(shapeFileZoneNameColumn);
 			if (!regionLinksMap.containsKey(zoneID) && buildingsPerZone.get(zoneID) != null) {
 				for (List<SimpleFeature> buildingList : buildingsPerZone.get(zoneID).values()) {
 					for (SimpleFeature building : buildingList) {
