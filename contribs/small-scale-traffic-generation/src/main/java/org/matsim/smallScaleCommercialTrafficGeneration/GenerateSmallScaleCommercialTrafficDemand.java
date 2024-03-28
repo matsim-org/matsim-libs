@@ -261,7 +261,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
 						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData,
 						pathToExistingDataDistributionToZones);
-				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone);
+				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone, shapeFileZoneNameColumn);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
@@ -908,8 +908,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Filters links by used mode "car" and creates Map with all links in each zone
 	 */
-	Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
-														 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
+	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
+																Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+																String shapeFileZoneNameColumn) throws URISyntaxException {
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -936,7 +937,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 			.put(l.getId(), l));
 		if (regionLinksMap.size() != indexZones.size())
-			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, indexZones, buildingsPerZone);
+			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, indexZones, buildingsPerZone, shapeFileZoneNameColumn);
 
 		return regionLinksMap;
 	}
@@ -944,9 +945,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Finds for areas without links the nearest Link if the area contains any building.
 	 */
-	private void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
-													 Index shpZones,
-													 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone) {
+	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+															Index shpZones,
+															Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
+															String shapeFileZoneNameColumn) {
 		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
 			String zoneID = (String) singleArea.getAttribute(shapeFileZoneNameColumn);
 			if (!regionLinksMap.containsKey(zoneID) && buildingsPerZone.get(zoneID) != null) {
