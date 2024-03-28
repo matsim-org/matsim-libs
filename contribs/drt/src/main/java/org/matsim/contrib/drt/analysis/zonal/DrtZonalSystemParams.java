@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import javax.annotation.Nullable;
 
+import org.matsim.contrib.common.zones.h3.H3Utils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -40,10 +41,10 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 		super(SET_NAME);
 	}
 
-	public enum ZoneGeneration {GridFromNetwork, ShapeFile}
+	public enum ZoneGeneration {GridFromNetwork, ShapeFile, H3}
 
 	@Parameter
-	@Comment("Logic for generation of zones for the DRT zonal system. Value can be: [GridFromNetwork, ShapeFile].")
+	@Comment("Logic for generation of zones for the DRT zonal system. Value can be: [GridFromNetwork, ShapeFile, H3].")
 	@NotNull
 	public ZoneGeneration zonesGeneration = null;
 
@@ -58,6 +59,14 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 	@Comment("allows to configure zones. Used with zonesGeneration=ShapeFile")
 	@Nullable
 	public String zonesShapeFile = null;
+
+	@Parameter
+	@Comment("allows to configure H3 hexagonal zones. Used with zonesGeneration=H3. " +
+		"Range from 0 (122 cells worldwide) to 15 (569 E^12 cells). " +
+		"Usually meaningful between resolution 6 (3.7 km avg edge length) " +
+		"and 10 (70 m avg edge length). ")
+	@Nullable
+	public Integer h3Resolution = null;
 
 	public enum TargetLinkSelection {random, mostCentral}
 
@@ -75,5 +84,9 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 				"cellSize must not be null when zonesGeneration is " + ZoneGeneration.GridFromNetwork);
 		Preconditions.checkArgument(zonesGeneration != ZoneGeneration.ShapeFile || zonesShapeFile != null,
 				"zonesShapeFile must not be null when zonesGeneration is " + ZoneGeneration.ShapeFile);
+		Preconditions.checkArgument(zonesGeneration != ZoneGeneration.H3 || h3Resolution != null,
+				"H3 resolution must not be null when zonesGeneration is " + ZoneGeneration.H3);
+		Preconditions.checkArgument(h3Resolution == null || h3Resolution >= 0 && h3Resolution <= H3Utils.MAX_RES,
+				"H3 resolution must not be null when zonesGeneration is " + ZoneGeneration.H3);
 	}
 }

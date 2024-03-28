@@ -67,7 +67,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "DC");
 
 		test.doSimStepUntil(250);
-//		test.debugFiles(collector, "deadLock");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/deadLock");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 240, "y1y", 0)
@@ -93,7 +93,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
 
 		test.doSimStepUntil(250);
-//		test.debugFiles(collector, "deadLockAvoidancePoint");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/deadLockAvoidancePoint");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 240, "y1y", 0)
@@ -118,7 +118,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
 
 		test.doSimStepUntil(800);
-		test.debugFiles(collector, "avoidancePoint");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/avoidancePoint");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 420, "EF", 0)
@@ -147,7 +147,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
 
 		test.doSimStepUntil(1500);
-//		test.debugFiles(collector, "tooSmall");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/tooSmall");
 
 
 		RailsimTestUtils.assertThat(collector)
@@ -166,7 +166,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
 
 		test.doSimStepUntil(800);
-//		test.debugFiles(collector, "oneWay");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/oneWay");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 350, "EF", 0)
@@ -185,7 +185,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
 
 		test.doSimStepUntil(800);
-//		test.debugFiles(collector, "twoWay");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/twoWay");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1a", 350, "EF", 0)
@@ -217,7 +217,7 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
 
 		test.doSimStepUntil(1500);
-//		test.debugFiles(collector, "movingBlock");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/movingBlock");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1a", 670, "EF", 0)

@@ -71,11 +71,9 @@ public class RailsimEngineMovingBlockTest {
 
 		test.doSimStepUntil(5_000);
 
-//		test.debugFiles(collector, "movingBlock");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/movingBlock");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 2370, 200, 0)
-			.hasTrainState("cargo", 3268, 200, 0)
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 2370, 200, 0).hasTrainState("cargo", 3268, 200, 0)
 			.hasTrainState("sprinter", 3345, 200, 0);
 
 		test = getTestEngine("networkMovingBlocks.xml");
@@ -84,10 +82,9 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		test.doStateUpdatesUntil(5_000, 1);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/movingBlock_detailed");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 2370, 200, 0)
-			.hasTrainState("cargo", 3268, 200, 0)
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 2370, 200, 0).hasTrainState("cargo", 3268, 200, 0)
 			.hasTrainState("sprinter", 3345, 200, 0);
 
 	}
@@ -100,22 +97,18 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter2", 400, "l6-5", "l2-1");
 
 		test.doSimStepUntil(2_000);
-//		test.debugFiles(collector, "opposite");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/opposite");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("sprinter2", 1368, 200, 0)
-			.hasTrainState("sprinter", 1559, 200, 0);
+		RailsimTestUtils.assertThat(collector).hasTrainState("sprinter2", 1368, 200, 0).hasTrainState("sprinter", 1559, 200, 0);
 
 		test = getTestEngine("networkMovingBlocks.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "l1-2", "l6-7");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter2", 400, "l6-5", "l2-1");
 
 		test.doStateUpdatesUntil(2_000, 5);
-//		test.debugFiles(collector, "opposite_detailed");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/opposite_detailed");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("sprinter2", 1368, 200, 0)
-			.hasTrainState("sprinter", 1559, 200, 0);
+		RailsimTestUtils.assertThat(collector).hasTrainState("sprinter2", 1368, 200, 0).hasTrainState("sprinter", 1559, 200, 0);
 
 	}
 
@@ -130,11 +123,9 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		test.doSimStepUntil(5_000);
-//		test.debugFiles(collector, "multiTrack");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/multiTrack");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 2370, 200, 0)
-			.hasTrainState("cargo", 3268, 200, 0)
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 2370, 200, 0).hasTrainState("cargo", 3268, 200, 0)
 			.hasTrainState("sprinter", 1984, 200, 0);
 
 		test = getTestEngine("networkMovingBlocks.xml", l -> RailsimUtils.setTrainCapacity(l, 3));
@@ -144,10 +135,9 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		test.doStateUpdatesUntil(5_000, 1);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/multiTrack_detailed");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 2370, 200, 0)
-			.hasTrainState("cargo", 3268, 200, 0)
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 2370, 200, 0).hasTrainState("cargo", 3268, 200, 0)
 			.hasTrainState("sprinter", 1984, 200, 0);
 
 	}
@@ -162,11 +152,9 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
 
 		test.doSimStepUntil(2_000);
-		test.debugFiles(collector, "mixed");
+		test.debugFiles(collector, utils.getOutputDirectory() + "/mixed");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 1418, 1000, 0)
-			.hasTrainState("cargo", 1241, 1000, 0)
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 1418, 1000, 0).hasTrainState("cargo", 1241, 1000, 0)
 			.hasTrainState("sprinter", 1324, 1000, 0);
 
 		test = getTestEngine("networkMixedTypes.xml");
@@ -175,10 +163,9 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
 
 		test.doStateUpdatesUntil(2_000, 1);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/mixed_detailed");
 
-		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 1418, 1000, 0)
-			.hasTrainState("cargo", 1241, 1000, 0)
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 1418, 1000, 0).hasTrainState("cargo", 1241, 1000, 0)
 			.hasTrainState("sprinter", 1324, 1000, 0);
 
 	}

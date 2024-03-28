@@ -30,8 +30,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemImpl;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.testcases.fakes.FakeLink;
@@ -46,9 +48,9 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	private final Link link1 = new FakeLink(Id.createLinkId("link_1"));
 	private final Link link2 = new FakeLink(Id.createLinkId("link_2"));
 
-	private final DrtZone zone1 = DrtZone.createDummyZone("zone_1", List.of(link1), new Coord());
-	private final DrtZone zone2 = DrtZone.createDummyZone("zone_2", List.of(link2), new Coord());
-	private final DrtZonalSystem zonalSystem = new DrtZonalSystem(List.of(zone1, zone2));
+	private final Zone zone1 = ZoneImpl.createDummyZone(Id.create("zone_1", Zone.class), List.of(link1), new Coord());
+	private final Zone zone2 = ZoneImpl.createDummyZone(Id.create("zone_2", Zone.class), List.of(link2), new Coord());
+	private final ZoneSystem zonalSystem = new ZoneSystemImpl(List.of(zone1, zone2));
 
 	@Test
 	void noDepartures() {
@@ -170,7 +172,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 		return new PersonDepartureEvent(time, null, link.getId(), mode, mode);
 	}
 
-	private void assertDemand(PreviousIterationDrtDemandEstimator estimator, double fromTime, DrtZone zone,
+	private void assertDemand(PreviousIterationDrtDemandEstimator estimator, double fromTime, Zone zone,
 			double expectedDemand) {
 		assertThat(estimator.getExpectedDemand(fromTime, ESTIMATION_PERIOD).applyAsDouble(zone)).isEqualTo(
 				expectedDemand);

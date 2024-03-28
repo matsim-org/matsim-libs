@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 import java.util.function.IntUnaryOperator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -40,7 +41,7 @@ public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelecto
 	}
 
 	@Override
-	public Link selectTargetLink(DrtZone zone) {
+	public Link selectTargetLink(Zone zone) {
 		return zone.getLinks().get(random.applyAsInt(zone.getLinks().size()));
 	}
 }
