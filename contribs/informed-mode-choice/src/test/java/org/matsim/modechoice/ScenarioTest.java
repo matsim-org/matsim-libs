@@ -28,11 +28,17 @@ public class ScenarioTest {
 		prepareConfig(config);
 
 		controler = MATSimApplication.prepare(TestScenario.class, config, getArgs());
+
+		prepareController(controler);
+
 		injector = controler.getInjector();
 
 	}
 
 	protected void prepareConfig(Config config) {
+	}
+
+	protected void prepareController(Controler controler) {
 	}
 
 	protected String[] getArgs() {

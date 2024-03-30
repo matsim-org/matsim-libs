@@ -89,11 +89,20 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	/**
 	 * Applies the routing modes of this candidate to a plan.
 	 *
-	 * @param plan
+	 * @param plan plan to apply the modes to
+	 * @param partial if true, only trips that have changed mode will be replaced
 	 */
-	public void applyTo(Plan plan) {
+	public void applyTo(Plan plan, boolean partial) {
 
 		plan.setScore(null);
+
+		String[] currentType = null;
+		if (partial) {
+			Object current = plan.getAttributes().getAttribute(TYPE_ATTR);
+			if (current instanceof String s) {
+				currentType = createModeArray(s);
+			}
+		}
 
 		applyAttributes(plan);
 
@@ -109,6 +118,11 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 			if (mode == null)
 				continue;
 
+			// don't update the trip if it has the same mode
+			if (currentType != null && currentType.length > k && currentType[k].equals(mode)) {
+				continue;
+			}
+
 			// Replaces all trip elements and inserts single leg
 			final List<PlanElement> fullTrip =
 					planElements.subList(
@@ -120,6 +134,15 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 			TripStructureUtils.setRoutingMode(leg, mode);
 			fullTrip.add(leg);
 		}
+	}
+
+	/**
+	 * Applies the routing modes of this candidate to all trip in a plan.
+	 *
+	 * @param plan plan to apply the modes to
+	 */
+	public void applyTo(Plan plan) {
+		applyTo(plan, false);
 	}
 
 	/**

@@ -59,26 +59,26 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 			this.modules.add(module);
 		}
 	}
-	
+
 	public int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
 		}
 		return this.modules.size() + 1; // we also have to count "firstModule", thus +1
 	}
-	
+
 	@Override
 	public void run(final HasPlansAndId<T, I> person) {
 		this.counter++;
-		
+
 		// if there is at least one unscored plan, find that one:
 		T plan = new RandomUnscoredPlanSelector<T, I>().selectPlan(person) ;
-		
+
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
 			plan = this.planSelector.selectPlan(person);
 		}
-		
+
 		// "select" that plan:
 		if ( plan != null ) {
 			person.setSelectedPlan(plan);
@@ -89,17 +89,17 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 
 		// if there is a "module" (i.e. "innovation"):
 		if (this.firstModule != null) {
-			
+
 			// set the working plan to a copy of the selected plan:
 			plan = person.createCopyOfSelectedPlanAndMakeSelected();
-			
+
 			//Id is only set inside planInheritance -> if null planInheritance is disabled
 			if (plan instanceof Plan && ((Plan) plan).getId() != null) {
 				// add plan inheritance flags
 				((Plan) plan).setIterationCreated(this.replanningContext.getIteration());
 				((Plan) plan).setPlanMutator(this.toString());
 			}
-			
+
 			// add new plan to container that contains the plans that are handled by this PlanStrategy:
 			this.plans.add(plan);
 
@@ -154,6 +154,8 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 	public PlanSelector<T, I> getPlanSelector() {
 		return planSelector;
 	}
-	
 
+	public GenericPlanStrategyModule<T> getFirstModule() {
+		return firstModule;
+	}
 }

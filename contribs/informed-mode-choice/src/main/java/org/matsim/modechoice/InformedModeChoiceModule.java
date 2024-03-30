@@ -29,19 +29,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The main and only module needed to install to use informed mode choice functionality.
+ * The main module needed to install to use informed mode choice functionality.
  *
  * @see Builder
  */
 public final class InformedModeChoiceModule extends AbstractModule {
 
 	public static String SELECT_BEST_K_PLAN_MODES_STRATEGY = "SelectBestKPlanModes";
-
 	public static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
-
 	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
 	public static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
-
 
 	private final Builder builder;
 
@@ -97,7 +94,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		addPlanStrategyBinding(SELECT_SINGLE_TRIP_MODE_STRATEGY).toProvider(SelectSingleTripModeStrategyProvider.class);
 		addPlanStrategyBinding(SELECT_SUBTOUR_MODE_STRATEGY).toProvider(SelectSubtourModeStrategyProvider.class);
 		addPlanStrategyBinding(RANDOM_SUBTOUR_MODE_STRATEGY).toProvider(RandomSubtourModeStrategyProvider.class);
-		//addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// Ensure that only one instance exists
 		bind(ModeChoiceWeightScheduler.class).in(Singleton.class);

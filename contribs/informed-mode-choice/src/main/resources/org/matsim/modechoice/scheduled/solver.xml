@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver xmlns="https://www.optaplanner.org/xsd/solver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://www.optaplanner.org/xsd/solver https://www.optaplanner.org/xsd/solver/solver.xsd">
+
+	<environmentMode>REPRODUCIBLE</environmentMode>
+<!--	<environmentMode>FULL_ASSERT</environmentMode>-->
+	<moveThreadCount>4</moveThreadCount>
+
+	<solutionClass>org.matsim.modechoice.replanning.scheduled.solver.ModeSchedulingProblem</solutionClass>
+	<entityClass>org.matsim.modechoice.replanning.scheduled.solver.AgentSchedule</entityClass>
+
+
+	<!-- Define the score function -->
+	<scoreDirectorFactory>
+		<incrementalScoreCalculatorClass>org.matsim.modechoice.replanning.scheduled.solver.ScoreCalculator</incrementalScoreCalculatorClass>
+	</scoreDirectorFactory>
+
+	<!-- Configure the optimization algorithms -->
+	<termination>
+<!--		<secondsSpentLimit>60</secondsSpentLimit>-->
+		<daysSpentLimit>2</daysSpentLimit>
+	</termination>
+	<localSearch>
+
+		<termination>
+			<unimprovedStepCountLimit>10000</unimprovedStepCountLimit>
+		</termination>
+
+		<unionMoveSelector>
+			<cacheType>JUST_IN_TIME</cacheType>
+			<selectionOrder>RANDOM</selectionOrder>
+
+			<moveIteratorFactory>
+				<fixedProbabilityWeight>0.15</fixedProbabilityWeight>
+				<moveIteratorFactoryClass>org.matsim.modechoice.replanning.scheduled.solver.ShufflePlansSelector</moveIteratorFactoryClass>
+			</moveIteratorFactory>
+
+			<moveIteratorFactory>
+				<fixedProbabilityWeight>0.15</fixedProbabilityWeight>
+				<moveIteratorFactoryClass>org.matsim.modechoice.replanning.scheduled.solver.SwapPlansSelector</moveIteratorFactoryClass>
+			</moveIteratorFactory>
+
+		</unionMoveSelector>
+
+
+	</localSearch>
+
+
+</solver>
