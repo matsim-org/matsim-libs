@@ -2,8 +2,6 @@ package org.matsim.modechoice.replanning.scheduled.solver;
 
 
 import it.unimi.dsi.fastutil.ints.IntIntPair;
-import it.unimi.dsi.fastutil.objects.Reference2IntMap;
-import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.calculator.IncrementalScoreCalculator;
 
@@ -15,19 +13,21 @@ import java.util.Map;
 public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSchedulingProblem, HardSoftLongScore> {
 
 	private ModeSchedulingProblem problem;
-	private Reference2IntMap<String>[] observed;
+
+	/**
+	 * Targets per window.
+	 */
+	private int[] observed;
 	private int[] switches;
+	private int targets;
 
 	@Override
 	public void resetWorkingSolution(ModeSchedulingProblem problem) {
 
-		observed = new Reference2IntMap[problem.getWindowSize()];
+		this.targets = problem.getTargets().size();
+		this.observed = new int[problem.getWindowSize() * targets];
 		this.problem = problem;
-		for (int i = 0; i < problem.getWindowSize(); i++) {
-			observed[i] = new Reference2IntOpenHashMap<>();
-		}
-
-		switches = new int[problem.getWindowSize()];
+		this.switches = new int[problem.getWindowSize()];
 
 		calcScoreInternal();
 	}
@@ -48,13 +48,14 @@ public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSch
 		for (int i = 0; i < agent.indices.size(); i++) {
 			int k = agent.indices.getInt(i);
 
+			for (int j = 0; j < targets; j++) {
+				observed[i * targets + j] += diff * agent.weights[k * targets + j];
+			}
+
 			// iterate all trips in the plan
 			for (int j = 0; j < agent.length; j++) {
-				String type = agent.planCategories[k * agent.length + j];
-				if (type != null)
-					observed[i].merge(type, diff, Integer::sum);
-
 				if (prevK >= 0) {
+					String type = agent.planCategories[k * agent.length + j];
 					String prevType = agent.planCategories[prevK * agent.length + j];
 					// All String are internal
 					if (prevType != type)
@@ -109,10 +110,11 @@ public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSch
 
 		for (int i = 0; i < problem.getWindowSize(); i++) {
 			long score = 0;
+			int k = 0;
 			for (Map.Entry<String, IntIntPair> kv : problem.getTargets().entrySet()) {
 
 				IntIntPair bounds = kv.getValue();
-				int obs = observed[i].getInt(kv.getKey());
+				int obs = observed[i * targets + (k++)];
 
 				// check against bounds
 				if (obs > bounds.rightInt())
@@ -123,7 +125,7 @@ public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSch
 
 			// Difference between score levels is added to penalize uneven distributed variations
 			if (prevHard != -1) {
-				hardScore += Math.abs(score - prevHard) / 3;
+				hardScore += Math.abs(score - prevHard) / 2;
 			}
 
 			// there is no current plan in very first iteration
@@ -131,7 +133,7 @@ public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSch
 			if (!problem.isFirstIteration() || i != 0) {
 				soft = Math.abs(switches[i] - problem.getSwitchTarget());
 				if (prevSoft != -1) {
-					softScore += Math.abs(prevSoft - soft) / 3;
+					softScore += Math.abs(prevSoft - soft) / 2;
 				}
 
 				prevSoft = soft;
@@ -146,7 +148,7 @@ public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSch
 		return HardSoftLongScore.of(-hardScore, -softScore);
 	}
 
-	public Reference2IntMap<String>[] getObserved() {
+	public int[] getObserved() {
 		return observed;
 	}
 

@@ -28,6 +28,10 @@ public final class AgentSchedule {
 	final String[] planCategories;
 
 	/**
+	 * Aggregated weights for each plan category.
+	 */
+	final byte[] weights;
+	/**
 	 * Number of trips in each plan.
 	 */
 	final int length;
@@ -37,15 +41,17 @@ public final class AgentSchedule {
 	 */
 	int currentPlan = -1;
 
-	AgentSchedule(Id<Person> id, String[] planCategories, int length) {
+	AgentSchedule(Id<Person> id, String[] planCategories, byte[] weights, int length) {
         this.id = id;
 		this.planCategories = planCategories;
+		this.weights = weights;
 		this.length = length;
 	}
 
 	private AgentSchedule(AgentSchedule other) {
 		this.id = other.id;
 		this.planCategories = other.planCategories;
+		this.weights = other.weights;
 		this.availablePlans.addAll(other.availablePlans);
 		this.indices.addAll(other.indices);
 		this.currentPlan = other.currentPlan;

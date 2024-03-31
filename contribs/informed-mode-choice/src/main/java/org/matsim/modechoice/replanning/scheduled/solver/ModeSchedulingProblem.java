@@ -113,7 +113,13 @@ public final class ModeSchedulingProblem {
 
 		log.info("Targets: {} | Switches: {}", targets, switchTarget);
 		for (int i = 0; i < windowSize; i++) {
-			log.info("Iteration: {} | Target: {} | Switches: {}", (offset + i), scorer.getObserved()[i], scorer.getSwitches()[i]);
+
+			StringBuilder b = new StringBuilder();
+			for (int k = 0; k < targets.size(); k++) {
+				b.append(scorer.getObserved()[i * targets.size() + k]).append(" ");
+			}
+
+			log.info("Iteration: {} | Target: {}| Switches: {}", (offset + i), b.toString(), scorer.getSwitches()[i]);
 		}
 	}
 

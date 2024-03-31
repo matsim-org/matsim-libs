@@ -31,6 +31,37 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	}
 
 	/**
+	 * Return features vector with number of occurrences per mode.
+	 */
+	public static double[] occurrences(List<String> modes, String type) {
+
+		double[] ft = new double[modes.size()];
+
+		for (int i = 0; i < modes.size(); i++) {
+			int count = StringUtils.countMatches(type, modes.get(i));
+			ft[i] = count;
+		}
+
+		return ft;
+	}
+
+	/**
+	 * Creates array of selected modes from plan type.
+	 */
+	public static String[] createModeArray(String planType) {
+		String[] modes = planType.split("-");
+		for (int i = 0; i < modes.length; i++) {
+
+			if (modes[i].equals("null"))
+				modes[i] = null;
+			else
+				modes[i] = modes[i].intern();
+		}
+
+		return modes;
+	}
+
+	/**
 	 * Total estimated utility.
 	 */
 	public double getUtility() {
@@ -39,6 +70,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 
 	/**
 	 * Get mode for trip i. Indexing starts at 0.
+	 *
 	 * @see #size()
 	 */
 	public String getMode(int i) {
@@ -72,24 +104,9 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	}
 
 	/**
-	 * Return features vector with number of occurrences per mode.
-	 */
-	public static double[] occurrences(List<String> modes, String type) {
-
-		double[] ft = new double[modes.size()];
-
-		for (int i = 0; i < modes.size(); i++) {
-			int count = StringUtils.countMatches(type, modes.get(i));
-			ft[i] = count;
-		}
-
-		return ft;
-	}
-
-	/**
 	 * Applies the routing modes of this candidate to a plan.
 	 *
-	 * @param plan plan to apply the modes to
+	 * @param plan    plan to apply the modes to
 	 * @param partial if true, only trips that have changed mode will be replaced
 	 */
 	public void applyTo(Plan plan, boolean partial) {
@@ -119,15 +136,16 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 				continue;
 
 			// don't update the trip if it has the same mode
-			if (currentType != null && currentType.length > k && currentType[k].equals(mode)) {
+			// k-1, because k was already incremented
+			if (currentType != null && currentType.length > k - 1 && currentType[k - 1].equals(mode)) {
 				continue;
 			}
 
 			// Replaces all trip elements and inserts single leg
 			final List<PlanElement> fullTrip =
-					planElements.subList(
-							planElements.indexOf(trip.getOriginActivity()) + 1,
-							planElements.indexOf(trip.getDestinationActivity()));
+				planElements.subList(
+					planElements.indexOf(trip.getOriginActivity()) + 1,
+					planElements.indexOf(trip.getDestinationActivity()));
 
 			fullTrip.clear();
 			Leg leg = PopulationUtils.createLeg(mode);
@@ -171,22 +189,6 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		return b.toString().intern();
 	}
 
-	/**
-	 * Creates array of selected modes from plan type.
-	 */
-	public static String[] createModeArray(String planType) {
-		String[] modes = planType.split("-");
-		for (int i = 0; i < modes.length; i++) {
-
-			if (modes[i].equals("null"))
-				modes[i] = null;
-			else
-				modes[i] = modes[i].intern();
-		}
-
-		return modes;
-	}
-
 	@Override
 	public int compareTo(PlanCandidate o) {
 		return Double.compare(o.utility, utility);
@@ -209,7 +211,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	@Override
 	public String toString() {
 		return "PlanCandidate{" +
-				"modes=" + Arrays.toString(modes) +
-				", utility=" + utility + '}';
+			"modes=" + Arrays.toString(modes) +
+			", utility=" + utility + '}';
 	}
 }

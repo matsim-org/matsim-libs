@@ -56,6 +56,8 @@ public class ShufflePlansSelector implements MoveIteratorFactory<ModeSchedulingP
 
 			AgentSchedule agent = agents.get(random.nextInt(agents.size()));
 
+			// TODO: chose plan in the right direction (using score director)
+
 			int idx = random.nextInt(ModeSchedulingSolver.WINDOW_SIZE);
 			int k = agent.availablePlans.getInt(random.nextInt(agent.availablePlans.size()));
 

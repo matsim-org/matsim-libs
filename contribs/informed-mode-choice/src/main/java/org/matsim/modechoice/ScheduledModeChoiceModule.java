@@ -10,6 +10,7 @@ import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.modechoice.replanning.WorstNotSelctedPlanSelector;
 import org.matsim.modechoice.replanning.scheduled.AllBestPlansStrategyProvider;
 import org.matsim.modechoice.replanning.scheduled.ReRouteSelectedStrategyProvider;
 import org.matsim.modechoice.replanning.scheduled.ScheduledStrategyChooser;
@@ -101,11 +102,10 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 			int target = (int) Math.ceil(iters / getConfig().replanning().getFractionOfIterationsToDisableInnovation());
 
 			log.info("Adjusting number of iterations from {} to {}.", getConfig().controller().getLastIteration(), target);
-			getConfig().controller().setLastIteration(iters);
+			getConfig().controller().setLastIteration(target);
 		}
 
-//		bindPlanSelectorForRemoval().to()
-//		getConfig().replanning().setPlanSelectorForRemoval();
+		bindPlanSelectorForRemoval().to(WorstNotSelctedPlanSelector.class);
 
 	}
 

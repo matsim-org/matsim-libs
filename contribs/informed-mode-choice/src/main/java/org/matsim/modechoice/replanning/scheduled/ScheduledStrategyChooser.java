@@ -78,9 +78,6 @@ public final class ScheduledStrategyChooser implements StrategyChooser<Plan, Per
 		double[] w = new double[weights.size()];
 		double total = 0;
 
-		if (replanningContext.getIteration() > 4)
-			total = 0;
-
 		int iterType = isScheduledIteration(replanningContext, scheduleConfig);
 
 		for (int i = 0; i < weights.size(); i++) {
