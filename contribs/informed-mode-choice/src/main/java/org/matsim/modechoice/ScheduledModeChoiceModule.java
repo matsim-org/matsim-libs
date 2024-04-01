@@ -73,62 +73,68 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 
 		ScheduledModeChoiceConfigGroup config = ConfigUtils.addOrGetModule(getConfig(), ScheduledModeChoiceConfigGroup.class);
 
-		Collection<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(getConfig().replanning().getStrategySettings());
-		getConfig().replanning().clearStrategySettings();
+		boolean enabled = !config.getSubpopulations().isEmpty();
 
-		for (String subpopulation : config.getSubpopulations()) {
+		log.info("Scheduled mode choice is {}.", enabled ? "enabled" : "disabled");
 
-			OptionalDouble reroute = strategies.stream().filter(s -> s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute) &&
-					s.getSubpopulation().equals(subpopulation))
-				.mapToDouble(ReplanningConfigGroup.StrategySettings::getWeight)
-				.findFirst();
+		if (enabled) {
 
-			OptionalDouble timeMutate = strategies.stream().filter(s ->
-					(s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator) ||
-						s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator_ReRoute)) &&
+			Collection<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(getConfig().replanning().getStrategySettings());
+			getConfig().replanning().clearStrategySettings();
+
+			for (String subpopulation : config.getSubpopulations()) {
+
+				OptionalDouble reroute = strategies.stream().filter(s -> s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute) &&
 						s.getSubpopulation().equals(subpopulation))
-				.mapToDouble(ReplanningConfigGroup.StrategySettings::getWeight)
-				.findFirst();
+					.mapToDouble(ReplanningConfigGroup.StrategySettings::getWeight)
+					.findFirst();
 
-			strategies.removeIf(s -> s.getSubpopulation().equals(subpopulation) && EXCLUDED.contains(s.getStrategyName()));
+				OptionalDouble timeMutate = strategies.stream().filter(s ->
+						(s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator) ||
+							s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator_ReRoute)) &&
+							s.getSubpopulation().equals(subpopulation))
+					.mapToDouble(ReplanningConfigGroup.StrategySettings::getWeight)
+					.findFirst();
 
-			ReplanningConfigGroup.StrategySettings strategy = new ReplanningConfigGroup.StrategySettings();
-			strategy.setStrategyName(ALL_BEST_K_PLAN_MODES_STRATEGY);
-			strategy.setSubpopulation(subpopulation);
-			strategy.setWeight(1.0);
-			strategies.add(strategy);
+				strategies.removeIf(s -> s.getSubpopulation().equals(subpopulation) && EXCLUDED.contains(s.getStrategyName()));
 
-			if (reroute.isPresent()) {
-				ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
-				s.setStrategyName(REROUTE_SELECTED);
-				s.setSubpopulation(subpopulation);
-				s.setWeight(reroute.getAsDouble());
-				strategies.add(s);
+				ReplanningConfigGroup.StrategySettings strategy = new ReplanningConfigGroup.StrategySettings();
+				strategy.setStrategyName(ALL_BEST_K_PLAN_MODES_STRATEGY);
+				strategy.setSubpopulation(subpopulation);
+				strategy.setWeight(1.0);
+				strategies.add(strategy);
+
+				if (reroute.isPresent()) {
+					ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
+					s.setStrategyName(REROUTE_SELECTED);
+					s.setSubpopulation(subpopulation);
+					s.setWeight(reroute.getAsDouble());
+					strategies.add(s);
+				}
+
+				if (timeMutate.isPresent()) {
+					ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
+					s.setStrategyName(TIME_MUTATE_SELECTED);
+					s.setSubpopulation(subpopulation);
+					s.setWeight(timeMutate.getAsDouble());
+					strategies.add(s);
+				}
 			}
 
-			if (timeMutate.isPresent()) {
-				ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
-				s.setStrategyName(TIME_MUTATE_SELECTED);
-				s.setSubpopulation(subpopulation);
-				s.setWeight(timeMutate.getAsDouble());
-				strategies.add(s);
+			strategies.forEach(s -> getConfig().replanning().addStrategySettings(s));
+
+			if (config.isAdjustTargetIterations()) {
+
+				int iters = config.getWarumUpIterations() + config.getScheduleIterations() * (1 + config.getBetweenIterations());
+
+				int target = (int) Math.ceil(iters / getConfig().replanning().getFractionOfIterationsToDisableInnovation());
+
+				log.info("Adjusting number of iterations from {} to {}.", getConfig().controller().getLastIteration(), target);
+				getConfig().controller().setLastIteration(target);
 			}
+
+			bindPlanSelectorForRemoval().to(WorstNotSelctedPlanSelector.class);
 		}
-
-		strategies.forEach(s -> getConfig().replanning().addStrategySettings(s));
-
-		if (config.isAdjustTargetIterations()) {
-
-			int iters = config.getWarumUpIterations() + config.getScheduleIterations() * (1 + config.getBetweenIterations());
-
-			int target = (int) Math.ceil(iters / getConfig().replanning().getFractionOfIterationsToDisableInnovation());
-
-			log.info("Adjusting number of iterations from {} to {}.", getConfig().controller().getLastIteration(), target);
-			getConfig().controller().setLastIteration(target);
-		}
-
-		bindPlanSelectorForRemoval().to(WorstNotSelctedPlanSelector.class);
-
 	}
 
 	/**
