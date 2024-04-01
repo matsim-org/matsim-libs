@@ -38,7 +38,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
  * @author mrieser
  * @see org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation
  */
-class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
+public class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
 
 	private static final Logger log = LogManager.getLogger( TimeAllocationMutatorModule.class );
@@ -47,7 +47,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 	private final TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
 
 
-	TimeAllocationMutatorModule( TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup) {
+	public TimeAllocationMutatorModule( TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup) {
 		super(globalConfigGroup);
 		this.mutationRange = timeAllocationMutatorConfigGroup.getMutationRange();
 		this.affectingDuration = timeAllocationMutatorConfigGroup.isAffectingDuration();

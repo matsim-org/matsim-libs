@@ -14,8 +14,12 @@ import org.matsim.modechoice.replanning.WorstNotSelctedPlanSelector;
 import org.matsim.modechoice.replanning.scheduled.AllBestPlansStrategyProvider;
 import org.matsim.modechoice.replanning.scheduled.ReRouteSelectedStrategyProvider;
 import org.matsim.modechoice.replanning.scheduled.ScheduledStrategyChooser;
+import org.matsim.modechoice.replanning.scheduled.TimeMutateSelectedStrategyProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.OptionalDouble;
+import java.util.Set;
 
 /**
  * Module for to enable scheduled mode choice.
@@ -42,6 +46,9 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 		ALL_BEST_K_PLAN_MODES_STRATEGY
 	);
 	public static String REROUTE_SELECTED = "ReRouteSelected";
+	public static String TIME_MUTATE_SELECTED = "TimeAllocationMutatorSelected";
+
+
 	private final Builder builder;
 
 	private ScheduledModeChoiceModule(Builder builder) {
@@ -60,9 +67,9 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 
 		addPlanStrategyBinding(ALL_BEST_K_PLAN_MODES_STRATEGY).toProvider(AllBestPlansStrategyProvider.class);
 		addPlanStrategyBinding(REROUTE_SELECTED).toProvider(ReRouteSelectedStrategyProvider.class);
+		addPlanStrategyBinding(TIME_MUTATE_SELECTED).toProvider(TimeMutateSelectedStrategyProvider.class);
 
-		bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {
-		}).to(ScheduledStrategyChooser.class);
+		bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).to(ScheduledStrategyChooser.class);
 
 		ScheduledModeChoiceConfigGroup config = ConfigUtils.addOrGetModule(getConfig(), ScheduledModeChoiceConfigGroup.class);
 
@@ -73,6 +80,13 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 
 			OptionalDouble reroute = strategies.stream().filter(s -> s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute) &&
 					s.getSubpopulation().equals(subpopulation))
+				.mapToDouble(ReplanningConfigGroup.StrategySettings::getWeight)
+				.findFirst();
+
+			OptionalDouble timeMutate = strategies.stream().filter(s ->
+					(s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator) ||
+						s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator_ReRoute)) &&
+						s.getSubpopulation().equals(subpopulation))
 				.mapToDouble(ReplanningConfigGroup.StrategySettings::getWeight)
 				.findFirst();
 
@@ -89,6 +103,14 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 				s.setStrategyName(REROUTE_SELECTED);
 				s.setSubpopulation(subpopulation);
 				s.setWeight(reroute.getAsDouble());
+				strategies.add(s);
+			}
+
+			if (timeMutate.isPresent()) {
+				ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
+				s.setStrategyName(TIME_MUTATE_SELECTED);
+				s.setSubpopulation(subpopulation);
+				s.setWeight(timeMutate.getAsDouble());
 				strategies.add(s);
 			}
 		}

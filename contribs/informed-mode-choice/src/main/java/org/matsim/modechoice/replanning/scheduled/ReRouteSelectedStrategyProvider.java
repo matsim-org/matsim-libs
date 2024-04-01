@@ -29,8 +29,6 @@ public class ReRouteSelectedStrategyProvider implements Provider<PlanStrategy> {
 	@Override
 	public PlanStrategy get() {
 
-		// TODO: selected plan might be removed after iteration
-		// would need a custom removal selector that does not remove the selected plan
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new KeepSelected<>());
 

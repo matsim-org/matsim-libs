@@ -2,6 +2,7 @@ package org.matsim.modechoice.replanning.scheduled.solver;
 
 
 import it.unimi.dsi.fastutil.ints.IntIntPair;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.calculator.IncrementalScoreCalculator;
 
@@ -63,6 +64,59 @@ public final class ScoreCalculator implements IncrementalScoreCalculator<ModeSch
 				}
 			}
 			prevK = k;
+		}
+	}
+
+	/**
+	 * Improve an agent schedule and update the internal state.
+	 */
+	public void applyImprovement(AgentSchedule agent, int idx, IntList avail, int[] targets) {
+
+		// new plan index
+		int bestK = agent.indices.getInt(idx);
+		int[] bestDiff = new int[targets.length];
+
+		// Weight of the current chosen plan
+		int[] weight = new int[targets.length];
+
+		// positive diff means there are too many trips (per target)
+		int[] diff = new int[targets.length];
+
+		int bestError = 0;
+		for (int i = 0; i < targets.length; i++) {
+			weight[i] = agent.weights[bestK * targets.length + i];
+			diff[i] = observed[idx * targets.length + i] - targets[i];
+			bestError += Math.abs(diff[i]);
+		}
+
+		for (int j = 0; j < avail.size(); j++) {
+
+			int k = avail.getInt(j);
+
+			// calc the improvement for each plan
+			int[] d = new int[targets.length];
+			int sum = 0;
+			for (int i = 0; i < targets.length; i++) {
+				byte w = agent.weights[k * targets.length + i];
+				d[i] = w - weight[i];
+				sum += Math.abs(diff[i] + d[i]);
+			}
+
+			if (sum < bestError) {
+				bestError = sum;
+				bestDiff = d;
+				bestK = k;
+			}
+		}
+
+		// update if index has changed
+		if (bestK != agent.indices.getInt(idx)) {
+			avail.rem(bestK);
+			agent.indices.set(idx, bestK);
+
+			for (int i = 0; i < targets.length; i++) {
+				observed[idx * targets.length + i] += bestDiff[i];
+			}
 		}
 	}
 

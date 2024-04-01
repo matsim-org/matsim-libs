@@ -2,13 +2,14 @@ package org.matsim.modechoice.replanning.scheduled;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.modechoice.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
 
 class AllBestPlansStrategyTest extends ScenarioTest {
 
@@ -29,6 +30,12 @@ class AllBestPlansStrategyTest extends ScenarioTest {
 		smc.setAdjustTargetIterations(true);
 		smc.setScheduleIterations(15);
 		smc.setSubpopulations("person");
+
+		ModeTargetParameters target = new ModeTargetParameters(
+			"person", Map.of(TransportMode.car, 0.55)
+		);
+
+		smc.addParameterSet(target);
 
 	}
 

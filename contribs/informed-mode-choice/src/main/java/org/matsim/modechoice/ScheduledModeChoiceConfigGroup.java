@@ -128,22 +128,4 @@ public class ScheduledModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
-	/**
-	 * Target parameters for mode shares.
-	 * This group allows arbitrary attributes to be defined, which are matched against person attributes.
-	 */
-	public static final class ModeTargetParameters extends ReflectiveConfigGroup {
-
-		private static final String GROUP_NAME = "modeTargetParameters";
-
-		@Parameter
-		@Comment("Target mode shares. Should only contain relevant modes.")
-		public Map<String, Double> shares = new HashMap<>();
-
-		public ModeTargetParameters() {
-			super(GROUP_NAME, true);
-		}
-
-	}
-
 }
