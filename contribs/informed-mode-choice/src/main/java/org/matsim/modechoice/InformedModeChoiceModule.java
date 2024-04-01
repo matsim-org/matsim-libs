@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.PlanRouter;
@@ -53,14 +54,13 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		bindAllModes(builder.fixedCosts, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.legEstimators, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.tripEstimators, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.options, new TypeLiteral<>() {
-		});
+		// Make sure the config group is initialized
+		ConfigUtils.addOrGetModule(getConfig(), InformedModeChoiceConfigGroup.class);
+
+		bindAllModes(builder.fixedCosts, new TypeLiteral<>() {});
+		bindAllModes(builder.legEstimators, new TypeLiteral<>() {});
+		bindAllModes(builder.tripEstimators, new TypeLiteral<>() {});
+		bindAllModes(builder.options, new TypeLiteral<>() {});
 
 		bind(ActivityEstimator.class).to(builder.activityEstimator).in(Singleton.class);
 
@@ -74,8 +74,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(PlanModelService.class).asEagerSingleton();
 		addControlerListenerBinding().to(PlanModelService.class).asEagerSingleton();
 
-		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
-		});
+		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {});
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
 		}
