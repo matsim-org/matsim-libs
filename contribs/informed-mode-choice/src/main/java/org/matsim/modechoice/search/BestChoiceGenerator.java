@@ -1,14 +1,14 @@
 package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.modechoice.InformedModeChoiceConfigGroup;
-import org.matsim.modechoice.ModeOptions;
+import org.matsim.core.config.Config;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Generates the best known choices.
@@ -20,7 +20,7 @@ public class BestChoiceGenerator extends TopKChoicesGenerator {
 	// and a dedicated implementation might be more efficient
 
 	@Inject
-	BestChoiceGenerator(InformedModeChoiceConfigGroup config) {
+	BestChoiceGenerator(Config config) {
 		super(config);
 	}
 

@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleIterator;
 import it.unimi.dsi.fastutil.objects.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
@@ -31,7 +32,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 
 	@Inject
-	TopKChoicesGenerator(InformedModeChoiceConfigGroup config) {
+	TopKChoicesGenerator(Config config) {
 		super(config);
 	}
 

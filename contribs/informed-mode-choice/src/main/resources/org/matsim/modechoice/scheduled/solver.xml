@@ -17,13 +17,12 @@
 
 	<!-- Configure the optimization algorithms -->
 	<termination>
-<!--		<secondsSpentLimit>60</secondsSpentLimit>-->
-		<daysSpentLimit>2</daysSpentLimit>
+		<hoursSpentLimit>12</hoursSpentLimit>
 	</termination>
 	<localSearch>
 
 		<termination>
-			<unimprovedStepCountLimit>10000</unimprovedStepCountLimit>
+			<unimprovedStepCountLimit>5000</unimprovedStepCountLimit>
 		</termination>
 
 		<unionMoveSelector>

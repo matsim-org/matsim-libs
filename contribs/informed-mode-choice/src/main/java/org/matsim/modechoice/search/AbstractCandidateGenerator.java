@@ -2,6 +2,8 @@ package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.constraints.TripConstraint;
@@ -42,9 +44,9 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 	protected final InformedModeChoiceConfigGroup config;
 	protected final Set<String> allModes;
 
-	protected AbstractCandidateGenerator(InformedModeChoiceConfigGroup config) {
-		this.config = config;
-		this.allModes = new HashSet<>(config.getModes());
+	protected AbstractCandidateGenerator(Config config) {
+		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+		this.allModes = new HashSet<>(this.config.getModes());
 	}
 
 	@SuppressWarnings("unchecked")

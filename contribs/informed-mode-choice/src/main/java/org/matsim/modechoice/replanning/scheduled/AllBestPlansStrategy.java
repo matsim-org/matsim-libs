@@ -145,7 +145,7 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 			Id<Person> personId = plan.getPerson().getId();
 
 			List<PlanCandidate> schedule = plans.get(personId);
-			if (schedule != null) {
+			if (schedule != null && !schedule.isEmpty()) {
 				PlanCandidate candidate = schedule.get(applyIdx);
 				candidate.applyTo(plan, true);
 

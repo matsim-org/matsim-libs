@@ -1,6 +1,7 @@
 package org.matsim.modechoice.search;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.matsim.core.config.Config;
 import org.matsim.modechoice.*;
 
 import javax.annotation.Nullable;
@@ -14,7 +15,7 @@ import java.util.function.Predicate;
 public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 
 	@Inject
-	public SingleTripChoicesGenerator(InformedModeChoiceConfigGroup config) {
+	public SingleTripChoicesGenerator(Config config) {
 		super(config);
 	}
 

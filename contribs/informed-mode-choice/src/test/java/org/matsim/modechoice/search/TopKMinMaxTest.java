@@ -70,7 +70,7 @@ public class TopKMinMaxTest {
 		InformedModeChoiceConfigGroup config = ConfigUtils.addOrGetModule(testModule.config, InformedModeChoiceConfigGroup.class);
 		config.setModes(List.of(TransportMode.car, TransportMode.walk));
 
-		generator = new TopKChoicesGenerator(config);
+		generator = new TopKChoicesGenerator(testModule.config);
 
 		injector = Guice.createInjector(testModule);
 

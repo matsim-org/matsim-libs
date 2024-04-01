@@ -1,5 +1,7 @@
 package org.matsim.modechoice.replanning;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -34,7 +36,7 @@ public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrate
 	private Provider<SingleTripChoicesGenerator> generator;
 
 	@Inject
-	private InformedModeChoiceConfigGroup config;
+	private Config config;
 
 	@Inject
 	private Provider<PlanSelector> selector;
@@ -44,6 +46,8 @@ public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrate
 
 	@Override
 	public PlanStrategy get() {
+
+		InformedModeChoiceConfigGroup config = ConfigUtils.addOrGetModule(this.config, InformedModeChoiceConfigGroup.class);
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
