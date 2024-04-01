@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
@@ -27,18 +29,21 @@ public class ModeConstraintChecker implements IterationEndsListener, PersonAlgor
 
 	private static final Logger log = LogManager.getLogger(ModeConstraintChecker.class);
 
-	@Inject
-	private Provider<GeneratorContext> provider;
+	private final Provider<GeneratorContext> provider;
 
-	@Inject
-	private PlanModelService service;
-
-	@Inject
-	private InformedModeChoiceConfigGroup config;
+	private final PlanModelService service;
+	private final InformedModeChoiceConfigGroup config;
 
 	private ThreadLocal<GeneratorContext> generator;
 
 	private final Set<Person> violations = ConcurrentHashMap.newKeySet();
+
+	@Inject
+	public ModeConstraintChecker(Provider<GeneratorContext> provider, PlanModelService service, Config config) {
+		this.provider = provider;
+		this.service = service;
+		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -47,7 +52,7 @@ public class ModeConstraintChecker implements IterationEndsListener, PersonAlgor
 
 		if (event.getIteration() == 0 && service.hasConstraints() && config.getConstraintCheck() != InformedModeChoiceConfigGroup.ConstraintCheck.none) {
 
-			generator = ThreadLocal.withInitial(() -> provider.get());
+			generator = ThreadLocal.withInitial(provider::get);
 			violations.clear();
 
 			ParallelPersonAlgorithmUtils.run(population, event.getServices().getConfig().global().getNumberOfThreads(), this);
@@ -56,13 +61,15 @@ public class ModeConstraintChecker implements IterationEndsListener, PersonAlgor
 			generator = null;
 		}
 
-		if (violations.size() > 0) {
+		if (!violations.isEmpty()) {
 
 			log.error("There are {} constraints violations", violations.size());
 			log.error("Violating persons are: {}", violations.stream().map(Person::getId).collect(Collectors.toList()));
 
 			if (config.getConstraintCheck() == InformedModeChoiceConfigGroup.ConstraintCheck.abort)
 				throw new IllegalStateException(String.format("Aborting due to %d constraint violations in input plans. Set constraintCheck to 'warn' or 'repair' to avoid this error.", violations.size()));
+
+			violations.clear();
 		}
 	}
 

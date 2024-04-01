@@ -129,8 +129,10 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 
 				int target = (int) Math.ceil(iters / getConfig().replanning().getFractionOfIterationsToDisableInnovation());
 
-				log.info("Adjusting number of iterations from {} to {}.", getConfig().controller().getLastIteration(), target);
-				getConfig().controller().setLastIteration(target);
+				if (getConfig().controller().getLastIteration() != target) {
+					log.info("Adjusting number of iterations from {} to {}.", getConfig().controller().getLastIteration(), target);
+					getConfig().controller().setLastIteration(target);
+				}
 			}
 
 			bindPlanSelectorForRemoval().to(WorstNotSelctedPlanSelector.class);

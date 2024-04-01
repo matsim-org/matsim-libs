@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -103,15 +104,17 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	}
 
 	@Provides
-	public CandidatePruner pruner(Map<String, CandidatePruner> pruners, InformedModeChoiceConfigGroup config) {
+	public CandidatePruner pruner(Map<String, CandidatePruner> pruners, Config config) {
 
-		if (config.getPruning() == null)
+		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+
+		if (imc.getPruning() == null)
 			return null;
 
-		CandidatePruner pruner = pruners.get(config.getPruning());
+		CandidatePruner pruner = pruners.get(imc.getPruning());
 
 		if (pruner == null)
-			throw new IllegalStateException(String.format("Requested pruner %s in config, but it is not bound in the module", config.getPruning()));
+			throw new IllegalStateException(String.format("Requested pruner %s in config, but it is not bound in the module", imc.getPruning()));
 
 		return pruner;
 	}

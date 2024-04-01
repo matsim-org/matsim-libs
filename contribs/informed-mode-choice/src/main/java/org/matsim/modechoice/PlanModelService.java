@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -52,11 +54,11 @@ public final class PlanModelService implements StartupListener {
 	private final Map<String, ModeOptions> options;
 
 	@Inject
-	private PlanModelService(InformedModeChoiceConfigGroup config, Map<String, ModeOptions> options) {
-		this.config = config;
+	private PlanModelService(Config config, Map<String, ModeOptions> options) {
+		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		this.options = options;
 
-		for (String mode : config.getModes()) {
+		for (String mode : this.config.getModes()) {
 
 			if (!options.containsKey(mode))
 				throw new IllegalArgumentException(String.format("No estimators configured for mode %s", mode));

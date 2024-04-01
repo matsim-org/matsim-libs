@@ -152,6 +152,7 @@ public final class ModeSchedulingSolver {
 
 			// number of trips for persons belonging to the target
 			int trips = plans.entrySet().stream()
+				.filter(p -> !p.getValue().isEmpty())
 				.filter(p -> this.target.mapping().get(p.getKey()).equals(key))
 				.mapToInt(p -> p.getValue().get(0).size())
 				.sum();
