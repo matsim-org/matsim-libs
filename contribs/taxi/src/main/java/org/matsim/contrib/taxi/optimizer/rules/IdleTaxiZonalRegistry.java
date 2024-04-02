@@ -91,7 +91,7 @@ public class IdleTaxiZonalRegistry {
 
 		return minCount >= vehicles.size() ?
 				vehicles.values().stream().filter(idleVehicleFilter) :
-				zonesSortedByDistance.get(zoneSystem.getZoneForNode(node).getId())
+				zonesSortedByDistance.get(zoneSystem.getZoneForNodeId(node).getId())
 						.stream()
 						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())
 						.filter(idleVehicleFilter)
@@ -99,7 +99,7 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	private Id<Zone> getZoneId(TaxiStayTask stayTask) {
-		return zoneSystem.getZoneForLink(stayTask.getLink().getId()).getId();
+		return zoneSystem.getZoneForLinkId(stayTask.getLink().getId()).getId();
 	}
 
 	public Stream<DvrpVehicle> vehicles() {

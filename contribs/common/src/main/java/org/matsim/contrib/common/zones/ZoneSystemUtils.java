@@ -6,7 +6,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdCollectors;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -23,7 +22,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 
@@ -55,16 +53,16 @@ public final class ZoneSystemUtils {
 	 * If a given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
 	 * Result may be null in case the given link is outside of the service area.
 	 */
-				@Nullable
-				private static String getGeometryIdForLink(Link link, Map<String, PreparedPolygon> geometries) {
-					Point linkCoord = MGC.coord2Point(link.getToNode().getCoord());
-					return geometries.entrySet()
-						.stream()
-						.filter(e -> e.getValue().intersects(linkCoord))
-						.findAny()
-						.map(Map.Entry::getKey)
-						.orElse(null);
-				}
+	@Nullable
+	private static String getGeometryIdForLink(Link link, Map<String, PreparedPolygon> geometries) {
+		Point linkCoord = MGC.coord2Point(link.getToNode().getCoord());
+		return geometries.entrySet()
+			.stream()
+			.filter(e -> e.getValue().intersects(linkCoord))
+			.findAny()
+			.map(Map.Entry::getKey)
+			.orElse(null);
+	}
 
 	public static Id<Zone> createZoneId(String id) {
 		return Id.create(id, Zone.class);

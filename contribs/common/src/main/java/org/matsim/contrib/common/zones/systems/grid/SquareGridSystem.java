@@ -60,17 +60,17 @@ public class SquareGridSystem implements ZoneSystem {
 
 	@Nullable
 	@Override
-	public Zone getZoneForLink(Id<Link> link) {
+	public Zone getZoneForLinkId(Id<Link> link) {
 		return grid.getZone(network.getLinks().get(link).getToNode().getCoord());
 	}
 
 	@Override
-	public Zone getZoneForNode(Node node) {
+	public Zone getZoneForNodeId(Node node) {
 		return grid.getZone(node.getCoord());
 	}
 
 	@Override
-	public List<Link> getLinksForZone(Id<Zone> zone) {
+	public List<Link> getLinksForZoneId(Id<Zone> zone) {
 		return zoneToLinksMap.get(zone);
 	}
 }

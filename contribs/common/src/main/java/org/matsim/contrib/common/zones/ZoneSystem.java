@@ -10,11 +10,11 @@ import java.util.Map;
 
 public interface ZoneSystem {
 	@Nullable
-	Zone getZoneForLink(Id<Link> link);
+	Zone getZoneForLinkId(Id<Link> link);
 
-	Zone getZoneForNode(Node node);
+	Zone getZoneForNodeId(Node node);
 
-	List<Link> getLinksForZone(Id<Zone> zone);
+	List<Link> getLinksForZoneId(Id<Zone> zone);
 
 
 	Map<Id<Zone>, Zone> getZones();

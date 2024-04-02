@@ -161,7 +161,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	}
 
 	private void createAndAddPerson(String id, Id<Zone> zoneId) {
-		Id<Link> linkId = zonalSystem.getLinksForZone(zoneId).get(0).getId();
+		Id<Link> linkId = zonalSystem.getLinksForZoneId(zoneId).get(0).getId();
 		Person person = factory.createPerson(Id.createPersonId(id));
 		Plan plan = factory.createPlan();
 		plan.addActivity(factory.createActivityFromLinkId("dummy", linkId));

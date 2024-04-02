@@ -62,10 +62,10 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 				return time;
 			}
 		}
-		return freeSpeedTravelTimeMatrix.get(gridSystem.getZoneForNode(fromNode), gridSystem.getZoneForNode(toNode));
+		return freeSpeedTravelTimeMatrix.get(gridSystem.getZoneForNodeId(fromNode), gridSystem.getZoneForNodeId(toNode));
 	}
 
 	public int getZonalTravelTime(Node fromNode, Node toNode, double departureTime) {
-		return freeSpeedTravelTimeMatrix.get(gridSystem.getZoneForNode(fromNode), gridSystem.getZoneForNode(toNode));
+		return freeSpeedTravelTimeMatrix.get(gridSystem.getZoneForNodeId(fromNode), gridSystem.getZoneForNodeId(toNode));
 	}
 }
