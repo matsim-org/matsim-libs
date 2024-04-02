@@ -182,6 +182,7 @@ public class TopKMinMaxTest {
 
 			bind(EventsManager.class).toInstance(em);
 			bind(ControlerListenerManager.class).toInstance(cl);
+			bind(Config.class).toInstance(config);
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 

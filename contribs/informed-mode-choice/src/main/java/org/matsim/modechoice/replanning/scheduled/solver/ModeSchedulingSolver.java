@@ -3,9 +3,7 @@ package org.matsim.modechoice.replanning.scheduled.solver;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import it.unimi.dsi.fastutil.objects.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,7 +46,7 @@ public final class ModeSchedulingSolver {
 
 		List<AgentSchedule> agents = new ArrayList<>();
 
-		Reference2ObjectMap<String, IntIntPair> target = createTarget(plans);
+		Target target = createTarget(plans);
 
 		Random rnd = new Random(0);
 
@@ -63,7 +61,7 @@ public final class ModeSchedulingSolver {
 			if (!this.target.mapping().containsKey(kv.getKey()))
 				continue;
 
-			AgentSchedule schedule = createInitialSchedule(kv.getKey(), candidates, target, rnd);
+			AgentSchedule schedule = createInitialSchedule(kv.getKey(), candidates, target);
 
 			// Schedule can be filtered
 			if (schedule == null)
@@ -78,7 +76,18 @@ public final class ModeSchedulingSolver {
 		if (agents.isEmpty())
 			throw new IllegalArgumentException("No relevant plans to optimize");
 
+		List<AgentSchedule> copy = new ArrayList<>(agents);
+		Collections.shuffle(copy, rnd);
+
+		for (AgentSchedule schedule : copy) {
+			List<PlanCandidate> candidates = plans.get(schedule.getId());
+			fillMissingCandidates(schedule, candidates, target, rnd);
+		}
+
 		int switchTarget = (int) (targetSwitchShare * agents.stream().mapToInt(a -> a.length).sum());
+
+		if (Arrays.stream(target.required).anyMatch(v -> v > 0))
+			log.warn("Not enough plans to satisfy target share. Increase schedule length or reduce top k.");
 
 		Map<Id<Person>, List<PlanCandidate>> result = new LinkedHashMap<>();
 
@@ -87,7 +96,7 @@ public final class ModeSchedulingSolver {
 			// Initialize agents
 			initialize(k, agents);
 
-			ModeSchedulingProblem problem = new ModeSchedulingProblem(WINDOW_SIZE, agents, target, switchTarget);
+			ModeSchedulingProblem problem = new ModeSchedulingProblem(WINDOW_SIZE, agents, target.targets, switchTarget);
 
 			preSolve(k, problem);
 
@@ -130,7 +139,7 @@ public final class ModeSchedulingSolver {
 		return result;
 	}
 
-	private AgentSchedule createInitialSchedule(Id<Person> id, List<PlanCandidate> candidates, Reference2ObjectMap<String, IntIntPair> target, Random rnd) {
+	private AgentSchedule createInitialSchedule(Id<Person> id, List<PlanCandidate> candidates, Target target) {
 
 		// Number of trips per plan
 		int trips = candidates.get(0).size();
@@ -138,7 +147,7 @@ public final class ModeSchedulingSolver {
 		String[] categories = new String[scheduleLength * trips];
 
 		// Summed number of categories
-		byte[] weights = new byte[scheduleLength * target.size()];
+		byte[] weights = new byte[scheduleLength * target.targets.size()];
 
 		String key = this.target.mapping().get(id);
 		Object2DoubleMap<String> t = this.target.targets().get(key);
@@ -147,25 +156,69 @@ public final class ModeSchedulingSolver {
 			PlanCandidate candidate = candidates.get(i);
 
 			categorizePlans(categories, trips, i, candidate, key, t);
-			computePlanWeights(weights, categories, trips, i, target);
+			computePlanWeights(weights, categories, trips, i, target.targets);
+
+			// Sum up weights for each category
+			for (int j = 0; j < target.targets.size(); j++) {
+				target.required[j] -= weights[i * target.targets.size() + j];
+			}
 		}
 
 		// Irrelevant plan for the optimization
 		if (Arrays.stream(categories).allMatch(p -> Objects.equals(p, null)))
 			return null;
 
-		// TODO: fill needed categories, instead of randomly
+		return new AgentSchedule(id, categories, weights, trips);
+	}
+
+	/**
+	 * Filly plan candidates until schedule length. Ensures plans of the best types are duplicated to match target shares.
+	 */
+	private void fillMissingCandidates(AgentSchedule schedule, List<PlanCandidate> candidates, Target target, Random rnd) {
+
+		int trips = candidates.get(0).size();
+		String key = this.target.mapping().get(schedule.getId());
+		Object2DoubleMap<String> t = this.target.targets().get(key);
+
 		// Fill candidates to topK randomly
 		while (candidates.size() < scheduleLength) {
-			PlanCandidate candidate = candidates.get(rnd.nextInt(candidates.size()));
+
+			PlanCandidate candidate = chooseCandidateForDuplication(candidates, schedule.weights, target.required, rnd);
 			candidates.add(candidate);
 
 			int i = candidates.size() - 1;
-			categorizePlans(categories, trips, i, candidate, key, t);
-			computePlanWeights(weights, categories, trips, i, target);
+			categorizePlans(schedule.planCategories, trips, i, candidate, key, t);
+			computePlanWeights(schedule.weights, schedule.planCategories, trips, i, target.targets);
+			for (int j = 0; j < target.targets.size(); j++) {
+				target.required[j] -= schedule.weights[i * target.targets.size() + j];
+			}
+		}
+	}
+
+	/**
+	 * Choose a plan candidate to be duplicated.
+	 */
+	private PlanCandidate chooseCandidateForDuplication(List<PlanCandidate> candidates, byte[] weights, long[] required, Random rnd) {
+
+		// If there are no more required trips, random one is chosen
+		int bestIdx = rnd.nextInt(candidates.size());
+		int bestTotal = 0;
+
+		for (int i = 0; i < candidates.size(); i++) {
+
+			int total = 0;
+			for (int j = 0; j < required.length; j++) {
+				int diff = weights[i * required.length + j];
+				total += required[j] > 0 ? diff : 0;
+			}
+
+			if (total > bestTotal) {
+				bestTotal = total;
+				bestIdx = i;
+			}
 		}
 
-		return new AgentSchedule(id, categories, weights, trips);
+		return candidates.get(bestIdx);
 	}
 
 	private void categorizePlans(String[] categories, int trips, int idx, PlanCandidate candidate, String key, Object2DoubleMap<String> t) {
@@ -195,9 +248,10 @@ public final class ModeSchedulingSolver {
 		}
 	}
 
-	private Reference2ObjectMap<String, IntIntPair> createTarget(Map<Id<Person>, List<PlanCandidate>> plans) {
+	private Target createTarget(Map<Id<Person>, List<PlanCandidate>> plans) {
 
 		Reference2ObjectMap<String, IntIntPair> target = new Reference2ObjectLinkedOpenHashMap<>();
+		Reference2LongMap<String> total = new Reference2LongArrayMap<>();
 
 		for (Map.Entry<String, Object2DoubleMap<String>> kv : this.target.targets().entrySet()) {
 
@@ -218,12 +272,19 @@ public final class ModeSchedulingSolver {
 				String t = key + "[" + e.getKey() + "]";
 				IntIntPair bounds = IntIntPair.of(lower, upper);
 				target.put(t.intern(), bounds);
+				total.put(t.intern(), (long) (e.getDoubleValue() * trips));
 
 				log.info("Target {} {} with {} trips.", t, bounds, trips);
 			}
 		}
 
-		return target;
+		long[] required = new long[target.size()];
+		int k = 0;
+		for (Reference2LongMap.Entry<String> e : total.reference2LongEntrySet()) {
+			required[k++] = scheduleLength * e.getLongValue();
+		}
+
+		return new Target(target, required);
 	}
 
 	/**
@@ -306,5 +367,8 @@ public final class ModeSchedulingSolver {
 		});
 
 		return solver.solve(problem);
+	}
+
+	private record Target(Reference2ObjectMap<String, IntIntPair> targets, long[] required) {
 	}
 }
