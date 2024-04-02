@@ -17,7 +17,8 @@ class AllBestPlansStrategyTest extends ScenarioTest {
 	protected void prepareConfig(Config config) {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-		imc.setTopK(20);
+		imc.setTopK(15);
+		imc.setConstraintCheck(InformedModeChoiceConfigGroup.ConstraintCheck.none);
 
 		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings()
 			.setStrategyName(ScheduledModeChoiceModule.ALL_BEST_K_PLAN_MODES_STRATEGY)
@@ -28,7 +29,7 @@ class AllBestPlansStrategyTest extends ScenarioTest {
 
 		ScheduledModeChoiceConfigGroup smc = ConfigUtils.addOrGetModule(config, ScheduledModeChoiceConfigGroup.class);
 		smc.setAdjustTargetIterations(true);
-		smc.setScheduleIterations(15);
+		smc.setScheduleIterations(18);
 		smc.setSubpopulations("person");
 
 		ModeTargetParameters target = new ModeTargetParameters(
@@ -47,6 +48,11 @@ class AllBestPlansStrategyTest extends ScenarioTest {
 			.build()
 		);
 
+	}
+
+	@Override
+	protected String[] getArgs() {
+		return new String[] {"--mc"};
 	}
 
 	@Test

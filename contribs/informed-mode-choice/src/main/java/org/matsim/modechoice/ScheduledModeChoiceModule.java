@@ -15,6 +15,7 @@ import org.matsim.modechoice.replanning.scheduled.AllBestPlansStrategyProvider;
 import org.matsim.modechoice.replanning.scheduled.ReRouteSelectedStrategyProvider;
 import org.matsim.modechoice.replanning.scheduled.ScheduledStrategyChooser;
 import org.matsim.modechoice.replanning.scheduled.TimeMutateSelectedStrategyProvider;
+import org.matsim.modechoice.replanning.scheduled.solver.ModeSchedulingSolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,6 +79,17 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 		log.info("Scheduled mode choice is {}.", enabled ? "enabled" : "disabled");
 
 		if (enabled) {
+
+			int length = config.getScheduleIterations();
+
+			length += Math.floorMod(-length, ModeSchedulingSolver.WINDOW_SIZE);
+
+			// schedule iterations must be divisible by window size
+			if (length != config.getScheduleIterations()) {
+				log.warn("Schedule length must be divisible by {}. Adjusting schedule iterations from {} to {}. ",
+					config.getScheduleIterations(), length, ModeSchedulingSolver.WINDOW_SIZE);
+				config.setScheduleIterations(length);
+			}
 
 			Collection<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(getConfig().replanning().getStrategySettings());
 			getConfig().replanning().clearStrategySettings();

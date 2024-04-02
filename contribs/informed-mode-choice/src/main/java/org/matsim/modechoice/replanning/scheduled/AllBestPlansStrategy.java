@@ -93,8 +93,8 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 		log.info("Creating plan schedule for {} agents.", target.mapping().size());
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
-		ModeSchedulingSolver solver = new ModeSchedulingSolver(scheduleConfig.getScheduleIterations(), imc.getTopK(),
-			target, scheduleConfig.getTargetSwitchShare());
+		ModeSchedulingSolver solver = new ModeSchedulingSolver(scheduleConfig.getScheduleIterations(), target,
+			scheduleConfig.getTargetSwitchShare());
 
 		// make sure plans always have the same order
 		plans = solver.solve(new TreeMap<>(plans));

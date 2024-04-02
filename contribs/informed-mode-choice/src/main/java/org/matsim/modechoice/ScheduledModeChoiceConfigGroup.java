@@ -2,7 +2,9 @@ package org.matsim.modechoice;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.*;
@@ -128,4 +130,15 @@ public class ScheduledModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+
+		if (imc.getTopK() > scheduleIterations) {
+			throw new IllegalArgumentException(String.format(
+				"Top-K (%d) must be less or equal to schedule iterations (%d).", imc.getTopK(), scheduleIterations)
+			);
+		}
+	}
 }

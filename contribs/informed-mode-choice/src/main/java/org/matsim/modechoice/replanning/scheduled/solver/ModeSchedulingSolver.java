@@ -27,29 +27,21 @@ public final class ModeSchedulingSolver {
 	/**
 	 * Number of plans to optimize simultaneously.
 	 */
-	static final int WINDOW_SIZE = 3;
+	public static final int WINDOW_SIZE = 3;
 
 	static final Logger log = LogManager.getLogger(ModeSchedulingSolver.class);
 
 	private final int scheduleLength;
-	private final int topK;
 	private final ModeTarget target;
 	private final double targetSwitchShare;
 
-	public ModeSchedulingSolver(int scheduleLength, int topK,
-								ModeTarget target,
-								double targetSwitchShare) {
+	public ModeSchedulingSolver(int scheduleLength, ModeTarget target, double targetSwitchShare) {
 		this.scheduleLength = scheduleLength;
-		// topK must be divisible by window size
-		this.topK = topK + Math.floorMod(-topK, WINDOW_SIZE);
 		this.target = target;
 		this.targetSwitchShare = targetSwitchShare;
 	}
 
 	public Map<Id<Person>, List<PlanCandidate>> solve(Map<Id<Person>, List<PlanCandidate>> plans) {
-
-		if (scheduleLength > topK)
-			throw new IllegalArgumentException("Schedule length must be less than or equal to topK");
 
 		if (plans.isEmpty())
 			throw new IllegalArgumentException("No plans to optimize");
@@ -71,26 +63,14 @@ public final class ModeSchedulingSolver {
 			if (!this.target.mapping().containsKey(kv.getKey()))
 				continue;
 
-			// Fill candidates to topK randomly
-			if (candidates.size() < topK) {
-				for (int i = candidates.size(); i < topK; i++) {
-					candidates.add(candidates.get(rnd.nextInt(candidates.size())));
-				}
-			}
+			AgentSchedule schedule = createInitialSchedule(kv.getKey(), candidates, target, rnd);
 
-			String[] planCategories = categorizePlans(kv.getKey(), candidates);
-			// Irrelevant plan for the optimization, if all entries are the same
-			// TODO might affect the target value
-			if (Arrays.stream(planCategories).allMatch(p -> Objects.equals(p, planCategories[0])))
+			// Schedule can be filtered
+			if (schedule == null)
 				continue;
 
-			int length = candidates.get(0).size();
-			byte[] weights = computePlanWeights(target, planCategories, candidates.size(), length);
-
-			AgentSchedule schedule = new AgentSchedule(kv.getKey(), planCategories, weights, length);
-
 			// All plans are available initially
-			IntStream.range(0, topK).forEach(schedule.availablePlans::add);
+			IntStream.range(0, scheduleLength).forEach(schedule.availablePlans::add);
 
 			agents.add(schedule);
 		}
@@ -134,11 +114,85 @@ public final class ModeSchedulingSolver {
 		// Copy original plan order for irrelevant agents
 		for (Map.Entry<Id<Person>, List<PlanCandidate>> kv : plans.entrySet()) {
 			if (!result.containsKey(kv.getKey())) {
-				result.put(kv.getKey(), kv.getValue());
+				List<PlanCandidate> candidates = kv.getValue();
+
+				// Not optimized plans need to be filled
+				if (candidates.size() < scheduleLength && !candidates.isEmpty()) {
+					for (int i = candidates.size(); i < scheduleLength; i++) {
+						candidates.add(candidates.get(rnd.nextInt(candidates.size())));
+					}
+				}
+
+				result.put(kv.getKey(), candidates);
 			}
 		}
 
 		return result;
+	}
+
+	private AgentSchedule createInitialSchedule(Id<Person> id, List<PlanCandidate> candidates, Reference2ObjectMap<String, IntIntPair> target, Random rnd) {
+
+		// Number of trips per plan
+		int trips = candidates.get(0).size();
+
+		String[] categories = new String[scheduleLength * trips];
+
+		// Summed number of categories
+		byte[] weights = new byte[scheduleLength * target.size()];
+
+		String key = this.target.mapping().get(id);
+		Object2DoubleMap<String> t = this.target.targets().get(key);
+
+		for (int i = 0; i < candidates.size(); i++) {
+			PlanCandidate candidate = candidates.get(i);
+
+			categorizePlans(categories, trips, i, candidate, key, t);
+			computePlanWeights(weights, categories, trips, i, target);
+		}
+
+		// Irrelevant plan for the optimization
+		if (Arrays.stream(categories).allMatch(p -> Objects.equals(p, null)))
+			return null;
+
+		// TODO: fill needed categories, instead of randomly
+		// Fill candidates to topK randomly
+		while (candidates.size() < scheduleLength) {
+			PlanCandidate candidate = candidates.get(rnd.nextInt(candidates.size()));
+			candidates.add(candidate);
+
+			int i = candidates.size() - 1;
+			categorizePlans(categories, trips, i, candidate, key, t);
+			computePlanWeights(weights, categories, trips, i, target);
+		}
+
+		return new AgentSchedule(id, categories, weights, trips);
+	}
+
+	private void categorizePlans(String[] categories, int trips, int idx, PlanCandidate candidate, String key, Object2DoubleMap<String> t) {
+		for (int j = 0; j < trips; j++) {
+			String mode = candidate.getMode(j);
+			String category = null;
+			if (t.containsKey(mode)) {
+				category = key + "[" + mode + "]";
+			}
+			categories[idx * trips + j] = category != null ? category.intern() : null;
+		}
+	}
+
+	/**
+	 * Aggregates categories against targets.
+	 */
+	@SuppressWarnings("StringEquality")
+	private void computePlanWeights(byte[] aggr, String[] categories, int trips, int i, Reference2ObjectMap<String, IntIntPair> target) {
+		int k = 0;
+		for (String ref : target.keySet()) {
+			int idx = i * target.size() + k++;
+			for (int j = 0; j < trips; j++) {
+				if (categories[i * trips + j] == ref) {
+					aggr[idx]++;
+				}
+			}
+		}
 	}
 
 	private Reference2ObjectMap<String, IntIntPair> createTarget(Map<Id<Person>, List<PlanCandidate>> plans) {
@@ -182,7 +236,7 @@ public final class ModeSchedulingSolver {
 		Random rnd = new Random(k);
 		Collections.shuffle(copy, rnd);
 
-		IntList avail = new IntArrayList(topK);
+		IntList avail = new IntArrayList(scheduleLength);
 
 		for (AgentSchedule agent : copy) {
 			agent.indices.clear();
@@ -216,7 +270,7 @@ public final class ModeSchedulingSolver {
 		Random rnd = new Random(k);
 		Collections.shuffle(copy, rnd);
 
-		IntList avail = new IntArrayList(topK);
+		IntList avail = new IntArrayList(scheduleLength);
 
 		for (AgentSchedule agent : copy) {
 
@@ -229,54 +283,6 @@ public final class ModeSchedulingSolver {
 				score.applyImprovement(agent, idx, avail, targets);
 			}
 		}
-	}
-
-	private String[] categorizePlans(Id<Person> id, List<PlanCandidate> candidates) {
-
-		int trips = candidates.get(0).size();
-		String[] categories = new String[candidates.size() * trips];
-
-		String key = target.mapping().get(id);
-		Object2DoubleMap<String> t = target.targets().get(key);
-
-		for (int i = 0; i < candidates.size(); i++) {
-			PlanCandidate candidate = candidates.get(i);
-
-			for (int j = 0; j < trips; j++) {
-				String mode = candidate.getMode(j);
-				String category = null;
-				if (t.containsKey(mode)) {
-					category = key + "[" + mode + "]";
-				}
-				categories[i * trips + j] = category != null ? category.intern() : null;
-			}
-		}
-
-		return categories;
-	}
-
-	/**
-	 * Aggregates categories against targets.
-	 */
-	@SuppressWarnings("StringEquality")
-	private byte[] computePlanWeights(Reference2ObjectMap<String, IntIntPair> target, String[] categories, int candidates, int trips) {
-
-		byte[] aggr = new byte[target.size() * candidates];
-
-		for (int i = 0; i < candidates; i++) {
-			int k = 0;
-			for (String ref : target.keySet()) {
-				int idx = i * target.size() + k++;
-				for (int j = 0; j < trips; j++) {
-
-					if (categories[i * trips + j] == ref) {
-						aggr[idx]++;
-					}
-				}
-			}
-		}
-
-		return aggr;
 	}
 
 	private ModeSchedulingProblem solve(ModeSchedulingProblem problem) {
