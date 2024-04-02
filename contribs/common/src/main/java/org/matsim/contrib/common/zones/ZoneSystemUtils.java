@@ -6,11 +6,14 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdCollectors;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.io.ZoneShpReader;
 import org.matsim.contrib.common.zones.io.ZoneXmlReader;
+import org.matsim.contrib.common.zones.util.ZoneFinder;
 import org.matsim.contrib.common.zones.util.ZoneFinderImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -88,5 +91,21 @@ public final class ZoneSystemUtils {
 		ZoneShpReader shpReader = new ZoneShpReader(zones);
 		shpReader.readZones(zonesShpUrl);
 		return zones;
+	}
+
+	// if CRSs of the network and zones are different, zoneFinder should convert between CRSs
+	public static IdMap<Link, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder) {
+		return EntryStream.of(network.getLinks())
+			.mapValues(link -> zoneFinder.findZone(link.getToNode().getCoord()))
+			.filterValues(Objects::nonNull)
+			.collect(IdCollectors.toIdMap(Link.class, Map.Entry::getKey, Map.Entry::getValue));
+	}
+
+	public static IdMap<Node, Zone> createNodeToZoneMap(Network network, ZoneFinder zoneFinder) {
+		return EntryStream.of(network.getNodes())
+			.mapValues(node -> zoneFinder.findZone(node.getCoord()))
+			.filterValues(Objects::nonNull)
+			.collect(IdCollectors.toIdMap(Node.class, Map.Entry::getKey, Map.Entry::getValue));
+
 	}
 }

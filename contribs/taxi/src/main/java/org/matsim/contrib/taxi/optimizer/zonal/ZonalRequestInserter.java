@@ -42,7 +42,6 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.ZonalSystemParams;
-import org.matsim.contrib.common.zones.util.NetworkWithZonesUtils;
 import org.matsim.contrib.common.zones.util.ZoneFinderImpl;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -78,7 +77,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 				ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
 		// TODO No conversion of SRS is done
 
-		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
+		this.linkToZone = ZoneSystemUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
 
 		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
 		// the zones used in ZonalTaxiOptim (for dispatching)

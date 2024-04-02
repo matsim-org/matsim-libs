@@ -1,19 +1,14 @@
 package org.matsim.contrib.common.zones;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdCollectors;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.common.zones.util.NetworkWithZonesUtils;
 import org.matsim.contrib.common.zones.util.ZoneFinder;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class ZoneSystemImpl implements ZoneSystem {
 
@@ -31,8 +26,8 @@ public class ZoneSystemImpl implements ZoneSystem {
 	public ZoneSystemImpl(Collection<Zone> zones, ZoneFinder zoneFinder, Network network) {
 		zones.forEach(zone -> this.zones.put(zone.getId(), zone));
 
-		IdMap<Node, Zone> nodeToZoneMap = NetworkWithZonesUtils.createNodeToZoneMap(network, zoneFinder);
-		IdMap<Link, Zone> linkToZoneMap = NetworkWithZonesUtils.createLinkToZoneMap(network, zoneFinder);
+		IdMap<Node, Zone> nodeToZoneMap = ZoneSystemUtils.createNodeToZoneMap(network, zoneFinder);
+		IdMap<Link, Zone> linkToZoneMap = ZoneSystemUtils.createLinkToZoneMap(network, zoneFinder);
 		this.nodeToZoneMap.putAll(nodeToZoneMap);
 		this.link2zone.putAll(linkToZoneMap);
 
