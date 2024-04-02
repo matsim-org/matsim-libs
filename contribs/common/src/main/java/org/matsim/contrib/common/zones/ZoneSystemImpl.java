@@ -52,17 +52,17 @@ public class ZoneSystemImpl implements ZoneSystem {
 	 */
 	@Override
 	@Nullable
-	public Zone getZoneForLink(Id<Link> link) {
+	public Zone getZoneForLinkId(Id<Link> link) {
 		return link2zone.get(link);
 	}
 
 	@Override
-	public Zone getZoneForNode(Node node) {
+	public Zone getZoneForNodeId(Node node) {
 		return nodeToZoneMap.get(node.getId());
 	}
 
 	@Override
-	public List<Link> getLinksForZone(Id<Zone> zone) {
+	public List<Link> getLinksForZoneId(Id<Zone> zone) {
 		return zoneToLinksMap.getOrDefault(zone, Collections.emptyList());
 	}
 

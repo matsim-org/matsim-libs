@@ -47,7 +47,7 @@ public class RebalancingUtils {
 		Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone = new HashMap<>();
 		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + params.minServiceTime).forEach(v -> {
 			Link link = ((StayTask)v.getSchedule().getCurrentTask()).getLink();
-			Zone zone = zoneSystem.getZoneForLink(link.getId());
+			Zone zone = zoneSystem.getZoneForLinkId(link.getId());
 			if (zone == null) {
 				zone = ZoneImpl.createDummyZone(Id.create("single-vehicle-zone-" + v.getId(), Zone.class),
 						link.getToNode().getCoord());
@@ -67,7 +67,7 @@ public class RebalancingUtils {
 			if (stayTask.getStatus() == Task.TaskStatus.PLANNED
 					&& stayTask.getBeginTime() < time + params.maxTimeBeforeIdle
 					&& v.getServiceEndTime() > time + params.minServiceTime) {
-				Zone zone = zoneSystem.getZoneForLink(stayTask.getLink().getId());
+				Zone zone = zoneSystem.getZoneForLinkId(stayTask.getLink().getId());
 				if (zone != null) {
 					soonIdleVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);
 				}

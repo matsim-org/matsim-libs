@@ -52,8 +52,8 @@ public class NetDepartureReplenishDemandEstimator
 		if (event.getMode().equals(mode)) {
 			// At the submission time, this is only a potential trip.
 			int timeBin = (int)Math.floor(event.getTime() / timeBinSize);
-			Zone departureZoneId = zonalSystem.getZoneForLink(event.getFromLinkId());
-			Zone arrivalZoneId = zonalSystem.getZoneForLink(event.getToLinkId());
+			Zone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
+			Zone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
 			potentialDrtTripsMap.put(event.getRequestId(), new Trip(timeBin, departureZoneId, arrivalZoneId));
 		}
 	}

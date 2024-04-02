@@ -49,14 +49,14 @@ public class DrtZonalSystemTest {
 	void test_cellSize100() {
 		ZoneSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 100));
-		Assertions.assertThat(drtZonalSystem.getZoneForLink(Id.createLinkId("ab")).getId().toString()).isEqualTo("10");
+		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId().toString()).isEqualTo("10");
 	}
 
 	@Test
 	void test_cellSize700() {
 		ZoneSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
-		Assertions.assertThat(drtZonalSystem.getZoneForLink(Id.createLinkId("ab")).getId().toString()).isEqualTo("2");
+		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId().toString()).isEqualTo("2");
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class DrtZonalSystemTest {
 
 		//link 'da' is outside of the service area
 		Id<Link> id = Id.createLinkId("da");
-		Assertions.assertThat(zonalSystem.getZoneForLink(id)).isNull();
+		Assertions.assertThat(zonalSystem.getZoneForLinkId(id)).isNull();
 	}
 
 	@Test

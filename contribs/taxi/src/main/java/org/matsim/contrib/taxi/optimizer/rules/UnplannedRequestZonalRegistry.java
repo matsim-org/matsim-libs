@@ -72,14 +72,14 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	public Stream<DrtRequest> findNearestRequests(Node node, int minCount) {
-		return zonesSortedByDistance.get(zoneSystem.getZoneForNode(node).getId())
+		return zonesSortedByDistance.get(zoneSystem.getZoneForNodeId(node).getId())
 				.stream()
 				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
 				.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(DrtRequest request) {
-		return zoneSystem.getZoneForNode(request.getFromLink().getFromNode()).getId();
+		return zoneSystem.getZoneForNodeId(request.getFromLink().getFromNode()).getId();
 	}
 
 	public int getRequestCount() {

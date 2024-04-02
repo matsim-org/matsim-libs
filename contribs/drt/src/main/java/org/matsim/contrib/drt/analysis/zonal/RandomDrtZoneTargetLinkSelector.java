@@ -46,7 +46,7 @@ public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelecto
 
 	@Override
 	public Link selectTargetLink(Zone zone) {
-		List<Link> linksForZone = zoneSystem.getLinksForZone(zone.getId());
+		List<Link> linksForZone = zoneSystem.getLinksForZoneId(zone.getId());
 		return linksForZone.get(random.applyAsInt(linksForZone.size()));
 	}
 }

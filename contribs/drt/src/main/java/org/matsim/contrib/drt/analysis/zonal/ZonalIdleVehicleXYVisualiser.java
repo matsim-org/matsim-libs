@@ -83,7 +83,7 @@ public class ZonalIdleVehicleXYVisualiser
 
 	private void handleEvent(AbstractTaskEvent event, Consumer<Zone> handler) {
 		if (event.getDvrpMode().equals(mode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
-			Zone zone = zonalSystem.getZoneForLink(event.getLinkId());
+			Zone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
 				handler.accept(zone);
 			}
