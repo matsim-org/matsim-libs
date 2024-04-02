@@ -23,7 +23,7 @@ public class ScheduledModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@Parameter
 	@Positive
 	@Comment("Number of iterations to be scheduled")
-	private int scheduleIterations = 15;
+	private int scheduleIterations = 24;
 	@Parameter
 	@PositiveOrZero
 	@Comment("Number of iterations between scheduled mode choice")
