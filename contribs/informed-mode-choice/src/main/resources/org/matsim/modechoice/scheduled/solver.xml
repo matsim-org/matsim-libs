@@ -22,7 +22,7 @@
 	<localSearch>
 
 		<termination>
-			<unimprovedStepCountLimit>5000</unimprovedStepCountLimit>
+			<unimprovedStepCountLimit>2500</unimprovedStepCountLimit>
 		</termination>
 
 		<unionMoveSelector>
