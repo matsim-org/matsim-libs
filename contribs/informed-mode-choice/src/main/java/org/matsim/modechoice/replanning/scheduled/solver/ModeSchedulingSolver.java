@@ -87,8 +87,7 @@ public final class ModeSchedulingSolver {
 		int switchTarget = (int) (targetSwitchShare * agents.stream().mapToInt(a -> a.length).sum());
 
 		if (Arrays.stream(target.required).anyMatch(v -> v > 0))
-			log.warn("Not enough plans to satisfy target share. Required {}. Increase schedule length or reduce top k.",
-				Arrays.toString(target.required));
+			log.warn("Not enough plans to satisfy target share. Increase schedule length, reduce top k, or increase mode asc.");
 
 		Map<Id<Person>, List<PlanCandidate>> result = new LinkedHashMap<>();
 
