@@ -55,7 +55,6 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 	private final Map<Id<Person>, Id<Link>> personId2homeLinkId = new HashMap<>();
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Person>> hasAlreadyPaidDailyResidentialParkingCosts = new HashSet<>();
-	private double compensationTime = Double.NaN;
 
 	@Inject
 	private ParkingCostConfigGroup parkingCostConfigGroup;
@@ -65,10 +64,6 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 	@Inject
 	private Scenario scenario;
-
-	@Inject
-	private QSimConfigGroup qSimConfigGroup;
-
 
 	@Override
     public void reset(int iteration) {
@@ -226,27 +221,23 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 	private double getParkingPenalty(Attributes attributes) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getParkingPenaltyAttributeName())).orElse(0.);
 	}
-	public Map<Id<Person>, Double> getPersonId2lastLeaveVehicleTime() {
+	Map<Id<Person>, Double> getPersonId2lastLeaveVehicleTime() {
 		return personId2lastLeaveVehicleTime;
 	}
 
-	public Map<Id<Person>, String> getPersonId2previousActivity() {
+	Map<Id<Person>, String> getPersonId2previousActivity() {
 		return personId2previousActivity;
 	}
 
-	public Map<Id<Person>, Id<Link>> getPersonId2relevantModeLinkId() {
+	Map<Id<Person>, Id<Link>> getPersonId2relevantModeLinkId() {
 		return personId2relevantModeLinkId;
 	}
 
-	public Map<Id<Person>, Id<Link>> getPersonId2homeLinkId() {
-		return personId2homeLinkId;
-	}
-
-	public Set<Id<Person>> getPtDrivers() {
+	Set<Id<Person>> getPtDrivers() {
 		return ptDrivers;
 	}
 
-	public Set<Id<Person>> getHasAlreadyPaidDailyResidentialParkingCosts() {
+	Set<Id<Person>> getHasAlreadyPaidDailyResidentialParkingCosts() {
 		return hasAlreadyPaidDailyResidentialParkingCosts;
 	}
 }
