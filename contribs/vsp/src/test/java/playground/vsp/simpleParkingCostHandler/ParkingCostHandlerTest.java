@@ -24,6 +24,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.*;
 
+/**
+ * Tests for the ParkingCostHandler class.
+ * The following test cases could be added:
+ * - Test chain of parking events.
+ * - Test activity prefixes excluded from parking.
+ */
 public class ParkingCostHandlerTest {
 	private Injector injector;
 

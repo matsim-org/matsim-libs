@@ -47,6 +47,14 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 * @author ikaddoura
 */
 
+/**
+ * This class handles parking costs for different types of parking activities.
+ * There are still things to refactor:
+ * - There are lots of magic numbers.
+ * - The method handleEvent(PersonEntersVehicleEvent event) is too long.
+ * - Helpful comments are missing.
+ * At least, there is a test class for this class. (paul april 2024)
+ */
 final class ParkingCostHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Map<Id<Person>, Double> personId2lastLeaveVehicleTime = new HashMap<>();
