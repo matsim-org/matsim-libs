@@ -26,6 +26,7 @@ import java.util.*;
 
 public class ParkingCostHandlerTest {
 	private Injector injector;
+
 	@BeforeEach
 	public void setup() {
 		Config config = ConfigUtils.createConfig();
@@ -128,12 +129,7 @@ public class ParkingCostHandlerTest {
 	@Test
 	public void personEntersVehicleEventTest() {
 		// tests basic functionality and cost calculation
-		Network network = injector.getInstance(Scenario.class).getNetwork();
-		// setup
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
-		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2, 10, 30, 100,3); // arbitrary values
-		setupLinkConfig(link, 10,440,5,15,500,30,30);
+		Link link = createNetworkAndSetupLink(10,440,5,15,500,30,30);
 		// Persons construction
 		Person ptDriver = new Tester(0); // should not pay at all
 		Person resident = new Tester(1); // should pay residential parking costs
@@ -144,9 +140,9 @@ public class ParkingCostHandlerTest {
 		PersonLeavesVehicleEvent pLVEventPtDriver = new PersonLeavesVehicleEvent(1000, ptDriver.getId(), null);
 		PersonEntersVehicleEvent pEVEventPtDriver = new PersonEntersVehicleEvent(11000, ptDriver.getId(),null);
 			// resident events
-		Event[] residentEvents = createEvents(resident.getId(),link.getId(),"home","car",10);
+		List<Event> residentEvents = createParkingEvents(resident.getId(),link.getId(),"home","car",10);
 			// shopper events
-		Event[] shopperEvents = createEvents(shopper.getId(),link.getId(),"shopping","car",1);
+		List<Event> shopperEvents = createParkingEvents(shopper.getId(),link.getId(),"shopping","car",1);
 
 		// Event handling
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
@@ -155,9 +151,9 @@ public class ParkingCostHandlerTest {
 		pch.handleEvent(pLVEventPtDriver);
 		pch.handleEvent(pEVEventPtDriver);
 			// resident handling
-		handleEventArray(pch, residentEvents);
+		handleParkingEvents(pch, residentEvents);
 			// shopper handling
-		handleEventArray(pch, shopperEvents);
+		handleParkingEvents(pch, shopperEvents);
 
 		// Assertions
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
@@ -178,20 +174,16 @@ public class ParkingCostHandlerTest {
 	@Test
 	public void penaltyParkingCostCalculationsTest() {
 		// Network construction
-		Network network = injector.getInstance(Scenario.class).getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
-		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
-		setupLinkConfig(link, 0, 200,10,10,200,2,100);
+		Link link = createNetworkAndSetupLink(0, 200,10,10,200,2,100);
 		// Person construction
 		Person tester1 = new Tester(0);
 		Person tester2 = new Tester(1);
 		// Event construction
-		Event[] events = createEvents(tester1.getId(),link.getId(),"other","car",3);
+		List<Event> events = createParkingEvents(tester1.getId(),link.getId(),"other","car",3);
 		// Event handling
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
-		handleEventArray(pch, events);
-		handleEventArray(pch, createEvents(tester2.getId(),link.getId(),"other","car",20));
+		handleParkingEvents(pch, events);
+		handleParkingEvents(pch, createParkingEvents(tester2.getId(),link.getId(),"other","car",20));
 		// Assertions
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
 		Assertions.assertEquals(-100, eventsManager.getEventByPersonId(tester1.getId()).getAmount());
@@ -199,18 +191,14 @@ public class ParkingCostHandlerTest {
 	}
 	@Test
 	public void firstHourParkingCostCalculationTest() {
-		Network network = injector.getInstance(Scenario.class).getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
-		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
-		setupLinkConfig(link, 0, 50,10,10,100,10,0);
+		Link link = createNetworkAndSetupLink(0, 50,10,10,100,10,0);
 
 		Person tester1 = new Tester(0);
 		Person tester2 = new Tester(1);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
-		handleEventArray(pch, createEvents(tester1.getId(),link.getId(),"other","car",1));
-		handleEventArray(pch, createEvents(tester2.getId(),link.getId(),"other","car",0.5)); // rounded up to 1hr
+		handleParkingEvents(pch, createParkingEvents(tester1.getId(),link.getId(),"other","car",1));
+		handleParkingEvents(pch, createParkingEvents(tester2.getId(),link.getId(),"other","car",0.5)); // rounded up to 1hr
 
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
 		Assertions.assertEquals(-10, eventsManager.getEventByPersonId(tester1.getId()).getAmount());
@@ -218,20 +206,16 @@ public class ParkingCostHandlerTest {
 	}
 	@Test
 	public void hourlyParkingCostCalculationTest() {
-		Network network = injector.getInstance(Scenario.class).getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
-		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
-		setupLinkConfig(link, 0, 150,10,20,100,10,0);
+		Link link = createNetworkAndSetupLink(0, 150,10,20,100,10,0);
 
 		Person parking1hr = new Tester(0);
 		Person parking3hr = new Tester(1);
 		Person parking8hr = new Tester(2);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
-		handleEventArray(pch, createEvents(parking1hr.getId(),link.getId(),"other","car",1));
-		handleEventArray(pch, createEvents(parking3hr.getId(),link.getId(),"other","car",3));
-		handleEventArray(pch, createEvents(parking8hr.getId(),link.getId(),"other","car",8));
+		handleParkingEvents(pch, createParkingEvents(parking1hr.getId(),link.getId(),"other","car",1));
+		handleParkingEvents(pch, createParkingEvents(parking3hr.getId(),link.getId(),"other","car",3));
+		handleParkingEvents(pch, createParkingEvents(parking8hr.getId(),link.getId(),"other","car",8));
 
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
 		Assertions.assertEquals(-10, eventsManager.getEventByPersonId(parking1hr.getId()).getAmount()); // first hour parking cost only
@@ -240,22 +224,19 @@ public class ParkingCostHandlerTest {
 	}
 	@Test
 	public void residentialFeeIsPaidOnceTest() {
-		Network network = injector.getInstance(Scenario.class).getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
-		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
-		setupLinkConfig(link, 100, 0,0,0,0,0,0);
+		Link link = createNetworkAndSetupLink(100, 0,0,0,0,0,0);
 
 		Person tester = new Tester(0);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
-		handleEventArray(pch, createEvents(tester.getId(),link.getId(),"home","car",10));
-		handleEventArray(pch, createEvents(tester.getId(),link.getId(),"home","car",2));
+		handleParkingEvents(pch, createParkingEvents(tester.getId(),link.getId(),"home","car",10));
+		handleParkingEvents(pch, createParkingEvents(tester.getId(),link.getId(),"home","car",2));
 
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
 		Assertions.assertEquals(1, eventsManager.getEvents().size());
 		Assertions.assertEquals(-100, eventsManager.getEventByPersonId(tester.getId()).getAmount());
 	}
+
 	@Test
 	public void handlerDefaultsTest() {
 		Network network = injector.getInstance(Scenario.class).getNetwork();
@@ -266,25 +247,21 @@ public class ParkingCostHandlerTest {
 		Person tester = new Tester(0);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
-		handleEventArray(pch, createEvents(tester.getId(),link.getId(),"other","car",10));
+		handleParkingEvents(pch, createParkingEvents(tester.getId(),link.getId(),"other","car",10));
 
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
 		Assertions.assertTrue(eventsManager.getEvents().isEmpty());
 	}
 	@Test
 	public void testDailyParkingCost() {
-		Network network = injector.getInstance(Scenario.class).getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
-		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
-		setupLinkConfig(link, 0, 50,10,10,100,10,0);
+		Link link = createNetworkAndSetupLink(0, 50,10,10,100,10,0);
 
 		Person tester1 = new Tester(0);
 		Person tester2 = new Tester(1);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
-		handleEventArray(pch, createEvents(tester1.getId(),link.getId(),"other","car",10));
-		handleEventArray(pch, createEvents(tester2.getId(),link.getId(),"other","car",2));
+		handleParkingEvents(pch, createParkingEvents(tester1.getId(),link.getId(),"other","car",10));
+		handleParkingEvents(pch, createParkingEvents(tester2.getId(),link.getId(),"other","car",2));
 
 		TestsEventsManager eventsManager = (TestsEventsManager) injector.getInstance(EventsManager.class);
 		Assertions.assertEquals(-50, eventsManager.getEventByPersonId(tester1.getId()).getAmount());
@@ -292,8 +269,14 @@ public class ParkingCostHandlerTest {
 	}
 
 	// sets up given cost attributes for a given link
-	private void setupLinkConfig(Link link, double residentialParkingFee, double dailyParkingCost, double firstHourParkingCost,
-								 double extraHourParkingCost, double maxDailyParkingCost, double maxParkingDurationHrs, double parkingPenaltyCost) {
+	private Link createNetworkAndSetupLink(double residentialParkingFee, double dailyParkingCost, double firstHourParkingCost,
+										   double extraHourParkingCost, double maxDailyParkingCost, double maxParkingDurationHrs, double parkingPenaltyCost) {
+
+		Network network = injector.getInstance(Scenario.class).getNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord(0, 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
+		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
+
 		ParkingCostConfigGroup configGroup = injector.getInstance(ParkingCostConfigGroup.class);
 
 		link.getAttributes().putAttribute(configGroup.getResidentialParkingFeeAttributeName(), residentialParkingFee);
@@ -303,28 +286,29 @@ public class ParkingCostHandlerTest {
 		link.getAttributes().putAttribute(configGroup.getMaxDailyParkingCostLinkAttributeName(), maxDailyParkingCost);
 		link.getAttributes().putAttribute(configGroup.getMaxParkingDurationAttributeName(), maxParkingDurationHrs);
 		link.getAttributes().putAttribute(configGroup.getParkingPenaltyAttributeName(), parkingPenaltyCost);
+
+		return link;
 	}
-	private Event[] createEvents(Id<Person> personId, Id<Link> linkId, String actType, String mode, double durationHrs){
-		Event[] out = new Event[4];
-		out[0] = new PersonLeavesVehicleEvent(0, personId, null);
-		out[1] = new ActivityEndEvent(0, personId, linkId,null, actType,null);
-		out[2] = new PersonDepartureEvent(0, personId, linkId, mode,null);
-		out[3] = new PersonEntersVehicleEvent(durationHrs * 3600, personId,null);
-		return out;
+
+	private List<Event> createParkingEvents(Id<Person> personId, Id<Link> linkId, String actType, String mode, double durationHrs){
+		List<Event> events = new ArrayList<>();
+		events.add(new PersonLeavesVehicleEvent(0, personId, null));
+		events.add(new ActivityEndEvent(0, personId, linkId,null, actType,null));
+		events.add(new PersonDepartureEvent(0, personId, linkId, mode,null));
+		events.add(new PersonEntersVehicleEvent(durationHrs * 3600, personId,null));
+		return events;
 	}
-	private void handleEventArray(ParkingCostHandler pch, Event[] events) {
+
+	private void handleParkingEvents(ParkingCostHandler pch, List<Event> events) {
 		for (Event event : events) {
 			if (event instanceof PersonLeavesVehicleEvent) {
 				pch.handleEvent((PersonLeavesVehicleEvent) event);
-				continue;
 			}
 			if (event instanceof ActivityEndEvent) {
 				pch.handleEvent((ActivityEndEvent) event);
-				continue;
 			}
 			if (event instanceof PersonDepartureEvent) {
 				pch.handleEvent((PersonDepartureEvent) event);
-				continue;
 			}
 			if (event instanceof PersonEntersVehicleEvent) {
 				pch.handleEvent((PersonEntersVehicleEvent) event);
