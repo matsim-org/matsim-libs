@@ -39,7 +39,13 @@ public final class ModeSchedulingSolver {
 		this.targetSwitchShare = targetSwitchShare;
 	}
 
-	public Map<Id<Person>, List<PlanCandidate>> solve(Map<Id<Person>, List<PlanCandidate>> plans) {
+	/**
+	 * Solve schedule problem for given set of candidates.
+	 * @param plans list of candidates for all agents
+	 * @param selectedCandidates index of candidate if it was selected at the beginning
+	 */
+	public Map<Id<Person>, List<PlanCandidate>> solve(Map<Id<Person>, List<PlanCandidate>> plans,
+													  Map<Id<Person>, Integer> selectedCandidates) {
 
 		if (plans.isEmpty())
 			throw new IllegalArgumentException("No plans to optimize");
@@ -69,6 +75,10 @@ public final class ModeSchedulingSolver {
 
 			// All plans are available initially
 			IntStream.range(0, scheduleLength).forEach(schedule.availablePlans::add);
+
+			// Set the initial plan index
+			if (selectedCandidates.containsKey(kv.getKey()))
+				schedule.currentPlan = selectedCandidates.get(kv.getKey());
 
 			agents.add(schedule);
 		}

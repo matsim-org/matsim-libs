@@ -7,6 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -34,12 +35,15 @@ public class AllBestPlansStrategyProvider implements Provider<PlanStrategy> {
 	@Inject
 	private Provider<GeneratorContext> generator;
 
+	@Inject
+	private Provider<StrategyManager> strategyManager;
+
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new KeepSelected<>());
 
-		builder.addStrategyModule(new AllBestPlansStrategy(config, scenario, generator));
+		builder.addStrategyModule(new AllBestPlansStrategy(config, scenario, strategyManager, generator));
 		builder.addStrategyModule(new PartialReRoute(facilities, tripRouterProvider, config.global(), timeInterpretation));
 
 		return builder.build();

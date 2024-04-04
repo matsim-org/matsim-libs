@@ -21,9 +21,9 @@ import org.matsim.modechoice.ScheduledModeChoiceConfigGroup;
  */
 public final class ScheduledStrategyChooser implements StrategyChooser<Plan, Person> {
 
-	private static final int ITER_WARMUP = -1;
-	private static final int ITER_BETWEEN = -2;
-	private static final int ITER_OVER = -3;
+	static final int ITER_WARMUP = -1;
+	static final int ITER_BETWEEN = -2;
+	static final int ITER_OVER = -3;
 
 	private final ScheduledModeChoiceConfigGroup scheduleConfig;
 
@@ -38,9 +38,8 @@ public final class ScheduledStrategyChooser implements StrategyChooser<Plan, Per
 	/**
 	 * Return the index of the schedule if it should be applied, -1 otherwise. -2 if the schedule is over.
 	 */
-	public static int isScheduledIteration(ReplanningContext replanningContext, ScheduledModeChoiceConfigGroup config) {
+	static int isScheduledIteration(int it, ScheduledModeChoiceConfigGroup config) {
 
-		int it = replanningContext.getIteration();
 		if (it < config.getWarumUpIterations())
 			return ITER_WARMUP;
 
@@ -78,7 +77,7 @@ public final class ScheduledStrategyChooser implements StrategyChooser<Plan, Per
 		double[] w = new double[weights.size()];
 		double total = 0;
 
-		int iterType = isScheduledIteration(replanningContext, scheduleConfig);
+		int iterType = isScheduledIteration(replanningContext.getIteration(), scheduleConfig);
 
 		for (int i = 0; i < weights.size(); i++) {
 
@@ -92,6 +91,9 @@ public final class ScheduledStrategyChooser implements StrategyChooser<Plan, Per
 				w[i] = 0;
 			// all other than scheduler are disabled every other iteration
 			else if (iterType >= 0 && !isSchedule)
+				w[i] = 0;
+			// scheduler is disabled before start and after end
+			else if ( (iterType == ITER_OVER || iterType == ITER_WARMUP) && isSchedule)
 				w[i] = 0;
 			else
 				w[i] = weights.getWeight(i);

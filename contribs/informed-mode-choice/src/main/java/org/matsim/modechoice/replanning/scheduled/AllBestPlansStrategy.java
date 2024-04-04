@@ -15,17 +15,19 @@ import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.modechoice.*;
+import org.matsim.modechoice.ModeTargetParameters;
+import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
+import org.matsim.modechoice.ScheduledModeChoiceConfigGroup;
 import org.matsim.modechoice.replanning.GeneratorContext;
 import org.matsim.modechoice.replanning.scheduled.solver.ModeSchedulingSolver;
 import org.matsim.modechoice.replanning.scheduled.solver.ModeTarget;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 /**
  * Strategy that tries all best plans deterministically while keeping the mode share fixed.
@@ -37,12 +39,18 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 	private final Config config;
 	private final ScheduledModeChoiceConfigGroup scheduleConfig;
 	private final Scenario scenario;
+	private final Provider<StrategyManager> strategyManager;
 	private final ThreadLocal<GeneratorContext> ctx;
 
 	/**
 	 * Scheduled plans for all relevant persons.
 	 */
 	private Map<Id<Person>, List<PlanCandidate>> plans = new ConcurrentHashMap<>();
+
+	/**
+	 * Index of candidate if it was selected at the beginning.
+	 */
+	private Map<Id<Person>, Integer> selectedCandidates = new ConcurrentHashMap<>();
 
 	/**
 	 * If greater than -1, the strategy will apply next plan from the schedule.
@@ -52,17 +60,19 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 	private ModeTarget target;
 
 	public AllBestPlansStrategy(Config config, Scenario scenario,
+								Provider<StrategyManager> strategyManager,
 								Provider<GeneratorContext> generator) {
 		super(config.global());
 		this.config = config;
 		this.scheduleConfig = ConfigUtils.addOrGetModule(config, ScheduledModeChoiceConfigGroup.class);
 		this.scenario = scenario;
+		this.strategyManager = strategyManager;
 		this.ctx = ThreadLocal.withInitial(generator::get);
 	}
 
 	@Override
 	protected void beforePrepareReplanningHook(ReplanningContext replanningContextTmp) {
-		applyIdx = ScheduledStrategyChooser.isScheduledIteration(replanningContextTmp, scheduleConfig);
+		applyIdx = ScheduledStrategyChooser.isScheduledIteration(replanningContextTmp.getIteration(), scheduleConfig);
 
 		if (applyIdx < 0)
 			return;
@@ -91,13 +101,12 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), config.global().getNumberOfThreads(), this);
 
 		log.info("Creating plan schedule for {} agents.", target.mapping().size());
-		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
 		ModeSchedulingSolver solver = new ModeSchedulingSolver(scheduleConfig.getScheduleIterations(), target,
 			scheduleConfig.getTargetSwitchShare());
 
 		// make sure plans always have the same order
-		plans = solver.solve(new TreeMap<>(plans));
+		plans = solver.solve(new TreeMap<>(plans), selectedCandidates);
 	}
 
 	@Override
@@ -117,6 +126,15 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 
 		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 		List<PlanCandidate> candidates = ctx.get().generator.generate(model);
+
+		OptionalInt idx = IntStream.range(0, candidates.size())
+			.filter(i -> Arrays.equals(candidates.get(i).getModes(), model.getCurrentModesMutable()))
+			.findFirst();
+
+		if (idx.isPresent()) {
+			selectedCandidates.put(person.getId(), idx.getAsInt());
+		}
+
 		plans.put(person.getId(), candidates);
 
 		// Only relevant are put in the mapping, others will be ignored
@@ -149,7 +167,7 @@ public class AllBestPlansStrategy extends AbstractMultithreadedModule implements
 				PlanCandidate candidate = schedule.get(applyIdx);
 				candidate.applyTo(plan, true);
 
-				plan.setType(candidate.getPlanType());
+//				plan.setType(candidate.getPlanType());
 			}
 		}
 	}

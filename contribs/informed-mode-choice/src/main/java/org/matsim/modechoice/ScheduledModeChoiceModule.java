@@ -10,11 +10,8 @@ import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.modechoice.replanning.WorstNotSelctedPlanSelector;
-import org.matsim.modechoice.replanning.scheduled.AllBestPlansStrategyProvider;
-import org.matsim.modechoice.replanning.scheduled.ReRouteSelectedStrategyProvider;
-import org.matsim.modechoice.replanning.scheduled.ScheduledStrategyChooser;
-import org.matsim.modechoice.replanning.scheduled.TimeMutateSelectedStrategyProvider;
+import org.matsim.modechoice.replanning.WorstNotSelectedPlanSelector;
+import org.matsim.modechoice.replanning.scheduled.*;
 import org.matsim.modechoice.replanning.scheduled.solver.ModeSchedulingSolver;
 
 import java.util.ArrayList;
@@ -94,6 +91,8 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 			Collection<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(getConfig().replanning().getStrategySettings());
 			getConfig().replanning().clearStrategySettings();
 
+			addControlerListenerBinding().to(ScheduleListener.class);
+
 			for (String subpopulation : config.getSubpopulations()) {
 
 				OptionalDouble reroute = strategies.stream().filter(s -> s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute) &&
@@ -137,7 +136,7 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 
 			if (config.isAdjustTargetIterations()) {
 
-				int iters = config.getWarumUpIterations() + config.getScheduleIterations() * (1 + config.getBetweenIterations());
+				int iters = config.getWarumUpIterations() + config.getScheduleIterations() * (1 + config.getBetweenIterations()) + config.getPostIterations();
 
 				int target = (int) Math.ceil(iters / getConfig().replanning().getFractionOfIterationsToDisableInnovation());
 
@@ -147,7 +146,7 @@ public class ScheduledModeChoiceModule extends AbstractModule {
 				}
 			}
 
-			bindPlanSelectorForRemoval().to(WorstNotSelctedPlanSelector.class);
+			bindPlanSelectorForRemoval().to(WorstNotSelectedPlanSelector.class);
 		}
 	}
 

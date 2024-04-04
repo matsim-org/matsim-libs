@@ -17,7 +17,7 @@ class AllBestPlansStrategyTest extends ScenarioTest {
 	protected void prepareConfig(Config config) {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-		imc.setTopK(15);
+		imc.setTopK(12);
 		imc.setConstraintCheck(InformedModeChoiceConfigGroup.ConstraintCheck.none);
 
 		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings()

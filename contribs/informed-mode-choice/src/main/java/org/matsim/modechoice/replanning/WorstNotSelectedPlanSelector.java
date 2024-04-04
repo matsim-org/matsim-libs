@@ -31,7 +31,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * See {@link org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector}.
  * This class is the same except the selected plan is not removed.
  */
-public class WorstNotSelctedPlanSelector implements PlanSelector<Plan, Person> {
+public class WorstNotSelectedPlanSelector implements PlanSelector<Plan, Person> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 

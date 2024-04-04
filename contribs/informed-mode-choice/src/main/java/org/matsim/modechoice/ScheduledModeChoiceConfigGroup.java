@@ -20,10 +20,17 @@ public class ScheduledModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@PositiveOrZero
 	@Comment("Initial iterations before schedule starts")
 	private int warumUpIterations = 5;
+
 	@Parameter
 	@Positive
 	@Comment("Number of iterations to be scheduled")
 	private int scheduleIterations = 24;
+
+	@Parameter
+	@PositiveOrZero
+	@Comment("Iterations after the schedule ended")
+	private int postIterations = 20;
+
 	@Parameter
 	@PositiveOrZero
 	@Comment("Number of iterations between scheduled mode choice")
@@ -62,6 +69,13 @@ public class ScheduledModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		this.scheduleIterations = scheduleIterations;
 	}
 
+	public int getPostIterations() {
+		return postIterations;
+	}
+
+	public void setPostIterations(int postIterations) {
+		this.postIterations = postIterations;
+	}
 	public int getBetweenIterations() {
 		return betweenIterations;
 	}
@@ -96,6 +110,7 @@ public class ScheduledModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public void setTargetSwitchShare(double targetSwitchShare) {
 		this.targetSwitchShare = targetSwitchShare;
 	}
+
 
 	/**
 	 * Return the defined mode target parameters.
