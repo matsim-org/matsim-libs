@@ -49,16 +49,17 @@ public class ParkingCostHandlerTest {
 	// Basic Event Handling Tests
 	@Test
 	public void transitDriverStartsEventTest() {
-		Person ptDriver = new Tester();
+		Person ptDriver = new Tester(0);
 		TransitDriverStartsEvent tDSE = new TransitDriverStartsEvent(0, ptDriver.getId(), null, null, null, null);
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
 		pch.handleEvent(tDSE);
 		Assertions.assertTrue(pch.getPtDrivers().contains(ptDriver.getId()));
 	}
+
 	@Test
 	public void personLeavesVehicleEventTest() {
-		Person ptDriver = new Tester();
-		Person tester = new Tester();
+		Person ptDriver = new Tester(0);
+		Person tester = new Tester(1);
 
 		TransitDriverStartsEvent tDSEvent = new TransitDriverStartsEvent(0, ptDriver.getId(), null, null, null, null);
 		PersonLeavesVehicleEvent pLVEventParking = new PersonLeavesVehicleEvent(100, tester.getId(), null);
@@ -77,13 +78,13 @@ public class ParkingCostHandlerTest {
 	}
 	@Test
 	public void activityEndEventTest() {
-		Person tester1 = new Tester();
+		Person tester1 = new Tester(0);
 		String actType1 = "test";
 
-		Person tester2 = new Tester();
+		Person tester2 = new Tester(1);
 		String actType2 = "test-interaction";
 
-		Person ptDriver = new Tester();
+		Person ptDriver = new Tester(2);
 
 		ActivityEndEvent aEEventActivity = new ActivityEndEvent(0, tester1.getId(), null, null,actType1, null);
 		ActivityEndEvent aEEventInteraction = new ActivityEndEvent(0, tester2.getId(), null, null, actType2, null);
@@ -103,9 +104,9 @@ public class ParkingCostHandlerTest {
 	}
 	@Test
 	public void personDepartureEventTest() {
-		Person testerWithCar = new Tester();
-		Person testerWithoutCar = new Tester();
-		Person ptDriver = new Tester();
+		Person testerWithCar = new Tester(0);
+		Person testerWithoutCar = new Tester(1);
+		Person ptDriver = new Tester(2);
 
 		PersonDepartureEvent pDEventCar = new PersonDepartureEvent(0, testerWithCar.getId(),null, "car",null);
 		PersonDepartureEvent pDEventNoCar = new PersonDepartureEvent(0, testerWithoutCar.getId(), null, "pt", null);
@@ -134,9 +135,9 @@ public class ParkingCostHandlerTest {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2, 10, 30, 100,3); // arbitrary values
 		setupLinkConfig(link, 10,440,5,15,500,30,30);
 		// Persons construction
-		Person ptDriver = new Tester(); // should not pay at all
-		Person resident = new Tester(); // should pay residential parking costs
-		Person shopper = new Tester(); // should pay non-residential parking costs
+		Person ptDriver = new Tester(0); // should not pay at all
+		Person resident = new Tester(1); // should pay residential parking costs
+		Person shopper = new Tester(2); // should pay non-residential parking costs
 		// Event construction
 			// ptDriver events
 		TransitDriverStartsEvent tDSEvent = new TransitDriverStartsEvent(0, ptDriver.getId(), null, null, null, null);
@@ -183,8 +184,8 @@ public class ParkingCostHandlerTest {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
 		setupLinkConfig(link, 0, 200,10,10,200,2,100);
 		// Person construction
-		Person tester1 = new Tester();
-		Person tester2 = new Tester();
+		Person tester1 = new Tester(0);
+		Person tester2 = new Tester(1);
 		// Event construction
 		Event[] events = createEvents(tester1.getId(),link.getId(),"other","car",3);
 		// Event handling
@@ -204,8 +205,8 @@ public class ParkingCostHandlerTest {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
 		setupLinkConfig(link, 0, 50,10,10,100,10,0);
 
-		Person tester1 = new Tester();
-		Person tester2 = new Tester();
+		Person tester1 = new Tester(0);
+		Person tester2 = new Tester(1);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
 		handleEventArray(pch, createEvents(tester1.getId(),link.getId(),"other","car",1));
@@ -223,9 +224,9 @@ public class ParkingCostHandlerTest {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
 		setupLinkConfig(link, 0, 150,10,20,100,10,0);
 
-		Person parking1hr = new Tester();
-		Person parking3hr = new Tester();
-		Person parking8hr = new Tester();
+		Person parking1hr = new Tester(0);
+		Person parking3hr = new Tester(1);
+		Person parking8hr = new Tester(2);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
 		handleEventArray(pch, createEvents(parking1hr.getId(),link.getId(),"other","car",1));
@@ -245,7 +246,7 @@ public class ParkingCostHandlerTest {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
 		setupLinkConfig(link, 100, 0,0,0,0,0,0);
 
-		Person tester = new Tester();
+		Person tester = new Tester(0);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
 		handleEventArray(pch, createEvents(tester.getId(),link.getId(),"home","car",10));
@@ -262,7 +263,7 @@ public class ParkingCostHandlerTest {
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord(10, 0));
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
 
-		Person tester = new Tester();
+		Person tester = new Tester(0);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
 		handleEventArray(pch, createEvents(tester.getId(),link.getId(),"other","car",10));
@@ -278,8 +279,8 @@ public class ParkingCostHandlerTest {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(1), node1, node2,10,30,100,3);
 		setupLinkConfig(link, 0, 50,10,10,100,10,0);
 
-		Person tester1 = new Tester();
-		Person tester2 = new Tester();
+		Person tester1 = new Tester(0);
+		Person tester2 = new Tester(1);
 
 		ParkingCostHandler pch = injector.getInstance(ParkingCostHandler.class);
 		handleEventArray(pch, createEvents(tester1.getId(),link.getId(),"other","car",10));
@@ -333,6 +334,7 @@ public class ParkingCostHandlerTest {
 }
 class TestsEventsManager implements EventsManager {
 	private final List<PersonMoneyEvent> events = new ArrayList<>();
+
 	@Override
 	public void processEvent(Event event) {
 		if (event instanceof PersonMoneyEvent) {
@@ -342,13 +344,16 @@ class TestsEventsManager implements EventsManager {
 	public List<PersonMoneyEvent> getEvents() {
 		return events;
 	}
+
 	public PersonMoneyEvent getEventByPersonId(Id<Person> id) {
-		for (PersonMoneyEvent event: events) {
-			if (event.getPersonId().equals(id)) {
-				return event;
-			}
+
+		List<PersonMoneyEvent> personMoneyEvents = events.stream().filter(e -> e.getPersonId().equals(id)).toList();
+
+		if (personMoneyEvents.size() > 1) {
+			Assertions.fail("Person has more money events than expected");
 		}
-		return null;
+
+		return personMoneyEvents.stream().findAny().orElse(null);
 	}
 	@Deprecated
 	public void addHandler(EventHandler handler) {}
@@ -363,9 +368,15 @@ class TestsEventsManager implements EventsManager {
 	@Deprecated
 	public void finishProcessing() {}
 }
+
 class Tester implements Person {
-	private static long nextId = 0;
-	private final Id<Person> id = Id.createPersonId(nextId++);
+
+	public Tester(long key) {
+		this.id = Id.createPersonId(key);
+	}
+
+	private final Id<Person> id;
+
 	@Override
 	public Id<Person> getId() {return this.id;}
 	@Deprecated
