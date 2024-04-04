@@ -52,7 +52,6 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 	private final Map<Id<Person>, Double> personId2lastLeaveVehicleTime = new HashMap<>();
 	private final Map<Id<Person>, String> personId2previousActivity = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> personId2relevantModeLinkId = new HashMap<>();
-	private final Map<Id<Person>, Id<Link>> personId2homeLinkId = new HashMap<>();
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Person>> hasAlreadyPaidDailyResidentialParkingCosts = new HashSet<>();
 
@@ -105,9 +104,10 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (!ptDrivers.contains(event.getPersonId())) {
-			personId2lastLeaveVehicleTime.put(event.getPersonId(), event.getTime());
+		if (ptDrivers.contains(event.getPersonId())) {
+			return;
 		}
+		personId2lastLeaveVehicleTime.put(event.getPersonId(), event.getTime());
 	}
 
 	@Override
