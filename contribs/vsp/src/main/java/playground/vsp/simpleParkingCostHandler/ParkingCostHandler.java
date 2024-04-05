@@ -21,6 +21,7 @@ package playground.vsp.simpleParkingCostHandler;
 
 import java.util.*;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -37,7 +38,6 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 
 import com.google.inject.Inject;
@@ -95,7 +95,10 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 			return;
 		}
 		personId2previousActivity.put(event.getPersonId(), event.getActType());
-		personId2relevantModeLinkId.remove(event.getPersonId());
+
+		if(event.getPersonId()!= null){
+			personId2relevantModeLinkId.remove(event.getPersonId());
+		}
 	}
 
 
@@ -104,10 +107,13 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 		if (ptDrivers.contains(event.getPersonId())) {
 			return;
 		}
+
 		// There might be several departures during a single trip.
-		if (event.getLegMode().equals(parkingCostConfigGroup.getMode())) {
-			personId2relevantModeLinkId.put(event.getPersonId(), event.getLinkId());
+		if (!event.getLegMode().equals(parkingCostConfigGroup.getMode())) {
+			return;
 		}
+
+		personId2relevantModeLinkId.put(event.getPersonId(), event.getLinkId());
 	}
 
 	@Override
@@ -115,6 +121,7 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 		if (ptDrivers.contains(event.getPersonId())) {
 			return;
 		}
+
 		personId2lastLeaveVehicleTime.put(event.getPersonId(), event.getTime());
 	}
 
@@ -148,31 +155,27 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 			if (residentialParkingFeePerDay > 0.) {
 				double amount = -1. * residentialParkingFeePerDay;
-				events.processEvent(createPersonMoneyEvent(event, amount, link, true));
+				events.processEvent(createPersonMoneyEvent(event, amount, link, "residential parking"));
 			}
 			return;
 		}
 
 		// other parking cost types
 
-		double costs = calcCosts(event, attributes);
+		double costs = calculateNonResidentialParkingCosts(event, attributes);
 
 		if (costs <= 0.) {
 			return;
 		}
 		double amount = -1. * costs;
-		events.processEvent(createPersonMoneyEvent(event, amount, link, false));
+		events.processEvent(createPersonMoneyEvent(event, amount, link, "non-residential parking"));
 	}
-	private PersonMoneyEvent createPersonMoneyEvent(PersonEntersVehicleEvent event, double amount, Link link, boolean isResidentialParking) {
-		String purpose;
-		if (isResidentialParking) {
-			purpose = "residential parking";
-		} else {
-			purpose = "non-residential parking";
-		}
+
+	private PersonMoneyEvent createPersonMoneyEvent(PersonEntersVehicleEvent event, double amount, Link link, String purpose) {
 		return new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, purpose, "city", "link " + link.getId());
 	}
-	private double calcCosts(PersonEntersVehicleEvent event, Attributes attributes) {
+
+	private double calculateNonResidentialParkingCosts(PersonEntersVehicleEvent event, Attributes attributes) {
 		double costs = 0.;
 
 		int parkingDurationHrs = (int) Math.ceil((event.getTime() - getParkingStartTime(event)) / 3600.);
@@ -208,43 +211,56 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 	private double getResidentialParkingFeePerDay(Attributes attributes) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getResidentialParkingFeeAttributeName())).orElse(0.);
 	}
+
 	private double getParkingStartTime(PersonEntersVehicleEvent event) {
 		return Optional.ofNullable(personId2lastLeaveVehicleTime.get(event.getPersonId())).orElse(0.);
 	}
+
 	private double getExtraHourParkingCosts(Attributes attributes) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getExtraHourParkingCostLinkAttributeName())).orElse(0.);
 	}
+
 	private double getFirstHourParkingCosts(Attributes attributes) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getFirstHourParkingCostLinkAttributeName())).orElse(0.);
 	}
+
 	private double getDailyParkingCosts(Attributes attributes, double firstHourParkingCosts, double extraHourParkingCosts) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getDailyParkingCostLinkAttributeName())).orElse(firstHourParkingCosts + 29 * extraHourParkingCosts);
 	}
+
 	private double getMaxDailyParkingCosts(Attributes attributes, double dailyParkingCosts) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getMaxDailyParkingCostLinkAttributeName())).orElse(dailyParkingCosts);
 	}
+
 	private double getMaxParkingDurationHrs(Attributes attributes) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getMaxParkingDurationAttributeName())).orElse(30.);
 	}
+
 	private double getParkingPenalty(Attributes attributes) {
 		return (double) Optional.ofNullable(attributes.getAttribute(parkingCostConfigGroup.getParkingPenaltyAttributeName())).orElse(0.);
 	}
+
+	@VisibleForTesting
 	Map<Id<Person>, Double> getPersonId2lastLeaveVehicleTime() {
 		return personId2lastLeaveVehicleTime;
 	}
 
+	@VisibleForTesting
 	Map<Id<Person>, String> getPersonId2previousActivity() {
 		return personId2previousActivity;
 	}
 
+	@VisibleForTesting
 	Map<Id<Person>, Id<Link>> getPersonId2relevantModeLinkId() {
 		return personId2relevantModeLinkId;
 	}
 
+	@VisibleForTesting
 	Set<Id<Person>> getPtDrivers() {
 		return ptDrivers;
 	}
 
+	@VisibleForTesting
 	Set<Id<Person>> getHasAlreadyPaidDailyResidentialParkingCosts() {
 		return hasAlreadyPaidDailyResidentialParkingCosts;
 	}
