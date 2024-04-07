@@ -18,7 +18,7 @@ class DefaultVehicleTypeTest {
 
 		Vehicles vehicles = scenario.getVehicles();
 
-		VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();
+		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
 		vehicles.addVehicleType(vehicleType);
 
 		VehicleType vehicleType2 = vehicles.getFactory().createVehicleType(Id.create("custom", VehicleType.class));
@@ -32,7 +32,7 @@ class DefaultVehicleTypeTest {
 
 		Vehicles vehicles = scenario.getVehicles();
 
-		VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();
+		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
 		vehicles.addVehicleType(vehicleType);
 
 		// this caused a clash in IDs before getDefaultVehicleType was fixed

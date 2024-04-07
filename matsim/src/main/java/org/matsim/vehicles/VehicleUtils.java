@@ -70,7 +70,7 @@ public final class VehicleUtils {
 		return new VehiclesImpl();
 	}
 
-	public static VehicleType getDefaultVehicleType() {
+	public static VehicleType createDefaultVehicleType() {
 		VehicleType defaultVehicleType = VehicleUtils.getFactory()
 				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
 		

@@ -42,7 +42,7 @@ public class CarriersUtilsTest {
 
 	@Test
 	void testAddAndGetVehicleToCarrier() {
-		VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();
+		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
 		
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
