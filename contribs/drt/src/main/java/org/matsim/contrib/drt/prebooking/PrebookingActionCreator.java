@@ -2,6 +2,9 @@ package org.matsim.contrib.drt.prebooking;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
+import java.util.List;
+
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
@@ -47,11 +50,42 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 
 		if (getBaseTypeOrElseThrow(task).equals(DrtTaskBaseType.STOP)) {
 			DrtStopTask stopTask = (DrtStopTask) task;
+			int incomingCapacity = getIncomingOccupancy(vehicle, stopTask);
+
 			return new PrebookingStopActivity(passengerHandler, dynAgent, stopTask, stopTask.getDropoffRequests(),
 					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(),
-					stopDurationProvider, vehicle, prebookingManager, abandonVoter);
+					stopDurationProvider, vehicle, prebookingManager, abandonVoter, incomingCapacity);
 		}
 
 		return delegate.createAction(dynAgent, vehicle, now);
+	}
+
+	private int getIncomingOccupancy(DvrpVehicle vehicle, DrtStopTask referenceTask) {
+		int incomingOccupancy = 0;
+
+		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
+
+		int index = tasks.size() - 1;
+		while (index >= 0) {
+			Task task = tasks.get(index);
+
+			if (task instanceof DrtStopTask) {
+				DrtStopTask stopTask = (DrtStopTask) task;
+
+				incomingOccupancy += stopTask.getDropoffRequests().values().stream()
+						.mapToInt(AcceptedDrtRequest::getPassengerCount).sum();
+
+				incomingOccupancy -= stopTask.getPickupRequests().values().stream()
+						.mapToInt(AcceptedDrtRequest::getPassengerCount).sum();
+
+				if (task == referenceTask) {
+					return incomingOccupancy;
+				}
+			}
+			
+			index--;
+		}
+
+		throw new IllegalStateException();
 	}
 }

@@ -77,52 +77,90 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates and return the Index of the zone shape.
 	 *
+	 * @param shapeFileZonePath       Path to the shape file of the zones
+	 * @param shapeCRS                CRS of the shape file
+	 * @param shapeFileZoneNameColumn Column name of the zone in the shape file
 	 * @return indexZones
 	 */
-	static Index getIndexZones(Path shapeFileZonePath, String shapeCRS) {
+	static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
-		return shpZones.createIndex(shapeCRS, "areaID");
+		if (shpZones.readFeatures().iterator().next().getAttribute(shapeFileZoneNameColumn) == null)
+			throw new NullPointerException("The column '" + shapeFileZoneNameColumn + "' does not exist in the zones shape file. Please check the input.");
+		return shpZones.createIndex(shapeCRS, shapeFileZoneNameColumn);
 	}
 
 	/**
 	 * Creates and return the Index of the landuse shape.
 	 *
-	 * @return indexLanduse
+	 * @param shapeFileLandusePath       	Path to the shape file of the landuse
+     * @param shapeCRS 				 		CRS of the shape file
+     * @param shapeFileLanduseTypeColumn 	Column name of the landuse in the shape file
+     * @return indexLanduse
 	 */
-	static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS) {
-
+	 static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
 		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
-		return shpLanduse.createIndex(shapeCRS, "fclass");
+		if (shpLanduse.readFeatures().iterator().next().getAttribute(shapeFileLanduseTypeColumn) == null)
+			throw new NullPointerException("The column '" + shapeFileLanduseTypeColumn + "' does not exist in the landuse shape file. Please check the input.");
+		return shpLanduse.createIndex(shapeCRS, shapeFileLanduseTypeColumn);
 	}
 
 	/**
 	 * Creates and return the Index of the building shape.
 	 *
-	 * @return indexBuildings
+	 * @param shapeFileBuildingsPath      	Path to the shape file of the buildings
+     * @param shapeCRS 				 		CRS of the shape file
+     * @param shapeFileBuildingTypeColumn 	Column name of the building in the shape file
+     * @return indexBuildings
 	 */
-	static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS) {
+	static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
+		ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
+		if (shpBuildings.readFeatures().iterator().next().getAttribute(shapeFileBuildingTypeColumn) == null)
+			throw new NullPointerException("The column '" + shapeFileBuildingTypeColumn + "' does not exist in the building shape file. Please check the input.");
 
-		ShpOptions shpLanduse = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
-		return shpLanduse.createIndex(shapeCRS, "type");
+		return shpBuildings.createIndex(shapeCRS, shapeFileBuildingTypeColumn);
+	}
+
+	/**
+	 * Creates and return the Index of the regions shape.
+	 *
+	 * @param shapeFileRegionsPath     Path to the shape file of the regions
+	 * @param shapeCRS                 CRS of the shape file
+	 * @param regionsShapeRegionColumn Column name of the region in the shape file
+	 * @return indexRegions
+	 */
+	public static Index getIndexRegions(Path shapeFileRegionsPath, String shapeCRS, String regionsShapeRegionColumn) {
+		ShpOptions shpRegions = new ShpOptions(shapeFileRegionsPath, shapeCRS, StandardCharsets.UTF_8);
+		if (shpRegions.readFeatures().iterator().next().getAttribute(regionsShapeRegionColumn) == null)
+			throw new NullPointerException("The column '" + regionsShapeRegionColumn + "' does not exist in the region shape file. Please check the input.");
+		return shpRegions.createIndex(shapeCRS, regionsShapeRegionColumn);
 	}
 
 	/**
 	 * Writes a csv file with the result of the distribution per zone of the input data.
 	 */
 	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-											  Path outputFileInOutputFolder, Map<String, String> zoneIdNameConnection)
+											  Path outputFileInOutputFolder, Map<String, String> zoneIdRegionConnection)
 		throws IOException {
 
-		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdNameConnection);
+		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdRegionConnection);
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
-	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> regionLinksMap,
+	/** Finds the nearest possible link for the building polygon.
+	 * @param zone
+	 * @param noPossibleLinks
+	 * @param linksPerZone
+	 * @param newLink
+	 * @param centroidPointOfBuildingPolygon
+	 * @param numberOfPossibleLinks
+	 * @return
+	 */
+	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> linksPerZone,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
 		double minDistance = Double.MAX_VALUE;
 		searchLink:
-		for (Link possibleLink : regionLinksMap.get(zone).values()) {
+		for (Link possibleLink : linksPerZone.get(zone).values()) {
 			if (possibleLink.getToNode().getOutLinks() == null)
 				continue;
 			if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
@@ -140,7 +178,7 @@ public class SmallScaleCommercialTrafficUtils {
 			}
 		}
 		if (newLink == null && numberOfPossibleLinks > 0) {
-			for (Link possibleLink : regionLinksMap.get(zone).values()) {
+			for (Link possibleLink : linksPerZone.get(zone).values()) {
 				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
 					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
 				if (distance < minDistance) {
@@ -158,11 +196,11 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
 												   Path outputFileInInputFolder,
-												   Map<String, String> zoneIdNameConnection) throws MalformedURLException {
+												   Map<String, String> zoneIdRegionConnection) throws MalformedURLException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 			StandardCharsets.UTF_8, true);
 		try {
-			String[] header = new String[]{"areaID", "areaName", "Inhabitants", "Employee", "Employee Primary Sector",
+			String[] header = new String[]{"zoneID", "region", "Inhabitants", "Employee", "Employee Primary Sector",
 				"Employee Construction", "Employee Secondary Sector Rest", "Employee Retail",
 				"Employee Traffic/Parcels", "Employee Tertiary Sector Rest"};
 			JOIN.appendTo(writer, header);
@@ -170,9 +208,9 @@ public class SmallScaleCommercialTrafficUtils {
 			for (String zone : resultingDataPerZone.keySet()) {
 				List<String> row = new ArrayList<>();
 				row.add(zone);
-				row.add(zoneIdNameConnection.get(zone));
+				row.add(zoneIdRegionConnection.get(zone));
 				for (String category : header) {
-					if (!category.equals("areaID") && !category.equals("areaName"))
+					if (!category.equals("zoneID") && !category.equals("region"))
 						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(category))));
 				}
 				JOIN.appendTo(writer, row);
@@ -189,7 +227,6 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String smallScaleCommercialTrafficType, Path output,
 											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
@@ -256,8 +293,8 @@ public class SmallScaleCommercialTrafficUtils {
 
 			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
 
-			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, Map.of(mode, vehicleId));
-			VehicleUtils.insertVehicleTypesIntoAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
+			VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
 
 			population.addPerson(newPerson);
 		}
@@ -297,7 +334,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * dispersedTraffic will be added additionally.
 	 */
 	static void readExistingModels(Scenario scenario, double sampleScenario,
-								   Map<String, Map<Id<Link>, Link>> regionLinksMap) throws Exception {
+								   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
 
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
@@ -498,7 +535,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 					List<String> startAreas = new ArrayList<>();
 					for (ScheduledTour tour : newCarrier.getSelectedPlan().getScheduledTours()) {
-						String tourStartZone = findZoneOfLink(tour.getTour().getStartLinkId(), regionLinksMap);
+						String tourStartZone = findZoneOfLink(tour.getTour().getStartLinkId(), linksPerZone);
 						if (!startAreas.contains(tourStartZone))
 							startAreas.add(tourStartZone);
 					}
@@ -526,9 +563,9 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Find the zone where the link is located
 	 */
-	static String findZoneOfLink(Id<Link> linkId, Map<String, Map<Id<Link>, Link>> regionLinksMap) {
-		for (String area : regionLinksMap.keySet()) {
-			if (regionLinksMap.get(area).containsKey(linkId))
+	static String findZoneOfLink(Id<Link> linkId, Map<String, Map<Id<Link>, Link>> linksPerZone) {
+		for (String area : linksPerZone.keySet()) {
+			if (linksPerZone.get(area).containsKey(linkId))
 				return area;
 		}
 		return null;

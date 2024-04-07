@@ -21,19 +21,26 @@
 
 package org.matsim.core.events;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.*;
+
+import java.io.File;
 
 public final class EventsUtils {
+
+	private static final Logger log = LogManager.getLogger(EventsUtils.class);
+
 
 	/**
 	 * Create a events manager instance that guarantees causality of processed events across all handlers.
 	 */
-    public static EventsManager createEventsManager() {
+	public static EventsManager createEventsManager() {
 		return new EventsManagerImpl();
-    }
+	}
 
 	/**
 	 * Creates a parallel events manager, with no guarantees for the order of processed events between multiple handlers.
@@ -43,10 +50,15 @@ public final class EventsUtils {
 	}
 
 	public static EventsManager createEventsManager(Config config) {
-		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );
+		final EventsManager events = Injector.createInjector(config, new EventsManagerModule()).getInstance(EventsManager.class);
 //		events.initProcessing();
 		return events;
 	}
+
+	public static void readEvents(EventsManager events, String filename) {
+		new MatsimEventsReader(events).readFile(filename);
+	}
+
 
 	/**
 	 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
@@ -58,21 +70,68 @@ public final class EventsUtils {
 			return events;
 		} else if (events instanceof ParallelEventsManager) {
 			return events;
-		}
-		else if (events instanceof SynchronizedEventsManagerImpl) {
+		} else if (events instanceof SynchronizedEventsManagerImpl) {
 			return events;
 		} else {
 			return new SynchronizedEventsManagerImpl(events);
 		}
 	}
 
-	public static void readEvents( EventsManager events, String filename ) {
-		new MatsimEventsReader(events).readFile(filename) ;
+	/**
+	 * Create and write fingerprint file for events.
+	 */
+	public static FingerprintEventHandler createEventsFingerprint(String eventFile, String outputFingerprintFile) {
+
+		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile, null);
+
+		EventFingerprint.write(outputFingerprintFile, handler.getEventFingerprint());
+
+		return handler;
 	}
 
-	public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
-		EventsFileComparator.Result result = EventsFileComparator.compare( filename1, filename2 );
-		return result ;
+
+	/**
+	 * Compares existing event file against fingerprint file. This will also create new fingerprint file along the input events.
+	 *
+	 * @param eventFile local events file
+	 * @param compareFingerprintFile path or uri to fingerprint file
+	 *
+	 * @return comparison results
+	 */
+	public static ComparisonResult createAndCompareEventsFingerprint(File eventFile, String compareFingerprintFile) {
+
+		String path = eventFile.getPath().replaceFirst("\\.xml[.a-zA-z0-9]*$", "");
+
+		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile.toString(), compareFingerprintFile);
+		EventFingerprint.write(path + ".fp.zst", handler.getEventFingerprint());
+
+		if (handler.getComparisonMessage() != null)
+			log.warn(handler.getComparisonMessage());
+
+		return handler.getComparisonResult();
+	}
+
+	/**
+	 * Compares existing event file against fingerprint file. This will also create new fingerprint file along the input events.
+	 *
+	 * @throws AssertionError if comparison fails
+	 * @see #createAndCompareEventsFingerprint(File, String)
+	 */
+	public static void assertEqualEventsFingerprint(File eventFile, String compareFingerprintFile) {
+
+		String path = eventFile.getPath().replaceFirst("\\.xml[.a-zA-z0-9]*$", "");
+
+		FingerprintEventHandler handler = EventsFileFingerprintComparator.createFingerprintHandler(eventFile.toString(), compareFingerprintFile);
+		EventFingerprint.write(path + ".fp.zst", handler.getEventFingerprint());
+
+
+		if (handler.getComparisonResult() != ComparisonResult.FILES_ARE_EQUAL)
+			throw new AssertionError(handler.getComparisonMessage());
+
+	}
+
+	public static ComparisonResult compareEventsFiles(String filename1, String filename2) {
+		return EventsFileComparator.compare(filename1, filename2);
 	}
 
 }

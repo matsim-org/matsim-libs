@@ -30,6 +30,8 @@ import java.util.function.IntUnaryOperator;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.testcases.fakes.FakeLink;
 import org.mockito.ArgumentCaptor;
 
@@ -45,7 +47,7 @@ public class RandomDrtZoneTargetLinkSelectorTest {
 
 	@Test
 	void testSelectTargetLink_fourLinks() {
-		DrtZone zone = DrtZone.createDummyZone("zone", List.of(link0, link1, link2, link3), null);
+		Zone zone = ZoneImpl.createDummyZone(Id.create("zone", Zone.class), List.of(link0, link1, link2, link3), null);
 
 		//fake random sequence
 		IntUnaryOperator random = mock(IntUnaryOperator.class);

@@ -2,6 +2,7 @@ header:
   tab: Header Tab
   title: Simwrapper Test Dashboard
   description: Test All Simwrapper Plug-Ins Dashboard
+  triggerPattern: '*example.csv'
 layout:
   first:
   - type: area

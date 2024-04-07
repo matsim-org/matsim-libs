@@ -79,6 +79,8 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final String COMPRESSION_TYPE = "compressionType";
 	private static final String EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS = "createScoringFunctionType";
 
+	private static final String MEMORY_OBSERVER_INTERVAL = "memoryObserverInterval";
+
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim, hermes}
 
@@ -108,6 +110,8 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private OverwriteFileSetting overwriteFileSetting = OverwriteFileSetting.failIfDirectoryExists;
 
 	private CleanIterations cleanItersAtEnd = CleanIterations.keep;
+
+	private int memoryObserverInterval = 60;
 
 	public ControllerConfigGroup() {
 		super(GROUP_NAME);
@@ -151,6 +155,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 				"to a file. `0' disables snapshots writing completely");
 		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");
 		map.put(CLEAN_ITERS_AT_END, "Defines what should be done with the ITERS directory when a simulation finished successfully");
+		map.put(MEMORY_OBSERVER_INTERVAL, "Defines the interval for printing memory usage to the log in [seconds]. Must be positive. Defaults to 60.");
 		return map;
 	}
 
@@ -427,6 +432,17 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	public void setEventTypeToCreateScoringFunctions(EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions) {
 		this.eventTypeToCreateScoringFunctions = eventTypeToCreateScoringFunctions;
 	}
+
+	@StringGetter(MEMORY_OBSERVER_INTERVAL)
+	public int getMemoryObserverInterval() {
+		return memoryObserverInterval;
+	}
+
+	@StringSetter(MEMORY_OBSERVER_INTERVAL)
+	public void setMemoryObserverInterval(int memoryObserverInterval) {
+		this.memoryObserverInterval = memoryObserverInterval;
+	}
+
 	// ---
 	int writePlansUntilIteration = 1 ;
 	public int getWritePlansUntilIteration() {
@@ -449,6 +465,9 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
 			log.warn( "this is not recommended, as it might result in a directory containing output from several model runs" );
 			log.warn( "prefer the options "+OverwriteFileSetting.deleteDirectoryIfExists+" or "+OverwriteFileSetting.failIfDirectoryExists );
+		}
+		if(config.controller().getMemoryObserverInterval() < 0) {
+			log.warn("Memory observer interval is negative. Simulation will most likely crash.");
 		}
 	}
 }

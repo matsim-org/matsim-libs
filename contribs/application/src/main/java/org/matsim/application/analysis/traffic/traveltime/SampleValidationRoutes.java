@@ -23,6 +23,7 @@ import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.application.prepare.network.SampleNetwork;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -85,23 +86,6 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--mode", description = "Mode to validate", defaultValue = TransportMode.car)
 	private String mode;
 
-	/**
-	 * Random coord in the same direction as a link.
-	 */
-	static Coord rndCoord(SplittableRandom rnd, double dist, Link link) {
-
-		Coord v = link.getFromNode().getCoord();
-		Coord u = link.getToNode().getCoord();
-
-		var angle = Math.atan2(u.getY() - v.getY(), u.getX() - v.getX());
-
-		var sample = angle + rnd.nextDouble(-0.2, 0.2) * Math.PI * 2;
-
-		var x = Math.cos(sample) * dist;
-		var y = Math.sin(sample) * dist;
-
-		return CoordUtils.round(new Coord(v.getX() + x, v.getY() + y));
-	}
 
 	public static void main(String[] args) {
 		new SampleValidationRoutes().execute(args);
@@ -268,7 +252,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 				continue;
 			}
 
-			Coord dest = rndCoord(rnd, rnd.nextDouble(distRange.get(0), distRange.get(1)), link);
+			Coord dest = SampleNetwork.rndCoord(rnd, rnd.nextDouble(distRange.get(0), distRange.get(1)), link);
 			Link to = NetworkUtils.getNearestLink(network, dest);
 
 			if (!to.getAllowedModes().contains(mode) || exclude.test(to)) {

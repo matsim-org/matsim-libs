@@ -43,14 +43,15 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 			RailLink link = position.getRoute(i);
 			RailResource r = link.getResource();
 //			// Iterate through route until requested resource is present
-
 			if (r == resource) {
 				resourceFound = true;
 			}
 
+			// all resources before requested resource can be ignored
 			if (!resourceFound)
 				continue;
 
+			// check for all conflict points at and beyond the resource
 			if (isConflictPoint(r)) {
 
 				Reservation reservation = conflictPoints.computeIfAbsent(r, k -> new Reservation());
@@ -63,6 +64,7 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 				reservation.trains.add(position.getDriver());
 
 			} else
+				// as soon as we find an avoidance point we can stop reserving
 				break;
 
 		}
