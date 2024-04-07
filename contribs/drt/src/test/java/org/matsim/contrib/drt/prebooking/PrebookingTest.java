@@ -12,7 +12,6 @@ import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -632,6 +631,8 @@ public class PrebookingTest {
 		 * - Leading to a few seconds in which the occupancy is higher than the vehicle capacity
 		 * 
 		 * This test led to a VerifyException in VehicleOccupancyProfileCalculator.processOccupancyChange
+		 * 
+		 * The PrebookingStopActivity logic has been changed at a later point to first perform all dropoffs, then perform all pickups
 		 */
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
@@ -686,8 +687,8 @@ public class PrebookingTest {
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
 			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3); // NOT 30s because we need to wait for the dropoffs
-			assertEquals(2753.0 + 60.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2356.0 + 60.0 + 30.0, requestInfo.pickupTime, 1e-3); // Starting after dropoff
+			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
@@ -700,6 +701,8 @@ public class PrebookingTest {
 		 * happens too late compared to the pickups in the following stop task.
 		 * 
 		 * This test led to a VerifyException in VehicleOccupancyProfileCalculator.processOccupancyChange
+		 * 
+		 * The PrebookingStopActivity logic has been changed at a later point to first perform all dropoffs, then perform all pickups
 		 */
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
@@ -747,15 +750,15 @@ public class PrebookingTest {
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
 			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A for B2 to enter
+			assertEquals(2356.0 + 90.0 + 60.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(2753.0 + 90.0 + 60.0, requestInfo.dropoffTime, 1e-3);
 		}
 		
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB2");
 			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2356.0 + 60.0 + 30.0, requestInfo.pickupTime, 1e-3); // +30 because we wait for dropoff of A
-			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A
+			assertEquals(2356.0 + 90.0 + 60.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(2753.0 + 90.0 + 60.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
