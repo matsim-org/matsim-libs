@@ -652,7 +652,7 @@ public class PrebookingTest {
 				bindModal(PassengerStopDurationProvider.class).toInstance(new PassengerStopDurationProvider() {
 					@Override
 					public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
-						if (request.getId().toString().startsWith("requestA")) {
+						if (request.getPassengerIds().get(0).toString().startsWith("requestA")) {
 							return 60.0;
 						} else {
 							return 30.0; // shorter than the dropoff duration (see below)
@@ -673,21 +673,21 @@ public class PrebookingTest {
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestA1");
 			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2356.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestA2");
 			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2356.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
 			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2753.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3); // NOT 30s because we need to wait for the dropoffs
+			assertEquals(2753.0 + 60.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
@@ -725,7 +725,7 @@ public class PrebookingTest {
 					
 					@Override
 					public double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request) {
-						if (request.getId().toString().equals("requestA")) {
+						if (request.getPassengerIds().get(0).toString().equals("requestA")) {
 							return 90.0; // longer than the pickups
 						} else {
 							return 60.0;
@@ -741,21 +741,21 @@ public class PrebookingTest {
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
 			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2356.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2356.0 + 90.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
 			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2753.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A for B2 to enter
 		}
 		
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB2");
 			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2753.0, requestInfo.dropoffTime, 1e-3);
+			assertEquals(2356.0 + 60.0 + 30.0, requestInfo.pickupTime, 1e-3); // +30 because we wait for dropoff of A
+			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A
 		}
 
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
