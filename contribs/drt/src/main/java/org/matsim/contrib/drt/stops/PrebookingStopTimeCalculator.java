@@ -29,10 +29,12 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 		// - the begin time of the existing stop (immediate request)
 		// - the given insertionTime (immediate request merged to an ongoing stop)
 		// - the requests's earliest departure time (prebooking)
+		// - end time of all dropoffs in the stop
 
 		double earliestStartTime = stop.getBeginTime();
 		earliestStartTime = Math.max(earliestStartTime, insertionTime);
 		earliestStartTime = Math.max(earliestStartTime, request.getEarliestStartTime());
+		earliestStartTime = Math.max(earliestStartTime, calculateDropoffEndTime(vehicle, stop, earliestStartTime));
 
 		// from that point on, we add the stop duration, and we never shrink the stop to
 		// account for other assigned requests
@@ -65,15 +67,19 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 	 */
 	@Override
 	public double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime) {
+		double latestDropoffEndTime = calculateDropoffEndTime(vehicle, stop, beginTime);
+		
 		double latestPickupEndTime = stop.getPickupRequests().values().stream().mapToDouble(request -> {
-			double departureTime = Math.max(beginTime, request.getEarliestStartTime());
+			double departureTime = Math.max(latestDropoffEndTime, request.getEarliestStartTime());
 			return departureTime + provider.calcPickupDuration(vehicle, request.getRequest());
 		}).max().orElse(beginTime);
 
-		double latestDropoffEndTime = stop.getDropoffRequests().values().stream().mapToDouble(request -> {
-			return beginTime + provider.calcDropoffDuration(vehicle, request.getRequest());
-		}).max().orElse(beginTime);
-
 		return Math.max(latestPickupEndTime, latestDropoffEndTime);
+	}
+	
+	private double calculateDropoffEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime) {
+		return stop.getDropoffRequests().values().stream().mapToDouble(r -> {
+			return beginTime + provider.calcDropoffDuration(vehicle, r.getRequest());
+		}).max().orElse(beginTime);
 	}
 }

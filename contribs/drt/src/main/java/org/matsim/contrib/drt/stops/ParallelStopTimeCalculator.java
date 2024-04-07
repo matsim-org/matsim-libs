@@ -27,6 +27,9 @@ public class ParallelStopTimeCalculator implements StopTimeCalculator {
 	@Override
 	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
+		// pickups happen after dropoffs
+		insertionTime = Math.max(insertionTime, calculateDropoffEndTime(vehicle, stop));
+		
 		// an additional stop may extend the stop duration
 		return Math.max(stop.getEndTime(), insertionTime + stopDurationProvider.calcPickupDuration(vehicle, request));
 	}
@@ -48,5 +51,11 @@ public class ParallelStopTimeCalculator implements StopTimeCalculator {
 	public double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime) {
 		// shifting the stop does not change the duration
 		return beginTime + (stop.getEndTime() - stop.getBeginTime());
+	}
+	
+	private double calculateDropoffEndTime(DvrpVehicle vehicle, DrtStopTask stop) {
+		return stop.getDropoffRequests().values().stream().mapToDouble(r -> {
+			return stopDurationProvider.calcDropoffDuration(vehicle, r.getRequest());
+		}).max().orElse(Double.NEGATIVE_INFINITY);
 	}
 }
