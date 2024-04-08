@@ -40,6 +40,11 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(ApplyNetworkParams.class);
 
+	// TODO:
+	// Filter road types, filter junction types
+	// adjustment factors
+	// TODO: capacity threshold handling
+
 	@CommandLine.Parameters(arity = "1..*", description = "Type of parameters to apply. Available: ${COMPLETION-CANDIDATES}")
 	private Set<NetworkAttribute> params;
 
@@ -94,13 +99,15 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 			}
 		}
 
-		Map<Id<Link>, Feature> features = NetworkParamsOpt.readFeatures(input.getPath("features.csv"), network.getLinks().size());
+		Map<Id<Link>, Feature> features = NetworkParamsOpt.readFeatures(input.getPath("features.csv"), network.getLinks());
 
 		for (Link link : network.getLinks().values()) {
 			Feature ft = features.get(link.getId());
 
 			try {
-				applyChanges(link, ft.junctionType(), ft.features());
+				applyChanges(link, ft);
+			} catch (UnsupportedOperationException u) {
+				// This will be ignored silently and should only be thrown if certain changes should not be applied
 			} catch (IllegalArgumentException e) {
 				warn++;
 				log.warn("Error processing link {}", link.getId(), e);
@@ -117,32 +124,34 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	/**
 	 * Apply speed and capacity models and apply changes.
 	 */
-	private void applyChanges(Link link, String junctionType, Object2DoubleMap<String> features) {
-
-		String type = NetworkUtils.getHighwayType(link);
+	private void applyChanges(Link link, Feature ft) {
 
 		boolean modified = false;
 
 		if (params.contains(NetworkAttribute.capacity)) {
 
-			FeatureRegressor capacity = model.capacity(junctionType);
+			FeatureRegressor capacity = model.capacity(ft.junctionType());
+			if (capacity == null) {
+				throw new UnsupportedOperationException("Capacity model not available for " + ft.junctionType());
+			}
 
-			double perLane = capacity.predict(features);
+			double perLane = capacity.predict(ft.features());
 
-			double cap = capacityEstimate(features.getDouble("speed"));
+			double cap = capacityEstimate(ft.features().getDouble("speed"));
 
 			// Minimum thresholds
-			double threshold = switch (junctionType) {
+			double threshold = switch (ft.junctionType()) {
 				// traffic light can reduce capacity at least to 50% (with equal green split)
 				case "traffic_light" -> 0.4;
 				case "right_before_left" -> 0.6;
 				// Motorways are kept at their max theoretical capacity
-				case "priority" -> type.startsWith("motorway") ? 1 : 0.8;
+				case "priority" -> ft.highwayType().startsWith("motorway") ? 1 : 0.8;
 				default -> 0;
 			};
 
 			if (perLane < cap * threshold) {
-				log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}", link.getId(), type, junctionType, perLane, cap * threshold);
+				log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}",
+					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * threshold);
 				perLane = cap * threshold;
 				modified = true;
 			}
@@ -154,11 +163,15 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 		if (params.contains(NetworkAttribute.freespeed)) {
 
 			double speedFactor = 1.0;
-			FeatureRegressor speedModel = model.speedFactor(junctionType);
+			FeatureRegressor speedModel = model.speedFactor(ft.junctionType());
+
+			if (speedModel == null) {
+				throw new UnsupportedOperationException("Speed model not available for " + ft.junctionType());
+			}
 
 			speedFactor =  paramsOpt != null ?
-				speedModel.predict(features, paramsOpt.getParams(junctionType)) :
-				speedModel.predict(features);
+				speedModel.predict(ft.features(), paramsOpt.getParams(ft.junctionType())) :
+				speedModel.predict(ft.features());
 
 			if (speedFactor > speedFactorBounds[1]) {
 				log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);

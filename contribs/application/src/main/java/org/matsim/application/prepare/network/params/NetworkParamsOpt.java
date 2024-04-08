@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -55,9 +56,11 @@ class NetworkParamsOpt {
 	/**
 	 * Read network edge features from csv.
 	 */
-	static Map<Id<Link>, Feature> readFeatures(String input, int expectedLinks) throws IOException {
+	static Map<Id<Link>, Feature> readFeatures(String input, Map<Id<Link>, ? extends Link> links) throws IOException {
 
-		Map<Id<Link>, Feature> features = new IdMap<>(Link.class, expectedLinks);
+		// TODO: read features from link attributes as well, if not present as input
+
+		Map<Id<Link>, Feature> features = new IdMap<>(Link.class, links.size());
 
 		try (CSVParser reader = new CSVParser(IOUtils.getBufferedReader(input),
 			CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
@@ -67,6 +70,7 @@ class NetworkParamsOpt {
 			for (CSVRecord row : reader) {
 
 				Id<Link> id = Id.createLinkId(row.get("linkId"));
+				Link link = links.get(id);
 
 				Object2DoubleOpenHashMap<String> ft = new Object2DoubleOpenHashMap<>();
 				ft.defaultReturnValue(Double.NaN);
@@ -81,7 +85,10 @@ class NetworkParamsOpt {
 					}
 				}
 
-				features.put(id, new Feature(row.get("junction_type"), ft));
+				String highwayType = header.contains(NetworkUtils.TYPE) ? row.get(NetworkUtils.TYPE) :
+					(link != null ? NetworkUtils.getHighwayType(link) : null);
+
+				features.put(id, new Feature(row.get("junction_type"), highwayType, ft));
 			}
 		}
 
@@ -170,7 +177,7 @@ class NetworkParamsOpt {
 		return new Result(rmse.getMean(), mse.getMean(), data);
 	}
 
-	record Feature(String junctionType, Object2DoubleMap<String> features) {
+	record Feature(String junctionType, String highwayType, Object2DoubleMap<String> features) {
 	}
 
 	record Result(double rmse, double mae, Map<String, List<Data>> data) {

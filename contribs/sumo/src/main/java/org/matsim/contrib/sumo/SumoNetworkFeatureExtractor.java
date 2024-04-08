@@ -78,6 +78,32 @@ class SumoNetworkFeatureExtractor {
 	}
 
 	/**
+	 * Calculate the curvature of an edge.
+	 *
+	 * @return KU in gon/km
+	 */
+	static double calcCurvature(SumoNetworkHandler.Edge edge) {
+
+		double gon = 0;
+		List<double[]> coords = edge.shape;
+		for (int i = 0; i < coords.size() - 2; i++) {
+
+			double[] a = coords.get(i);
+			double[] b = coords.get(i + 1);
+			double[] c = coords.get(i + 2);
+
+			double ab = Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2));
+			double bc = Math.sqrt(Math.pow(c[0] - b[0], 2) + Math.pow(c[1] - b[1], 2));
+			double ac = Math.sqrt(Math.pow(c[0] - a[0], 2) + Math.pow(c[1] - a[1], 2));
+
+			double angle = Math.acos((ac * ac - ab * ab - bc * bc) / (-2 * ab * bc));
+			gon += Math.abs(angle) * 200 / Math.PI;
+		}
+
+		return gon / (edge.getLength() * 1000);
+	}
+
+	/**
 	 * Get priority. Higher is more important.
 	 */
 	private int getPrio(SumoNetworkHandler.Edge edge) {
@@ -86,9 +112,9 @@ class SumoNetworkFeatureExtractor {
 
 	public List<String> getHeader() {
 		return List.of("linkId", "highway_type", "speed", "length", "num_lanes", "change_num_lanes", "change_speed", "num_to_links", "num_conns",
-			"num_response", "num_foes", "dir_multiple_s", "dir_l", "dir_r", "dir_s", "dir_exclusive",
+			"num_response", "num_foes", "dir_multiple_s", "dir_l", "dir_r", "dir_s", "dir_exclusive", "curvature",
 			"junction_type", "junction_inc_lanes", "priority_higher", "priority_equal", "priority_lower",
-			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway", "is_link");
+			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway", "is_link", "is_merging");
 	}
 
 	public void print(CSVPrinter out) {
@@ -152,6 +178,9 @@ class SumoNetworkFeatureExtractor {
 			.mapToInt(e -> e.lanes.size())
 			.sum();
 
+		boolean merging = incomingEdges.get(junction.id).stream()
+			.anyMatch(e -> e.type.contains("link"));
+
 		boolean geq_secondary = switch (highwayType) {
 			case "secondary", "primary", "trunk", "motorway" -> true;
 			default -> false;
@@ -178,6 +207,7 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool(dirs.contains('r')));
 		out.print(bool(dirs.contains('s')));
 		out.print(bool(exclusiveDirs));
+		out.print(calcCurvature(edge));
 		out.print(junction.type);
 		out.print(Math.min(12, incomingLanes));
 		out.print(bool("higher".equals(prio)));
@@ -187,6 +217,7 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool(geq_primary));
 		out.print(bool("motorway".equals(highwayType)));
 		out.print(bool(highwayType.contains("link")));
+		out.print(bool(merging));
 
 		out.println();
 	}

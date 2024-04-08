@@ -151,7 +151,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
 
 		validationSet = readValidation(validationFiles, refHours);
-		features = readFeatures(input.getPath("features.csv"), network.getLinks().size());
+		features = readFeatures(input.getPath("features.csv"), network.getLinks());
 
 		CSVPrinter csv;
 		Path out = output.getPath("eval.csv");
