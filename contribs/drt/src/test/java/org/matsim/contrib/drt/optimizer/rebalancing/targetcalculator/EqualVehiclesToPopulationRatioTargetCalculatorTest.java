@@ -33,9 +33,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -59,7 +60,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	private final Network network = NetworkUtils.readNetwork(
 			config.network().getInputFileURL(config.getContext()).toString());
 
-	private final DrtZonalSystem zonalSystem = DrtZonalSystem.createFromPreparedGeometries(network,
+	private final ZoneSystem zonalSystem = ZoneSystemUtils.createFromPreparedGeometries(network,
 			DrtGridUtils.createGridFromNetwork(network, 500.));
 
 	private final Population population = PopulationUtils.createPopulation(config);
@@ -67,34 +68,36 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 
 	@Test
 	void testCalculate_oneVehiclePerZone() {
-		initPopulation(Map.of("2", 1, "4", 1, "8", 1));
+		initPopulation(Map.of(ZoneSystemUtils.createZoneId("2"), 1, ZoneSystemUtils.createZoneId("4"), 1, ZoneSystemUtils.createZoneId("8"), 1));
+
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(8)).calculate(0, Map.of());
 
-		assertTarget(targetFunction, zonalSystem, "1", 0);
-		assertTarget(targetFunction, zonalSystem, "2", 8. * (1. / 3));
-		assertTarget(targetFunction, zonalSystem, "3", 0);
-		assertTarget(targetFunction, zonalSystem, "4", 8. * (1. / 3));
-		assertTarget(targetFunction, zonalSystem, "5", 0);
-		assertTarget(targetFunction, zonalSystem, "6", 0);
-		assertTarget(targetFunction, zonalSystem, "7", 0);
-		assertTarget(targetFunction, zonalSystem, "8", 8. * (1. / 3));
+		assertTarget(targetFunction, zonalSystem, Id.create("1", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("2", Zone.class), 8. * (1. / 3));
+		assertTarget(targetFunction, zonalSystem, Id.create("3", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("4", Zone.class), 8. * (1. / 3));
+		assertTarget(targetFunction, zonalSystem, Id.create("5", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("6", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("7", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("8", Zone.class), 8. * (1. / 3));
 	}
 
 	@Test
 	void testCalculate_twoVehiclesPerZone() {
-		initPopulation(Map.of("2", 1, "4", 1, "8", 1));
+		initPopulation(Map.of(ZoneSystemUtils.createZoneId("2"), 1, ZoneSystemUtils.createZoneId("4"), 1, ZoneSystemUtils.createZoneId("8"), 1));
+
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());
 
-		assertTarget(targetFunction, zonalSystem, "1", 0);
-		assertTarget(targetFunction, zonalSystem, "2", 16 * (1. / 3));
-		assertTarget(targetFunction, zonalSystem, "3", 0);
-		assertTarget(targetFunction, zonalSystem, "4", 16 * (1. / 3));
-		assertTarget(targetFunction, zonalSystem, "5", 0);
-		assertTarget(targetFunction, zonalSystem, "6", 0);
-		assertTarget(targetFunction, zonalSystem, "7", 0);
-		assertTarget(targetFunction, zonalSystem, "8", 16. * (1. / 3));
+		assertTarget(targetFunction, zonalSystem, Id.create("1", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("2", Zone.class), 16 * (1. / 3));
+		assertTarget(targetFunction, zonalSystem, Id.create("3", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("4", Zone.class), 16 * (1. / 3));
+		assertTarget(targetFunction, zonalSystem, Id.create("5", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("6", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("7", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("8", Zone.class), 16. * (1. / 3));
 	}
 
 	@Test
@@ -103,30 +106,30 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());
 
-		assertTarget(targetFunction, zonalSystem, "1", 0);
-		assertTarget(targetFunction, zonalSystem, "2", 0);
-		assertTarget(targetFunction, zonalSystem, "3", 0);
-		assertTarget(targetFunction, zonalSystem, "4", 0);
-		assertTarget(targetFunction, zonalSystem, "5", 0);
-		assertTarget(targetFunction, zonalSystem, "6", 0);
-		assertTarget(targetFunction, zonalSystem, "7", 0);
-		assertTarget(targetFunction, zonalSystem, "8", 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("1", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("2", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("3", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("4", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("5", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("6", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("7", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("8", Zone.class), 0);
 	}
 
 	@Test
 	void testCalculate_unevenDistributionOfActivitiesInPopulatedZones() {
-		initPopulation(Map.of("2", 2, "4", 4, "8", 8));
+		initPopulation(Map.of(ZoneSystemUtils.createZoneId("2"), 2, ZoneSystemUtils.createZoneId("4"), 4, ZoneSystemUtils.createZoneId("8"), 8));
 		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());
 
-		assertTarget(targetFunction, zonalSystem, "1", 0);
-		assertTarget(targetFunction, zonalSystem, "2", 16 * (2. / 14));
-		assertTarget(targetFunction, zonalSystem, "3", 0);
-		assertTarget(targetFunction, zonalSystem, "4", 16 * (4. / 14));
-		assertTarget(targetFunction, zonalSystem, "5", 0);
-		assertTarget(targetFunction, zonalSystem, "6", 0);
-		assertTarget(targetFunction, zonalSystem, "7", 0);
-		assertTarget(targetFunction, zonalSystem, "8", 16 * (8. / 14));
+		assertTarget(targetFunction, zonalSystem, Id.create("1", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("2", Zone.class), 16 * (2. / 14));
+		assertTarget(targetFunction, zonalSystem, Id.create("3", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("4", Zone.class), 16 * (4. / 14));
+		assertTarget(targetFunction, zonalSystem, Id.create("5", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("6", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("7", Zone.class), 0);
+		assertTarget(targetFunction, zonalSystem, Id.create("8", Zone.class), 16 * (8. / 14));
 	}
 
 	private FleetSpecification createFleetSpecification(int count) {
@@ -149,7 +152,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	 * 2	4	6	8
 	 * 1	3	5	7
 	 */
-	private void initPopulation(Map<String, Integer> populationPerZone) {
+	private void initPopulation(Map<Id<Zone>, Integer> populationPerZone) {
 		populationPerZone.forEach((zoneId, population) -> {
 			for (int i = 0; i < population; i++) {
 				createAndAddPerson(zoneId + "_" + i, zoneId);
@@ -157,7 +160,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 		});
 	}
 
-	private void createAndAddPerson(String id, String zoneId) {
+	private void createAndAddPerson(String id, Id<Zone> zoneId) {
 		Id<Link> linkId = zonalSystem.getZones().get(zoneId).getLinks().get(0).getId();
 		Person person = factory.createPerson(Id.createPersonId(id));
 		Plan plan = factory.createPlan();
@@ -166,8 +169,8 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 		population.addPerson(person);
 	}
 
-	private void assertTarget(ToDoubleFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
-			double expectedValue) {
+	private void assertTarget(ToDoubleFunction<Zone> targetFunction, ZoneSystem zonalSystem, Id<Zone> zoneId,
+							  double expectedValue) {
 		assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
 	}
 }

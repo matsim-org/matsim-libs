@@ -10,7 +10,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class RunEvExampleTest{
 
@@ -39,8 +39,8 @@ public class RunEvExampleTest{
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+				Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
 			}
 
 		} catch ( Exception ee ) {
@@ -72,8 +72,8 @@ public class RunEvExampleTest{
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+				Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
 			}
 
 		} catch ( Exception ee ) {

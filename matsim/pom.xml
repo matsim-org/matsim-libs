@@ -222,7 +222,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.5-11</version>
+			<version>1.5.6-2</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -344,7 +344,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.7.0</version>
+						<version>3.7.1</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>
