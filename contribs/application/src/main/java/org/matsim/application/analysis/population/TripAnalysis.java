@@ -98,7 +98,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
 			.sample(false)
-			.separator(new CsvOptions().detectDelimiter(input.getPath("persons.csv"))).build());
+			.separator(CsvOptions.detectDelimiter(input.getPath("persons.csv"))).build());
 
 		int total = persons.rowCount();
 
