@@ -64,7 +64,7 @@ final class MergeNoiseOutput {
 	 *
 	 * @return maxTime value
 	 */
-	public double getMaxTime() {
+	public int getMaxTime() {
 		return maxTime;
 	}
 

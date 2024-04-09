@@ -31,9 +31,9 @@ import java.util.Set;
 @CommandSpec(
 	requireRunDirectory = true,
 	produces = {
-		"immission_per_day.csv",
-		"immission_per_hour.csv",
 		"emission_per_day.csv",
+		"immission_per_day.%s",
+		"immission_per_hour.%s"
 	}
 )
 public class NoiseAnalysis implements MATSimAppCommand {
@@ -90,7 +90,8 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		String outputFilePath = output.getPath().getParent().toString();
+		String outputFilePath = output.getPath().getParent() == null ? "." : output.getPath().getParent().toString();
+
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputFilePath);
 		outputFilePath += "/noise-analysis";
 		noiseCalculation.run();

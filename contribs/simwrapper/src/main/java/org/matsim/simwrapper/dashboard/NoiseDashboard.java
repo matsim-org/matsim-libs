@@ -47,7 +47,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.compute(NoiseAnalysis.class, "immission_per_hour.csv");
+				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro.gz");
 
 			});
 		layout.row("links2")
@@ -64,7 +64,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.compute(NoiseAnalysis.class, "immission_per_day.csv");
+				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro.gz");
 
 			});
 
