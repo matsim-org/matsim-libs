@@ -323,6 +323,8 @@ public final class Plotly extends Viz {
 		SIZE,
 		COLOR,
 		OPACITY
+
+		// TODO: facet col und row
 	}
 
 	/**
@@ -364,6 +366,8 @@ public final class Plotly extends Viz {
 				constant == null &&
 				aggregate == null)
 				return file;
+
+			// TODO:  normalize und rename optionen
 
 			return this;
 		}
@@ -506,6 +510,8 @@ public final class Plotly extends Viz {
 			columns.put(ColumnType.OPACITY, columnName);
 			return this;
 		}
+
+		// TODO: facet col und row im trace
 
 		private void insert(Map<String, Object> obj) {
 

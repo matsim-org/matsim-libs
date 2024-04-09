@@ -77,7 +77,11 @@ public class DashboardTests {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		run(new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv"));
+		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv");
+
+		dashboard.withGroupedRefData("grouped_ref.csv");
+
+		run(dashboard);
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
 			.isDirectoryContaining("glob:**mode_share.csv");

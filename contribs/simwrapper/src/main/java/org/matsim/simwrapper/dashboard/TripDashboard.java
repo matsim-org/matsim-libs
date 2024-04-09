@@ -75,7 +75,7 @@ public class TripDashboard implements Dashboard {
 		header.title = "Trips";
 		header.description = "General information about modal share and trip distributions.";
 
-		String[] args = new String[this.groupedRefData == null ? this.args.length: this.args.length + 2];
+		String[] args = new String[this.groupedRefData == null ? this.args.length : this.args.length + 2];
 		System.arraycopy(this.args, 0, args, 0, this.args.length);
 
 		// Add ref data to the argument if set
@@ -246,6 +246,25 @@ public class TripDashboard implements Dashboard {
 		});
 
 		if (groupedRefData != null) {
+
+			layout.row("arrivals").el(Plotly.class, (viz, data) -> {
+
+				viz.title = "FACETS";
+				viz.description = "by hour and purpose";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Hour").build())
+					.yAxis(Axis.builder().title("Share").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+						.name("purpose", ColorScheme.Spectral)
+						.x("h")
+						.y("arrival")
+				);
+
+			});
 
 			// TODO create the additional tab
 
