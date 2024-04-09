@@ -52,6 +52,7 @@ public class LanduseBuildingAnalysisTest {
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
 		String shapeFileZoneNameColumn = "name";
+		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		Path pathToExistingDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		// Test if the reading of the existing data distribution works correctly
@@ -60,7 +61,7 @@ public class LanduseBuildingAnalysisTest {
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						usedLanduseConfiguration,
 						SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
-                        SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, pathToExistingDataDistributionToZones);
+                        SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, pathToExistingDataDistributionToZones, shapeFileBuildingTypeColumn);
 
 		Assertions.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
@@ -154,7 +155,7 @@ public class LanduseBuildingAnalysisTest {
 		List<SimpleFeature> buildingsFeatures = SCTUtils.getIndexBuildings(inputDataDirectory).getAllFeatures();
 		Assertions.assertEquals(31, buildingsFeatures.size(), MatsimTestUtils.EPSILON);
 		LanduseBuildingAnalysis.analyzeBuildingType(buildingsFeatures, buildingsPerZone,
-				landuseCategoriesAndDataConnection, SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory));
+				landuseCategoriesAndDataConnection, SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), shapeFileBuildingTypeColumn);
 
 		Assertions.assertEquals(3, buildingsPerZone.size(), MatsimTestUtils.EPSILON);
 		Assertions.assertTrue(buildingsPerZone.containsKey("area1"));
@@ -247,13 +248,14 @@ public class LanduseBuildingAnalysisTest {
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String shapeFileZoneNameColumn = "name";
+		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		// Analyze resultingData per zone
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
-					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, null);
+					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, null, shapeFileBuildingTypeColumn);
 
 		Assertions.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
