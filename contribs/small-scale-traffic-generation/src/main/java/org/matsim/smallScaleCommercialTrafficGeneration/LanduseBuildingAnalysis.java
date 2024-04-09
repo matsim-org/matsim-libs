@@ -264,7 +264,12 @@ public class LanduseBuildingAnalysis {
 								else
 									buildingLevels = (long) building.getAttribute("levels")
 											/ (double) buildingTypes.length;
-								double area = (int) (long) building.getAttribute("area") * buildingLevels;
+								double groundArea;
+								if (building.getAttribute("area") != null)
+									groundArea = (int) (long) building.getAttribute("area");
+								else
+									groundArea = ((Geometry) building.getDefaultGeometry()).getArea();
+								double area = groundArea * buildingLevels;
 								landuseCategoriesPerZone.get(zone).mergeDouble(singleCategoryOfBuilding, area,
 										Double::sum);
 							}
