@@ -268,9 +268,11 @@ public class LanduseBuildingAnalysis {
 		}
 	}
 
-	/** Calculates the area for each usage category of a building based on the number of levels and the area.
-	 * @param building 			the building to be analyzed
-	 * @param buildingTypes 	the types of the building
+	/**
+	 * Calculates the area for each usage category of a building based on the number of levels and the area.
+	 *
+	 * @param building      the building to be analyzed
+	 * @param buildingTypes the types of the building
 	 * @return
 	 */
 	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
