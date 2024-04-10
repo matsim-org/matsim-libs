@@ -112,18 +112,18 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 
-		ActivityFacilitiesFactory f = facilities.getFactory();
+		ActivityFacilitiesFactory facilitiesFactory = facilities.getFactory();
 
 		for (String zone : buildingsPerZone.keySet()) {
 			for (String assignedDataType : buildingsPerZone.get(zone).keySet()) {
 				buildingsPerZone.get(zone).get(assignedDataType).forEach(singleBuilding -> {
 					Id<ActivityFacility> id = Id.create(singleBuilding.getID(), ActivityFacility.class);
 					if (facilities.getFacilities().containsKey(id)) {
-						facilities.getFacilities().get(id).addActivityOption(f.createActivityOption(assignedDataType));
+						facilities.getFacilities().get(id).addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
 					} else {
 						Coord coord = MGC.point2Coord(((Geometry) singleBuilding.getDefaultGeometry()).getCentroid());
-						ActivityFacility facility = f.createActivityFacility(id, coord);
-						facility.addActivityOption(f.createActivityOption(assignedDataType));
+						ActivityFacility facility = facilitiesFactory.createActivityFacility(id, coord);
+						facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
 						String[] buildingTypes = ((String) singleBuilding.getAttribute("type")).split(";");
 						int calculatedAreaPerBuildingCategory = calculateAreaPerBuildingCategory(singleBuilding, buildingTypes);
 						facility.getAttributes().putAttribute("shareOfZone_" + assignedDataType,
