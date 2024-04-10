@@ -28,14 +28,16 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
 
 /**
  * @author tschlenther
  */
 public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
-	private final Map<DrtZone, Link> targetLinks;
+	private final Map<Zone, Link> targetLinks;
 
-	public MostCentralDrtZoneTargetLinkSelector(DrtZonalSystem drtZonalSystem) {
+	public MostCentralDrtZoneTargetLinkSelector(ZoneSystem drtZonalSystem) {
 		targetLinks = drtZonalSystem.getZones()
 				.values()
 				.stream()
@@ -48,11 +50,11 @@ public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSe
 	}
 
 	@Override
-	public Link selectTargetLink(DrtZone zone) {
+	public Link selectTargetLink(Zone zone) {
 		return this.targetLinks.get(zone);
 	}
 
-	private double squaredDistance(DrtZone zone, Node node) {
+	private double squaredDistance(Zone zone, Node node) {
 		return calculateSquaredDistance(zone.getCentroid(), node.getCoord());
 	}
 }

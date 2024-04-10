@@ -63,7 +63,7 @@ public class SmallScaleCommercialTrafficUtilsTest {
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand.filterLinksForZones(scenario,
 			SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(), shapeFileZoneNameColumn),
-			facilitiesPerZone);
+			facilitiesPerZone, shapeFileZoneNameColumn);
 
 		Assertions.assertEquals(3, regionLinksMap.size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(60, regionLinksMap.get("area1").size(), MatsimTestUtils.EPSILON);

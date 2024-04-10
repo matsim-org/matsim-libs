@@ -27,6 +27,7 @@ public class SimWrapperTest {
 			header.title = "Simwrapper Test Dashboard";
 			header.description = "Test All Simwrapper Plug-Ins Dashboard";
 			header.tab = "Header Tab";
+			header.triggerPattern = "*example.csv";
 
 			layout.row("first")
 					.el(Area.class, (viz, data) -> {

@@ -80,7 +80,7 @@ public final class CsvOptions {
 	 * Get the CSV format defined by the options.
 	 */
 	public CSVFormat getFormat() {
-		CSVFormat.Builder format = this.csvFormat.getFormat().builder().setSkipHeaderRecord(true);
+		CSVFormat.Builder format = this.csvFormat.getFormat().builder().setHeader().setSkipHeaderRecord(true);
 		if (csvDelimiter != null)
 			format = format.setDelimiter(csvDelimiter);
 
