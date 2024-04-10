@@ -115,6 +115,23 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 		ActivityFacilitiesFactory facilitiesFactory = facilities.getFactory();
 
+		calculateAreaSharesOfTheFacilities(facilities, facilitiesFactory);
+		Path facilityOutput = output.resolve("commercialFacilities.xml.gz");
+		log.info("Created {} facilities, writing to {}", facilities.getFacilities().size(), facilityOutput);
+
+		FacilitiesWriter writer = new FacilitiesWriter(facilities);
+		writer.write(facilityOutput.toString());
+
+		return 0;
+	}
+
+	/**
+	 * Adds the share of the area of each facility compared to the area of the facilities of this category in this zone
+	 *
+	 * @param facilities
+	 * @param facilitiesFactory
+	 */
+	private void calculateAreaSharesOfTheFacilities(ActivityFacilities facilities, ActivityFacilitiesFactory facilitiesFactory) {
 		for (String zone : buildingsPerZone.keySet()) {
 			for (String assignedDataType : buildingsPerZone.get(zone).keySet()) {
 				if (assignedDataType.equals("Employee")) {
@@ -139,13 +156,6 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 			}
 		}
-		Path facilityOutput = output.resolve("commercialFacilities.xml.gz");
-		log.info("Created {} facilities, writing to {}", facilities.getFacilities().size(), facilityOutput);
-
-		FacilitiesWriter writer = new FacilitiesWriter(facilities);
-		writer.write(facilityOutput.toString());
-
-		return 0;
 	}
 
 	/** Add the share of the area of the building compared to the area of the buildings of this category in this zone to the attributes of the facility
