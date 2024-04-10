@@ -51,7 +51,7 @@ public class LanduseBuildingAnalysis {
 
 	private static final Logger log = LogManager.getLogger(LanduseBuildingAnalysis.class);
 	private static final Joiner JOIN = Joiner.on("\t");
-	static Map<String, Object2DoubleMap<String>> resultingSumsForZones = new HashMap<>();
+	static Map<String, Object2DoubleMap<String>> sumsOfAreasPerZoneAndCategory = new HashMap<>();
 
 	/**
 	 * Creates a distribution of the given input data for each zone based on the
@@ -151,7 +151,7 @@ public class LanduseBuildingAnalysis {
 				}
 		}
 		for (Map.Entry<String, Object2DoubleMap<String>> entry : resultingDataPerZone.entrySet()) {
-			resultingSumsForZones.put(entry.getKey(), new Object2DoubleOpenHashMap<>(entry.getValue()));
+			sumsOfAreasPerZoneAndCategory.put(entry.getKey(), new Object2DoubleOpenHashMap<>(entry.getValue()));
 		}
 		/*
 		 * creates the percentages of each category and zones based on the sum in this
@@ -412,7 +412,15 @@ public class LanduseBuildingAnalysis {
 		}
 	}
 
-	static double getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(String zone, int area, String category){
-		return area / resultingSumsForZones.get(zone).getDouble(category);
+	/**
+	 * This method calculates the share of the building area of the related area of the complete zone of this category.
+	 *
+	 * @param zone                               the zone of the building
+	 * @param area                               the area of the building
+	 * @param assignedDataType                   the data type of the building
+	 * @return
+	 */
+	static double getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(String zone, int area, String assignedDataType){
+			return area / sumsOfAreasPerZoneAndCategory.get(zone).getDouble(assignedDataType);
 	}
 }
