@@ -284,7 +284,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 	/**
 	 * Reads existing scenarios and add them to the scenario. If the scenario is
-	 * part of the goodsTraffic or commercialPersonTraffic the demand of the existing
+	 * part of the goodsTraffic or commercialPersonTraffic, the demand of the existing
 	 * scenario reduces the demand of the small scale commercial traffic. The
 	 * dispersedTraffic will be added additionally.
 	 */
@@ -332,7 +332,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 			if (sampleSizeExistingScenario < sampleScenario)
 				throw new Exception("The sample size of the existing scenario " + modelName
-					+ "is smaller than the sample size of the scenario. No upscaling for existing scenarios implemented.");
+					+ "is smaller than the sample size of the scenario. No up scaling for existing scenarios implemented.");
 
 			double sampleFactor = sampleScenario / sampleSizeExistingScenario;
 
