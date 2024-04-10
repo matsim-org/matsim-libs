@@ -260,7 +260,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 						usedLanduseConfiguration.toString(), indexLanduse, indexZones,
 						indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData,
-						pathToExistingDataDistributionToZones);
+						pathToExistingDataDistributionToZones, shapeFileBuildingTypeColumn);
 				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, buildingsPerZone, shapeFileZoneNameColumn);
 
 				switch (usedSmallScaleCommercialTrafficType) {
@@ -882,7 +882,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (buildingsPerZone.isEmpty()) {
 			List<SimpleFeature> buildingsFeatures = indexBuildings.getAllFeatures();
 			LanduseBuildingAnalysis.analyzeBuildingType(buildingsFeatures, buildingsPerZone,
-				landuseCategoriesAndDataConnection, indexLanduse, indexZones);
+				landuseCategoriesAndDataConnection, indexLanduse, indexZones, shapeFileBuildingTypeColumn);
 		}
 		Id<Link> newLink = null;
 		for (int a = 0; newLink == null && a < buildingsPerZone.get(zone).get(selectedCategory).size() * 2; a++) {

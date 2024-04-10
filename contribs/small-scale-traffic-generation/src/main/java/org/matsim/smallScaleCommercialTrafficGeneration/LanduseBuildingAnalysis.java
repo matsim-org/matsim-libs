@@ -60,7 +60,7 @@ public class LanduseBuildingAnalysis {
 																			 String shapeFileZoneNameColumn,
 																			 Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
 																			 Path pathToInvestigationAreaData,
-																			 Path pathToExistingDataDistributionToZones)
+																			 Path pathToExistingDataDistributionToZones, String shapeFileBuildingTypeColumn)
 		throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
@@ -114,7 +114,7 @@ public class LanduseBuildingAnalysis {
 			Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
 			createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones, indexInvestigationAreaRegions,
 					usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
-					buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection);
+					buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection, shapeFileBuildingTypeColumn);
 
 			Map<String, Map<String, Integer>> investigationAreaData = new HashMap<>();
 			readAreaData(investigationAreaData, pathToInvestigationAreaData);
@@ -222,7 +222,8 @@ public class LanduseBuildingAnalysis {
 												  Index indexLanduse, Index indexZones, Index indexInvestigationAreaRegions, String usedLanduseConfiguration,
 												  Index indexBuildings, Map<String, List<String>> landuseCategoriesAndDataConnection,
 												  Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-												  String shapeFileZoneNameColumn, Map<String, String> zoneIdRegionConnection) {
+												  String shapeFileZoneNameColumn, Map<String, String> zoneIdRegionConnection,
+												  String shapeFileBuildingTypeColumn) {
 
 		List<String> neededLanduseCategories = List.of("residential", "industrial", "commercial", "retail", "farmyard",
 				"farmland", "construction");
@@ -249,13 +250,13 @@ public class LanduseBuildingAnalysis {
 
 			List<SimpleFeature> buildingsFeatures = indexBuildings.getAllFeatures();
 			analyzeBuildingType(buildingsFeatures, buildingsPerZone, landuseCategoriesAndDataConnection,
-				indexLanduse, indexZones);
+				indexLanduse, indexZones, shapeFileBuildingTypeColumn);
 
 			for (String zone : buildingsPerZone.keySet())
 				for (String category : buildingsPerZone.get(zone).keySet())
 					if (category.equals("Employee") || category.equals("Inhabitants"))
 						for (SimpleFeature building : buildingsPerZone.get(zone).get(category)) {
-							String[] buildingTypes = ((String) building.getAttribute("type")).split(";");
+							String[] buildingTypes = ((String) building.getAttribute(shapeFileBuildingTypeColumn)).split(";");
 							for (String singleCategoryOfBuilding : buildingTypes) {
 								double buildingLevels;
 								if (building.getAttribute("levels") == null)
@@ -263,7 +264,12 @@ public class LanduseBuildingAnalysis {
 								else
 									buildingLevels = (long) building.getAttribute("levels")
 											/ (double) buildingTypes.length;
-								double area = (int) (long) building.getAttribute("area") * buildingLevels;
+								double groundArea;
+								if (building.getAttribute("area") != null)
+									groundArea = (int) (long) building.getAttribute("area");
+								else
+									groundArea = ((Geometry) building.getDefaultGeometry()).getArea();
+								double area = groundArea * buildingLevels;
 								landuseCategoriesPerZone.get(zone).mergeDouble(singleCategoryOfBuilding, area,
 										Double::sum);
 							}
@@ -315,7 +321,7 @@ public class LanduseBuildingAnalysis {
 	static void analyzeBuildingType(List<SimpleFeature> buildingsFeatures,
 									Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
 									Map<String, List<String>> landuseCategoriesAndDataConnection, Index indexLanduse,
-									Index indexZones) {
+									Index indexZones, String shapeFileBuildingTypeColumn) {
 
 		int countOSMObjects = 0;
 		log.info("Analyzing buildings types. This may take some time...");
@@ -333,7 +339,7 @@ public class LanduseBuildingAnalysis {
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());
 			String singleZone = indexZones.query(centroidPointOfBuildingPolygon);
-			String buildingType = String.valueOf(singleBuildingFeature.getAttribute("type"));
+			String buildingType = String.valueOf(singleBuildingFeature.getAttribute(shapeFileBuildingTypeColumn));
 			if (buildingType.isEmpty() || buildingType.equals("null") || buildingType.equals("yes")) {
 				buildingType = indexLanduse.query(centroidPointOfBuildingPolygon);
 				buildingTypes = new String[] { buildingType };
@@ -341,7 +347,7 @@ public class LanduseBuildingAnalysis {
 				buildingType.replace(" ", "");
 				buildingTypes = buildingType.split(";");
 			}
-			singleBuildingFeature.setAttribute("type", String.join(";", buildingTypes));
+			singleBuildingFeature.setAttribute(shapeFileBuildingTypeColumn, String.join(";", buildingTypes));
 			boolean isEmployeeCategory = false;
 			for (String singleBuildingType : buildingTypes) {
 				for (String category : landuseCategoriesAndDataConnection.keySet()) {
