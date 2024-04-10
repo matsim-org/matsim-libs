@@ -203,8 +203,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup;
 		switch (usedCreationOption) {
-			case useExistingCarrierFileWithSolution -> {
-				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
+			case useExistingCarrierFileWithSolution, useExistingCarrierFileWithoutSolution -> {
+				log.info("Existing carriers (including carrier vehicle types) should be set in the freight config group");
 				if (includeExistingModels)
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
@@ -213,18 +213,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
 				CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-			}
-			case useExistingCarrierFileWithoutSolution -> {
-				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
-				if (includeExistingModels)
-					throw new Exception(
-						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
-					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
-				log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
-				CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-				solveSeparatedVRPs(scenario, null);
+				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
+					solveSeparatedVRPs(scenario, null);
+				}
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
