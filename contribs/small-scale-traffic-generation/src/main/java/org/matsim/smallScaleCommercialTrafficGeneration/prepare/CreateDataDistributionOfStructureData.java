@@ -71,11 +71,6 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	private final Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
-	private ShpOptions.Index indexZones;
-	private ShpOptions.Index indexBuildings;
-	private ShpOptions.Index indexLanduse;
-	private ShpOptions.Index indexInvestigationAreaRegions;
-
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateDataDistributionOfStructureData()).execute(args));
 	}
@@ -98,10 +93,12 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 			throw new Exception("Required regions shape file {} not found" + shapeFileRegionsPath.toString());
 		}
 
-		indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
-		indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS, shapeFileBuildingTypeColumn);
-		indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS, shapeFileLanduseTypeColumn);
-		indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS, regionsShapeRegionColumn);
+		ShpOptions.Index indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
+		ShpOptions.Index indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS,
+			shapeFileBuildingTypeColumn);
+		ShpOptions.Index indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS, shapeFileLanduseTypeColumn);
+		ShpOptions.Index indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS,
+			regionsShapeRegionColumn);
 
 		if(Files.notExists(output))
 			new File(output.toString()).mkdir();
