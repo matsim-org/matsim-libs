@@ -423,6 +423,10 @@ public class LanduseBuildingAnalysis {
 	 * @return
 	 */
 	static double getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(String zone, int area, String assignedDataType){
+		if (assignedDataType.equals("Employee")){
+			double sumOfEmployees = sumsOfAreasPerZoneAndCategory.get(zone).keySet().stream().filter(s -> s.contains("Employee")).mapToInt(s -> (int) sumsOfAreasPerZoneAndCategory.get(zone).getDouble(s)).sum();
+			return area / sumOfEmployees;
+		}
 			return area / sumsOfAreasPerZoneAndCategory.get(zone).getDouble(assignedDataType);
 	}
 }

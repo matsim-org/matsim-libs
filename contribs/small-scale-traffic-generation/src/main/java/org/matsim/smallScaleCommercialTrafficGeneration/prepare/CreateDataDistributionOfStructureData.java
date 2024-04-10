@@ -134,21 +134,21 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	private void calculateAreaSharesOfTheFacilities(ActivityFacilities facilities, ActivityFacilitiesFactory facilitiesFactory) {
 		for (String zone : buildingsPerZone.keySet()) {
 			for (String assignedDataType : buildingsPerZone.get(zone).keySet()) {
-				if (assignedDataType.equals("Employee")) {
-					continue;
-				}
+
 				buildingsPerZone.get(zone).get(assignedDataType).forEach(singleBuilding -> {
 					ActivityFacility facility;
 					Id<ActivityFacility> id = Id.create(singleBuilding.getID(), ActivityFacility.class);
 					if (facilities.getFacilities().containsKey(id)) {
 						facility = facilities.getFacilities().get(id);
-						facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
+						if (!assignedDataType.equals("Employee"))
+							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
 						addShareOfAreaOfBuildingToAttributes(zone, assignedDataType, singleBuilding, facility);
 					}
 					else{
 						Coord coord = MGC.point2Coord(((Geometry) singleBuilding.getDefaultGeometry()).getCentroid());
 						facility = facilitiesFactory.createActivityFacility(id, coord);
-						facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
+						if (!assignedDataType.equals("Employee"))
+							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
 						addShareOfAreaOfBuildingToAttributes(zone, assignedDataType, singleBuilding, facility);
 						facilities.addActivityFacility(facility);
 					}
@@ -170,14 +170,25 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		int calculatedAreaPerOSMBuildingCategory = calculateAreaPerBuildingCategory(singleBuilding, buildingTypes);
 
 		// counts the number of raw building types for this assignedDataType
-		int numberOfBuildingCategoriesInThisDataType = Arrays.stream(buildingTypes).filter(buildingType -> landuseCategoriesAndDataConnection.get(assignedDataType).contains(buildingType)).toArray().length;
+		int numberOfBuildingCategoriesInThisDataType;
+		if (assignedDataType.equals("Employee")) {
+			numberOfBuildingCategoriesInThisDataType = Arrays.stream(buildingTypes).filter(
+				buildingType -> landuseCategoriesAndDataConnection.keySet().stream().filter(
+					key -> key.contains("Employee") && landuseCategoriesAndDataConnection.get(key).contains(
+						buildingType)).toArray().length > 0).toArray().length;
+			// because commercial is in two categories
+			if (Arrays.asList(buildingTypes).contains("commercial"))
+				numberOfBuildingCategoriesInThisDataType -= 1;
+		} else
+			numberOfBuildingCategoriesInThisDataType = Arrays.stream(buildingTypes).filter(
+				buildingType -> landuseCategoriesAndDataConnection.get(assignedDataType).contains(buildingType)).toArray().length;
 
 		// calculates the area of this assignedDataType
 		int areaForLanduseCategoriesOfThisDataType = calculatedAreaPerOSMBuildingCategory * numberOfBuildingCategoriesInThisDataType;
 
 		// if a building is commercial and the assignedDataType contains commercial buildings, the area of the commercial part is halved, because the commercial type is represented in two data types
 		int calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType;
-		if (landuseCategoriesAndDataConnection.get(assignedDataType).contains("commercial") && Arrays.asList(buildingTypes).contains("commercial"))
+		if (!assignedDataType.equals("Employee") && landuseCategoriesAndDataConnection.get(assignedDataType).contains("commercial") && Arrays.asList(buildingTypes).contains("commercial"))
 			calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType - calculatedAreaPerOSMBuildingCategory / 2;
 		double shareOfTheBuildingAreaOfTheRelatedAreaOfTheZone = getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(zone,
 			calculatedAreaPerBuildingCategory, assignedDataType);
