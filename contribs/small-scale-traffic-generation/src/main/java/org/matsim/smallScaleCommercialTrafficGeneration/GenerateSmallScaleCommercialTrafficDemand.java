@@ -257,7 +257,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return 0;
 	}
 
-	/** //TODO Creates
+	/** Creates a map with the different facility types per building.
 	 * @param scenario
 	 * @param facilitiesPerZone
 	 */
