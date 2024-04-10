@@ -746,8 +746,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		carriers.addCarrier(thisCarrier);
 
 		while (vehicleDepots.size() < numberOfDepots) {
-			Id<Link> link = findPossibleLink(startZone, selectedStartCategory, null, linksPerZone, scenario.getActivityFacilities());
-			vehicleDepots.add(link.toString());
+			Id<Link> linkId = findPossibleLink(startZone, selectedStartCategory, null, linksPerZone);
+			vehicleDepots.add(linkId.toString());
 		}
 
 		for (String singleDepot : vehicleDepots) {
