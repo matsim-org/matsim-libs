@@ -135,29 +135,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
 	private boolean includeExistingModels;
 
-	@CommandLine.Option(names = "--regionsShapeFileName", description = "Path of the region shape file.")
-	private Path shapeFileRegionsPath;
-
-		@CommandLine.Option(names = "--regionsShapeRegionColumn", description = "Name of the region column in the region shape file.")
-	private String regionsShapeRegionColumn;
-
 	@CommandLine.Option(names = "--zoneShapeFileName", description = "Path of the zone shape file.")
 	private Path shapeFileZonePath;
 
 	@CommandLine.Option(names = "--zoneShapeFileNameColumn", description = "Name of the unique column of the name/Id of each zone in the zones shape file.")
 	private String shapeFileZoneNameColumn;
-
-	@CommandLine.Option(names = "--buildingsShapeFileName", description = "Path of the buildings shape file")
-	private Path shapeFileBuildingsPath;
-
-	@CommandLine.Option(names = "--shapeFileBuildingTypeColumn", description = "Name of the unique column of the building type in the buildings shape file.")
-	private String shapeFileBuildingTypeColumn;
-
-	@CommandLine.Option(names = "--landuseShapeFileName", description = "Path of the landuse shape file")
-	private Path shapeFileLandusePath;
-
-	@CommandLine.Option(names = "--shapeFileLanduseTypeColumn", description = "Name of the unique column of the landuse type in the landuse shape file.")
-	private String shapeFileLanduseTypeColumn;
 
 	@CommandLine.Option(names = "--shapeCRS", description = "CRS of the three input shape files (zones, landuse, buildings")
 	private String shapeCRS;
