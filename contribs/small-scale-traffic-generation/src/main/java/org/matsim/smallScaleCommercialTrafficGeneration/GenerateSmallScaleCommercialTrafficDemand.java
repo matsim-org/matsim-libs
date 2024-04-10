@@ -129,9 +129,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--creationOption", description = "Set option of mode differentiation:  useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution")
 	private CreationOption usedCreationOption;
 
-	@CommandLine.Option(names = "--landuseConfiguration", description = "Set option of used OSM data. Options: useOnlyOSMLanduse, useOSMBuildingsAndLanduse, useExistingDataDistribution")
-	private LanduseConfiguration usedLanduseConfiguration;
-
 	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic type. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
 	private SmallScaleCommercialTrafficType usedSmallScaleCommercialTrafficType;
 
