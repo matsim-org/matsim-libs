@@ -108,7 +108,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 			.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 				usedLanduseConfiguration.toString(), indexLanduse, indexZones,
-				indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData);
+				indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileZoneNameColumn);
 
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 
