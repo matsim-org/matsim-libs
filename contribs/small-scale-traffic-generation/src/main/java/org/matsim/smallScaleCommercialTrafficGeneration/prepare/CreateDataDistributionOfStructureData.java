@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis.*;
 
-@CommandLine.Command(name = "create-data-distribution-of-structure-data", description = "Create data distribution as preperation for the generation of small scale commercial traffic", showDefaultValues = true)
+@CommandLine.Command(name = "create-data-distribution-of-structure-data", description = "Create data distribution as preparation for the generation of small scale commercial traffic", showDefaultValues = true)
 public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateDataDistributionOfStructureData.class);
