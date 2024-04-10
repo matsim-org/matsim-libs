@@ -126,7 +126,7 @@ public class TrafficVolumeGeneration {
 		Path outputFileStart = output.resolve("calculatedData")
 				.resolve("TrafficVolume_" + trafficType + "_" + "startPerZone_" + sampleName + "pt.csv");
 		writeCSVTrafficVolume(trafficVolume_start, outputFileStart);
-		log.info("Write traffic volume for start trips per zone in CSV: " + outputFileStart);
+		log.info("Write traffic volume for start trips per zone in CSV: {}", outputFileStart);
 		return trafficVolume_start;
 	}
 
@@ -150,7 +150,7 @@ public class TrafficVolumeGeneration {
 		Path outputFileStop = output.resolve("calculatedData")
 				.resolve("TrafficVolume_" + trafficType + "_" + "stopPerZone_" + sampleName + "pt.csv");
 		writeCSVTrafficVolume(trafficVolume_stop, outputFileStop);
-		log.info("Write traffic volume for stop trips per zone in CSV: " + outputFileStop);
+		log.info("Write traffic volume for stop trips per zone in CSV: {}", outputFileStop);
 		return trafficVolume_stop;
 	}
 
@@ -299,9 +299,9 @@ public class TrafficVolumeGeneration {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 										trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
 							} catch (IllegalArgumentException e) {
-								log.warn("For carrier " + carrier.getId().toString() + " a location of the service "
-										+ service.getService().getId()
-										+ " is not part of the zones. That's why the traffic volume was not reduces by this service.");
+								log.warn(
+									"For the tour {} of carrier {} a location of the service {} is not part of the zones. That's why the traffic volume was not reduces by this service.",
+									tour.getTour().getId(), carrier.getId().toString(), service.getService().getId());
 							}
 						}
 						if (tourElement instanceof Pickup pickup) {
@@ -313,9 +313,9 @@ public class TrafficVolumeGeneration {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 										trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
 							} catch (IllegalArgumentException e) {
-								log.warn("For carrier " + carrier.getId().toString() + " a location of the shipment "
-										+ pickup.getShipment().getId()
-										+ " is not part of the zones. That's why the traffic volume was not reduces by this shipment.");
+								log.warn(
+									"For the tour {} of carrier {} a location of the shipment {} is not part of the zones. That's why the traffic volume was not reduces by this shipment.",
+									tour.getTour().getId(), carrier.getId().toString(), pickup.getShipment().getId());
 							}
 						}
 					}
@@ -336,9 +336,9 @@ public class TrafficVolumeGeneration {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
 						} catch (IllegalArgumentException e) {
-							log.warn("For carrier " + carrier.getId().toString() + " a location of the service "
-									+ service.getId()
-									+ " is not part of the zones. That's why the traffic volume was not reduces by this service.");
+							log.warn(
+								"For carrier {} a location of the service {} is not part of the zones. That's why the traffic volume was not reduces by this service.",
+								carrier.getId().toString(), service.getId());
 						}
 					}
 				} else if (!carrier.getShipments().isEmpty()) {
@@ -351,9 +351,9 @@ public class TrafficVolumeGeneration {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
 						} catch (IllegalArgumentException e) {
-							log.warn("For carrier " + carrier.getId().toString() + " a location of the shipment "
-									+ shipment.getId()
-									+ " is not part of the zones. That's why the traffic volume was not reduces by this shipment.");
+							log.warn(
+								"For carrier {} a location of the shipment {} is not part of the zones. That's why the traffic volume was not reduces by this shipment.",
+								carrier.getId().toString(), shipment.getId());
 						}
 					}
 				}
@@ -411,9 +411,9 @@ public class TrafficVolumeGeneration {
 			if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)
 					&& trafficVolumePerTypeAndZone.get(trafficVolumeKey).getDouble(purpose) > 0) {
 				trafficVolumePerTypeAndZone.get(trafficVolumeKey).mergeDouble(purpose, -1, Double::sum);
-				log.warn(volumeType + "-Volume of zone " + trafficVolumeKey.getZone() + " (mode '" + modeORvehType
-						+ "', purpose '" + purpose + "') was reduced because the volume for the zone " + originalZone
-						+ " where an existing model has a demand has a generated demand of 0.");
+				log.warn(
+					"{}-Volume of zone {} (mode '{}', purpose '{}') was reduced because the volume for the zone {} where an existing model has a demand has a generated demand of 0.",
+					volumeType, trafficVolumeKey.getZone(), modeORvehType, purpose, originalZone);
 				break;
 			}
 		}

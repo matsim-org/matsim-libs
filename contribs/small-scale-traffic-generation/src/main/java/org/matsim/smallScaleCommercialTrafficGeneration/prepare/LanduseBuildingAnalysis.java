@@ -73,7 +73,7 @@ public class LanduseBuildingAnalysis {
 //		Path outputFileInOutputFolder = output.resolve("calculatedData").resolve("dataDistributionPerZone.csv");
 		Path outputFileInOutputFolder = output.resolve("dataDistributionPerZone.csv");
 
-		log.info("New analyze for data distribution is started. The used method is: " + usedLanduseConfiguration);
+		log.info("New analyze for data distribution is started. The used method is: {}", usedLanduseConfiguration);
 		Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
 		createLanduseDistribution(landuseCategoriesPerZone, indexLanduse, indexZones, indexInvestigationAreaRegions,
 			usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
@@ -325,8 +325,8 @@ public class LanduseBuildingAnalysis {
 		for (SimpleFeature singleBuildingFeature : buildingsFeatures) {
 			countOSMObjects++;
 			if (countOSMObjects % 10000 == 0)
-				log.info("Investigate Building " + countOSMObjects + " of " + buildingsFeatures.size() + " buildings: "
-						+ Math.round((double) countOSMObjects / buildingsFeatures.size() * 100) + " %");
+				log.info("Investigate Building {} of {} buildings: {} %", countOSMObjects, buildingsFeatures.size(),
+					Math.round((double) countOSMObjects / buildingsFeatures.size() * 100));
 
 			if (singleBuildingFeature.getFeatureType().indexOf("levels") == -1)
 				throw new RuntimeException("The buildings object should contain the attribute 'levels'.");
@@ -376,7 +376,7 @@ public class LanduseBuildingAnalysis {
 		throws IOException {
 
 		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdRegionConnection);
-		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
+		log.info("The data distribution is finished and written to: {}", outputFileInOutputFolder);
 	}
 
 	/**

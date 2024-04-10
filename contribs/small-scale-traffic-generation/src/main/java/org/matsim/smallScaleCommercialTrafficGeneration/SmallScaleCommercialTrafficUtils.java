@@ -266,7 +266,8 @@ public class SmallScaleCommercialTrafficUtils {
 			CreateDifferentPlansForFreightPopulation.createMorePlansWithDifferentActivityOrder(population, numberOfPlanVariantsPerAgent);
 		else if (numberOfPlanVariantsPerAgent < 1)
 			log.warn(
-				"You selected " + numberOfPlanVariantsPerAgent + " of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.");
+				"You selected {} of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.",
+				numberOfPlanVariantsPerAgent);
 
 		PopulationUtils.writePopulation(population, outputPopulationFile);
 		scenario.getPopulation().getPersons().clear();
@@ -318,7 +319,7 @@ public class SmallScaleCommercialTrafficUtils {
 				throw new Exception("For the existing model " + modelName
 					+ " no vehicleTypesFile exists. The vehicleTypesFile should have the name 'vehicleTypes.xml.gz'");
 
-			log.info("Integrating existing scenario: " + modelName);
+			log.info("Integrating existing scenario: {}", modelName);
 
 			CarrierVehicleTypes readVehicleTypes = new CarrierVehicleTypes();
 			CarrierVehicleTypes usedVehicleTypes = new CarrierVehicleTypes();
@@ -346,11 +347,10 @@ public class SmallScaleCommercialTrafficUtils {
 			int remainedTours = 0;
 			double roundingError = 0.;
 
-			log.info("The existing scenario " + modelName + " is a " + (int) (sampleSizeExistingScenario * 100)
-				+ "% scenario and has " + numberOfToursExistingScenario + " tours");
-			log.info("The existing scenario " + modelName + " will be sampled down to the scenario sample size of "
-				+ (int) (sampleScenario * 100) + "% which results in " + sampledNumberOfToursExistingScenario
-				+ " tours.");
+			log.info("The existing scenario {} is a {}% scenario and has {} tours", modelName, (int) (sampleSizeExistingScenario * 100),
+				numberOfToursExistingScenario);
+			log.info("The existing scenario {} will be sampled down to the scenario sample size of {}% which results in {} tours.", modelName,
+				(int) (sampleScenario * 100), sampledNumberOfToursExistingScenario);
 
 			int numberOfAnalyzedTours = 0;
 			for (Carrier carrier : carriers.getCarriers().values()) {
@@ -550,8 +550,7 @@ public class SmallScaleCommercialTrafficUtils {
 				}
 			}
 		}
-		log.info("Data distribution for " + resultingDataPerZone.size() + " zones was read from " +
-			pathToDataDistributionToZones);
+		log.info("Data distribution for {} zones was read from {}", resultingDataPerZone.size(), pathToDataDistributionToZones);
 		return resultingDataPerZone;
 
 	}

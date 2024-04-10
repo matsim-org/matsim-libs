@@ -211,7 +211,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
 					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
-				log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
+				log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 				CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
 					solveSeparatedVRPs(scenario, null);
@@ -399,8 +399,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
-			log.info("Solving carriers " + (fromIndex + 1) + "-" + (toIndex) + " of all " + allCarriers.size()
-				+ " carriers. This are " + subCarriers.size() + " VRP to solve.");
+			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
+				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario);
 			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
@@ -659,16 +659,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						FleetSize fleetSize = FleetSize.FINITE;
 						ArrayList<String> vehicleDepots = new ArrayList<>();
 						createdCarrier++;
-						log.info("Create carrier number " + createdCarrier + " of a maximum Number of "
-							+ maxNumberOfCarrier + " carriers.");
-						log.info("Carrier: " + carrierName + "; depots: " + numberOfDepots + "; services: "
-							+ (int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
-							purpose, smallScaleCommercialTrafficType) / occupancyRate));
+						log.info("Create carrier number {} of a maximum Number of {} carriers.", createdCarrier, maxNumberOfCarrier);
+						log.info("Carrier: {}; depots: {}; services: {}", carrierName, numberOfDepots,
+							(int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
+								purpose, smallScaleCommercialTrafficType) / occupancyRate));
 						createNewCarrierAndAddVehicleTypes(scenario, purpose, startZone,
 							selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
 							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, linksPerZone, smallScaleCommercialTrafficType,
 							tourStartTimeSelector, tourDurationTimeSelector);
-						log.info("Create services for carrier: " + carrierName);
+						log.info("Create services for carrier: {}", carrierName);
 						for (String stopZone : odMatrix.getListOfZones()) {
 							int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(startZone,
 								stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
@@ -706,8 +705,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			stopDurationTimeSelector.get(sector).writeResults();
 		}
 
-		log.warn("The jspritIterations are now set to " + jspritIterations + " in this simulation!");
-		log.info("Finished creating " + createdCarrier + " carriers including related services.");
+		log.warn("The jspritIterations are now set to {} in this simulation!", jspritIterations);
+		log.info("Finished creating {} carriers including related services.", createdCarrier);
 	}
 
 	/**
@@ -958,7 +957,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : trafficVolume_start.keySet()) {
 			count++;
 			if (count % 50 == 0 || count == 1)
-				log.info("Create OD pair " + count + " of " + trafficVolume_start.size());
+				log.info("Create OD pair {} of {}", count, trafficVolume_start.size());
 
 			String startZone = trafficVolumeKey.getZone();
 			String modeORvehType = trafficVolumeKey.getModeORvehType();
