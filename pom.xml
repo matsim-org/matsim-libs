@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.0.0-jre</version>
+                <version>33.1.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -200,7 +200,7 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.25.0</version>
+                <version>2.26.1</version>
             </dependency>
 
             <dependency>
@@ -212,7 +212,7 @@
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>6.6.1</version>
+                <version>6.6.2</version>
             </dependency>
 
             <dependency>
@@ -345,6 +345,12 @@
 			</dependency>
 
 			<dependency>
+			    <groupId>com.google.j2objc</groupId>
+			    <artifactId>j2objc-annotations</artifactId>
+			    <version>3.0.0</version>
+			</dependency>
+
+			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
 				<version>1.14.12</version>
@@ -359,7 +365,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.13.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

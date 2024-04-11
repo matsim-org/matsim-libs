@@ -44,6 +44,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
+import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
@@ -178,7 +179,8 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(drtCfg.maxAllowedPickupDelay)));
+		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
@@ -187,11 +189,11 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
-			
+
 			// Makes basic DrtActionCreator create legs with consumption tracker
 			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
 		})).in(Singleton.class);
-		
+
 		bindModal(EDrtActionCreator.class).toProvider(modalProvider(getter -> {
 			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
 					? getter.getModal(PrebookingActionCreator.class)
@@ -201,9 +203,9 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			// + adds ChargingActivity
 			return new EDrtActionCreator(delegate, getter.get(MobsimTimer.class));
 		})).asEagerSingleton();
-		
+
 		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(EDrtActionCreator.class));
-		
+
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}
 }

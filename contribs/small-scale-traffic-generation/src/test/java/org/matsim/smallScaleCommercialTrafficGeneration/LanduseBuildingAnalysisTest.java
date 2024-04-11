@@ -51,18 +51,22 @@ public class LanduseBuildingAnalysisTest {
 		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useExistingDataDistribution";
-
+		String shapeFileZoneNameColumn = "name";
+		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
+		Path pathToExistingDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		// Test if the reading of the existing data distribution works correctly
+
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-						inputDataDirectory, usedLanduseConfiguration,
-						SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
+						usedLanduseConfiguration,
+						SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
+                        SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, pathToExistingDataDistributionToZones);
 
 		Assertions.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
-		Assertions.assertTrue(resultingDataPerZone.containsKey("testArea1_area1"));
-		Assertions.assertTrue(resultingDataPerZone.containsKey("testArea1_area2"));
-		Assertions.assertTrue(resultingDataPerZone.containsKey("testArea2_area3"));
+		Assertions.assertTrue(resultingDataPerZone.containsKey("area1"));
+		Assertions.assertTrue(resultingDataPerZone.containsKey("area2"));
+		Assertions.assertTrue(resultingDataPerZone.containsKey("area3"));
 
 		for (String zone : resultingDataPerZone.keySet()) {
 			Object2DoubleMap<String> categories = resultingDataPerZone.get(zone);
@@ -86,60 +90,64 @@ public class LanduseBuildingAnalysisTest {
 
 			Assertions.assertEquals(categories.getDouble("Employee"), employeeSum, MatsimTestUtils.EPSILON);
 
-			if (zone.equals("testArea1_area1")) {
-				Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(3500, resultingDataPerZone.get(zone).getDouble("Employee"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(0, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-			}
-			if (zone.equals("testArea1_area2")) {
-				Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(6500, resultingDataPerZone.get(zone).getDouble("Employee"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(2000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-			}
-			if (zone.equals("testArea2_area3")) {
-				Assertions.assertEquals(800, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(300, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-			}
+            switch (zone) {
+                case "area1" -> {
+                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(3500, resultingDataPerZone.get(zone).getDouble("Employee"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(0, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                }
+                case "area2" -> {
+                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(6500, resultingDataPerZone.get(zone).getDouble("Employee"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(2000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                }
+                case "area3" -> {
+                    Assertions.assertEquals(800, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(300, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                }
+				default -> Assertions.fail("Zone not found");
+            }
+
 		}
 
 		// tests if the reading of the buildings works correctly
@@ -149,12 +157,12 @@ public class LanduseBuildingAnalysisTest {
 				landuseCategoriesAndDataConnection, SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory));
 
 		Assertions.assertEquals(3, buildingsPerZone.size(), MatsimTestUtils.EPSILON);
-		Assertions.assertTrue(buildingsPerZone.containsKey("testArea1_area1"));
-		Assertions.assertTrue(buildingsPerZone.containsKey("testArea1_area2"));
-		Assertions.assertTrue(buildingsPerZone.containsKey("testArea2_area3"));
+		Assertions.assertTrue(buildingsPerZone.containsKey("area1"));
+		Assertions.assertTrue(buildingsPerZone.containsKey("area2"));
+		Assertions.assertTrue(buildingsPerZone.containsKey("area3"));
 
 		// test for area1
-		Map<String, List<SimpleFeature>> builingsPerArea1 = buildingsPerZone.get("testArea1_area1");
+		Map<String, List<SimpleFeature>> builingsPerArea1 = buildingsPerZone.get("area1");
 		Assertions.assertEquals(7, builingsPerArea1.size(), MatsimTestUtils.EPSILON);
 		List<SimpleFeature> inhabitantsBuildings = builingsPerArea1.get("Inhabitants");
 		Assertions.assertEquals(4, inhabitantsBuildings.size(), MatsimTestUtils.EPSILON);
@@ -184,7 +192,7 @@ public class LanduseBuildingAnalysisTest {
 		Assertions.assertEquals(6, builingsPerArea1.get("Employee").size(), MatsimTestUtils.EPSILON);
 
 		// test for area2
-		Map<String, List<SimpleFeature>> builingsPerArea2 = buildingsPerZone.get("testArea1_area2");
+		Map<String, List<SimpleFeature>> builingsPerArea2 = buildingsPerZone.get("area2");
 		Assertions.assertEquals(8, builingsPerArea2.size(), MatsimTestUtils.EPSILON);
 		List<SimpleFeature> employeeRetail = builingsPerArea2.get("Employee Retail");
 		Assertions.assertEquals(2, employeeRetail.size(), MatsimTestUtils.EPSILON);
@@ -208,7 +216,7 @@ public class LanduseBuildingAnalysisTest {
 		Assertions.assertEquals(8, builingsPerArea2.get("Employee").size(), MatsimTestUtils.EPSILON);
 
 		// test for area3
-		Map<String, List<SimpleFeature>> builingsPerArea3 = buildingsPerZone.get("testArea2_area3");
+		Map<String, List<SimpleFeature>> builingsPerArea3 = buildingsPerZone.get("area3");
 		Assertions.assertEquals(8, builingsPerArea3.size(), MatsimTestUtils.EPSILON);
 		List<SimpleFeature> tertiaryRetail = builingsPerArea3.get("Employee Tertiary Sector Rest");
 		Assertions.assertEquals(1, tertiaryRetail.size(), MatsimTestUtils.EPSILON);
@@ -238,18 +246,20 @@ public class LanduseBuildingAnalysisTest {
 		assert(new File(output.resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
-
+		String shapeFileZoneNameColumn = "name";
+		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		// Analyze resultingData per zone
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
-					inputDataDirectory, usedLanduseConfiguration,
-					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory), buildingsPerZone);
+					usedLanduseConfiguration,
+					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
+					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, null);
 
 		Assertions.assertEquals(3, resultingDataPerZone.size(), MatsimTestUtils.EPSILON);
 
-		Assertions.assertTrue(resultingDataPerZone.containsKey("testArea1_area1"));
-		Assertions.assertTrue(resultingDataPerZone.containsKey("testArea1_area2"));
-		Assertions.assertTrue(resultingDataPerZone.containsKey("testArea2_area3"));
+		Assertions.assertTrue(resultingDataPerZone.containsKey("area1"));
+		Assertions.assertTrue(resultingDataPerZone.containsKey("area2"));
+		Assertions.assertTrue(resultingDataPerZone.containsKey("area3"));
 
 		for (String zone : resultingDataPerZone.keySet()) {
 			Object2DoubleMap<String> categories = resultingDataPerZone.get(zone);
@@ -273,60 +283,63 @@ public class LanduseBuildingAnalysisTest {
 
 			Assertions.assertEquals(categories.getDouble("Employee"), employeeSum, MatsimTestUtils.EPSILON);
 
-			if (zone.equals("testArea1_area1")) {
-				Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(3500, resultingDataPerZone.get(zone).getDouble("Employee"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(0, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-			}
-			if (zone.equals("testArea1_area2")) {
-				Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(6500, resultingDataPerZone.get(zone).getDouble("Employee"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(2000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-			}
-			if (zone.equals("testArea2_area3")) {
-				Assertions.assertEquals(800, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
-						MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(300, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
-						MatsimTestUtils.EPSILON);
-			}
+            switch (zone) {
+                case "area1" -> {
+                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(3500, resultingDataPerZone.get(zone).getDouble("Employee"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(0, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                }
+                case "area2" -> {
+                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(6500, resultingDataPerZone.get(zone).getDouble("Employee"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(2000, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                }
+                case "area3" -> {
+                    Assertions.assertEquals(800, resultingDataPerZone.get(zone).getDouble("Inhabitants"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble("Employee"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble("Employee Primary Sector"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Construction"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble("Employee Secondary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble("Employee Retail"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble("Employee Traffic/Parcels"),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(300, resultingDataPerZone.get(zone).getDouble("Employee Tertiary Sector Rest"),
+                            MatsimTestUtils.EPSILON);
+                }
+				default -> Assertions.fail("Zone not found");
+            }
 		}
 	}
 }

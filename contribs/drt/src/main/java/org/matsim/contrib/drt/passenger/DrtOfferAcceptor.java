@@ -26,9 +26,6 @@ import java.util.Optional;
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtOfferAcceptor {
-	DrtOfferAcceptor DEFAULT_ACCEPTOR = (request, departureTime, arrivalTime) -> Optional.of(
-			AcceptedDrtRequest.createFromOriginalRequest(request));
-
 	/**
 	 * @param request       drt request
 	 * @param departureTime offered departure time for the new request

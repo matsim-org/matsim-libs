@@ -66,6 +66,7 @@ jobs:
           - contribs/simwrapper
           - contribs/sbb-extensions
           - contribs/simulatedannealing
+          - contribs/small-scale-traffic-generation
           - benchmark
 
     steps:
