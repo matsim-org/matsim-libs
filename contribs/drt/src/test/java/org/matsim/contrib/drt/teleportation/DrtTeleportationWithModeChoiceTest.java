@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.DetourBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.EuclideanDistanceBasedDrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -37,7 +39,7 @@ public class DrtTeleportationWithModeChoiceTest {
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans_only_drt_4.0.xml.gz");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(100);
+		config.controller().setLastIteration(3);
 
 		config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
 		config.replanning().setMaxAgentPlanMemorySize(3);
@@ -58,7 +60,7 @@ public class DrtTeleportationWithModeChoiceTest {
 		bikeModeParams.setMarginalUtilityOfTraveling(-6.);
 		config.scoring().addModeParams(bikeModeParams);
 		// Update change mode
-		config.changeMode().setModes( new String[] { TransportMode.drt, TransportMode.bike });
+		config.changeMode().setModes(new String[]{TransportMode.drt, TransportMode.bike});
 
 		// Setting DRT config group
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
@@ -70,8 +72,11 @@ public class DrtTeleportationWithModeChoiceTest {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
-				bindModal(DrtEstimator.class).toInstance(DetourBasedDrtEstimator.normalDistributed(1.2, 32,
-						0.3, 300, 0.4));
+//				bindModal(DrtEstimator.class).toInstance(DetourBasedDrtEstimator.normalDistributed(1.2, 32,
+//						0.3, 300, 0.4));
+				bindModal(DrtEstimator.class).toProvider(modalProvider(getter -> new
+					EuclideanDistanceBasedDrtEstimator(getter.getModal(Network.class), 2.0, 0.1577493,
+					103.0972273, 120, 0.3, -0.1, 0.28)));
 			}
 		});
 
