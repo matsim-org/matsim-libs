@@ -61,7 +61,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
@@ -703,7 +702,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (int i = 0; i < numberOfJobs; i++) {
 
-			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, linksPerZone, scenario.getActivityFacilities());
+			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, linksPerZone);
 			Id<CarrierService> idNewService = Id.create(carrierName + "_" + linkId + "_" + rnd.nextInt(10000),
 				CarrierService.class);
 
@@ -835,7 +834,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Finds a possible link for a service or the vehicle location.
 	 */
 	private Id<Link> findPossibleLink(String zone, String selectedCategory, List<String> noPossibleLinks,
-									  Map<String, Map<Id<Link>, Link>> linksPerZone, ActivityFacilities activityFacilities) {
+									  Map<String, Map<Id<Link>, Link>> linksPerZone) {
 
 		Id<Link> newLink = null;
 		for (int a = 0; newLink == null && a < facilitiesPerZone.get(zone).get(selectedCategory).size() * 2; a++) {
