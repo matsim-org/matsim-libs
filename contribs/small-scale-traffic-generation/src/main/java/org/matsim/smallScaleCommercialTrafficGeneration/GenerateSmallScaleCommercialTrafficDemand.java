@@ -99,7 +99,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	// Option 3: Leerkamp (nur in RVR Modell).
 
-	// Option: Add prepare class with OSM Analyse and create facility file with results
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 
 	private enum CreationOption {
