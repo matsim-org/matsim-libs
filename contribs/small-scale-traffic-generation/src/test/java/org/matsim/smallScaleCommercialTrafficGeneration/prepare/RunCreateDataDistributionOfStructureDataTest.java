@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-class CreateDataDistributionOfStructureDataTest {
+class RunCreateDataDistributionOfStructureDataTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
