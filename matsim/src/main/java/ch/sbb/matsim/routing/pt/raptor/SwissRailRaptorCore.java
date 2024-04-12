@@ -691,7 +691,9 @@ public class SwissRailRaptorCore {
                                 currentDepartureIndex = alternativeDepartureIndex;
                                 currentVehicle = this.data.departureVehicles[currentDepartureIndex];
                                 currentDepartureTime = alternativeDepartureTime;
-                                if (!alternativeBoardingPE.isTransfer) {
+                                if (alternativeBoardingPE.isTransfer) {
+                                    firstRouteStop = this.data.routeStops[toRouteStopIndex];
+                                } else {
                                     // we improve to a line/route we entered at some earlier stop, do not create a new transfer for this,
                                     // but set the boarding info back to the original boarding of this route
                                     alternativeBoardingPE = alternativeBoardingPE.comingFrom;
@@ -702,6 +704,8 @@ public class SwissRailRaptorCore {
                                     alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
                                     alternativeWaitingCost = -marginalUtilityOfWaitingPt_utl_s * alternativeWaitingTime;
                                     alternativeTravelCostWhenBoarding = alternativeBoardingPE.arrivalTravelCost + alternativeWaitingCost;
+
+                                    firstRouteStop = alternativeBoardingPE.toRouteStop;
                                 }
                                 currentAgentBoardingTime = alternativeAgentBoardingTime;
                                 currentTravelCostWhenBoarding = alternativeTravelCostWhenBoarding;
