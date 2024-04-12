@@ -69,8 +69,6 @@ public class LanduseBuildingAnalysis {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
 		Map<String, String> zoneIdRegionConnection = new HashMap<>();
-		// aufgrund des separaten Aufbaus der Ordnerstruktur wird der Pfad angepasst
-//		Path outputFileInOutputFolder = output.resolve("calculatedData").resolve("dataDistributionPerZone.csv");
 		Path outputFileInOutputFolder = output.resolve("dataDistributionPerZone.csv");
 
 		log.info("New analyze for data distribution is started. The used method is: {}", usedLanduseConfiguration);
@@ -122,7 +120,7 @@ public class LanduseBuildingAnalysis {
 
 		Map<String, Object2DoubleOpenHashMap<String>> totalSquareMetersPerCategory = new HashMap<String, Object2DoubleOpenHashMap<String>>();
 		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<String, Object2DoubleOpenHashMap<String>>();
-		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesPerCategories = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesPerCategories = new HashMap<>();
 
 		investigationAreaData.keySet()
 				.forEach(c -> totalSquareMetersPerCategory.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
@@ -329,9 +327,6 @@ public class LanduseBuildingAnalysis {
 			if (countOSMObjects % 10000 == 0)
 				log.info("Investigate Building {} of {} buildings: {} %", countOSMObjects, buildingsFeatures.size(),
 					Math.round((double) countOSMObjects / buildingsFeatures.size() * 100));
-
-			if (singleBuildingFeature.getFeatureType().indexOf("levels") == -1)
-				throw new RuntimeException("The buildings object should contain the attribute 'levels'.");
 
 			List<String> categoriesOfBuilding = new ArrayList<String>();
 			String[] buildingTypes;
