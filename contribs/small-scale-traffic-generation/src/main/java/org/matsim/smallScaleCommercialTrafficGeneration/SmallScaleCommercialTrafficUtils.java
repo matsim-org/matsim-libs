@@ -231,7 +231,7 @@ public class SmallScaleCommercialTrafficUtils {
 			}
 
 			String key = String.format("%s_%s_%s", subpopulation, relatedCarrier.getAttributes().getAttribute("tourStartArea"),
-				relatedCarrier.getAttributes().getAttribute("purpose")); //TODO
+				relatedCarrier.getAttributes().getAttribute("purpose"));
 
 			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
 
