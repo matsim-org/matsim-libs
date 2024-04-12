@@ -21,18 +21,18 @@ The tool provides two different model types of small-scale commercial traffic. T
 - The generation model uses only open data.
   - zone shape file:
     - contains the zones for each region
-    - should contain columns: `areaID`, `region`
+    - the user can define the column of the name of the zone
   - structure data:
-    - *dataDistributionPerZone.csv*
       - contains numbers of inhabitants and employees per sector for each `region`
-      - this file should be located next to the config file
   - OSM data:
+    - Regions
+      - shape contains the regions related to the regions in the structure data
+      - the user can define the column of the name of the region
     - Landuse
-      - should contain the following columns: `fclass`
+      - the user can define the column of landuse categories
     - Buildings
-      - should contain the following columns: `type`, `levels`, `area`
-- Remarks:
-  - The zone shape file and the structure data should have the same regions.
+      - should contain the following columns: `levels`, `area`
+      - the user can define the column of the buildings categories
   
 ## Usage
 For generating the traffic, the following steps are necessary:
