@@ -526,7 +526,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 
-	/** TODO
+	/** Reads the data distribution of the zones.
 	 * @param pathToDataDistributionToZones
 	 * @return
 	 * @throws IOException
