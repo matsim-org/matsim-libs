@@ -62,8 +62,8 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 	@Test
 	void testMainRunAndResults() {
 		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
-		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
-		Path pathToExistingDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		Path pathToDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		String pathToCommercialFacilities = "commercialFacilities.xml.gz";
 		String output = utils.getOutputDirectory();
 		String sample = "0.1";
 		String jspritIterations = "2";
@@ -81,24 +81,18 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String shapeCRS = "EPSG:4326";
 		String resultPopulation = "testPopulation.xml.gz";
 
+
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 				pathToConfig,
-				"--pathToInvestigationAreaData", pathToInvestigationAreaData.toString(),
-				"--pathToExistingDataDistributionToZones", pathToExistingDataDistributionToZones.toString(),
+				"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+				"--pathToCommercialFacilities", pathToCommercialFacilities,
 				"--sample", sample,
 				"--jspritIterations", jspritIterations,
 				"--creationOption", creationOption,
-				"--landuseConfiguration", landuseConfiguration,
 				"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
 				"--includeExistingModels",
-				"--regionsShapeFileName", regionsShapeFileName,
-				"--regionsShapeRegionColumn", regionsShapeRegionColumn,
 				"--zoneShapeFileName", zoneShapeFileName,
 				"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
-				"--buildingsShapeFileName", buildingsShapeFileName,
-				"--shapeFileBuildingTypeColumn", shapeFileBuildingTypeColumn,
-				"--landuseShapeFileName", landuseShapeFileName,
-				"--shapeFileLanduseTypeColumn", shapeFileLanduseTypeColumn,
 				"--shapeCRS", shapeCRS,
 				"--nameOutputPopulation", resultPopulation,
 				"--pathOutput", output);
