@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>24.1-SNAPSHOT</version>
+		<version>2024.1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>common</artifactId>
-			<version>24.1-SNAPSHOT</version>
+			<version>2024.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

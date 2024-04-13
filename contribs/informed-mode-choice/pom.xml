@@ -9,14 +9,14 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>24.1-SNAPSHOT</version>
+		<version>2024.1-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>application</artifactId>
-			<version>24.1-SNAPSHOT</version>
+			<version>2024.1-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>xerces</groupId>

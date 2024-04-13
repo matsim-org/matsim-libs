@@ -5,7 +5,7 @@
     <groupId>org.matsim</groupId>
     <artifactId>matsim-all</artifactId>
     <packaging>pom</packaging>
-    <version>24.1-SNAPSHOT</version>
+    <version>2024.1-SNAPSHOT</version>
     <name>MATSim-All</name>
     <modules>
         <module>matsim</module>
