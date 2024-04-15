@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.common.zones.Zone;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridSystem;
-import org.matsim.contrib.common.zones.ZonalSystems;
+import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystems;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
 public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 	private final double TIME_INTERVAL = 3600.;
 	private final List<Matrix> timeDependentMatrix;
-	private final SquareGridSystem gridSystem;
+	private final SquareGridZoneSystem gridSystem;
 	private final double alpha;
 	private final Map<Zone, Node> centralNodes;
 	private final int numberOfBins;
@@ -49,8 +49,8 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 										TravelTimeMatrix freeSpeedMatrix, double alpha) {
 		this.alpha = alpha;
 		this.numberOfBins = numberOfBins(maxTime);
-		this.gridSystem = new SquareGridSystem(dvrpNetwork, params.cellSize);
-		this.centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
+		this.gridSystem = new SquareGridZoneSystem(dvrpNetwork, params.cellSize);
+		this.centralNodes = ZoneSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
 		this.timeDependentMatrix = IntStream.range(0, numberOfBins).mapToObj(i -> new Matrix(centralNodes.keySet()))
 				.toList();
 		this.params = params;
@@ -113,7 +113,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		if (sparseValue != null) {
 			return sparseValue;
 		}
-		return this.timeDependentMatrix.get(bin).get(this.gridSystem.getZoneForNodeId(fromNode), this.gridSystem.getZoneForNodeId(toNode));
+		return this.timeDependentMatrix.get(bin).get(this.gridSystem.getZoneForNodeId(fromNode).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode).orElseThrow());
 	}
 
 	int getBin(double departureTime) {
@@ -135,7 +135,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		} else {
 			double currentTravelTimeEstimate = this.getTravelTime(fromNode, toNode, departureTime);
 			double value = getUpdatedValue(currentTravelTimeEstimate, routeEstimate, this.alpha);
-			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZoneForNodeId(fromNode), this.gridSystem.getZoneForNodeId(toNode),
+			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZoneForNodeId(fromNode).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode).orElseThrow(),
 					value);
 		}
 

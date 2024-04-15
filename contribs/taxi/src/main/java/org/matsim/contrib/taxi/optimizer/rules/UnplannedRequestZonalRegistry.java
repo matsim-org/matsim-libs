@@ -31,7 +31,7 @@ import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.common.zones.ZonalSystems;
+import org.matsim.contrib.common.zones.ZoneSystems;
 
 public class UnplannedRequestZonalRegistry {
 	private final ZoneSystem zoneSystem;
@@ -42,7 +42,7 @@ public class UnplannedRequestZonalRegistry {
 
 	public UnplannedRequestZonalRegistry(ZoneSystem zoneSystem) {
 		this.zoneSystem = zoneSystem;
-		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zoneSystem.getZones());
+		zonesSortedByDistance = ZoneSystems.initZonesByDistance(zoneSystem.getZones());
 
 		for (Id<Zone> id : zoneSystem.getZones().keySet()) {
 			requestsInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
@@ -72,14 +72,14 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	public Stream<DrtRequest> findNearestRequests(Node node, int minCount) {
-		return zonesSortedByDistance.get(zoneSystem.getZoneForNodeId(node).getId())
+		return zonesSortedByDistance.get(zoneSystem.getZoneForNodeId(node).orElseThrow().getId())
 				.stream()
 				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
 				.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(DrtRequest request) {
-		return zoneSystem.getZoneForNodeId(request.getFromLink().getFromNode()).getId();
+		return zoneSystem.getZoneForNodeId(request.getFromLink().getFromNode()).orElseThrow().getId();
 	}
 
 	public int getRequestCount() {

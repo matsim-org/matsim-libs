@@ -21,6 +21,7 @@ package org.matsim.contrib.common.zones.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
@@ -52,13 +53,13 @@ public class ZoneFinderImpl implements ZoneFinder {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Zone findZone(Coord coord) {
+	public Optional<Zone> findZone(Coord coord) {
 		Point point = MGC.coord2Point(coord);
 		Envelope env = point.getEnvelopeInternal();
 
 		Zone zone = getSmallestZoneContainingPoint(quadTree.query(env), point);
 		if (zone != null) {
-			return zone;
+			return Optional.of(zone);
 		}
 
 		if (expansionDistance > 0) {
@@ -66,7 +67,7 @@ public class ZoneFinderImpl implements ZoneFinder {
 			zone = getNearestZone(quadTree.query(env), point);
 		}
 
-		return zone;
+		return Optional.ofNullable(zone);
 	}
 
 	private Zone getSmallestZoneContainingPoint(List<Zone> zones, Point point) {

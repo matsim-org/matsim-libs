@@ -33,6 +33,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.IntUnaryOperator;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +62,7 @@ public class RandomDrtZoneTargetLinkSelectorTest {
 		when(random.applyAsInt(boundCaptor.capture())).thenReturn(0, 3, 1, 2);
 
 		//test selected target links
-		RandomDrtZoneTargetLinkSelector selector = new RandomDrtZoneTargetLinkSelector(new ZoneSystemImpl(List.of(zone), coord -> zone, network), random);
+		RandomDrtZoneTargetLinkSelector selector = new RandomDrtZoneTargetLinkSelector(new ZoneSystemImpl(List.of(zone), coord -> Optional.of(zone), network), random);
 		assertThat(selector.selectTargetLink(zone)).isEqualTo(network.getLinks().get(LINK_ID_0));
 		assertThat(selector.selectTargetLink(zone)).isEqualTo(network.getLinks().get(LINK_ID_3));
 		assertThat(selector.selectTargetLink(zone)).isEqualTo(network.getLinks().get(LINK_ID_1));
