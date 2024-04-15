@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,11 +32,14 @@ import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemImpl;
-import org.matsim.contrib.common.zones.util.ZoneFinder;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.testcases.fakes.FakeLink;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -58,9 +57,9 @@ public class PreviousIterationDrtDemandEstimatorTest {
 	private final Zone zone2 = ZoneImpl.createDummyZone(Id.create("zone_2", Zone.class), new Coord());
 	private final ZoneSystem zonalSystem = new ZoneSystemImpl(List.of(zone1, zone2), coord -> {
         if(coord == link1.getToNode().getCoord()) {
-            return zone1;
+            return Optional.of(zone1);
         } else if(coord == link2.getToNode().getCoord()) {
-            return zone2;
+            return Optional.of(zone2);
         } else {
             throw new RuntimeException();
         }

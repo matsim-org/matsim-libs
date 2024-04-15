@@ -39,7 +39,7 @@ import org.matsim.contrib.taxi.optimizer.zonal.ZonalRequestInserter;
 import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridSystem;
+import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -116,7 +116,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	}
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
-		ZoneSystem zoneSystem = new SquareGridSystem(network, params.cellSize);
+		ZoneSystem zoneSystem = new SquareGridZoneSystem(network, params.cellSize);
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zoneSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zoneSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);

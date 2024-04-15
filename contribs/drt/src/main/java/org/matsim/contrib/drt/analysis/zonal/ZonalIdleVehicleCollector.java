@@ -64,10 +64,7 @@ public class ZonalIdleVehicleCollector implements TaskStartedEventHandler, TaskE
 
 	private void handleEvent(AbstractTaskEvent event, Consumer<Zone> handler) {
 		if (event.getDvrpMode().equals(dvrpMode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
-			Zone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
-			if (zone != null) {
-				handler.accept(zone);
-			}
+			zonalSystem.getZoneForLinkId(event.getLinkId()).ifPresent(handler);
 		}
 	}
 

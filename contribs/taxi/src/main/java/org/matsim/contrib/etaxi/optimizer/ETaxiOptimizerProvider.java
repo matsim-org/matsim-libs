@@ -37,7 +37,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridSystem;
+import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -100,7 +100,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	}
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
-		ZoneSystem zoneSystem = new SquareGridSystem(network, params.cellSize);
+		ZoneSystem zoneSystem = new SquareGridZoneSystem(network, params.cellSize);
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zoneSystem,
 				eScheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zoneSystem);

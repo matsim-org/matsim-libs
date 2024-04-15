@@ -27,12 +27,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 import static java.util.stream.Collectors.toMap;
 
-public class SquareGridSystem implements ZoneSystem {
+public class SquareGridZoneSystem implements ZoneSystem {
 	private final SquareGrid grid;
 	private final Map<Id<Zone>, Zone> zones;
 
@@ -40,7 +39,7 @@ public class SquareGridSystem implements ZoneSystem {
 	private final Network network;
 
 
-	public SquareGridSystem(Network network, double cellSize) {
+	public SquareGridZoneSystem(Network network, double cellSize) {
 		this.network = network;
 		this.grid = new SquareGrid(network.getNodes().values(), cellSize);
 		zones = network.getNodes().values().stream()
@@ -58,15 +57,14 @@ public class SquareGridSystem implements ZoneSystem {
 		return Collections.unmodifiableMap(zones);
 	}
 
-	@Nullable
 	@Override
-	public Zone getZoneForLinkId(Id<Link> link) {
-		return grid.getZone(network.getLinks().get(link).getToNode().getCoord());
+	public Optional<Zone> getZoneForLinkId(Id<Link> link) {
+		return Optional.ofNullable(grid.getZone(network.getLinks().get(link).getToNode().getCoord()));
 	}
 
 	@Override
-	public Zone getZoneForNodeId(Node node) {
-		return grid.getZone(node.getCoord());
+	public Optional<Zone> getZoneForNodeId(Node node) {
+		return Optional.ofNullable(grid.getZone(node.getCoord()));
 	}
 
 	@Override

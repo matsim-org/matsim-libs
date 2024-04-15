@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -97,14 +98,16 @@ public final class ZoneSystemUtils {
 	public static IdMap<Link, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder) {
 		return EntryStream.of(network.getLinks())
 			.mapValues(link -> zoneFinder.findZone(link.getToNode().getCoord()))
-			.filterValues(Objects::nonNull)
+			.filterValues(Optional::isPresent)
+			.mapValues(Optional::get)
 			.collect(IdCollectors.toIdMap(Link.class, Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public static IdMap<Node, Zone> createNodeToZoneMap(Network network, ZoneFinder zoneFinder) {
 		return EntryStream.of(network.getNodes())
 			.mapValues(node -> zoneFinder.findZone(node.getCoord()))
-			.filterValues(Objects::nonNull)
+			.filterValues(Optional::isPresent)
+			.mapValues(Optional::get)
 			.collect(IdCollectors.toIdMap(Node.class, Map.Entry::getKey, Map.Entry::getValue));
 
 	}

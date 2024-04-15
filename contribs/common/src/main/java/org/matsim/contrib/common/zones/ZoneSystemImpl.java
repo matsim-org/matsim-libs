@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.util.ZoneFinder;
 
-import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ZoneSystemImpl implements ZoneSystem {
 
@@ -32,11 +32,10 @@ public class ZoneSystemImpl implements ZoneSystem {
 		this.link2zone.putAll(linkToZoneMap);
 
 		for (Link link : network.getLinks().values()) {
-			Zone zone = zoneFinder.findZone(link.getToNode().getCoord());
-			if(zone != null) {
+			zoneFinder.findZone(link.getToNode().getCoord()).ifPresent(zone -> {
                 List<Link> links = zoneToLinksMap.computeIfAbsent(zone.getId(), zoneId1 -> new ArrayList<>());
-				links.add(link);
-			}
+                links.add(link);
+            });
 		}
 	}
 
@@ -46,14 +45,13 @@ public class ZoneSystemImpl implements ZoneSystem {
 	 * Result may be null in case the given link is outside of the service area.
 	 */
 	@Override
-	@Nullable
-	public Zone getZoneForLinkId(Id<Link> link) {
-		return link2zone.get(link);
+	public Optional<Zone> getZoneForLinkId(Id<Link> link) {
+		return Optional.ofNullable(link2zone.get(link));
 	}
 
 	@Override
-	public Zone getZoneForNodeId(Node node) {
-		return nodeToZoneMap.get(node.getId());
+	public Optional<Zone> getZoneForNodeId(Node node) {
+		return Optional.ofNullable(nodeToZoneMap.get(node.getId()));
 	}
 
 	@Override

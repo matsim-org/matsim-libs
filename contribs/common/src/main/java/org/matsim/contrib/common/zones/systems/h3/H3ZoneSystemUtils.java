@@ -17,7 +17,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,8 +41,8 @@ public class H3ZoneSystemUtils {
 
 		Set<Id<Zone>> requiredZones = network.getLinks().values().stream()
 			.map(link -> h3ZoneFinder.findZone(link.getToNode().getCoord()))
-			.filter(Objects::nonNull) // Filter out any null zones
-			.map(Identifiable::getId) // Convert Zone to Id<Zone>, adjust this line if findZone() directly returns Id<Zone>
+			.filter(Optional::isPresent) // Filter out any null zones
+			.map(op -> op.get().getId()) // Convert Zone to Id<Zone>, adjust this line if findZone() directly returns Id<Zone>
 			.collect(Collectors.toSet()); // Collect unique Ids into a Set
 
 		zones.keySet().retainAll(requiredZones);
@@ -67,10 +67,10 @@ public class H3ZoneSystemUtils {
 		}
 
 		@Override
-		public Zone findZone(Coord coord) {
+		public Optional<Zone> findZone(Coord coord) {
 			LatLng latLng = H3GridUtils.coordToLatLng(ct.transform(coord));
             Id<Zone> zoneId = ZoneSystemUtils.createZoneId(h3.latLngToCellAddress(latLng.lat, latLng.lng, resolution));
-            return zones.getOrDefault(zoneId, null);
+            return Optional.ofNullable(zones.get(zoneId));
 		}
 	}
 }
