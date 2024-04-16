@@ -19,37 +19,53 @@
 
 package org.matsim.contrib.common.zones.systems.grid;
 
+import com.google.common.base.Preconditions;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.GridZoneSystem;
 import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.toMap;
+public class SquareGridZoneSystem implements GridZoneSystem {
 
-public class SquareGridZoneSystem implements ZoneSystem {
-	private final SquareGrid grid;
-	private final Map<Id<Zone>, Zone> zones;
+	static final double EPSILON = 1;
+
+	private final double cellSize;
+
+	private double minX;
+	private double minY;
+	private double maxX;
+	private double maxY;
+
+	private final int cols;
+
+    private final Zone[] internalZones;
+
+	private final IdMap<Zone, Zone> zones = new IdMap<>(Zone.class);
 
 	private final IdMap<Zone, List<Link>> zoneToLinksMap = new IdMap<>(Zone.class);
 	private final Network network;
 
 
 	public SquareGridZoneSystem(Network network, double cellSize) {
+		Preconditions.checkArgument(!network.getNodes().isEmpty(), "Cannot create SquareGrid if no nodes");
+
 		this.network = network;
-		this.grid = new SquareGrid(network.getNodes().values(), cellSize);
-		zones = network.getNodes().values().stream()
-			.map(n -> grid.getOrCreateZone(n.getCoord()))
-			.collect(toMap(Zone::getId, z -> z, (z1, z2) -> z1));
-		for (Link link : network.getLinks().values()) {
-			Id<Zone> zoneId = grid.getZone(link.getToNode().getCoord()).getId();
-			List<Link> links = zoneToLinksMap.computeIfAbsent(zoneId, zoneId1 -> new ArrayList<>());
-			links.add(link);
-		}
+		this.cellSize = cellSize;
+
+		initBounds();
+
+        int rows = (int) Math.ceil((maxY - minY) / cellSize);
+		this.cols = (int)Math.ceil((maxX - minX) / cellSize);
+		this.internalZones = new Zone[rows * cols];
 	}
 
 	@Override
@@ -58,17 +74,72 @@ public class SquareGridZoneSystem implements ZoneSystem {
 	}
 
 	@Override
-	public Optional<Zone> getZoneForLinkId(Id<Link> link) {
-		return Optional.ofNullable(grid.getZone(network.getLinks().get(link).getToNode().getCoord()));
+	public Optional<Zone> getZoneForLinkId(Id<Link> linkId) {
+		return getZoneForNodeId(network.getLinks().get(linkId).getToNode().getId());
 	}
 
 	@Override
-	public Optional<Zone> getZoneForNodeId(Node node) {
-		return Optional.ofNullable(grid.getZone(node.getCoord()));
+	public Optional<Zone> getZoneForNodeId(Id<Node> nodeId) {
+		return Optional.of(getOrCreateZone(network.getNodes().get(nodeId).getCoord()));
+	}
+
+	@Override
+	public Optional<Zone> getZoneForCoord(Coord coord) {
+		return Optional.of(getOrCreateZone(coord));
 	}
 
 	@Override
 	public List<Link> getLinksForZoneId(Id<Zone> zone) {
 		return zoneToLinksMap.get(zone);
+	}
+
+	private Zone getOrCreateZone(Coord coord) {
+		int index = getIndex(coord);
+		Zone zone = internalZones[index];
+		if (zone == null) {
+			double x0 = minX + cellSize / 2;
+			double y0 = minY + cellSize / 2;
+			int r = bin(coord.getY(), minY);
+			int c = bin(coord.getX(), minX);
+			Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
+			zone = new ZoneImpl(Id.create(index, Zone.class), null, centroid, "square");
+			internalZones[index] = zone;
+			zones.put(zone.getId(), zone);
+
+			for (Link link : network.getLinks().values()) {
+				if(getIndex(link.getToNode().getCoord()) == index) {
+					List<Link> links = zoneToLinksMap.computeIfAbsent(zone.getId(), zoneId -> new ArrayList<>());
+					links.add(link);
+				}
+			}
+		}
+		return zone;
+	}
+
+
+	// This method's content has been copied from NetworkImpl
+	private void initBounds() {
+		double[] boundingBox = NetworkUtils.getBoundingBox(network.getNodes().values());
+
+		minX = boundingBox[0] - EPSILON;
+		minY = boundingBox[1] - EPSILON;
+		maxX = boundingBox[2] + EPSILON;
+		maxY = boundingBox[3] + EPSILON;
+		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
+	}
+
+
+	private int getIndex(Coord coord) {
+		Preconditions.checkArgument(coord.getX() >= minX, "Coord.x less than minX");
+		Preconditions.checkArgument(coord.getX() <= maxX, "Coord.x greater than maxX");
+		Preconditions.checkArgument(coord.getY() >= minY, "Coord.y less than minY");
+		Preconditions.checkArgument(coord.getY() <= maxY, "Coord.y greater than maxY");
+		int r = bin(coord.getY(), minY);
+		int c = bin(coord.getX(), minX);
+		return r * cols + c;
+	}
+
+	private int bin(double coord, double minCoord) {
+		return (int)((coord - minCoord) / cellSize);
 	}
 }

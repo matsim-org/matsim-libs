@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ZoneSystem {
 	Optional<Zone> getZoneForLinkId(Id<Link> link);
 
-	Optional<Zone> getZoneForNodeId(Node node);
+	Optional<Zone> getZoneForNodeId(Id<Node> nodeId);
 
 	List<Link> getLinksForZoneId(Id<Zone> zone);
 

@@ -18,21 +18,19 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.zone;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.matsim.contrib.common.zones.systems.grid.SquareGrid.EPSILON;
-
-import java.util.List;
+package org.matsim.contrib.common.zones.systems.grid;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneImpl;
-import org.matsim.contrib.common.zones.systems.grid.SquareGrid;
 import org.matsim.core.network.NetworkUtils;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem.EPSILON;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -40,50 +38,47 @@ import org.matsim.core.network.NetworkUtils;
 public class SquareGridTest {
 	@Test
 	void emptyNodes_fail() {
-		assertThatThrownBy(() -> new SquareGrid(List.of(), 100)).isExactlyInstanceOf(IllegalArgumentException.class)
+		assertThatThrownBy(() -> new SquareGridZoneSystem(NetworkUtils.createNetwork(), 100)).isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Cannot create SquareGrid if no nodes");
 	}
 
 	@Test
 	void outsideBoundaries_withinEpsilon_success() {
 		Node node_0_0 = node(0, 0);
-		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
-		assertThatCode(() -> grid.getZone(new Coord(-EPSILON, EPSILON))).doesNotThrowAnyException();
+		Network network = NetworkUtils.createNetwork();
+		network.addNode(node_0_0);
+		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100);
+		assertThatCode(() -> grid.getZoneForCoord(new Coord(-EPSILON, EPSILON))).doesNotThrowAnyException();
 	}
 
 	@Test
 	void outsideBoundaries_outsideEpsilon_fail() {
 		Node node_0_0 = node(0, 0);
-		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
-		assertThatThrownBy(() -> grid.getZone(new Coord(-2 * EPSILON, 0))).isExactlyInstanceOf(
+		Network network = NetworkUtils.createNetwork();
+		network.addNode(node_0_0);
+		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100);
+
+		assertThatThrownBy(() -> grid.getZoneForCoord(new Coord(-2 * EPSILON, 0))).isExactlyInstanceOf(
 				IllegalArgumentException.class);
-	}
-
-	@Test
-	void testLazyZoneCreation() {
-		Node node_0_0 = node(0, 0);
-		SquareGrid grid = new SquareGrid(List.of(node_0_0), 100);
-
-		Coord coord = new Coord(0, 0);
-		Zone zone = new ZoneImpl(Id.create(0, Zone.class), null, new Coord(49, 49), "square");
-		assertThat(grid.getZone(coord)).isNull();
-		assertThat(grid.getOrCreateZone(coord)).isEqualToComparingFieldByField(zone);
-		assertThat(grid.getZone(coord)).isEqualToComparingFieldByField(zone);
 	}
 
 	@Test
 	void testGrid() {
 		Node node_0_0 = node(0, 0);
 		Node node_150_150 = node(150, 150);
-		SquareGrid grid = new SquareGrid(List.of(node_0_0, node_150_150), 100);
+
+		Network network = NetworkUtils.createNetwork();
+		network.addNode(node_0_0);
+		network.addNode(node_150_150);
+		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100);
 
 		Coord coord0 = new Coord(100 - 2 * EPSILON, 100 - 2 * EPSILON);
 		Zone zone0 = new ZoneImpl(Id.create(0, Zone.class), null, new Coord(49, 49), "square");
-		assertThat(grid.getOrCreateZone(coord0)).isEqualToComparingFieldByField(zone0);
+		assertThat(grid.getZoneForCoord(coord0).orElseThrow()).isEqualToComparingFieldByField(zone0);
 
 		Coord coord1 = new Coord(100 - EPSILON, 100 - EPSILON);
 		Zone zone1 = new ZoneImpl(Id.create(3, Zone.class), null, new Coord(149, 149), "square");
-		assertThat(grid.getOrCreateZone(coord1)).isEqualToComparingFieldByField(zone1);
+		assertThat(grid.getZoneForCoord(coord1).orElseThrow()).isEqualToComparingFieldByField(zone1);
 	}
 
 	private Node node(double x, double y) {

@@ -37,7 +37,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 //TODO add zone indexing?
 public class ZoneSystems {
 	public static Set<Zone> filterZonesWithNodes(Collection<? extends Node> nodes, ZoneSystem zoneSystem) {
-		return nodes.stream().map(zoneSystem::getZoneForNodeId).filter(Optional::isPresent).map(Optional::get).collect(toSet());
+		return nodes.stream().map(node -> zoneSystem.getZoneForNodeId(node.getId())).filter(Optional::isPresent).map(Optional::get).collect(toSet());
 	}
 
 	public static List<Node> selectNodesWithinArea(Collection<? extends Node> nodes, List<PreparedGeometry> areaGeoms) {
@@ -49,12 +49,12 @@ public class ZoneSystems {
 
 	public static Map<Zone, Node> computeMostCentralNodes(Collection<? extends Node> nodes, ZoneSystem zoneSystem) {
 		BinaryOperator<Node> chooseMoreCentralNode = (n1, n2) -> {
-			Zone zone = zoneSystem.getZoneForNodeId(n1).orElseThrow();
+			Zone zone = zoneSystem.getZoneForNodeId(n1.getId()).orElseThrow();
 			return DistanceUtils.calculateSquaredDistance(n1, zone) <= DistanceUtils.calculateSquaredDistance(n2,
 					zone) ? n1 : n2;
 		};
 		return nodes.stream()
-				.map(n -> Pair.of(n, zoneSystem.getZoneForNodeId(n).orElseThrow()))
+				.map(n -> Pair.of(n, zoneSystem.getZoneForNodeId(n.getId()).orElseThrow()))
 				.collect(toMap(Pair::getValue, Pair::getKey, chooseMoreCentralNode));
 	}
 

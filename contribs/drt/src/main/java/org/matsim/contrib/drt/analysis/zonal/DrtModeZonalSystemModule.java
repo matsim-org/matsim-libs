@@ -22,12 +22,13 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import com.google.common.base.Preconditions;
 import one.util.streamex.EntryStream;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
-import org.matsim.contrib.common.zones.systems.h3.H3GridUtils;
-import org.matsim.contrib.common.zones.systems.h3.H3ZoneSystemUtils;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -36,6 +37,7 @@ import org.matsim.core.controler.MatsimServices;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.filterGridWithinServiceArea;
@@ -85,15 +87,17 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 					case H3:
 						Preconditions.checkNotNull(params.h3Resolution);
 						String crs = getConfig().global().getCoordinateSystem();
-						Map<String, PreparedPolygon> gridFromNetwork = H3GridUtils.createH3GridFromNetwork(network, params.h3Resolution, crs);
-						var gridZones =
-							switch (drtCfg.operationalScheme) {
-								case stopbased, door2door -> gridFromNetwork;
-								case serviceAreaBased -> filterGridWithinServiceArea(gridFromNetwork,
-									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
-										drtCfg.drtServiceAreaShapeFile)));
-							};
-						return H3ZoneSystemUtils.createFromPreparedGeometries(network, gridZones, crs, params.h3Resolution);
+
+						Predicate<Zone> zoneFilter;
+                        if(drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+							List<PreparedGeometry> serviceAreas = loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
+								drtCfg.drtServiceAreaShapeFile));
+							zoneFilter = zone -> serviceAreas.stream().anyMatch(serviceArea -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
+						} else {
+                            zoneFilter = zone -> true;
+                        }
+
+                        return new H3ZoneSystem(crs, params.h3Resolution, network, zoneFilter);
 
 					default:
 						throw new RuntimeException("Unsupported zone generation");

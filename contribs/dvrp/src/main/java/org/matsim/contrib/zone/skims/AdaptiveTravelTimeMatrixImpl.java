@@ -113,7 +113,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		if (sparseValue != null) {
 			return sparseValue;
 		}
-		return this.timeDependentMatrix.get(bin).get(this.gridSystem.getZoneForNodeId(fromNode).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode).orElseThrow());
+		return this.timeDependentMatrix.get(bin).get(this.gridSystem.getZoneForNodeId(fromNode.getId()).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode.getId()).orElseThrow());
 	}
 
 	int getBin(double departureTime) {
@@ -135,7 +135,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		} else {
 			double currentTravelTimeEstimate = this.getTravelTime(fromNode, toNode, departureTime);
 			double value = getUpdatedValue(currentTravelTimeEstimate, routeEstimate, this.alpha);
-			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZoneForNodeId(fromNode).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode).orElseThrow(),
+			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZoneForNodeId(fromNode.getId()).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode.getId()).orElseThrow(),
 					value);
 		}
 

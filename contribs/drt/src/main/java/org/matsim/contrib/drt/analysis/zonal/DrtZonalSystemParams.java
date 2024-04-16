@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import javax.annotation.Nullable;
 
-import org.matsim.contrib.common.zones.systems.h3.H3Utils;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3Utils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 

@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.util.ZoneFinder;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class ZoneSystemImpl implements ZoneSystem {
 
@@ -50,8 +49,8 @@ public class ZoneSystemImpl implements ZoneSystem {
 	}
 
 	@Override
-	public Optional<Zone> getZoneForNodeId(Node node) {
-		return Optional.ofNullable(nodeToZoneMap.get(node.getId()));
+	public Optional<Zone> getZoneForNodeId(Id<Node> nodeId) {
+		return Optional.ofNullable(nodeToZoneMap.get(nodeId));
 	}
 
 	@Override
