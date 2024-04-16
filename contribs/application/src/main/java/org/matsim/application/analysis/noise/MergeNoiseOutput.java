@@ -24,6 +24,8 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -55,8 +57,7 @@ final class MergeNoiseOutput {
 	 * @return rounded value
 	 */
 	private static double round(double value, int precision) {
-		int scale = (int) Math.pow(10, precision);
-		return (double) Math.round(value * scale) / scale;
+		return BigDecimal.valueOf(value).setScale(precision, RoundingMode.HALF_UP).doubleValue();
 	}
 
 	/**
@@ -311,4 +312,12 @@ final class MergeNoiseOutput {
 
 	}
 
+	/**
+	 * Set if the MergeNoiseOutput should create a CSV file for immissions.
+	 *
+	 * @param createCSVFileForImmissions
+	 */
+	public void setCreateCSVFileForImmissions(boolean createCSVFileForImmissions) {
+		this.createCSVFileForImmissions = createCSVFileForImmissions;
+	}
 }
