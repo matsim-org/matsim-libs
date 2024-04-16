@@ -65,7 +65,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions();
 
-	@CommandLine.Option(names = "--output", description = "Output path", required = true)
+	@CommandLine.Option(names = "--output", description = "Path of the output plans file", required = true)
 	private Path outputPath;
 
 	@CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
@@ -118,6 +118,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 		CoordinateTransformation sct = shp.createTransformation(crs.getInputCRS());
 
+		log.info("Filtering the links within the relevant area...");
 		// Identify links on the boundary
 		List<Id<Link>> linksOnTheBoundary = new ArrayList<>();
 		for (Link link : network.getLinks().values()) {
@@ -127,6 +128,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				linksOnTheBoundary.add(link.getId());
 			}
 		}
+		log.info("Finished filtering the links within the relevant area...");
 
 		CoordinateTransformation ct = crs.getTransformation();
 
@@ -140,7 +142,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 			processed += 1;
 			if (processed % 10000 == 0) {
-				log.info("Processing: {} persons have been processed", processed);
+				log.info("Processing: {} persons of {} persons have been processed", processed, originalPlans.getPersons().keySet().size());
 			}
 
 			Plan plan = person.getSelectedPlan();
