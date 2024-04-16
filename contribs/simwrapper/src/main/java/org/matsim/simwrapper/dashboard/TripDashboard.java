@@ -247,7 +247,8 @@ public class TripDashboard implements Dashboard {
 
 		if (groupedRefData != null) {
 
-			layout.row("arrivals").el(Plotly.class, (viz, data) -> {
+			// age,economic_status,dist_group,main_mode,share
+			layout.row("facets").el(Plotly.class, (viz, data) -> {
 
 				viz.title = "FACETS";
 				viz.description = "by hour and purpose";
@@ -258,10 +259,11 @@ public class TripDashboard implements Dashboard {
 					.build();
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+					viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_age.csv")).mapping()
+						.facetCol("age")
 						.name("purpose", ColorScheme.Spectral)
-						.x("h")
-						.y("arrival")
+						.x("dist_group")
+						.y("values")
 				);
 
 			});

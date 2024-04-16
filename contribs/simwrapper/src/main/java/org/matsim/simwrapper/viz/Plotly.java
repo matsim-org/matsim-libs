@@ -322,9 +322,9 @@ public final class Plotly extends Viz {
 		TEXT,
 		SIZE,
 		COLOR,
-		OPACITY
-
-		// TODO: facet col und row
+		OPACITY,
+		FACET_COL,
+		FACET_ROW,
 	}
 
 	/**
@@ -355,6 +355,8 @@ public final class Plotly extends Viz {
 		private Map<String, Object> pivot;
 		private Map<String, Object> constant;
 		private Map<String, Object> aggregate;
+		private Map<String, Object> normalize;
+		private Map<String, Object> rename;
 
 		private DataSet(String file, String name) {
 			this.file = file;
@@ -364,7 +366,9 @@ public final class Plotly extends Viz {
 		private Object toJSON() {
 			if (pivot == null &&
 				constant == null &&
-				aggregate == null)
+				aggregate == null &&
+				normalize == null &&
+				rename == null)
 				return file;
 
 			// TODO:  normalize und rename optionen
@@ -511,7 +515,21 @@ public final class Plotly extends Viz {
 			return this;
 		}
 
-		// TODO: facet col und row im trace
+		/**
+		 * Mapping for facet_col column.
+		 */
+		public DataMapping facetCol(String columnName) {
+			columns.put(ColumnType.FACET_COL, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for facet_row column.
+		 */
+		public DataMapping facetRow(String columnName) {
+			columns.put(ColumnType.FACET_ROW, columnName);
+			return this;
+		}
 
 		private void insert(Map<String, Object> obj) {
 

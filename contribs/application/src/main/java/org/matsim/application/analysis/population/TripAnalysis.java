@@ -39,7 +39,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
 	produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
-				"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv"}
+		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv", "mode_share_per_age.csv"}
 )
 public class TripAnalysis implements MATSimAppCommand {
 
