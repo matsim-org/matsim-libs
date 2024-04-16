@@ -37,16 +37,24 @@ import java.util.stream.Collectors;
 final class MergeNoiseOutput {
 
 	private static final Logger log = LogManager.getLogger(MergeNoiseOutput.class);
+
+
+	/**
+	 * If true, a CSV file is created for immissions. Deprecated, this code will be removed.
+	 */
+	private static final boolean CREATE_CSV_FILES = false;
+
 	private final String[] inputPath;
 	private final Path outputDirectory;
+	private final String crs;
 	private final String[] labels = {"immission", "emission"};
 	private final int minTime = 3600;
 	private int maxTime = 24 * 3600;
-	private boolean createCSVFileForImmissions = false;
 
-	MergeNoiseOutput(String[] inputPath, Path outputDirectory) {
+	MergeNoiseOutput(String[] inputPath, Path outputDirectory, String crs) {
 		this.inputPath = inputPath;
 		this.outputDirectory = outputDirectory;
+		this.crs = crs;
 	}
 
 	/**
@@ -89,10 +97,10 @@ final class MergeNoiseOutput {
 			// Select the correct method based on the label
 			switch (labels[i]) {
 				case "immission" -> {
-					if (createCSVFileForImmissions) {
-						mergeImmissions(inputPath[i], labels[i]);
+					if (CREATE_CSV_FILES) {
+						mergeImmissionsCSV(inputPath[i], labels[i]);
 					} else {
-						mergeImissionsAvro(inputPath[i], labels[i]);
+						mergeImissions(inputPath[i], labels[i]);
 					}
 
 				}
@@ -162,7 +170,7 @@ final class MergeNoiseOutput {
 	 * @param pathParameter path to the immissions data
 	 * @param label         label for the immissions data
 	 */
-	private void mergeImissionsAvro(String pathParameter, String label) {
+	private void mergeImissions(String pathParameter, String label) {
 
 		// data per time step, maps coord to value
 		Int2ObjectMap<Object2FloatMap<FloatFloatPair>> data = new Int2ObjectOpenHashMap<>();
@@ -200,8 +208,8 @@ final class MergeNoiseOutput {
 		XYTData xytHourData = new XYTData();
 
 		xytHourData.setTimestamps(data.keySet().intStream().boxed().toList());
-		List<Float> xCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::firstFloat)).distinct().sorted().collect(Collectors.toList());
-		List<Float> yCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::secondFloat)).distinct().sorted().collect(Collectors.toList());
+		List<Float> xCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::firstFloat)).distinct().sorted().toList();
+		List<Float> yCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::secondFloat)).distinct().sorted().toList();
 
 		xytHourData.setXCoords(xCoords);
 		xytHourData.setYCoords(yCoords);
@@ -224,9 +232,8 @@ final class MergeNoiseOutput {
 			}
 		}
 
-		// TODO: hardcoded CRSs
 		xytHourData.setData(Map.of("imissions", raw));
-		xytHourData.setCrs("EPSG:25832");
+		xytHourData.setCrs(crs);
 
 		File out = outputDirectory.getParent().resolve(label + "_per_hour.avro").toFile();
 
@@ -248,7 +255,7 @@ final class MergeNoiseOutput {
 		xytDayData.setXCoords(xCoords);
 		xytDayData.setYCoords(yCoords);
 		xytDayData.setData(Map.of("imissions", raw));
-		xytDayData.setCrs("EPSG:25832");
+		xytDayData.setCrs(crs);
 
 		File outDay = outputDirectory.getParent().resolve(label + "_per_day.avro").toFile();
 
@@ -256,7 +263,8 @@ final class MergeNoiseOutput {
 	}
 
 	// Merges the immissions data
-	private void mergeImmissions(String pathParameter, String label) {
+	@Deprecated
+	private void mergeImmissionsCSV(String pathParameter, String label) {
 		log.info("Merging immissions data for label {}", label);
 		Object2DoubleMap<Coord> mergedData = new Object2DoubleOpenHashMap<>();
 
@@ -310,14 +318,5 @@ final class MergeNoiseOutput {
 		csvOutputMerged.write().csv(outPerDay);
 		log.info("Merged noise data written to {} ", outPerDay);
 
-	}
-
-	/**
-	 * Set if the MergeNoiseOutput should create a CSV file for immissions.
-	 *
-	 * @param createCSVFileForImmissions
-	 */
-	public void setCreateCSVFileForImmissions(boolean createCSVFileForImmissions) {
-		this.createCSVFileForImmissions = createCSVFileForImmissions;
 	}
 }

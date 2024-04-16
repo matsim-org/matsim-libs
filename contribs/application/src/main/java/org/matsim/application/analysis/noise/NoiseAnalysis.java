@@ -100,7 +100,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		process.run();
 
 		final String[] paths = {outputFilePath + "/immissions/", outputFilePath + "/emissions/"};
-		MergeNoiseOutput mergeNoiseOutput = new MergeNoiseOutput(paths, Path.of(outputFilePath));
+		MergeNoiseOutput mergeNoiseOutput = new MergeNoiseOutput(paths, Path.of(outputFilePath), config.global().getCoordinateSystem());
 		mergeNoiseOutput.run();
 
 
