@@ -253,17 +253,18 @@ public class TripDashboard implements Dashboard {
 				viz.title = "FACETS";
 				viz.description = "by hour and purpose";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Hour").build())
-					.yAxis(Axis.builder().title("Share").build())
+					.xAxis(Axis.builder().title("dist_group").build())
+					.yAxis(Axis.builder().title("sim_share").build())
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
+				// TODO: Still in testing
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 					viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_age.csv")).mapping()
 						.facetCol("age")
-						.name("purpose", ColorScheme.Spectral)
+						.name("main_mode", ColorScheme.Spectral)
 						.x("dist_group")
-						.y("values")
+						.y("sim_share")
 				);
 
 			});
