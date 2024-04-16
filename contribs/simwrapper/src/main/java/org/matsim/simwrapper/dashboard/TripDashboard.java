@@ -26,7 +26,10 @@ public class TripDashboard implements Dashboard {
 	@Nullable
 	private final String modeUsersRefCsv;
 
-	private String groupedRefData;
+	@Nullable
+	private String groupedRefCsv;
+	@Nullable
+	private String[] categories;
 
 	private String[] args;
 
@@ -55,9 +58,15 @@ public class TripDashboard implements Dashboard {
 
 	/**
 	 * Set grouped reference data. Will enable additional tab with analysis for subgroups of the population.
+	 * @param groupedRefCsv resource containing the grouped reference data
+	 * @param categories    categories to show on dashboard, if empty all categories will be used
 	 */
-	public TripDashboard withGroupedRefData(String groupedRefData) {
-		this.groupedRefData = groupedRefData;
+	public TripDashboard withGroupedRefData(String groupedRefCsv, String... categories) {
+		this.groupedRefCsv = groupedRefCsv;
+		if (categories.length == 0) {
+			categories = detectCategories(groupedRefCsv);
+		}
+		this.categories = categories;
 		return this;
 	}
 
@@ -69,19 +78,24 @@ public class TripDashboard implements Dashboard {
 		return this;
 	}
 
+	private static String[] detectCategories(String groupedRefCsv) {
+		// TODO: Implement
+		return new String[0];
+	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Trips";
 		header.description = "General information about modal share and trip distributions.";
 
-		String[] args = new String[this.groupedRefData == null ? this.args.length : this.args.length + 2];
+		String[] args = new String[this.groupedRefCsv == null ? this.args.length : this.args.length + 2];
 		System.arraycopy(this.args, 0, args, 0, this.args.length);
 
 		// Add ref data to the argument if set
-		if (groupedRefData != null) {
+		if (groupedRefCsv != null) {
 			args[this.args.length] = "--input-ref-data";
-			args[this.args.length + 1] = groupedRefData;
+			args[this.args.length + 1] = groupedRefCsv;
 		}
 
 		Layout.Row first = layout.row("first");
@@ -245,7 +259,7 @@ public class TripDashboard implements Dashboard {
 
 		});
 
-		if (groupedRefData != null) {
+		if (groupedRefCsv != null) {
 
 			// age,economic_status,dist_group,main_mode,share
 			layout.row("facets").el(Plotly.class, (viz, data) -> {

@@ -1,6 +1,10 @@
 package org.matsim.application.analysis.population;
 
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Categorize values into groups.
@@ -21,6 +25,12 @@ public final class Category {
 	 */
 	private final Map<String, String> grouped;
 
+
+	/**
+	 * Regular expressions for each category.
+	 */
+	private final Map<String, Pattern> regex;
+
 	/**
 	 * Range categories.
 	 */
@@ -29,12 +39,17 @@ public final class Category {
 	public Category(Set<String> values) {
 		this.values = values;
 		this.grouped = new HashMap<>();
+		this.regex = new HashMap<>();
 		for (String v : values) {
 			if (v.contains(",")) {
 				String[] grouped = v.split(",");
 				for (String g : grouped) {
 					this.grouped.put(g, v);
 				}
+			}
+
+			if (v.startsWith("/") && v.endsWith("/")) {
+				this.regex.put(v, Pattern.compile(v.substring(1, v.length() - 1), Pattern.CASE_INSENSITIVE));
 			}
 		}
 
@@ -67,6 +82,42 @@ public final class Category {
 	}
 
 	/**
+	 * Create categories from config parameters.
+	 */
+	public static Map<String, Category> fromConfigParams(Collection<? extends ReflectiveConfigGroup> params) {
+
+		Map<String, Set<String>> categories = new HashMap<>();
+
+		// Collect all values
+		for (ReflectiveConfigGroup parameter : params) {
+			for (Map.Entry<String, String> kv : parameter.getParams().entrySet()) {
+				categories.computeIfAbsent(kv.getKey(), k -> new HashSet<>()).add(kv.getValue());
+			}
+		}
+
+		return categories.entrySet().stream()
+			.collect(HashMap::new, (m, e) -> m.put(e.getKey(), new Category(e.getValue())), HashMap::putAll);
+	}
+
+	/**
+	 * Match attributes from an object with parameters defined in config.
+	 */
+	public static boolean matchAttributesWithConfig(Attributes attr, ReflectiveConfigGroup config, Map<String, Category> categories) {
+
+		for (Map.Entry<String, String> e : config.getParams().entrySet()) {
+			// might be null if not defined
+			Object objValue = attr.getAttribute(e.getKey());
+			String category = categories.get(e.getKey()).categorize(objValue);
+
+			// compare as string
+			if (!Objects.toString(category).equals(e.getValue()))
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Categorize a single value.
 	 */
 	public String categorize(Object value) {
@@ -85,6 +136,12 @@ public final class Category {
 				return v;
 			else if (grouped.containsKey(v))
 				return grouped.get(v);
+			else {
+				for (Map.Entry<String, Pattern> kv : regex.entrySet()) {
+					if (kv.getValue().matcher(v).matches())
+						return kv.getKey();
+				}
+			}
 
 			try {
 				double d = Double.parseDouble(v);
@@ -120,14 +177,23 @@ public final class Category {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return "Category{" +
+			"values=" + values +
+			(grouped != null && !grouped.isEmpty() ? ", grouped=" + grouped : "") +
+			(regex != null && !regex.isEmpty() ? ", regex=" + regex : "") +
+			(ranges != null && !ranges.isEmpty() ? ", ranges=" + ranges : "") +
+			'}';
+	}
+
 	/**
+	 * Number range.
+	 *
 	 * @param left  Left bound of the range.
 	 * @param right Right bound of the range. (exclusive)
 	 * @param label Label of this group.
 	 */
 	private record Range(double left, double right, String label) {
-
-
 	}
-
 }
