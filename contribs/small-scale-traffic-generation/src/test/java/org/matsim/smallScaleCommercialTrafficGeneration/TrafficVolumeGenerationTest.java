@@ -35,6 +35,8 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
+import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreator;
+import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -42,8 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-
-import static org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis.createDefaultDataConnectionForOSM;
 
 /**
  * @author Ricardo Ewert
@@ -67,7 +67,8 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection);
+		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
@@ -198,7 +199,8 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection);
+		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
@@ -523,7 +525,8 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection);
+		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
 
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -697,7 +700,9 @@ public class TrafficVolumeGenerationTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection);
+		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
