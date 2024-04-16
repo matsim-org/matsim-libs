@@ -57,7 +57,6 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
 
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -68,7 +67,7 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
@@ -189,7 +188,6 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
 
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -200,7 +198,7 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
@@ -512,7 +510,6 @@ public class TrafficVolumeGenerationTest {
 
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -526,7 +523,7 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -675,7 +672,6 @@ public class TrafficVolumeGenerationTest {
 
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
@@ -701,7 +697,7 @@ public class TrafficVolumeGenerationTest {
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,

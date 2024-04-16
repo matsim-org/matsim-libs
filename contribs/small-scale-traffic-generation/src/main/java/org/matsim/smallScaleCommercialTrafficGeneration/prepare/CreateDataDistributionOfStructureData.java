@@ -71,7 +71,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data", defaultValue = "contribs/small-scale-traffic-generation/test/input/org/matsim/smallScaleCommercialTrafficGeneration/investigationAreaData.csv")
 	private Path pathToInvestigationAreaData;
 
-	private final Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+	private Map<String, List<String>> landuseCategoriesAndDataConnection;
 	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 	public CreateDataDistributionOfStructureData(LanduseDataConnectionCreator landuseDataConnectionCreator) {
@@ -115,7 +115,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		if(Files.notExists(output))
 			new File(output.toString()).mkdir();
 
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 			.createInputDataDistribution(output, landuseCategoriesAndDataConnection,

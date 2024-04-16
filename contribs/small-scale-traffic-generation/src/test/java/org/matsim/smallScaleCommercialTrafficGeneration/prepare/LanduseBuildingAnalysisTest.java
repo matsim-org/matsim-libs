@@ -45,7 +45,6 @@ public class LanduseBuildingAnalysisTest {
 
 	@Test
 	void testReadOfDataDistributionPerZoneAndBuildingAnalysis() throws IOException {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -56,7 +55,7 @@ public class LanduseBuildingAnalysisTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).getParent().resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 		// Test if the reading of the existing data distribution works correctly
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
@@ -240,7 +239,6 @@ public class LanduseBuildingAnalysisTest {
 
 	@Test
 	void testLanduseDistribution() throws IOException {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -251,7 +249,7 @@ public class LanduseBuildingAnalysisTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).getParent().resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		landuseDataConnectionCreator.createLanduseDataConnection(landuseCategoriesAndDataConnection);
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		// Analyze resultingData per zone
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis

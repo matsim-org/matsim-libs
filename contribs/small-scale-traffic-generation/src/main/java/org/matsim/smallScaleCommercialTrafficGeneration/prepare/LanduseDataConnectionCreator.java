@@ -9,5 +9,5 @@ import java.util.Map;
  * @author Ricardo Ewert
  */
 public interface LanduseDataConnectionCreator {
-	void createLanduseDataConnection(Map<String, List<String>> landuseCategoriesAndDataConnection);
+	Map<String, List<String>> createLanduseDataConnection();
 }
