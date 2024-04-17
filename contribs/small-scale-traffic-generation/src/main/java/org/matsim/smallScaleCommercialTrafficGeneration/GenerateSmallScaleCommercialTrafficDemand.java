@@ -200,6 +200,17 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 				CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+				// Remove vehicle types which are not used by the carriers
+				Map<Id<VehicleType>, VehicleType> readVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes();
+				List<Id<VehicleType>> usedCarrierVehicleTypes = CarriersUtils.getCarriers(scenario).getCarriers().values().stream()
+					.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
+					.map(vehicle -> vehicle.getType().getId())
+					.distinct()
+					.toList();
+
+				readVehicleTypes.keySet().removeIf(vehicleType -> !usedCarrierVehicleTypes.contains(vehicleType));
+
 				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
 					solveSeparatedVRPs(scenario, null);
 				}
