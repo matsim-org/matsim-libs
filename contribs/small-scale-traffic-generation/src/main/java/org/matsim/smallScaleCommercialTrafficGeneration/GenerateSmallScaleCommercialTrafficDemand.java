@@ -118,6 +118,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--pathToCommercialFacilities", description = "Path to the commercial facilities.")
 	private Path pathToCommercialFacilities;
 
+	@CommandLine.Option(names = "--carrierFilePath", description = "Path to the carrier file.")
+	private Path carrierFilePath;
+
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
 
@@ -189,6 +192,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
 				freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+				if (freightCarriersConfigGroup.getCarriersFile() == null)
+					freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
 				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
 					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
