@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Interface for creating the connection between landuse categories and the employee data.
+ * Interface for creating the connection between landuse or building categories and the required employee data categories for the simulation.
  *
  * @author Ricardo Ewert
  */
