@@ -24,7 +24,15 @@ public final class H3Utils {
 
 	private static H3Core h3;
 
-	public final static int MAX_RES = 16;
+    static {
+        try {
+            h3 = H3Core.newInstance();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public final static int MAX_RES = 16;
 
 
 	public static H3Core getInstance() {

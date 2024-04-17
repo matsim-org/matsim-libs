@@ -49,7 +49,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 										TravelTimeMatrix freeSpeedMatrix, double alpha) {
 		this.alpha = alpha;
 		this.numberOfBins = numberOfBins(maxTime);
-		this.gridSystem = new SquareGridZoneSystem(dvrpNetwork, params.cellSize);
+		this.gridSystem = new SquareGridZoneSystem(dvrpNetwork, params.cellSize, zone -> true);
 		this.centralNodes = ZoneSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
 		this.timeDependentMatrix = IntStream.range(0, numberOfBins).mapToObj(i -> new Matrix(centralNodes.keySet()))
 				.toList();

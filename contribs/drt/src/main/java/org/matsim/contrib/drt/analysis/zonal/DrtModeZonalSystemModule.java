@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
+import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -36,11 +37,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
-import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
-import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.filterGridWithinServiceArea;
 import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedGeometries;
 import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedPolygons;
 
@@ -73,15 +71,17 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 					case GridFromNetwork: {
 						Preconditions.checkNotNull(params.cellSize);
-						Map<String, PreparedPolygon> gridFromNetwork = createGridFromNetwork(network, params.cellSize);
-						var gridZones =
-							switch (drtCfg.operationalScheme) {
-								case stopbased, door2door -> gridFromNetwork;
-								case serviceAreaBased -> filterGridWithinServiceArea(gridFromNetwork,
-									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
-										drtCfg.drtServiceAreaShapeFile)));
-							};
-						return ZoneSystemUtils.createFromPreparedGeometries(network, gridZones);
+						Predicate<Zone> zoneFilter;
+						if(drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+							List<PreparedGeometry> serviceAreas = loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
+								drtCfg.drtServiceAreaShapeFile));
+							zoneFilter = zone -> serviceAreas.stream().anyMatch(serviceArea -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
+						} else {
+							zoneFilter = zone -> true;
+						}
+
+						SquareGridZoneSystem squareGridZoneSystem = new SquareGridZoneSystem(network, params.cellSize, zoneFilter);
+						return squareGridZoneSystem;
 					}
 
 					case H3:

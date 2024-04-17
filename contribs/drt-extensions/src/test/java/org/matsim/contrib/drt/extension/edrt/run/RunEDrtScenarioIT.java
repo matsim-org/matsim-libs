@@ -87,7 +87,7 @@ public class RunEDrtScenarioIT {
 
 		controller.run();
 
-		assertEquals(2011, tracker.passengerPickupEvents);
+		assertEquals(1926, tracker.passengerPickupEvents);
 	}
 
 

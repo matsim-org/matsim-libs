@@ -26,7 +26,6 @@ public class H3ZoneSystem implements GridZoneSystem {
 
 	private final TObjectLongMap<Coord> coordH3Cache = new TObjectLongHashMap<>();
 
-
 	private final CoordinateTransformation toLatLong;
 	private final CoordinateTransformation fromLatLong;
 
@@ -54,8 +53,12 @@ public class H3ZoneSystem implements GridZoneSystem {
 			return Optional.of(zones.get(zoneId));
 		} else {
 			Optional<Zone> zone = H3Utils.createZone(h3Address, fromLatLong);
-			zone.ifPresent(z -> initZone(z, h3Address));
-			return zone;
+			if(zone.isPresent() && filter.test(zone.get())) {
+				initZone(zone.get(), h3Address);
+				return zone;
+			} else {
+				return Optional.empty();
+			}
 		}
 	}
 

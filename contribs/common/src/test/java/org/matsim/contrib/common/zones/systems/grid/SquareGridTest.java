@@ -21,6 +21,10 @@
 package org.matsim.contrib.common.zones.systems.grid;
 
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -30,7 +34,6 @@ import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.core.network.NetworkUtils;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem.EPSILON;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -38,7 +41,7 @@ import static org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem.
 public class SquareGridTest {
 	@Test
 	void emptyNodes_fail() {
-		assertThatThrownBy(() -> new SquareGridZoneSystem(NetworkUtils.createNetwork(), 100)).isExactlyInstanceOf(IllegalArgumentException.class)
+		assertThatThrownBy(() -> new SquareGridZoneSystem(NetworkUtils.createNetwork(), 100, zone -> true)).isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Cannot create SquareGrid if no nodes");
 	}
 
@@ -47,8 +50,8 @@ public class SquareGridTest {
 		Node node_0_0 = node(0, 0);
 		Network network = NetworkUtils.createNetwork();
 		network.addNode(node_0_0);
-		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100);
-		assertThatCode(() -> grid.getZoneForCoord(new Coord(-EPSILON, EPSILON))).doesNotThrowAnyException();
+		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100, zone -> true);
+		assertThatCode(() -> grid.getZoneForCoord(new Coord(-0, 0))).doesNotThrowAnyException();
 	}
 
 	@Test
@@ -56,9 +59,9 @@ public class SquareGridTest {
 		Node node_0_0 = node(0, 0);
 		Network network = NetworkUtils.createNetwork();
 		network.addNode(node_0_0);
-		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100);
+		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100, zone -> true);
 
-		assertThatThrownBy(() -> grid.getZoneForCoord(new Coord(-2 * EPSILON, 0))).isExactlyInstanceOf(
+		assertThatThrownBy(() -> grid.getZoneForCoord(new Coord(-2, 0))).isExactlyInstanceOf(
 				IllegalArgumentException.class);
 	}
 
@@ -70,15 +73,36 @@ public class SquareGridTest {
 		Network network = NetworkUtils.createNetwork();
 		network.addNode(node_0_0);
 		network.addNode(node_150_150);
-		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100);
+		SquareGridZoneSystem grid = new SquareGridZoneSystem(network, 100, zone -> true);
 
-		Coord coord0 = new Coord(100 - 2 * EPSILON, 100 - 2 * EPSILON);
-		Zone zone0 = new ZoneImpl(Id.create(0, Zone.class), null, new Coord(49, 49), "square");
-		assertThat(grid.getZoneForCoord(coord0).orElseThrow()).isEqualToComparingFieldByField(zone0);
+		Coord coord0 = new Coord(100, 100);
+		CoordinateSequence coordinateSequence = getCoordinateSequence();
 
-		Coord coord1 = new Coord(100 - EPSILON, 100 - EPSILON);
-		Zone zone1 = new ZoneImpl(Id.create(3, Zone.class), null, new Coord(149, 149), "square");
-		assertThat(grid.getZoneForCoord(coord1).orElseThrow()).isEqualToComparingFieldByField(zone1);
+		PreparedPolygon polygon = new PreparedPolygon(new GeometryFactory().createPolygon(coordinateSequence));
+		Zone zone0 = new ZoneImpl(Id.create(3, Zone.class), polygon, new Coord(150, 150), "square");
+		assertThat(grid.getZoneForCoord(coord0).orElseThrow()).isEqualToComparingFieldByFieldRecursively(zone0);
+
+
+	}
+
+	private static CoordinateSequence getCoordinateSequence() {
+		CoordinateSequence coordinateSequence = new CoordinateArraySequence(5);
+
+		coordinateSequence.setOrdinate(0,0, 100);
+		coordinateSequence.setOrdinate(0,1, 100);
+
+		coordinateSequence.setOrdinate(1,0, 200);
+		coordinateSequence.setOrdinate(1,1, 100);
+
+		coordinateSequence.setOrdinate(2,0, 200);
+		coordinateSequence.setOrdinate(2,1, 200);
+
+		coordinateSequence.setOrdinate(3,0, 100);
+		coordinateSequence.setOrdinate(3,1, 200);
+
+		coordinateSequence.setOrdinate(4,0, 100);
+		coordinateSequence.setOrdinate(4,1, 100);
+		return coordinateSequence;
 	}
 
 	private Node node(double x, double y) {

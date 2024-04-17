@@ -43,7 +43,7 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
 	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads, TravelTime travelTime) {
-		zoneSystem = new SquareGridZoneSystem(dvrpNetwork, params.cellSize);
+		zoneSystem = new SquareGridZoneSystem(dvrpNetwork, params.cellSize, zone -> true);
 		var centralNodes = ZoneSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), zoneSystem);
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);

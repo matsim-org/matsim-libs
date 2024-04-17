@@ -93,8 +93,8 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(296.95)
-				.inVehicleTravelTimeMean(387.02)
+				.waitAverage(297.19)
+				.inVehicleTravelTimeMean(386.78)
 				.totalTravelTimeMean(683.97)
 				.build();
 
@@ -162,9 +162,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 			.rejectionRate(0.0)
 			.rejections(0)
-			.waitAverage(261.57)
-			.inVehicleTravelTimeMean(382.74)
-			.totalTravelTimeMean(644.32)
+			.waitAverage(269.8)
+			.inVehicleTravelTimeMean(379.69)
+			.totalTravelTimeMean(649.49)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -191,8 +191,8 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(1)
-				.waitAverage(305.97)
-				.inVehicleTravelTimeMean(378.18)
+				.waitAverage(306.21)
+				.inVehicleTravelTimeMean(377.94)
 				.totalTravelTimeMean(684.16)
 				.build();
 
@@ -270,11 +270,11 @@ public class RunDrtExampleIT {
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.03)
-				.rejections(11)
-				.waitAverage(223.86)
-				.inVehicleTravelTimeMean(389.57)
-				.totalTravelTimeMean(613.44)
+				.rejectionRate(0.02)
+				.rejections(9)
+				.waitAverage(224.56)
+				.inVehicleTravelTimeMean(392.65)
+				.totalTravelTimeMean(617.21)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -305,11 +305,11 @@ public class RunDrtExampleIT {
 		controller.run();
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.04)
-				.rejections(16)
-				.waitAverage(278.92)
-				.inVehicleTravelTimeMean(384.6)
-				.totalTravelTimeMean(663.52)
+				.rejectionRate(0.05)
+				.rejections(18)
+				.waitAverage(276.95)
+				.inVehicleTravelTimeMean(384.72)
+				.totalTravelTimeMean(661.66)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
