@@ -29,6 +29,8 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateDataDistributionOfStructureData.class);
 
+	private static LanduseDataConnectionCreator landuseDataConnectionCreator;
+
 	private enum LanduseConfiguration {
 		useOnlyOSMLanduse, useOSMBuildingsAndLanduse
 	}
@@ -69,11 +71,20 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data", defaultValue = "contribs/small-scale-traffic-generation/test/input/org/matsim/smallScaleCommercialTrafficGeneration/investigationAreaData.csv")
 	private Path pathToInvestigationAreaData;
 
-	private final Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+	private Map<String, List<String>> landuseCategoriesAndDataConnection;
 	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
+	public CreateDataDistributionOfStructureData(LanduseDataConnectionCreator landuseDataConnectionCreator) {
+		CreateDataDistributionOfStructureData.landuseDataConnectionCreator = landuseDataConnectionCreator;
+		log.info("Using LanduseDataConnectionCreator {} to connect the types of the landuse data to the categories of the small scale commercial traffic generation", landuseDataConnectionCreator.getClass().getSimpleName());
+	}
+	public CreateDataDistributionOfStructureData() {
+		landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		log.info("Using default LanduseDataConnectionCreatorForOSM_Data to connect the types of the landuse data to the categories of the small scale commercial traffic generation");
+	}
+
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new CreateDataDistributionOfStructureData()).execute(args));
+		System.exit(new CommandLine(new CreateDataDistributionOfStructureData(landuseDataConnectionCreator)).execute(args));
 	}
 
 	@Override
@@ -104,7 +115,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		if(Files.notExists(output))
 			new File(output.toString()).mkdir();
 
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection); //TODO: find way to import this connection
+		landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 			.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
