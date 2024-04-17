@@ -47,6 +47,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -78,7 +79,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
@@ -867,32 +867,27 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 																Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
 																String shapeFileZoneNameColumn) throws URISyntaxException {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
-		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
 
-		String networkPath;
-		if (scenario.getConfig().network().getInputFile().startsWith("https:"))
-			networkPath = scenario.getConfig().network().getInputFile();
-		else
-			networkPath = scenario.getConfig().getContext().toURI().resolve(scenario.getConfig().network().getInputFile()).getPath();
-
-		Network networkToChange = NetworkUtils.readNetwork(networkPath);
-		NetworkUtils.runNetworkCleaner(networkToChange);
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+		Set<String> modes = new HashSet<>();
+		modes.add("car");
+		Network filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
+		filter.filter(filteredNetwork, modes);
 
 		CoordinateTransformation ct = indexZones.getShp().createTransformation(ProjectionUtils.getCRS(scenario.getNetwork()));
-
-		links = networkToChange.getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car"))
-			.collect(Collectors.toList());
+		//TODO possible check if newCoord attribute is really needed (find better way)
+		List<Link> links = new ArrayList<>(filteredNetwork.getLinks().values());
 		links.forEach(l -> l.getAttributes().putAttribute("newCoord",
 			CoordUtils.round(ct.transform(l.getCoord()))));
 		links.forEach(l -> l.getAttributes().putAttribute("zone",
 			indexZones.query((Coord) l.getAttributes().getAttribute("newCoord"))));
-		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).collect(Collectors.toList());
+		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).toList();
 		links.forEach(l -> linksPerZone
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 			.put(l.getId(), l));
 		if (linksPerZone.size() != indexZones.size())
-			findNearestLinkForZonesWithoutLinks(networkToChange, linksPerZone, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
+			findNearestLinkForZonesWithoutLinks(filteredNetwork, linksPerZone, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
 		return linksPerZone;
 	}
@@ -909,7 +904,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (!linksPerZone.containsKey(zoneID) && facilitiesPerZone.get(zoneID) != null) {
 				for (List<ActivityFacility> buildingList : facilitiesPerZone.get(zoneID).values()) {
 					for (ActivityFacility building : buildingList) {
-						Link l = NetworkUtils.getNearestLink(networkToChange, building.getCoord());
+						Link l = NetworkUtils.getNearestLinkExactly(networkToChange, building.getCoord());
                         assert l != null;
                         linksPerZone
 							.computeIfAbsent(zoneID, (k) -> new HashMap<>())
