@@ -253,21 +253,31 @@ public class LanduseBuildingAnalysis {
 	 *
 	 * @param building      the building to be analyzed
 	 * @param buildingTypes the types of the building
-	 * @return
+	 * @return the area of the building for each category
 	 */
 	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
 		double buildingLevels;
+		double buildingLevelsPerType;
 		if (building.getAttribute("levels") == null)
 			buildingLevels = 1;
-		else
-			buildingLevels = (long) building.getAttribute("levels")
-				/ (double) buildingTypes.length;
+		else {
+			Object levelsAttribute = building.getAttribute("levels");
+			if (levelsAttribute instanceof String) {
+				buildingLevels = Double.parseDouble((String) levelsAttribute);
+			} else if (levelsAttribute instanceof Long) {
+				buildingLevels = (long) levelsAttribute;
+			} else {
+				throw new RuntimeException("The attribute 'levels' of the building shape is not a string or a long.");
+			}
+		}
+		buildingLevelsPerType = buildingLevels / (double) buildingTypes.length;
+
 		double groundArea;
 		if (building.getAttribute("area") != null)
 			groundArea = (int) (long) building.getAttribute("area");
 		else
 			groundArea = ((Geometry) building.getDefaultGeometry()).getArea();
-		double area = groundArea * buildingLevels;
+		double area = groundArea * buildingLevelsPerType;
 		return (int) Math.round(area);
 	}
 
