@@ -120,10 +120,8 @@ public class LanduseBuildingAnalysis {
 					resultingDataPerZone.get(zoneId).mergeDouble(categoryData, 0., Double::sum);
 					if (landuseCategoriesAndDataConnection.get(categoryData).contains(categoryLanduse)) {
 						double additionalArea = landuseCategoriesPerZone.get(zoneId).getDouble(categoryLanduse);
-						// because the category commercial is in two categories (traffic/parcels and
-						// Tertiary Sector Rest
-						if (categoryLanduse.equals("commercial"))
-							additionalArea = additionalArea * 0.5;
+//						// because the categoryLanduse can be in two categories (e.g., traffic/parcels and Tertiary Sector Rest
+						additionalArea = additionalArea / LanduseDataConnectionCreator.getNumberOfEmployeeCategoriesOfThisTyp(landuseCategoriesAndDataConnection, categoryLanduse);
 						resultingDataPerZone.get(zoneId).mergeDouble(categoryData, additionalArea, Double::sum);
 						totalSquareMetersPerCategory.get(regionOfZone).mergeDouble(categoryData, additionalArea,
 								Double::sum);
