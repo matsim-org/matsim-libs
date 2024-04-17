@@ -475,7 +475,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
-		assert(new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir());
+		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 		rnd = MatsimRandom.getRandom();
 		if (config.network().getInputFile() == null)
