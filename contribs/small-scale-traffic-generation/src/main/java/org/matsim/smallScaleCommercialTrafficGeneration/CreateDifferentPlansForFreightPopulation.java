@@ -38,7 +38,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	}
 
 	@Override
-	public Integer call() throws Exception {
+	public Integer call() {
 
 		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.activityOrderVariation;
 
