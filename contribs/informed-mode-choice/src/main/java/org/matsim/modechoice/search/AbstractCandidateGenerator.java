@@ -19,10 +19,10 @@ import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
 abstract class AbstractCandidateGenerator implements CandidateGenerator {
 
 	@Inject
-	protected Map<String, TripEstimator<?>> tripEstimator;
+	protected Map<String, TripEstimator> tripEstimator;
 
 	@Inject
-	protected Map<String, FixedCostsEstimator<?>> fixedCosts;
+	protected Map<String, FixedCostsEstimator> fixedCosts;
 
 	@Inject
 	protected ScoringParametersForPerson params;

@@ -32,7 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 /**
  * @author vsp-gleich
@@ -55,7 +55,7 @@ public class RoadPricingByConfigfileTest {
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, EventsUtils.compareEventsFiles( expected, actual ));
+				Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, EventsUtils.compareEventsFiles( expected, actual ));
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );

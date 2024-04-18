@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -43,6 +43,30 @@ public class ShpOptionsTest {
 	}
 
 	@Test
+	void get() {
+
+		Path input = Path.of(utils.getClassInputDirectory()
+				.replace("ShpOptionsTest", "CreateLandUseShpTest")
+				.replace("options", "prepare"))
+			.resolve("andorra-latest-free.shp.zip");
+
+		Assumptions.assumeTrue(Files.exists(input));
+
+		ShpOptions shp = new ShpOptions(input, null, null);
+
+		ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "name");
+
+		SimpleFeature result = index.queryFeature(new Coord(1.5333461, 42.555388));
+
+		assertThat(result)
+			.isNotNull();
+
+		String name = index.query(new Coord(1.5333461, 42.555388));
+		assertThat(name)
+			.isEqualTo("Museu de la Miniatura");
+	}
+
+	@Test
 	void all() {
 
 		// use same shape file as for land-use
@@ -57,11 +81,14 @@ public class ShpOptionsTest {
 
 		ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "_");
 
-		List<SimpleFeature> ft = index.getAll();
+		List<SimpleFeature> ft = index.getAllFeatures();
 
 		assertThat(ft)
 				.hasSize(4906)
 				.hasSize(Set.copyOf(ft).size());
+
+		assertThat(shp.readFeatures())
+			.hasSameElementsAs(ft);
 
 	}
 

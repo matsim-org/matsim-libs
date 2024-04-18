@@ -131,7 +131,7 @@ import com.google.inject.Injector;
 		Assertions.assertTrue(value2.get() > 0);
 	}
 
-	private class TestQSimModule extends AbstractQSimModule {
+	private static class TestQSimModule extends AbstractQSimModule {
 		private final AtomicLong value;
 
 		public TestQSimModule(AtomicLong value) {

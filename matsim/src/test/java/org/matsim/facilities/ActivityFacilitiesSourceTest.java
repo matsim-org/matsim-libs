@@ -20,7 +20,6 @@
 package org.matsim.facilities;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -44,8 +43,6 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Stream;
 
 /**

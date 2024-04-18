@@ -103,13 +103,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (StartupListener aListener : listener) {
-            log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyStartup(event);
         }
 		listener = this.listenerList.getListeners(StartupListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (StartupListener aListener : listener) {
-            log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyStartup(event);
         }
 		log.info("all ControlerStartupListeners called." );
@@ -125,14 +125,14 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
 
         for (ShutdownListener aListener : listener) {
-            log.info("calling notifyShutdown on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyShutdown on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyShutdown(event);
         }
         listener = this.listenerList.getListeners(ShutdownListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
 
         for (ShutdownListener aListener : listener) {
-            log.info("calling notifyShutdown on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyShutdown on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyShutdown(event);
         }
         log.info("all ControlerShutdownListeners called.");
@@ -147,13 +147,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (IterationStartsListener aListener : listener) {
-            log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyIterationStarts(event);
         }
 		listener = this.listenerList.getListeners(IterationStartsListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (IterationStartsListener aListener : listener) {
-            log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyIterationStarts(event);
         }
 		log.info("[it." + iteration + "] all ControlerIterationStartsListeners called.");
@@ -169,7 +169,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 			IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
 			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
 			for (IterationEndsListener aListener : listener) {
-                log.info("calling notifyIterationEnds on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+                log.info("calling notifyIterationEnds on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyIterationEnds(event);
             }
 		}
@@ -177,7 +177,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 			IterationEndsListener[] listener = this.listenerList.getListeners(IterationEndsListener.class);
 			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
             for (IterationEndsListener aListener : listener) {
-                log.info("calling notifyIterationEnds on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+                log.info("calling notifyIterationEnds on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyIterationEnds(event);
             }
 		}
@@ -194,7 +194,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 			ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
 			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
             for (ScoringListener aListener : listener) {
-                log.info("calling notifyScoring on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+                log.info("calling notifyScoring on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyScoring(event);
             }
 		}
@@ -202,7 +202,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 			ScoringListener[] listener = this.listenerList.getListeners(ScoringListener.class);
 			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
             for (ScoringListener aListener : listener) {
-                log.info("calling notifyScoring on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+                log.info("calling notifyScoring on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyScoring(event);
             }
 		}
@@ -218,13 +218,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (ReplanningListener aListener : listener) {
-            log.info("calling notifyReplanning on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyReplanning on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyReplanning(event);
         }
 		listener = this.listenerList.getListeners(ReplanningListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (ReplanningListener aListener : listener) {
-            log.info("calling notifyReplanning on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyReplanning on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyReplanning(event);
         }
 		log.info("[it." + iteration + "] all ControlerReplanningListeners called.");
@@ -239,13 +239,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (BeforeMobsimListener aListener : listener) {
-            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyBeforeMobsim(event);
         }
 		listener = this.listenerList.getListeners(BeforeMobsimListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (BeforeMobsimListener aListener : listener) {
-            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyBeforeMobsim(event);
         }
 		log.info("[it." + iteration + "] all ControlerBeforeMobsimListeners called.");
@@ -260,13 +260,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (AfterMobsimListener aListener : listener) {
-            log.info("calling notifyAfterMobsim on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyAfterMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyAfterMobsim(event);
         }
 		listener = this.listenerList.getListeners(AfterMobsimListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
         for (AfterMobsimListener aListener : listener) {
-            log.info("calling notifyAfterMobsim on " + aListener.getClass().getName() + " with priority " + + aListener.priority());
+            log.info("calling notifyAfterMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyAfterMobsim(event);
         }
 		log.info("[it." + iteration + "] all ControlerAfterMobsimListeners called.");

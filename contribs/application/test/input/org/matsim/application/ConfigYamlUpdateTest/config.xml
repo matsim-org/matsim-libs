@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="scoring">
+		<param name="fractionOfIterationsToStartScoreMSA" value="0.8"/>
+		<parameterset type="scoringParameters">
+			<param name="marginalUtilityOfMoney" value="1.0"/>
+			<param name="performing" value="6.88"/>
+
+			<parameterset type="modeParams">
+				<param name="constant" value="-0.6269580844054548"/>
+				<param name="dailyMonetaryConstant" value="-3.0"/>
+				<param name="dailyUtilityConstant" value="0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+				<param name="monetaryDistanceRate" value="-1.49E-4"/>
+				<param name="mode" value="car"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="constant" value="-1.3788242711735"/>
+				<param name="dailyMonetaryConstant" value="0.0"/>
+				<param name="dailyUtilityConstant" value="0.0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.88"/>
+				<param name="monetaryDistanceRate" value="-1.49E-4"/>
+				<param name="mode" value="ride"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="constant" value="-0.24909103628514367"/>
+				<param name="dailyMonetaryConstant" value="-3.0"/>
+				<param name="dailyUtilityConstant" value="0.0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+				<param name="monetaryDistanceRate" value="0.0"/>
+				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="constant" value="-2.2321797854695955"/>
+				<param name="dailyMonetaryConstant" value="0.0"/>
+				<param name="dailyUtilityConstant" value="0.0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+				<param name="monetaryDistanceRate" value="0.0"/>
+				<param name="mode" value="bike"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="constant" value="0.0"/>
+				<param name="dailyMonetaryConstant" value="0.0"/>
+				<param name="dailyUtilityConstant" value="0.0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+				<param name="monetaryDistanceRate" value="0.0"/>
+				<param name="mode" value="walk"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="constant" value="0.0"/>
+				<param name="dailyMonetaryConstant" value="0.0"/>
+				<param name="dailyUtilityConstant" value="0.0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+				<param name="monetaryDistanceRate" value="-4.0E-4"/>
+				<param name="mode" value="freight"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="constant" value="0.0"/>
+				<param name="dailyMonetaryConstant" value="0.0"/>
+				<param name="dailyUtilityConstant" value="0.0"/>
+				<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+				<param name="monetaryDistanceRate" value="-4.0E-4"/>
+				<param name="mode" value="truck"/>
+			</parameterset>
+		</parameterset>
+	</module>
+</config>

@@ -1,14 +1,7 @@
 package org.matsim.freightDemandGeneration;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -17,21 +10,21 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.CarrierVehicle;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freightDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * @author Ricardo Ewert
@@ -54,13 +47,13 @@ public class CarrierReaderFromCSVTest {
 		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
-		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
 		String shapeCategory = "Ortsteil";
-		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightCarriersConfigGroup, scenario, polygonsInShape, shapeCategory);
+		ShpOptions.Index indexShape = shp.createIndex(shapeCategory);
+		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightCarriersConfigGroup, scenario, indexShape, shapeCategory);
 		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightCarriersConfigGroup,
-				polygonsInShape, 1, null);
+			indexShape, 1, null);
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
 		Assertions.assertTrue(
 				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
@@ -146,9 +139,9 @@ public class CarrierReaderFromCSVTest {
 			if (!depot.equals("j(2,6)R")) {
 				Link link = network.getLinks().get(Id.createLinkId(depot));
 				Assertions.assertTrue(
-						FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, null, null));
-				Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area1"}, null));
-				Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, new String[]{"area2"}, null));
+						FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
+				Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area1"}, null));
+				Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area2"}, null));
 			}
 
 		}

@@ -588,6 +588,7 @@ public class SwissRailRaptorCore {
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
+        boolean useTransportModeUtilities = parameters.isUseTransportModeUtilities();
 
         int routeIndex = -1;
         for (int firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(0); firstRouteStopIndex >= 0; firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(firstRouteStopIndex+1)) {
@@ -627,7 +628,8 @@ public class SwissRailRaptorCore {
                 routeIndex = tmpRouteIndex;
                 int firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
 
-                double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(boardingPE.toRouteStop.mode);
+                double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(
+                		 !useTransportModeUtilities ? boardingPE.toRouteStop.mode : boardingPE.toRouteStop.route.getTransportMode());
                 transferProvider.reset(boardingPE.transfer);
 
                 for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
@@ -637,7 +639,7 @@ public class SwissRailRaptorCore {
                     int inVehicleTime = arrivalTime - currentAgentBoardingTime;
                     double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
                     double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
-                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(transferProvider, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
+                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(boardingPE,transferProvider, data.config, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
                     double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                     double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
                     if (totalArrivalCost <= previousArrivalCost) {
@@ -758,7 +760,7 @@ public class SwissRailRaptorCore {
                 transferProvider.reset(transfer);
                 int newArrivalTime = arrivalTime + transfer.transferTime;
                 double newArrivalTravelCost = arrivalTravelCost - transfer.transferTime * margUtilityTransitWalk;
-                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(transferProvider, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost, arrivalTime)) : 0;
+                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(fromPE, transferProvider, data.config, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost, arrivalTime)) : 0;
                 double newTotalArrivalCost = newArrivalTravelCost + newArrivalTransferCost;
                 double prevLeastArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                 if (newTotalArrivalCost < prevLeastArrivalCost || (!strict && newTotalArrivalCost <= prevLeastArrivalCost)) {
@@ -882,7 +884,7 @@ public class SwissRailRaptorCore {
         return initialStop != null && initialStop.planElements != null;
     }
 
-    private static class PathElement {
+    static class PathElement {
         final PathElement comingFrom;
         final RRouteStop toRouteStop;
         final int firstDepartureTime; // the departure time at the start stop

@@ -70,6 +70,10 @@ public final class RaptorUtils {
                 staticConfig.addModeMappingForPassengers(mapping.getRouteMode(), mapping.getPassengerMode());
             }
         }
+
+		for (SwissRailRaptorConfigGroup.ModeToModeTransferPenalty penalty : srrConfig.getModeToModeTransferPenaltyParameterSets()){
+			staticConfig.addModeToModeTransferPenalty(penalty.fromMode,penalty.toMode,penalty.transferPenalty);
+		}
         staticConfig.setUseCapacityConstraints(srrConfig.isUseCapacityConstraints());
 
         return staticConfig;

@@ -83,8 +83,13 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 			PlanCandidate c = chooseCandidate(model, null);
 
-			if (c != null)
+			if (c != null) {
+				if (pruner != null) {
+					pruner.onSelectCandidate(model, c);
+				}
+
 				c.applyTo(plan);
+			}
 		}
 
 
@@ -141,7 +146,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			// Set one trip to be modifiable
 			mask[idx] = true;
 
-			Collection<PlanCandidate> candidates = generator.generate(model, modes, mask);
+			List<PlanCandidate> candidates = generator.generate(model, modes, mask);
 
 			// Remove based on threshold
 			if (pruner != null) {
@@ -153,6 +158,8 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 					double threshold = max.getAsDouble() - t;
 					candidates.removeIf(c -> c.getUtility() < threshold);
 				}
+
+				pruner.pruneCandidates(model, candidates, rnd);
 			}
 
 			// Remove options that are the same as the current mode

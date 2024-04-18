@@ -81,13 +81,13 @@ public class IterationTravelStatsControlerListenerTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));;
+		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		person1.addPlan(plan1);
-		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));;
+		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
 		person2.addPlan(plan2);
-		Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));;
+		Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
 		person3.addPlan(plan3);
-		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));;
+		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));
 		person4.addPlan(plan4);
 
 		scenario.getPopulation().addPerson(person1);

@@ -35,14 +35,12 @@ import java.util.List;
 /**
  * Removes all transit activities (like "pt -interaction") as well as the legs
  * following those activities. In addition, all legs with mode "transit_walk"
- * are set to mode "pt" to be routed again with the transit. 
- * 
+ * are set to mode "pt" to be routed again with the transit.
+ *
  * @see PtConstants#TRANSIT_ACTIVITY_TYPE
- * 
+ *
  * @author mrieser
- */
-
-/**
+ *
  * @deprecated -- use {@link org.matsim.core.population.algorithms.TripsToLegsAlgorithm} instead to circumvene problems with different types of access /
  * egress legs and stage activities.
  */

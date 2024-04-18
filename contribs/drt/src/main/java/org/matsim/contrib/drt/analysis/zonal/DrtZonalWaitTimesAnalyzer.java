@@ -20,18 +20,6 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +28,10 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -49,21 +40,27 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
 
 public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, ShutdownListener {
 
 	private final DrtConfigGroup drtCfg;
 	private final DrtEventSequenceCollector requestAnalyzer;
-	private final DrtZonalSystem zones;
-	private static final String zoneIdForOutsideOfZonalSystem = "outsideOfDrtZonalSystem";
+	private final ZoneSystem zones;
+	private static final Id<Zone> zoneIdForOutsideOfZonalSystem = Id.create("outsideOfDrtZonalSystem", Zone.class);
 	private static final String notAvailableString = "NaN";
 	private static final Logger log = LogManager.getLogger(DrtZonalWaitTimesAnalyzer.class);
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtEventSequenceCollector requestAnalyzer,
-			DrtZonalSystem zones) {
+			ZoneSystem zones) {
 		this.drtCfg = configGroup;
 		this.requestAnalyzer = requestAnalyzer;
 		this.zones = zones;
@@ -79,7 +76,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 
 	public void write(String fileName) {
 		String delimiter = ";";
-		Map<String, DescriptiveStatistics> zoneStats = createZonalStats();
+		Map<Id<Zone>, DescriptiveStatistics> zoneStats = createZonalStats();
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
 			DecimalFormat format = new DecimalFormat();
@@ -89,16 +86,16 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 			format.setGroupingUsed(false);
 			bw.append("zone;centerX;centerY;nRequests;sumWaitTime;meanWaitTime;min;max;p95;p90;p80;p75;p50");
 			// sorted output
-			SortedSet<String> zoneIdsAndOutside = new TreeSet<>(zones.getZones().keySet());
+			SortedSet<Id<Zone>> zoneIdsAndOutside = new TreeSet<>(zones.getZones().keySet());
 			zoneIdsAndOutside.add(zoneIdForOutsideOfZonalSystem);
 
-			for (String zoneId : zoneIdsAndOutside) {
-				DrtZone drtZone = zones.getZones().get(zoneId);
+			for (Id<Zone> zoneId : zoneIdsAndOutside) {
+				Zone drtZone = zones.getZones().get(zoneId);
 				String centerX = drtZone != null ? String.valueOf(drtZone.getCentroid().getX()) : notAvailableString;
 				String centerY = drtZone != null ? String.valueOf(drtZone.getCentroid().getY()) : notAvailableString;
 				DescriptiveStatistics stats = zoneStats.get(zoneId);
 				bw.newLine();
-				bw.append(zoneId)
+				bw.append(zoneId.toString())
 						.append(delimiter)
 						.append(centerX)
 						.append(delimiter)
@@ -131,10 +128,10 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		}
 	}
 
-	private Map<String, DescriptiveStatistics> createZonalStats() {
-		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
+	private Map<Id<Zone>, DescriptiveStatistics> createZonalStats() {
+		Map<Id<Zone>, DescriptiveStatistics> zoneStats = new IdMap<>(Zone.class);
 		// prepare stats for all zones
-		for (String zoneId : zones.getZones().keySet()) {
+		for (Id<Zone> zoneId : zones.getZones().keySet()) {
 			zoneStats.put(zoneId, new DescriptiveStatistics());
 		}
 		zoneStats.put(zoneIdForOutsideOfZonalSystem, new DescriptiveStatistics());
@@ -142,8 +139,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		for (EventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
 			for (Map.Entry<Id<Person>, EventSequence.PersonEvents> entry : seq.getPersonEvents().entrySet()) {
 				if(entry.getValue().getPickedUp().isPresent()) {
-					DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
-					final String zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
+					Zone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+					final Id<Zone> zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
 					double waitTime = entry.getValue().getPickedUp().get() .getTime() - seq.getSubmitted().getTime();
 					zoneStats.get(zoneStr).addValue(waitTime);
 				}
@@ -159,10 +156,12 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	public void notifyShutdown(ShutdownEvent event) {
 		String crs = event.getServices().getConfig().global().getCoordinateSystem();
 		Collection<SimpleFeature> features = convertGeometriesToSimpleFeatures(crs);
-		String fileName = event.getServices()
+		if(!features.isEmpty()) {
+			String fileName = event.getServices()
 				.getControlerIO()
-				.getOutputFilename("drt_waitStats" + "_" + drtCfg.getMode() + "_zonal.shp");
-		ShapeFileWriter.writeGeometries(features, fileName);
+				.getOutputFilename("drt_waitStats" + "_" + drtCfg.getMode() + "_zonal.gpkg");
+			GeoFileWriter.writeGeometries(features, fileName);
+		}
 	}
 
 	private Collection<SimpleFeature> convertGeometriesToSimpleFeatures(String targetCoordinateSystem) {
@@ -172,9 +171,10 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		} catch (IllegalArgumentException e) {
 			log.warn("Coordinate reference system \""
 					+ targetCoordinateSystem
-					+ "\" is unknown. Please set a crs in config global. Will try to create drt_waitStats_"
+					+ "\" is unknown. Please set a crs in config global. Will not create drt_waitStats_"
 					+ drtCfg.getMode()
-					+ "_zonal.shp anyway.");
+					+ "_zonal.gpkg.");
+			return Collections.emptyList();
 		}
 
 		simpleFeatureBuilder.setName("drtZoneFeature");
@@ -197,9 +197,9 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 
 		Collection<SimpleFeature> features = new ArrayList<>();
 
-		Map<String, DescriptiveStatistics> zoneStats = createZonalStats();
+		Map<Id<Zone>, DescriptiveStatistics> zoneStats = createZonalStats();
 
-		for (DrtZone zone : zones.getZones().values()) {
+		for (Zone zone : zones.getZones().values()) {
 			Object[] routeFeatureAttributes = new Object[14];
 			Geometry geometry = zone.getPreparedGeometry() != null ? zone.getPreparedGeometry().getGeometry() : null;
 			DescriptiveStatistics stats = zoneStats.get(zone.getId());
@@ -219,7 +219,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 			routeFeatureAttributes[13] = stats.getPercentile(50);
 
 			try {
-				features.add(builder.buildFeature(zone.getId(), routeFeatureAttributes));
+				features.add(builder.buildFeature(zone.getId().toString(), routeFeatureAttributes));
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}

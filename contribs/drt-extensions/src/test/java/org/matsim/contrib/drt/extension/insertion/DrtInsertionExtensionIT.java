@@ -283,7 +283,7 @@ public class DrtInsertionExtensionIT {
 		}
 
 		assertEquals(1470, distanceCalculator.calculatedDistances);
-		assertEquals(5288, distanceApproximator.calculatedDistances);
+		assertEquals(5280, distanceApproximator.calculatedDistances);
 	}
 
 	@Test
@@ -319,7 +319,7 @@ public class DrtInsertionExtensionIT {
 		}
 
 		assertEquals(1470, distanceCalculator.calculatedDistances);
-		assertEquals(5288, distanceApproximator.calculatedDistances);
+		assertEquals(5280, distanceApproximator.calculatedDistances);
 	}
 
 	static class CustomDistanceCalculator extends CustomCalculator {
@@ -464,9 +464,9 @@ public class DrtInsertionExtensionIT {
 		controller.run();
 
 		assertEquals(22, handler.rejectedRequests);
-		assertEquals(2066658.0, handler.fleetDistance, 1e-3);
-		assertEquals(694149.0, handler.activeTime(), 1e-3);
-		assertEquals(280.61475, handler.meanWaitTime(), 1e-3);
+		assertEquals(2070663.0, handler.fleetDistance, 1e-3);
+		assertEquals(699076.0, handler.activeTime(), 1e-3);
+		assertEquals(279.37704, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test

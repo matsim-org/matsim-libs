@@ -46,6 +46,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [shared_mobility](shared_mobility/README.md)                             | Simulate human-driven shared mobility (i.e., micromobility)
 | [signals](signals/README.md)                                             | Simulate traffic lights microscopically
 | [simwrapper](simwrapper/README.md)                                       | Creates dashboards automatically with [SimWrapper](https://simwrapper.github.io/)
+| [small-scale-traffic-generation](small-scale-traffic-generation/README.md)       | Tool to generate small-scale commercial traffic
 | [socnetsim](socnetsim/README.md)                                         | Social network simulation
 | [sumo](sumo/README.md)                                                   | Converter and integrations for [SUMO](https://sumo.dlr.de/])
 | [taxi](taxi/README.md)                                                   | Taxi service functionality

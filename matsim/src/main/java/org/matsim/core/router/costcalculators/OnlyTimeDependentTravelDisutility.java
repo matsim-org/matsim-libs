@@ -27,18 +27,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
  *  A Travel Cost Calculator that uses the travel times as travel disutility.
- *  
+ *
  * @author cdobler
  */
 public class OnlyTimeDependentTravelDisutility implements TravelDisutility {
 
 	private static final Logger log = LogManager.getLogger(OnlyTimeDependentTravelDisutility.class);
-	
+
 	protected final TravelTime travelTime;
 
 	public OnlyTimeDependentTravelDisutility(final TravelTime travelTime) {
@@ -49,7 +48,7 @@ public class OnlyTimeDependentTravelDisutility implements TravelDisutility {
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {		
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		return this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 	}
 

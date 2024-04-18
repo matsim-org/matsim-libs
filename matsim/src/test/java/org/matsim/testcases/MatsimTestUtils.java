@@ -32,6 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,8 +42,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Some helper methods for writing JUnit 5 tests in MATSim.
@@ -318,7 +317,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	}
 
   public static void assertEqualEventsFiles( String filename1, String filename2 ) {
-		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
 	}
 
   public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {

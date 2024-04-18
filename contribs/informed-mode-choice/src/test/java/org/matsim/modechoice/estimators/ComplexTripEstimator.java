@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Complex estimator, using MATSim infrastructure
  */
-public final class ComplexTripEstimator implements TripEstimator<ModeAvailability>, LinkEnterEventHandler, IterationEndsListener {
+public final class ComplexTripEstimator implements TripEstimator, LinkEnterEventHandler, IterationEndsListener {
 
 	private int iters = 0;
 	private int events = 0;

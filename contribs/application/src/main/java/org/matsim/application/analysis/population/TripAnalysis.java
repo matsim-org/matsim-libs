@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
@@ -26,11 +27,12 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
 import tech.tablesaw.selection.Selection;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
@@ -93,7 +95,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
 			.sample(false)
-			.separator(';').build());
+			.separator(new CsvOptions().detectDelimiter(input.getPath("persons.csv"))).build());
 
 		int total = persons.rowCount();
 
@@ -134,10 +136,9 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
 			.sample(false)
-			.separator(';').build());
+			.separator(CsvOptions.detectDelimiter(input.getPath("trips.csv"))).build());
 
-
-		// Trip filter with start and end
+		// Trip filter with start AND end
 		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
 			Geometry geometry = shp.getGeometry();
 			GeometryFactory f = new GeometryFactory();
@@ -148,6 +149,22 @@ public class TripAnalysis implements MATSimAppCommand {
 				Point start = f.createPoint(new Coordinate(row.getDouble("start_x"), row.getDouble("start_y")));
 				Point end = f.createPoint(new Coordinate(row.getDouble("end_x"), row.getDouble("end_y")));
 				if (geometry.contains(start) && geometry.contains(end)) {
+					idx.add(i);
+				}
+			}
+
+			trips = trips.where(Selection.with(idx.toIntArray()));
+//		trip filter with start OR end
+		} else if (shp.isDefined() && filter == LocationFilter.trip_start_or_end) {
+			Geometry geometry = shp.getGeometry();
+			GeometryFactory f = new GeometryFactory();
+			IntList idx = new IntArrayList();
+
+			for (int i = 0; i < trips.rowCount(); i++) {
+				Row row = trips.row(i);
+				Point start = f.createPoint(new Coordinate(row.getDouble("start_x"), row.getDouble("start_y")));
+				Point end = f.createPoint(new Coordinate(row.getDouble("end_x"), row.getDouble("end_y")));
+				if (geometry.contains(start) || geometry.contains(end)) {
 					idx.add(i);
 				}
 			}
@@ -403,6 +420,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	 */
 	enum LocationFilter {
 		trip_start_and_end,
+		trip_start_or_end,
 		home,
 		none
 	}

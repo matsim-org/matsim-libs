@@ -132,7 +132,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 	 * <p> o-----o------o
 	 *
 	 */
-	private class PseudoInputs {
+	private static class PseudoInputs {
 
 		Scenario scenario;
 		Config config;

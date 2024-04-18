@@ -38,7 +38,8 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	}
 
 	/**
-	 * Get mode for trip i.
+	 * Get mode for trip i. Indexing starts at 0.
+	 * @see #size()
 	 */
 	public String getMode(int i) {
 		return modes[i];
@@ -49,6 +50,25 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public String[] getModes() {
 		return Arrays.copyOf(modes, modes.length);
+	}
+
+	/**
+	 * Check whether a certain mode is present at least once.
+	 */
+	public boolean containsMode(String mode) {
+		for (String m : modes) {
+			if (mode.equals(m)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Number of trips.
+	 */
+	public int size() {
+		return modes.length;
 	}
 
 	/**

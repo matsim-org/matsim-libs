@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -41,10 +40,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.utils.misc.Time;
@@ -91,7 +88,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	private double infoTime = 0;
 	private List<A> engines;
 	private InternalInterface internalInterface = null;
-	
+
 	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
 		this.qsim = sim;
 
@@ -106,17 +103,17 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		case wait:
 			break;
 		default:
-			throw new RuntimeException("Unknown vehicle behavior option.");			
+			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
-		
+
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
 			if(qSimConfigGroup.isSeepModeStorageFree()) {
 				log.warn("Seep mode(s) " + qSimConfigGroup.getSeepModes() + " does not take storage space thus only considered for flow capacities.");
 			}
 		}
-		
+
 		if (netsimNetworkFactory != null){
 			qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 		} else {
@@ -133,7 +130,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}
-	
+
 	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch(snapshotStyle) {
@@ -157,23 +154,23 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	@Override
 	public final void onPrepareSim() {
-		this.infoTime = 
-				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
+		this.infoTime =
+				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
 		/*
 		 * infoTime may be < simStartTime, this ensures to print out the
-		 * info at the very first timestep already 
+		 * info at the very first timestep already
 		 */
 
 		this.engines = initQSimEngineRunners();
 		assignNetElementActivators();
 		initMultiThreading();
 	}
-	
-	/** 
+
+	/**
 	 * do everything necessary to start the threads for {@link AbstractQNetsimEngineRunner}
 	 */
 	protected abstract void initMultiThreading();
-	
+
 
 	@Override
 	public final void afterSim() {
@@ -198,26 +195,26 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		}
 	}
 
-	/** 
+	/**
 	 * do everything to finish multithreading {@link #afterSim()}, e.g. shut down a threadpool
 	 */
 	protected abstract void finishMultiThreading();
 
 	/**
-	 * called during {@link #doSimStep(double)}. Should perform the 
-	 * simstep-logic in {@link AbstractQNetsimEngineRunner} provided by {@link #getQnetsimEngineRunner()} 
-	 * 
+	 * called during {@link #doSimStep(double)}. Should perform the
+	 * simstep-logic in {@link AbstractQNetsimEngineRunner} provided by {@link #getQnetsimEngineRunner()}
+	 *
 	 * @param time
 	 */
-	protected abstract void run(double time); 
+	protected abstract void run(double time);
 
 	/**
 	 * create all necessary {@link AbstractQNetsimEngineRunner}. Will be called during {@link #onPrepareSim()}.
-	 * 
+	 *
 	 * @return the list of {@link AbstractQNetsimEngineRunner}
 	 */
 	protected abstract List<A> initQSimEngineRunners() ;
-	
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -225,11 +222,11 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	@Override
 	public final void doSimStep(final double time) {
 		run(time);
-		
+
 		this.printSimLog(time);
 	}
 
-	
+
 	@Override
 	public final void setInternalInterface( InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
@@ -288,7 +285,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	}
 
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-		Id<Link> linkId = planAgent.getCurrentLinkId(); 
+		Id<Link> linkId = planAgent.getCurrentLinkId();
 		if (linkId != null) { // may be bushwacking
 			QLinkI qLink = this.qNetwork.getNetsimLink(linkId );
 			if ( qLink==null ) {
@@ -308,7 +305,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	public final void printEngineRunTimes() {
 		if (!QSim.analyzeRunTimes) return;
-		
+
 		if (printRunTimesPerTimeStep) log.info("detailed QNetsimEngineRunner run times per time step:");
 		{
 			StringBuffer sb = new StringBuffer();
@@ -412,7 +409,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 				 * step, the link should be activated.
 				 */
 				// this set is always empty...
-//				if (linksToActivateInitially.remove(qLink) 
+//				if (linksToActivateInitially.remove(qLink)
 //						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
 //					this.engines.get(i).registerLinkAsActive(qLink);
 //				}
@@ -435,7 +432,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	private final void arrangeNextAgentState(MobsimAgent pp) {
 		internalInterface.arrangeNextAgentState(pp);
 	}
-	
+
 	/**
 	 * @return the {@link AbstractQNetsimEngineRunner} created by {@link #initQSimEngineRunners()}
 	 */

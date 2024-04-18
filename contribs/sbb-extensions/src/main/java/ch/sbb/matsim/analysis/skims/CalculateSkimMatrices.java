@@ -70,7 +70,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.StringUtils;
@@ -233,7 +233,7 @@ public class CalculateSkimMatrices {
 
     public final void selectSamplingPoints(List<WeightedCoord> locations, int numberOfPointsPerZone, String zonesShapeFilename, String zonesIdAttributeName, Random r) throws IOException {
         log.info("loading zones from " + zonesShapeFilename);
-        Collection<SimpleFeature> zones = new ShapeFileReader().readFileAndInitialize(zonesShapeFilename);
+        Collection<SimpleFeature> zones = new GeoFileReader().readFileAndInitialize(zonesShapeFilename);
         SpatialIndex zonesQt = new Quadtree();
         for (SimpleFeature zone : zones) {
             Envelope envelope = ((Geometry) (zone.getDefaultGeometry())).getEnvelopeInternal();
@@ -321,7 +321,7 @@ public class CalculateSkimMatrices {
                 int idx = Integer.parseInt(parts[1]);
                 double x = Double.parseDouble(parts[2]);
                 double y = Double.parseDouble(parts[3]);
-                final int length = idx > maxIdx ? idx : maxIdx;
+                final int length = Math.max(idx, maxIdx);
                 Coord[] coords = this.coordsPerZone.computeIfAbsent(zoneId, k -> new Coord[length + 1]);
                 if (coords.length < (idx + 1)) {
                     Coord[] tmp = new Coord[idx + 1];
@@ -453,10 +453,25 @@ public class CalculateSkimMatrices {
                                                   double endTime,
                                                   Config config,
                                                   String outputPrefix,
-            BiPredicate<TransitLine, TransitRoute> trainDetector) throws IOException {
+												  BiPredicate<TransitLine, TransitRoute> trainDetector,
+												  PTSkimMatrices.CoordAggregator coordAggregator) throws IOException {
 
         var matrices = calculatePTMatrices(networkFilename,
-                transitScheduleFilename, startTime, endTime, config, trainDetector);
+                transitScheduleFilename, startTime, endTime, config, trainDetector, coordAggregator);
+        writePTMatricesAsCSV(matrices, outputPrefix);
+    }
+	public final void calculateAndWritePTMatrices(String networkFilename,
+                                                  String transitScheduleFilename,
+                                                  double startTime,
+                                                  double endTime,
+                                                  Config config,
+                                                  String outputPrefix,
+												  BiPredicate<TransitLine, TransitRoute> trainDetector
+												  ) throws IOException {
+
+        var matrices = calculatePTMatrices(networkFilename,
+			transitScheduleFilename, startTime, endTime, config, trainDetector, new PTSkimMatrices.CoordAggregator() {
+			});
         writePTMatricesAsCSV(matrices, outputPrefix);
     }
 
@@ -476,11 +491,12 @@ public class CalculateSkimMatrices {
     }
 
     public final PTSkimMatrices.PtIndicators<String> calculatePTMatrices(String networkFilename,
-                                                                         String transitScheduleFilename,
-                                                                         double startTime,
-                                                                         double endTime,
-                                                                         Config config,
-            BiPredicate<TransitLine, TransitRoute> trainDetector) {
+																		 String transitScheduleFilename,
+																		 double startTime,
+																		 double endTime,
+																		 Config config,
+																		 BiPredicate<TransitLine, TransitRoute> trainDetector,
+																		 PTSkimMatrices.CoordAggregator coordAggregator) {
         Scenario scenario = ScenarioUtils.createScenario(config);
         log.info("loading schedule from " + transitScheduleFilename);
         new TransitScheduleReader(scenario).readFile(transitScheduleFilename);
@@ -494,7 +510,7 @@ public class CalculateSkimMatrices {
 
         log.info("calc PT matrices for " + Time.writeTime(startTime) + " - " + Time.writeTime(endTime));
         PTSkimMatrices.PtIndicators<String> matrices = PTSkimMatrices.calculateSkimMatrices(
-                raptorData, this.coordsPerZone, startTime, endTime, 120, raptorParameters, this.numberOfThreads, trainDetector);
+			raptorData, this.coordsPerZone, startTime, endTime, 120, raptorParameters, this.numberOfThreads, trainDetector, coordAggregator);
         return matrices;
 
     }
@@ -511,15 +527,6 @@ public class CalculateSkimMatrices {
         return null;
     }
 
-    private static class WeightedCoord {
-
-        Coord coord;
-        double weight;
-
-        private WeightedCoord(Coord coord, double weight) {
-            this.coord = coord;
-            this.weight = weight;
-        }
-    }
+	public record WeightedCoord(Coord coord, double weight){}
 
 }

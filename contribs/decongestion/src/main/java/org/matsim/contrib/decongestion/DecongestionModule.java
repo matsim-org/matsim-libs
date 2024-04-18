@@ -19,12 +19,15 @@
 
 package org.matsim.contrib.decongestion;
 
-import org.matsim.api.core.v01.Scenario;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTollingAll;
 import org.matsim.contrib.decongestion.handler.PersonVehicleTracker;
+import org.matsim.contrib.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingBangBang;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingPID;
@@ -37,51 +40,46 @@ import org.matsim.core.controler.AbstractModule;
 
 public class DecongestionModule extends AbstractModule {
 
-	private final DecongestionConfigGroup decongestionConfigGroup;
-	
-	public DecongestionModule(Scenario scenario) {
-		this.decongestionConfigGroup = (DecongestionConfigGroup) scenario.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
-	}
+	@Inject private DecongestionConfigGroup decongestionConfigGroup;
 
 	@Override
 	public void install() {
 		
 		if (decongestionConfigGroup.isEnableDecongestionPricing()) {
-			switch( decongestionConfigGroup.getDecongestionApproach() ) {
-				case BangBang:
-					this.bind(DecongestionTollingBangBang.class).asEagerSingleton();
-					this.bind(DecongestionTollSetting.class).to(DecongestionTollingBangBang.class);
-					break;
-				case PID:
-					this.bind(DecongestionTollingPID.class).asEagerSingleton();
-					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-					this.addEventHandlerBinding().to(DecongestionTollingPID.class);
-					break;
-				case P_MC:
-					this.bind(DecongestionTollingP_MCP.class).asEagerSingleton();
-					this.bind(DecongestionTollSetting.class).to(DecongestionTollingP_MCP.class);
-					this.addEventHandlerBinding().to(DecongestionTollingP_MCP.class);
-					break;
-				default:
-					throw new RuntimeException("not implemented") ;
+			switch( decongestionConfigGroup.getDecongestionApproach() ){
+				case BangBang -> {
+					this.bind( DecongestionTollingBangBang.class ).in( Singleton.class );
+					this.bind( DecongestionTollSetting.class ).to( DecongestionTollingBangBang.class );
+				}
+				case PID -> {
+					this.bind( DecongestionTollingPID.class ).in( Singleton.class );
+					this.bind( DecongestionTollSetting.class ).to( DecongestionTollingPID.class );
+					this.addEventHandlerBinding().to( DecongestionTollingPID.class );
+				}
+				case P_MC -> {
+					this.bind( DecongestionTollingP_MCP.class ).in( Singleton.class );
+					this.bind( DecongestionTollSetting.class ).to( DecongestionTollingP_MCP.class );
+					this.addEventHandlerBinding().to( DecongestionTollingP_MCP.class );
+				}
+				default -> throw new RuntimeException( "not implemented" );
 			}
 			
 		} else {
 			// no pricing
 			
 		}
-		this.bind(DecongestionInfo.class).asEagerSingleton();
+		addTravelDisutilityFactoryBinding( TransportMode.car ).to( TollTimeDistanceTravelDisutilityFactory.class );
+
+		this.bind(DecongestionInfo.class).in( Singleton.class );
 		
-		this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
-		this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
-		this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+		this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class).in( Singleton.class );
+		this.addEventHandlerBinding().to(IntervalBasedTolling.class);
 		
-		this.bind(DelayAnalysis.class).asEagerSingleton();
-		this.addEventHandlerBinding().to(DelayAnalysis.class);
+		this.addEventHandlerBinding().to(DelayAnalysis.class).in( Singleton.class );
 		
-		this.addEventHandlerBinding().to(PersonVehicleTracker.class).asEagerSingleton();
+		this.addEventHandlerBinding().to(PersonVehicleTracker.class).in( Singleton.class );
 		
-		this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+		this.addControlerListenerBinding().to(DecongestionControlerListener.class).in( Singleton.class );
 	}
 
 }

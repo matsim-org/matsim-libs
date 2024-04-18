@@ -20,17 +20,14 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Map;
-import java.util.function.ToDoubleFunction;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -41,6 +38,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -53,7 +55,7 @@ public class EqualVehicleDensityTargetCalculatorTest {
 	private final Network network = NetworkUtils.readNetwork(
 			config.network().getInputFileURL(config.getContext()).toString());
 
-	private final DrtZonalSystem zonalSystem = DrtZonalSystem.createFromPreparedGeometries(network,
+	private final ZoneSystem zonalSystem = ZoneSystemUtils.createFromPreparedGeometries(network,
 			DrtGridUtils.createGridFromNetwork(network, 500.));
 
 	@Test
@@ -91,8 +93,8 @@ public class EqualVehicleDensityTargetCalculatorTest {
 		return fleetSpecification;
 	}
 
-	private void assertTarget(ToDoubleFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
-			double expectedValue) {
-		assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
+	private void assertTarget(ToDoubleFunction<Zone> targetFunction, ZoneSystem zonalSystem, Id<Zone> zoneId,
+							  double expectedValue) {
+		Assertions.assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
 	}
 }
