@@ -30,7 +30,6 @@ public class SpeedyGraphBuilder {
 	private Link[] links;
 	private Node[] nodes;
 
-	@Deprecated // use build-method with additional mode argument
 	public static SpeedyGraph build(Network network) {
 		if (hasTurnRestrictions(network)) {
 			return new SpeedyGraphBuilder().buildWithTurnRestrictions(network);
