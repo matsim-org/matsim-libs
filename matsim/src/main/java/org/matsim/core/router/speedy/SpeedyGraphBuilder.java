@@ -9,6 +9,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,12 +32,12 @@ public class SpeedyGraphBuilder {
 
 	@Deprecated // use build-method with additional mode argument
 	public static SpeedyGraph build(Network network) {
-		return build(network, "nothing");
+		return build(network);
 	}
 
 	public static SpeedyGraph build(Network network, String mode) {
 		if (hasTurnRestrictions(network)) {
-			return new SpeedyGraphBuilder().buildWithTurnRestrictions(network, mode);
+			return new SpeedyGraphBuilder().buildWithTurnRestrictions(network);
 		}
 		return new SpeedyGraphBuilder().buildWithoutTurnRestrictions(network);
 	}
@@ -50,7 +51,7 @@ public class SpeedyGraphBuilder {
 		return false;
 	}
 
-	private SpeedyGraph buildWithTurnRestrictions(Network network, String mode) {
+	private SpeedyGraph buildWithTurnRestrictions(Network network) {
 		/*
 		 * The implementation follows the algorithm developed by
 		 * Marcel Rieser (Simunto) and Hannes Rewald (Volkswagen Group)
@@ -85,7 +86,7 @@ public class SpeedyGraphBuilder {
 			if (disallowedNextLinks == null) {
 				continue;
 			}
-			List<List<Id<Link>>> turnRestrictions = disallowedNextLinks.getDisallowedLinkSequences(mode);
+			Collection<List<Id<Link>>> turnRestrictions = disallowedNextLinks.getMergedDisallowedLinkSequences();
 			if (turnRestrictions == null || turnRestrictions.isEmpty()) {
 				continue;
 			}
@@ -139,15 +140,15 @@ public class SpeedyGraphBuilder {
 		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links);
 	}
 
-	private ColoredLink applyTurnRestriction(TurnRestrictionsContext context, List<List<Id<Link>>> restrictions, Link startingLink) {
+	private ColoredLink applyTurnRestriction(TurnRestrictionsContext context, Collection<List<Id<Link>>> restrictions, Link startingLink) {
 		return this.applyTurnRestriction(context, restrictions, startingLink, null);
 	}
 
-	private void applyTurnRestriction(TurnRestrictionsContext context, List<List<Id<Link>>> restrictions, ColoredLink startingLink) {
+	private void applyTurnRestriction(TurnRestrictionsContext context, Collection<List<Id<Link>>> restrictions, ColoredLink startingLink) {
 		this.applyTurnRestriction(context, restrictions, null, startingLink);
 	}
 
-	private ColoredLink applyTurnRestriction(TurnRestrictionsContext context, List<List<Id<Link>>> restrictions, Link startingLink, ColoredLink coloredStartingLink) {
+	private ColoredLink applyTurnRestriction(TurnRestrictionsContext context, Collection<List<Id<Link>>> restrictions, Link startingLink, ColoredLink coloredStartingLink) {
 		Set<Node> affectedNodes = new HashSet<>();
 		Set<ColoredNode> affectedColoredNodes = new HashSet<>();
 		Set<Link> affectedLinks = new HashSet<>();
