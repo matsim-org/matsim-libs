@@ -67,7 +67,7 @@ public class OneToManyPathCalculatorTest {
 	private final IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
-	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(SpeedyGraphBuilder.build(network, TransportMode.car), travelTime,
+	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(SpeedyGraphBuilder.build(network), travelTime,
 			new TimeAsTravelDisutility(travelTime));
 
 	@BeforeEach

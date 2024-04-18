@@ -35,7 +35,7 @@ public class SpeedyDijkstraTest extends AbstractLeastCostPathCalculatorTest {
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
 		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
-		SpeedyGraph g = SpeedyGraphBuilder.build(network, TransportMode.car);
+		SpeedyGraph g = SpeedyGraphBuilder.build(network);
 		return new SpeedyDijkstra(g, travelTimeCostCalculator, travelTimeCostCalculator);
 	}
 

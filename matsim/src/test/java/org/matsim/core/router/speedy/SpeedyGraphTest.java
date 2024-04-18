@@ -24,7 +24,7 @@ public class SpeedyGraphTest {
         Fixture f = new Fixture();
         Network network = f.network;
 
-        SpeedyGraph graph = SpeedyGraphBuilder.build(network, TransportMode.car);
+        SpeedyGraph graph = SpeedyGraphBuilder.build(network);
 
         // test out-links
 

@@ -182,7 +182,7 @@ class SpeedyGraphBuilderTest {
 
 	/** Checks that none of the provided paths exist in the graph based on the provided network */
 	private static void verifyGraph(Network network, String fromNode, String[][] forbiddenPaths) {
-		SpeedyGraph graph = SpeedyGraphBuilder.build(network, TransportMode.car);
+		SpeedyGraph graph = SpeedyGraphBuilder.build(network);
 		Node realFromNode = network.getNodes().get(Id.create(fromNode, Node.class));
 
 		for (String[] path : forbiddenPaths) {
@@ -213,7 +213,7 @@ class SpeedyGraphBuilderTest {
 	}
 
 	private static SpeedyGraph runTest(Network network, String fromNode, String toNode, String... expectedPath) {
-		SpeedyGraph graph = SpeedyGraphBuilder.build(network, TransportMode.car);
+		SpeedyGraph graph = SpeedyGraphBuilder.build(network);
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		SpeedyDijkstra dijkstra = new SpeedyDijkstra(graph, freespeed, freespeed);
 
