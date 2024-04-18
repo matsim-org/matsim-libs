@@ -107,6 +107,18 @@ public class DisallowedNextLinks {
 				.collect(Collectors.toMap(Entry::getKey, e -> Collections.unmodifiableList(e.getValue())));
 	}
 
+    public DisallowedNextLinks copyOnlyModes(final Collection<String> modes) {
+        final DisallowedNextLinks newInstance = new DisallowedNextLinks();
+
+        for (String mode : modes) {
+            for (List<Id<Link>> sequence : getDisallowedLinkSequences(mode)) {
+                newInstance.addDisallowedLinkSequence(mode, sequence);
+            }
+        }
+
+        return newInstance;
+    }
+
 	public void clear() {
 		this.linkIdSequencesMap.clear();
 	}
