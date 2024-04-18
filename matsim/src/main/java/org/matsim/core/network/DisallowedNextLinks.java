@@ -1,12 +1,15 @@
 package org.matsim.core.network;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -73,6 +76,25 @@ public class DisallowedNextLinks {
 	public List<List<Id<Link>>> getDisallowedLinkSequences(String mode) {
 		List<List<Id<Link>>> sequences = this.linkIdSequencesMap.get(mode);
 		return sequences != null ? Collections.unmodifiableList(sequences) : Collections.emptyList();
+	}
+
+    /**
+     * Returns an aggregation of all link restrictions, for all modes. This is meant to be used in monomodal networks.
+     */
+	public Collection<List<Id<Link>>> getMergedDisallowedLinkSequences() {
+        // Implementation note: we do not want duplicates, so the logical choice is a set,
+        // as the argument for memory footprint does not hold here (short lived object).
+        // This makes the return types inconsistent, but one could argue that all methods should
+        // return Collections rather than Lists (ordering is not meaningful)
+        // We use a LinkedHashSet to preserve iteration order, to be consistent with other methods in this class
+        // td 04.24
+        final Set<List<Id<Link>>> sequences = new LinkedHashSet<>();
+
+        for (List<List<Id<Link>>> sequencesForMode : linkIdSequencesMap.values()) {
+            sequences.addAll(sequencesForMode);
+        }
+
+		return Collections.unmodifiableSet(sequences);
 	}
 
 	@Nullable
