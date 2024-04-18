@@ -32,10 +32,6 @@ public class SpeedyGraphBuilder {
 
 	@Deprecated // use build-method with additional mode argument
 	public static SpeedyGraph build(Network network) {
-		return build(network);
-	}
-
-	public static SpeedyGraph build(Network network, String mode) {
 		if (hasTurnRestrictions(network)) {
 			return new SpeedyGraphBuilder().buildWithTurnRestrictions(network);
 		}
