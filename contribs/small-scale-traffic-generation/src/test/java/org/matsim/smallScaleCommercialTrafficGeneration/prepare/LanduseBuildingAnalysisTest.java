@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis.createDefaultDataConnectionForOSM;
-
 /**
  * @author Ricardo Ewert
  *
@@ -47,7 +45,6 @@ public class LanduseBuildingAnalysisTest {
 
 	@Test
 	void testReadOfDataDistributionPerZoneAndBuildingAnalysis() throws IOException {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -57,9 +54,9 @@ public class LanduseBuildingAnalysisTest {
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).getParent().resolve("investigationAreaData.csv");
+		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 		// Test if the reading of the existing data distribution works correctly
-
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection);
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
@@ -242,7 +239,6 @@ public class LanduseBuildingAnalysisTest {
 
 	@Test
 	void testLanduseDistribution() throws IOException {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path output = Path.of(utils.getOutputDirectory());
@@ -252,7 +248,8 @@ public class LanduseBuildingAnalysisTest {
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).getParent().resolve("investigationAreaData.csv");
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection);
+		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		// Analyze resultingData per zone
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis

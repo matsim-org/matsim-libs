@@ -47,6 +47,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -77,8 +78,9 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
@@ -117,6 +119,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	@CommandLine.Option(names = "--pathToCommercialFacilities", description = "Path to the commercial facilities.")
 	private Path pathToCommercialFacilities;
+
+	@CommandLine.Option(names = "--carrierFilePath", description = "Path to the carrier file.")
+	private Path carrierFilePath;
 
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
@@ -189,10 +194,23 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
 				freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+				if (freightCarriersConfigGroup.getCarriersFile() == null)
+					freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
 				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
 					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 				CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+				// Remove vehicle types which are not used by the carriers
+				Map<Id<VehicleType>, VehicleType> readVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes();
+				List<Id<VehicleType>> usedCarrierVehicleTypes = CarriersUtils.getCarriers(scenario).getCarriers().values().stream()
+					.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
+					.map(vehicle -> vehicle.getType().getId())
+					.distinct()
+					.toList();
+
+				readVehicleTypes.keySet().removeIf(vehicleType -> !usedCarrierVehicleTypes.contains(vehicleType));
+
 				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
 					solveSeparatedVRPs(scenario, null);
 				}
@@ -443,7 +461,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (output == null || output.toString().isEmpty())
 			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
-					+ java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
+					+ LocalDate.now() + "_" + LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
 				.toString());
 		else
 			config.controller().setOutputDirectory(output.toString());
@@ -470,7 +488,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
-		assert(new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir());
+		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 		rnd = MatsimRandom.getRandom();
 		if (config.network().getInputFile() == null)
@@ -862,32 +880,27 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 																Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
 																String shapeFileZoneNameColumn) throws URISyntaxException {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
-		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
 
-		String networkPath;
-		if (scenario.getConfig().network().getInputFile().startsWith("https:"))
-			networkPath = scenario.getConfig().network().getInputFile();
-		else
-			networkPath = scenario.getConfig().getContext().toURI().resolve(scenario.getConfig().network().getInputFile()).getPath();
-
-		Network networkToChange = NetworkUtils.readNetwork(networkPath);
-		NetworkUtils.runNetworkCleaner(networkToChange);
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+		Set<String> modes = new HashSet<>();
+		modes.add("car");
+		Network filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
+		filter.filter(filteredNetwork, modes);
 
 		CoordinateTransformation ct = indexZones.getShp().createTransformation(ProjectionUtils.getCRS(scenario.getNetwork()));
-
-		links = networkToChange.getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car"))
-			.collect(Collectors.toList());
+		//TODO possible check if newCoord attribute is really needed (find better way)
+		List<Link> links = new ArrayList<>(filteredNetwork.getLinks().values());
 		links.forEach(l -> l.getAttributes().putAttribute("newCoord",
 			CoordUtils.round(ct.transform(l.getCoord()))));
 		links.forEach(l -> l.getAttributes().putAttribute("zone",
 			indexZones.query((Coord) l.getAttributes().getAttribute("newCoord"))));
-		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).collect(Collectors.toList());
+		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).toList();
 		links.forEach(l -> linksPerZone
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 			.put(l.getId(), l));
 		if (linksPerZone.size() != indexZones.size())
-			findNearestLinkForZonesWithoutLinks(networkToChange, linksPerZone, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
+			findNearestLinkForZonesWithoutLinks(filteredNetwork, linksPerZone, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
 		return linksPerZone;
 	}
@@ -904,7 +917,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (!linksPerZone.containsKey(zoneID) && facilitiesPerZone.get(zoneID) != null) {
 				for (List<ActivityFacility> buildingList : facilitiesPerZone.get(zoneID).values()) {
 					for (ActivityFacility building : buildingList) {
-						Link l = NetworkUtils.getNearestLink(networkToChange, building.getCoord());
+						Link l = NetworkUtils.getNearestLinkExactly(networkToChange, building.getCoord());
                         assert l != null;
                         linksPerZone
 							.computeIfAbsent(zoneID, (k) -> new HashMap<>())

@@ -47,6 +47,7 @@ import javax.management.InvalidAttributeValueException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class CarriersUtils {
@@ -198,14 +199,22 @@ public class CarriersUtils {
 										   .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
 										   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
 
+		AtomicInteger startedVRPCounter = new AtomicInteger(0);
+		AtomicInteger solvedVRPCounter = new AtomicInteger(0);
+
 		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
 		ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 		forkJoinPool.submit(() -> tempList.parallelStream().forEach(carrierId -> {
 			Carrier carrier = carriers.getCarriers().get(carrierId);
 
 			double start = System.currentTimeMillis();
-			int serviceCount = carrier.getServices().size();
-			log.info("Start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
+			if (!carrier.getServices().isEmpty())
+				log.info("Start tour planning for {} which has {} services", carrier.getId(), carrier.getServices().size());
+			else if (!carrier.getShipments().isEmpty())
+				log.info("Start tour planning for {} which has {} shipments", carrier.getId(), carrier.getShipments().size());
+
+			startedVRPCounter.incrementAndGet();
+			log.info("started VRP solving for carrier number {} out of {} carriers.", startedVRPCounter.get(), carriers.getCarriers().size());
 
 			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork()).setRoutingCost(netBasedCosts).build();
 			VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup, netBasedCosts, problem);
@@ -226,14 +235,17 @@ public class CarriersUtils {
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 
-			log.info("tour planning for carrier " + carrier.getId() + " took " + (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			log.info("tour planning for carrier {} took {} seconds.", carrier.getId(), (System.currentTimeMillis() - start) / 1000);
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
 			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
-			log.info("routing plan for carrier " + carrier.getId());
+			log.info("routing plan for carrier {}", carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
-			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took " + (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			solvedVRPCounter.incrementAndGet();
+			log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds.", carrier.getId(),
+				(System.currentTimeMillis() - start) / 1000);
+			log.info("solved {} out of {} carriers.", solvedVRPCounter.get(), carriers.getCarriers().size());
 
 			carrier.setSelectedPlan(newPlan);
 		})).get();
