@@ -48,7 +48,7 @@ public class RunDrtAndTaxiExample {
 	public static void run(URL configUrl, boolean otfvis) {
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		ConfigGroup zoneParams = dvrpConfigGroup.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		dvrpConfigGroup.addParameterSet(zoneParams);
+		dvrpConfigGroup.getTravelTimeMatrixParams().addParameterSet(zoneParams);
 
 
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new MultiModeTaxiConfigGroup(),
