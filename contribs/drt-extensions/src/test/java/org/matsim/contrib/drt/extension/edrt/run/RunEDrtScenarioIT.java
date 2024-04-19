@@ -82,11 +82,6 @@ public class RunEDrtScenarioIT {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 			new OTFVisConfigGroup(), new EvConfigGroup());
 
-		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
-		ConfigGroup zoneSystemParams = matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		matrixParams.addParameterSet(zoneSystemParams);
-
-
 		Controler controller = RunEDrtScenario.createControler(config, false);
 		config.controller().setLastIteration(2);
 
