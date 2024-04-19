@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.core.network.NetworkUtils;
 
 import java.util.Optional;

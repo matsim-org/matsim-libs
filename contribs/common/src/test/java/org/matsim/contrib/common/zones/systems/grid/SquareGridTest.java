@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneImpl;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.core.network.NetworkUtils;
 
 import static org.assertj.core.api.Assertions.*;

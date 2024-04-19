@@ -30,7 +30,7 @@ import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.zones.Zone;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 
 import java.util.ArrayList;
 import java.util.List;

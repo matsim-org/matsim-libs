@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.common.zones.ZoneSystems;
 
 public class IdleTaxiZonalRegistry {
 	private final ScheduleInquiry scheduleInquiry;
@@ -49,7 +49,7 @@ public class IdleTaxiZonalRegistry {
 		this.scheduleInquiry = scheduleInquiry;
 
 		this.zoneSystem = zoneSystem;
-		zonesSortedByDistance = ZoneSystems.initZonesByDistance(zoneSystem.getZones());
+		zonesSortedByDistance = ZoneSystemUtils.initZonesByDistance(zoneSystem.getZones());
 
 		for (Id<Zone> id : zoneSystem.getZones().keySet()) {
 			vehiclesInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order

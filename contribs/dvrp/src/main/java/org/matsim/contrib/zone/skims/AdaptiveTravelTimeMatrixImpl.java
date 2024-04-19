@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.common.zones.Zone;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
-import org.matsim.contrib.common.zones.ZoneSystems;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -38,19 +38,19 @@ import java.util.stream.IntStream;
 public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 	private final double TIME_INTERVAL = 3600.;
 	private final List<Matrix> timeDependentMatrix;
-	private final SquareGridZoneSystem gridSystem;
+	private final ZoneSystem gridSystem;
 	private final double alpha;
 	private final Map<Zone, Node> centralNodes;
 	private final int numberOfBins;
 	private final DvrpTravelTimeMatrixParams params;
 	private final Map<SparseTravelTimeKey, Double> sparseTravelTimeCache = new ConcurrentHashMap<>();
 
-	public AdaptiveTravelTimeMatrixImpl(double maxTime, Network dvrpNetwork, DvrpTravelTimeMatrixParams params,
+	public AdaptiveTravelTimeMatrixImpl(double maxTime, Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params,
 										TravelTimeMatrix freeSpeedMatrix, double alpha) {
 		this.alpha = alpha;
 		this.numberOfBins = numberOfBins(maxTime);
-		this.gridSystem = new SquareGridZoneSystem(dvrpNetwork, params.cellSize, zone -> true);
-		this.centralNodes = ZoneSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
+		this.gridSystem = zoneSystem;
+		this.centralNodes = ZoneSystemUtils.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
 		this.timeDependentMatrix = IntStream.range(0, numberOfBins).mapToObj(i -> new Matrix(centralNodes.keySet()))
 				.toList();
 		this.params = params;

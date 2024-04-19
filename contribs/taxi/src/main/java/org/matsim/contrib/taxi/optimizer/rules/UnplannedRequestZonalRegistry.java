@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.common.zones.ZoneSystems;
 
 public class UnplannedRequestZonalRegistry {
 	private final ZoneSystem zoneSystem;
@@ -42,7 +42,7 @@ public class UnplannedRequestZonalRegistry {
 
 	public UnplannedRequestZonalRegistry(ZoneSystem zoneSystem) {
 		this.zoneSystem = zoneSystem;
-		zonesSortedByDistance = ZoneSystems.initZonesByDistance(zoneSystem.getZones());
+		zonesSortedByDistance = ZoneSystemUtils.initZonesByDistance(zoneSystem.getZones());
 
 		for (Id<Zone> id : zoneSystem.getZones().keySet()) {
 			requestsInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order

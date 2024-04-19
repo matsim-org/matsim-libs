@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentRequestInserter;
@@ -39,7 +40,7 @@ import org.matsim.contrib.taxi.optimizer.zonal.ZonalRequestInserter;
 import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.contrib.common.zones.systems.grid.SquareGridZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -116,7 +117,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	}
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
-		ZoneSystem zoneSystem = new SquareGridZoneSystem(network, params.cellSize, zone -> true);
+		ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(context, network, params.getZoneSystemParams());
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zoneSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zoneSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);

@@ -16,8 +16,9 @@
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
 
 			<parameterset type="zonalSystem">
-				<param name="zonesGeneration" value="GridFromNetwork"/>
-				<param name="cellSize" value="500"/>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
+				</parameterset>
 			</parameterset>
 
 			<parameterset type="rebalancing">
