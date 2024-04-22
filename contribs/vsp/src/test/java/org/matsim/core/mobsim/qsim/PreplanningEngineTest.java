@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.qsim;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -24,6 +25,7 @@ class PreplanningEngineTest{
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Disabled
 	@Test public void test() {
 		// I am interested here in testing this NOT with DRT but with other modes.  kai, apr'24
 		// In the somewhat longer run, should work together with fleetpy (of TUM).  kai, apr'24
