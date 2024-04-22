@@ -80,6 +80,15 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 		// (doing this the indirect way because of the Set vs List discussion above.  kai, apr'23
 	}
 
+	public void removeActiveComponent( String component ) {
+		// I need this so often that I am finally adding it here.  kai, apr'24
+
+		List<String> components = getActiveComponents();
+		components.remove( component );
+		setActiveComponents( components );
+		// (doing this the indirect way because of the Set vs List discussion above.  kai, apr'24
+	}
+
 	@StringGetter(ACTIVE_COMPONENTS)
 	public String getActiveComponentsAsString() {
 		return String.join(", ", activeComponents);
