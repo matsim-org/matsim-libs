@@ -628,8 +628,7 @@ public class TripDistributionMatrix {
 				} catch (IOException e) {
 					log.error("Problem to write OD matrix", e);
 				}
-				log.info("Write OD matrix for mode " + modeORvehType + " and for purpose " + purpose + " to "
-						+ outputFolder);
+				log.info("Write OD matrix for mode {} and for purpose {} to {}", modeORvehType, purpose, outputFolder);
 			}
 		}
 	}

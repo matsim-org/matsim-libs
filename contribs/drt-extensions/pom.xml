@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>16.0-SNAPSHOT</version>
+		<version>2025.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -15,25 +15,25 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>ev</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>informed-mode-choice</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>simwrapper</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>vsp</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 
