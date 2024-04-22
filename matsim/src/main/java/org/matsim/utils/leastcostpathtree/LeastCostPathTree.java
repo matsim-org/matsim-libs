@@ -63,7 +63,7 @@ public class LeastCostPathTree {
 	private final TravelDisutility tcFunction;
 	private IdMap<Node, NodeData> nodeData = null;
 	
-	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.getDefaultVehicleType());
+	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.createDefaultVehicleType());
 	private final Person PERSON = PopulationUtils.getFactory().createPerson(Id.create("thePerson", Person.class));
 
 	// ////////////////////////////////////////////////////////////////////
