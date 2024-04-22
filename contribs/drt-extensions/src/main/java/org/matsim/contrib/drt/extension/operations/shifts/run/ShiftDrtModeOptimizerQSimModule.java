@@ -43,6 +43,7 @@ import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetCreator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
@@ -164,9 +165,9 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ShiftDrtActionCreator.class));
 
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+		bindModal(FleetCreator.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Override
-			public Fleet get() {
+			public FleetCreator get() {
 				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
 				Network network = getModalInstance(Network.class);
 				return Fleets.createCustomFleet(fleetSpecification,

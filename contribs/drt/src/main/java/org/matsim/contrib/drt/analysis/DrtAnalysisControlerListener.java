@@ -96,7 +96,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private boolean vheaderWritten = false;
 	private final String runId;
 	private final DecimalFormat format = new DecimalFormat();
-	private final int maxcap;
 	private static final String notAvailableString = "NA";
 
 	private final String delimiter;
@@ -112,7 +111,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = Optional.ofNullable(config.controller().getRunId()).orElse(notAvailableString);
-		maxcap = findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -212,6 +210,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				event.getIteration());
 		double l_d = getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size() * directDistanceMean);
 
+		int maxcap = drtVehicleStats.getVehicleStates().values().stream().mapToInt(v -> v.maxCapacity).max().orElse(0);
+		
 		MinCountAndShareIdleVehiclesOverDay minCountAndShareIdleVehiclesOverDay = getMinCountAndShareIdleVehiclesOverDay();
 		String vehStats = summarizeVehicles(drtVehicleStats.getVehicleStates(), delimiter)
 				+ delimiter
@@ -221,7 +221,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				+ delimiter
 				+ format.format(minCountAndShareIdleVehiclesOverDay.minCountIdleVehiclesOverDay);
 		String occStats = summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter, maxcap);
-		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
+		writeIterationVehicleStats(vehStats, occStats, event.getIteration(), maxcap);
 		if (drtCfg.plotDetailedCustomerStats) {
 			String header = String.join(delimiter, //
 					"submissionTime", //
@@ -349,7 +349,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	 * @param summarizeVehicles
 	 * @param it                iteration
 	 */
-	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it) {
+	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it, int maxcap) {
 		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
 				bw.write(line("runId", "iteration", "vehicles", "totalServiceDuration", "totalDistance", "totalEmptyDistance", "emptyRatio", "totalPassengerDistanceTraveled",
@@ -930,14 +930,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				format.format(d_p_d_t) + "");
 	}
 
-	/**
-	 * @param fleet
-	 * @return
-	 */
-	static int findMaxVehicleCapacity(FleetSpecification fleet) {
-		return fleet.getVehicleSpecifications().values().stream().mapToInt(DvrpVehicleSpecification::getCapacity).max().getAsInt();
-	}
-
 	private static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String del,
 			int maxcap) {
 		DecimalFormat format = new DecimalFormat();
@@ -949,7 +941,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		double[] sum = new double[maxcap + 1];
 
 		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
-			for (int i = 0; i <= maxcap; i++) {
+			for (int i = 0; i < state.totalDistanceByOccupancy.length; i++) {
 				sum[i] += state.totalDistanceByOccupancy[i];
 			}
 		}

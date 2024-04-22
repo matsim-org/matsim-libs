@@ -20,21 +20,15 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.api.core.v01.IdMap;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
+import com.google.common.base.Verify;
 import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 @Singleton
 public class DvrpVehicleLookup {
@@ -48,10 +42,14 @@ public class DvrpVehicleLookup {
 		}
 	}
 
-	private final Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap;
+	private final IdMap<DvrpVehicle, VehicleAndMode> vehicleLookupMap = new IdMap<>(DvrpVehicle.class);
 
-	public DvrpVehicleLookup(Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap) {
-		this.vehicleLookupMap = vehicleLookupMap;
+	void addVehicle(String mode, DvrpVehicle vehicle) {
+		Verify.verify(vehicleLookupMap.put(vehicle.getId(), new VehicleAndMode(vehicle, mode)) == null);
+	}
+
+	void removeVehicle(String mode, Id<DvrpVehicle> vehicleId) {
+		Verify.verify(vehicleLookupMap.remove(vehicleId).mode.equals(mode));
 	}
 
 	public VehicleAndMode lookupVehicleAndMode(Id<DvrpVehicle> id) {
@@ -61,26 +59,5 @@ public class DvrpVehicleLookup {
 	public DvrpVehicle lookupVehicle(Id<DvrpVehicle> id) {
 		VehicleAndMode vehicleAndMode = lookupVehicleAndMode(id);
 		return vehicleAndMode == null ? null : vehicleAndMode.vehicle;
-	}
-
-	public static class DvrpVehicleLookupProvider implements Provider<DvrpVehicleLookup> {
-		@Inject
-		private Injector injector;
-
-		@Inject
-		private Set<DvrpMode> dvrpModes;
-
-		@Override
-		public DvrpVehicleLookup get() {
-			Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap = new HashMap<>();
-			for (DvrpMode m : dvrpModes) {
-				for (DvrpVehicle v : injector.getInstance(Key.get(Fleet.class, m)).getVehicles().values()) {
-					if (vehicleLookupMap.put(v.getId(), new VehicleAndMode(v, m.value())) != null) {
-						throw new RuntimeException("Two DvrpVehicles with the same id: " + v.getId());
-					}
-				}
-			}
-			return new DvrpVehicleLookup(vehicleLookupMap);
-		}
 	}
 }

@@ -98,8 +98,7 @@ public final class DvrpModule extends AbstractModule {
 			protected void configureQSim() {
 				addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				bind(DvrpVehicleLookup.class).toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
-						.asEagerSingleton();
+				bind(DvrpVehicleLookup.class);
 			}
 		});
 

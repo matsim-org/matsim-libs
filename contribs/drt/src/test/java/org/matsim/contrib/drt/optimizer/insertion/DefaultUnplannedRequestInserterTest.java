@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
@@ -57,6 +58,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.fakes.FakeLink;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -261,8 +263,15 @@ public class DefaultUnplannedRequestInserterTest {
 	}
 
 	private Fleet fleet(DvrpVehicle... vehicles) {
-		var map = Arrays.stream(vehicles).collect(ImmutableMap.toImmutableMap(Identifiable::getId, v -> v));
-		return () -> map;
+		Fleet fleet = Mockito.mock(Fleet.class);
+		
+		IdMap<DvrpVehicle, DvrpVehicle> map = new IdMap<>(DvrpVehicle.class);
+		for (DvrpVehicle v : vehicles) {
+			map.put(v.getId(), v);
+		}
+		
+		Mockito.when(fleet.getVehicles()).thenReturn(map);
+		return fleet;
 	}
 
 	private DvrpVehicle vehicle(String vehicleId) {
