@@ -45,10 +45,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
@@ -321,9 +318,7 @@ public class PtAlongALine2Test {
 		}
 		if (drtMode == DrtMode.withPrebooking) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
-				person.getSelectedPlan()
-						.getAttributes()
-						.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 7200.);
+				PreplanningUtils.setPrebookingOffset_s( person.getSelectedPlan(), 7200. );
 			}
 		}
 

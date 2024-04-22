@@ -26,6 +26,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import jakarta.inject.Inject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,7 +39,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
-
+	private static final Logger log = LogManager.getLogger(ActivityEngineWithWakeup.class );
 	private final EventsManager eventsManager;
 	private final PreplanningEngine preplanningEngine;
 	private final ActivityEngine delegate;
@@ -55,6 +57,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 
 	@Override
 	public void onPrepareSim() {
+		log.warn( "running onPrepareSim");
 		delegate.onPrepareSim();
 	}
 
