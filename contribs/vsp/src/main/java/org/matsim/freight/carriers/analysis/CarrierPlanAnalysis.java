@@ -78,7 +78,7 @@ public class CarrierPlanAnalysis  {
 			if (CarriersUtils.getJspritComputationTime(carrier) != Integer.MIN_VALUE)
 				bw1.write("\t" + Time.writeTime(CarriersUtils.getJspritComputationTime(carrier), Time.TIMEFORMAT_HHMMSS));
 			else
-				bw1.write("\t" + CarriersUtils.getJspritComputationTime(carrier));
+				bw1.write("\t" + "null");
 
 			bw1.newLine();
 		}
