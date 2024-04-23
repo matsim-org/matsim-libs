@@ -95,9 +95,9 @@ public final class ShpOptions {
 	}
 
 	/**
-	 * Create shp options for a geo pkg file.
+	 * Create shp options with a specific layer. (Usually for gpkg files).
 	 */
-	public static ShpOptions ofGeoPkg(String shp, @Nullable String shpLayer) {
+	public static ShpOptions ofLayer(String shp, @Nullable String shpLayer) {
 		return new ShpOptions(shp, null, shpLayer, null);
 	}
 
