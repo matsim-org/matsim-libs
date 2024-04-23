@@ -106,7 +106,7 @@ public final class NetworkSkimMatrices {
 
     private static class RowWorker<T> implements Runnable {
 
-        private final static Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.getDefaultVehicleType());
+        private final static Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.createDefaultVehicleType());
         private final static Person PERSON = PopulationUtils.getFactory().createPerson(Id.create("thePerson", Person.class));
         private final ConcurrentLinkedQueue<T> originZones;
         private final Set<T> destinationZones;
