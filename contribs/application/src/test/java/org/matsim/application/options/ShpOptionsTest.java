@@ -115,7 +115,7 @@ public class ShpOptionsTest {
 
 		Path path = Path.of(utils.getPackageInputDirectory(), "example.gpkg");
 
-		ShpOptions shp = ShpOptions.ofGeoPkg(path.toString(), null);
+		ShpOptions shp = ShpOptions.ofLayer(path.toString(), null);
 
 		List<SimpleFeature> features = shp.readFeatures();
 
