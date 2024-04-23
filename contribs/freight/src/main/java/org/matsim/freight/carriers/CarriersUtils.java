@@ -64,6 +64,7 @@ public class CarriersUtils {
 
 	private static final String ATTR_SKILLS = "skills";
 	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
+	private static final String ATTR_JSPRIT_Time = "jspritComputationTime";
 
 	public static Carrier createCarrier( Id<Carrier> id ){
 		return new CarrierImpl(id);
@@ -243,11 +244,13 @@ public class CarriersUtils {
 			log.info("routing plan for carrier {}", carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 			solvedVRPCounter.incrementAndGet();
+			double timeForPlanningAndRouting = (System.currentTimeMillis() - start) / 1000;
 			log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds.", carrier.getId(),
-				(System.currentTimeMillis() - start) / 1000);
+				timeForPlanningAndRouting);
 			log.info("solved {} out of {} carriers.", solvedVRPCounter.get(), carriers.getCarriers().size());
 
 			carrier.setSelectedPlan(newPlan);
+			setJspritComputationTime(carrier, timeForPlanningAndRouting);
 		})).get();
 
 	}
@@ -615,6 +618,18 @@ public class CarriersUtils {
 
 	public static Double getJspritScore (CarrierPlan plan) {
 		return (Double) plan.getAttributes().getAttribute(ATTR_JSPRIT_SCORE);
+	}
+
+	public static double getJspritComputationTime(Carrier carrier){
+		try {
+			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
+		} catch (Exception e) {
+			log.error("Requested attribute jspritComputationTime does not exists. Will return " + Integer.MIN_VALUE);
+			return Integer.MIN_VALUE;
+		}
+	}
+	public static void setJspritComputationTime(Carrier carrier, double time){
+		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
 	}
 
 	public static void writeCarriers(Carriers carriers, String filename ) {
