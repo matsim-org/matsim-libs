@@ -74,10 +74,10 @@ import java.util.Collection;
 
 				Vehicle vehicle;
 				if( CarriersUtils.getVehicle( freightDriverPlan ) == null ){
-					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
+					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.createDefaultVehicleType() );
 					log.warn( "vehicle for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed." );
 				} else if( CarriersUtils.getVehicle( freightDriverPlan ).getType() == null ){
-					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
+					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.createDefaultVehicleType() );
 					log.warn( "vehicleType for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed." );
 				} else {
 					vehicle = CarriersUtils.getVehicle( freightDriverPlan );

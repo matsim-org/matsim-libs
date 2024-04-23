@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
@@ -41,22 +42,24 @@ public class CarriersUtilsTest {
 
 	@Test
 	void testAddAndGetVehicleToCarrier() {
+		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
+		
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),VehicleUtils.getDefaultVehicleType());
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),vehicleType);
 //		carrierVehicle.setType(VehicleUtils.getDefaultVehicleType());
 
 		//add Vehicle
 		CarriersUtils.addCarrierVehicle(carrier, carrierVehicle);
 		Assertions.assertEquals(1, carrier.getCarrierCapabilities().getCarrierVehicles().size());
 		CarrierVehicle cv = (CarrierVehicle) carrier.getCarrierCapabilities().getCarrierVehicles().values().toArray()[0];
-		Assertions.assertEquals(VehicleUtils.getDefaultVehicleType(), cv.getType());
+		Assertions.assertEquals(vehicleType, cv.getType());
 		Assertions.assertEquals(Id.createLinkId("link0"), cv.getLinkId() );
 
 		//get Vehicle
 		CarrierVehicle carrierVehicle1 = CarriersUtils.getCarrierVehicle(carrier, testVehicleId );
 		Assertions.assertEquals(testVehicleId, carrierVehicle1.getId());
-		Assertions.assertEquals(VehicleUtils.getDefaultVehicleType(), carrierVehicle1.getType());
+		Assertions.assertEquals(vehicleType, carrierVehicle1.getType());
 		Assertions.assertEquals(Id.createLinkId("link0"), carrierVehicle1.getLinkId() );
 	}
 
