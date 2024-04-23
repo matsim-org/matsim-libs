@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -61,7 +62,7 @@ public class CarrierPlanAnalysis  {
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) ");
+		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) \t jspritComputationTime");
 		bw1.newLine();
 
 		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
@@ -73,6 +74,7 @@ public class CarrierPlanAnalysis  {
 			bw1.write("\t" + carrier.getSelectedPlan().getScheduledTours().size());
 			bw1.write("\t" + carrier.getShipments().size());
 			bw1.write("\t" + carrier.getServices().size());
+			bw1.write("\t" + CarriersUtils.getJspritComputationTime(carrier));
 			bw1.newLine();
 		}
 
