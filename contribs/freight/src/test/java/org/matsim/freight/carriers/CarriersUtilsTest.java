@@ -116,4 +116,14 @@ public class CarriersUtilsTest {
 		Assertions.assertEquals(125, CarriersUtils.getJspritIterations(carrier) );
 	}
 
+	@Test
+	void testGetSetJspritComputationTime(){
+		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
+		//Computation time is not set. should return Integer.Min_Value (null is not possible because returning (int)
+		Assertions.assertEquals(Integer.MIN_VALUE, CarriersUtils.getJspritComputationTime(carrier) );
+
+		CarriersUtils.setJspritComputationTime(carrier, 125);
+		Assertions.assertEquals(125, CarriersUtils.getJspritComputationTime(carrier) );
+	}
+
 }
