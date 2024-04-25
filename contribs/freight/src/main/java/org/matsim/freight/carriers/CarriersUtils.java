@@ -47,6 +47,7 @@ import javax.management.InvalidAttributeValueException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 public class CarriersUtils {
@@ -195,95 +196,26 @@ public class CarriersUtils {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2*carrier.getShipments().size());
 		}
 
-		HashMap<Id<Carrier>, Integer> sortedMap = carrierActivityCounterMap.entrySet().stream()
-										   .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-										   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
-
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
-		AtomicInteger solvedVRPCounter = new AtomicInteger(0);
 
-		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
+        int nThreads = Runtime.getRuntime().availableProcessors();
+		PriorityBlockingQueue<Runnable> jspritTasks = new PriorityBlockingQueue<>(nThreads);
 
-		int nThreads = Runtime.getRuntime().availableProcessors();
-		ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
 
-		List<List<Id<Carrier>>> splitList = splitListAlternating(nThreads, tempList);
-		log.info("Distribution of carriers on threads: {}", splitList.stream().map(List::size).toList());
-		List<Future<?>> futureList = new ArrayList<>();
-		for (List<Id<Carrier>> subList : splitList) {
-			futureList.add(executorService.submit(() -> subList.forEach(carrierId -> {
-				Carrier carrier = carriers.getCarriers().get(carrierId);
-
-				double start = System.currentTimeMillis();
-				if (!carrier.getServices().isEmpty())
-					log.info("Start tour planning for {} which has {} services", carrier.getId(), carrier.getServices().size());
-				else if (!carrier.getShipments().isEmpty())
-					log.info("Start tour planning for {} which has {} shipments", carrier.getId(), carrier.getShipments().size());
-
-				startedVRPCounter.incrementAndGet();
-				log.info("started VRP solving for carrier number {} out of {} carriers. Current thread id: {}", startedVRPCounter.get(), carriers.getCarriers()
-																																				 .size(), Thread.currentThread()
-																																								.getId());
-
-				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
-																   .setRoutingCost(netBasedCosts).build();
-				VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup, netBasedCosts, problem);
-
-				algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
-				int jspritIterations = getJspritIterations(carrier);
-				try {
-					if (jspritIterations > 0) {
-						algorithm.setMaxIterations(jspritIterations);
-					} else {
-						throw new InvalidAttributeValueException(
-							"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
-								+ carrier.getId().toString());
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-					//				e.printStackTrace();
-				}
-
-				VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
-
-				log.info("tour planning for carrier {} took {} seconds.", carrier.getId(), (System.currentTimeMillis() - start) / 1000);
-
-				CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
-				// yy In principle, the carrier should know the vehicle types that it can deploy.
-
-				log.info("routing plan for carrier {}", carrier.getId());
-				NetworkRouter.routePlan(newPlan, netBasedCosts);
-				solvedVRPCounter.incrementAndGet();
-				double timeForPlanningAndRouting = (System.currentTimeMillis() - start) / 1000;
-				log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds.", carrier.getId(),
-					timeForPlanningAndRouting);
-				log.info("solved {} out of {} carriers.", solvedVRPCounter.get(), carriers.getCarriers().size());
-
-				carrier.setSelectedPlan(newPlan);
-				setJspritComputationTime(carrier, timeForPlanningAndRouting);
-			})));
+		for (Map.Entry<Id<Carrier>, Integer> entry : new ArrayList<>(carrierActivityCounterMap.entrySet())) {
+            jspritTasks.add(new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts, startedVRPCounter, carriers.getCarriers().size()));
 		}
 
-		for (Future<?> future : futureList) {
-			future.get();
-		}
-	}
+		ThreadPoolExecutor executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, jspritTasks);
 
-	// split tempList in nThreads parts such that it is split to 1,2,...,n,1,2,..
-	private static List<List<Id<Carrier>>> splitListAlternating(int nThreads, ArrayList<Id<Carrier>> tempList) {
-		List<List<Id<Carrier>>> splitList = new ArrayList<>();
-		for (int i = 0; i < nThreads; i++) {
-			List<Id<Carrier>> subList = new ArrayList<>();
-			for (int j = i; j < tempList.size(); j += nThreads) {
-				subList.add(tempList.get(j));
-			}
-			splitList.add(subList);
+		executor.prestartAllCoreThreads();
+		executor.shutdown();
+		if (executor.awaitTermination(100, TimeUnit.DAYS)) {
+			log.info("All carriers solved.");
+		} else {
+			log.error("Not all carriers solved.");
 		}
-
-		assert splitList.size() == nThreads;
-		assert splitList.stream().mapToInt(List::size).sum() == tempList.size();
-		return splitList;
 	}
 
 	/**
@@ -667,4 +599,75 @@ public class CarriersUtils {
 		new CarrierPlanWriter( carriers ).write( filename );
 	}
 
+	static class JspritCarrierTask implements Runnable, Comparable<JspritCarrierTask>{
+		private final int priority;
+		private final Carrier carrier;
+		private final Scenario scenario;
+		private final NetworkBasedTransportCosts netBasedCosts;
+		private final AtomicInteger startedVRPCounter;
+		private final int taskCount;
+
+		public JspritCarrierTask(int priority, Carrier carrier, Scenario scenario, NetworkBasedTransportCosts netBasedCosts, AtomicInteger startedVRPCounter, int taskCount) {
+			this.priority = priority;
+			this.carrier = carrier;
+			this.scenario = scenario;
+			this.netBasedCosts = netBasedCosts;
+			this.startedVRPCounter = startedVRPCounter;
+			this.taskCount = taskCount;
+		}
+
+		@Override
+		public void run() {
+			FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightCarriersConfigGroup.class );
+
+			double start = System.currentTimeMillis();
+			if (!carrier.getServices().isEmpty())
+				log.info("Start tour planning for {} which has {} services", carrier.getId(), carrier.getServices().size());
+			else if (!carrier.getShipments().isEmpty())
+				log.info("Start tour planning for {} which has {} shipments", carrier.getId(), carrier.getShipments().size());
+
+			startedVRPCounter.incrementAndGet();
+			log.info("started VRP solving for carrier number {} out of {} carriers. Thread id: {}. Priority: {}", startedVRPCounter.get(), taskCount, Thread.currentThread().getId(), this.priority);
+
+			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
+															   .setRoutingCost(netBasedCosts).build();
+			VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup, netBasedCosts, problem);
+
+			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
+			int jspritIterations = getJspritIterations(carrier);
+			try {
+				if (jspritIterations > 0) {
+					algorithm.setMaxIterations(jspritIterations);
+				} else {
+					throw new InvalidAttributeValueException(
+						"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
+							+ carrier.getId().toString());
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
+
+			log.info("tour planning for carrier {} took {} seconds.", carrier.getId(), (System.currentTimeMillis() - start) / 1000);
+
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			// yy In principle, the carrier should know the vehicle types that it can deploy.
+
+			log.info("routing plan for carrier {}", carrier.getId());
+			NetworkRouter.routePlan(newPlan, netBasedCosts);
+			double timeForPlanningAndRouting = (System.currentTimeMillis() - start) / 1000;
+			log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds. Thread id: {}", carrier.getId(),
+				timeForPlanningAndRouting, Thread.currentThread().getId());
+
+			carrier.setSelectedPlan(newPlan);
+			setJspritComputationTime(carrier, timeForPlanningAndRouting);
+		}
+
+		@Override
+		public int compareTo(JspritCarrierTask that) {
+			// descending order of priority
+			return that.priority - this.priority;
+		}
+	}
 }
