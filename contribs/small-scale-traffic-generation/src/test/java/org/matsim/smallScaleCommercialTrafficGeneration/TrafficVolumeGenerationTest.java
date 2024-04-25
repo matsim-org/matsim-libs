@@ -635,7 +635,7 @@ public class TrafficVolumeGenerationTest {
 				estimatesStart = new HashMap<>();
 				estimatesStart.put(1, 2.);
 				estimatesStart.put(2, 7.);
-				estimatesStart.put(3, 40.);
+				estimatesStart.put(3, 37.);
 				estimatesStart.put(4, 69.);
 				estimatesStart.put(5, 46.);
 				estimatesStart.put(6, 8.);
@@ -657,7 +657,7 @@ public class TrafficVolumeGenerationTest {
 						if (modeORvehType.equals("vehTyp3")) {
 							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-							Assertions.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(4, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(17, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(11, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
@@ -769,7 +769,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(37, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assertions.assertEquals(330, sumOfStartOtherAreas, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(319, sumOfStartOtherAreas, MatsimTestUtils.EPSILON);
 	}
 
 

@@ -50,7 +50,7 @@ public class TrafficVolumeGeneration {
 	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
 	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
 
-	static class TrafficVolumeKey {
+	public static class TrafficVolumeKey {
 		private final String zone;
 		private final String modeORvehType;
 
