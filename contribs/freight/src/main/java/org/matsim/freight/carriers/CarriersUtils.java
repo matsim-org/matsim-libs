@@ -212,6 +212,7 @@ public class CarriersUtils {
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
 
 		List<List<Id<Carrier>>> splitList = splitListAlternating(nThreads, tempList);
+		log.info("Distribution of carriers on threads: {}", splitList.stream().map(List::size).toList());
 		for (List<Id<Carrier>> subList : splitList) {
 			executorService.submit(() -> subList.forEach(carrierId -> {
 				Carrier carrier = carriers.getCarriers().get(carrierId);
