@@ -209,6 +209,8 @@ public class CarriersUtils {
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
+		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
+
 		List<List<Id<Carrier>>> splitList = splitListAlternating(nThreads, tempList);
 		for (List<Id<Carrier>> subList : splitList) {
 			executorService.submit(() -> subList.forEach(carrierId -> {
@@ -221,7 +223,7 @@ public class CarriersUtils {
 					log.info("Start tour planning for {} which has {} shipments", carrier.getId(), carrier.getShipments().size());
 
 				startedVRPCounter.incrementAndGet();
-				log.info("started VRP solving for carrier number {} out of {} carriers.", startedVRPCounter.get(), carriers.getCarriers().size());
+				log.info("started VRP solving for carrier number {} out of {} carriers. Current thread id: {}", startedVRPCounter.get(), carriers.getCarriers().size(), Thread.currentThread().getId());
 
 				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork()).setRoutingCost(netBasedCosts).build();
 				VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup, netBasedCosts, problem);
