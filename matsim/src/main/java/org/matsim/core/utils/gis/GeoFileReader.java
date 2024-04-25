@@ -133,6 +133,19 @@ public class GeoFileReader implements MatsimSomeReader {
 		return featureSet;
 	}
 
+	/**
+	 * Read all simple features from a data store. This method makes sure the store is closed afterwards.
+	 * @return list of contained features.
+	 * @see #getSimpleFeatures(DataStore, Name)
+	 */
+	public static List<SimpleFeature> getSimpleFeatures(DataStore dataStore, String layerName) throws IOException {
+		SimpleFeatureSource featureSource = dataStore.getFeatureSource(layerName);
+		Gbl.assertNotNull(featureSource);
+		List<SimpleFeature> featureSet = getSimpleFeatures(featureSource);
+		dataStore.dispose();
+		return featureSet;
+	}
+
 	private static List<SimpleFeature> getSimpleFeatures(SimpleFeatureSource featureSource) throws IOException {
 		SimpleFeatureIterator it = featureSource.getFeatures().features();
 		List<SimpleFeature> featureSet = new ArrayList<>();
