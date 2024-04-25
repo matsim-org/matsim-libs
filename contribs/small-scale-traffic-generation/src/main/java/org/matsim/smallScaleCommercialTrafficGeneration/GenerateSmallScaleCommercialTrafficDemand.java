@@ -108,7 +108,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution
 	}
 
-	private enum SmallScaleCommercialTrafficType {
+	public enum SmallScaleCommercialTrafficType {
 		commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic
 	}
 
