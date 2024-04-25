@@ -34,14 +34,15 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 * part of the goodsTraffic or commercialPersonTraffic, the demand of the existing
 	 * scenario reduces the demand of the small scale commercial traffic. The
 	 * dispersedTraffic will be added additionally.
+	 * For this method, the carriers should be located correctly and all needed information is taken from 'existingModels.csv'
 	 *
 	 * @param scenario       the scenario
 	 * @param sampleScenario the sample size of the scenario
 	 * @param linksPerZone   the links per zone
 	 */
 	@Override
-	public void readExistingModels(Scenario scenario, double sampleScenario,
-								   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
+	public void readExistingCarriersFromFolder(Scenario scenario, double sampleScenario,
+											   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
 		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()

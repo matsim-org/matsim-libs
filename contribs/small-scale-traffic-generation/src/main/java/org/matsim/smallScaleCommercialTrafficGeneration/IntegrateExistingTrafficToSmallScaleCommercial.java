@@ -9,8 +9,8 @@ import java.util.Map;
 
 public interface IntegrateExistingTrafficToSmallScaleCommercial {
 
-	void readExistingModels(Scenario scenario, double sampleScenario,
-								   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception;
+	void readExistingCarriersFromFolder(Scenario scenario, double sampleScenario,
+										Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception;
 
 	void reduceDemandBasedOnExistingCarriers(Scenario scenario,
 											 Map<String, Map<Id<Link>, Link>> linksPerZone, String smallScaleCommercialTrafficType,

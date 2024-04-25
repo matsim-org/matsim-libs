@@ -409,7 +409,7 @@ public class TrafficVolumeGenerationTest {
 			facilitiesPerZone, shapeFileZoneNameColumn);
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
-		integratedExistingModels.readExistingModels(scenario, sample, linksPerZone);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -478,7 +478,7 @@ public class TrafficVolumeGenerationTest {
 					facilitiesPerZone, shapeFileZoneNameColumn);
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
-		integratedExistingModels.readExistingModels(scenario, sample, linksPerZone);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		Assertions.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -555,7 +555,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
 
-		integratedExistingModels.readExistingModels(scenario, sample, linksPerZone);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
@@ -721,7 +721,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
 
-		integratedExistingModels.readExistingModels(scenario, sample, regionLinksMap);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, regionLinksMap);
 
 		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);

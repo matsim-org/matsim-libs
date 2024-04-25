@@ -453,7 +453,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
-			integrateExistingTrafficToSmallScaleCommercial.readExistingModels(scenario, sample, linksPerZone);
+			integrateExistingTrafficToSmallScaleCommercial.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
