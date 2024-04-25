@@ -45,10 +45,7 @@ import org.matsim.vehicles.VehicleType;
 
 import javax.management.InvalidAttributeValueException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -213,8 +210,9 @@ public class CarriersUtils {
 
 		List<List<Id<Carrier>>> splitList = splitListAlternating(nThreads, tempList);
 		log.info("Distribution of carriers on threads: {}", splitList.stream().map(List::size).toList());
+		List<Future<?>> futureList = new ArrayList<>();
 		for (List<Id<Carrier>> subList : splitList) {
-			executorService.submit(() -> subList.forEach(carrierId -> {
+			futureList.add(executorService.submit(() -> subList.forEach(carrierId -> {
 				Carrier carrier = carriers.getCarriers().get(carrierId);
 
 				double start = System.currentTimeMillis();
@@ -224,9 +222,12 @@ public class CarriersUtils {
 					log.info("Start tour planning for {} which has {} shipments", carrier.getId(), carrier.getShipments().size());
 
 				startedVRPCounter.incrementAndGet();
-				log.info("started VRP solving for carrier number {} out of {} carriers. Current thread id: {}", startedVRPCounter.get(), carriers.getCarriers().size(), Thread.currentThread().getId());
+				log.info("started VRP solving for carrier number {} out of {} carriers. Current thread id: {}", startedVRPCounter.get(), carriers.getCarriers()
+																																				 .size(), Thread.currentThread()
+																																								.getId());
 
-				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork()).setRoutingCost(netBasedCosts).build();
+				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
+																   .setRoutingCost(netBasedCosts).build();
 				VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup, netBasedCosts, problem);
 
 				algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
@@ -236,11 +237,12 @@ public class CarriersUtils {
 						algorithm.setMaxIterations(jspritIterations);
 					} else {
 						throw new InvalidAttributeValueException(
-								"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
-										+ carrier.getId().toString());}
+							"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
+								+ carrier.getId().toString());
+					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
-	//				e.printStackTrace();
+					//				e.printStackTrace();
 				}
 
 				VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
@@ -260,7 +262,11 @@ public class CarriersUtils {
 
 				carrier.setSelectedPlan(newPlan);
 				setJspritComputationTime(carrier, timeForPlanningAndRouting);
-			})).get();
+			})));
+		}
+
+		for (Future<?> future : futureList) {
+			future.get();
 		}
 	}
 
