@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -58,13 +58,12 @@ public class SmallScaleCommercialTrafficUtilsTest {
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 		String shapeFileZoneNameColumn = "name";
 
-		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(),
-                                shapeFileZoneNameColumn),
-                        buildingsPerZone, shapeFileZoneNameColumn);
+		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand.filterLinksForZones(scenario,
+			SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(), shapeFileZoneNameColumn),
+			facilitiesPerZone, shapeFileZoneNameColumn);
 
 		Assertions.assertEquals(3, regionLinksMap.size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(60, regionLinksMap.get("area1").size(), MatsimTestUtils.EPSILON);
