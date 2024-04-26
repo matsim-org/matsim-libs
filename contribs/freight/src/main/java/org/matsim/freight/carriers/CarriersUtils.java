@@ -47,7 +47,6 @@ import javax.management.InvalidAttributeValueException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 public class CarriersUtils {
@@ -199,22 +198,23 @@ public class CarriersUtils {
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
         int nThreads = Runtime.getRuntime().availableProcessors();
-		PriorityBlockingQueue<Runnable> jspritTasks = new PriorityBlockingQueue<>(nThreads);
-
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
 
-		for (Map.Entry<Id<Carrier>, Integer> entry : new ArrayList<>(carrierActivityCounterMap.entrySet())) {
-            jspritTasks.add(new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts, startedVRPCounter, carriers.getCarriers().size()));
+		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
+
+		List<Future<?>> futures = new ArrayList<>();
+		List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
+																				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+																				.toList();
+
+		for (Map.Entry<Id<Carrier>, Integer> entry : sorted){
+			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts, startedVRPCounter, carriers.getCarriers().size());
+			log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
+            futures.add(executor.submit(task));
 		}
 
-		ThreadPoolExecutor executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, jspritTasks);
-
-		executor.prestartAllCoreThreads();
-		executor.shutdown();
-		if (executor.awaitTermination(100, TimeUnit.DAYS)) {
-			log.info("All carriers solved.");
-		} else {
-			log.error("Not all carriers solved.");
+		for (Future<?> future : futures) {
+			future.get();
 		}
 	}
 
@@ -599,7 +599,7 @@ public class CarriersUtils {
 		new CarrierPlanWriter( carriers ).write( filename );
 	}
 
-	static class JspritCarrierTask implements Runnable, Comparable<JspritCarrierTask>{
+	static class JspritCarrierTask implements Runnable{
 		private final int priority;
 		private final Carrier carrier;
 		private final Scenario scenario;
@@ -614,6 +614,10 @@ public class CarriersUtils {
 			this.netBasedCosts = netBasedCosts;
 			this.startedVRPCounter = startedVRPCounter;
 			this.taskCount = taskCount;
+		}
+
+		public int getPriority() {
+			return priority;
 		}
 
 		@Override
@@ -663,11 +667,32 @@ public class CarriersUtils {
 			carrier.setSelectedPlan(newPlan);
 			setJspritComputationTime(carrier, timeForPlanningAndRouting);
 		}
+	}
+
+	// we need this class because otherwise there is a runtime error in the PriorityBlockingQueue
+	// https://jvmaware.com/priority-queue-and-threadpool/
+	private static class JspritTreadPoolExecutor extends ThreadPoolExecutor{
+		public JspritTreadPoolExecutor(BlockingQueue<Runnable> workQueue, int nThreads) {
+			super(nThreads, nThreads, 0, TimeUnit.SECONDS, workQueue);
+		}
 
 		@Override
-		public int compareTo(JspritCarrierTask that) {
-			// descending order of priority
-			return that.priority - this.priority;
+		protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+			return new CustomFutureTask<>(runnable);
+		}
+	}
+
+	private static class CustomFutureTask<T> extends FutureTask<T> implements Comparable<CustomFutureTask<T>>{
+		private final JspritCarrierTask task;
+
+		public CustomFutureTask(Runnable task) {
+			super(task, null);
+			this.task = (JspritCarrierTask) task;
+		}
+
+		@Override
+		public int compareTo(CustomFutureTask that) {
+			return that.task.getPriority() - this.task.getPriority();
 		}
 	}
 }
