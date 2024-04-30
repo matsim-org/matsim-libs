@@ -3,11 +3,11 @@ package org.matsim.contrib.common.zones;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 public class ZoneImpl implements Zone {
 
@@ -16,6 +16,9 @@ public class ZoneImpl implements Zone {
 	private PreparedPolygon preparedGeometry; //null for virtual/dummy zones
 	private final Coord centroid;
 	private String type;
+
+	private final Attributes attributes = new AttributesImpl();
+
 
 	public ZoneImpl(Id<Zone> id, PreparedPolygon preparedGeometry, @Nullable String type) {
 		this(id, preparedGeometry, MGC.point2Coord(preparedGeometry.getGeometry().getCentroid()), type);
@@ -67,4 +70,8 @@ public class ZoneImpl implements Zone {
 		return new ZoneImpl(id, null, centroid, null);
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 }

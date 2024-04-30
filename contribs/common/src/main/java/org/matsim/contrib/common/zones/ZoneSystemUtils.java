@@ -5,6 +5,7 @@ import one.util.streamex.EntryStream;
 import one.util.streamex.StreamEx;
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygonal;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Id;
@@ -26,6 +27,9 @@ import org.matsim.contrib.common.zones.util.ZoneFinder;
 import org.matsim.contrib.common.zones.util.ZoneFinderImpl;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.GeoFileReader;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,13 +43,14 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
-import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedPolygons;
 
 /**
  * @author nkuehnel / MOIA
  */
 public final class ZoneSystemUtils {
 
+
+	public static final String THE_GEOM = "the_geom";
 
 	private ZoneSystemUtils() {}
 
@@ -65,11 +70,9 @@ public final class ZoneSystemUtils {
 			case GISFileZoneSystemParams.SET_NAME -> {
 				Preconditions.checkNotNull(((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
 				Preconditions.checkNotNull(context);
-
-				final List<PreparedPolygon> preparedGeometries = loadPreparedPolygons(
-					ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile));
-				yield ZoneSystemUtils.createFromPreparedGeometries(network,
-					EntryStream.of(preparedGeometries).mapKeys(i -> (i + 1) + "").toMap());
+				URL url = ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
+				Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(url);
+				yield ZoneSystemUtils.createFromFeatures(network, features);
 			}
 			case SquareGridZoneSystemParams.SET_NAME -> {
 				Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).cellSize);
@@ -90,22 +93,39 @@ public final class ZoneSystemUtils {
 		return zoneSystem;
 	}
 
-	public static ZoneSystem createFromPreparedGeometries(Network network, Map<String, PreparedPolygon> geometries) {
+	public static ZoneSystem createFromFeatures(Network network, Collection<SimpleFeature> features) {
+
+		Map<String, PreparedFeature> featureById = StreamEx.of(features.stream())
+			.mapToEntry(SimpleFeature::getID, sf -> new PreparedFeature(sf, new PreparedPolygon((Polygonal) sf.getDefaultGeometry())))
+			.toMap();
 
 		//geometries without links are skipped
 		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
-			.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
+			.mapToEntry(l -> getGeometryIdForLink(l, featureById), l -> l)
 			.filterKeys(Objects::nonNull)
 			.grouping(toList());
 
 		//the zonal system contains only zones that have at least one link
 		Map<Id<Zone>, Zone> zones = EntryStream.of(linksByGeometryId)
-			.mapKeyValue((id, links) -> new ZoneImpl(Id.create(id, Zone.class), geometries.get(id), null))
+			.mapKeyValue((id, links) -> {
+				PreparedFeature preparedFeature = featureById.get(id);
+				ZoneImpl zone = new ZoneImpl(Id.create(id, Zone.class), preparedFeature.preparedPolygon, null);
+				for (Property attribute : preparedFeature.sf.getProperties()) {
+					String attributeName = attribute.getName().toString();
+					Object att = preparedFeature.sf().getAttribute(attributeName);
+					if(!attributeName.equals(THE_GEOM) && att != null) {
+						zone.getAttributes().putAttribute(attributeName, att);
+					}
+				}
+				return zone;
+            })
 			.collect(IdCollectors.toIdMap(Zone.class, Identifiable::getId, zone -> zone));
 
 
 		return new ZoneSystemImpl(zones.values(), new ZoneFinderImpl(zones), network);
 	}
+
+	private record PreparedFeature(SimpleFeature sf, PreparedPolygon preparedPolygon){}
 
 	/**
 	 * @param link
@@ -114,11 +134,11 @@ public final class ZoneSystemUtils {
 	 * Result may be null in case the given link is outside of the service area.
 	 */
 	@Nullable
-	private static String getGeometryIdForLink(Link link, Map<String, PreparedPolygon> geometries) {
+	private static String getGeometryIdForLink(Link link, Map<String, PreparedFeature> features) {
 		Point linkCoord = MGC.coord2Point(link.getToNode().getCoord());
-		return geometries.entrySet()
+		return features.entrySet()
 			.stream()
-			.filter(e -> e.getValue().intersects(linkCoord))
+			.filter(e -> e.getValue().preparedPolygon.intersects(linkCoord))
 			.findAny()
 			.map(Map.Entry::getKey)
 			.orElse(null);
