@@ -47,6 +47,9 @@ import org.opengis.feature.simple.SimpleFeature;
  *
  */
 public class GeometryUtils {
+
+	private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+
 	private GeometryUtils() {} // do not instantiate
 
 	/**
@@ -101,13 +104,13 @@ public class GeometryUtils {
 	public static LineString createGeotoolsLineString(Link link) {
 		Coordinate fromCoord = MGC.coord2Coordinate( link.getFromNode().getCoord() ) ;
 		Coordinate toCoord = MGC.coord2Coordinate( link.getToNode().getCoord() ) ;
-		LineString theSegment = new GeometryFactory().createLineString(new Coordinate[]{ fromCoord, toCoord });
+		LineString theSegment = GEOMETRY_FACTORY.createLineString(new Coordinate[] { fromCoord, toCoord });
 		return theSegment;
 	}
 
 	public static Point createGeotoolsPoint(Coord coord ) {
 		Coordinate coordinate = MGC.coord2Coordinate(coord) ;
-		Point point = new GeometryFactory().createPoint( coordinate ) ;
+		Point point = GEOMETRY_FACTORY.createPoint(coordinate);
 		return point ;
 	}
 
