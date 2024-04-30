@@ -17,14 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone.io;
-
-import java.util.*;
+package org.matsim.contrib.common.zones.io;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Stack;
 
 public class ZoneXmlReader extends MatsimXmlParser {
 	private final static String ZONE = "zone";
@@ -53,6 +57,6 @@ public class ZoneXmlReader extends MatsimXmlParser {
 	private void startZone(Attributes atts) {
 		Id<Zone> id = Id.create(atts.getValue("id"), Zone.class);
 		String type = atts.getValue("type");
-		zones.put(id, new Zone(id, type));
+		zones.put(id, new ZoneImpl(id, null, null, type));
 	}
 }

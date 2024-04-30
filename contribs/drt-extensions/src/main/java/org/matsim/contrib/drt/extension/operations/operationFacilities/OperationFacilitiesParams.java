@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.ConfigGroup;
 
 import java.net.URL;

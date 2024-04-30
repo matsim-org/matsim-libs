@@ -29,6 +29,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
@@ -139,10 +140,10 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		for (EventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
 			for (Map.Entry<Id<Person>, EventSequence.PersonEvents> entry : seq.getPersonEvents().entrySet()) {
 				if(entry.getValue().getPickedUp().isPresent()) {
-					Zone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
-					final Id<Zone> zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
+					Id<Zone> zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId())
+						.map(Identifiable::getId).orElse(zoneIdForOutsideOfZonalSystem);
 					double waitTime = entry.getValue().getPickedUp().get() .getTime() - seq.getSubmitted().getTime();
-					zoneStats.get(zoneStr).addValue(waitTime);
+					zoneStats.get(zone).addValue(waitTime);
 				}
 			}
 		}

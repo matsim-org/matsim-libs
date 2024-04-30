@@ -1,6 +1,6 @@
 package org.matsim.contrib.common.zones;
 
-import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
@@ -11,9 +11,9 @@ import java.util.List;
 
 public interface Zone extends BasicLocation, Identifiable<Zone> {
 	@Nullable
-	PreparedGeometry getPreparedGeometry();
+	PreparedPolygon getPreparedGeometry();
 
 	Coord getCentroid();
+	String getType();
 
-	List<Link> getLinks();
 }

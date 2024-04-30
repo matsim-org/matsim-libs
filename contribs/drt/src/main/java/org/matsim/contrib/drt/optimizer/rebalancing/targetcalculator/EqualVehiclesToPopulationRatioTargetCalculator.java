@@ -35,7 +35,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -73,7 +73,8 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 				.stream()
 				.map(person -> (Activity)person.getSelectedPlan().getPlanElements().get(0))
 				.map(activity -> zonalSystem.getZoneForLinkId(activity.getLinkId()))
-				.filter(Objects::nonNull)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.collect(Collectors.groupingBy(zone -> zone, collectingAndThen(counting(), Long::intValue)));
 	}
 

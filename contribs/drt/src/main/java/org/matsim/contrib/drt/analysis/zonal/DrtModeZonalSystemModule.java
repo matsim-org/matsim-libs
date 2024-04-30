@@ -23,11 +23,17 @@ package org.matsim.contrib.drt.analysis.zonal;
 import com.google.common.base.Preconditions;
 import one.util.streamex.EntryStream;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
-import org.matsim.contrib.common.zones.h3.H3GridUtils;
-import org.matsim.contrib.common.zones.h3.H3ZoneSystemUtils;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -35,11 +41,10 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
-import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
-import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.filterGridWithinServiceArea;
 import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedGeometries;
+import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedPolygons;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -56,43 +61,51 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		if (drtCfg.getZonalSystemParams().isPresent()) {
-			DrtZonalSystemParams params = drtCfg.getZonalSystemParams().get();
+			DrtZoneSystemParams params = drtCfg.getZonalSystemParams().get();
+			ZoneSystemParams zoneSystemParams = params.getZoneSystemParams();
 
 			bindModal(ZoneSystem.class).toProvider(modalProvider(getter -> {
 				Network network = getter.getModal(Network.class);
-				switch (params.zonesGeneration) {
-					case ShapeFile: {
-						final List<PreparedGeometry> preparedGeometries = loadPreparedGeometries(
-							ConfigGroup.getInputFileURL(getConfig().getContext(), params.zonesShapeFile));
+				switch (zoneSystemParams.getName()) {
+					case GISFileZoneSystemParams.SET_NAME: {
+						Preconditions.checkNotNull(((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
+						final List<PreparedPolygon> preparedGeometries = loadPreparedPolygons(
+							ConfigGroup.getInputFileURL(getConfig().getContext(), ((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile));
 						return ZoneSystemUtils.createFromPreparedGeometries(network,
 							EntryStream.of(preparedGeometries).mapKeys(i -> (i + 1) + "").toMap());
 					}
 
-					case GridFromNetwork: {
-						Preconditions.checkNotNull(params.cellSize);
-						Map<String, PreparedGeometry> gridFromNetwork = createGridFromNetwork(network, params.cellSize);
-						var gridZones =
-							switch (drtCfg.operationalScheme) {
-								case stopbased, door2door -> gridFromNetwork;
-								case serviceAreaBased -> filterGridWithinServiceArea(gridFromNetwork,
-									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
-										drtCfg.drtServiceAreaShapeFile)));
-							};
-						return ZoneSystemUtils.createFromPreparedGeometries(network, gridZones);
+					case SquareGridZoneSystemParams.SET_NAME: {
+						Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).cellSize);
+						Predicate<Zone> zoneFilter;
+						if(drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+							List<PreparedGeometry> serviceAreas = loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
+								drtCfg.drtServiceAreaShapeFile));
+							zoneFilter = zone -> serviceAreas.stream().anyMatch(serviceArea -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
+						} else {
+							zoneFilter = zone -> true;
+						}
+
+						SquareGridZoneSystem squareGridZoneSystem = new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).cellSize, zoneFilter);
+						return squareGridZoneSystem;
 					}
 
-					case H3:
-						Preconditions.checkNotNull(params.h3Resolution);
+					case H3GridZoneSystemParams.SET_NAME: {
+
+						Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).h3Resolution);
 						String crs = getConfig().global().getCoordinateSystem();
-						Map<String, PreparedGeometry> gridFromNetwork = H3GridUtils.createH3GridFromNetwork(network, params.h3Resolution, crs);
-						var gridZones =
-							switch (drtCfg.operationalScheme) {
-								case stopbased, door2door -> gridFromNetwork;
-								case serviceAreaBased -> filterGridWithinServiceArea(gridFromNetwork,
-									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
-										drtCfg.drtServiceAreaShapeFile)));
-							};
-						return H3ZoneSystemUtils.createFromPreparedGeometries(network, gridZones, crs, params.h3Resolution);
+
+						Predicate<Zone> zoneFilter;
+						if (drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+							List<PreparedGeometry> serviceAreas = loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
+								drtCfg.drtServiceAreaShapeFile));
+							zoneFilter = zone -> serviceAreas.stream().anyMatch(serviceArea -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
+						} else {
+							zoneFilter = zone -> true;
+						}
+
+						return new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).h3Resolution, network, zoneFilter);
+					}
 
 					default:
 						throw new RuntimeException("Unsupported zone generation");
@@ -104,7 +117,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 					case mostCentral:
 						return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(ZoneSystem.class));
 					case random:
-						return new RandomDrtZoneTargetLinkSelector();
+						return new RandomDrtZoneTargetLinkSelector(getter.getModal(ZoneSystem.class));
 					default:
 						throw new RuntimeException(
 							"Unsupported target link selection = " + params.targetLinkSelection);
