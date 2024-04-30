@@ -34,6 +34,7 @@ import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -72,8 +73,9 @@ public class TaxiOptimizerTests {
 			Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
 
-			boolean result = PopulationUtils.comparePopulations(expected, actual);
-			Assertions.assertTrue(result);
+			PopulationComparison populationComparison = new PopulationComparison();
+			PopulationComparison.Result result = populationComparison.compare(expected, actual);
+			Assertions.assertEquals(PopulationComparison.Result.equal, result);
 		}
 		{
 			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
