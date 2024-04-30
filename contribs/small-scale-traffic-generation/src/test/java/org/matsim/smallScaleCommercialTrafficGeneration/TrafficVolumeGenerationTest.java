@@ -408,7 +408,8 @@ public class TrafficVolumeGenerationTest {
 			SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(), shapeFileZoneNameColumn),
 			facilitiesPerZone, shapeFileZoneNameColumn);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, linksPerZone);
+		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -476,7 +477,8 @@ public class TrafficVolumeGenerationTest {
 						shapeFileZoneNameColumn),
 					facilitiesPerZone, shapeFileZoneNameColumn);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, linksPerZone);
+		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		Assertions.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -522,8 +524,11 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
+
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
 		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+
+		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -550,9 +555,9 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, linksPerZone);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
-		TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, usedTrafficType,
+		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 
 		// test for "area1"
@@ -630,7 +635,7 @@ public class TrafficVolumeGenerationTest {
 				estimatesStart = new HashMap<>();
 				estimatesStart.put(1, 2.);
 				estimatesStart.put(2, 7.);
-				estimatesStart.put(3, 40.);
+				estimatesStart.put(3, 37.);
 				estimatesStart.put(4, 69.);
 				estimatesStart.put(5, 46.);
 				estimatesStart.put(6, 8.);
@@ -652,7 +657,7 @@ public class TrafficVolumeGenerationTest {
 						if (modeORvehType.equals("vehTyp3")) {
 							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
-							Assertions.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
+							Assertions.assertEquals(4, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(17, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(11, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 							Assertions.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(6), MatsimTestUtils.EPSILON);
@@ -699,6 +704,9 @@ public class TrafficVolumeGenerationTest {
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
 		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
+		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
+
+
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
@@ -713,9 +721,9 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, regionLinksMap);
 
-		TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
+		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 
 		//because the reduction of the start volume in zone3 (purpose 2) is higher than the value, a start reduction will be distributed over other zones
@@ -761,7 +769,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(37, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(17, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		Assertions.assertEquals(330, sumOfStartOtherAreas, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(319, sumOfStartOtherAreas, MatsimTestUtils.EPSILON);
 	}
 
 
