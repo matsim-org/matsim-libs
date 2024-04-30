@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -82,7 +83,9 @@ public class ExternalModuleTest {
             }
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
-        Assertions.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
+
+		PopulationComparison.Result result = PopulationComparison.compare(scenario.getPopulation(), originalScenario.getPopulation());
+		Assertions.assertEquals(PopulationComparison.Result.equal, result);
     }
 
 	@Test
@@ -99,7 +102,8 @@ public class ExternalModuleTest {
             }
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
-        Assertions.assertFalse(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
+		PopulationComparison.Result result = PopulationComparison.compare(scenario.getPopulation(), originalScenario.getPopulation());
+		Assertions.assertEquals(PopulationComparison.Result.equal, result);
     }
 
     private Population loadPopulation(String filename) {

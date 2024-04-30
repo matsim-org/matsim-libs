@@ -12,8 +12,10 @@ public class PopulationComparison{
 
 	private static final Logger log = LogManager.getLogger( PopulationComparison.class );
 
+	private PopulationComparison(){}
 
-	public Result compare( Population population1, Population population2 ){
+
+	public static Result compare( Population population1, Population population2 ){
 		Result result=Result.equal;
 
 		Iterator<? extends Person> it1 = population1.getPersons().values().iterator();
