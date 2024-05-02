@@ -148,4 +148,22 @@ public class AttributesTest {
 			Assertions.fail("Expected NoSuchElementException, but caught a different one.");
 		}
 	}
+
+		@Test
+		void testComparison() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			a1.putAttribute("att1", "1");
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			a2.putAttribute("att1", "1");
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			a2.putAttribute("att1", "one");
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+		}
 }

@@ -3,9 +3,11 @@ package org.matsim.core.population.routes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.utils.objectattributes.attributable.AttributesComparison;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class PopulationComparison{
 	public enum Result { equal, notEqual }
@@ -24,34 +26,70 @@ public class PopulationComparison{
 		while( it1.hasNext() || it2.hasNext() ) {
 			if ( ! it1.hasNext() ) {
 				result = Result.notEqual ;
+				log.warn( "" );
+				log.warn( " different length in populations. " );
 				return result ;
 			}
 			if ( ! it2.hasNext() ) {
 				result = Result.notEqual ;
+				log.warn( "" );
+				log.warn( " different length in populations. " );
 				return result ;
 			}
+
 			Person person1 = it1.next();
 			Person person2 = it2.next();
+
 			if ( !person1.getId().equals( person2.getId() ) ) {
-				log.warn( "persons out of sequence" );
+				log.warn( "" );
+				log.warn( "persons out of sequence p1: " + person1.getId() + " | p2: " + person2.getId());
 				result = Result.notEqual ;
 				continue;
 			}
+
+			if(!AttributesComparison.equals(person1.getAttributes(), person2.getAttributes())) {
+				log.warn( "" );
+				log.warn( "person attributes different p1: " + person1.getId() + " | p2: " + person2.getId());
+			}
+
 			Plan plan1 = person1.getSelectedPlan();
 			Plan plan2 = person2.getSelectedPlan();
-			if ( Math.abs( plan1.getScore() - plan2.getScore() ) > 100.*Double.MIN_VALUE ||
-			 !equals(plan1.getPlanElements(), plan2.getPlanElements())) {
 
-				double maxScore = Double.NEGATIVE_INFINITY;
-				for( Plan plan : person2.getPlans() ){
-					if ( plan.getScore() > maxScore ) {
-						maxScore = plan.getScore() ;
+			if(!AttributesComparison.equals(plan1.getAttributes(), plan2.getAttributes())) {
+				log.warn( "" );
+				log.warn( "selected plan attributes different p1: " + person1.getId() + " | p2: " + person2.getId());
+			}
+
+			Optional<Double> score1 = Optional.ofNullable(plan1.getScore());
+			Optional<Double> score2 = Optional.ofNullable(plan2.getScore());
+
+			if(score1.isPresent() && score2.isPresent()) {
+				if ( Math.abs( plan1.getScore() - plan2.getScore() ) > 100.*Double.MIN_VALUE) {
+
+					double maxScore = Double.NEGATIVE_INFINITY;
+					for( Plan plan : person2.getPlans() ){
+						if ( plan.getScore() > maxScore ) {
+							maxScore = plan.getScore() ;
+						}
 					}
-				}
 
+					log.warn( "" );
+					log.warn("personId=" + person1.getId() + "; score1=" + plan1.getScore() + "; score2=" + plan2.getScore() + "; maxScore2=" + maxScore ) ;
+					log.warn( "" );
+
+					result = Result.notEqual;
+
+				}
+			} else if(score1.isEmpty() && score2.isEmpty()) {} else {
 				log.warn( "" );
-				log.warn("personId=" + person1.getId() + "; score1=" + plan1.getScore() + "; score2=" + plan2.getScore() + "; maxScore2=" + maxScore ) ;
+				log.warn( " selected plan scores not consistently present: p1: " + person1.getId() + " | p2: " + person2.getId());
+				result = Result.notEqual;
+			}
+
+			if(!equals(plan1.getPlanElements(), plan2.getPlanElements())) {
 				log.warn( "" );
+				log.warn( " selected plan elements not equal: p1: " + person1.getId() + " | p2: " + person2.getId() );
+
 				for( PlanElement planElement : plan1.getPlanElements() ){
 					log.warn( planElement );
 				}
@@ -60,7 +98,7 @@ public class PopulationComparison{
 					log.warn( planElement );
 				}
 				log.warn( "" );
-
+				result = Result.notEqual;
 			}
 		}
 		return result ;
@@ -86,6 +124,9 @@ public class PopulationComparison{
 	 *
 	 */
 	private static boolean equals(PlanElement o1, PlanElement o2) {
+		if(!AttributesComparison.equals(o1.getAttributes(), o2.getAttributes())) {
+			return false;
+		}
 		if (o1 instanceof Leg) {
 			if (o2 instanceof Leg) {
 				Leg leg1 = (Leg) o1;
