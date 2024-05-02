@@ -78,7 +78,7 @@ public class RunAddAgentSourceExample{
 			qsim.insertAgentIntoMobsim( ag );
 
 			// insert vehicle:
-			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle( Id.create( ag.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
+			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle( Id.create( ag.getId(), Vehicle.class ), VehicleUtils.createDefaultVehicleType() );
 			QVehicleImpl qVeh = new QVehicleImpl( vehicle );
 			qsim.addParkedVehicle( qVeh, ag.getCurrentLinkId() );
 
