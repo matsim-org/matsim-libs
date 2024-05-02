@@ -73,7 +73,7 @@ public class PopulationComparison {
             Optional<Double> score2 = Optional.ofNullable(plan2.getScore());
 
             if (score1.isPresent() && score2.isPresent()) {
-                if (!isWithinDelta(delta, plan2.getScore(), plan1.getScore())) {
+                if (!isWithinDelta(plan1.getScore(), plan2.getScore(), delta)) {
 
                     double maxScore = Double.NEGATIVE_INFINITY;
                     for (Plan plan : person2.getPlans()) {
