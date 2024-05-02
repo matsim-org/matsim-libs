@@ -28,8 +28,8 @@ import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
-import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
 import org.matsim.core.router.speedy.LeastCostPathTree;

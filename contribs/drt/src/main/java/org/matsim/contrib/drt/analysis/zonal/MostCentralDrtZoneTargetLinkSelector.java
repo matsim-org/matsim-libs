@@ -37,11 +37,11 @@ import org.matsim.contrib.common.zones.ZoneSystem;
 public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
 	private final Map<Zone, Link> targetLinks;
 
-	public MostCentralDrtZoneTargetLinkSelector(ZoneSystem drtZonalSystem) {
-		targetLinks = drtZonalSystem.getZones()
+	public MostCentralDrtZoneTargetLinkSelector(ZoneSystem zoneSystem) {
+		targetLinks = zoneSystem.getZones()
 				.values()
 				.stream()
-				.collect(toMap(zone -> zone, zone -> zone.getLinks().stream().min(
+				.collect(toMap(zone -> zone, zone -> zoneSystem.getLinksForZoneId(zone.getId()).stream().min(
 						//1. choose links with the most central toNode (there may be several "most central" nodes)
 						//2. if there is more than one such link (which is usually the case),
 						//   choose one with the most central fromNode

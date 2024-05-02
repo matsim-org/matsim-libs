@@ -29,14 +29,14 @@ import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.matsim.contrib.common.zones.ZoneSystemUtils.createFromPreparedGeometries;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtilsTest.createNetwork;
 
 /**
@@ -46,16 +46,14 @@ public class DrtZonalSystemTest {
 
 	@Test
 	void test_cellSize100() {
-		ZoneSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
-				DrtGridUtils.createGridFromNetwork(createNetwork(), 100));
-		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId().toString()).isEqualTo("10");
+		SquareGridZoneSystem drtZonalSystem = new SquareGridZoneSystem(createNetwork(), 100);
+		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).orElseThrow().getId().toString()).isEqualTo("90");
 	}
 
 	@Test
 	void test_cellSize700() {
-		ZoneSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
-				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
-		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId().toString()).isEqualTo("2");
+		SquareGridZoneSystem drtZonalSystem = new SquareGridZoneSystem(createNetwork(), 700);
+		Assertions.assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).orElseThrow().getId().toString()).isEqualTo("2");
 	}
 
 	@Test
@@ -63,15 +61,15 @@ public class DrtZonalSystemTest {
 		Coordinate min = new Coordinate(-500, 500);
 		Coordinate max = new Coordinate(1500, 1500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
-		Map<String, PreparedGeometry> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
-		ZoneSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
-				grid);
+
+		Predicate<Zone> zoneFilter = zone -> serviceArea.stream().anyMatch(area -> area.intersects(zone.getPreparedGeometry().getGeometry()));
+		SquareGridZoneSystem zonalSystem = new SquareGridZoneSystem(createNetwork(), 100, zoneFilter);
 
 		assertEquals(2, zonalSystem.getZones().size());
 
 		//link 'da' is outside of the service area
 		Id<Link> id = Id.createLinkId("da");
-		Assertions.assertThat(zonalSystem.getZoneForLinkId(id)).isNull();
+		Assertions.assertThat(zonalSystem.getZoneForLinkId(id)).isNotPresent();
 	}
 
 	@Test
@@ -79,9 +77,9 @@ public class DrtZonalSystemTest {
 		Coordinate min = new Coordinate(1500, 1500);
 		Coordinate max = new Coordinate(2500, 2500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
-		Map<String, PreparedGeometry> grid = DrtGridUtils.filterGridWithinServiceArea(DrtGridUtils.createGridFromNetwork(createNetwork(), 100), serviceArea);
-		ZoneSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
-				grid);
+
+		Predicate<Zone> zoneFilter = zone -> serviceArea.stream().anyMatch(area -> area.intersects(zone.getPreparedGeometry().getGeometry()));
+		SquareGridZoneSystem zonalSystem = new SquareGridZoneSystem(createNetwork(), 100, zoneFilter);
 
 		//service area is off the network - so we should have 0 zones..
 		assertEquals(0, zonalSystem.getZones().size());
@@ -100,7 +98,4 @@ public class DrtZonalSystemTest {
 		ServiceArea.add(preparedGeometryFactory.create(polygon));
 		return ServiceArea;
 	}
-
-
-
 }
