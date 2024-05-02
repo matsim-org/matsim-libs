@@ -122,7 +122,7 @@ public class PopulationComparison {
         if (time1.isUndefined() ^ time2.isUndefined()) {
             return false;
         } else if(time1.isDefined()) {
-            return isWithinDelta(time1.seconds(), time2.seconds(), delta);
+            return isWithinDelta((int) time1.seconds(), (int) time2.seconds(), delta);
         }
         return true;
     }
