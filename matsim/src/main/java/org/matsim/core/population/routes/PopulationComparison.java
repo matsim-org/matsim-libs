@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class PopulationComparison {
 
-    private final static double DEFAULT_SCORE_DELTA = 1e-10;
+    private final static double DEFAULT_DELTA = 1e-10;
 
     public enum Result {equal, notEqual}
 
@@ -21,11 +21,11 @@ public class PopulationComparison {
     }
 
     public static Result compare(Population population1, Population population2) {
-        return compare(population1, population2, DEFAULT_SCORE_DELTA);
+        return compare(population1, population2, DEFAULT_DELTA);
     }
 
 
-    public static Result compare(Population population1, Population population2, double scoreDelta) {
+    public static Result compare(Population population1, Population population2, double delta) {
         Result result = Result.equal;
 
         Iterator<? extends Person> it1 = population1.getPersons().values().iterator();
@@ -72,7 +72,7 @@ public class PopulationComparison {
             Optional<Double> score2 = Optional.ofNullable(plan2.getScore());
 
             if (score1.isPresent() && score2.isPresent()) {
-                if (Math.abs(plan1.getScore() - plan2.getScore()) > scoreDelta) {
+                if (isWithinDelta(delta, plan2.getScore(), plan1.getScore())) {
 
                     double maxScore = Double.NEGATIVE_INFINITY;
                     for (Plan plan : person2.getPlans()) {
@@ -113,15 +113,23 @@ public class PopulationComparison {
         return result;
     }
 
+    private static boolean isWithinDelta(double delta, double double1, double double2) {
+        return Math.abs(double1 - double2) > delta;
+    }
 
     public static boolean equals(List<PlanElement> planElements,
                                  List<PlanElement> planElements2) {
+        return equals(planElements, planElements2, DEFAULT_DELTA);
+    }
+
+    public static boolean equals(List<PlanElement> planElements,
+                                 List<PlanElement> planElements2, double delta) {
         int nElements = planElements.size();
         if (nElements != planElements2.size()) {
             return false;
         } else {
             for (int i = 0; i < nElements; i++) {
-                if (!equals(planElements.get(i), planElements2.get(i))) {
+                if (!equals(planElements.get(i), planElements2.get(i), delta)) {
                     return false;
                 }
             }
@@ -132,42 +140,38 @@ public class PopulationComparison {
     /* Warning: This is NOT claimed to be correct. (It isn't.)
      *
      */
-    private static boolean equals(PlanElement o1, PlanElement o2) {
+    private static boolean equals(PlanElement o1, PlanElement o2, double delta) {
         if (!AttributesComparison.equals(o1.getAttributes(), o2.getAttributes())) {
             return false;
         }
-        if (o1 instanceof Leg) {
-            if (o2 instanceof Leg) {
-                Leg leg1 = (Leg) o1;
-                Leg leg2 = (Leg) o2;
-                if (!leg1.getDepartureTime().equals(leg2.getDepartureTime())) {
+        if (o1 instanceof Leg leg1) {
+            if (o2 instanceof Leg leg2) {
+                if (!isWithinDelta(leg1.getDepartureTime().orElse(Double.NaN), leg2.getDepartureTime().orElse(Double.NaN), delta)) {
                     return false;
                 }
                 if (!leg1.getMode().equals(leg2.getMode())) {
                     return false;
                 }
-                if (!leg1.getTravelTime().equals(leg2.getTravelTime())) {
+                if (!isWithinDelta(leg1.getTravelTime().orElse(Double.NaN), leg2.getTravelTime().orElse(Double.NaN), delta)) {
                     return false;
                 }
             } else {
                 return false;
             }
-        } else if (o1 instanceof Activity) {
-            if (o2 instanceof Activity) {
-                Activity activity1 = (Activity) o1;
-                Activity activity2 = (Activity) o2;
+        } else if (o1 instanceof Activity activity1) {
+            if (o2 instanceof Activity activity2) {
                 if (activity1.getEndTime().isUndefined() ^ activity2.getEndTime().isUndefined()) {
                     return false;
                 }
-                if (activity1.getEndTime().isDefined() && activity1.getEndTime().seconds()
-                        != activity2.getEndTime().seconds()) {
+                if(activity1.getEndTime().isDefined() && !isWithinDelta(activity1.getEndTime().seconds(),
+                        activity2.getEndTime().seconds(), delta)) {
                     return false;
                 }
                 if (activity1.getStartTime().isUndefined() ^ activity2.getStartTime().isUndefined()) {
                     return false;
                 }
-                if (activity1.getStartTime().isDefined() && activity1.getStartTime().seconds()
-                        != activity2.getStartTime().seconds()) {
+                if (activity1.getStartTime().isDefined() && !isWithinDelta(activity1.getStartTime().seconds(),
+                        activity2.getStartTime().seconds(), delta)) {
                     return false;
                 }
             } else {
