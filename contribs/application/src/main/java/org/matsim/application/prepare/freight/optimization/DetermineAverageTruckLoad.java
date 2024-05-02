@@ -26,7 +26,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
@@ -110,7 +110,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         }
 
         // Read shape file // TODO this is acutally not needed. Just testing the functionality of reading shape file from URL. Delete afterwards!!!
-        List<SimpleFeature> nutsFeatures = ShapeFileReader.getAllFeatures(URI.create(nutsPath).toURL()).
+        List<SimpleFeature> nutsFeatures = GeoFileReader.getAllFeatures(URI.create(nutsPath).toURL()).
                 stream().filter(f -> relevantNutsIds.contains(f.getAttribute("NUTS_ID").toString())).
                 collect(Collectors.toList());
         System.out.println("There are " + nutsFeatures.size() + " relevant NUTS regions");

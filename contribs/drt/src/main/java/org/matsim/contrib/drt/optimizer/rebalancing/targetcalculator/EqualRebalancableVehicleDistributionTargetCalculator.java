@@ -20,19 +20,19 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
-import static java.util.stream.Collectors.toSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * TODO add some description
@@ -43,24 +43,24 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 	private static final Logger log = LogManager.getLogger(EqualRebalancableVehicleDistributionTargetCalculator.class);
 
 	private final ZonalDemandEstimator demandEstimator;
-	private final DrtZonalSystem zonalSystem;
+	private final ZoneSystem zonalSystem;
 	private final double demandEstimationPeriod;
 
 	public EqualRebalancableVehicleDistributionTargetCalculator(ZonalDemandEstimator demandEstimator,
-			DrtZonalSystem zonalSystem, double demandEstimationPeriod) {
+			ZoneSystem zonalSystem, double demandEstimationPeriod) {
 		this.demandEstimator = demandEstimator;
 		this.zonalSystem = zonalSystem;
 		this.demandEstimationPeriod = demandEstimationPeriod;
 	}
 
 	@Override
-	public ToDoubleFunction<DrtZone> calculate(double time,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+	public ToDoubleFunction<Zone> calculate(double time,
+											Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		int numAvailableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
 
-		ToDoubleFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemand(time,
+		ToDoubleFunction<Zone> currentDemandEstimator = demandEstimator.getExpectedDemand(time,
 				demandEstimationPeriod);
-		Set<DrtZone> activeZones = zonalSystem.getZones()
+		Set<Zone> activeZones = zonalSystem.getZones()
 				.values()
 				.stream()
 				.filter(zone -> currentDemandEstimator.applyAsDouble(zone) > 0)

@@ -165,9 +165,9 @@ import org.matsim.vehicles.VehicleUtils;
 			person.addPlan(plan);
 
 			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
-					VehicleUtils.getDefaultVehicleType());
+					VehicleUtils.createDefaultVehicleType());
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
-			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
+			scenario.getVehicles().addVehicleType(VehicleUtils.createDefaultVehicleType());
 			scenario.getVehicles().addVehicle(vehicle);
 
 			TravelTime travelTime = new FreeSpeedTravelTime();
@@ -251,8 +251,8 @@ import org.matsim.vehicles.VehicleUtils;
 			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setFreespeed(10.0));
 
 			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(Id.createVehicleId("P"),
-					VehicleUtils.getDefaultVehicleType());
-			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
+					VehicleUtils.createDefaultVehicleType());
+			scenario.getVehicles().addVehicleType(VehicleUtils.createDefaultVehicleType());
 			scenario.getVehicles().addVehicle(vehicle);
 
 			Population population = scenario.getPopulation();

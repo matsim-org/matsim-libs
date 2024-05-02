@@ -369,7 +369,7 @@ class ScenarioImporter {
 		Id<org.matsim.api.core.v01.network.Link> endLId = netroute.getEndLinkId();
 		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getVehicles().getVehicles();
 		Vehicle v = vehicles.get(VehicleUtils.getVehicleId(person, leg.getMode()));
-		Id<VehicleType> vtypeid = v == null ? VehicleUtils.getDefaultVehicleType().getId() : v.getType().getId();
+		Id<VehicleType> vtypeid = v == null ? VehicleUtils.createDefaultVehicleType().getId() : v.getType().getId();
 		int pcuCategory = this.vehicleTypeMapping.get(vtypeid);
 		Id<Vehicle> vid = v == null ? Id.createVehicleId("v" + person.getId()) : v.getId();
 		double velocity = v == null ?

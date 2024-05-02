@@ -51,7 +51,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -112,7 +112,7 @@ public class SelectedPlans2ESRIShape {
 			drawOutputSample();
 			if (this.writeActs) {
 				writeActs();
-			} 
+			}
 			if (this.writeLegs) {
 				writeLegs();
 			}
@@ -143,7 +143,7 @@ public class SelectedPlans2ESRIShape {
 			}
 		}
 
-		ShapeFileWriter.writeGeometries(fts, outputFile);
+		GeoFileWriter.writeGeometries(fts, outputFile);
 	}
 
 	private void writeLegs() throws IOException {
@@ -164,7 +164,7 @@ public class SelectedPlans2ESRIShape {
 				}
 			}
 		}
-		ShapeFileWriter.writeGeometries(fts, outputFile);
+		GeoFileWriter.writeGeometries(fts, outputFile);
 	}
 
 	private SimpleFeature getActFeature(final String id, final Activity act) {
@@ -176,7 +176,7 @@ public class SelectedPlans2ESRIShape {
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
 		Coord c = new Coord(cc.getX() + rx, cc.getY() + ry);
-		
+
 		try {
 			return this.actBuilder.buildFeature(null, new Object [] {MGC.coord2Point(c), id, type, linkId, startTime, endTime});
 		} catch (IllegalArgumentException e) {
@@ -235,7 +235,7 @@ public class SelectedPlans2ESRIShape {
 		actBuilder.add("LINK_ID", String.class);
 		actBuilder.add("START_TIME", Double.class);
 		actBuilder.add("END_TIME", Double.class);
-		
+
 		SimpleFeatureTypeBuilder legBuilder = new SimpleFeatureTypeBuilder();
 		legBuilder.setName("leg");
 		legBuilder.setCRS(this.crs);

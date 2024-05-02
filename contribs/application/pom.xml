@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>16.0-SNAPSHOT</version>
+		<version>2025.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -30,37 +30,37 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>osm</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>sumo</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>noise</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 			<exclusions>
 				<!-- Logging levels are all messed up without this exclusion -->
 				<exclusion>
@@ -79,12 +79,25 @@
 			<artifactId>gtfs2matsim</artifactId>
 			<version>master-33809c4f0f-1</version>
 			<exclusions>
+				<!-- Exclude unneeded dependencies and these with known CVE -->
 				<exclusion>
 					<groupId>org.geotools</groupId>
 					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.matsim</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.amazonaws</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.graphql-java</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.postgresql</groupId>
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>

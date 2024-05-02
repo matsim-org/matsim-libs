@@ -1,13 +1,8 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.ToDoubleFunction;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
@@ -18,20 +13,25 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
+
 public class NetDepartureReplenishDemandEstimator
 		implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 
-	private record Trip(int timeBin, DrtZone fromZone, DrtZone toZone) {
+	private record Trip(int timeBin, Zone fromZone, Zone toZone) {
 	}
 
-	private final DrtZonalSystem zonalSystem;
+	private final ZoneSystem zonalSystem;
 	private final String mode;
 	private final int timeBinSize;
-	private final Map<Integer, Map<DrtZone, Integer>> currentZoneNetDepartureMap = new HashMap<>();
-	private final Map<Integer, Map<DrtZone, Integer>> previousZoneNetDepartureMap = new HashMap<>();
+	private final Map<Integer, Map<Zone, Integer>> currentZoneNetDepartureMap = new HashMap<>();
+	private final Map<Integer, Map<Zone, Integer>> previousZoneNetDepartureMap = new HashMap<>();
 	private final Map<Id<Request>, Trip> potentialDrtTripsMap = new HashMap<>();
 
-	public NetDepartureReplenishDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
+	public NetDepartureReplenishDemandEstimator(ZoneSystem zonalSystem, DrtConfigGroup drtCfg,
 			FeedforwardRebalancingStrategyParams strategySpecificParams) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
@@ -52,8 +52,8 @@ public class NetDepartureReplenishDemandEstimator
 		if (event.getMode().equals(mode)) {
 			// At the submission time, this is only a potential trip.
 			int timeBin = (int)Math.floor(event.getTime() / timeBinSize);
-			DrtZone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
-			DrtZone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
+			Zone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId()).orElseThrow();
+			Zone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId()).orElseThrow();
 			potentialDrtTripsMap.put(event.getRequestId(), new Trip(timeBin, departureZoneId, arrivalZoneId));
 		}
 	}
@@ -78,7 +78,7 @@ public class NetDepartureReplenishDemandEstimator
 		potentialDrtTripsMap.clear();
 	}
 
-	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(int timeBin) {
+	public ToDoubleFunction<Zone> getExpectedDemandForTimeBin(int timeBin) {
 		var expectedDemandForTimeBin = previousZoneNetDepartureMap.getOrDefault(timeBin, Collections.emptyMap());
 		return zone -> expectedDemandForTimeBin.getOrDefault(zone, 0);
 	}

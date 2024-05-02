@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
@@ -42,7 +42,7 @@ import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -133,7 +133,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment(
 		"Defines the maximum delay allowed from the initial scheduled pick up time. Once the initial pickup time is offered, the latest promised"
 			+ "pickup time is calculated based on initial scheduled pickup time + maxAllowedPickupDelay. "
-			+ "By default, this limit is disabled. If enabled, a value between 120 and 240 is a good choice.")
+			+ "By default, this limit is disabled. If enabled, a value between 0 and 240 is a good choice.")
 	@PositiveOrZero
 	public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
 
@@ -220,7 +220,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
 	@Nullable
-	private DrtZonalSystemParams zonalSystemParams;
+	private DrtZoneSystemParams zonalSystemParams;
 
 	@Nullable
 	private RebalancingParams rebalancingParams;
@@ -248,8 +248,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 				params -> rebalancingParams = (RebalancingParams)params);
 
 		//zonal system (optional)
-		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
-				params -> zonalSystemParams = (DrtZonalSystemParams)params);
+		addDefinition(DrtZoneSystemParams.SET_NAME, DrtZoneSystemParams::new, () -> zonalSystemParams,
+				params -> zonalSystemParams = (DrtZoneSystemParams)params);
 
 		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
@@ -323,6 +323,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+
+		if ((maxDetourAlpha != Double.POSITIVE_INFINITY && maxDetourBeta != Double.POSITIVE_INFINITY) || maxAbsoluteDetour != Double.POSITIVE_INFINITY) {
+			Verify.verify(maxAllowedPickupDelay != Double.POSITIVE_INFINITY, "Detour constraints are activated, " +
+				"maxAllowedPickupDelay must be specified! A value between 0 and 240 seconds can be a good choice for maxAllowedPickupDelay.");
+		}
+
 	}
 
 	@Override
@@ -334,7 +340,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return drtInsertionSearchParams;
 	}
 
-	public Optional<DrtZonalSystemParams> getZonalSystemParams() {
+	public Optional<DrtZoneSystemParams> getZonalSystemParams() {
 		return Optional.ofNullable(zonalSystemParams);
 	}
 

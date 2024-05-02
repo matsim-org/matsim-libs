@@ -41,6 +41,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class EquilTest  {
 	private static final Logger log = LogManager.getLogger( EquilTest.class ) ;
@@ -84,7 +85,7 @@ public class EquilTest  {
 
 		writer.closeFile();
 
-		final EventsFileComparator.Result result = new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceFileName , eventsFileName );
-		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result, "different event files." );
+		final ComparisonResult result = new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceFileName , eventsFileName );
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result, "different event files." );
 	}
 }

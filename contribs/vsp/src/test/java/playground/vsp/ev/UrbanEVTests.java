@@ -1,11 +1,5 @@
 package playground.vsp.ev;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -30,6 +24,13 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 // TODO translate and complete
 
@@ -88,6 +89,12 @@ public class UrbanEVTests {
 		//		EVUtils.setInitialEnergy(scenario.getVehicles().getVehicleTypes().get(Id.create("Not enough time so charging early", VehicleType.class)).getEngineInformation(),
 		//				5.0);
 
+		//this guy shall not be pre-plan charging during activities
+		Id<Vehicle> carNotToCharge = VehicleUtils.getVehicleIds(
+			scenario.getPopulation().getPersons().get(Id.createPersonId("Do not charge during activities")))
+			.get(TransportMode.car);
+		UrbanEVUtils.setChargingDuringActivities(scenario.getVehicles().getVehicles().get(carNotToCharge), false);
+
 		///controler with Urban EV module
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
 		handler = new UrbanEVTestHandler();
@@ -119,7 +126,7 @@ public class UrbanEVTests {
 			}
 		}
 		Assertions.assertFalse(fail,
-				"the following persons do not execute the same amount of activities as they plan to:" + personsWithDifferingActCount);
+				"the following persons do not execute the same number of activities as they plan to:" + personsWithDifferingActCount);
 	}
 
 	@Test
@@ -174,8 +181,8 @@ public class UrbanEVTests {
 		Assertions.assertEquals(1, plugins.size(), 0);
 
 		ActivityStartEvent pluginActStart = plugins.get(0);
-		//starts at 10am at work and travels 8 links à 99s
-		Assertions.assertEquals(10 * 3600 + 8 * 99, pluginActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
+		//starts at 10am at work and travels 8 links à 99s + 3s waiting time to enter traffic
+		Assertions.assertEquals(10 * 3600 + 8 * 99 + 3, pluginActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
 		Assertions.assertEquals("172", pluginActStart.getLinkId().toString(), "wrong charging start location");
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Charging during shopping"), List.of());
@@ -187,14 +194,23 @@ public class UrbanEVTests {
 	}
 
 	@Test
+	void testDoNotChargeDuringActivities() {
+		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Do not charge during activities"), List.of());
+		Assertions.assertEquals(0, plugins.size(), 0);
+
+		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Do not charge during activities"), List.of());
+		Assertions.assertEquals(0, plugouts.size(), 0);
+	}
+
+	@Test
 	void testLongDistance() {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.getOrDefault(Id.createPersonId("Charger Selection long distance leg"),
 				List.of());
 		Assertions.assertEquals(1, plugins.size(), 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
 
-		//starts at 8 am and travels 19 links à 99s + 3s waiting time to enter traffic
-		Assertions.assertEquals(8 * 3600 + 19 * 99 + 3, pluginActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
+		//starts at 8 am and travels 19 links à 99s + 7s waiting time to enter traffic
+		Assertions.assertEquals(8 * 3600 + 19 * 99 + 7, pluginActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
 		Assertions.assertEquals("89", pluginActStart.getLinkId().toString(), "wrong charging start location");
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Charger Selection long distance leg"),
@@ -419,6 +435,50 @@ public class UrbanEVTests {
 			person2.setSelectedPlan(plan2);
 
 			scenario.getPopulation().addPerson(person2);
+		}
+
+		{
+			Person person2a = factory.createPerson(Id.createPersonId("Do not charge during activities"));
+
+			Plan plan2a = factory.createPlan();
+
+			Activity home21 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
+			home21.setEndTime(8 * 3600);
+			plan2a.addActivity(home21);
+			plan2a.addLeg(factory.createLeg(TransportMode.car));
+
+			Activity work21 = factory.createActivityFromLinkId("work", Id.createLinkId("176"));
+			work21.setEndTime(10 * 3600);
+			plan2a.addActivity(work21);
+
+			plan2a.addLeg(factory.createLeg(TransportMode.car));
+
+			//			Activity work22 = factory.createActivityFromLinkId("work", Id.createLinkId("60"));
+			//			work22.setEndTime(12 * 3600);
+			//			plan2a.addActivity(work22);
+			//
+			//			plan2a.addLeg(factory.createLeg(TransportMode.car));
+
+			Activity shopping21 = factory.createActivityFromLinkId("shopping", Id.createLinkId("9"));
+			shopping21.setMaximumDuration(1200);
+
+			plan2a.addActivity(shopping21);
+
+			plan2a.addLeg(factory.createLeg(TransportMode.car));
+
+			Activity work23 = factory.createActivityFromLinkId("work", Id.createLinkId("5"));
+			work23.setEndTime(13 * 3600);
+			plan2a.addActivity(work23);
+
+			plan2a.addLeg(factory.createLeg(TransportMode.car));
+
+			Activity home22 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
+			home22.setEndTime(15 * 3600);
+			plan2a.addActivity(home22);
+			person2a.addPlan(plan2a);
+			person2a.setSelectedPlan(plan2a);
+
+			scenario.getPopulation().addPerson(person2a);
 		}
 
 		{

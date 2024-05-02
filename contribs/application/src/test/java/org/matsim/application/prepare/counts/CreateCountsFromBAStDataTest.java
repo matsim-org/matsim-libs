@@ -22,8 +22,7 @@ public class CreateCountsFromBAStDataTest {
 
 	String countsOutput = "test-counts.xml.gz";
 
-	String ignoredCounts = "ignored.csv";
-	String manualMatchedCounts = "manual.csv";
+	String mapping = "mapping.csv";
 	String wrongManualMatchedCounts = "wrong_manual.csv";
 
 	String network = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString();
@@ -59,9 +58,6 @@ public class CreateCountsFromBAStDataTest {
 		new MatsimCountsReader(counts).readFile(out);
 
 		assertThat(counts.getMeasureLocations())
-			.hasSize(24);
-
-		assertThat(counts.getCounts())
 			.hasSize(24);
 
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> e : counts.getMeasureLocations().entrySet()) {
@@ -105,7 +101,7 @@ public class CreateCountsFromBAStDataTest {
 			"--shp-crs=" + shpCrs,
 			"--year=2021",
 			"--output=" + out2,
-			"--ignored-counts=" + utils.getPackageInputDirectory() + ignoredCounts,
+			"--counts-mapping=" + utils.getPackageInputDirectory() + mapping,
 		};
 
 		new CreateCountsFromBAStData().execute(args2);
@@ -140,7 +136,7 @@ public class CreateCountsFromBAStDataTest {
 			"--shp-crs=" + shpCrs,
 			"--year=2021",
 			"--output=" + out,
-			"--manual-matched-counts=" + utils.getPackageInputDirectory() + manualMatchedCounts,
+			"--counts-mapping=" + utils.getPackageInputDirectory() + mapping,
 		};
 
 		new CreateCountsFromBAStData().execute(args);
@@ -178,7 +174,7 @@ public class CreateCountsFromBAStDataTest {
 			"--shp-crs=" + shpCrs,
 			"--year=2021",
 			"--output=" + out,
-			"--manual-matched-counts=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
+			"--counts-mapping=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
 		};
 
 		Assertions.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));

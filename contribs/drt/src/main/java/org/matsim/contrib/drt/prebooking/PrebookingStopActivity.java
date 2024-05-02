@@ -48,12 +48,13 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final AbandonVoter abandonVoter;
 
 	private final Supplier<Double> endTime;
+	private int onboard;
 
 	public PrebookingStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
 			Supplier<Double> endTime, PassengerStopDurationProvider stopDurationProvider, DvrpVehicle vehicle,
-			PrebookingManager prebookingManager, AbandonVoter abandonVoter) {
+			PrebookingManager prebookingManager, AbandonVoter abandonVoter, int initialOccupancy) {
 		super(activityType);
 		this.passengerHandler = passengerHandler;
 		this.driver = driver;
@@ -64,12 +65,13 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		this.prebookingManager = prebookingManager;
 		this.abandonVoter = abandonVoter;
 		this.endTime = endTime;
+		this.onboard = initialOccupancy;
 	}
 
 	@Override
 	protected boolean isLastStep(double now) {
-		boolean pickupsReady = updatePickupRequests(now);
 		boolean dropoffsReady = updateDropoffRequests(now);
+		boolean pickupsReady = updatePickupRequests(now);
 		return pickupsReady && dropoffsReady && now >= endTime.get();
 	}
 
@@ -97,6 +99,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			if (entry.getValue() <= now) { // Request should leave now
 				passengerHandler.dropOffPassengers(driver, entry.getKey(), now);
 				prebookingManager.notifyDropoff(entry.getKey());
+				onboard -= dropoffRequests.get(entry.getKey()).getPassengerCount();
 				iterator.remove();
 			}
 		}
@@ -128,12 +131,18 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		var enterIterator = enterTimes.entrySet().iterator();
 
 		while (enterIterator.hasNext()) {
+			if (onboard >= vehicle.getCapacity()) {
+				// only let people enter if there is currently free capacity
+				break;
+			}
+
 			var entry = enterIterator.next();
 
 			if (entry.getValue() <= now) {
 				// let agent enter now
 				Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
 				enteredRequests.add(entry.getKey());
+				onboard += pickupRequests.get(entry.getKey()).getPassengerCount();
 				enterIterator.remove();
 			}
 		}

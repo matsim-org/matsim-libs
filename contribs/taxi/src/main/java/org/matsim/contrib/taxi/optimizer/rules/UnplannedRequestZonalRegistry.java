@@ -27,24 +27,24 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.zone.ZonalSystem;
-import org.matsim.contrib.zone.ZonalSystems;
-import org.matsim.contrib.zone.Zone;
 
 public class UnplannedRequestZonalRegistry {
-	private final ZonalSystem zonalSystem;
+	private final ZoneSystem zoneSystem;
 	private final IdMap<Zone, List<Zone>> zonesSortedByDistance;
 	private final IdMap<Zone, Map<Id<Request>, DrtRequest>> requestsInZones = new IdMap<>(Zone.class);
 
 	private int requestCount = 0;
 
-	public UnplannedRequestZonalRegistry(ZonalSystem zonalSystem) {
-		this.zonalSystem = zonalSystem;
-		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
+	public UnplannedRequestZonalRegistry(ZoneSystem zoneSystem) {
+		this.zoneSystem = zoneSystem;
+		zonesSortedByDistance = ZoneSystemUtils.initZonesByDistance(zoneSystem.getZones());
 
-		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
+		for (Id<Zone> id : zoneSystem.getZones().keySet()) {
 			requestsInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}
 	}
@@ -72,14 +72,14 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	public Stream<DrtRequest> findNearestRequests(Node node, int minCount) {
-		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+		return zonesSortedByDistance.get(zoneSystem.getZoneForNodeId(node.getId()).orElseThrow().getId())
 				.stream()
 				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
 				.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(DrtRequest request) {
-		return zonalSystem.getZone(request.getFromLink().getFromNode()).getId();
+		return zoneSystem.getZoneForNodeId(request.getFromLink().getFromNode().getId()).orElseThrow().getId();
 	}
 
 	public int getRequestCount() {

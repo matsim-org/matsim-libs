@@ -67,6 +67,10 @@ public class WeightedRandomSelection<T> {
 		return entryList.size();
 	}
 
+	public double getTotalWeight() {
+		return totalWeight;
+	}
+
 	private record Entry<E>(E e, double cumulativeWeight) implements Comparable<Entry<E>> {
 		public int compareTo(Entry<E> o) {
 			double diff = this.cumulativeWeight - o.cumulativeWeight;

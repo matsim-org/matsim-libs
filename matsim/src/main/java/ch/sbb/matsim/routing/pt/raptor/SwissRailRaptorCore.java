@@ -588,6 +588,7 @@ public class SwissRailRaptorCore {
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
+        boolean useTransportModeUtilities = parameters.isUseTransportModeUtilities();
 
         int routeIndex = -1;
         for (int firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(0); firstRouteStopIndex >= 0; firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(firstRouteStopIndex+1)) {
@@ -627,7 +628,8 @@ public class SwissRailRaptorCore {
                 routeIndex = tmpRouteIndex;
                 int firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
 
-                double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(boardingPE.toRouteStop.mode);
+                double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(
+                		 !useTransportModeUtilities ? boardingPE.toRouteStop.mode : boardingPE.toRouteStop.route.getTransportMode());
                 transferProvider.reset(boardingPE.transfer);
 
                 for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
