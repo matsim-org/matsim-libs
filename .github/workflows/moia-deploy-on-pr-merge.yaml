@@ -1,0 +1,33 @@
+name: deploy-on-pr-merge
+
+on:
+  push: # snapshot deployment
+    branches:
+      - moia-deployment
+
+jobs:
+  deploy-snapshot:
+    name: deploy MOIA
+    # for PR-labelled deployment -- only if closed by merging
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+
+    runs-on: ubuntu-latest
+
+    environment: prd
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: Set version
+        run:  mvn versions:set -DnewVersion=moia-latest-SNAPSHOT
+      - name: Deploy with Maven
+        env:
+          USERNAME: ${{github.actor}}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -pl org.matsim.contrib:sbb-extensions,org.matsim.contrib:drt,org.matsim.contrib:drt-extensions,org.matsim.contrib:discrete_mode_choice,org.matsim.contrib:simulatedannealing deploy -am  --settings settings.xml -DskipTests=true -DaltSnapshotDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs
+      - name: Trigger external development build
+        run: |
+              curl -XPOST -u "${{ secrets.PAT_USERNAME}}:${{secrets.PAT_TOKEN}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/moia-dev/matsim-external-development/dispatches --data '{"event_type": "build_application"}'
