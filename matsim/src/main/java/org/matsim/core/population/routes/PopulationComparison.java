@@ -3,6 +3,7 @@ package org.matsim.core.population.routes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.AttributesComparison;
 
 import java.util.Iterator;
@@ -72,7 +73,7 @@ public class PopulationComparison {
             Optional<Double> score2 = Optional.ofNullable(plan2.getScore());
 
             if (score1.isPresent() && score2.isPresent()) {
-                if (isWithinDelta(delta, plan2.getScore(), plan1.getScore())) {
+                if (!isWithinDelta(delta, plan2.getScore(), plan1.getScore())) {
 
                     double maxScore = Double.NEGATIVE_INFINITY;
                     for (Plan plan : person2.getPlans()) {
@@ -113,8 +114,17 @@ public class PopulationComparison {
         return result;
     }
 
-    private static boolean isWithinDelta(double delta, double double1, double double2) {
-        return Math.abs(double1 - double2) > delta;
+    private static boolean isWithinDelta(double double1, double double2, double delta) {
+        return Math.abs(double1 - double2) < delta;
+    }
+
+    private static boolean isBothUndefinedOrWithinDelta(OptionalTime time1, OptionalTime time2, double delta) {
+        if (time1.isUndefined() ^ time2.isUndefined()) {
+            return false;
+        } else if(time1.isDefined()) {
+            return isWithinDelta(time1.seconds(), time2.seconds(), delta);
+        }
+        return true;
     }
 
     public static boolean equals(List<PlanElement> planElements,
@@ -146,13 +156,13 @@ public class PopulationComparison {
         }
         if (o1 instanceof Leg leg1) {
             if (o2 instanceof Leg leg2) {
-                if (!isWithinDelta(leg1.getDepartureTime().orElse(Double.NaN), leg2.getDepartureTime().orElse(Double.NaN), delta)) {
+                if(!isBothUndefinedOrWithinDelta(leg1.getDepartureTime(), leg2.getDepartureTime(), delta)) {
                     return false;
                 }
                 if (!leg1.getMode().equals(leg2.getMode())) {
                     return false;
                 }
-                if (!isWithinDelta(leg1.getTravelTime().orElse(Double.NaN), leg2.getTravelTime().orElse(Double.NaN), delta)) {
+                if (!isBothUndefinedOrWithinDelta(leg1.getTravelTime(), leg2.getTravelTime(), delta)) {
                     return false;
                 }
             } else {
@@ -160,18 +170,10 @@ public class PopulationComparison {
             }
         } else if (o1 instanceof Activity activity1) {
             if (o2 instanceof Activity activity2) {
-                if (activity1.getEndTime().isUndefined() ^ activity2.getEndTime().isUndefined()) {
+                if (!isBothUndefinedOrWithinDelta(activity1.getEndTime(), activity2.getEndTime(), delta)) {
                     return false;
                 }
-                if(activity1.getEndTime().isDefined() && !isWithinDelta(activity1.getEndTime().seconds(),
-                        activity2.getEndTime().seconds(), delta)) {
-                    return false;
-                }
-                if (activity1.getStartTime().isUndefined() ^ activity2.getStartTime().isUndefined()) {
-                    return false;
-                }
-                if (activity1.getStartTime().isDefined() && !isWithinDelta(activity1.getStartTime().seconds(),
-                        activity2.getStartTime().seconds(), delta)) {
+                if (!isBothUndefinedOrWithinDelta(activity1.getStartTime(), activity2.getStartTime(), delta)) {
                     return false;
                 }
             } else {
