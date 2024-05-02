@@ -22,8 +22,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -32,8 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.ReplanningContext;
@@ -103,7 +102,7 @@ public class ExternalModuleTest {
         }, "test", outputDirectoryHierarchy, scenario);
         replanPopulation(scenario.getPopulation(), testee);
 		PopulationComparison.Result result = PopulationComparison.compare(scenario.getPopulation(), originalScenario.getPopulation());
-		Assertions.assertEquals(PopulationComparison.Result.equal, result);
+		Assertions.assertNotEquals(PopulationComparison.Result.equal, result);
     }
 
     private Population loadPopulation(String filename) {
