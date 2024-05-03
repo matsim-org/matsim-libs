@@ -267,11 +267,11 @@
             <!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
             <param name="writeDetailedCustomerStats" value="true"/>
 
-            <parameterset type="zonalSystem">
-                <param name="zonesGeneration" value="ShapeFile"/>
-                <!--<param name="cellSize" value="200"/>-->
-                <param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
-            </parameterset>
+			<parameterset type="zonalSystem" >
+				<parameterset type="GISFileZoneSystem" >
+					<param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
+				</parameterset>
+			</parameterset>
 
             <!--<parameterset type="rebalancing">
                 <parameterset type="minCostFlowRebalancingStrategy">
@@ -312,11 +312,11 @@
             <!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
             <param name="writeDetailedCustomerStats" value="true"/>
 
-            <parameterset type="zonalSystem">
-                <param name="zonesGeneration" value="ShapeFile"/>
-                <!--<param name="cellSize" value="200"/>-->
-                <param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
-            </parameterset>
+			<parameterset type="zonalSystem" >
+				<parameterset type="GISFileZoneSystem" >
+					<param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
+				</parameterset>
+			</parameterset>
 
             <!--<parameterset type="rebalancing">
                 <parameterset type="minCostFlowRebalancingStrategy">
@@ -334,7 +334,9 @@
         <!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
         <param name="travelTimeEstimationAlpha" value="0.05" />
         <parameterset type="travelTimeMatrix">
-            <param name="cellSize" value="200"/>
+			<parameterset type="SquareGridZoneSystem" >
+            	<param name="cellSize" value="200"/>
+			</parameterset>
         </parameterset>
 
     </module>

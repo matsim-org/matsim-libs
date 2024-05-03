@@ -20,23 +20,26 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemImpl;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.testcases.fakes.FakeLink;
+import org.matsim.core.network.NetworkUtils;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -45,12 +48,22 @@ public class PreviousIterationDrtDemandEstimatorTest {
 
 	private static final int ESTIMATION_PERIOD = 1800;
 
-	private final Link link1 = new FakeLink(Id.createLinkId("link_1"));
-	private final Link link2 = new FakeLink(Id.createLinkId("link_2"));
+	private final Network network = createNetwork();
 
-	private final Zone zone1 = ZoneImpl.createDummyZone(Id.create("zone_1", Zone.class), List.of(link1), new Coord());
-	private final Zone zone2 = ZoneImpl.createDummyZone(Id.create("zone_2", Zone.class), List.of(link2), new Coord());
-	private final ZoneSystem zonalSystem = new ZoneSystemImpl(List.of(zone1, zone2));
+	private final Link link1 = network.getLinks().get(Id.createLinkId("link_1"));
+	private final Link link2 = network.getLinks().get(Id.createLinkId("link_2"));
+
+	private final Zone zone1 = ZoneImpl.createDummyZone(Id.create("zone_1", Zone.class), new Coord());
+	private final Zone zone2 = ZoneImpl.createDummyZone(Id.create("zone_2", Zone.class), new Coord());
+	private final ZoneSystem zonalSystem = new ZoneSystemImpl(List.of(zone1, zone2), coord -> {
+        if(coord == link1.getToNode().getCoord()) {
+            return Optional.of(zone1);
+        } else if(coord == link2.getToNode().getCoord()) {
+            return Optional.of(zone2);
+        } else {
+            throw new RuntimeException();
+        }
+    }, network);
 
 	@Test
 	void noDepartures() {
@@ -176,5 +189,19 @@ public class PreviousIterationDrtDemandEstimatorTest {
 			double expectedDemand) {
 		assertThat(estimator.getExpectedDemand(fromTime, ESTIMATION_PERIOD).applyAsDouble(zone)).isEqualTo(
 				expectedDemand);
+	}
+
+	static Network createNetwork() {
+		Network network = NetworkUtils.createNetwork();
+		Node a = network.getFactory().createNode(Id.createNodeId("a"), new Coord());
+		Node b = network.getFactory().createNode(Id.createNodeId("b"), new Coord());
+		network.addNode(a);
+		network.addNode(b);
+
+		Link ab = network.getFactory().createLink(Id.createLinkId("link_1"), a, b);
+		Link bc = network.getFactory().createLink(Id.createLinkId("link_2"), b, a);
+		network.addLink(ab);
+		network.addLink(bc);
+		return network;
 	}
 }

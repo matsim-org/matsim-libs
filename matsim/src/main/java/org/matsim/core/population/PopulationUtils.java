@@ -665,7 +665,10 @@ public final class PopulationUtils {
 	 * this will go unnoticed (this method will just return true or false,
 	 * probably false, except if both Writers have written the exact same text
 	 * until the Exception happens).
+	 *
+	 * @deprecated -- please use {@link org.matsim.core.population.routes.PopulationComparison} instead.  nkuehnel, apr'24
 	 */
+	@Deprecated
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
 			try( InputStream inputStream1 = openPopulationInputStream( s1 ) ; InputStream inputStream2 = openPopulationInputStream( s2 ) ){
@@ -1186,6 +1189,10 @@ public final class PopulationUtils {
 		readPopulation( population, filename );
 		return population ;
 	}
+	/**
+	 * @deprecated -- please use {@link org.matsim.core.population.routes.PopulationComparison} instead.  nkuehnel, apr'24
+	 */
+	@Deprecated
 	public static boolean comparePopulations( Population population1, Population population2 ) {
 		return PopulationUtils.equalPopulation( population1, population2 );
 	}

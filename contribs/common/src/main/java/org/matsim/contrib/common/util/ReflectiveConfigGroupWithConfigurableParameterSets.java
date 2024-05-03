@@ -18,18 +18,17 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.common.util;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 
 /**
  * Provides additional functionality for handling parameter sets according to definitions.
