@@ -39,7 +39,7 @@ import java.util.Map;
 public final class VehicleUtils {
 	private static final Logger log = LogManager.getLogger( VehicleUtils.class ) ;
 
-	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
+	private static final String DEFAULT_VEHICLE_TYPE_ID = "defaultVehicleType";
 	private static final String VEHICLE_ATTRIBUTE_KEY = "vehicles";
 	private static final String VEHICLE_TYPES_ATTRIBUTE_KEY = "vehicleTypes";
 
@@ -62,10 +62,6 @@ public final class VehicleUtils {
 		return new VehicleType( typeId );
 	}
 
-	static {
-		DEFAULT_VEHICLE_TYPE.getCapacity().setSeats( 4 );
-	}
-
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();
 	}
@@ -74,8 +70,13 @@ public final class VehicleUtils {
 		return new VehiclesImpl();
 	}
 
-	public static VehicleType getDefaultVehicleType() {
-		return DEFAULT_VEHICLE_TYPE;
+	public static VehicleType createDefaultVehicleType() {
+		VehicleType defaultVehicleType = VehicleUtils.getFactory()
+				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
+		
+		defaultVehicleType.getCapacity().setSeats(4);
+		
+		return defaultVehicleType;
 	}
 
 	/**

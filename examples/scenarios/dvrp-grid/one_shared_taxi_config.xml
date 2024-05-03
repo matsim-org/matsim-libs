@@ -3,7 +3,9 @@
 <config>
 	<module name="dvrp">
 		<parameterset type="travelTimeMatrix">
-			<param name="cellSize" value="10"/>
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="10"/>
+			</parameterset>
 		</parameterset>
 	</module>
 

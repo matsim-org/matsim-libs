@@ -30,9 +30,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -51,6 +56,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -367,8 +373,25 @@ public class RailsimIntegrationTest {
 			type.setMaximumVelocity(30);
 			type.setLength(100);
 		}
-
-		SnzActivities.addScoringParams(config);
+		
+		// simplify the activity types, e.g. home_3600 -> home
+		Set<String> activityTypes = new HashSet<>();	
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				for (PlanElement pE : plan.getPlanElements()) {
+					if(pE instanceof Activity) {
+						Activity act = (Activity) pE;
+						String baseType = act.getType().split("_")[0];
+						act.setType(baseType);
+						activityTypes.add(baseType);
+					}
+				}
+			}
+		}
+		
+		for (String type : activityTypes) {
+			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(1234.));
+		}
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new RailsimModule());

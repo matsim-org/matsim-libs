@@ -26,8 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
-import org.matsim.contrib.common.zones.ZoneSystemUtils;
-import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -42,8 +41,6 @@ import org.matsim.examples.ExamplesUtils;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -55,8 +52,8 @@ public class EqualVehicleDensityTargetCalculatorTest {
 	private final Network network = NetworkUtils.readNetwork(
 			config.network().getInputFileURL(config.getContext()).toString());
 
-	private final ZoneSystem zonalSystem = ZoneSystemUtils.createFromPreparedGeometries(network,
-			DrtGridUtils.createGridFromNetwork(network, 500.));
+	private final ZoneSystem zonalSystem = new SquareGridZoneSystem(network, 500.);
+
 
 	@Test
 	void calculate_oneVehiclePerZone() {

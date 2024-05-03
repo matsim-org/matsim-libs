@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
@@ -53,6 +54,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -77,8 +79,13 @@ public class RunDrtExampleIT {
 	@Test
 	void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
 		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 				new OTFVisConfigGroup());
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
@@ -93,8 +100,8 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(296.95)
-				.inVehicleTravelTimeMean(387.02)
+				.waitAverage(297.19)
+				.inVehicleTravelTimeMean(386.78)
 				.totalTravelTimeMean(683.97)
 				.build();
 
@@ -105,7 +112,12 @@ public class RunDrtExampleIT {
 	void testRunDrtExampleWithNoRejections_SelectiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 				new OTFVisConfigGroup());
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
@@ -139,7 +151,12 @@ public class RunDrtExampleIT {
 	void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 			new OTFVisConfigGroup());
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
@@ -162,9 +179,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 			.rejectionRate(0.0)
 			.rejections(0)
-			.waitAverage(261.57)
-			.inVehicleTravelTimeMean(382.74)
-			.totalTravelTimeMean(644.32)
+			.waitAverage(269.8)
+			.inVehicleTravelTimeMean(379.69)
+			.totalTravelTimeMean(649.49)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -173,8 +190,13 @@ public class RunDrtExampleIT {
 	@Test
 	void testRunDrtExampleWithRequestRetry() {
 		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfig,
 				new OTFVisConfigGroup());
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
@@ -191,8 +213,8 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(1)
-				.waitAverage(305.97)
-				.inVehicleTravelTimeMean(378.18)
+				.waitAverage(306.21)
+				.inVehicleTravelTimeMean(377.94)
 				.totalTravelTimeMean(684.16)
 				.build();
 
@@ -270,11 +292,11 @@ public class RunDrtExampleIT {
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.03)
-				.rejections(11)
-				.waitAverage(223.86)
-				.inVehicleTravelTimeMean(389.57)
-				.totalTravelTimeMean(613.44)
+				.rejectionRate(0.02)
+				.rejections(9)
+				.waitAverage(224.56)
+				.inVehicleTravelTimeMean(392.65)
+				.totalTravelTimeMean(617.21)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -283,8 +305,13 @@ public class RunDrtExampleIT {
 	@Test
 	void testRunDrtExampleWithIncrementalStopDuration() {
 		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfig,
 				new OTFVisConfigGroup());
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -305,11 +332,11 @@ public class RunDrtExampleIT {
 		controller.run();
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.04)
-				.rejections(16)
-				.waitAverage(278.92)
-				.inVehicleTravelTimeMean(384.6)
-				.totalTravelTimeMean(663.52)
+				.rejectionRate(0.05)
+				.rejections(18)
+				.waitAverage(276.95)
+				.inVehicleTravelTimeMean(384.72)
+				.totalTravelTimeMean(661.66)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -318,10 +345,15 @@ public class RunDrtExampleIT {
 	@Test
 	void testRunDrtWithPrebooking() {
 		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_drt_config.xml");
 
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 				new OTFVisConfigGroup());
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
