@@ -54,7 +54,7 @@ public class RunChessboardIT {
 				Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
-				PopulationComparison.Result result = new PopulationComparison().compare(expected, actual);
+				PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
 				Assertions.assertSame(PopulationComparison.Result.equal, result);
 			}
 			{
