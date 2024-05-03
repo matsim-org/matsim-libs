@@ -24,13 +24,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.AbstractLeastCostPathCalculatorTest;
+import org.matsim.core.router.AbstractLeastCostPathCalculatorTestWithTurnRestrictions;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 /**
  * @author mrieser
  */
-public class SpeedyDijkstraTest extends AbstractLeastCostPathCalculatorTest {
+public class SpeedyDijkstraTest extends AbstractLeastCostPathCalculatorTestWithTurnRestrictions {
 
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
