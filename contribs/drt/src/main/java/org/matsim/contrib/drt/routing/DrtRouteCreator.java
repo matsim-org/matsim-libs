@@ -61,7 +61,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum travel time
 	 */
 	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta;
+		return drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha * unsharedRideTime + drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeBeta;
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum ride time
 	 */
 	static double getMaxRideTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour, drtCfg.maxDetourAlpha * unsharedRideTime + drtCfg.maxDetourBeta);
+		return Math.min(unsharedRideTime + drtCfg.getDrtOptimizationConstraintsParam().maxAbsoluteDetour, drtCfg.getDrtOptimizationConstraintsParam().maxDetourAlpha * unsharedRideTime + drtCfg.getDrtOptimizationConstraintsParam().maxDetourBeta);
 	}
 
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
@@ -89,7 +89,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		route.setTravelTime(maxTravelTime);
 		route.setMaxRideTime(maxRideDuration);
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(drtCfg.maxWaitTime);
+		route.setMaxWaitTime(drtCfg.getDrtOptimizationConstraintsParam().maxWaitTime);
 
 		if (this.drtCfg.storeUnsharedPath) {
 			route.setUnsharedPath(unsharedPath);

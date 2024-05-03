@@ -20,8 +20,8 @@ public class PessimisticDrtEstimator implements DrtEstimator {
 	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
 		// If not estimates are present, use travel time alpha as detour
 		// beta is not used, because estimates are supposed to be minimums and not worst cases
-		double travelTime = Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
-			route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha);
+		double travelTime = Math.min(route.getDirectRideTime() + drtConfig.getDrtOptimizationConstraintsParam().maxAbsoluteDetour,
+			route.getDirectRideTime() * drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha);
 
 		// for distance, also use the max travel time alpha
 		return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, 0);

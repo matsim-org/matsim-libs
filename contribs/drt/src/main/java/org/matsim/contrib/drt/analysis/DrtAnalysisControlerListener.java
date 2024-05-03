@@ -400,7 +400,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			if (createChart) {
 				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]", "Initially planned wait time [s]",
-						times, Pair.of(0., drtCfg.maxWaitTime));
+						times, Pair.of(0., drtCfg.getDrtOptimizationConstraintsParam().maxWaitTime));
 				//			xAxis.setLowerBound(0);
 				//			yAxis.setLowerBound(0);
 				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
@@ -664,11 +664,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
 
 			final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]", "unshared ride time [s]", travelTimes,
-					Pair.of(drtCfg.maxTravelTimeAlpha, drtCfg.maxTravelTimeBeta));
+					Pair.of(drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha, drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeBeta));
 			ChartSaveUtils.saveAsPNG(chart2, fileName + "_travelTimePlot", 1500, 1500);
 
 			final JFreeChart chart3 = DensityScatterPlots.createPlot("Ride Times", "ride time [s]", "unshared ride time [s]", rideTimes,
-					Pair.of(drtCfg.maxTravelTimeAlpha, drtCfg.maxTravelTimeBeta));
+					Pair.of(drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha, drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeBeta));
 			ChartSaveUtils.saveAsPNG(chart3, fileName + "_rideTimePlot", 1500, 1500);
 		}
 	}

@@ -90,7 +90,7 @@ public class RunDrtExampleIT {
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//disable rejections
-			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+            drtCfg.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -129,7 +129,7 @@ public class RunDrtExampleIT {
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
-			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+            drtCfg.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -168,7 +168,7 @@ public class RunDrtExampleIT {
 			drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
 
 			//disable rejections
-			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+            drtCfg.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controller().setLastIteration(3);
