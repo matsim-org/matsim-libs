@@ -68,8 +68,7 @@ public class RunETaxiScenarioIT {
 			Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
 
-			PopulationComparison populationComparison = new PopulationComparison();
-			PopulationComparison.Result result = populationComparison.compare(expected, actual);
+			PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
 			Assertions.assertEquals(PopulationComparison.Result.equal, result);
 		}
 		{
