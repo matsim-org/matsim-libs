@@ -37,10 +37,34 @@ public class DisallowedNextLinks {
 	// list in favor of a smaller memory footprint.
 	private final Map<String, List<List<Id<Link>>>> linkIdSequencesMap = new HashMap<>();
 
+    /**
+     * A builder to allow building a populated instance in one statement.
+     * Be aware that several calls to the build() method of a particular Builder instance will
+     * return the same DisallowedNextLinks instance!
+     */
+    public static class Builder {
+        private final DisallowedNextLinks instance = new DisallowedNextLinks();
+
+        public Builder withDisallowedLinkSequence(String mode, List<Id<Link>> linkSequence) {
+            instance.addDisallowedLinkSequence(mode, linkSequence);
+            return this;
+        }
+
+        /**
+         * Be aware that several calls to the build() method of a particular Builder
+         * instance will return the same DisallowedNextLinks instance!
+         * 
+         * @return an instance with the required disallowedNextLinks set
+         */
+        public DisallowedNextLinks build() {
+            return instance;
+        }
+    }
+
 	public DisallowedNextLinks() { // ! remove constructor, if routing considers this
 		if (!warnedAboutNotConsideredInRouting) {
 			warnedAboutNotConsideredInRouting = true;
-			LOG.warn("Considering DisallowedNextLinks in routing is not yet implemented!");
+			LOG.warn("Considering DisallowedNextLinks in routing is only implemented by SpeedyDijkstra and SpeedyALT!");
 		}
 	}
 
@@ -153,5 +177,10 @@ public class DisallowedNextLinks {
 	public int hashCode() {
 		return this.linkIdSequencesMap.hashCode();
 	}
+
+    @Override
+    public String toString() {
+        return "DisallowedNextLinks [linkIdSequencesMap=" + linkIdSequencesMap + "]";
+    }
 
 }
