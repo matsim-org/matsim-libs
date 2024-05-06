@@ -42,7 +42,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.maxHeight = 20;
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
-				viz.setColorRamp("greenRed", 10, false);
+				viz.setColorRamp(new double[]{40, 50, 60}, new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"});
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro");
 			});
 		layout.row("links2")
@@ -55,7 +55,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.maxHeight = 20;
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
-				viz.setColorRamp("greenRed", 10, false);
+				viz.setColorRamp(new double[]{40, 50, 60}, new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"});
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro");
 			});
 
@@ -73,7 +73,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.display.lineColor.dataset = "noise";
 				viz.display.lineColor.columnName = "value";
 				viz.display.lineColor.join = "Link Id";
-				viz.display.lineColor.fixedColors = new String[]{"#fd6335", "#c6150f", "#900f63", "#2972b7"};
+				viz.display.lineColor.fixedColors = new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"};
 				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 4, true, "45, 55, 65");
 				viz.display.lineWidth.dataset = "noise";
 				viz.display.lineWidth.columnName = "value";

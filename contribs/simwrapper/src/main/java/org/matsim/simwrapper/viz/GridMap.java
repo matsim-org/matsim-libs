@@ -74,6 +74,11 @@ public class GridMap extends Viz {
 	/**
 	 * Sets the full color ramps settings.
 	 */
+	public GridMap setColorRamp(double[] breakpoints, String[] colors) {
+		colorRamp = Map.of("breakpoints", breakpoints, "fixedColors", colors);
+		return this;
+	}
+
 	public GridMap setColorRamp(String ramp, int steps, boolean reverse) {
 		colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
 		return this;
