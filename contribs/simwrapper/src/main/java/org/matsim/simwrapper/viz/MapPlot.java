@@ -15,7 +15,7 @@ public final class MapPlot extends Viz {
 
 	public Display display = new Display();
 	public Double minValue;
-	public double maxValue;
+	public Double maxValue;
 	@JsonProperty(required = true)
 	private Object shapes;
 	private Map<String, String> datasets = new HashMap<>();
