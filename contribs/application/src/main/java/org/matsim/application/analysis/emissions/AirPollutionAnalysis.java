@@ -142,6 +142,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("transitSchedule", input.getRunDirectory()).toAbsolutePath().toString());
 		config.transit().setVehiclesFile(ApplicationUtils.matchInput("transitVehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.plans().setInputFile(null);
+		config.facilities().setInputFile(null);
 		config.eventsManager().setNumberOfThreads(null);
 		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
@@ -337,8 +338,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 						Coord coord = raster.getCoordForIndex(xi, yi);
 						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 
-//						if (value == 0)
-//							continue;
+						if (value == 0)
+							continue;
 
 						printer.print(timeBin.getStartTime());
 						printer.print(coord.getX());
