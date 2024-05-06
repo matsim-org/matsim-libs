@@ -32,23 +32,10 @@ public class NoiseDashboard implements Dashboard {
 		header.title = "Noise";
 		header.description = "Shows the noise footprint and spatial distribution.";
 
-		layout.row("links")
+		layout.row("aggregate noise")
 			.el(GridMap.class, (viz, data) -> {
-				viz.title = "Noise Immissions";
-				viz.description = "Noise Immissions per hour";
-				viz.height = 12.0;
-				viz.cellSize = 250;
-				viz.opacity = 0.2;
-				viz.maxHeight = 20;
-				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
-				viz.setColorRamp(new double[]{40, 50, 60}, new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"});
-				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro");
-			});
-		layout.row("links2")
-			.el(GridMap.class, (viz, data) -> {
-				viz.title = "Noise Immissions";
-				viz.description = "Noise Immissions per day";
+				viz.title = "Noise Immissions (Grid)";
+				viz.description = "Aggregate Noise Immissions per day";
 				viz.height = 12.0;
 				viz.cellSize = 250;
 				viz.opacity = 0.2;
@@ -57,12 +44,10 @@ public class NoiseDashboard implements Dashboard {
 				viz.zoom = data.context().mapZoomLevel;
 				viz.setColorRamp(new double[]{40, 50, 60}, new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"});
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro");
-			});
-
-		layout.row("links3")
+			})
 			.el(MapPlot.class, (viz, data) -> {
-				viz.title = "Noise Emissions";
-				viz.description = "Noise Emmissions per day";
+				viz.title = "Noise Emissions (Link)";
+				viz.description = "Aggregate Noise Emissions per day";
 				viz.height = 12.0;
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
@@ -79,6 +64,19 @@ public class NoiseDashboard implements Dashboard {
 				viz.display.lineWidth.columnName = "value";
 				viz.display.lineWidth.scaleFactor = 8d;
 				viz.display.lineWidth.join = "Link Id";
+			});
+		layout.row("hourly noise")
+			.el(GridMap.class, (viz, data) -> {
+				viz.title = "Hourly Noise Immissions (Grid)";
+				viz.description = "Noise Immissions per hour";
+				viz.height = 12.0;
+				viz.cellSize = 250;
+				viz.opacity = 0.2;
+				viz.maxHeight = 20;
+				viz.center = data.context().getCenter();
+				viz.zoom = data.context().mapZoomLevel;
+				viz.setColorRamp(new double[]{40, 50, 60}, new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"});
+				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro");
 			});
 	}
 }
