@@ -248,10 +248,14 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Map<String, Id<Vehicle>> modeId = VehicleUtils.getVehicleIds(person);
 
+		VehicleType defaultVehicleType = scenario.getVehicles().getVehicleTypes()
+				.get(VehicleUtils.createDefaultVehicleType().getId());
+		assertNotNull(defaultVehicleType);
+
         // should be only one, but however
         for (Id<Vehicle> vehicleId : modeId.values()) {
             assertTrue(scenario.getVehicles().getVehicles().containsKey(vehicleId));
-            assertEquals(VehicleUtils.getDefaultVehicleType(), scenario.getVehicles().getVehicles().get(vehicleId).getType());
+            assertEquals(defaultVehicleType, scenario.getVehicles().getVehicles().get(vehicleId).getType());
         }
     }
 

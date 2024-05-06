@@ -46,7 +46,6 @@ public class RebalancingModule extends AbstractDvrpModeModule {
 	public void install() {
 		if (drtCfg.getRebalancingParams().isPresent()) {
 			RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
-			install(new DrtModeZonalSystemModule(drtCfg));
 
 			if (rebalancingParams.getRebalancingStrategyParams() instanceof MinCostFlowRebalancingStrategyParams) {
 				install(new DrtModeMinCostFlowRebalancingModule(drtCfg));

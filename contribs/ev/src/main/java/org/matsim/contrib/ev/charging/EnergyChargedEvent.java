@@ -20,12 +20,13 @@
 
 package org.matsim.contrib.ev.charging;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -79,5 +80,15 @@ public class EnergyChargedEvent extends Event {
 		attr.put(ATTRIBUTE_ENERGY, energy + "");
 		attr.put(ATTRIBUTE_END_CHARGE, endCharge + "");
 		return attr;
+	}
+
+	public static EnergyChargedEvent convert(GenericEvent genericEvent) {
+		Map<String, String> attributes = genericEvent.getAttributes();
+		double time = genericEvent.getTime();
+		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(EnergyChargedEvent.ATTRIBUTE_VEHICLE));
+		Id<Charger> chargerId = Id.create(attributes.get(EnergyChargedEvent.ATTRIBUTE_CHARGER), Charger.class);
+		double energy = Double.parseDouble(attributes.get(EnergyChargedEvent.ATTRIBUTE_ENERGY));
+		double endCharge = Double.parseDouble(attributes.get(EnergyChargedEvent.ATTRIBUTE_END_CHARGE));
+		return new EnergyChargedEvent(time, chargerId, vehicleId, energy, endCharge);
 	}
 }

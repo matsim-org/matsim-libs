@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -39,10 +39,10 @@ import org.matsim.contrib.common.util.DistanceUtils;
  */
 public class AggregatedMinCostRelocationCalculator implements ZonalRelocationCalculator {
 	public static class DrtZoneVehicleSurplus {
-		public final DrtZone zone;
+		public final Zone zone;
 		public final int surplus;
 
-		public DrtZoneVehicleSurplus(DrtZone zone, int surplus) {
+		public DrtZoneVehicleSurplus(Zone zone, int surplus) {
 			this.zone = zone;
 			this.surplus = surplus;
 		}
@@ -56,14 +56,14 @@ public class AggregatedMinCostRelocationCalculator implements ZonalRelocationCal
 
 	@Override
 	public List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+			Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		return calcRelocations(rebalancableVehiclesPerZone, TransportProblem.solveForVehicleSurplus(vehicleSurplus));
 	}
 
-	private List<Relocation> calcRelocations(Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
-			List<TransportProblem.Flow<DrtZone, DrtZone>> flows) {
+	private List<Relocation> calcRelocations(Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
+			List<TransportProblem.Flow<Zone, Zone>> flows) {
 		List<Relocation> relocations = new ArrayList<>();
-		for (TransportProblem.Flow<DrtZone, DrtZone> flow : flows) {
+		for (TransportProblem.Flow<Zone, Zone> flow : flows) {
 			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(flow.origin());
 
 			Link targetLink = targetLinkSelector.selectTargetLink(flow.destination());

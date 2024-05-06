@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
@@ -62,14 +66,23 @@ public final class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerPar
 	@Positive
 	public int nearestVehiclesLimit = 30;
 
-	@Parameter
-	@Comment("The side length of square zones used in zonal registers of idle vehicles"
-			+ " and open requests. The default value is 1000 m. This value is good for urban areas. For large areas"
-			+ " with sparsely distributed taxis and low taxi demand, you may consider using a bigger cell size."
-			+ " On the other hand, if 'nearestRequestsLimit' or 'nearestVehiclesLimit' are very low,"
-			+ " a smaller cell size may work better.")
-	@Positive
-	public double cellSize = 1000;
+	private ZoneSystemParams zoneSystemParams = new SquareGridZoneSystemParams();
+
+	private void initSingletonParameterSets() {
+
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+	}
 
 	/**
 	 * {@value #REOPTIMIZATION_TIME_STEP_EXP}
@@ -81,9 +94,19 @@ public final class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerPar
 
 	public RuleBasedTaxiOptimizerParams() {
 		super(SET_NAME, false, false);
+		initSingletonParameterSets();
+		initDefault();
+	}
+
+	private void initDefault() {
+		((SquareGridZoneSystemParams) zoneSystemParams).cellSize = 1000.;
 	}
 
 	public int getReoptimizationTimeStep() {
 		return reoptimizationTimeStep;
+	}
+
+	public ZoneSystemParams getZoneSystemParams() {
+		return zoneSystemParams;
 	}
 }

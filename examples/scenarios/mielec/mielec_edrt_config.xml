@@ -3,7 +3,9 @@
 <config>
 	<module name="dvrp">
 		<parameterset type="travelTimeMatrix">
-			<param name="cellSize" value="100"/>
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="100"/>
+			</parameterset>
 		</parameterset>
 	</module>
 
@@ -20,8 +22,9 @@
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
 
 			<parameterset type="zonalSystem">
-				<param name="zonesGeneration" value="GridFromNetwork"/>
-				<param name="cellSize" value="500"/>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
+				</parameterset>
 			</parameterset>
 
 			<parameterset type="rebalancing">

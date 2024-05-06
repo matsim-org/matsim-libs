@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
@@ -54,17 +55,14 @@ public class ScheduleWaitingTimeEstimator implements PTWaitingTimeEstimator {
 		return new Tuple<>(transitLine.getId(), transitRoute.getId());
 	}
 
+	@Override
 	public double estimateWaitingTime(List<? extends PlanElement> elements) {
 		double totalWaitingTime = 0.0;
 
 		for (PlanElement element : elements) {
-			if (element instanceof Leg) {
-				Leg leg = (Leg) element;
-
-				if (leg.getMode().equals("pt")) {
-					TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
-					totalWaitingTime += estimateWaitingTime(leg.getDepartureTime().seconds(), route);
-				}
+			if (element instanceof Leg leg && leg.getMode().equals(TransportMode.pt)) {
+				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
+				totalWaitingTime += this.estimateWaitingTime(leg.getDepartureTime().seconds(), route);
 			}
 		}
 

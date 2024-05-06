@@ -1,12 +1,15 @@
 package org.matsim.core.network;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -34,10 +37,34 @@ public class DisallowedNextLinks {
 	// list in favor of a smaller memory footprint.
 	private final Map<String, List<List<Id<Link>>>> linkIdSequencesMap = new HashMap<>();
 
+    /**
+     * A builder to allow building a populated instance in one statement.
+     * Be aware that several calls to the build() method of a particular Builder instance will
+     * return the same DisallowedNextLinks instance!
+     */
+    public static class Builder {
+        private final DisallowedNextLinks instance = new DisallowedNextLinks();
+
+        public Builder withDisallowedLinkSequence(String mode, List<Id<Link>> linkSequence) {
+            instance.addDisallowedLinkSequence(mode, linkSequence);
+            return this;
+        }
+
+        /**
+         * Be aware that several calls to the build() method of a particular Builder
+         * instance will return the same DisallowedNextLinks instance!
+         * 
+         * @return an instance with the required disallowedNextLinks set
+         */
+        public DisallowedNextLinks build() {
+            return instance;
+        }
+    }
+
 	public DisallowedNextLinks() { // ! remove constructor, if routing considers this
 		if (!warnedAboutNotConsideredInRouting) {
 			warnedAboutNotConsideredInRouting = true;
-			LOG.warn("Considering DisallowedNextLinks in routing is not yet implemented!");
+			LOG.warn("Considering DisallowedNextLinks in routing is only implemented by SpeedyDijkstra and SpeedyALT!");
 		}
 	}
 
@@ -75,6 +102,25 @@ public class DisallowedNextLinks {
 		return sequences != null ? Collections.unmodifiableList(sequences) : Collections.emptyList();
 	}
 
+    /**
+     * Returns an aggregation of all link restrictions, for all modes. This is meant to be used in monomodal networks.
+     */
+	public Collection<List<Id<Link>>> getMergedDisallowedLinkSequences() {
+        // Implementation note: we do not want duplicates, so the logical choice is a set,
+        // as the argument for memory footprint does not hold here (short lived object).
+        // This makes the return types inconsistent, but one could argue that all methods should
+        // return Collections rather than Lists (ordering is not meaningful)
+        // We use a LinkedHashSet to preserve iteration order, to be consistent with other methods in this class
+        // td 04.24
+        final Set<List<Id<Link>>> sequences = new LinkedHashSet<>();
+
+        for (List<List<Id<Link>>> sequencesForMode : linkIdSequencesMap.values()) {
+            sequences.addAll(sequencesForMode);
+        }
+
+		return Collections.unmodifiableSet(sequences);
+	}
+
 	@Nullable
 	public List<List<Id<Link>>> removeDisallowedLinkSequences(String mode) {
 		return this.linkIdSequencesMap.remove(mode);
@@ -84,6 +130,18 @@ public class DisallowedNextLinks {
 		return this.linkIdSequencesMap.entrySet().stream()
 				.collect(Collectors.toMap(Entry::getKey, e -> Collections.unmodifiableList(e.getValue())));
 	}
+
+    public DisallowedNextLinks copyOnlyModes(final Collection<String> modes) {
+        final DisallowedNextLinks newInstance = new DisallowedNextLinks();
+
+        for (String mode : modes) {
+            for (List<Id<Link>> sequence : getDisallowedLinkSequences(mode)) {
+                newInstance.addDisallowedLinkSequence(mode, sequence);
+            }
+        }
+
+        return newInstance;
+    }
 
 	public void clear() {
 		this.linkIdSequencesMap.clear();
@@ -119,5 +177,10 @@ public class DisallowedNextLinks {
 	public int hashCode() {
 		return this.linkIdSequencesMap.hashCode();
 	}
+
+    @Override
+    public String toString() {
+        return "DisallowedNextLinks [linkIdSequencesMap=" + linkIdSequencesMap + "]";
+    }
 
 }

@@ -61,7 +61,7 @@ public class RandomDynAgentSource implements AgentSource {
 //			qSim.createAndParkVehicleOnLink(qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
 //					VehicleUtils.getDefaultVehicleType()), startLinkId);
 
-			final Vehicle vehicle = qSimVehicleFactory.createVehicle( Id.create( id, Vehicle.class ), VehicleUtils.getDefaultVehicleType() ) ;
+			final Vehicle vehicle = qSimVehicleFactory.createVehicle( Id.create( id, Vehicle.class ), VehicleUtils.createDefaultVehicleType() ) ;
 			QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory.  kai, nov'18
 			qSim.addParkedVehicle( qVehicle, startLinkId );
 

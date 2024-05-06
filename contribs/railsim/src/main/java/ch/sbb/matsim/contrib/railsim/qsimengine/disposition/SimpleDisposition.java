@@ -111,7 +111,7 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		}
 
-		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, detour);
+		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, null);
 	}
 
 	private Detour checkDetour(double time, List<RailLink> segment, TrainPosition position) {

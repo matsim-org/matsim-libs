@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
 public abstract class AbstractLeastCostPathCalculatorTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	protected MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final Network network);
