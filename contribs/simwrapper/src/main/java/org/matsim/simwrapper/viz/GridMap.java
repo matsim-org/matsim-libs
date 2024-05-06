@@ -10,6 +10,18 @@ import java.util.Map;
 public class GridMap extends Viz {
 
 	/**
+	 * The center of the map.
+	 */
+	@JsonProperty(required = false)
+	public Double zoom;
+
+	/**
+	 * The center of the map.
+	 */
+	@JsonProperty(required = false)
+	public double[] center;
+
+	/**
 	 * The filepath containing the data.
 	 */
 	@JsonProperty(required = true)
@@ -39,6 +51,12 @@ public class GridMap extends Viz {
 	@JsonProperty(required = false)
 	public Integer maxHeight;
 
+	/**
+	 * The valueColumn defines the column with the values. The default value is `value`.
+	 */
+	@JsonProperty(required = false)
+	public String valueColumn;
+
 	private Map<String, Object> colorRamp;
 
 	public GridMap() {
@@ -56,6 +74,11 @@ public class GridMap extends Viz {
 	/**
 	 * Sets the full color ramps settings.
 	 */
+	public GridMap setColorRamp(double[] breakpoints, String[] colors) {
+		colorRamp = Map.of("breakpoints", breakpoints, "fixedColors", colors);
+		return this;
+	}
+
 	public GridMap setColorRamp(String ramp, int steps, boolean reverse) {
 		colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
 		return this;
