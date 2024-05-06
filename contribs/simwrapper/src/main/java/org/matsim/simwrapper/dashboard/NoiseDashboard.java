@@ -43,7 +43,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro.gz");
+				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro");
 			});
 		layout.row("links2")
 			.el(GridMap.class, (viz, data) -> {
@@ -56,7 +56,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro.gz");
+				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro");
 			});
 
 		layout.row("links3")
@@ -73,7 +73,8 @@ public class NoiseDashboard implements Dashboard {
 				viz.display.lineColor.dataset = "noise";
 				viz.display.lineColor.columnName = "value";
 				viz.display.lineColor.join = "Link Id";
-				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
+				viz.display.lineColor.fixedColors = new String[]{"#fd6335", "#c6150f", "#900f63", "#2972b7"};
+				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 4, true, "45, 55, 65");
 				viz.display.lineWidth.dataset = "noise";
 				viz.display.lineWidth.columnName = "value";
 				viz.display.lineWidth.scaleFactor = 8d;

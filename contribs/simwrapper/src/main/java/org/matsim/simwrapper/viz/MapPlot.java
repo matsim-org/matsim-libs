@@ -81,6 +81,8 @@ public final class MapPlot extends Viz {
 		public String join;
 
 		public Double scaleFactor;
+		@JsonProperty()
+		public String[] fixedColors;
 
 		private Map<String, Object> colorRamp;
 
@@ -95,6 +97,11 @@ public final class MapPlot extends Viz {
 		/**
 		 * Sets the full color ramps settings.
 		 */
+		public DisplaySettings setColorRamp(String ramp, int steps, boolean reverse, String breakpoints) {
+			colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps, "breakpoints", breakpoints);
+			return this;
+		}
+
 		public DisplaySettings setColorRamp(String ramp, int steps, boolean reverse) {
 			colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
 			return this;
