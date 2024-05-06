@@ -14,7 +14,7 @@ public final class MapPlot extends Viz {
 	public Double zoom;
 
 	public Display display = new Display();
-	public double minValue;
+	public Double minValue;
 	public double maxValue;
 	@JsonProperty(required = true)
 	private Object shapes;
