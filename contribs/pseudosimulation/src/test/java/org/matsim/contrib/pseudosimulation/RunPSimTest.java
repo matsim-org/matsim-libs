@@ -102,7 +102,7 @@ public class RunPSimTest {
 		PopulationUtils.readPopulation( popExpected, utils.getInputDirectory() + "/output_plans.xml.gz" );
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
-		new PopulationComparison().compare( popExpected, popActual ) ;
+		PopulationComparison.compare( popExpected, popActual ) ;
 		Assertions.assertEquals(138.86084460860525, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
 
 	}

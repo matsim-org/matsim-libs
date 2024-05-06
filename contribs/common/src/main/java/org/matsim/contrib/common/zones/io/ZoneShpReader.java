@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.zone;
+package org.matsim.contrib.common.zones.io;
 
-import static java.util.stream.Collectors.toMap;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
+import org.matsim.core.utils.gis.GeoFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
+import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Node;
-
-public class SquareGridSystem implements ZonalSystem {
-	private final SquareGrid grid;
+public class ZoneShpReader {
 	private final Map<Id<Zone>, Zone> zones;
 
-	public SquareGridSystem(Collection<? extends Node> nodes, double cellSize) {
-		this.grid = new SquareGrid(nodes, cellSize);
-		zones = nodes.stream()
-				.map(n -> grid.getOrCreateZone(n.getCoord()))
-				.collect(toMap(Zone::getId, z -> z, (z1, z2) -> z1));
+	public ZoneShpReader(Map<Id<Zone>, Zone> zones) {
+		this.zones = zones;
 	}
 
-	@Override
-	public Map<Id<Zone>, Zone> getZones() {
-		return Collections.unmodifiableMap(zones);
+	public void readZones(URL url) {
+		readZones(url, ZoneShpWriter.ID_HEADER);
 	}
 
-	@Override
-	public Zone getZone(Node node) {
-		return grid.getZone(node.getCoord());
+	public void readZones(URL url, String idHeader) {
+		Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(url);
+		if (features.size() != zones.size()) {
+			throw new RuntimeException("Features#: " + features.size() + "; zones#: " + zones.size());
+		}
+
+		for (SimpleFeature ft : features) {
+			String id = ft.getAttribute(idHeader).toString();
+			Zone z = zones.get(Id.create(id, Zone.class));
+			if(z instanceof ZoneImpl zImpl) {
+				zImpl.setGeometry(new PreparedPolygon((MultiPolygon) ft.getDefaultGeometry()));
+			}
+		}
 	}
 }

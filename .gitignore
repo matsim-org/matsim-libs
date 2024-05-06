@@ -12,5 +12,8 @@ matsimExamples
 matsim/docs/doxygen/html
 matsim/src/main/java/Doxyfile
 
+# VS Code files
+.vscode
+
 # ignore output directories:
 output/
