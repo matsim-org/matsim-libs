@@ -17,7 +17,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
   private static final long serialVersionUID = -7545707257116531193L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"XYTData\",\"namespace\":\"org.matsim.application.avro\",\"fields\":[{\"name\":\"crs\",\"type\":\"string\",\"doc\":\"Coordinate reference system\"},{\"name\":\"xCoords\",\"type\":{\"type\":\"array\",\"items\":\"float\"},\"doc\":\"List of x coordinates\"},{\"name\":\"yCoords\",\"type\":{\"type\":\"array\",\"items\":\"float\"},\"doc\":\"List of y coordinates\"},{\"name\":\"timestamps\",\"type\":{\"type\":\"array\",\"items\":\"int\"},\"doc\":\"List of timestamps in seconds\"},{\"name\":\"data\",\"type\":{\"type\":\"map\",\"values\":{\"type\":\"array\",\"items\":\"float\"}},\"doc\":\"XYT data\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"XYTData\",\"namespace\":\"org.matsim.application.avro\",\"fields\":[{\"name\":\"crs\",\"type\":\"string\",\"doc\":\"Coordinate reference system\"},{\"name\":\"xCoords\",\"type\":{\"type\":\"array\",\"items\":\"float\"},\"doc\":\"List of x coordinates\"},{\"name\":\"yCoords\",\"type\":{\"type\":\"array\",\"items\":\"float\"},\"doc\":\"List of y coordinates\"},{\"name\":\"timestamps\",\"type\":{\"type\":\"array\",\"items\":\"int\"},\"doc\":\"List of timestamps in seconds\"},{\"name\":\"data\",\"type\":{\"type\":\"map\",\"values\":{\"type\":\"array\",\"items\":\"float\"}},\"doc\":\"XYT data for each dataset. The key is the name, the data is stored in one chunk of data.\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -81,7 +81,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
   private java.util.List<java.lang.Float> yCoords;
   /** List of timestamps in seconds */
   private java.util.List<java.lang.Integer> timestamps;
-  /** XYT data */
+  /** XYT data for each dataset. The key is the name, the data is stored in one chunk of data. */
   private java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> data;
 
   /**
@@ -97,7 +97,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param xCoords List of x coordinates
    * @param yCoords List of y coordinates
    * @param timestamps List of timestamps in seconds
-   * @param data XYT data
+   * @param data XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
    */
   public XYTData(java.lang.CharSequence crs, java.util.List<java.lang.Float> xCoords, java.util.List<java.lang.Float> yCoords, java.util.List<java.lang.Integer> timestamps, java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> data) {
     this.crs = crs;
@@ -214,7 +214,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
 
   /**
    * Gets the value of the 'data' field.
-   * @return XYT data
+   * @return XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
    */
   public java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> getData() {
     return data;
@@ -223,7 +223,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
 
   /**
    * Sets the value of the 'data' field.
-   * XYT data
+   * XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
    * @param value the value to set.
    */
   public void setData(java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> value) {
@@ -279,7 +279,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
     private java.util.List<java.lang.Float> yCoords;
     /** List of timestamps in seconds */
     private java.util.List<java.lang.Integer> timestamps;
-    /** XYT data */
+    /** XYT data for each dataset. The key is the name, the data is stored in one chunk of data. */
     private java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> data;
 
     /** Creates a new Builder */
@@ -521,7 +521,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
 
     /**
       * Gets the value of the 'data' field.
-      * XYT data
+      * XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
       * @return The value.
       */
     public java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> getData() {
@@ -531,7 +531,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
 
     /**
       * Sets the value of the 'data' field.
-      * XYT data
+      * XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
       * @param value The value of 'data'.
       * @return This builder.
       */
@@ -544,7 +544,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
 
     /**
       * Checks whether the 'data' field has been set.
-      * XYT data
+      * XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
       * @return True if the 'data' field has been set, false otherwise.
       */
     public boolean hasData() {
@@ -554,7 +554,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
 
     /**
       * Clears the value of the 'data' field.
-      * XYT data
+      * XYT data for each dataset. The key is the name, the data is stored in one chunk of data.
       * @return This builder.
       */
     public org.matsim.application.avro.XYTData.Builder clearData() {
