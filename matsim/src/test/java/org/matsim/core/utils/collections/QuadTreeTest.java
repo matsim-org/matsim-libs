@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class QuadTreeTest {
 
-	private final static Logger log = LogManager.getLogger(QuadTreeTest.class);
+	private final static Logger LOG = LogManager.getLogger(QuadTreeTest.class);
 
 	/**
 	 * @return A simple QuadTree with 6 entries for tests.
@@ -110,7 +110,7 @@ public class QuadTreeTest {
 			Assertions.fail( "no exception when adding an element on the left" );
 		}
 		catch (IllegalArgumentException e) {
-			log.info( "catched expected exception" , e );
+			LOG.info( "caught expected exception" , e );
 		}
 
 		try {
@@ -118,7 +118,7 @@ public class QuadTreeTest {
 			Assertions.fail( "no exception when adding an element on the right" );
 		}
 		catch (IllegalArgumentException e) {
-			log.info( "catched expected exception" , e );
+			LOG.info( "caught expected exception" , e );
 		}
 
 		try {
@@ -126,7 +126,7 @@ public class QuadTreeTest {
 			Assertions.fail( "no exception when adding an element above" );
 		}
 		catch (IllegalArgumentException e) {
-			log.info( "catched expected exception" , e );
+			LOG.info( "caught expected exception" , e );
 		}
 
 		try {
@@ -134,7 +134,7 @@ public class QuadTreeTest {
 			Assertions.fail( "no exception when adding an element below" );
 		}
 		catch (IllegalArgumentException e) {
-			log.info( "catched expected exception" , e );
+			LOG.info( "caught expected exception" , e );
 		}
 	}
 
@@ -381,7 +381,7 @@ public class QuadTreeTest {
 		qt.put(400, 900, "node2");
 		qt.put(700, 300, "node3");
 		qt.put(900, 400, "node4");
-		
+
 		Collection<String> values = new ArrayList<>();
 		qt.getRectangle(new Rect(400, 300, 700, 900), values);
 		Assertions.assertEquals(2, values.size());
@@ -531,7 +531,7 @@ public class QuadTreeTest {
 			fail("missing exception.");
 		}
 		catch (ConcurrentModificationException e) {
-			log.info("catched expected exception: ", e);
+			LOG.info("caught expected exception: ", e);
 		}
 	}
 
@@ -565,8 +565,6 @@ public class QuadTreeTest {
 	/**
 	 * Tests that by serializing and de-serializing a QuadTree, all important attributes
 	 * of the QuadTree are maintained. At the moment, this is essentially the size-attribute.
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@Test
 	void testSerialization() throws IOException, ClassNotFoundException {
@@ -579,7 +577,7 @@ public class QuadTreeTest {
 
 		ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
 		ObjectInputStream in = new ObjectInputStream(inStream);
-		QuadTree<String> qt2 = (QuadTree<String>)in.readObject();
+		@SuppressWarnings("unchecked") QuadTree<String> qt2 = (QuadTree<String>)in.readObject();
 		in.close();
 		assertEquals(qt.size(), qt2.size());
 		valuesTester(qt2.size(), qt2.values());
@@ -587,13 +585,10 @@ public class QuadTreeTest {
 
 	/**
 	 * An internal helper method to do the real testing.
-	 *
-	 * @param treeSize
-	 * @param values
 	 */
 	private void valuesTester(final int treeSize, final Collection<String> values) {
 		int counter = 0;
-		for (String value : values) {
+		for (String ignored : values) {
 			counter++;
 		}
 		assertEquals(treeSize, counter);
@@ -601,11 +596,7 @@ public class QuadTreeTest {
 	}
 
 	/**
-	 * Checks that the given collection contains exactly all of the exptectedEntries, but none more.
-	 *
-	 * @param <T>
-	 * @param expectedEntries
-	 * @param collection
+	 * Checks that the given collection contains exactly all expectedEntries, but none more.
 	 */
 	private <T> void assertContains(final T[] expectedEntries, final Collection<T> collection) {
 		assertEquals(expectedEntries.length, collection.size());
@@ -615,7 +606,7 @@ public class QuadTreeTest {
 	}
 
 	/**
-	 * An internal class to test the execute()-methods
+	 * An internal class to test the execute-methods
 	 *
 	 */
 	static class TestExecutor implements QuadTree.Executor<String> {
@@ -634,7 +625,7 @@ public class QuadTreeTest {
 	 */
 	@Test
 	void testGetRing() {
-		QuadTree qt = new QuadTree(0, 0, 3, 3);
+		QuadTree<String> qt = new QuadTree<>(0, 0, 3, 3);
 
 		for(int x = 0; x < 4; x++) {
 			for(int y = 0; y < 4; y++) {
@@ -643,39 +634,39 @@ public class QuadTreeTest {
 		}
 
 		Collection<String> result = qt.getRing(1, 1, 0, 1);
-		assertEquals(result.contains("1,1"), true);
-		assertEquals(result.contains("0,1"), true);
-		assertEquals(result.contains("1,0"), true);
-		assertEquals(result.contains("2,1"), true);
-		assertEquals(result.contains("1,2"), true);
+		assertTrue(result.contains("1,1"));
+		assertTrue(result.contains("0,1"));
+		assertTrue(result.contains("1,0"));
+		assertTrue(result.contains("2,1"));
+		assertTrue(result.contains("1,2"));
 
 		result = qt.getRing(1, 1, 0.5, 1);
-		assertEquals(result.contains("1,1"), false);
-		assertEquals(result.contains("0,1"), true);
-		assertEquals(result.contains("1,0"), true);
-		assertEquals(result.contains("2,1"), true);
-		assertEquals(result.contains("1,2"), true);
+		assertFalse(result.contains("1,1"));
+		assertTrue(result.contains("0,1"));
+		assertTrue(result.contains("1,0"));
+		assertTrue(result.contains("2,1"));
+		assertTrue(result.contains("1,2"));
 
 		result = qt.getRing(1, 1, 1.1, 1);
-		assertEquals(result.size(), 0);
+		assertEquals(0, result.size());
 
 		result = qt.getRing(1, 1, 0, 0);
-		assertEquals(result.size(), 1);
-		assertEquals(result.contains("1,1"), true);
+		assertEquals(1, result.size());
+		assertTrue(result.contains("1,1"));
 
 		result = qt.getRing(-1, 1, 1, 1.4);
-		assertEquals(result.size(), 1);
-		assertEquals(result.contains("0,1"), true);
+		assertEquals(1, result.size());
+		assertTrue(result.contains("0,1"));
 
 		result = qt.getRing(-1, 1, 1, 1.5);
-		assertEquals(result.size(), 3);
-		assertEquals(result.contains("0,1"), true);
-		assertEquals(result.contains("0,0"), true);
-		assertEquals(result.contains("0,2"), true);
+		assertEquals(3, result.size());
+		assertTrue(result.contains("0,1"));
+		assertTrue(result.contains("0,0"));
+		assertTrue(result.contains("0,2"));
 
-		result = qt.getRing(0, 0, Math.sqrt(18), Math.sqrt(18));
-		assertEquals(result.size(), 1);
-		assertEquals(result.contains("3,3"), true);
+		result = qt.getRing(0, 0, Math.sqrt(18.0), Math.sqrt(18.000001));
+		assertEquals(1, result.size());
+		assertTrue(result.contains("3,3"));
 	}
 
 	/**
@@ -753,15 +744,15 @@ public class QuadTreeTest {
 		}
 		long endTimeQuery = System.currentTimeMillis();
 
-		log.info("init time: " + (endTimeInit - startTimeInit) / 1000.0 + " sec.");
-		log.info("query time: " + (endTimeQuery - startTimeQuery) / 1000.0 + " sec.");
-		log.info("memory usage: " + (usedMemAfter - usedMemBefore) / 1024 / 1024.0 + " MB");
-		log.info("check, ignore: " + countFirstQuadrant);
+		LOG.info("init time: {} sec.", (endTimeInit - startTimeInit) / 1000.0);
+		LOG.info("query time: {} sec.", (endTimeQuery - startTimeQuery) / 1000.0);
+		LOG.info("memory usage: {} MB", (usedMemAfter - usedMemBefore) / 1024 / 1024.0);
+		LOG.info("check, ignore: {}", countFirstQuadrant);
 	}
 
 	public static void main(String[] args) {
 		for (int i = 0; i < 5; i++) {
-			log.info("Round " + i);
+			LOG.info("Round {}", i);
 			measurePerformance();
 		}
 	}

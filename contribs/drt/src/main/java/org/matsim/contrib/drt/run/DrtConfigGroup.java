@@ -28,8 +28,10 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
@@ -216,6 +218,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
+
+	public enum SimulationType {
+		fullSimulation, estimateAndTeleport
+	}
+
+	@Parameter
+	@Comment("Whether full simulation drt is employed")
+	public SimulationType simulationType = SimulationType.fullSimulation;
+
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
@@ -233,6 +244,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Nullable
 	private PrebookingParams prebookingParams;
+
+	@Nullable
+	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -279,6 +293,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
 				() -> prebookingParams,
 				params -> prebookingParams = (PrebookingParams)params);
+
+		// estimator (optional)
+		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
+			() -> drtEstimatorParams,
+			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
 	}
 
 	@Override
@@ -329,6 +349,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 				"maxAllowedPickupDelay must be specified! A value between 0 and 240 seconds can be a good choice for maxAllowedPickupDelay.");
 		}
 
+		if (simulationType == SimulationType.estimateAndTeleport) {
+			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
+				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
+		}
 	}
 
 	@Override
@@ -362,6 +386,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<PrebookingParams> getPrebookingParams() {
 		return Optional.ofNullable(prebookingParams);
+	}
+
+	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
+		return Optional.ofNullable(drtEstimatorParams);
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.estimator;
+package org.matsim.contrib.drt.estimator;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -38,20 +37,20 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 	//private final DefaultMainLegRouter.RouteCreator creator;
 	private final DrtEstimator estimator;
 	private final DrtEventSequenceCollector collector;
-	private final DrtEstimatorConfigGroup config;
+	private final String mode;
 
 	private CSVPrinter csv;
 
-	public DrtEstimateAnalyzer(DrtEstimator estimator, DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config) {
+	public DrtEstimateAnalyzer(DrtEstimator estimator, DrtEventSequenceCollector collector, String mode) {
 		this.estimator = estimator;
 		this.collector = collector;
-		this.config = config;
+		this.mode = mode;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-		String filename = event.getServices().getControlerIO().getOutputFilename("drt_estimates_" + config.getMode() + ".csv");
+		String filename = event.getServices().getControlerIO().getOutputFilename("drt_estimates_" + mode + ".csv");
 
 		try {
 			csv = new CSVPrinter(Files.newBufferedWriter(Path.of(filename), StandardCharsets.UTF_8), CSVFormat.DEFAULT);
@@ -115,8 +114,9 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 					DrtEstimator.Estimate estimate = estimator.estimate(route, OptionalTime.defined(seq.getSubmitted().getTime()));
 
 					waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
-					travelTime.addValue(Math.abs(estimate.travelTime() - valTravelTime));
-					fare.addValue(Math.abs(estimate.fare() - valFare));
+					travelTime.addValue(Math.abs(estimate.rideTime() - valTravelTime));
+					// TODO add fare estimator?
+//					fare.addValue(Math.abs(estimate.fare() - valFare));
 				}
 			}
 		}
