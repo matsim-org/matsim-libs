@@ -29,22 +29,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
@@ -60,7 +47,7 @@ public class EventsReadersTest {
 
 	static class TestHandler implements ActivityEndEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler,
 			LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler,
-			PersonStuckEventHandler {
+			PersonStuckEventHandler, PersonMoneyEventHandler {
 
 		public int eventCounter = 0;
 
@@ -141,6 +128,17 @@ public class EventsReadersTest {
 			assertEquals("9", event.getLinkId().toString());
 		}
 
+		@Override
+		public void handleEvent(final PersonMoneyEvent event) {
+			this.eventCounter++;
+			assertEquals(9, this.eventCounter, "expected personMoney-Event to be event #9");
+			assertEquals(21690.0, event.getTime(), 0.0);
+			assertEquals("9", event.getPersonId().toString());
+			assertEquals("drtFare", event.getPurpose());
+			assertEquals(TransportMode.drt, event.getTransactionPartner());
+			assertEquals(-1.0, event.getAmount(), 0.0);
+			assertEquals("drt_0", event.getReference());
+		}
 	}
 
 	@Test
@@ -152,7 +150,7 @@ public class EventsReadersTest {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.readFile(utils.getClassInputDirectory() + "events.xml");
 		events.finishProcessing();
-		assertEquals(8, handler.eventCounter, "number of read events");
+		assertEquals(9, handler.eventCounter, "number of read events");
 	}
 
 	@Test
@@ -164,6 +162,6 @@ public class EventsReadersTest {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(utils.getClassInputDirectory() + "events.xml");
 		events.finishProcessing();
-		assertEquals(8, handler.eventCounter, "number of read events");
+		assertEquals(9, handler.eventCounter, "number of read events");
 	}
 }
