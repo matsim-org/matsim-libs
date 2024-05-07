@@ -101,25 +101,25 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 
 		// === material related to wait2link below here ===
 		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time, 
-					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+			this.events.processEvent(new LinkLeaveEvent(time,
+					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
 					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)
 					// had driver id in previous version
 					));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time, 
-					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+			this.events.processEvent(new LinkEnterEvent(time,
+					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
 					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)
 					// had driver id in previous version
 					));
 		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType) ) {
 			// (this is the new version, marked by the new events name)
 
-			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
+			this.events.processEvent(new VehicleEntersTrafficEvent(time,
 					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
-					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class),
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
+					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE),
 					Double.parseDouble( atts.getValue( VehicleEntersTrafficEvent.ATTRIBUTE_POSITION) )
 					));
 		} else if ( "wait2link".equals(eventType) ) {
@@ -140,19 +140,19 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			} else {
 				position = 1.0 ;
 			}
-			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
+			this.events.processEvent(new VehicleEntersTrafficEvent(time,
 					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
-					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class),
 					vehicleId,
-					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
+					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE),
 					position
 					));
 		} else if (VehicleLeavesTrafficEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new VehicleLeavesTrafficEvent(time, 
-					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
-					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK), Link.class), 
-					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
-					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE), 
+			this.events.processEvent(new VehicleLeavesTrafficEvent(time,
+					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER), Person.class),
+					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK), Link.class),
+					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
+					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE),
 					Double.parseDouble( atts.getValue( VehicleLeavesTrafficEvent.ATTRIBUTE_POSITION) )
 					));
 		}
@@ -165,7 +165,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				coord = new Coord( xx, yy ) ;
 			}
 			this.events.processEvent(new ActivityEndEvent(
-					time, 
+					time,
 					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
 					Id.create(atts.getValue(HasLinkId.ATTRIBUTE_LINK), Link.class),
 					atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY),
@@ -208,7 +208,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			Id<Link> linkId = linkIdString == null ? null : Id.create(linkIdString, Link.class);
 			this.events.processEvent(new VehicleAbortsEvent(time, Id.create(atts.getValue(VehicleAbortsEvent.ATTRIBUTE_VEHICLE), Vehicle.class), linkId));
 		} else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
-			this.events.processEvent(new PersonMoneyEvent(time, Id.create(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT)), atts.getValue(PersonMoneyEvent.ATTRIBUTE_PURPOSE), atts.getValue(PersonMoneyEvent.ATTRIBUTE_TRANSACTION_PARTNER)));
+			this.events.processEvent(new PersonMoneyEvent(time, Id.create(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT)), atts.getValue(PersonMoneyEvent.ATTRIBUTE_PURPOSE), atts.getValue(PersonMoneyEvent.ATTRIBUTE_TRANSACTION_PARTNER), atts.getValue(PersonMoneyEvent.ATTRIBUTE_REFERENCE)));
 		} else if (PersonScoreEvent.EVENT_TYPE.equals(eventType) || "personScore".equals(eventType)) {
 			this.events.processEvent(new PersonScoreEvent(time, Id.create(atts.getValue(PersonScoreEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonScoreEvent.ATTRIBUTE_AMOUNT)), atts.getValue(PersonScoreEvent.ATTRIBUTE_KIND)));
 		} else if (PersonEntersVehicleEvent.EVENT_TYPE.equals(eventType)) {
