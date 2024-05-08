@@ -8,14 +8,14 @@ public interface NetworkModel {
 	/**
 	 * Flow Capacity (per lane)
 	 */
-	default FeatureRegressor capacity(String junctionType) {
+	default FeatureRegressor capacity(String junctionType, String highwayType) {
 		return null;
 	}
 
 	/**
 	 * Speed factor (relative to free flow speed).
 	 */
-	default FeatureRegressor speedFactor(String junctionType) {
+	default FeatureRegressor speedFactor(String junctionType, String highwayType) {
 		return null;
 	}
 

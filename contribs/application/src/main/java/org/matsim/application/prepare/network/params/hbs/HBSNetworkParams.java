@@ -9,14 +9,20 @@ import org.matsim.application.prepare.network.params.NetworkModel;
  */
 public class HBSNetworkParams implements NetworkModel {
 
-	@Override
-	public FeatureRegressor capacity(String junctionType) {
-		// TODO: should depend on junction type and or road type
-		return new HBSRoadCapacity();
-	}
+	private static final FeatureRegressor MOTORWAY = new HSBMotorwayCapacity();
+	private static final FeatureRegressor ROAD = new HBSRoadCapacity();
 
 	@Override
-	public FeatureRegressor speedFactor(String junctionType) {
-		throw new UnsupportedOperationException("Not implemented");
+	public FeatureRegressor capacity(String junctionType, String highwayType) {
+
+		if (highwayType.startsWith("motorway")) {
+			return MOTORWAY;
+		} else if (junctionType.startsWith("priority")) {
+			// All other roads
+			return ROAD;
+		}
+
+		throw new UnsupportedOperationException("Unknown type: " + junctionType);
 	}
+
 }

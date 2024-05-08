@@ -104,7 +104,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 						continue;
 					}
 
-					FeatureRegressor speedModel = model.speedFactor(ft.junctionType());
+					FeatureRegressor speedModel = model.speedFactor(ft.junctionType(), ft.highwayType());
 
 					if (speedModel == null) {
 						link.setFreespeed(allowedSpeed);

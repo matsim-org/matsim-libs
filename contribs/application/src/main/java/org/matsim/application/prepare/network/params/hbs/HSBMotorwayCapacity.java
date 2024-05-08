@@ -4,13 +4,11 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.matsim.application.prepare.network.params.FeatureRegressor;
 
 /**
- * See {@link HBSNetworkParams}.
+ * Capacity for motorways.
  */
-class HBSRoadCapacity implements FeatureRegressor {
+public class HSBMotorwayCapacity implements FeatureRegressor {
 	@Override
 	public double predict(Object2DoubleMap<String> ft) {
-
 		return 0;
-
 	}
 }
