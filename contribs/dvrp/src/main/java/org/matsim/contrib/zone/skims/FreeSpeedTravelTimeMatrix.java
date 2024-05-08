@@ -22,28 +22,28 @@ package org.matsim.contrib.zone.skims;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
-import org.matsim.contrib.zone.SquareGridSystem;
-import org.matsim.contrib.zone.ZonalSystems;
 import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
-	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
+	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params, int numberOfThreads,
 		double qSimTimeStepSize) {
-		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, params, numberOfThreads, new QSimFreeSpeedTravelTime(qSimTimeStepSize));
+		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, zoneSystem, params, numberOfThreads, new QSimFreeSpeedTravelTime(qSimTimeStepSize));
 	}
 
-	private final SquareGridSystem gridSystem;
+	private final ZoneSystem zoneSystem;
 	private final Matrix freeSpeedTravelTimeMatrix;
 	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
-	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads, TravelTime travelTime) {
-		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.cellSize);
-		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
+	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params, int numberOfThreads, TravelTime travelTime) {
+		this.zoneSystem = zoneSystem;
+		var centralNodes = ZoneSystemUtils.computeMostCentralNodes(dvrpNetwork.getNodes().values(), zoneSystem);
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
@@ -62,10 +62,10 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 				return time;
 			}
 		}
-		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
+		return freeSpeedTravelTimeMatrix.get(zoneSystem.getZoneForNodeId(fromNode.getId()).orElseThrow(), zoneSystem.getZoneForNodeId(toNode.getId()).orElseThrow());
 	}
 
 	public int getZonalTravelTime(Node fromNode, Node toNode, double departureTime) {
-		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
+		return freeSpeedTravelTimeMatrix.get(zoneSystem.getZoneForNodeId(fromNode.getId()).orElseThrow(), zoneSystem.getZoneForNodeId(toNode.getId()).orElseThrow());
 	}
 }

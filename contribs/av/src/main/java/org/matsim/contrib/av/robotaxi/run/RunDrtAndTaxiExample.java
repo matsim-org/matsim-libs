@@ -23,6 +23,7 @@ package org.matsim.contrib.av.robotaxi.run;
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
@@ -33,6 +34,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -44,8 +46,13 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunDrtAndTaxiExample {
 	public static void run(URL configUrl, boolean otfvis) {
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		ConfigGroup zoneParams = dvrpConfigGroup.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		dvrpConfigGroup.getTravelTimeMatrixParams().addParameterSet(zoneParams);
+
+
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new MultiModeTaxiConfigGroup(),
-				new DvrpConfigGroup(), new OTFVisConfigGroup());
+			dvrpConfigGroup, new OTFVisConfigGroup());
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 		config.controller()

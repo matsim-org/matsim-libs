@@ -99,20 +99,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 						   + routingMode + ";\tmode=" + mode) ;
 
 		// the network refers to the (transport)mode:
-		Network filteredNetwork = null;
-
-		// Ensure this is not performed concurrently by multiple threads!
-		synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
-			filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
-			if (filteredNetwork == null) {
-				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-				Set<String> modes = new HashSet<>();
-				modes.add(mode);
-				filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
-				filter.filter(filteredNetwork, modes);
-				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
-			}
-		}
+		Network filteredNetwork = singleModeNetworksCache.getOrCreateSingleModeNetwork(mode);
 
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);

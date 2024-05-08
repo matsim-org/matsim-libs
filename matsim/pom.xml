@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>matsim-all</artifactId>
-		<version>16.0-SNAPSHOT</version>
+		<version>2025.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -180,7 +180,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>16.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -222,7 +222,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.6-2</version>
+			<version>1.5.6-3</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -257,7 +257,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.10.0</version>
+			<version>1.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
