@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -27,6 +28,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -87,7 +89,11 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"eight_shared_taxi_config.xml");
 
-		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new MultiModeDrtConfigGroup(), new OTFVisConfigGroup());
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		ConfigGroup zoneParams = dvrpConfigGroup.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		dvrpConfigGroup.getTravelTimeMatrixParams().addParameterSet(zoneParams);
+
+		Config config = ConfigUtils.loadConfig(configUrl, dvrpConfigGroup, new MultiModeDrtConfigGroup(), new OTFVisConfigGroup());
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.qsim().setEndTime(4*3600);
 

@@ -45,6 +45,7 @@ public class DrtTeleportedRouteCalculator implements TeleportedRouteCalculator {
 	// it could be possible to integrate the drt estimators used by the informed mode-choice
 	// this router should probably not use the beeline distance but the direct travel route
 	// speed-up would still be significant (oct'23)
+	// estimator have been moved to drt contrib, one can now use estimateAndTeleport for new functionality (mar'24)
 
 	@Override
 	public Route calculateRoute(PassengerRequest request) {

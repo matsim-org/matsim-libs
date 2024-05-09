@@ -39,6 +39,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -161,12 +162,12 @@ public class RoutingIT {
 		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
 		new PopulationReader(referenceScenario).readFile(inPlansName);
 
-		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
-		if ( !isEqual ) {
+		PopulationComparison.Result result = PopulationComparison.compare(referenceScenario.getPopulation(), scenario.getPopulation());
+		if (result == PopulationComparison.Result.notEqual) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
-		Assertions.assertTrue(isEqual, "different plans files.");
+		Assertions.assertEquals(PopulationComparison.Result.equal, result, "different plans files");
 	}
 
 	private static void calcRoute(

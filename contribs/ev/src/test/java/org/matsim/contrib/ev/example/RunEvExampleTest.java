@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
@@ -33,8 +34,8 @@ public class RunEvExampleTest{
 				Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
-				boolean result = PopulationUtils.comparePopulations( expected, actual );
-				Assertions.assertTrue(result);
+				PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
+				Assertions.assertEquals(PopulationComparison.Result.equal, result);
 			}
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
@@ -66,8 +67,8 @@ public class RunEvExampleTest{
 				Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
-				boolean result = PopulationUtils.comparePopulations( expected, actual );
-				Assertions.assertTrue(result);
+				PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
+				Assertions.assertEquals(PopulationComparison.Result.equal, result);
 			}
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
