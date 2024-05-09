@@ -14,6 +14,7 @@ import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.application.prepare.Predictor;
 import org.matsim.application.prepare.network.params.NetworkParamsOpt.Feature;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -74,12 +75,12 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	/**
 	 * Theoretical capacity.
 	 */
-	private static double capacityEstimate(double v) {
+	public static double capacityEstimate(double v) {
 
 		// headway
 		double tT = 1.2;
 
-		// car length
+		// car length + buffer
 		double lL = 7.0;
 
 		double Qc = v / (v * tT + lL);
@@ -117,9 +118,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 			try {
 				applyChanges(link, ft);
-			} catch (UnsupportedOperationException u) {
-				// This will be ignored silently and should only be thrown if certain changes should not be applied
-			} catch (IllegalArgumentException e) {
+			}  catch (IllegalArgumentException e) {
 				warn++;
 				log.warn("Error processing link {}", link.getId(), e);
 			}
@@ -141,26 +140,27 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 		if (params.contains(NetworkAttribute.capacity)) {
 
-			FeatureRegressor capacity = model.capacity(ft.junctionType(), ft.highwayType());
+			Predictor capacity = model.capacity(ft.junctionType(), ft.highwayType());
+			// No operation performed if not supported
 			if (capacity == null) {
-				throw new UnsupportedOperationException("Capacity model not available for " + ft.junctionType());
+				return;
 			}
 
-			double perLane = capacity.predict(ft.features());
+			double perLane = capacity.predict(ft.features(), ft.categories());
 
 			double cap = capacityEstimate(ft.features().getDouble("speed"));
 
-			if (perLane < cap * speedFactorBounds[0]) {
+			if (perLane < cap * capacityBounds[0]) {
 				log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}",
-					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * speedFactorBounds[0]);
-				perLane = cap * speedFactorBounds[0];
+					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * capacityBounds[0]);
+				perLane = cap * capacityBounds[0];
 				modified = true;
 			}
 
-			if (perLane > cap * speedFactorBounds[1]) {
+			if (perLane > cap * capacityBounds[1]) {
 				log.warn("Reducing capacity per lane on {} ({}, {}) from {} to {}",
-					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * speedFactorBounds[1]);
-				perLane = cap * speedFactorBounds[1];
+					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * capacityBounds[1]);
+				perLane = cap * capacityBounds[1];
 				modified = true;
 			}
 
@@ -170,16 +170,16 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 		if (params.contains(NetworkAttribute.freespeed)) {
 
-			double speedFactor = 1.0;
-			FeatureRegressor speedModel = model.speedFactor(ft.junctionType(), ft.highwayType());
+			Predictor speedModel = model.speedFactor(ft.junctionType(), ft.highwayType());
 
+			// No operation performed if not supported
 			if (speedModel == null) {
-				throw new UnsupportedOperationException("Speed model not available for " + ft.junctionType());
+				return;
 			}
 
-			speedFactor =  paramsOpt != null ?
-				speedModel.predict(ft.features(), paramsOpt.getParams(ft.junctionType())) :
-				speedModel.predict(ft.features());
+			double speedFactor =  paramsOpt != null ?
+				speedModel.predict(ft.features(), ft.categories(), paramsOpt.getParams(ft.junctionType())) :
+				speedModel.predict(ft.features(), ft.categories());
 
 			if (speedFactor > speedFactorBounds[1]) {
 				log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);

@@ -84,6 +84,8 @@ class SumoNetworkFeatureExtractor {
 	 */
 	static double calcCurvature(SumoNetworkHandler.Edge edge) {
 
+		// TODO: not finished and correctly tested
+
 		double gon = 0;
 		List<double[]> coords = edge.shape;
 		for (int i = 0; i < coords.size() - 2; i++) {
@@ -114,7 +116,7 @@ class SumoNetworkFeatureExtractor {
 		return List.of("linkId", "highway_type", "speed", "length", "num_lanes", "change_num_lanes", "change_speed", "num_to_links", "num_conns",
 			"num_response", "num_foes", "dir_multiple_s", "dir_l", "dir_r", "dir_s", "dir_exclusive", "curvature",
 			"junction_type", "junction_inc_lanes", "priority_higher", "priority_equal", "priority_lower",
-			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway", "is_link", "is_merging");
+			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway", "is_link", "has_merging_link", "is_merging_into");
 	}
 
 	public void print(CSVPrinter out) {
@@ -181,6 +183,18 @@ class SumoNetworkFeatureExtractor {
 		boolean merging = incomingEdges.get(junction.id).stream()
 			.anyMatch(e -> e.type.contains("link"));
 
+		OptionalInt highestPrio = incomingEdges.get(junction.id).stream()
+			.mapToInt(this::getPrio).max();
+
+		// Find category of the highest merging lane
+		String mergingHighest = "";
+		if (highestPrio.isPresent() && highestPrio.getAsInt() > getPrio(edge)) {
+			Optional<Map.Entry<String, LinkProperties>> m = osm.entrySet().stream().filter(e -> e.getValue().getHierarchyLevel() == -highestPrio.getAsInt())
+				.findFirst();
+			if (m.isPresent())
+				mergingHighest = m.get().getKey();
+		}
+
 		boolean geq_secondary = switch (highwayType) {
 			case "secondary", "primary", "trunk", "motorway" -> true;
 			default -> false;
@@ -218,6 +232,7 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool("motorway".equals(highwayType)));
 		out.print(bool(highwayType.contains("link")));
 		out.print(bool(merging));
+		out.print(mergingHighest);
 
 		out.println();
 	}

@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -74,6 +76,7 @@ class NetworkParamsOpt {
 
 				Object2DoubleOpenHashMap<String> ft = new Object2DoubleOpenHashMap<>();
 				ft.defaultReturnValue(Double.NaN);
+				Object2ObjectMap<String, String> categories = new Object2ObjectOpenHashMap<>();
 
 				for (String column : header) {
 					String v = row.get(column);
@@ -82,13 +85,14 @@ class NetworkParamsOpt {
 					} catch (NumberFormatException e) {
 						// every not equal to True will be false
 						ft.put(column, Boolean.parseBoolean(v) ? 1 : 0);
+						categories.put(column, v);
 					}
 				}
 
 				String highwayType = header.contains(NetworkUtils.TYPE) ? row.get(NetworkUtils.TYPE) :
 					(link != null ? NetworkUtils.getHighwayType(link) : null);
 
-				features.put(id, new Feature(row.get("junction_type"), highwayType, ft));
+				features.put(id, new Feature(row.get("junction_type").intern(), highwayType, ft, categories));
 			}
 		}
 
@@ -177,7 +181,7 @@ class NetworkParamsOpt {
 		return new Result(rmse.getMean(), mse.getMean(), data);
 	}
 
-	record Feature(String junctionType, String highwayType, Object2DoubleMap<String> features) {
+	record Feature(String junctionType, String highwayType, Object2DoubleMap<String> features, Object2ObjectMap<String, String> categories) {
 	}
 
 	record Result(double rmse, double mae, Map<String, List<Data>> data) {

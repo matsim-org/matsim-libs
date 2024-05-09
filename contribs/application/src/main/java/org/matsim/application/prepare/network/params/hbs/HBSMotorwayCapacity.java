@@ -5,9 +5,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.matsim.application.prepare.Predictor;
 
 /**
- * Capacity for general roads, that are not motorways or residential roads.
+ * Capacity for motorways.
  */
-public class HBSRoadCapacity implements Predictor {
+public class HBSMotorwayCapacity implements Predictor {
 	@Override
 	public double predict(Object2DoubleMap<String> features, Object2ObjectMap<String, String> categories) {
 		return 0;
