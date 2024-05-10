@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSe
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -45,16 +46,17 @@ public class RunMultiHubShiftDrtScenarioIT {
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.maxTravelTimeAlpha = 1.5;
-		drtConfigGroup.maxTravelTimeBeta = 10. * 60.;
+		DrtOptimizationConstraintsParams constraintsParam = drtConfigGroup.getDrtOptimizationConstraintsParam();
+		constraintsParam.maxTravelTimeAlpha = 1.5;
+        constraintsParam.maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
-		drtConfigGroup.maxWaitTime = 600.;
-		drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+        constraintsParam.maxWaitTime = 600.;
+        constraintsParam.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.maxWalkDistance = 1000.;
+        constraintsParam.maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());

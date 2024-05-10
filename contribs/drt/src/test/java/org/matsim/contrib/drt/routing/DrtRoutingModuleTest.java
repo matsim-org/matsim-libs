@@ -80,9 +80,9 @@ public class DrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.mode = drtMode;
-		drtCfg.maxTravelTimeAlpha = 1.5;
-		drtCfg.maxTravelTimeBeta = 5 * 60;
-		drtCfg.maxWaitTime = 5 * 60;
+        drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.5;
+        drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5 * 60;
+        drtCfg.getDrtOptimizationConstraintsParam().maxWaitTime = 5 * 60;
 
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
 				.getFacilities()
@@ -91,7 +91,7 @@ public class DrtRoutingModuleTest {
 				.map(DrtStopFacilityImpl::createFromFacility)
 				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
 
-		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.maxWalkDistance,
+		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getDrtOptimizationConstraintsParam().maxWalkDistance,
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
 				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
@@ -259,7 +259,7 @@ public class DrtRoutingModuleTest {
 	private Scenario createTestScenario() {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.maxWalkDistance = 200;
+        drtConfigGroup.getDrtOptimizationConstraintsParam().maxWalkDistance = 200;
 		drtConfigGroup.transitStopFile = utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz";
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);

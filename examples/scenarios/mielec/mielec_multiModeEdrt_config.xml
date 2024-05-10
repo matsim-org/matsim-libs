@@ -14,9 +14,11 @@
 			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="mode" value="drt1"/>
 			<param name="stopDuration" value="60"/>
-			<param name="maxWaitTime" value="600"/>
-			<param name="maxTravelTimeAlpha" value="1.3"/>
-			<param name="maxTravelTimeBeta" value="400"/>
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="600"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="400"/>
+			</parameterset>
 
 			<param name="idleVehiclesReturnToDepots" value="true"/>
 			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
@@ -40,9 +42,11 @@
 			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="mode" value="drt2"/>
 			<param name="stopDuration" value="60"/>
-			<param name="maxWaitTime" value="600"/>
-			<param name="maxTravelTimeAlpha" value="1.3"/>
-			<param name="maxTravelTimeBeta" value="400"/>
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="600"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="400"/>
+			</parameterset>
 
 			<param name="idleVehiclesReturnToDepots" value="true"/>
 			<param name="vehiclesFile" value="vehicles-10-cap-4_drt2.xml"/>
