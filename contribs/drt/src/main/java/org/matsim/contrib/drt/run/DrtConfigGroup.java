@@ -19,17 +19,15 @@
 
 package org.matsim.contrib.drt.run;
 
-import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
-
-import java.util.Collection;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
@@ -44,17 +42,15 @@ import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Optional;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -236,6 +232,27 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
 
+	}
+
+	/**
+	 * for backwards compatibility with old drt config groups
+	 */
+	public void handleAddUnknownParam(final String paramName, final String value) {
+		switch (paramName) {
+			case "maxWaitTime":
+			case "maxTravelTimeAlpha":
+			case "maxTravelTimeBeta":
+			case "maxAbsoluteDetour":
+			case "maxDetourAlpha":
+			case "maxDetourBeta":
+			case "maxAllowedPickupDelay":
+			case "rejectRequestIfMaxWaitOrTravelTimeViolated":
+			case "maxWalkDistance":
+				getDrtOptimizationConstraintsParam().addParam(paramName, value);
+            	break;
+            default:
+                super.handleAddUnknownParam(paramName, value);
+        }
 	}
 
 	@Override

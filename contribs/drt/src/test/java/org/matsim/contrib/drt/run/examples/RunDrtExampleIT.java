@@ -393,7 +393,7 @@ public class RunDrtExampleIT {
 	 * rejectionRate, rejections, waitAverage, inVehicleTravelTimeMean, & totalTravelTimeMean
 	 */
 
-	private void verifyDrtCustomerStatsCloseToExpectedStats(String outputDirectory, Stats expectedStats) {
+	 static void verifyDrtCustomerStatsCloseToExpectedStats(String outputDirectory, Stats expectedStats) {
 
 		String filename = outputDirectory + "/drt_customer_stats_drt.csv";
 
@@ -424,7 +424,7 @@ public class RunDrtExampleIT {
 		assertThat(actualStats).usingRecursiveComparison().isEqualTo(expectedStats);
 	}
 
-	private static class Stats {
+	static class Stats {
 		private final double rejectionRate;
 		private final double rejections;
 		private final double waitAverage;
