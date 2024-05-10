@@ -147,6 +147,9 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 			}
 
 			double perLane = capacity.predict(ft.features(), ft.categories());
+			if (Double.isNaN(perLane)) {
+				return;
+			}
 
 			double cap = capacityEstimate(ft.features().getDouble("speed"));
 
@@ -180,6 +183,10 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 			double speedFactor =  paramsOpt != null ?
 				speedModel.predict(ft.features(), ft.categories(), paramsOpt.getParams(ft.junctionType())) :
 				speedModel.predict(ft.features(), ft.categories());
+
+			if (Double.isNaN(speedFactor)) {
+				return;
+			}
 
 			if (speedFactor > speedFactorBounds[1]) {
 				log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);
