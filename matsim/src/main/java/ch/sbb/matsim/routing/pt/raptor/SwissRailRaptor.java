@@ -231,13 +231,13 @@ public class SwissRailRaptor implements TransitRouter {
         for (TransitStopFacility stop : fromStops) {
             accessStops.add(new InitialStop(stop, 0, 0, 0, null));
         }
-        return this.calcLeastCostTree(accessStops, departureTime, parameters, person, null);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, Integer.MAX_VALUE, person, null);
     }
 
     public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Facility fromFacility, double departureTime, Person person, Attributes routingAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         List<InitialStop> accessStops = findAccessStops(fromFacility, fromFacility, person, departureTime, routingAttributes, parameters);
-        return this.calcLeastCostTree(accessStops, departureTime, parameters, person, null);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, Integer.MAX_VALUE, person, null);
     }
 
 	/** Calculates a least-cost-tree for every actual departure time between <code>earliestDepartureTime</code>
@@ -245,7 +245,7 @@ public class SwissRailRaptor implements TransitRouter {
 	 *  This method returns nothing, instead users have to use the <code>observer</code> to collect
 	 *  relevant results.
 	 */
-		public void calcTreesObservable(TransitStopFacility stopFacility, double earliestDepartureTime, double latestStartTime, RaptorParameters parameters, Person person, RaptorObserver observer) {
+		public void calcTreesObservable(TransitStopFacility stopFacility, double earliestDepartureTime, double latestStartTime, RaptorParameters parameters, int maxTransfers, Person person, RaptorObserver observer) {
 			if (this.data.config.getOptimization() != RaptorStaticConfig.RaptorOptimization.OneToAllRouting && !this.treeWarningShown) {
 				log.warn("SwissRailRaptorData was not initialized with full support for tree calculations and may result in unexpected results. Use `RaptorStaticConfig.setOptimization(RaptorOptimization.OneToAllRouting)` to fix this issue.");
 				this.treeWarningShown = true;
@@ -274,14 +274,14 @@ public class SwissRailRaptor implements TransitRouter {
 			double lastDepTime = -1;
 			for (double departureTime : departureTimes) {
 				if (departureTime > lastDepTime) {
-					calcLeastCostTree(accessStops, departureTime, parameters, person, observer);
+					calcLeastCostTree(accessStops, departureTime, parameters, maxTransfers, person, observer);
 					lastDepTime = departureTime;
 				}
 			}
 		}
 
-    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, Person person, RaptorObserver observer) {
-        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, person, observer);
+    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, int maxTransfers, Person person, RaptorObserver observer) {
+        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, maxTransfers, person, observer);
     }
 
     public SwissRailRaptorData getUnderlyingData() {

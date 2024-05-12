@@ -487,10 +487,10 @@ public class SwissRailRaptorCore {
     }
 
     public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person) {
-      return this.calcLeastCostTree(depTime, startStops, parameters, person, null);
+      return this.calcLeastCostTree(depTime, startStops, parameters, Integer.MAX_VALUE, person, null);
     }
 
-    public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person, RaptorObserver observer) {
+    public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, int maxTransfers, Person person, RaptorObserver observer) {
         reset();
 
         BitSet initialRouteStopIndices = new BitSet();
@@ -514,6 +514,7 @@ public class SwissRailRaptorCore {
         }
 
         // the main loop
+        int transfers = 0;
         while (true) {
             // first stage (according to paper) is to set earliestArrivalTime_k(stop) = earliestArrivalTime_k-1(stop)
             // but because we re-use the earliestArrivalTime-array, we don't have to do anything.
@@ -532,8 +533,13 @@ public class SwissRailRaptorCore {
                 initialStopIndices = null;
             }
 
+            if (transfers >= maxTransfers) {
+                break;
+            }
+
             // third stage (according to paper): handle footpaths / transfers
             handleTransfers(true, parameters);
+            transfers++;
 
             // final stage: check stop criterion
             if (this.improvedRouteStopIndices.isEmpty()) {
