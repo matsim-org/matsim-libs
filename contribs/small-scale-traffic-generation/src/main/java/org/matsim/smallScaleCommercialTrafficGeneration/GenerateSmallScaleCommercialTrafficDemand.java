@@ -94,6 +94,7 @@ import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommerc
  *
  * @author Ricardo Ewert
  */
+//TODO: use EnumeratedDistribution for distributions with probabilities
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
 public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
 	// freight traffic from extern:
