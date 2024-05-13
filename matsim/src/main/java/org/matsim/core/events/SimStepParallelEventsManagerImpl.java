@@ -291,7 +291,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 					if (event.getTime() < this.lastEventTime) {
 						throw new RuntimeException("Events in the queue are not ordered chronologically. " +
 								"This should never happen. Is the SimTimeStepParallelEventsManager registered " +
-								"as a MobsimAfterSimStepListener?");
+								"as a MobsimAfterSimStepListener? LastEventTime = " + this.lastEventTime +
+							  " currentEvent.time = " + event.getTime() + " currentEvent.type = " + event.getEventType() +
+							  " full event: " + event.toString());
 					} else {
 						this.lastEventTime = event.getTime();
 					}

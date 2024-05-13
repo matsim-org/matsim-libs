@@ -38,33 +38,27 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  */
 public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable, Identifiable<Plan> {
 	
-	public abstract List<PlanElement> getPlanElements();
+	List<PlanElement> getPlanElements();
 
-	public abstract void addLeg(final Leg leg);
+	void addLeg( final Leg leg );
 
-	public abstract void addActivity(final Activity act);
+	void addActivity( final Activity act );
 
+	void setType( final String type );
+	
+	void setPlanId( Id<Plan> planId );
+	
+	Id<Plan> getId();
+	
+	int getIterationCreated();
+	
+	void setIterationCreated( int iteration );
+	
+	String getPlanMutator();
+	
+	void setPlanMutator( String planMutator );
 
-	/**
-	 * Plan type, which may be used to ensure there is at least one plan of a certain type.
-	 */
-	public abstract String getType();
-
-	public abstract void setType(final String type);
-	
-	public abstract void setPlanId(Id<Plan> planId);
-	
-	public abstract Id<Plan> getId();
-	
-	public abstract int getIterationCreated();
-	
-	public abstract void setIterationCreated(int iteration);
-	
-	public abstract String getPlanMutator();
-	
-	public abstract void setPlanMutator(String planMutator);
-
-	public abstract Person getPerson();
+	Person getPerson();
 
 	/**
 	 * Sets the reference to the person.
@@ -72,7 +66,7 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 	 * sure that the bidirectional reference is set correctly if
 	 * you are using this method!.
 	 */
-	public abstract void setPerson(Person person);
+	void setPerson( Person person );
 	
 
 }

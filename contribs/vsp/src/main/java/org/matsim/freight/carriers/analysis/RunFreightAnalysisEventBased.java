@@ -120,7 +120,7 @@ public class RunFreightAnalysisEventBased {
 
 		log.info("Analysis completed.");
 		log.info("Writing output...");
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistance(analysisOutputDirectory, scenario);
+		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(analysisOutputDirectory, scenario);
 		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
 		carrierLoadAnalysis.writeLoadPerVehicle(analysisOutputDirectory, scenario);
 	}

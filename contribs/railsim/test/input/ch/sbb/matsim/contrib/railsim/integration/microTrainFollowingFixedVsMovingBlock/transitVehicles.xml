@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="trainType1">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.1</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.1</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="200"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="5"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="trainType2">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.1</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="300"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="20"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="t1_train1" type="trainType1"/>
+	<vehicle id="t1_train2" type="trainType2"/>
+	<vehicle id="t2_train1" type="trainType1"/>
+	<vehicle id="t2_train2" type="trainType2"/>
+
+</vehicleDefinitions>

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
@@ -58,7 +59,7 @@ public final class NetworkSkimMatrices {
 
     public static <T> NetworkIndicators<T> calculateSkimMatrices(Network xy2lNetwork, Network routingNetwork, Map<T, Coord[]> coordsPerZone, double departureTime, TravelTime travelTime,
             TravelDisutility travelDisutility, int numberOfThreads) {
-        SpeedyGraph routingGraph = new SpeedyGraph(routingNetwork);
+        SpeedyGraph routingGraph = SpeedyGraphBuilder.build(routingNetwork);
         Map<T, Node[]> nodesPerZone = new HashMap<>();
         for (Map.Entry<T, Coord[]> e : coordsPerZone.entrySet()) {
             T zoneId = e.getKey();
@@ -106,7 +107,7 @@ public final class NetworkSkimMatrices {
 
     private static class RowWorker<T> implements Runnable {
 
-        private final static Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.getDefaultVehicleType());
+        private final static Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.createDefaultVehicleType());
         private final static Person PERSON = PopulationUtils.getFactory().createPerson(Id.create("thePerson", Person.class));
         private final ConcurrentLinkedQueue<T> originZones;
         private final Set<T> destinationZones;

@@ -35,6 +35,7 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -71,7 +72,7 @@ public class VehicleAssignmentProblem<D> {
 
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
-		pathSearch = OneToManyPathSearch.createSearch(new SpeedyGraph(network), nodeMap, travelTime, travelDisutility,
+		pathSearch = OneToManyPathSearch.createSearch(SpeedyGraphBuilder.build(network), nodeMap, travelTime, travelDisutility,
 				false);
 
 		// TODO this kNN is slow

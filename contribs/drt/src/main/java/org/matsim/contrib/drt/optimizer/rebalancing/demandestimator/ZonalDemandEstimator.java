@@ -23,14 +23,14 @@
  */
 package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
-import java.util.function.ToDoubleFunction;
+import org.matsim.contrib.common.zones.Zone;
 
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import java.util.function.ToDoubleFunction;
 
 /**
  * @author jbischoff
  * @author Michal Maciejewski (michalm)
  */
 public interface ZonalDemandEstimator {
-	ToDoubleFunction<DrtZone> getExpectedDemand(double fromTime, double estimationPeriod);
+	ToDoubleFunction<Zone> getExpectedDemand(double fromTime, double estimationPeriod);
 }

@@ -24,8 +24,11 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.contrib.zone.skims.FreeSpeedTravelTimeMatrix;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.config.Config;
@@ -78,9 +81,15 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 			//use mode-specific travel time matrix built for this subnetwork
 			//lazily initialised: optimisers may not need it
 			bindModal(TravelTimeMatrix.class).toProvider(modalProvider(
-					getter -> FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(getter.getModal(Network.class),
-							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads(),
-							qSimConfigGroup.getTimeStepSize()))).in(Singleton.class);
+					getter -> {
+						Network network = getter.getModal(Network.class);
+						DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+						ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
+							matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem());
+						return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem,
+							matrixParams, globalConfigGroup.getNumberOfThreads(),
+                                qSimConfigGroup.getTimeStepSize());
+                    })).in(Singleton.class);
 		} else {
 			//use DVRP-routing (dvrp-global) network
 			bindModal(Network.class).to(

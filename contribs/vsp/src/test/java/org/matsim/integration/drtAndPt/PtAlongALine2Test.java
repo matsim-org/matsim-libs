@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
@@ -35,6 +36,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -45,10 +47,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
@@ -223,16 +222,18 @@ public class PtAlongALine2Test {
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 			dvrpConfig.networkModes = ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3"));
+			ConfigGroup zoneParams = dvrpConfig.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+			dvrpConfig.getTravelTimeMatrixParams().addParameterSet(zoneParams);
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 			{
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = TransportMode.drt;
-				drtConfigGroup.maxTravelTimeAlpha = 2.0;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 2.0;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -242,11 +243,11 @@ public class PtAlongALine2Test {
 			if (drt2) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt2";
-				drtConfigGroup.maxTravelTimeAlpha = 1.3;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -255,11 +256,11 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt3";
-				drtConfigGroup.maxTravelTimeAlpha = 1.3;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -321,9 +322,7 @@ public class PtAlongALine2Test {
 		}
 		if (drtMode == DrtMode.withPrebooking) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
-				person.getSelectedPlan()
-						.getAttributes()
-						.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 7200.);
+				PreplanningUtils.setPrebookingOffset_s( person.getSelectedPlan(), 7200. );
 			}
 		}
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -23,7 +24,7 @@ public class SpeedyGraphTest {
         Fixture f = new Fixture();
         Network network = f.network;
 
-        SpeedyGraph graph = new SpeedyGraph(network);
+        SpeedyGraph graph = SpeedyGraphBuilder.build(network);
 
         // test out-links
 

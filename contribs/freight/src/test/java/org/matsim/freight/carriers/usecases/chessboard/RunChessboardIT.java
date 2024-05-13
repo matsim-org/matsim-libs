@@ -32,7 +32,7 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class RunChessboardIT {
 
@@ -54,14 +54,14 @@ public class RunChessboardIT {
 				Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
-				PopulationComparison.Result result = new PopulationComparison().compare(expected, actual);
+				PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
 				Assertions.assertSame(PopulationComparison.Result.equal, result);
 			}
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assertions.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+				Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
 			}
 		} catch (Exception ee ) {
 			ee.printStackTrace();

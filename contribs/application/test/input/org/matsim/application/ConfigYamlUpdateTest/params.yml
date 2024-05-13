@@ -1,0 +1,13 @@
+scoring:
+  scoringParameters:
+    - modeParams:
+        - mode: walk
+          constant: 0.0
+        - mode: car
+          constant: -0.62
+        - mode: pt
+          constant: -0.25
+        - mode: bike
+          constant: -2.23
+        - mode: ride
+          constant: -1.37

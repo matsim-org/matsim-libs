@@ -45,6 +45,19 @@ class EventsAssert extends AbstractCollectionAssert<EventsAssert, Collection<? e
 		);
 	}
 
+	public EventsAssert hasTrainState(String veh, double time, String headLink, double speed) {
+		return haveAtLeast(1,
+			new Condition<>(event ->
+				(event instanceof RailsimTrainStateEvent ev)
+					&& ev.getVehicleId().toString().equals(veh)
+					&& FuzzyUtils.equals(ev.getTime(), time)
+					&& ev.getHeadLink().toString().equals(headLink)
+					&& FuzzyUtils.equals(ev.getSpeed(), speed),
+				String.format("event with veh %s time %.0f link: %s speed: %.2f", veh, time, headLink, speed))
+		);
+	}
+
+
 	@Override
 	protected EventAssert toAssert(Event value, String description) {
 		return null;

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.WeightedRandomSelection;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
@@ -79,11 +80,11 @@ public class DrtCompanionUtils {
 		}
 	}
 
-	public static Optional<Id<PassengerGroupIdentifier.PassengerGroup>> getPassengerGroupIdentifier(Person person) {
-		if (person.getAttributes().getAttribute(GROUP_IDENTIFIER_ATTRIBUTE) == null) {
+	public static Optional<Id<PassengerGroupIdentifier.PassengerGroup>> getPassengerGroupIdentifier(Leg leg) {
+		if (leg.getAttributes().getAttribute(GROUP_IDENTIFIER_ATTRIBUTE) == null) {
 			return Optional.empty();
 		} else {
-			return Optional.of(Id.create(person.getAttributes()
+			return Optional.of(Id.create(leg.getAttributes()
 				.getAttribute(GROUP_IDENTIFIER_ATTRIBUTE).toString(), PassengerGroupIdentifier.PassengerGroup.class));
 		}
 	}
@@ -104,8 +105,13 @@ public class DrtCompanionUtils {
 		person.getAttributes().putAttribute(ADDITIONAL_GROUP_PART_ATTRIBUTE, additionalgroupPart);
 	}
 
-	public static void setPassengerGroupIdentifier(Person person, Id<PassengerGroupIdentifier.PassengerGroup> passengerGroupIdentifierId ) {
-		person.getAttributes().putAttribute(GROUP_IDENTIFIER_ATTRIBUTE, passengerGroupIdentifierId);
+	public static void setPassengerGroupIdentifier(Leg leg, Id<PassengerGroupIdentifier.PassengerGroup> passengerGroupIdentifierId ) {
+		leg.getAttributes().putAttribute(GROUP_IDENTIFIER_ATTRIBUTE, passengerGroupIdentifierId);
+	}
+
+	public static void removePassengerGroupIdentifier(Leg leg)
+	{
+		leg.getAttributes().removeAttribute(GROUP_IDENTIFIER_ATTRIBUTE);
 	}
 
 }

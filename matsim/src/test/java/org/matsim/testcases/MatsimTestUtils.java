@@ -32,6 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -316,7 +317,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	}
 
   public static void assertEqualEventsFiles( String filename1, String filename2 ) {
-		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
 	}
 
   public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {

@@ -3,13 +3,14 @@ package org.matsim.simwrapper;
 import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
-import scala.util.parsing.combinator.testing.Str;
 
+import javax.annotation.Nullable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -25,12 +26,17 @@ public final class Data {
 	/**
 	 * Maps context to command runners.
 	 */
-	private final Map<String, CommandRunner> runners = new HashMap<>();
+	private final Map<String, CommandRunner> runners;
 
 	/**
 	 * Resources that needs to be copied.
 	 */
-	private final Map<Path, URL> resources = new HashMap<>();
+	private final Map<Path, URL> resources;
+
+	/**
+	 * Global args that are added to all commands.
+	 */
+	private final Map<Class<? extends MATSimAppCommand>, String[]> globalArgs = new LinkedHashMap<>();
 
 	/**
 	 * The output directory.
@@ -41,8 +47,20 @@ public final class Data {
 
 	Data(SimWrapperConfigGroup config) {
 		// path needed, but not available yet
-		this.currentContext = runners.computeIfAbsent("", CommandRunner::new);
 		this.config = config;
+		this.runners = new LinkedHashMap<>();
+		this.resources = new LinkedHashMap<>();
+
+		this.currentContext = runners.computeIfAbsent("", CommandRunner::new);
+		this.context = config.get("");
+	}
+
+	private Data(Data other, String context) {
+		this.config = other.config;
+		this.runners = other.runners;
+		this.resources = other.resources;
+		this.path = other.path;
+		this.setCurrentContext(context);
 	}
 
 	/**
@@ -62,7 +80,7 @@ public final class Data {
 	/**
 	 * Set the default args that will be used for a specific command.
 	 */
-	public Data args(Class<? extends MATSimAppCommand> command, String... args) {
+	public Data defaultArgs(Class<? extends MATSimAppCommand> command, String... args) {
 		currentContext.add(command, args);
 		return this;
 	}
@@ -94,17 +112,32 @@ public final class Data {
 	}
 
 	/**
-	 * Uses a command to construct the required output.
+	 * Uses a command to compute the required output.
 	 *
 	 * @param command the command to be executed
 	 * @param file    name of the produced output file
 	 */
 	public String compute(Class<? extends MATSimAppCommand> command, String file, String... args) {
 		currentContext.add(command, args);
-		Path path = currentContext.getRequiredPath(command, file);
+		Path p = currentContext.getRequiredPath(command, file);
 
 		// Relative path from the simulation output
-		return this.getUnixPath(this.path.getParent().relativize(path));
+		return this.getUnixPath(this.path.getParent().relativize(p));
+	}
+
+	/**
+	 * Uses a command to compute the required output. This can be used for commands that produce multiple outputs with a placeholder in the name.
+	 *
+	 * @param placeholder placeholder to be replaced in the file name
+	 * @see #compute(Class, String, String...)
+	 */
+	public String computeWithPlaceholder(Class<? extends MATSimAppCommand> command, String file, String placeholder, String... args) {
+		currentContext.add(command, args);
+		Path p = currentContext.getRequiredPath(command, file, placeholder);
+
+		// Relative path from the simulation output
+		return this.getUnixPath(this.path.getParent().relativize(p));
+
 	}
 
 	public String subcommand(String command, String file) {
@@ -186,12 +219,52 @@ public final class Data {
 
 	/**
 	 * Switch to a different context, which can hold different arguments and shp options.
+	 * This changes the state of the underlying object. The pubic API will return a new object and leave the original unchanged.
+	 *
+	 * @see #withContext(String)
 	 */
 	void setCurrentContext(String name) {
 		currentContext = runners.computeIfAbsent(name, CommandRunner::new);
 		currentContext.setOutput(path);
 		context = config.get(name);
 	}
+
+	/**
+	 * Use the default context for this data object.
+	 */
+	public Data withDefaultContext() {
+		return withContext(null);
+	}
+
+	/**
+	 * Change the context of this data object.
+	 */
+	public Data withContext(@Nullable String name) {
+		if (name == null)
+			name = "";
+
+		return new Data(this, name);
+	}
+
+
+	/**
+	 * Adds arguments to the given command in all contexts. This can be used to globally modify the behaviour of a command.
+	 */
+	public Data addGlobalArgs(Class<? extends MATSimAppCommand> command, String... args) {
+
+		if (globalArgs.containsKey(command)) {
+			String[] oldArgs = globalArgs.get(command);
+			String[] newArgs = new String[oldArgs.length + args.length];
+			System.arraycopy(oldArgs, 0, newArgs, 0, oldArgs.length);
+			System.arraycopy(args, 0, newArgs, oldArgs.length, args.length);
+			globalArgs.put(command, newArgs);
+		} else {
+			globalArgs.put(command, Arrays.copyOf(args, args.length));
+		}
+
+		return this;
+	}
+
 
 	void setPath(Path path) {
 		this.path = path;
@@ -204,4 +277,9 @@ public final class Data {
 	Map<Path, URL> getResources() {
 		return resources;
 	}
+
+	Map<Class<? extends MATSimAppCommand>, String[]> getGlobalArgs() {
+		return globalArgs;
+	}
+
 }

@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -33,6 +34,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
@@ -214,6 +216,8 @@ public class PrebookingTestEnvironment {
 		config.scoring().addActivityParams(genericParams);
 
 		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
 		config.addModule(dvrpConfig);
 
 		MultiModeDrtConfigGroup drtConfig = new MultiModeDrtConfigGroup();
@@ -222,9 +226,9 @@ public class PrebookingTestEnvironment {
 		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
 		modeConfig.mode = "drt";
-		modeConfig.maxWaitTime = maximumWaitTime;
-		modeConfig.maxTravelTimeAlpha = detourRelative;
-		modeConfig.maxTravelTimeBeta = detourAbsolute;
+        modeConfig.getDrtOptimizationConstraintsParam().maxWaitTime = maximumWaitTime;
+        modeConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = detourRelative;
+        modeConfig.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = detourAbsolute;
 		modeConfig.stopDuration = stopDuration;
 		modeConfig.idleVehiclesReturnToDepots = false;
 		modeConfig.vehiclesFile = null;

@@ -13,7 +13,7 @@ import java.util.Objects;
 public final class ModeEstimate {
 
 	private final String mode;
-	private final Enum<?> option;
+	private final ModeAvailability option;
 
 	private final double[] est;
 	private final double[] tripEst;
@@ -35,7 +35,7 @@ public final class ModeEstimate {
 	 * @param isMin        whether these are minimum estimates
 	 * @param storeTripEst whether trip est needs to be stored
 	 */
-	ModeEstimate(String mode, Enum<?> option, int n, boolean isUsable, boolean storeTripEst, boolean isMin) {
+	ModeEstimate(String mode, ModeAvailability option, int n, boolean isUsable, boolean storeTripEst, boolean isMin) {
 		this.mode = mode;
 		this.option = option;
 		this.min = isMin;
@@ -48,7 +48,7 @@ public final class ModeEstimate {
 		return mode;
 	}
 
-	public Enum<?> getOption() {
+	public ModeAvailability getOption() {
 		return option;
 	}
 
