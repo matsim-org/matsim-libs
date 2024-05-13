@@ -23,7 +23,7 @@ public class HBSRoadCapacity implements Predictor {
 
 		// Own assumption of increasing capacity with more lanes
 		// This is not covered by the HBS and is a very rare case
-		return (3913.3439999999996) * 1.3 / lanes;
+		return (3913.3439999999996 * 1.3) / lanes;
 	}
 
 	/**
