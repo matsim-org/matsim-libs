@@ -110,10 +110,10 @@ public class PtAlongALineTest {
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.mode = "drt_A";
 			drtConfig.stopDuration = 60.;
-			drtConfig.maxWaitTime = 900.;
-			drtConfig.maxTravelTimeAlpha = 1.3;
-			drtConfig.maxTravelTimeBeta = 10. * 60.;
-			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+            drtConfig.getDrtOptimizationConstraintsParam().maxWaitTime = 900.;
+            drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+            drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 10. * 60.;
+            drtConfig.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 			drtConfig.changeStartLinkToLastLinkInSchedule = true;
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
@@ -247,11 +247,11 @@ public class PtAlongALineTest {
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.maxTravelTimeAlpha = 1.3;
-			drtConfig.maxTravelTimeBeta = 5. * 60.;
+            drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+            drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 			drtConfig.stopDuration = 60.;
-			drtConfig.maxWaitTime = Double.MAX_VALUE;
-			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+            drtConfig.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+            drtConfig.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 			drtConfig.mode = TransportMode.drt;
 			mm.addParameterSet(drtConfig);
 		}
