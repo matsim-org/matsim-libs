@@ -11,7 +11,6 @@ public class HBSNetworkParams implements NetworkModel {
 
 	private static final Predictor MOTORWAY = new HBSMotorwayCapacity();
 	private static final Predictor ROAD = new HBSRoadCapacity();
-	private static final Predictor SIDEROAD = new HBSSideRoadCapacity();
 
 	@Override
 	public Predictor capacity(String junctionType, String highwayType) {
@@ -23,12 +22,10 @@ public class HBSNetworkParams implements NetworkModel {
 
 		if (highwayType.startsWith("motorway")) {
 			return MOTORWAY;
-		} else if (highwayType.startsWith("trunk") || highwayType.startsWith("primary") || highwayType.startsWith("secondary")) {
-			return ROAD;
 		}
 
 		// All lower category roads
-		return SIDEROAD;
+		return ROAD;
 	}
 
 }

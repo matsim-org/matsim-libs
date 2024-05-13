@@ -29,7 +29,12 @@ def calc_capacity_stadtstrasse(street):
 
     if street.lanes == 1:
         f = 1.0
-        if street.speed == 50:
+        # Assume middle-high "Erschließungsintensität"
+        if street.speed == 30:
+            k = 45
+            a = 38
+            b = 0.715
+        elif street.speed == 50:
             k = 45
             a = 54
             b = 0.850
@@ -106,7 +111,7 @@ for osm_type, street_type in osm_types.items():
     for lanes in range(1, 5):
         capacities[osm_type][lanes] = {}
         for speed in speeds:
-            if (osm_type == 'residential' and speed > 70) or (osm_type == 'residential' and speed < 50) or (osm_type == 'residential' and lanes > 2):
+            if (osm_type == 'residential' and speed > 70) or (osm_type == 'residential' and speed < 30) or (osm_type == 'residential' and lanes > 2):
                 continue
             if (osm_type == 'unclassified' and speed > 100) or (osm_type == 'unclassified' and speed <= 50) or (osm_type == 'unclassified' and lanes > 2):
                 continue
@@ -166,7 +171,7 @@ for v in range(50, 140, 10):
     capacity_compare.append(capacity_estimate(v))
 fig.add_trace(go.Scatter(x=speeds_compare, y=capacity_compare, mode='lines', showlegend=True, name="REFERENZ"))
 
-for qp in (0, 100, 400, 800):
+for qp in (0, 200, 400, 600):
     kontenpunkt_y = []
     kontenpunkt_y.append(merge(qp))
     kontenpunkt_y.append(merge(qp))
