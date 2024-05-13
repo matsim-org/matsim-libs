@@ -229,11 +229,11 @@ public class PtAlongALine2Test {
 			{
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = TransportMode.drt;
-				drtConfigGroup.maxTravelTimeAlpha = 2.0;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 2.0;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -243,11 +243,11 @@ public class PtAlongALine2Test {
 			if (drt2) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt2";
-				drtConfigGroup.maxTravelTimeAlpha = 1.3;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -256,11 +256,11 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt3";
-				drtConfigGroup.maxTravelTimeAlpha = 1.3;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = Double.MAX_VALUE;
+                drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
