@@ -10,6 +10,7 @@ import org.matsim.core.network.NetworkUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -120,7 +121,10 @@ public class SpeedyGraphBuilder {
 		for (Node node : network.getNodes().values()) {
 			this.nodes[node.getId().index()] = node;
 		}
-		for (Link link : network.getLinks().values()) {
+		List<Id<Link>> linkIds = new ArrayList<>(network.getLinks().keySet());
+        Collections.sort(linkIds);
+        for (Id<Link> linkId : linkIds) {
+        	Link link = network.getLinks().get(linkId);
 			if (context.replacedLinks.get(link.getId()) == null) {
 				addLink(link);
 			}
@@ -310,7 +314,10 @@ public class SpeedyGraphBuilder {
 		for (Node node : network.getNodes().values()) {
 			this.nodes[node.getId().index()] = node;
 		}
-		for (Link link : network.getLinks().values()) {
+		List<Id<Link>> linkIds = new ArrayList<>(network.getLinks().keySet());
+        Collections.sort(linkIds);
+        for (Id<Link> linkId : linkIds) {
+        	Link link = network.getLinks().get(linkId);
 			addLink(link);
 		}
 
