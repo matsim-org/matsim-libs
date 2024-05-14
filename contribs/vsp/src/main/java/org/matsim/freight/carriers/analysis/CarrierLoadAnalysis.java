@@ -101,8 +101,11 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 
 		//Write headline:
 		bw1.write("vehicleId"+RunFreightAnalysisEventBased.delimiter+
+				"vehicleTypeId" + RunFreightAnalysisEventBased.delimiter +
 				"capacity"+RunFreightAnalysisEventBased.delimiter+
-				"maxLoad"+RunFreightAnalysisEventBased.delimiter+"load state during tour");
+				"maxLoad"+RunFreightAnalysisEventBased.delimiter+
+				"usedCapacity[%]" + RunFreightAnalysisEventBased.delimiter +
+				"load state during tour");
 		bw1.newLine();
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
@@ -114,8 +117,10 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 			final Double capacity = vehicleType.getCapacity().getOther();
 
 			bw1.write(vehicleId.toString());
+			bw1.write(RunFreightAnalysisEventBased.delimiter + vehicleType.getId().toString());
 			bw1.write(RunFreightAnalysisEventBased.delimiter + capacity);
 			bw1.write(RunFreightAnalysisEventBased.delimiter + maxLoad);
+			bw1.write(RunFreightAnalysisEventBased.delimiter + Math.round(100*100*maxLoad/capacity)/100);
 			bw1.write(RunFreightAnalysisEventBased.delimiter + load);
 			bw1.newLine();
 		}
