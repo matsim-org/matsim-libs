@@ -107,7 +107,12 @@ class NetworkParamsOpt {
 		ft.defaultReturnValue(Double.NaN);
 		Object2ObjectMap<String, String> categories = new Object2ObjectOpenHashMap<>();
 
-		categories.put("highway_type", NetworkUtils.getHighwayType(link));
+		// Link might not be present in the network
+		if (link == null)
+			return new Feature("", "", ft, categories);
+
+		String highwayType = NetworkUtils.getHighwayType(link);
+		categories.put("highway_type", highwayType);
 		ft.put("speed", NetworkUtils.getAllowedSpeed(link));
 		ft.put("num_lanes", link.getNumberOfLanes());
 		ft.put("length", link.getLength());
@@ -124,7 +129,7 @@ class NetworkParamsOpt {
 			}
 		}
 
-		return new Feature("", NetworkUtils.getHighwayType(link), ft, categories);
+		return new Feature("", highwayType, ft, categories);
 	}
 
 	/**
