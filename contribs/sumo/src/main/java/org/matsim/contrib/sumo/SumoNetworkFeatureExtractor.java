@@ -120,7 +120,7 @@ class SumoNetworkFeatureExtractor {
 			"junction_type", "junction_inc_lanes", "priority_higher", "priority_equal", "priority_lower",
 			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway",
 			"is_link", "has_merging_link", "is_merging_into",
-			"num_connections", "num_left", "num_right", "num_straight"
+			"num_left", "num_right", "num_straight"
 			);
 	}
 
@@ -224,7 +224,7 @@ class SumoNetworkFeatureExtractor {
 		out.print(Math.max(-3, Math.min(3, maxLanes - edge.lanes.size())));
 		out.print(maxSpeed - edge.lanes.get(0).speed);
 		out.print(toEdges.size());
-		out.print(Math.min(6, handler.connections.get(edge.id).size()));
+		out.print(Math.min(6, connections.size()));
 		out.print(Math.min(12, aggr.response().cardinality()));
 		out.print(Math.min(12, aggr.foes().cardinality()));
 		out.print(bool(multipleDirS));
@@ -244,7 +244,6 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool(highwayType.contains("link")));
 		out.print(bool(merging));
 		out.print(mergingHighest);
-		out.print(connections.size());
 		out.print(numConnections.getInt('l'));
 		out.print(numConnections.getInt('r'));
 		out.print(numConnections.getInt('s'));
