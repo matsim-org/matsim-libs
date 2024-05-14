@@ -92,15 +92,17 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeLoadAnalysis(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
-		String fileName = analysisOutputDirectory + "Load_perVehicle.tsv";
+		String fileName = analysisOutputDirectory + "Load_perVehicle"+RunFreightAnalysisEventBased.fileExtension;
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("vehicleId \t capacity \t maxLoad \t load state during tour");
+		bw1.write("vehicleId"+RunFreightAnalysisEventBased.delimiter+
+				"capacity"+RunFreightAnalysisEventBased.delimiter+
+				"maxLoad"+RunFreightAnalysisEventBased.delimiter+"load state during tour");
 		bw1.newLine();
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
@@ -112,9 +114,9 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 			final Double capacity = vehicleType.getCapacity().getOther();
 
 			bw1.write(vehicleId.toString());
-			bw1.write("\t" + capacity);
-			bw1.write("\t" + maxLoad);
-			bw1.write("\t" + load);
+			bw1.write(RunFreightAnalysisEventBased.delimiter + capacity);
+			bw1.write(RunFreightAnalysisEventBased.delimiter + maxLoad);
+			bw1.write(RunFreightAnalysisEventBased.delimiter + load);
 			bw1.newLine();
 		}
 
