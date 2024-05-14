@@ -21,6 +21,8 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Set;
 
@@ -167,7 +169,8 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 				modified = true;
 			}
 
-			link.setCapacity(link.getNumberOfLanes() * perLane);
+			int totalCap = BigDecimal.valueOf(link.getNumberOfLanes() * perLane).setScale(0, RoundingMode.HALF_UP).intValue();
+			link.setCapacity(totalCap);
 		}
 
 
