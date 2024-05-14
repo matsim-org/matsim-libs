@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentPickupStartEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -37,10 +38,7 @@ import org.matsim.vehicles.VehicleUtils;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
 
@@ -108,6 +106,14 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 				"load state during tour");
 		bw1.newLine();
 
+		// for calculation
+		List<Double> perc = new ArrayList();
+		List<String> types = new ArrayList();
+
+		// for capacity display
+		List<String> capPerType = new ArrayList<>();
+
+
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
 			final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
@@ -115,6 +121,15 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();
+
+			perc.add(maxLoad/capacity);
+			String cap = vehicleType.getId().toString() + RunFreightAnalysisEventBased.delimiter + capacity;
+			if (!capPerType.contains(cap)) {
+				capPerType.add(cap);
+			}
+			if (!types.contains(vehicleType.getId().toString())) {
+				types.add(vehicleType.getId().toString());
+			}
 
 			bw1.write(vehicleId.toString());
 			bw1.write(RunFreightAnalysisEventBased.delimiter + vehicleType.getId().toString());
@@ -127,5 +142,52 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 
 		bw1.close();
 		log.info("Output written to " + fileName);
+
+		//Tiles with used vehicleTypes & average load and capacity per vehicle type
+
+		log.info("Writing out summary of vehicle load analysis ...");
+
+		//Write file for tiles
+		String fileName1 = analysisOutputDirectory + "Load_summary.csv";
+		BufferedWriter bw2 = new BufferedWriter(new FileWriter(fileName1));
+
+		//For calculation of average usage (%)
+		double use = Math.round(perc.stream().mapToDouble(Double::doubleValue).sum()/ perc.size()*100);
+
+		// Determination of all VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
+		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
+		//For the case that there are additional vehicle types found in the events.
+		for (Id<Vehicle> vehicleId  : vehicle2Load.keySet()) {
+			VehicleType vehicleType  = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+			vehicleTypesMap.putIfAbsent(vehicleType.getId(),vehicleType);
+		}
+
+		bw2.write("Used vehicle types"+ RunFreightAnalysisEventBased.delimiter
+				+ types.size() +"/"+vehicleTypesMap.size()+ RunFreightAnalysisEventBased.delimiter +
+				"truck");
+		bw2.newLine();
+		bw2.write("Average use of capacity"+ RunFreightAnalysisEventBased.delimiter
+				+ use + "%" + RunFreightAnalysisEventBased.delimiter
+				+"chart-pie");
+		bw2.close();
+		log.info("Output written to " + fileName1);
+
+		//Capacity per vehicle type
+		String fileName2 = analysisOutputDirectory + "Capacity_summary.csv";
+		BufferedWriter bw3 = new BufferedWriter(new FileWriter(fileName2));
+
+		//Write file
+		bw3.write("vehicleTypeId"+ RunFreightAnalysisEventBased.delimiter
+				+ "maxCapacity");
+		bw3.newLine();
+
+		for (String cap : capPerType) {
+			bw3.write(cap);
+			bw3.newLine();
+		}
+
+		bw3.close();
+		log.info("Output written to " + fileName2);
+
 	}
 }
