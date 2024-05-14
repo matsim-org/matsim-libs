@@ -9,21 +9,33 @@ import org.matsim.application.prepare.Predictor;
  */
 public class HBSRoadCapacity implements Predictor {
 	/**
-	 * Capacity on primary roads (Landstraße)
+	 * Capacity on "Landstraße", often osm secondary
 	 */
-	private static double capacityHighway(int lanes) {
-
-		// There is currently no way to differentiate Landstraße and Stadtstraße which can both have up to 70km/h
+	private static double capacityLandStr(int lanes) {
 
 		if (lanes == 1)
-			return 2846.990116534646;
+			return 1369.532383465354;
 
 		if (lanes == 2)
-			return 3913.3439999999996 / 2;
+			return 1956.6719999999998 / 2;
 
 		// Own assumption of increasing capacity with more lanes
 		// This is not covered by the HBS and is a very rare case
-		return (3913.3439999999996 * 1.3) / lanes;
+		return (1956.6719999999998 * 1.3) / lanes;
+	}
+
+	/**
+	 * Bundesstraße with at least 70km/h, often osm primary or trunk
+	 */
+	private static double capacityBundesStr(int lanes) {
+
+		if (lanes == 1)
+			return 2033.868926820213;
+
+		if (lanes == 2)
+			return 3902.4390243902435 / 2;
+
+		return (3902.4390243902435 * 1.3) / lanes;
 	}
 
 	/**
@@ -53,9 +65,11 @@ public class HBSRoadCapacity implements Predictor {
 	 */
 	private static double capacityMerging(String roadType, String mainType) {
 
-		if (mainType.equals("primary"))
+		if (mainType.equals("trunk") || mainType.equals("primary") || roadType.contains("residential"))
+			// ~600 veh/h
 			return capacityMerging(600);
 
+		// ~800 veh/h
 		return capacityMerging(400);
 	}
 
@@ -65,16 +79,22 @@ public class HBSRoadCapacity implements Predictor {
 		// Speed in km/h
 		int speed = (int) Math.round(features.getDouble("speed") * 3.6);
 		int lanes = (int) features.getOrDefault("lanes", 1);
+		String type = categories.get("highway_type");
 
-		if (speed >= 70) {
-			return capacityHighway(lanes);
+		// Primary and trunk roads are often Bundesstraßen,
+		// but only if they have a speed limit of 70 or more, this calculation is valid
+		// From OSM alone it is not possible to distinguish anbaufreie Hauptverkehrsstraßen and Landstraße clearly
+		if (speed >= 90 || ( (type.contains("primary") || type.contains("trunk")) && speed >= 70)) {
+			return capacityBundesStr(lanes);
+		} else if (speed >= 70) {
+			return capacityLandStr(lanes);
 		}
 
 		String merging = categories.get("is_merging_into");
 
 		// Only merging with a single lane road is considered
 		if (!merging.isEmpty() && lanes == 1) {
-			return capacityMerging(categories.get("highway_type"), merging);
+			return capacityMerging(type, merging);
 		}
 
 		// Capacity for city roads

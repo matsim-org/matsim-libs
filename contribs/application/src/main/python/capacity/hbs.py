@@ -42,6 +42,7 @@ def calc_capacity_stadtstrasse(street):
             k = 40
             a = 89
             b = 0.846
+
         return (-1.0 * b * math.pow(k, 3/2) * math.sqrt(4 * a * f + b * b * k) + 2 * a * f * k + b * b * k * k)/(2 * f * f)
     elif street.lanes == 2:
         f = 0.7
@@ -50,25 +51,27 @@ def calc_capacity_stadtstrasse(street):
             a = -0.009
             b = 55.58
         elif street.speed == 70:
+            f = 0.5
             k = 40
             a = -0.008
             b = 80
+
         return (b * k)/(f - a * k)
 
 def calc_capacity_landstrasse(street):
-    # Source: HSB L3
+    # Source: HSB table L3-4
     if street.lanes == 1:
         k = 20
         a = 98.73
         b = 0.8175
-        m = 1.0
-        return 0.5 * (b * math.pow(k, 3/2) * math.pow(m, 3/2) * math.sqrt(4 * a + b * b * k * m) - k * m * (b * b * -1.0 * k * m - 2 * a))
+        return 0.5 * (-b * math.pow(k, 3/2) * math.sqrt(4 * a + b * b * k) + 2 * a * k + b*b*k*k)
     if street.lanes == 2:
         k = 48
-        m = 1.0
         a = 55.5
         b = -0.614
-        return k * m * (2 * a + b * k * m)
+
+        # Divide by 2 because the formula is for both directions
+        return k * (2 * a + b * k) / 2
 
 def calc_capacity_autobahn(street):
     # Source: HSB A3
