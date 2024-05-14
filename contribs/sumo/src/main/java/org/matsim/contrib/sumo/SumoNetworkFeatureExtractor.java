@@ -1,5 +1,7 @@
 package org.matsim.contrib.sumo;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 
@@ -116,7 +118,10 @@ class SumoNetworkFeatureExtractor {
 		return List.of("linkId", "highway_type", "speed", "length", "num_lanes", "change_num_lanes", "change_speed", "num_to_links", "num_conns",
 			"num_response", "num_foes", "dir_multiple_s", "dir_l", "dir_r", "dir_s", "dir_exclusive", "curvature",
 			"junction_type", "junction_inc_lanes", "priority_higher", "priority_equal", "priority_lower",
-			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway", "is_link", "has_merging_link", "is_merging_into");
+			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway",
+			"is_link", "has_merging_link", "is_merging_into",
+			"num_connections", "num_left", "num_right", "num_straight"
+			);
 	}
 
 	public void print(CSVPrinter out) {
@@ -157,11 +162,17 @@ class SumoNetworkFeatureExtractor {
 		Set<Character> dirs = new HashSet<>();
 		boolean multipleDirS = false;
 		boolean exclusiveDirs = true;
+
+		// Number of connections per direction
+		Object2IntMap<Character> numConnections = new Object2IntOpenHashMap<>();
+
 		for (SumoNetworkHandler.Connection c : connections) {
 
 			Set<Character> d = directionSet(c);
 			if (dirs.contains('s') && d.contains('s'))
 				multipleDirS = true;
+
+			d.forEach(dir -> numConnections.mergeInt(dir, 1, Integer::sum));
 
 			Set<Character> intersection = new HashSet<>(dirs); // use the copy constructor
 			intersection.retainAll(d);
@@ -233,6 +244,10 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool(highwayType.contains("link")));
 		out.print(bool(merging));
 		out.print(mergingHighest);
+		out.print(connections.size());
+		out.print(numConnections.getInt('l'));
+		out.print(numConnections.getInt('r'));
+		out.print(numConnections.getInt('s'));
 
 		out.println();
 	}
