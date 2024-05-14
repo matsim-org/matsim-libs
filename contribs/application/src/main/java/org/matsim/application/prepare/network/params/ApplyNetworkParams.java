@@ -54,7 +54,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
 	private double[] speedFactorBounds;
 
-	@CommandLine.Option(names = "--capacity-bounds", split = ",", description = "Relative capacity bounds against theoretical max (lower,upper bound)", defaultValue = "0.3,1.0")
+	@CommandLine.Option(names = "--capacity-bounds", split = ",", description = "Relative capacity bounds against theoretical max (lower,upper bound)", defaultValue = "0.25,1.0")
 	private double[] capacityBounds;
 
 	@CommandLine.Option(names = "--road-types", split = ",", description = "Road types to apply changes to")
@@ -73,7 +73,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	}
 
 	/**
-	 * Theoretical capacity.
+	 * Theoretical capacity assuming fixed car length and headway. This should usually not be exceeded.
 	 */
 	public static double capacityEstimate(double v) {
 
