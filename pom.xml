@@ -442,23 +442,23 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <linksource>true</linksource>
-                            <doclint>none</doclint>
-                            <quiet>true</quiet>
-                        </configuration>
-                    </plugin>
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>attach-javadocs</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>jar</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                        <configuration>-->
+<!--                            <linksource>true</linksource>-->
+<!--                            <doclint>none</doclint>-->
+<!--                            <quiet>true</quiet>-->
+<!--                        </configuration>-->
+<!--                    </plugin>-->
                 </plugins>
             </build>
         </profile>
@@ -466,25 +466,25 @@
             <id>jacoco</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.10</version>
-                        <executions>
-                            <execution>
-                                <id>default-prepare-agent</id>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>default-report</id>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+<!--                    <plugin>-->
+<!--                        <groupId>org.jacoco</groupId>-->
+<!--                        <artifactId>jacoco-maven-plugin</artifactId>-->
+<!--                        <version>0.8.10</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>default-prepare-agent</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>prepare-agent</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                            <execution>-->
+<!--                                <id>default-report</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>report</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
                 </plugins>
             </build>
         </profile>
