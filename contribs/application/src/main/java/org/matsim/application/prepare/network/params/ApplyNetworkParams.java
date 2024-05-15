@@ -169,6 +169,9 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 				modified = true;
 			}
 
+			if (ft.features().getOrDefault("num_lanes", link.getNumberOfLanes()) != link.getNumberOfLanes())
+				log.warn("Number of lanes for link {} does not match the feature file", link.getId());
+
 			int totalCap = BigDecimal.valueOf(link.getNumberOfLanes() * perLane).setScale(0, RoundingMode.HALF_UP).intValue();
 			link.setCapacity(totalCap);
 		}
