@@ -78,7 +78,7 @@ public class HBSRoadCapacity implements Predictor {
 
 		// Speed in km/h
 		int speed = (int) Math.round(features.getDouble("speed") * 3.6);
-		int lanes = (int) features.getOrDefault("lanes", 1);
+		int lanes = (int) features.getOrDefault("num_lanes", 1);
 		String type = categories.get("highway_type");
 
 		// Primary and trunk roads are often Bundesstraßen,
