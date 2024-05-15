@@ -116,6 +116,8 @@ class NetworkParamsOpt {
 		ft.put("speed", NetworkUtils.getAllowedSpeed(link));
 		ft.put("num_lanes", link.getNumberOfLanes());
 		ft.put("length", link.getLength());
+		ft.put("capacity", link.getCapacity());
+		ft.put("freespeed", link.getFreespeed());
 
 		for (Map.Entry<String, Object> e : link.getAttributes().getAsMap().entrySet()) {
 			String key = e.getKey();
