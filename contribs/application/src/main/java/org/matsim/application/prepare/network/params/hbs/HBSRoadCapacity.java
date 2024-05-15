@@ -98,7 +98,7 @@ public class HBSRoadCapacity implements Predictor {
 		}
 
 		// Capacity for city roads
-		if (speed >= 40 || lanes >= 2) {
+		if (speed >= 40 || lanes >= 2 || features.getDouble("is_secondary_or_higher") == 1) {
 			return switch (lanes) {
 				case 1 -> 1139.0625;
 				case 2 -> 2263.438914027149 / 2;
