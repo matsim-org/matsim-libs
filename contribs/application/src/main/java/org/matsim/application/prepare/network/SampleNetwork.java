@@ -144,6 +144,10 @@ public class SampleNetwork implements MATSimAppCommand {
 
 				List<? extends Node> list = e.getValue();
 
+				// for now only consider traffic lights
+				if (!e.getKey().equals("traffic_light"))
+					continue;
+
 				log.info("Sampling {} out of {} intersections for type {}", sample, list.size(), e.getKey());
 
 				for (int i = 0; i < sample && !list.isEmpty(); i++) {
