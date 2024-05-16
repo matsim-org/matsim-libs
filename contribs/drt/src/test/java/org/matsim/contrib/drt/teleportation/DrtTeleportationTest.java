@@ -46,7 +46,7 @@ class DrtTeleportationTest {
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
-		DrtOptimizationConstraintsParams constraintsParam = drtConfigGroup.getDrtOptimizationConstraintsParam();
+		DrtOptimizationConstraintsParams constraintsParam = drtConfigGroup.getDefaultDrtOptimizationConstraintsParam();
 		constraintsParam.maxTravelTimeAlpha = 1.2;
 		constraintsParam.maxTravelTimeBeta = 600;
 		constraintsParam.maxWaitTime = 300;

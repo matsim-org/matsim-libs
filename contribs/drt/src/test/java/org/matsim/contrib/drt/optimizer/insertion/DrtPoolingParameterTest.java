@@ -225,9 +225,9 @@ public class DrtPoolingParameterTest {
 
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		mm.getModalElements().forEach(x -> {
-            x.getDrtOptimizationConstraintsParam().maxWaitTime = maxWaitTime;
-            x.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = maxTravelTimeAlpha;
-            x.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = maxTravelTimeBeta;
+			x.getDefaultDrtOptimizationConstraintsParam().maxWaitTime = maxWaitTime;
+			x.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeAlpha = maxTravelTimeAlpha;
+			x.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeBeta = maxTravelTimeBeta;
 			x.stopDuration = 1.;
 		});
 

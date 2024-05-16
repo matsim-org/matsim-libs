@@ -226,9 +226,9 @@ public class PrebookingTestEnvironment {
 		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
 		modeConfig.mode = "drt";
-        modeConfig.getDrtOptimizationConstraintsParam().maxWaitTime = maximumWaitTime;
-        modeConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = detourRelative;
-        modeConfig.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = detourAbsolute;
+		modeConfig.getDefaultDrtOptimizationConstraintsParam().maxWaitTime = maximumWaitTime;
+		modeConfig.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeAlpha = detourRelative;
+		modeConfig.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeBeta = detourAbsolute;
 		modeConfig.stopDuration = stopDuration;
 		modeConfig.idleVehiclesReturnToDepots = false;
 		modeConfig.vehiclesFile = null;

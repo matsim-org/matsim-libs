@@ -141,9 +141,9 @@ class RunJointDemandDRTExample {
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 
         DrtConfigGroup drtCfg = new DrtConfigGroup();
-        drtCfg.getDrtOptimizationConstraintsParam().maxWaitTime = 2 * 3600;
-        drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 5;
-        drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 15 * 60;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxWaitTime = 2 * 3600;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 5;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeBeta = 15 * 60;
         drtCfg.stopDuration = 60;
         drtCfg.vehiclesFile = "jointDemand_vehicles.xml";
         multiModeDrtConfigGroup.addParameterSet(drtCfg);

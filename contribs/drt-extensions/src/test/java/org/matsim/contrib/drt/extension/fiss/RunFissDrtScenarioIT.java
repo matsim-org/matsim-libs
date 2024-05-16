@@ -53,16 +53,16 @@ public class RunFissDrtScenarioIT {
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-        drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.5;
-        drtConfigGroup.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 10. * 60.;
+		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.5;
+		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
-        drtConfigGroup.getDrtOptimizationConstraintsParam().maxWaitTime = 600.;
-        drtConfigGroup.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxWaitTime = 600.;
+		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-        drtConfigGroup.getDrtOptimizationConstraintsParam().maxWalkDistance = 1000.;
+		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());

@@ -66,16 +66,16 @@ public class MultiModeTaxiModule extends AbstractModule {
 		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
 		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
 		// manually after the TaxiAsDrtConfigGroup config is created.
-        drtCfg.getDrtOptimizationConstraintsParam().maxWaitTime = 3600;
-        drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 2;
-        drtCfg.getDrtOptimizationConstraintsParam().maxTravelTimeBeta = 3600;
-        drtCfg.getDrtOptimizationConstraintsParam().maxAbsoluteDetour = Double.MAX_VALUE;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxWaitTime = 3600;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 2;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeBeta = 3600;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxAbsoluteDetour = Double.MAX_VALUE;
 
-        drtCfg.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		drtCfg.changeStartLinkToLastLinkInSchedule = taxiCfg.changeStartLinkToLastLinkInSchedule;
 		drtCfg.idleVehiclesReturnToDepots = false;
 		drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-        drtCfg.getDrtOptimizationConstraintsParam().maxWalkDistance = Double.MAX_VALUE;
+		drtCfg.getDefaultDrtOptimizationConstraintsParam().maxWalkDistance = Double.MAX_VALUE;
 		drtCfg.vehiclesFile = taxiCfg.taxisFile;
 		drtCfg.transitStopFile = null;
 		drtCfg.drtServiceAreaShapeFile = null;

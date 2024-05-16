@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.run;
 
 import com.google.common.base.Verify;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -11,8 +12,13 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
 
-    public final static String SET_NAME = "drtOptimizationConstraints";
+	public static final String SET_NAME = "drtOptimizationConstraints";
+	public static final String DEFAULT_PARAMS_NAME = "default";
 
+	@Parameter
+	@Comment("name of optimization params")
+	@NotBlank
+	public String name = DEFAULT_PARAMS_NAME;
 
     @Parameter
     @Comment("Max wait time for the bus to come (optimisation constraint).")
