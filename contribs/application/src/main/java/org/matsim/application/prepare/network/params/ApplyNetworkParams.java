@@ -22,6 +22,7 @@ import picocli.CommandLine;
 import java.io.BufferedReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,13 +58,16 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--capacity-bounds", split = ",", defaultValue = "0.4,0.6,0.8",
 		description = "Minimum relative capacity against theoretical max (traffic light,right before left, priority)")
-	private double[] capacityBounds;
+	private List<Double> capacityBounds;
 
 	@CommandLine.Option(names = "--road-types", split = ",", description = "Road types to apply changes to")
 	private Set<String> roadTypes;
 
 	@CommandLine.Option(names = "--junction-types", split = ",", description = "Junction types to apply changes to")
 	private Set<String> junctionTypes;
+
+	@CommandLine.Option(names = "--decrease-only", description = "Only set values if the are lower than the current value", defaultValue = "false")
+	private boolean decrease;
 
 	private NetworkModel model;
 	private NetworkParams paramsOpt;
@@ -141,87 +145,121 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 		boolean modified = false;
 
 		if (params.contains(NetworkAttribute.capacity)) {
-
-			Predictor capacity = model.capacity(ft.junctionType(), ft.highwayType());
-			// No operation performed if not supported
-			if (capacity == null) {
-				return;
-			}
-
-			double perLane = capacity.predict(ft.features(), ft.categories());
-			if (Double.isNaN(perLane)) {
-				return;
-			}
-
-			double cap = capacityEstimate(ft.features().getDouble("speed"));
-
-			// Minimum thresholds
-			double threshold = switch (ft.junctionType()) {
-				case "traffic_light" -> capacityBounds[0];
-				case "right_before_left" -> capacityBounds[1];
-				case "priority" -> capacityBounds[2];
-				default -> 0;
-			};
-
-			if (perLane < cap * threshold) {
-				log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}",
-					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * threshold);
-				perLane = cap * threshold;
-				modified = true;
-			}
-
-			if (perLane > cap) {
-				log.warn("Reducing capacity per lane on {} ({}, {}) from {} to {}",
-					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap);
-				perLane = cap;
-				modified = true;
-			}
-
-			if (ft.features().getOrDefault("num_lanes", link.getNumberOfLanes()) != link.getNumberOfLanes())
-				log.warn("Number of lanes for link {} does not match the feature file", link.getId());
-
-			int totalCap = BigDecimal.valueOf(link.getNumberOfLanes() * perLane).setScale(0, RoundingMode.HALF_UP).intValue();
-			link.setCapacity(totalCap);
+			modified = applyCapacity(link, ft);
 		}
 
-
 		if (params.contains(NetworkAttribute.freespeed)) {
-
-			Predictor speedModel = model.speedFactor(ft.junctionType(), ft.highwayType());
-
-			// No operation performed if not supported
-			if (speedModel == null) {
-				return;
-			}
-
-			double speedFactor = paramsOpt != null ?
-				speedModel.predict(ft.features(), ft.categories(), paramsOpt.getParams(ft.junctionType())) :
-				speedModel.predict(ft.features(), ft.categories());
-
-			if (Double.isNaN(speedFactor)) {
-				return;
-			}
-
-			if (speedFactor > speedFactorBounds[1]) {
-				log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);
-				speedFactor = speedFactorBounds[1];
-				modified = true;
-			}
-
-			// Threshold for very low speed factors
-			if (speedFactor < speedFactorBounds[0]) {
-				log.warn("Increasing speed factor on {} from {} to {}", link, speedFactor, speedFactorBounds[0]);
-				speedFactor = speedFactorBounds[0];
-				modified = true;
-			}
-
-			double freeSpeed = (double) link.getAttributes().getAttribute("allowed_speed") * speedFactor;
-
-			link.setFreespeed(new BigDecimal(freeSpeed).setScale(3, RoundingMode.HALF_EVEN).doubleValue());
-			link.getAttributes().putAttribute("speed_factor", new BigDecimal(speedFactor).setScale(3, RoundingMode.HALF_EVEN).doubleValue());
+			modified |= applyFreeSpeed(link, ft);
 		}
 
 		if (modified)
 			warn++;
 	}
+
+	private boolean applyCapacity(Link link, Feature ft) {
+
+		Predictor capacity = model.capacity(ft.junctionType(), ft.highwayType());
+		// No operation performed if not supported
+		if (capacity == null) {
+			return false;
+		}
+
+		double perLane = capacity.predict(ft.features(), ft.categories());
+		if (Double.isNaN(perLane)) {
+			return true;
+		}
+
+		double cap = capacityEstimate(ft.features().getDouble("speed"));
+
+		if (capacityBounds.isEmpty())
+			capacityBounds.add(0.0);
+
+		// Fill up to 3 elements if not provided
+		if (capacityBounds.size() < 3) {
+			capacityBounds.add(capacityBounds.get(0));
+			capacityBounds.add(capacityBounds.get(1));
+		}
+
+		// Minimum thresholds
+		double threshold = switch (ft.junctionType()) {
+			case "traffic_light" -> capacityBounds.get(0);
+			case "right_before_left" -> capacityBounds.get(1);
+			case "priority" -> capacityBounds.get(2);
+			default -> 0;
+		};
+
+		boolean modified = false;
+
+		if (perLane < cap * threshold) {
+			log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}",
+				link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * threshold);
+			perLane = cap * threshold;
+			modified = true;
+		}
+
+		if (perLane > cap) {
+			log.warn("Reducing capacity per lane on {} ({}, {}) from {} to {}",
+				link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap);
+			perLane = cap;
+			modified = true;
+		}
+
+		if (ft.features().getOrDefault("num_lanes", link.getNumberOfLanes()) != link.getNumberOfLanes())
+			log.warn("Number of lanes for link {} does not match the feature file", link.getId());
+
+		int totalCap = BigDecimal.valueOf(link.getNumberOfLanes() * perLane).setScale(0, RoundingMode.HALF_UP).intValue();
+
+		if (decrease && totalCap > link.getCapacity())
+			return false;
+
+		link.setCapacity(totalCap);
+
+		return modified;
+	}
+
+	private boolean applyFreeSpeed(Link link, Feature ft) {
+
+		Predictor speedModel = model.speedFactor(ft.junctionType(), ft.highwayType());
+
+		// No operation performed if not supported
+		if (speedModel == null) {
+			return false;
+		}
+
+		double speedFactor = paramsOpt != null ?
+			speedModel.predict(ft.features(), ft.categories(), paramsOpt.getParams(ft.junctionType())) :
+			speedModel.predict(ft.features(), ft.categories());
+
+		if (Double.isNaN(speedFactor)) {
+			return false;
+		}
+
+		boolean modified = false;
+
+		if (speedFactor > speedFactorBounds[1]) {
+			log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);
+			speedFactor = speedFactorBounds[1];
+			modified = true;
+		}
+
+		// Threshold for very low speed factors
+		if (speedFactor < speedFactorBounds[0]) {
+			log.warn("Increasing speed factor on {} from {} to {}", link, speedFactor, speedFactorBounds[0]);
+			speedFactor = speedFactorBounds[0];
+			modified = true;
+		}
+
+		double freeSpeed = (double) link.getAttributes().getAttribute("allowed_speed") * speedFactor;
+
+		freeSpeed = BigDecimal.valueOf(freeSpeed).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+
+		if (decrease && freeSpeed > link.getFreespeed())
+			return false;
+
+		link.setFreespeed(freeSpeed);
+		link.getAttributes().putAttribute("speed_factor", freeSpeed);
+
+		return modified;
+	}
+
 }
