@@ -29,6 +29,7 @@ import java.util.ServiceConfigurationError;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -44,7 +45,6 @@ import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -127,7 +127,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 		}
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> features = new ArrayList<>();
 
 		Object[] featureAttribs;
 		for(Count c: counts.getCounts().values()){
