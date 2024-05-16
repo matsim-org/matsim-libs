@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -56,7 +55,8 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
 	private double[] speedFactorBounds;
 
-	@CommandLine.Option(names = "--capacity-bounds", split = ",", description = "Relative capacity bounds against theoretical max (lower,upper bound)", defaultValue = "0.25,1.0")
+	@CommandLine.Option(names = "--capacity-bounds", split = ",", defaultValue = "0.4,0.6,0.8",
+		description = "Minimum relative capacity against theoretical max (traffic light,right before left, priority)")
 	private double[] capacityBounds;
 
 	@CommandLine.Option(names = "--road-types", split = ",", description = "Road types to apply changes to")
@@ -120,7 +120,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 			try {
 				applyChanges(link, ft);
-			}  catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				warn++;
 				log.warn("Error processing link {}", link.getId(), e);
 			}
@@ -155,17 +155,25 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 			double cap = capacityEstimate(ft.features().getDouble("speed"));
 
-			if (perLane < cap * capacityBounds[0]) {
+			// Minimum thresholds
+			double threshold = switch (ft.junctionType()) {
+				case "traffic_light" -> capacityBounds[0];
+				case "right_before_left" -> capacityBounds[1];
+				case "priority" -> capacityBounds[2];
+				default -> 0;
+			};
+
+			if (perLane < cap * threshold) {
 				log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}",
-					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * capacityBounds[0]);
-				perLane = cap * capacityBounds[0];
+					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * threshold);
+				perLane = cap * threshold;
 				modified = true;
 			}
 
-			if (perLane > cap * capacityBounds[1]) {
+			if (perLane > cap) {
 				log.warn("Reducing capacity per lane on {} ({}, {}) from {} to {}",
-					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap * capacityBounds[1]);
-				perLane = cap * capacityBounds[1];
+					link.getId(), ft.highwayType(), ft.junctionType(), perLane, cap);
+				perLane = cap;
 				modified = true;
 			}
 
@@ -186,7 +194,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 				return;
 			}
 
-			double speedFactor =  paramsOpt != null ?
+			double speedFactor = paramsOpt != null ?
 				speedModel.predict(ft.features(), ft.categories(), paramsOpt.getParams(ft.junctionType())) :
 				speedModel.predict(ft.features(), ft.categories());
 
