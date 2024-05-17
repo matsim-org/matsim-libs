@@ -20,6 +20,8 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -28,8 +30,6 @@ import org.locationtech.jts.geom.LineString;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 

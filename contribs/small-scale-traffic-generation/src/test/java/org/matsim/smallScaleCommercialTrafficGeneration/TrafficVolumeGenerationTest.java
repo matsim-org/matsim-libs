@@ -20,6 +20,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,7 +39,6 @@ import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingA
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreator;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.File;
 import java.io.IOException;

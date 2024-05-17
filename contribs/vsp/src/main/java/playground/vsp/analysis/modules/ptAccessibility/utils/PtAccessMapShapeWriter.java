@@ -26,13 +26,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.ptAccessibility.stops.PtStopMap;
 
@@ -135,7 +135,7 @@ public class PtAccessMapShapeWriter {
 		Object[] bufferFeatureAttribs;
 
 		for (Entry<Integer, HashMap<String, Geometry>> distance2mode2bufferEntry : distance2mode2buffer.entrySet()) {
-			bufferFeatures = new ArrayList<SimpleFeature>();
+			bufferFeatures = new ArrayList<>();
 			HashMap<String, Geometry> mode2buffer = distance2mode2bufferEntry.getValue();
 			for (Entry<String, Geometry> mode2BufferEntry : mode2buffer.entrySet()) {
 				bufferFeatureAttribs = new Object[2];
