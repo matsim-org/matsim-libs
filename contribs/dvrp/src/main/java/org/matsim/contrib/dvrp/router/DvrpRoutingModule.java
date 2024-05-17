@@ -69,6 +69,10 @@ public class DvrpRoutingModule implements RoutingModule {
 		this.timeInterpretation = timeInterpretation;
 	}
 
+	public AccessEgressFacilityFinder getStopFinder() {
+		return stopFinder;
+	}
+
 	@Override
 	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		final Facility fromFacility = request.getFromFacility();

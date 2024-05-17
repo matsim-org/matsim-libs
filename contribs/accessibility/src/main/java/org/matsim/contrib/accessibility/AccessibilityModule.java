@@ -159,9 +159,10 @@ public final class AccessibilityModule extends AbstractModule {
 					} else if ( TransportMode.pt.equals( mode ) ){
 						calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.scoring(), scenario );
 					} else if ( Modes4Accessibility.estimatedDrt.name().equals( mode )) {
-						final TravelTime travelTime = travelTimes.get(TransportMode.drt);
-						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.drt);
-						calculator = new EstimatedDrtAccessibilityContributionCalculator(mode, travelTime, travelDisutilityFactory, scenario);
+//						final TravelTime travelTime = travelTimes.get("dvrp_estimated"); //TODO
+						final TravelTime travelTime = travelTimes.get(TransportMode.car); //TODO
+						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car); //TODO
+						calculator = new EstimatedDrtAccessibilityContributionCalculator(mode, travelTime, travelDisutilityFactory, scenario, tripRouter);
 					} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
