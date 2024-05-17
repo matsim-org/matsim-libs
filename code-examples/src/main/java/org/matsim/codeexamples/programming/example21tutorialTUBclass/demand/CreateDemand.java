@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -43,11 +44,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author jbischoff
@@ -161,7 +162,7 @@ public class CreateDemand {
 		
 		Map<String,Geometry> shapeMap = new HashMap<String, Geometry>();
 		
-		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
+		for (SimpleFeature ft : GeoFileReader.getAllFeatures(filename)) {
 
 				GeometryFactory geometryFactory= new GeometryFactory();
 				WKTReader wktReader = new WKTReader(geometryFactory);
