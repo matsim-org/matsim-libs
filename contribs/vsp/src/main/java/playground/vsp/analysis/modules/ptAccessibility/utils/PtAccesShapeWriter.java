@@ -28,6 +28,7 @@ import java.util.ServiceConfigurationError;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Coord;
@@ -35,7 +36,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.GeoFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.ptAccessibility.activity.ActivityLocation;
 import playground.vsp.analysis.modules.ptAccessibility.activity.LocationMap;
@@ -59,7 +59,7 @@ public class PtAccesShapeWriter {
 				setName(name).
 				addAttribute("name", String.class).
 				create();
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> features = new ArrayList<>();
 
 		Object[] featureAttribs;
 		for(Entry<String, MultiPolygon> e: mps.entrySet()){
