@@ -7,6 +7,7 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -14,8 +15,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -80,14 +81,14 @@ class CreateDemand {
 
 		// read in the shape file and store the geometries according to their region identifier stored as 'RS' in the
 		// shape file
-		regions = ShapeFileReader.getAllFeatures(sampleFolder.resolve("thueringen-kreise.shp").toString()).stream()
+		regions = GeoFileReader.getAllFeatures(sampleFolder.resolve("thueringen-kreise.shp").toString()).stream()
 				.collect(Collectors.toMap(feature -> (String) feature.getAttribute("RS"), feature -> (Geometry) feature.getDefaultGeometry()));
 
 		// Read in landcover data to make people stay in populated areas
 		// we are using a weighted distribution by area-size, so that small areas receive less inhabitants than more
 		// populated ones.
 		List<Pair<Geometry, Double>> weightedGeometries = new ArrayList<>();
-		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(sampleFolder.resolve("landcover.shp").toString())) {
+		for (SimpleFeature feature : GeoFileReader.getAllFeatures(sampleFolder.resolve("landcover.shp").toString())) {
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 			weightedGeometries.add(new Pair<>(geometry, geometry.getArea()));
 		}

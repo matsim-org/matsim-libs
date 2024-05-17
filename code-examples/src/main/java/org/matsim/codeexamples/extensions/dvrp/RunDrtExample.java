@@ -1,37 +1,29 @@
 package org.matsim.codeexamples.extensions.dvrp;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 class RunDrtExample{
@@ -71,6 +63,7 @@ class RunDrtExample{
 
 		@SuppressWarnings("unused")
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+		dvrpConfig.getTravelTimeMatrixParams().addParameterSet(new SquareGridZoneSystemParams());
 		// (config group needs to be "materialized")
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
@@ -78,10 +71,10 @@ class RunDrtExample{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.mode = DRT_A;
 			drtConfig.stopDuration = 60.;
-			drtConfig.maxWaitTime=900;
-			drtConfig.maxTravelTimeAlpha = 1.3;
-			drtConfig.maxTravelTimeBeta=10. * 60.;
-			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
+			drtConfig.getDrtOptimizationConstraintsParam().maxWaitTime=900;
+			drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+			drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeBeta=10. * 60.;
+			drtConfig.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
 			drtConfig.vehiclesFile="one_shared_taxi_vehicles_A.xml";
 			drtConfig.changeStartLinkToLastLinkInSchedule=true;
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
@@ -91,10 +84,10 @@ class RunDrtExample{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.mode = DRT_B;
 			drtConfig.stopDuration = 60.;
-			drtConfig.maxWaitTime=900;
-			drtConfig.maxTravelTimeAlpha = 1.3;
-			drtConfig.maxTravelTimeBeta=10. * 60.;
-			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
+			drtConfig.getDrtOptimizationConstraintsParam().maxWaitTime=900;
+			drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.3;
+			drtConfig.getDrtOptimizationConstraintsParam().maxTravelTimeBeta=10. * 60.;
+			drtConfig.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
 			drtConfig.vehiclesFile="one_shared_taxi_vehicles_B.xml";
 			drtConfig.changeStartLinkToLastLinkInSchedule=true;
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
@@ -104,10 +97,11 @@ class RunDrtExample{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.mode = DRT_C;
 			drtConfig.stopDuration = 60.;
-			drtConfig.maxWaitTime=900;
-			drtConfig.maxTravelTimeAlpha = 1.3;
-			drtConfig.maxTravelTimeBeta=10. * 60.;
-			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
+			DrtOptimizationConstraintsParams constraintsParam = drtConfig.getDrtOptimizationConstraintsParam();
+			constraintsParam.maxWaitTime=900;
+			constraintsParam.maxTravelTimeAlpha = 1.3;
+			constraintsParam.maxTravelTimeBeta=10. * 60.;
+			constraintsParam.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
 			drtConfig.vehiclesFile="one_shared_taxi_vehicles_C.xml";
 			drtConfig.changeStartLinkToLastLinkInSchedule=true;
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
