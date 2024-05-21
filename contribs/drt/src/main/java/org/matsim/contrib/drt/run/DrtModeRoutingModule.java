@@ -105,7 +105,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			case stopbased, serviceAreaBased -> {
 				bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
 						getter -> new ClosestAccessEgressFacilityFinder(
-								drtCfg.getDefaultDrtOptimizationConstraintsParam().maxWalkDistance,
+								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance,
 													     getter.get( Network.class ),
 													     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
 									     .asEagerSingleton();

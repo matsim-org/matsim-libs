@@ -116,8 +116,9 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl());
 
+		DrtOptimizationConstraintsSet defaultOptimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(CostCalculationStrategy.class)
-				.to(drtCfg.getDefaultDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated
+				.to(defaultOptimizationConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated
 						?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
@@ -151,7 +152,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				.asEagerSingleton();
 
 		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
-				drtCfg.getDefaultDrtOptimizationConstraintsParam().maxAllowedPickupDelay)));
+				defaultOptimizationConstraintsSet.maxAllowedPickupDelay)));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(

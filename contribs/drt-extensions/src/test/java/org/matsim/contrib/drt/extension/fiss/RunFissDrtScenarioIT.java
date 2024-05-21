@@ -12,6 +12,7 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -53,16 +54,17 @@ public class RunFissDrtScenarioIT {
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeAlpha = 1.5;
-		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
-		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxWaitTime = 600.;
-		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		DrtOptimizationConstraintsSet defaultConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
+		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
+		defaultConstraintsSet.maxWaitTime = 600.;
+		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		defaultConstraintsSet.maxWalkDistance = 1000.;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.getDefaultDrtOptimizationConstraintsParam().maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());

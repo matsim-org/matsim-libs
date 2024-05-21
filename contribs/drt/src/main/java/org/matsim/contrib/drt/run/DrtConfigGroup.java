@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -160,6 +161,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
+	@NotNull
+	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
+
 	@Nullable
 	private DrtZoneSystemParams zonalSystemParams;
 
@@ -187,8 +191,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	}
 
 	private void initSingletonParameterSets() {
-		//drt optimization constraints
-		getDefaultDrtOptimizationConstraintsParam();
+
+		//optimization constraints (mandatory)
+		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, DrtOptimizationConstraintsParams::new,
+				() -> drtOptimizationConstraintsParams,
+				params -> drtOptimizationConstraintsParams = (DrtOptimizationConstraintsParams) params);
 
 		//rebalancing (optional)
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
@@ -231,7 +238,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
-
 	}
 
 	/**
@@ -248,7 +254,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			case "maxAllowedPickupDelay":
 			case "rejectRequestIfMaxWaitOrTravelTimeViolated":
 			case "maxWalkDistance":
-				getDefaultDrtOptimizationConstraintsParam().addParam(paramName, value);
+				addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().addParam(paramName, value);
             	break;
             default:
                 super.handleAddUnknownParam(paramName, value);
@@ -269,9 +275,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		List<DrtOptimizationConstraintsParams> drtOptimizationConstraintsParams = getDrtOptimizationConstraintsParams();
-		for (DrtOptimizationConstraintsParams params : drtOptimizationConstraintsParams) {
-			Verify.verify(params.maxWaitTime >= stopDuration,
+		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
+		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
+			Verify.verify(constraintsSet.maxWaitTime >= stopDuration,
 					"maxWaitTime must not be smaller than stopDuration");
 		}
 
@@ -306,17 +312,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
 				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
 		}
-
-		Verify.verify(!drtOptimizationConstraintsParams.isEmpty(),
-				"At least one DrtOptimizationConstraintsParams is required.");
-		Verify.verify(drtOptimizationConstraintsParams.stream()
-				.anyMatch(params -> DrtOptimizationConstraintsParams.DEFAULT_PARAMS_NAME.equals(params.name)),
-				"Default DrtOptimizationConstraintsParams is required.");
-		Verify.verify(drtOptimizationConstraintsParams.stream()
-				.map(params -> params.name)
-				.distinct()
-				.count() == drtOptimizationConstraintsParams.size(),
-				"Cannot have DrtOptimizationConstraintsParams with identical names.");
 	}
 
 	@Override
@@ -324,27 +319,17 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return mode;
 	}
 
-	public List<DrtOptimizationConstraintsParams> getDrtOptimizationConstraintsParams() {
-		return getParameterSets(DrtOptimizationConstraintsParams.SET_NAME).stream()
-				.filter(DrtOptimizationConstraintsParams.class::isInstance)
-				.map(DrtOptimizationConstraintsParams.class::cast)
-				.toList();
-	}
 
-	public DrtOptimizationConstraintsParams getDefaultDrtOptimizationConstraintsParam() {
-		Optional<DrtOptimizationConstraintsParams> drtOptParams = getDrtOptimizationConstraintsParams().stream()
-				.filter(params -> DrtOptimizationConstraintsParams.DEFAULT_PARAMS_NAME.equals(params.name))
-				.findAny();
-		if (drtOptParams.isEmpty()) {
-			addParameterSet(new DrtOptimizationConstraintsParams());
-		}
-		return getDrtOptimizationConstraintsParams().stream()
-				.filter(params -> DrtOptimizationConstraintsParams.DEFAULT_PARAMS_NAME.equals(params.name))
-				.findAny().orElseThrow();
-	}
 
 	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
 		return drtInsertionSearchParams;
+	}
+
+	public DrtOptimizationConstraintsParams addOrGetDrtOptimizationConstraintsParams() {
+		if(drtOptimizationConstraintsParams == null) {
+			drtOptimizationConstraintsParams = new DrtOptimizationConstraintsParams();
+		}
+		return drtOptimizationConstraintsParams;
 	}
 
 	public Optional<DrtZoneSystemParams> getZonalSystemParams() {
