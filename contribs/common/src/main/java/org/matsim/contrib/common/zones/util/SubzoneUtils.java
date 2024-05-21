@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.common.zones.util;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.geometry.jts.GeometryCollector;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
@@ -27,7 +28,6 @@ import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.locationtech.jts.geom.util.PolygonExtracter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.zones.Zone;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.Collection;
 import java.util.HashMap;

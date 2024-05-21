@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import one.util.streamex.EntryStream;
 import one.util.streamex.StreamEx;
 import org.apache.commons.lang3.tuple.Pair;
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygonal;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -28,8 +30,6 @@ import org.matsim.contrib.common.zones.util.ZoneFinderImpl;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

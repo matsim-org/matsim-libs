@@ -24,6 +24,8 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -34,8 +36,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author jbischoff
@@ -85,7 +85,7 @@ public class CommuterGenerator {
 		//landuse
 		if (useLanduse){
 			DgLanduseReader landuseReader = new DgLanduseReader();
-			Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
+			Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
 			Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
 			cdw.addLanduse("home", homeLanduse);
 			cdw.addLanduse("work", workLanduse);
