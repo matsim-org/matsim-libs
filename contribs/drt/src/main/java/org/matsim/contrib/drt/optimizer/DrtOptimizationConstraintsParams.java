@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.optimizer;
 
 import com.google.common.base.Verify;
 import jakarta.validation.constraints.DecimalMin;

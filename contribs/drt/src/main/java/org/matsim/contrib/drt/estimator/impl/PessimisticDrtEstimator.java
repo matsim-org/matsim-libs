@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.estimator.impl;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**

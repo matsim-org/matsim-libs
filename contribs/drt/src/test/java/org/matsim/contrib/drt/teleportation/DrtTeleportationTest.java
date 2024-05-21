@@ -12,7 +12,7 @@ import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;

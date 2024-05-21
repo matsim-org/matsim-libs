@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.run;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 

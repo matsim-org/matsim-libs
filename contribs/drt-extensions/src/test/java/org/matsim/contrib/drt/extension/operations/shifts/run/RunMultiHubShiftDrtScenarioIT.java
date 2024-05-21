@@ -13,7 +13,7 @@ import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSe
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
