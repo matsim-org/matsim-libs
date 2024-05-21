@@ -551,7 +551,7 @@ public class SwissRailRaptorCore {
                 initialStopIndices = null;
             }
 
-            if (transfers >= maxTransfers) {
+            if (transfers > maxTransfers) {
                 break;
             }
 
