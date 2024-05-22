@@ -10,16 +10,16 @@ public class LogNormalDistributionGenerator implements DistributionGenerator {
 
 	private final double maxValue;
 
-	public LogNormalDistributionGenerator(Random random, double mu, double sigma) {
-		this.random = new Random();
+	public LogNormalDistributionGenerator(long seed, double mu, double sigma) {
+		this.random = new Random(seed);
 		this.mu = mu;
 		this.sigma = sigma;
 		this.minValue = 0.5;
 		this.maxValue = 3;
 	}
 
-	public LogNormalDistributionGenerator(Random random, double mu, double sigma, double minValue, double maxValue) {
-		this.random = random;
+	public LogNormalDistributionGenerator(long seed, double mu, double sigma, double minValue, double maxValue) {
+		this.random = new Random(seed);
 		this.mu = mu;
 		this.sigma = sigma;
 		this.minValue = minValue;

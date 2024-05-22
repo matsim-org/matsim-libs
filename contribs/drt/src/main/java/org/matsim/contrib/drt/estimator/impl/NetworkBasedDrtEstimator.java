@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.distribution.DistributionGenerator;
+import org.matsim.contrib.drt.estimator.impl.distribution.LogNormalDistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantTripEstimator;
 import org.matsim.contrib.drt.estimator.impl.trip_estimation.TripEstimator;
@@ -12,6 +13,8 @@ import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.WaitingTime
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.OptionalTime;
+
+import java.util.Random;
 
 /**
  * DRT estimator that uses available data (e.g., real-world operational data, simulation-based data) to provide estimated data for DRT trips.
@@ -71,13 +74,35 @@ public final class NetworkBasedDrtEstimator implements DrtEstimator {
 	 * @param waitTimeStd standard deviation of waiting time (normalized to 1)
 	 * @return NetworkBasedDrtEstimator
 	 */
-	public static NetworkBasedDrtEstimator normalDistributed(double estRideTimeAlpha, double estRideTimeBeta, double rideTimeStd, double estMeanWaitTime,
-															 double waitTimeStd) {
+	public static NetworkBasedDrtEstimator normalDistributedNetworkBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta,
+																					 double rideTimeStd, double estMeanWaitTime,
+																					 double waitTimeStd) {
 		return new Builder()
 			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(estMeanWaitTime))
 			.setRideDurationEstimator(new ConstantTripEstimator(estRideTimeAlpha, estRideTimeBeta))
-			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(4711, waitTimeStd))
-			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(4711, rideTimeStd))
+			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, waitTimeStd))
+			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, rideTimeStd))
+			.build();
+	}
+
+	/**
+	 * Example DRT estimator based on the log-normal distributed ride time and normal distributed waiting time
+	 * @param estRideTimeAlpha typical ride duration = alpha * direct ride time + beta, alpha is specified here
+	 * @param estRideTimeBeta typical ride duration = alpha * direct ride time + beta, beta is specified here
+	 * @param mu log-normal distribution parameter for ride duration (normalized to typical ride duration)
+	 * @param sigma log-normal distribution parameter for ride duration (normalized to typical ride duration)
+	 * @param estMeanWaitTime estimated waiting time (i.e., mean wait time)
+	 * @param waitTimeStd standard deviation of waiting time (normalized to 1)
+	 * @return NetworkBasedDrtEstimator
+	 */
+	public static NetworkBasedDrtEstimator mixDistributedNetworkBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta,
+																				  double mu, double sigma, double estMeanWaitTime,
+																				  double waitTimeStd) {
+		return new Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(estMeanWaitTime))
+			.setRideDurationEstimator(new ConstantTripEstimator(estRideTimeAlpha, estRideTimeBeta))
+			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, waitTimeStd))
+			.setRideDurationDistributionGenerator(new LogNormalDistributionGenerator(2, mu, sigma))
 			.build();
 	}
 
@@ -91,7 +116,7 @@ public final class NetworkBasedDrtEstimator implements DrtEstimator {
 		double alpha = alphaBetaTuple.getFirst();
 		double beta = alphaBetaTuple.getSecond();
 		double typicalRideDuration = directRideTIme * alpha + beta;
-		double typicalRideDistance = directDistance * alpha + beta;
+		double typicalRideDistance = (typicalRideDuration / directRideTIme) * directDistance;
 		double typicalWaitingTime = waitingTimeEstimator.estimateWaitTime(fromLinkId, toLinkId, departureTime);
 
 		double estimatedWaitingTime = typicalWaitingTime * waitingTimeDistributionGenerator.generateRandomValue();

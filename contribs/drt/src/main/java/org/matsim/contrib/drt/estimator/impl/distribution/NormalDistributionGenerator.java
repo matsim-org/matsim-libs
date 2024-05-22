@@ -26,7 +26,7 @@ public class NormalDistributionGenerator implements DistributionGenerator{
 
 	@Override
 	public double generateRandomValue() {
-		double randomValue = random.nextGaussian() * std;
+		double randomValue = 1 + random.nextGaussian() * std;
 		randomValue = Math.min(maxValue, randomValue);
 		randomValue = Math.max(minValue, randomValue);
 		return randomValue;

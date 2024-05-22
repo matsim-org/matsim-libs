@@ -47,8 +47,8 @@ public class EuclideanDistanceBasedDrtEstimator implements DrtEstimator {
 		this.networkDistanceFactor = networkDistanceFactor;
 		this.tripEstimator = new ConstantTripEstimator(slope, intercept);
 		this.waitingTimeEstimator = new ConstantWaitingTimeEstimator(estimatedMeanWaitTime);
-		this.rideDurationDistributionGenerator = new LogNormalDistributionGenerator(new Random(4711), mu, sigma);
-		this.waitingTimeDistributionGenerator = new NormalDistributionGenerator(4711, waitTimeStd);
+		this.rideDurationDistributionGenerator = new LogNormalDistributionGenerator(1, mu, sigma);
+		this.waitingTimeDistributionGenerator = new NormalDistributionGenerator(2, waitTimeStd);
 	}
 
 	public EuclideanDistanceBasedDrtEstimator(Network network, double networkDistanceFactor, TripEstimator tripEstimator,
