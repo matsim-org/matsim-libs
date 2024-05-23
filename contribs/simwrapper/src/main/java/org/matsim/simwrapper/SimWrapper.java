@@ -120,6 +120,15 @@ public final class SimWrapper {
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
 	 */
 	public void generate(Path dir) throws IOException {
+		generate(dir, false);
+	}
+
+	/**
+	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
+	 * @param dir target directory
+	 * @param append if true, existing dashboards will not be overwritten
+	 */
+	public void generate(Path dir, boolean append) throws IOException {
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 			.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
@@ -157,6 +166,11 @@ public final class SimWrapper {
 			yaml.subtabs = layout.getTabs();
 
 			Path out = dir.resolve("dashboard-" + i + ".yaml");
+
+			while (append && Files.exists(out)) {
+				out = dir.resolve("dashboard-" + ++i + ".yaml");
+			}
+
 			writer.writeValue(out.toFile(), yaml);
 
 			i++;

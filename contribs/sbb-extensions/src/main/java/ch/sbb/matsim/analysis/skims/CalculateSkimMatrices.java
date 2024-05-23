@@ -41,6 +41,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -80,7 +81,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Main class to calculate skim matrices. Provides a main-method to be directly started from the command line, but the main-method also acts as a template for custom code using the skims calculation.

@@ -23,13 +23,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.contrib.parking.parkingproxy.analysis.RegionModeshareAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 public class RunAreaAnalysis {
 

@@ -25,6 +25,7 @@ import java.util.ServiceConfigurationError;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -36,7 +37,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author droeder
@@ -185,7 +185,7 @@ public class HeatMap {
 		b.add("count", Double.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> features = new ArrayList<>();
 
 		Object[] featureAttribs;
 		int i = 0;
