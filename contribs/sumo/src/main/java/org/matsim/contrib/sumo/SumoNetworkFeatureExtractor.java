@@ -78,32 +78,58 @@ class SumoNetworkFeatureExtractor {
 	}
 
 	/**
-	 * Calculate the curvature of an edge.
+	 * Calculate the curvature of an edge. One gon is 1/400 of a full circle.
+	 * The formula is: KU = (Sum of the curvature of the subsegments) / (Length of the edge)
 	 *
-	 * @return KU in gon/km
+	 * @return curvature in gon/km
 	 */
 	static double calcCurvature(SumoNetworkHandler.Edge edge) {
+		double totalGon = 0;
+		List<double[]> coordinates = edge.shape;
 
-		// TODO: not finished and correctly tested
+		for (int i = 2; i < coordinates.size(); i++) {
+			double[] pointA = coordinates.get(i - 2);
+			double[] pointB = coordinates.get(i - 1);
+			double[] pointC = coordinates.get(i);
 
-		double gon = 0;
-		List<double[]> coords = edge.shape;
-		for (int i = 0; i < coords.size() - 2; i++) {
+			double[] vectorAB = {pointB[0] - pointA[0], pointB[1] - pointA[1]};
+			double[] vectorBC = {pointC[0] - pointB[0], pointC[1] - pointB[1]};
 
-			double[] a = coords.get(i);
-			double[] b = coords.get(i + 1);
-			double[] c = coords.get(i + 2);
+			double dotProduct = calcDotProduct(vectorAB, vectorBC);
+			double magnitudeAB = calcMagnitude(vectorAB);
+			double magnitudeBC = calcMagnitude(vectorBC);
 
-			double ab = Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2));
-			double bc = Math.sqrt(Math.pow(c[0] - b[0], 2) + Math.pow(c[1] - b[1], 2));
-			double ac = Math.sqrt(Math.pow(c[0] - a[0], 2) + Math.pow(c[1] - a[1], 2));
+			double cosine = dotProduct / (magnitudeAB * magnitudeBC);
+			double angleRadians = Math.acos(cosine);
+			double angleDegrees = Math.toDegrees(angleRadians);
 
-			double angle = Math.acos((ac * ac - ab * ab - bc * bc) / (-2 * ab * bc));
-			gon += Math.abs(angle) * 200 / Math.PI;
+			totalGon += Math.abs((angleDegrees / 360) * 400);
 		}
 
-		return gon / (edge.getLength() * 1000);
+		return totalGon / (edge.getLength() / 1000);
 	}
+
+	/**
+	 * Calculate the dot product of two vectors.
+	 *
+	 * @param vec1 vector 1
+	 * @param vec2 vector 2
+	 * @return dot product
+	 */
+	private static double calcDotProduct(double[] vec1, double[] vec2) {
+		return vec1[0] * vec2[0] + vec1[1] * vec2[1];
+	}
+
+	/**
+	 * Calculate the magnitude of a vector.
+	 *
+	 * @param vec vector
+	 * @return magnitude
+	 */
+	private static double calcMagnitude(double[] vec) {
+		return Math.sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
+	}
+
 
 	/**
 	 * Get priority. Higher is more important.
