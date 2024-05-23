@@ -30,7 +30,7 @@ class SumoNetworkFeatureExtractor {
 		incomingEdges = new HashMap<>();
 
 		for (SumoNetworkHandler.Edge edge : this.handler.edges.values()) {
-			incomingEdges.computeIfAbsent(edge.to, (k) -> new ArrayList<>())
+			incomingEdges.computeIfAbsent(edge.to, k -> new ArrayList<>())
 				.add(edge);
 		}
 	}
@@ -147,7 +147,7 @@ class SumoNetworkFeatureExtractor {
 			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway",
 			"is_link", "has_merging_link", "is_merging_into",
 			"num_left", "num_right", "num_straight"
-			);
+		);
 	}
 
 	public void print(CSVPrinter out) {
@@ -165,7 +165,7 @@ class SumoNetworkFeatureExtractor {
 		String highwayType = getHighwayType(edge.type);
 
 		SumoNetworkHandler.Junction junction = handler.junctions.get(edge.to);
-		List<SumoNetworkHandler.Connection> connections = handler.connections.computeIfAbsent(edge.id, (k) -> new ArrayList<>());
+		List<SumoNetworkHandler.Connection> connections = handler.connections.computeIfAbsent(edge.id, k -> new ArrayList<>());
 
 		Set<SumoNetworkHandler.Edge> toEdges = connections.stream()
 			.filter(c -> !c.dir.equals("t"))
@@ -232,12 +232,12 @@ class SumoNetworkFeatureExtractor {
 				mergingHighest = m.get().getKey();
 		}
 
-		boolean geq_secondary = switch (highwayType) {
+		boolean geqSecondary = switch (highwayType) {
 			case "secondary", "primary", "trunk", "motorway" -> true;
 			default -> false;
 		};
 
-		boolean geq_primary = switch (highwayType) {
+		boolean geqPrimary = switch (highwayType) {
 			case "primary", "trunk", "motorway" -> true;
 			default -> false;
 		};
@@ -264,8 +264,8 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool("higher".equals(prio)));
 		out.print(bool("equal".equals(prio)));
 		out.print(bool("lower".equals(prio)));
-		out.print(bool(geq_secondary));
-		out.print(bool(geq_primary));
+		out.print(bool(geqSecondary));
+		out.print(bool(geqPrimary));
 		out.print(bool("motorway".equals(highwayType)));
 		out.print(bool(highwayType.contains("link")));
 		out.print(bool(merging));
