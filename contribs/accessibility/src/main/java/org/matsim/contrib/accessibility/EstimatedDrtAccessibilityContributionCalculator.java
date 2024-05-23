@@ -157,7 +157,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 			double directRideDistance_m = ((Leg) planElementsMain.get(2)).getRoute().getDistance();
 
-
+//			getAlphaBeta(null, null, null);
 
 			double waitTime_s = 103.34; //TODO
 			double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
