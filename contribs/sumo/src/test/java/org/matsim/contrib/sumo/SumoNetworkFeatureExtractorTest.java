@@ -15,8 +15,6 @@ class SumoNetworkFeatureExtractorTest {
 
 		double ku = SumoNetworkFeatureExtractor.calcCurvature(edge);
 
-		//TODO should be around 200 for 200m road
-
 		// Length: 0.2 km
 		// Gon: 200
 		// Curvature: 200 / 0.2 = 1000
