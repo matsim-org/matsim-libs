@@ -13,7 +13,7 @@ public class HBSMotorwayCapacity implements Predictor {
 
 		// speed in km/h
 		int speed = (int) Math.round(features.getDouble("speed") * 3.6);
-		int lanes = (int) features.getOrDefault("lanes", 1);
+		int lanes = (int) features.getOrDefault("num_lanes", 1);
 
 		// Capacity for 1 lane motorways is not defined in HBS
 		double capacity = 2000;

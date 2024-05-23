@@ -60,9 +60,12 @@ class NetworkParamsOpt {
 	 */
 	static Map<Id<Link>, Feature> readFeatures(String input, Map<Id<Link>, ? extends Link> links) throws IOException {
 
-		// TODO: read features from link attributes as well, if not present as input
-
 		Map<Id<Link>, Feature> features = new IdMap<>(Link.class, links.size());
+
+		// Create features from link attributes
+		for (Link link : links.values()) {
+			features.put(link.getId(), createDefaultFeature(link));
+		}
 
 		try (CSVParser reader = new CSVParser(IOUtils.getBufferedReader(input),
 			CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
@@ -73,30 +76,62 @@ class NetworkParamsOpt {
 
 				Id<Link> id = Id.createLinkId(row.get("linkId"));
 				Link link = links.get(id);
-
-				Object2DoubleOpenHashMap<String> ft = new Object2DoubleOpenHashMap<>();
-				ft.defaultReturnValue(Double.NaN);
-				Object2ObjectMap<String, String> categories = new Object2ObjectOpenHashMap<>();
+				Feature ft = features.computeIfAbsent(id, (k) -> createDefaultFeature(link));
 
 				for (String column : header) {
 					String v = row.get(column);
 					try {
-						ft.put(column, Double.parseDouble(v));
+						ft.features.put(column, Double.parseDouble(v));
 					} catch (NumberFormatException e) {
 						// every not equal to True will be false
-						ft.put(column, Boolean.parseBoolean(v) ? 1 : 0);
-						categories.put(column, v);
+						ft.features.put(column, Boolean.parseBoolean(v) ? 1 : 0);
+						ft.categories.put(column, v);
 					}
 				}
 
 				String highwayType = header.contains(NetworkUtils.TYPE) ? row.get(NetworkUtils.TYPE) :
 					(link != null ? NetworkUtils.getHighwayType(link) : null);
 
-				features.put(id, new Feature(row.get("junction_type").intern(), highwayType, ft, categories));
+				features.put(id, new Feature(row.get("junction_type").intern(), highwayType, ft.features, ft.categories));
 			}
 		}
 
 		return features;
+	}
+
+	/**
+	 * Create default feature based on link attributes.
+	 */
+	private static Feature createDefaultFeature(Link link) {
+		Object2DoubleOpenHashMap<String> ft = new Object2DoubleOpenHashMap<>();
+		ft.defaultReturnValue(Double.NaN);
+		Object2ObjectMap<String, String> categories = new Object2ObjectOpenHashMap<>();
+
+		// Link might not be present in the network
+		if (link == null)
+			return new Feature("", "", ft, categories);
+
+		String highwayType = NetworkUtils.getHighwayType(link);
+		categories.put("highway_type", highwayType);
+		ft.put("speed", NetworkUtils.getAllowedSpeed(link));
+		ft.put("num_lanes", link.getNumberOfLanes());
+		ft.put("length", link.getLength());
+		ft.put("capacity", link.getCapacity());
+		ft.put("freespeed", link.getFreespeed());
+
+		for (Map.Entry<String, Object> e : link.getAttributes().getAsMap().entrySet()) {
+			String key = e.getKey();
+			Object value = e.getValue();
+			if (value instanceof Number) {
+				ft.put(key, ((Number) value).doubleValue());
+			} else if (value instanceof Boolean) {
+				ft.put(key, (Boolean) value ? 1 : 0);
+			} else {
+				categories.put(key, value.toString());
+			}
+		}
+
+		return new Feature("", highwayType, ft, categories);
 	}
 
 	/**
