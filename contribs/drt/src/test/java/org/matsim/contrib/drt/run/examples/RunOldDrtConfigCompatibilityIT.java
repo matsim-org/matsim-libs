@@ -41,7 +41,9 @@ public class RunOldDrtConfigCompatibilityIT {
 
         for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
             //disable rejections
-            drtCfg.getDrtOptimizationConstraintsParam().rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+			drtCfg.addOrGetDrtOptimizationConstraintsParams()
+                    .addOrGetDefaultDrtOptimizationConstraintsSet()
+                    .rejectRequestIfMaxWaitOrTravelTimeViolated = false;
         }
 
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
