@@ -31,6 +31,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 public abstract class TransformationFactory {
 
 	public final static String WGS84 = "WGS84";
+	public final static String EPSG4326 = "EPSG:4326";
 	public final static String ATLANTIS = "Atlantis";
 	public final static String CH1903_LV03 = "CH1903_LV03"; // switzerland
 	public final static String CH1903_LV03_Plus = "CH1903_LV03_Plus"; // switzerland new
@@ -40,7 +41,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84_UTM35S = "WGS84_UTM35S"; // South Africa (Gauteng)
 	public final static String WGS84_UTM36S = "WGS84_UTM36S"; // South Africa (eThekwini, Kwazulu-Natal)
 	public final static String WGS84_Albers = "WGS84_Albers"; // South Africa (Africa Albers Equal Conic)
-	public final static String WGS84_SA_Albers = "WGS84_SA_Albers"; // South Africa (Adapted version of Africa Albers Equal) 
+	public final static String WGS84_SA_Albers = "WGS84_SA_Albers"; // South Africa (Adapted version of Africa Albers Equal)
 	public final static String HARTEBEESTHOEK94_LO19 = "SA_Lo19"; // South Africa adaption of Transverse Mercator. Cape Town
 	public final static String HARTEBEESTHOEK94_LO25 = "SA_Lo25"; // South Africa adaption of Transverse Mercator. Nelson Mandela Bay Metropolitan
 	public final static String HARTEBEESTHOEK94_LO29 = "SA_Lo29"; // South Africa adaption of Transverse Mercator. General for SA as a whole, and Gauteng
@@ -57,7 +58,7 @@ public abstract class TransformationFactory {
 	public static final String WGS84_TM = "WGS84_TM"; //Singapore3
 	public static final String PCS_ITRF2000_TM_UOS = "PCS_ITRF2000_TM_UOS"; // South Korea - but used by University of Seoul - probably a wrong one...
 	public static final String DHDN_SoldnerBerlin = "DHDN_SoldnerBerlin"; // Berlin
-	
+
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
 	 * coordinate system to another one.
@@ -68,12 +69,12 @@ public abstract class TransformationFactory {
 	 */
 	public static CoordinateTransformation getCoordinateTransformation(final String fromSystem, final String toSystem) {
 		if (fromSystem.equals(toSystem)) return new IdentityTransformation();
-		if (WGS84.equals(fromSystem)) {
+		if (WGS84.equals(fromSystem) || EPSG4326.equalsIgnoreCase(fromSystem)) {
 			if (CH1903_LV03.equals(toSystem)) return new WGS84toCH1903LV03();
 			if (CH1903_LV03_Plus.equals(toSystem)) return new WGS84toCH1903LV03Plus();
 			if (ATLANTIS.equals(toSystem)) return new WGS84toAtlantis();
 		}
-		if (WGS84.equals(toSystem)) {
+		if (WGS84.equals(toSystem) || EPSG4326.equalsIgnoreCase(toSystem)) {
 			if (CH1903_LV03.equals(fromSystem)) return new CH1903LV03toWGS84();
 			if (CH1903_LV03_Plus.equals(fromSystem)) return new CH1903LV03PlustoWGS84();
 			if (GK4.equals(fromSystem)) return new GK4toWGS84();

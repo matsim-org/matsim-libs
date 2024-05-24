@@ -20,22 +20,18 @@
 
 package org.matsim.contrib.zone.skims;
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
+public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String SET_NAME = "travelTimeMatrix";
-
-	@Parameter
-	@Comment("size of square cells (meters) used for computing travel time matrix." + " Default value is 200 m")
-	@Positive
-	public double cellSize = 200; //[m]
 
 	// Satisfying only one criterion (max distance or travel time) is enough to be considered a neighbour.
 
@@ -58,13 +54,32 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
 	@PositiveOrZero
 	public double maxNeighborTravelTime = 0; //[s]
+	private ZoneSystemParams zoneSystemParams;
+
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
+		initSingletonParameterSets();
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return super.createParameterSet(type);
+
+	private void initSingletonParameterSets() {
+
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+	}
+
+	public ZoneSystemParams getZoneSystemParams() {
+		return zoneSystemParams;
 	}
 }

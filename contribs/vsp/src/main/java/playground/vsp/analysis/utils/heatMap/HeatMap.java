@@ -25,6 +25,7 @@ import java.util.ServiceConfigurationError;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -35,8 +36,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileWriter;
 
 /**
  * @author droeder
@@ -52,9 +52,9 @@ public class HeatMap {
 	private double maxY = -Double.MAX_VALUE;
 	private QuadTree<Tile> tiles;
 	private Integer gridSize;
-	
+
 	private class Tile{
-		
+
 		private Polygon area;
 		private Double value;
 
@@ -78,34 +78,34 @@ public class HeatMap {
 			this.area = factory.createPolygon(factory.createLinearRing(c), null);
 			this.value = 0.;
 		}
-		
+
 		public Coord getCentroid(){
 			return MGC.point2Coord(this.area.getCentroid());
 		}
-		
+
 		public Polygon getGeometry(){
 			return this.area;
 		}
-		
+
 		public void add(Double d){
 			this.value += d;
 		}
-		
+
 		public double getValue(){
 			return this.value;
 		}
 	}
-	
+
 	/**
 	 * a class to create a simple HeatMap from coordinates and corresponding values.
-	 * 
+	 *
 	 * @param gridSize, the number of tiles of the HeatMap
 	 */
 	public HeatMap(Integer gridSize) {
 		this.gridSize = gridSize;
 		this.values = new ArrayList<Tuple<Coord,Double>>();
 	}
-	
+
 	public void addValue(Coord coord, Double value){
 		this.values.add(new Tuple<Coord, Double>(coord, value));
 		findMinMax(coord);
@@ -128,7 +128,7 @@ public class HeatMap {
 			this.minY = coord.getY();
 		}
 	}
-	
+
 	public void createHeatMap(){
 		this.tiles = new QuadTree<Tile>(minX, minY, maxX, maxY);
 		Double dx, dy, inc;
@@ -171,7 +171,7 @@ public class HeatMap {
 			t.add(v.getSecond());
 		}
 	}
-	
+
 	private Collection<Tile> getTiles() {
 		return this.tiles.values();
 	}
@@ -184,9 +184,9 @@ public class HeatMap {
 		b.add("name", String.class);
 		b.add("count", Double.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
+		Collection<SimpleFeature> features = new ArrayList<>();
+
 		Object[] featureAttribs;
 		int i = 0;
 		for(Tile t: heatmap.getTiles()){
@@ -205,7 +205,7 @@ public class HeatMap {
 			log.info("There are no tiles for " + name);
 		} else {
 			try{
-				ShapeFileWriter.writeGeometries(features, file);
+				GeoFileWriter.writeGeometries(features, file);
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}

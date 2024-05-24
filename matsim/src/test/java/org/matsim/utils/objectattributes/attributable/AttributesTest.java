@@ -24,11 +24,9 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
-	/**
+/**
  * @author thibautd
  */
 public class AttributesTest {
@@ -148,4 +146,104 @@ public class AttributesTest {
 			Assertions.fail("Expected NoSuchElementException, but caught a different one.");
 		}
 	}
+
+		@Test
+		void testComparison() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			a1.putAttribute("att1", "1");
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			a2.putAttribute("att1", "1");
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			a2.putAttribute("att1", "one");
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+		}
+
+		@Test
+		void testComplexComparisonMap() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+
+			Map<Object, Object> map = new HashMap<>();
+			a1.putAttribute("map", map);
+			a2.putAttribute("map", map);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Map<Object, Object> map2 = new HashMap<>();
+			a2.putAttribute("map", map2);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Object o = new Object();
+			map.put(o, o);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			map2.put(o, o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+
+			Map<Object, Object> recursiveMap = new HashMap<>();
+			map.put("recursiveMap", recursiveMap);
+			map2.put("recursiveMap", recursiveMap);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			recursiveMap.put(o, o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Map<Object, Object> recursiveMap2 = new HashMap<>();
+			map2.put("recursiveMap", recursiveMap2);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			recursiveMap2.put(o, o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+		}
+
+		@Test
+		void testComplexComparisonList() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+
+			List<Object> list= new ArrayList<>();
+			a1.putAttribute("list", list);
+			a2.putAttribute("list", list);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			List<Object> list2 = new ArrayList<>();
+			a2.putAttribute("list", list2);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Object o = new Object();
+			list.add(o);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			list2.add(o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			List<Object> recursiveList = new ArrayList<>();
+			list.add(recursiveList);
+			list2.add(recursiveList);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			recursiveList.add(o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			List<Object> recursiveList2 = new ArrayList<>();
+			list2.add(recursiveList2);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+			list2.remove(recursiveList);
+
+			recursiveList2.add(o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+		}
 }

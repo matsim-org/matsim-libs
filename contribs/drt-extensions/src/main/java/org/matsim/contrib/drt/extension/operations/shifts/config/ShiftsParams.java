@@ -9,7 +9,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.config;
 
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.ConfigGroup;
 
 import java.net.URL;

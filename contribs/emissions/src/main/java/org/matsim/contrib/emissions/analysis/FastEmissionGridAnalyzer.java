@@ -239,8 +239,11 @@ public abstract class FastEmissionGridAnalyzer {
 
 		emissions.forEachEntry((linkId, value) -> {
 			var link = network.getLinks().get(linkId);
-			var numberOfCells = rasterizeLink(link, 0, raster);
-			rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			// If the link does not exist in the network, we ignore it
+			if (link != null) {
+				var numberOfCells = rasterizeLink(link, 0, raster);
+				rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			}
 			return true;
 		});
 		return raster;
@@ -260,11 +263,14 @@ public abstract class FastEmissionGridAnalyzer {
 		for (var entry : emissions.entrySet()) {
 
 			var link = network.getLinks().get(entry.getKey());
-			var value = entry.getValue();
-			// first count number of cells
-			var numberOfCells = rasterizeLink(link, 0, raster);
-			// second pass for actually writing the emission values
-			rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			// If the link does not exist in the network, we ignore it
+			if (link != null) {
+				var value = entry.getValue();
+				// first count number of cells
+				var numberOfCells = rasterizeLink(link, 0, raster);
+				// second pass for actually writing the emission values
+				rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			}
 		}
 		return raster;
 	}

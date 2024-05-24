@@ -172,7 +172,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	// ===============
 	// ===============
 	/**
-	 * @param detailedVsAverageLookupBehavior -- {@value #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
+	 * @param detailedVsAverageLookupBehavior -- {@value  #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
 	 * @noinspection JavadocReference
 	 */
 	@StringSetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)

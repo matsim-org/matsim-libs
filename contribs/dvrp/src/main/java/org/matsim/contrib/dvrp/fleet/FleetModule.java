@@ -52,7 +52,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 		this.fleetSpecificationUrl = fleetSpecificationUrl;
 		this.updateVehicleStartLinkToLastLink = updateVehicleStartLinkToLastLink;
 
-		vehicleType = VehicleUtils.getDefaultVehicleType();
+		vehicleType = VehicleUtils.createDefaultVehicleType();
 	}
 
 	public FleetModule(String mode, URL fleetSpecificationUrl, VehicleType vehicleType) {

@@ -21,18 +21,18 @@ package org.matsim.contrib.bicycle.network;
 import java.awt.image.Raster;
 import java.io.IOException;
 
+import org.geotools.api.data.DataSourceException;
+import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
-import org.geotools.data.DataSourceException;
 import org.geotools.gce.geotiff.GeoTiffReader;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.Position2D;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  * @author smetzler, dziemke
@@ -101,7 +101,7 @@ public class ElevationDataParser {
 		
 		GridCoordinates2D posGrid = null;
 		try {
-			posGrid = gg.worldToGrid(new DirectPosition2D(transformedCoord.getX(), transformedCoord.getY()));
+			posGrid = gg.worldToGrid(new Position2D(transformedCoord.getX(), transformedCoord.getY()));
 		} catch (InvalidGridGeometryException e) {
 			e.printStackTrace();
 		} catch (TransformException e) {

@@ -57,6 +57,9 @@ public class EmissionsDashboard implements Dashboard {
 				viz.opacity = 0.2;
 				viz.maxHeight = 100;
 				viz.projection = "EPSG:25832";
+				viz.zoom = data.context().mapZoomLevel;
+				viz.center = data.context().getCenter();
+
 				viz.setColorRamp("greenRed", 10, false);
 				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.csv");
 			});
@@ -70,6 +73,9 @@ public class EmissionsDashboard implements Dashboard {
 				viz.opacity = 0.2;
 				viz.maxHeight = 100;
 				viz.projection = "EPSG:25832";
+				viz.zoom = data.context().mapZoomLevel;
+				viz.center = data.context().getCenter();
+
 				viz.setColorRamp("greenRed", 10, false);
 				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_hour.csv");
 			});

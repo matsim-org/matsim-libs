@@ -20,51 +20,21 @@
 
 package org.matsim.core.utils.gis;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.data.simple.SimpleFeatureStore;
-import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URL;
 import java.util.Collection;
+
 /**
  * This is a simple utility class that provides methods to write Feature instances
  * of the geotools framework to an ESRI shape file.
  *
  * @author glaemmel
  */
+@Deprecated
 public class ShapeFileWriter implements MatsimSomeWriter {
 
-	private static final Logger log = LogManager.getLogger(ShapeFileWriter.class);
-
 	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
-		if (features.isEmpty()) {
-			throw new UncheckedIOException(new IOException("Cannot write empty collection"));
-		}
-		log.info("Writing shapefile to " + filename);
-		try {
-			URL fileURL = (new File(filename)).toURI().toURL();
-
-			ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
-			SimpleFeature feature = features.iterator().next();
-			datastore.createSchema(feature.getFeatureType());
-
-			DefaultFeatureCollection coll = new DefaultFeatureCollection();
-			coll.addAll(features);
-
-			SimpleFeatureType featureType = features.iterator().next().getFeatureType();
-			datastore.createSchema(featureType);
-			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource();
-			featureSource.addFeatures(coll);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		GeoFileWriter.writeGeometries(features, filename);
 	}
 }

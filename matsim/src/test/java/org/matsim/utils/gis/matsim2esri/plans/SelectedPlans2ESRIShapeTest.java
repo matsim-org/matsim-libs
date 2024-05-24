@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -34,10 +36,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class SelectedPlans2ESRIShapeTest {
 
@@ -66,7 +66,7 @@ public class SelectedPlans2ESRIShapeTest {
 		sp.setWriteLegs(false);
 		sp.write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outShp);
 		Assertions.assertEquals(2235, writtenFeatures.size());
 	}
 
@@ -91,7 +91,7 @@ public class SelectedPlans2ESRIShapeTest {
 		sp.setWriteLegs(true);
 		sp.write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outShp);
 		Assertions.assertEquals(1431, writtenFeatures.size());
 	}
 

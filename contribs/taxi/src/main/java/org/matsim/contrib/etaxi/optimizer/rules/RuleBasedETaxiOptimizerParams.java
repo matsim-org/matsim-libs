@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.etaxi.optimizer.rules;
 
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.core.config.ConfigGroup;
@@ -52,21 +55,14 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 
 	public RuleBasedETaxiOptimizerParams() {
 		super(SET_NAME, false, false);
+		initSingletonParameterSets();
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return type.equals(RuleBasedTaxiOptimizerParams.SET_NAME) ?
-				new RuleBasedTaxiOptimizerParams() :
-				super.createParameterSet(type);
-	}
-
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		if (set.getName().equals(RuleBasedTaxiOptimizerParams.SET_NAME)) {
-			ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
-		}
-		super.addParameterSet(set);
+	private void initSingletonParameterSets() {
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(RuleBasedTaxiOptimizerParams.SET_NAME, RuleBasedTaxiOptimizerParams::new,
+			() -> ruleBasedTaxiOptimizerParams,
+			params -> ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)params);
 	}
 
 	public RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {

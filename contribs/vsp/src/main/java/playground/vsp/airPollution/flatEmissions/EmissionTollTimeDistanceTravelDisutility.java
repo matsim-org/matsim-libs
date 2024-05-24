@@ -82,7 +82,7 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
             if (person == null){
                 // additionally, no person is given -> a default vehicle type is used
                 log.warn("No person and no vehicle is given to calculate the link travel disutility. The default vehicle type is used to estimate emission disutility.");
-                emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
+                emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.createDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
                 emissionVehicle = this.emissionVehicles.getVehicles().get(Id.createVehicleId(person.getId()));

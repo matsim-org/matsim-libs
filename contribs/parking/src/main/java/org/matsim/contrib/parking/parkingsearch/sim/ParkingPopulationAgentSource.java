@@ -79,7 +79,7 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 		case defaultVehicle:
 			for (String mode : mainModes) {
 				// initialize each mode with default vehicle type:
-				modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+				modeVehicleTypes.put(mode, VehicleUtils.createDefaultVehicleType());
 			}
 			break;
 		case fromVehiclesData:
