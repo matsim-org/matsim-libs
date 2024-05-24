@@ -6,11 +6,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.text.similarity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.type.AttributeDescriptor;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.AttributeDescriptor;
 import picocli.CommandLine;
 
 import java.nio.file.Files;

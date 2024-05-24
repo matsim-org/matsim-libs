@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -15,7 +16,6 @@ import org.matsim.contrib.carsharing.relocation.infrastructure.RelocationZone;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
-import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.Attributes;
 
 public class RelocationZonesReader extends MatsimXmlParser {
