@@ -27,13 +27,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -57,19 +57,19 @@ public class LanduseBuildingAnalysis {
 	 * Creates a distribution of the given input data for each zone based on the
 	 * used OSM data.
 	 */
-	public static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
+	public static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path outputDataDistributionFile,
 																					Map<String, List<String>> landuseCategoriesAndDataConnection,
 																					String usedLanduseConfiguration, Index indexLanduse,
 																					Index indexZones,
 																					Index indexBuildings, Index indexInvestigationAreaRegions,
 																					String shapeFileZoneNameColumn,
 																					Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-																					Path pathToInvestigationAreaData, String shapeFileBuildingTypeColumn)
+																					Path pathToInvestigationAreaData,
+																					String shapeFileBuildingTypeColumn)
 		throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
 		Map<String, String> zoneIdRegionConnection = new HashMap<>();
-		Path outputFileInOutputFolder = output.resolve("dataDistributionPerZone.csv");
 
 		log.info("New analyze for data distribution is started. The used method is: {}", usedLanduseConfiguration);
 		Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
@@ -83,7 +83,7 @@ public class LanduseBuildingAnalysis {
 		createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
 			landuseCategoriesAndDataConnection, zoneIdRegionConnection);
 
-		writeResultOfDataDistribution(resultingDataPerZone, outputFileInOutputFolder,
+		writeResultOfDataDistribution(resultingDataPerZone, outputDataDistributionFile,
 			zoneIdRegionConnection);
 
 

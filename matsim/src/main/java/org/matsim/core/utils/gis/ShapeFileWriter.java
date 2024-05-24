@@ -20,10 +20,11 @@
 
 package org.matsim.core.utils.gis;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.Collection;
+
 /**
  * This is a simple utility class that provides methods to write Feature instances
  * of the geotools framework to an ESRI shape file.

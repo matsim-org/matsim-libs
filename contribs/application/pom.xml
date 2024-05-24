@@ -87,7 +87,7 @@
 		<dependency>
 			<groupId>com.github.matsim-org</groupId>
 			<artifactId>gtfs2matsim</artifactId>
-			<version>master-33809c4f0f-1</version>
+			<version>fc8b13954d</version>
 			<exclusions>
 				<!-- Exclude unneeded dependencies and these with known CVE -->
 				<exclusion>

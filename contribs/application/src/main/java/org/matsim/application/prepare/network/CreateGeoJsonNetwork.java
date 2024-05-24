@@ -82,7 +82,7 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 		json.put("type", "FeatureCollection");
 
 		// Default CRS assumed to be 4326
-		if (!networkCrs.equalsIgnoreCase("epsg:4326")) {
+		if (!crs.getTargetCRS().equalsIgnoreCase("epsg:4326")) {
 			ObjectNode crs = json.putObject("crs");
 			putCrs(crs, networkCrs);
 		}
