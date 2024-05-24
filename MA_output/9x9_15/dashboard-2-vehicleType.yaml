@@ -1,0 +1,95 @@
+header:
+  tab: "Vehicle type stats"
+  title: "Vehicle type stats"
+  description: "General information about the vehicle types"
+
+
+layout:
+  general:
+    - type: csv
+      title: Available vehicle types
+      width: 1.0
+      dataset: analysis/TimeDistance_perVehicleType.csv
+      showAllRows: true
+      hideHeader: true
+      show: ["vehicleTypeId"]
+      style: "topsheet"
+      height: 3
+    - type: "tile"
+      width: 2
+      dataset: analysis/Load_summary.csv
+      height: 3
+  parameters:
+    - type: plotly
+      title: "Vehicle type parameters"
+      height: 5
+      width: 1
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicleType.csv"
+      traces:
+        - type: "bar"
+          x: $dataset.vehicleTypeId                    
+          y: $dataset.costPerSecond[EUR/s] 
+          name: "cost per second [EUR/s]"
+          group_name: "cost per second [EUR/s]"
+        - type: "bar"
+          x: $dataset.vehicleTypeId                    
+          y: $dataset.fixedCosts[EUR/veh]   
+          name: "fixed costs[EUR/veh] "
+          group_name: "fixed costs[EUR/veh]"
+        - type: "bar"
+          x: $dataset.vehicleTypeId                    
+          y: $dataset.costPerMeter[EUR/m]   
+          name: "cost per meter[EUR/m]"
+          group_name: "cost per meter[EUR/m]"
+      interactive: dropdown
+      layout:
+        colorway : ['#1F90CC']
+  vehnumbers:
+    - type: plotly
+      title: "Number of vehicles"
+      description: "by type"
+      height: 5
+      width: 1
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicleType.csv"
+      traces:
+        - type: "bar"
+          x: $dataset.vehicleTypeId                    
+          y: $dataset.nuOfVehicles
+      layout:
+        barmode: stack
+        showlegend: false
+        colorway : ["1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+    - type: "bar"
+      title: "Travel distance"
+      description: "by type"
+      height: 5
+      width: 1
+      props:
+        dataset: "analysis/TimeDistance_perVehicleType.csv"
+        x: "vehicleTypeId"
+        stacked: false
+        columns: ["SumOfTravelDistances[km]"]
+        xAxisName: 'carrierId'
+        yAxisName: 'Sum of travel distances [km]'
+  durationdist:
+    - type: plotly
+      title: "Travel time und tour duration"
+      description: "by type"
+      height: 5
+      width: 1
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicleType.csv"
+      traces:
+        - type: bar
+          x: $dataset.vehicleTypeId
+          y: $dataset.SumOfTravelTime[h]
+          name: "Sum of travel time [h]"
+        - type: bar
+          x: $dataset.vehicleTypeId
+          y: $dataset.SumOfTourDuration[h]
+          name: "Sum of tour duration [h]"
+      layout:
+        showlegend: true
+        colorway : ["1f90cc",  "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]

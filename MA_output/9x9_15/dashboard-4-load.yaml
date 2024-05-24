@@ -1,0 +1,61 @@
+header:
+  tab: "Capacity stats"
+  title: "Capacity stats"
+  description: "General information about the used vehicle types and load state per vehicle"
+
+
+layout:
+  capacityAndLoad:
+    - type: plotly
+      width: 2
+      height: 5
+      title: Max. capacity
+      description: by vehicle type
+      datasets:
+        dataset: "analysis/Capacity_summary.csv"
+      traces:
+        - type: "bar"
+          y: $dataset.maxCapacity 
+          x: $dataset.vehicleTypeId 
+          name: $dataset.vehicleTypeId 
+      layout:
+        xaxis:
+          title: vehicle type
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: maximal capacity
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1c18a0", "1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+  vload:
+    - type: plotly
+      width: 2
+      height: 5
+      title: Max. used capacity in percent
+      description: by vehicle type
+      datasets:
+        dataset: "analysis/Load_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.usedCapacity[%] 
+          box: {visible: true}
+          name: $dataset.vehicleTypeId 
+          points: all
+      layout:
+        xaxis:
+          title: vehicle type
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: maximal load [%]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1c18a0", "1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c"]
+  csv:
+    - type: "csv"
+      title: Load_perVehicle.csv
+      dataset: analysis/Load_perVehicle.csv
+      enableFilter: true

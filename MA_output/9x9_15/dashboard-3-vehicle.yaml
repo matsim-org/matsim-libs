@@ -1,0 +1,206 @@
+header:
+  title: Vehicle stats
+  description: "General information about the vehicle stats"
+  
+layout:
+  distance:
+    - type: plotly
+      width: 1
+      height: 5
+      title: Distance per vehicle
+      description: for all vehicle types
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.travelDistance[km]
+          box: {visible: true}
+          points: all
+          name: "all vehicles"
+      layout:
+        xaxis:
+          title: ""
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Distance[km]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1c18a0", "1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+    - type: plotly
+      width: 3
+      height: 5
+      title: Distance per vehicle
+      description: by vehicle type
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.travelDistance[km]
+          box: {visible: true}
+          name: $dataset.vehicleTypeId 
+          points: all
+      layout:
+        xaxis:
+          title: vehicleTypeId
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Distance[km]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+  time:
+    - type: plotly
+      height: 5
+      width: 1
+      title: Travel time per Vehicle
+      description: for all vehicle types
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.travelTime[h]
+          name: "all vehicles"
+          box: {visible: true}
+          points: all
+      layout:
+        xaxis:
+          title: ""
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Travel time [h]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1c18a0", "1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+    - type: plotly
+      height: 5
+      width: 3
+      title: Travel time per Vehicle
+      description: by vehicle type
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.travelTime[h]
+          name: $dataset.vehicleTypeId 
+          box: {visible: true}
+          points: all
+      layout:
+        xaxis:
+          title: vehicleTypeId
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Travel time [h]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+  time2:
+    - type: plotly
+      height: 5
+      width: 1
+      title: Tour duration per Vehicle
+      description: for all vehicle types
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.tourDuration[h]
+          name: "all vehicles"
+          box: {visible: true}
+          points: all
+      layout:
+        xaxis:
+          title: ""
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Tour Duration[h]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1c18a0", "1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+    - type: plotly
+      height: 5
+      width: 3
+      title: Tour duration per Vehicle
+      description: by vehicle type
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.tourDuration[h]
+          name: $dataset.vehicleTypeId
+          box: {visible: true}
+          points: all
+      layout:
+        xaxis:
+          title: vehicleTypeId
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Tour Duration[h]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+  costs:
+    - type: plotly
+      height: 5
+      width: 1
+      title: Total costs per Vehicle
+      description: for all vehicle types
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.totalCosts[EUR] 
+          name: all vehicles
+          box: {visible: true}
+          points: all
+      layout:
+        xaxis:
+          title: ""
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: total costs[EUR]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1c18a0", "1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+    - type: plotly
+      height: 5
+      width: 3
+      title: Total costs per Vehicle
+      description: by vehicle type
+      datasets:
+        dataset: "analysis/TimeDistance_perVehicle.csv"
+      traces:
+        - type: "violin"
+          y: $dataset.totalCosts[EUR] 
+          name: $dataset.vehicleTypeId 
+          box: {visible: true}
+          points: all
+      layout:
+        xaxis:
+          title: vehicleTypeId
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: total costs[EUR]
+          color: '#444'
+          type: '-'
+        showlegend: false
+        colorway : ["1e54b6", "1f90cc", "3c71d9", "9013fe", "760e95", "aa108e", "c40d1e", "a40c2e", "5e082c","4e0c49","3d1066"]
+  csv:
+    - type: "csv"
+      title: TimeDistance_perVehicle.csv
+      dataset: analysis/TimeDistance_perVehicle.csv
+      enableFilter: true

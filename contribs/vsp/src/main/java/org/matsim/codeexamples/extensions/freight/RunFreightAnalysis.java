@@ -34,7 +34,9 @@ public class RunFreightAnalysis {
 	}
 	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
 
-		var analysis = new RunFreightAnalysisEventBased("", "\\analysis", "EPSG:31468");
+		var analysis = new RunFreightAnalysisEventBased(
+				"MA_output/9x9_15\\",
+				"MA_output/9x9_15/analysis", "EPSG:31468");
 		try {
 			analysis.runAnalysis();
 		} catch (IOException e) {

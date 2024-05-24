@@ -1,0 +1,30 @@
+version: 2
+
+header:
+  title: "Emission stats"
+  description: "The emissions analysis is not a 'standard analysis', as it requires additional data."
+
+layout:
+  row1:
+    - type: "links"
+      title: "Simulated emissions in the study area"
+      height: 10
+      csvFile: "output/analysis/Emissions_PerLink.csv"
+      geojsonFile: "network.geojson.gz"
+      center: [13.3286309, 52.5221844]
+      zoom: 11
+      display:
+          color:
+            dataset: csvFile
+            columnName: NOx
+            colorRamp:
+              ramp: Viridis
+              reverse: false
+              steps: 7
+          width:
+            dataset: csvFile
+            columnName: NOx
+            scaleFactor: 1000
+
+
+ 

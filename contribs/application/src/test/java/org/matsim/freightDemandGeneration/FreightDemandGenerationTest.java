@@ -22,36 +22,40 @@ public class FreightDemandGenerationTest {
 	void testMain() {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
-			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
-			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
-			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
-			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
-			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
+			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "testVehicleTypes_1.xml");
+			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_1.csv");
+			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_1.csv");
+			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
+			//String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-			String shapeCategory = "Ortsteil";
+			//String shapeCategory = "Ortsteil";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
-					"--demandOption", "createDemandFromCSVAndUsePopulation",
-					"--populationOption", "usePopulationInShape",
-					"--populationSamplingOption", "createMoreLocations",
-					"--VRPSolutionsOption", "runJspritAndMATSim",
+					//"--demandOption", "createDemandFromCSVAndUsePopulation",
+					"--demandOption", "createDemandFromCSV",
+					//"--populationOption", "usePopulationInShape",
+					"--populationOption", "useNoPopulation",
+					//"--populationSamplingOption", "createMoreLocations",
+					"--populationSamplingOption", "noPopulationSampling",
+					//"--VRPSolutionsOption", "runJsprit",
+					"--VRPSolutionsOption", "createNoSolutionAndOnlyWriteCarrierFile",
 					"--combineSimilarJobs", "false",
 					"--carrierFileLocation", "",
 					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
-					"--shapeFileLocation", shapeFilePath.toString(),
-					"--shapeCRS", "WGS84",
-					"--populationFileLocation", populationLocation,
-					"--populationCRS", "WGS84",
+					//"--shapeFileLocation", shapeFilePath.toString(),
+					//"--shapeCRS", "WGS84",
+					//"--populationFileLocation", populationLocation,
+					//"--populationCRS", "WGS84",
 					"--network", network,
 					"--networkCRS", "WGS84",
 					"--networkChangeEvents", "",
-					"--shapeCategory", shapeCategory,
+					//"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
-					"--inputDemandCSV", demandCSVLocation.toString(),
-					"--populationSample", "0.5",
-					"--populationSamplingTo", "1.0",
-					"--defaultJspritIterations", "3"
+					"--inputDemandCSV", demandCSVLocation.toString()
+					//"--populationSample", "0.5",
+					//"--populationSamplingTo", "1.0",
+					//"--defaultJspritIterations", "3"
 			);
 		} catch (Exception ee) {
 			LogManager.getLogger(this.getClass()).fatal("there was an exception: \n" + ee);
