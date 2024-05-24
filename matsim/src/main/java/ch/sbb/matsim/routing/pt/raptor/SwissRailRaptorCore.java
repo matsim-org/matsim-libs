@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -880,17 +880,18 @@ public class SwissRailRaptorCore {
     }
 
     private static RaptorRoute createRaptorRoute(Facility fromFacility, Facility toFacility, PathElement destinationPathElement, double departureTime) {
-        LinkedList<PathElement> pes = new LinkedList<>();
+        ArrayList<PathElement> pes = new ArrayList<>();
         double arrivalCost = Double.POSITIVE_INFINITY;
         if (destinationPathElement != null) {
             arrivalCost = destinationPathElement.arrivalTravelCost + destinationPathElement.arrivalTransferCost;
             PathElement pe = destinationPathElement;
             while (pe.comingFrom != null) {
-                pes.addFirst(pe);
+                pes.add(pe);
                 pe = pe.comingFrom;
             }
-            pes.addFirst(pe);
+            pes.add(pe);
         }
+        Collections.reverse(pes);
 
         RaptorRoute raptorRoute = new RaptorRoute(fromFacility, toFacility, arrivalCost);
         double time = departureTime;
