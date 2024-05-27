@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,6 +44,8 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.HighestScoreSumSelector;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * @author thibautd
  */
@@ -56,7 +54,7 @@ public class GroupPlanStrategyTest {
 	private static final int N_INITIALLY_INDIV_PLANS = 8;
 
 	@Test
-	public void testNewPlanIsSelected() throws Exception {
+	void testNewPlanIsSelected() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -75,20 +73,20 @@ public class GroupPlanStrategyTest {
 				if ( PersonUtils.isSelected(plan) ) {
 					// new plan: selection status inverted
 					assertFalse(
-							"old plan still selected",
-							selectedPlans.contains( plan ));
+							selectedPlans.contains( plan ),
+							"old plan still selected");
 				}
 				else {
 					assertTrue(
-							"old plan still selected",
-							selectedPlans.contains( plan ));
+							selectedPlans.contains( plan ),
+							"old plan still selected");
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testNumberOfPlans() throws Exception {
+	void testNumberOfPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -100,13 +98,13 @@ public class GroupPlanStrategyTest {
 		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 
 		assertEquals(
-				"group size changed by strategy!",
 				groupSize,
-				group.getPersons().size());
+				group.getPersons().size(),
+				"group size changed by strategy!");
 	}
 
 	@Test
-	public void testNumberOfSelectedJointPlans() throws Exception {
+	void testNumberOfSelectedJointPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -130,17 +128,17 @@ public class GroupPlanStrategyTest {
 		}
 
 		assertEquals(
-				"wrong number of selected plans in joint plans",
 				N_INITIALLY_INDIV_PLANS,
-				countSelectedJoint );
+				countSelectedJoint,
+				"wrong number of selected plans in joint plans" );
 		assertEquals(
-				"wrong number of selected plans in individual plans",
 				N_INITIALLY_JOINT_PLANS,
-				countSelectedIndiv );
+				countSelectedIndiv,
+				"wrong number of selected plans in individual plans" );
 	}
 
 	@Test
-	public void testNumberOfNonSelectedJointPlans() throws Exception {
+	void testNumberOfNonSelectedJointPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
 				new HighestScoreSumSelector(
@@ -164,13 +162,13 @@ public class GroupPlanStrategyTest {
 		}
 
 		assertEquals(
-				"wrong number of non selected plans in joint plans",
 				N_INITIALLY_JOINT_PLANS,
-				countNonSelectedJoint );
+				countNonSelectedJoint,
+				"wrong number of non selected plans in joint plans" );
 		assertEquals(
-				"wrong number of non selected plans in individual plans",
 				N_INITIALLY_INDIV_PLANS,
-				countNonSelectedIndiv );
+				countNonSelectedIndiv,
+				"wrong number of non selected plans in individual plans" );
 	}
 
 	private ReplanningGroup createTestGroup(final JointPlans jointPlans) {
@@ -214,7 +212,7 @@ public class GroupPlanStrategyTest {
 
 		return person;
 	}
-	
+
 	private static ReplanningContext createContext() {
 		return null;
 	}

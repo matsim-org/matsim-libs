@@ -27,10 +27,10 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
- * 
+ *
  * @author aneumann
  *
  */

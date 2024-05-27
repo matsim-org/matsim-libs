@@ -27,7 +27,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
@@ -59,7 +59,7 @@ public final class ParallelEventsManager implements EventsManager {
 
 	@Inject
 	ParallelEventsManager(Config config) {
-		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true, config.parallelEventHandling().getEventsQueueSize());
+		this(config.eventsManager().getSynchronizeOnSimSteps() != null ? config.eventsManager().getSynchronizeOnSimSteps() : true, config.eventsManager().getEventsQueueSize());
 
 	}
 

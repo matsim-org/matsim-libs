@@ -1,8 +1,8 @@
 package org.matsim.application.prepare.population;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -17,11 +17,11 @@ import java.util.List;
 public class SplitActivityTypesDurationTest {
 
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void split() {
+	void split() {
 
 		Path input = Path.of(utils.getPackageInputDirectory(), "persons.xml");
 

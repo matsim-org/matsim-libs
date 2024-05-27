@@ -31,8 +31,8 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.net.URL;
 import java.util.Collections;
 
@@ -126,7 +126,7 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 			final Config config = scenario.getConfig();
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory( originalTravelDisutilityFactory, scheme, config );
-			travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
+			travelDisutilityFactory.setSigma(config.routing().getRoutingRandomness());
 			return travelDisutilityFactory;
 		}
 

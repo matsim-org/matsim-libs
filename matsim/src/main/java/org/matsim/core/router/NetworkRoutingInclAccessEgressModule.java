@@ -19,7 +19,7 @@
 
 package org.matsim.core.router;
 
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import static org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +42,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -80,10 +80,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final RoutingModule accessToNetworkRouter;
 	private final RoutingModule egressFromNetworkRouter;
 	private final Config config;
-	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
-	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
+
 	private static boolean hasWarnedAccessEgress = false;
-	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
+	private final RoutingConfigGroup.AccessEgressType accessEgressType;
 	private final TimeInterpretation timeInterpretation;
 
 	private final MultimodalLinkChooser multimodalLinkChooser;
@@ -103,7 +102,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final MultimodalLinkChooser multimodalLinkChooser) {
 		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
-		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
+		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
@@ -113,7 +112,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.config = scenario.getConfig();
 		this.accessToNetworkRouter = accessToNetworkRouter;
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
-		this.accessEgressType = config.plansCalcRoute().getAccessEgressType();
+		this.accessEgressType = config.routing().getAccessEgressType();
 		this.timeInterpretation = timeInterpretation;
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
@@ -132,7 +131,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	public synchronized List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
-		
+
 		final Facility fromFacility = request.getFromFacility();
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
@@ -225,11 +224,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressLeg.setTravelTime(egressTime);
 			egressLeg.getRoute().setTravelTime(egressTime);
 			egressTrip.add(egressLeg);
-		} else {
+		} else if ( accessEgressType==AccessEgressType.accessEgressModeToLink || accessEgressType==AccessEgressType.accessEgressModeToLinkPlusTimeConstant ) {
 			Facility fromFacility = FacilitiesUtils.wrapLinkAndCoord(egressActLink,startCoord);
 			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if(networkRoutedEgressTrip == null) return null;
-			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
+			if (this.accessEgressType.equals(RoutingConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double egressTime = NetworkUtils.getLinkEgressTime(egressActLink,mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId().toString()));
 				Leg leg0 = TripStructureUtils.getLegs(networkRoutedEgressTrip).get(0);
 				double travelTime = leg0.getTravelTime().seconds()+egressTime;
@@ -237,6 +236,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.getRoute().setTravelTime(travelTime);
 			}
 			egressTrip.addAll(networkRoutedEgressTrip);
+		} else {
+			throw new RuntimeException( "should not happen" );
 		}
 		return egressTrip;
 	}
@@ -272,12 +273,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				startLinkId = accessActLink.getId();
 			}
 
-			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory,
-					config);
+			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory, config);
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			accessTrip.add(accessLeg);
-		} else if (accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.walkConstantTimeToLink)) {
+		} else if (accessEgressType.equals(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink)) {
 			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
 			accessLeg.setDepartureTime(departureTime);
 			Id<Link> startLinkId = fromFacility.getLinkId();
@@ -292,11 +292,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			accessLeg.getRoute().setTravelTime(accessTime);
 			accessTrip.add(accessLeg);
 //			now += accessTime;
-		} else {
+		} else if ( accessEgressType==AccessEgressType.accessEgressModeToLink || accessEgressType==AccessEgressType.accessEgressModeToLinkPlusTimeConstant ) {
 			Facility toFacility = FacilitiesUtils.wrapLinkAndCoord(accessActLink,endCoord);
 			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
-			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
+			if (this.accessEgressType.equals(RoutingConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double accessTime = NetworkUtils.getLinkAccessTime(accessActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
 				Leg leg0 = TripStructureUtils.getLegs(networkRoutedAccessTrip).get(0);
 				double travelTime = leg0.getTravelTime().seconds()+accessTime;
@@ -304,6 +304,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.getRoute().setTravelTime(travelTime);
 			}
 			accessTrip.addAll(networkRoutedAccessTrip);
+		} else {
+			throw new RuntimeException( "should not happen" );
 		}
 
 		final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType);
@@ -312,27 +314,25 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
-		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
-//		act.setMaximumDuration(0.0); // obsolete since this is hard-coded in InteractionActivity
-		return act;
+        return PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
 	}
 
 	private static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config) {
-		final ModeRoutingParams params;
-		ModeRoutingParams tmp;
-		final Map<String, ModeRoutingParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
+		final RoutingConfigGroup.TeleportedModeParams params;
+		RoutingConfigGroup.TeleportedModeParams tmp;
+		final Map<String, RoutingConfigGroup.TeleportedModeParams> paramsMap = config.routing().getModeRoutingParams();
 		if ((tmp = paramsMap.get(TransportMode.non_network_walk)) != null) {
 			params = tmp;
 		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
 			params = tmp;
 		} else {
-			log.fatal( "Teleportation (= mode routing) params neither defined for " + TransportMode.walk + " nor for " + TransportMode.non_network_walk + ".  There are two cases:" ); ;
+			log.fatal( "Teleportation (= mode routing) params neither defined for " + TransportMode.walk + " nor for " + TransportMode.non_network_walk + ".  There are two cases:" );
 			log.fatal( "(1) " + TransportMode.walk + " is teleported.  Then you need to define the corresponding teleportation (= mode routing) params for " + TransportMode.walk + "." );
 			log.fatal( "(2) " + TransportMode.walk + " is routed on the network.  Then you need to define the corresponding teleportation (= mode routing) params for "
 						  + TransportMode.non_network_walk + ".");
 			log.fatal("The old default fallback bevhavior was disabled in may'21.");
-			throw new RuntimeException( "Need teleportation params for bushwhaking modes.  See log statements above." );
+			throw new RuntimeException( "Need teleportation params for bushwhacking modes.  See log statements above." );
 
 //			params = new ModeRoutingParams();
 //			// old defaults
@@ -341,13 +341,18 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			// yyyyyy The above may be a source for buggy behavior: If the teleportation params are cleared, then presumably also the
 			// non-network routing is cleared, and then here it will fall back on the auto-magic behavior.  kai, may'21.
+
+			// Not sure if this can happen:
+			// (1) If walk is a non-network mode, then using the params from that is what we want.
+			// (2) If walk is a network mode, then the walk params cannot be defined as teleportation mode params at the same time.
+			// But presumably there are other cases.  kai, jun'22
 		}
 
 		routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
 	}
 
 	static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
-			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, ModeRoutingParams params) {
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, TeleportedModeParams params ) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15
@@ -403,9 +408,16 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime((int) path.travelTime);
+
+			double relPosOnDepartureLink = 1.0;
+			double relPosOnArrivalLink = 1.0;
+
+			double maxSpeedOnToLink = Math.min(vehicle.getType().getMaximumVelocity(),toLink.getFreespeed());
+			double travelTimeEstimateOnToLink = (toLink.getLength() / maxSpeedOnToLink) * relPosOnArrivalLink;
+			route.setTravelTime((int) (path.travelTime+travelTimeEstimateOnToLink));
+
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.filteredNetwork));
+			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;

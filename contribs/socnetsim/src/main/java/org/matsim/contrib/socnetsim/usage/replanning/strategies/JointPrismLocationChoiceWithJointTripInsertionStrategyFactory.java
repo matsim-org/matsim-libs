@@ -53,14 +53,14 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private javax.inject.Provider<TripRouter> tripRouterProvider;
+	private jakarta.inject.Provider<TripRouter> tripRouterProvider;
 	private final MainModeIdentifier mainModeIdentifier;
 	private final TimeInterpretation timeInterpretation;
 
 	@Inject
 	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
-																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier, 
-																		 javax.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier,
+																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier,
+																		 jakarta.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier,
 																		 TimeInterpretation timeInterpretation) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
@@ -84,13 +84,13 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 						sc.getConfig(),
 						mainModeIdentifier) );
-		
+
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					sc.getConfig(),
 					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
 					planLinkIdentifier ) );
-		
+
 		strategy.addStrategyModule(
 			new JointPlanBasedGroupStrategyModule(
 					new AbstractMultithreadedGenericStrategyModule<JointPlan>( sc.getConfig().global() ) {
@@ -102,7 +102,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 								(JointTripInsertorConfigGroup) sc.getConfig().getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 								mainModeIdentifier);
 						}
-						
+
 						@Override
 						protected String getName() {
 							return "JointTripMutator";

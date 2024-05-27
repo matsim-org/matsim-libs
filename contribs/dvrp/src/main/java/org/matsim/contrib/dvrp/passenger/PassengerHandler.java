@@ -26,10 +26,14 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
  * @author Michal Maciejewski (michalm)
+ *
+ * This looks quite general.  But as of now is a dvrp thing.  kai, apr'23
  */
 public interface PassengerHandler {
-	boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId,
+	boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId);
+
+	boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId,
 			double now);
 
-	void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now);
+	void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now);
 }

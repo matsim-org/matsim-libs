@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -47,8 +49,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static org.junit.Assert.assertNull;
-
 /**
  * @author thibautd
  */
@@ -57,7 +57,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	private TripRouter tripRouter;
 	private Random random;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		config = JointScenarioUtils.createConfig();
 //		tripRouter = new  TripRouter();
@@ -66,31 +66,31 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	}
 
 	@Test
-	public void testRemoverIgnorance() throws Exception {
+	void testRemoverIgnorance() throws Exception {
 		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , new MainModeIdentifierImpl() );
-		
+
 		JointPlan jointPlan = createPlanWithJointTrips();
 
 		assertNull(
-				"unexpected removed trips",
-				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ) );
+				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ),
+				"unexpected removed trips" );
 
 	}
 
 	@Test
-	public void testInsertorIgnorance() throws Exception {
+	void testInsertorIgnorance() throws Exception {
 		final JointTripInsertorAlgorithm algo =
 			new JointTripInsertorAlgorithm(
 					random,
 					null,
 					(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 					TripStructureUtils.getRoutingModeIdentifier() ); // yyyyyy ??????
-		
+
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 
 		assertNull(
-				"unexpected removed trips",
-				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ) );
+				algo.run( jointPlan , jointPlan.getIndividualPlans().keySet() ),
+				"unexpected removed trips" );
 
 	}
 

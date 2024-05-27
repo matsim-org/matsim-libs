@@ -22,9 +22,9 @@
  */
 package org.matsim.contrib.accessibility.logsumComputations;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -33,12 +33,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class CompareLogsumFormulas2Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-
-	@Test public void testLogsumFormulas(){
+	@Test
+	void testLogsumFormulas(){
 
 		double walkTravelTime2Network = 2.; // 2min
 		double travelTimeOnNetwork = 6.;	// 6min
@@ -66,7 +66,7 @@ public class CompareLogsumFormulas2Test {
 		double Sum2 =PreFactor * AggregationSum;
 		System.out.println(Sum2);
 
-		Assert.assertTrue( Sum1 == Sum2 );
+		Assertions.assertTrue( Sum1 == Sum2 );
 	}
 
 }

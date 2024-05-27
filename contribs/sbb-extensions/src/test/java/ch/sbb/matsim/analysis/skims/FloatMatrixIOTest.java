@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.analysis.skims;
 
 import java.io.ByteArrayInputStream;
@@ -9,16 +24,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser / SBB
  */
 public class FloatMatrixIOTest {
 
-    @Test
-    public void testIO() throws IOException {
+	@Test
+	void testIO() throws IOException {
         Set<String> zoneIds = new HashSet<>();
         zoneIds.add("un");
         zoneIds.add("dos");
@@ -45,14 +61,14 @@ public class FloatMatrixIOTest {
         inStream.close();
 
         float epsilon = 1e-6f;
-        Assert.assertEquals(2.0f, matrix2.get("un", "un"), epsilon);
-        Assert.assertEquals(3.0f, matrix2.get("un", "dos"), epsilon);
-        Assert.assertEquals(4.0f, matrix2.get("un", "tres"), epsilon);
-        Assert.assertEquals(4.0f, matrix2.get("dos", "un"), epsilon);
-        Assert.assertEquals(9.0f, matrix2.get("dos", "dos"), epsilon);
-        Assert.assertEquals(16.0f, matrix2.get("dos", "tres"), epsilon);
-        Assert.assertEquals(8.0f, matrix2.get("tres", "un"), epsilon);
-        Assert.assertEquals(27.0f, matrix2.get("tres", "dos"), epsilon);
-        Assert.assertEquals(64.0f, matrix2.get("tres", "tres"), epsilon);
+        Assertions.assertEquals(2.0f, matrix2.get("un", "un"), epsilon);
+        Assertions.assertEquals(3.0f, matrix2.get("un", "dos"), epsilon);
+        Assertions.assertEquals(4.0f, matrix2.get("un", "tres"), epsilon);
+        Assertions.assertEquals(4.0f, matrix2.get("dos", "un"), epsilon);
+        Assertions.assertEquals(9.0f, matrix2.get("dos", "dos"), epsilon);
+        Assertions.assertEquals(16.0f, matrix2.get("dos", "tres"), epsilon);
+        Assertions.assertEquals(8.0f, matrix2.get("tres", "un"), epsilon);
+        Assertions.assertEquals(27.0f, matrix2.get("tres", "dos"), epsilon);
+        Assertions.assertEquals(64.0f, matrix2.get("tres", "tres"), epsilon);
     }
 }

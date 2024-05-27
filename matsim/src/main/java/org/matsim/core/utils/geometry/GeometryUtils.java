@@ -19,9 +19,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
 package org.matsim.core.utils.geometry;
 
 import java.util.ArrayList;
@@ -31,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.geometry.jts.GeometryBuilder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -43,19 +41,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author kainagel
  *
  */
 public class GeometryUtils {
+
+	private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+
 	private GeometryUtils() {} // do not instantiate
 
 	/**
 	 * Method to find all links in {@link Network} that intersect a given {@link Link}.  Convenience method that
 	 * only uses MATSim objects.
-	 * 
+	 *
 	 * @param link
 	 * @param network
 	 * @return
@@ -67,24 +67,24 @@ public class GeometryUtils {
 
 	/**
 	 * Method to find all links in {@link Network} that intersect a given {@link LineString}.
-	 * 
+	 *
 	 * @param lineString
 	 * @param network
 	 * @return
-	 * 
+	 *
 	 * @see {@link GeometryUtilsTest#testIntersectingLinks()}
 	 */
 	public static List<Link> findIntersectingLinks(LineString lineString, final Network network) {
 		// yy One could probably improve this method by using the (already existing) link quadtree to look only at
 		// those links that are in the bounding box.  kai, oct'17
-		
+
 		// convert matsim links into geotools line strings:
 		Map<Link,LineString> segments = new LinkedHashMap<>() ;
 		for ( Link link : network.getLinks().values() ) {
 			LineString theSegment = GeometryUtils.createGeotoolsLineString(link);
 			segments.put( link, theSegment ) ;
 		}
-	
+
 		// find the intersecting segments:
 		List<Link> resultList = new ArrayList<>();
 		for ( Entry<Link, LineString> entry : segments.entrySet() ) {
@@ -97,25 +97,25 @@ public class GeometryUtils {
 
 	/**
 	 * Helper method for type conversion.
-	 * 
+	 *
 	 * @param link
 	 * @return
 	 */
 	public static LineString createGeotoolsLineString(Link link) {
 		Coordinate fromCoord = MGC.coord2Coordinate( link.getFromNode().getCoord() ) ;
 		Coordinate toCoord = MGC.coord2Coordinate( link.getToNode().getCoord() ) ;
-		LineString theSegment = new GeometryFactory().createLineString(new Coordinate[]{ fromCoord, toCoord });
+		LineString theSegment = GEOMETRY_FACTORY.createLineString(new Coordinate[] { fromCoord, toCoord });
 		return theSegment;
 	}
-	
+
 	public static Point createGeotoolsPoint(Coord coord ) {
 		Coordinate coordinate = MGC.coord2Coordinate(coord) ;
-		Point point = new GeometryFactory().createPoint( coordinate ) ;
+		Point point = GEOMETRY_FACTORY.createPoint(coordinate);
 		return point ;
 	}
-	
+
 	public static Polygon createGeotoolsPolygon(List<Coord> coords ) {
-		
+
 		// better way to do this is welcome.  kai, dec'17
 		double [] flatArray = new double[coords.size()*2] ;
 		int ii=0 ;
@@ -126,9 +126,9 @@ public class GeometryUtils {
 			ii++ ;
 		}
 		return new GeometryBuilder().polygon( flatArray ) ;
-		
+
 		// the following yields some failing tests in the minibus contrib. ihab, feb'19
-		
+
 //		Coordinate[] coordinates = new Coordinate[coords.size()] ;
 //		int ii=0 ;
 //		for ( Coord coord : coords ) {
@@ -136,7 +136,7 @@ public class GeometryUtils {
 //			ii++ ;
 //		}
 //		return new GeometryFactory().createPolygon(coordinates);
-		
+
 	}
 
 	public static Point getRandomPointInFeature( Random rnd, SimpleFeature ft ) {

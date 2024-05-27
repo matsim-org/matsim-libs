@@ -25,10 +25,11 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.*;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -47,8 +48,8 @@ public class InsertionCostCalculatorTest {
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
 
 	@Test
-	public void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 50 }, null, null);
+	void testCalculate() {
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, null, null);
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
@@ -174,7 +175,7 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private VehicleEntry entry(double[] slackTimes, ImmutableList<Waypoint.Stop> stops, Waypoint.Start start) {
-		return new VehicleEntry(null, start, stops, slackTimes);
+		return new VehicleEntry(null, start, stops, slackTimes, null, 0);
 	}
 
 	private Link link(String id) {

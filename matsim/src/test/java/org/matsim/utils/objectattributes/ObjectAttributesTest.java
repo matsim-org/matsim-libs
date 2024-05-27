@@ -19,8 +19,8 @@
 
 package org.matsim.utils.objectattributes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -28,12 +28,12 @@ import org.junit.Test;
 public class ObjectAttributesTest {
 
 	@Test
-	public void testPutGet() {
+	void testPutGet() {
 		ObjectAttributes linkAttributes = new ObjectAttributes();
-		Assert.assertNull(linkAttributes.getAttribute("1", "osm:roadtype"));
-		Assert.assertNull(linkAttributes.putAttribute("1", "osm:roadtype", "trunk"));
-		Assert.assertEquals("trunk", linkAttributes.getAttribute("1", "osm:roadtype"));
-		Assert.assertEquals("trunk", linkAttributes.putAttribute("1", "osm:roadtype", "motorway"));
-		Assert.assertEquals("motorway", linkAttributes.getAttribute("1", "osm:roadtype"));
+		Assertions.assertNull(linkAttributes.getAttribute("1", "osm:roadtype"));
+		Assertions.assertNull(linkAttributes.putAttribute("1", "osm:roadtype", "trunk"));
+		Assertions.assertEquals("trunk", linkAttributes.getAttribute("1", "osm:roadtype"));
+		Assertions.assertEquals("trunk", linkAttributes.putAttribute("1", "osm:roadtype", "motorway"));
+		Assertions.assertEquals("motorway", linkAttributes.getAttribute("1", "osm:roadtype"));
 	}
 }

@@ -1,14 +1,15 @@
 package org.matsim.application.prepare;
 
-import com.beust.jcommander.internal.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.data.DataStore;
-import org.geotools.data.FileDataStore;
-import org.geotools.data.FileDataStoreFactorySpi;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.FileDataStore;
+import org.geotools.api.data.FileDataStoreFactorySpi;
+import org.geotools.api.data.SimpleFeatureStore;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.data.store.ReprojectingFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
@@ -16,14 +17,13 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import picocli.CommandLine;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -90,7 +90,7 @@ public class CreateLandUseShp implements MATSimAppCommand {
 			STRtree index = new STRtree();
 			boolean built = false;
 
-			List<Path> paths = Lists.newArrayList();
+			List<Path> paths =new ArrayList<>();
 			if (input.toString().endsWith("zip")) {
 				FileSystem fs = FileSystems.newFileSystem(input, ClassLoader.getSystemClassLoader());
 				for (String l : layer) {

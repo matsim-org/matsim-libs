@@ -23,9 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,7 +41,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -58,7 +56,7 @@ import org.matsim.vehicles.Vehicle;
  * In such scenarios, flowCapacityFraction is accumulated in every second and that's where
  * problem starts. For e.g. 0.2+0.1 = 0.30000000004 also 0.6+0.1=0.79999999999999999
  * See, nice article http://floating-point-gui.de/basic/
- * 
+ *
  * See small numerical test also
  * @author amit
  */
@@ -66,20 +64,20 @@ import org.matsim.vehicles.Vehicle;
 public class JavaRoundingErrorInQsimTest {
 
 	@Test
-	public void printDecimalSum(){
+	void printDecimalSum(){
 		double a = 0.1;
 		double sum =0;
 		double counter = 0;
-		
+
 		for(int i=0; i<10;i++){
 			sum += a;
 			counter++;
-			System.out.println("Sum at counter "+counter+" is "+sum);	
+			System.out.println("Sum at counter "+counter+" is "+sum);
 		}
 	}
-	
+
 	@Test
-	public void testToCheckTravelTime () {
+	void testToCheckTravelTime() {
 		// 2 cars depart on same time, central (bottleneck) link allow only 1 agent / 10 sec.
 		PseudoInputs net = new PseudoInputs();
 		net.createNetwork(360);
@@ -97,10 +95,10 @@ public class JavaRoundingErrorInQsimTest {
 			.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
-		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 2" , 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON);
+		Assertions.assertEquals( 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 2");
 
-		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one. 
-		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 1" , 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON);
+		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one.
+		Assertions.assertEquals( 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 1");
 		LogManager.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for vehicle 1. This is done intentionally in order to keep this in mind for future.");
 	}
 
@@ -162,10 +160,10 @@ public class JavaRoundingErrorInQsimTest {
 			link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
-			final double capacity = linkCapacity; 
+			final double capacity = linkCapacity;
 			link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1000, (double) 25, capacity, (double) 1, null, "22");
 			final Node fromNode2 = node3;
-			final Node toNode2 = node4;	
+			final Node toNode2 = node4;
 			link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
 
 		}

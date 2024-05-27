@@ -35,6 +35,8 @@ import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouter;
 
 /**
  * @author thibautd
+ *
+ * @deprecated -- I think that this functionality is now also in the central {@link TripRouter}.  kai, apr'23
  */
 public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 	private final PlanAlgorithm delegate;
@@ -97,14 +99,14 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 		return id;
 	}
 
-	public TripRouter getTripRouter() {
-		if (delegate instanceof PlanRouter) {
-			return ((PlanRouter) delegate).getTripRouter();
-		}
-		if (delegate instanceof JointPlanRouter) {
-			return ((JointPlanRouter) delegate).getTripRouter();
-		}
-		throw new IllegalStateException( ""+delegate.getClass() );
-	}
+//	public TripRouter getTripRouter() {
+//		if (delegate instanceof PlanRouter) {
+//			return ((PlanRouter) delegate).getTripRouter();
+//		}
+//		if (delegate instanceof JointPlanRouter) {
+//			return ((JointPlanRouter) delegate).getTripRouter();
+//		}
+//		throw new IllegalStateException( ""+delegate.getClass() );
+//	}
 }
 

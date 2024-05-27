@@ -52,8 +52,8 @@ public class JointPlansDumping implements BeforeMobsimListener {
 			final OutputDirectoryHierarchy controlerIO ) {
 		this.sc = sc ;
 		this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
-		this.firstIteration = sc.getConfig().controler().getFirstIteration();
-		this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
+		this.firstIteration = sc.getConfig().controller().getFirstIteration();
+		this.writePlansInterval = sc.getConfig().controller().getWritePlansInterval() ;
 		this.controlerIO = controlerIO ;
 	}
 

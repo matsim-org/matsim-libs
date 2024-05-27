@@ -22,13 +22,13 @@ package org.matsim.contrib.taxi.run.examples;
 
 import java.net.URL;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunMultiModeTaxiExampleTestIT {
 	@Test
-	public void testRun() {
+	void testRun() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "multi_mode_one_taxi_config.xml");
 		RunMultiModeTaxiExample.run(configUrl, false, 1);
 	}

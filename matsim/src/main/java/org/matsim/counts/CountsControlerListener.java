@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -44,7 +44,7 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -63,7 +63,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
     private GlobalConfigGroup globalConfigGroup;
     private Network network;
-    private ControlerConfigGroup controlerConfigGroup;
+    private ControllerConfigGroup controllerConfigGroup;
     private final CountsConfigGroup config;
     private final Set<String> analyzedModes;
     private final VolumesAnalyzer volumesAnalyzer;
@@ -77,10 +77,10 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
         this.globalConfigGroup = globalConfigGroup;
         this.network = network;
-        this.controlerConfigGroup = controlerConfigGroup;
+        this.controllerConfigGroup = controllerConfigGroup;
         this.config = countsConfigGroup;
         this.volumesAnalyzer = volumesAnalyzer;
         this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
@@ -100,7 +100,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (counts != null && this.config.getWriteCountsInterval() > 0) {
-            if (useVolumesOfIteration(event.getIteration(), controlerConfigGroup.getFirstIteration())) {
+            if (useVolumesOfIteration(event.getIteration(), controllerConfigGroup.getFirstIteration())) {
                 addVolumes(volumesAnalyzer);
             }
 
@@ -175,23 +175,23 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 		return (iterationMod > (this.config.getWriteCountsInterval() - this.config.getAverageCountsOverIterations())
 				&& (effectiveIteration + (this.config.getWriteCountsInterval() - iterationMod) >= averaging));
 	}
-	
+
 	/*package*/ boolean createCountsInIteration(final int iteration) {
-		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));		
+		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));
 	}
 
 	private void addVolumes(final VolumesAnalyzer volumes) {
 		this.iterationsUsed++;
 		for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
 			Id<Link> linkId = e.getKey();
-			double[] volumesPerHour = e.getValue(); 
-			double[] newVolume = getVolumesPerHourForLink(volumes, linkId); 
+			double[] volumesPerHour = e.getValue();
+			double[] newVolume = getVolumesPerHourForLink(volumes, linkId);
 			for (int i = 0; i < 24; i++) {
 				volumesPerHour[i] += newVolume[i];
 			}
 		}
 	}
-	
+
 	private double[] getVolumesPerHourForLink(final VolumesAnalyzer volumes, final Id<Link> linkId) {
 		if (this.config.isFilterModes()) {
 			double[] newVolume = new double[24];
@@ -207,7 +207,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 			return volumes.getVolumesPerHourForLink(linkId);
 		}
 	}
-	
+
 	private void reset() {
 		this.iterationsUsed = 0;
 		for (double[] hours : this.linkStats.values()) {

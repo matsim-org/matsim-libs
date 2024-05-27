@@ -31,12 +31,12 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import com.google.inject.Inject;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
- * 
+ *
  * Adds a rerouting strategy that will only reroute pt trips.
- * 
+ *
  * @author aneumann
  *
  */

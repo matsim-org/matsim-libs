@@ -1,7 +1,7 @@
 package org.matsim.core.router.speedy;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
@@ -11,7 +11,7 @@ import java.util.Random;
 public class DAryMinHeapTest {
 
 	@Test
-	public void testPoll() {
+	void testPoll() {
 		double cost[] = new double[10];
 		DAryMinHeap pq = new DAryMinHeap(20, 3);
 
@@ -28,31 +28,31 @@ public class DAryMinHeapTest {
 		pq.insert(1, cost[1]);
 		pq.insert(0, cost[0]);
 
-		Assert.assertEquals(3, pq.size());
+		Assertions.assertEquals(3, pq.size());
 
-		Assert.assertEquals(1, pq.poll());
-		Assert.assertEquals(2, pq.poll());
-		Assert.assertEquals(0, pq.poll());
+		Assertions.assertEquals(1, pq.poll());
+		Assertions.assertEquals(2, pq.poll());
+		Assertions.assertEquals(0, pq.poll());
 
-		Assert.assertTrue(pq.isEmpty());
+		Assertions.assertTrue(pq.isEmpty());
 
 		for (int i = 0; i < 8; i++) {
 			pq.insert(i, cost[i]);
 		}
 
-		Assert.assertEquals(5, pq.poll());
-		Assert.assertEquals(1, pq.poll());
-		Assert.assertEquals(6, pq.poll());
-		Assert.assertEquals(2, pq.poll());
-		Assert.assertEquals(0, pq.poll());
-		Assert.assertEquals(7, pq.poll());
-		Assert.assertEquals(3, pq.poll());
-		Assert.assertEquals(4, pq.poll());
-		Assert.assertTrue(pq.isEmpty());
+		Assertions.assertEquals(5, pq.poll());
+		Assertions.assertEquals(1, pq.poll());
+		Assertions.assertEquals(6, pq.poll());
+		Assertions.assertEquals(2, pq.poll());
+		Assertions.assertEquals(0, pq.poll());
+		Assertions.assertEquals(7, pq.poll());
+		Assertions.assertEquals(3, pq.poll());
+		Assertions.assertEquals(4, pq.poll());
+		Assertions.assertTrue(pq.isEmpty());
 	}
 
 	@Test
-	public void testDecreaseKey() {
+	void testDecreaseKey() {
 		DAryMinHeap pq = new DAryMinHeap(20, 4);
 
 		pq.insert(2, 4);
@@ -61,14 +61,14 @@ public class DAryMinHeapTest {
 
 		pq.decreaseKey(2, 1.0);
 
-		Assert.assertEquals(2, pq.poll());
-		Assert.assertEquals(1, pq.poll());
-		Assert.assertEquals(0, pq.poll());
-		Assert.assertTrue(pq.isEmpty());
+		Assertions.assertEquals(2, pq.poll());
+		Assertions.assertEquals(1, pq.poll());
+		Assertions.assertEquals(0, pq.poll());
+		Assertions.assertTrue(pq.isEmpty());
 	}
 
 	@Test
-	public void stresstest() {
+	void stresstest() {
 		int cnt = 2000;
 		double[] cost = new double[cnt];
 		Random r = new Random(20190210L);
@@ -87,7 +87,7 @@ public class DAryMinHeapTest {
 			step++;
 			int node = pq.poll();
 			double nodeCost = cost[node];
-			Assert.assertTrue(step + ": " + lastCost + " <= " + nodeCost, lastCost <= nodeCost);
+			Assertions.assertTrue(lastCost <= nodeCost, step + ": " + lastCost + " <= " + nodeCost);
 			lastCost = nodeCost;
 		}
 
@@ -110,7 +110,7 @@ public class DAryMinHeapTest {
 			step++;
 			int node = pq.poll();
 			double nodeCost = cost[node];
-			Assert.assertTrue(step + ": " + lastCost + " <= " + nodeCost, lastCost <= nodeCost);
+			Assertions.assertTrue(lastCost <= nodeCost, step + ": " + lastCost + " <= " + nodeCost);
 			lastCost = nodeCost;
 		}
 

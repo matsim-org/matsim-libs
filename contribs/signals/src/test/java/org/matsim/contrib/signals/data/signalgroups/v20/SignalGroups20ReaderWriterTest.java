@@ -29,9 +29,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -42,15 +42,15 @@ import org.xml.sax.SAXException;
 /**
 * @author jbischoff
 * @author dgrether
-* 
+*
 */
 public class SignalGroups20ReaderWriterTest {
 	private static final Logger log = LogManager.getLogger(SignalGroups20ReaderWriterTest.class);
 
 	private static final String TESTXML = "testSignalGroups_v2.0.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Id<SignalSystem> id23 = Id.create("23", SignalSystem.class);
 	private Id<Signal> id1 = Id.create("1", Signal.class);
@@ -63,7 +63,7 @@ public class SignalGroups20ReaderWriterTest {
 
 
 	@Test
-	public void testParser() throws IOException, JAXBException, SAXException,
+	void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		SignalGroupsData sgd = new SignalGroupsDataImpl();
 		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd);
@@ -71,9 +71,9 @@ public class SignalGroups20ReaderWriterTest {
 		checkContent(sgd);
 
 	}
-	
+
 	@Test
-	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
 		String testoutput = this.testUtils.getOutputDirectory() + "testSgOutput.xml";
 		log.debug("reading file...");
@@ -93,43 +93,43 @@ public class SignalGroups20ReaderWriterTest {
 		reader.readFile(testoutput);
 		checkContent(sgd);
 	}
-	
 
-	
+
+
 	private void checkContent(SignalGroupsData sgd) {
-		Assert.assertNotNull(sgd);
-		Assert.assertNotNull(sgd.getSignalGroupDataBySignalSystemId());
-		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id23));
-		
+		Assertions.assertNotNull(sgd);
+		Assertions.assertNotNull(sgd.getSignalGroupDataBySignalSystemId());
+		Assertions.assertNotNull(sgd.getSignalGroupDataBySystemId(id23));
+
 		//sg23
 		Map<Id<SignalGroup>,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
-		Assert.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
+		Assertions.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
 
 		Set<Id<Signal>> sg = ss23.get(idSg1).getSignalIds();
-		Assert.assertTrue(sg.contains(id1));
-		
+		Assertions.assertTrue(sg.contains(id1));
+
 		//sg42
-		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
+		Assertions.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
 		Map<Id<SignalGroup>,SignalGroupData> ss42 = sgd.getSignalGroupDataBySystemId(id42);
-		Assert.assertEquals(id42,ss42.get(idSg1).getSignalSystemId());
+		Assertions.assertEquals(id42,ss42.get(idSg1).getSignalSystemId());
 
 		sg =  ss42.get(idSg1).getSignalIds();
-		Assert.assertTrue(sg.contains(id1));
+		Assertions.assertTrue(sg.contains(id1));
 		sg =  ss42.get(idSg2).getSignalIds();
-		Assert.assertTrue(sg.contains(id1));
-		Assert.assertTrue(sg.contains(id4));
-		Assert.assertTrue(sg.contains(id5));
-		
+		Assertions.assertTrue(sg.contains(id1));
+		Assertions.assertTrue(sg.contains(id4));
+		Assertions.assertTrue(sg.contains(id5));
 
-		
-		
-	
+
+
+
+
 		}
-		
-		
+
+
 	}
-	
-	
-	
-	
+
+
+
+
 

@@ -23,28 +23,25 @@
 
 
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class HouseholdAttributeConversionTest {
-	@Rule
+	public class HouseholdAttributeConversionTest {
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDefaults() {
+	 @Test
+	 void testDefaults() {
 		final String path = utils.getOutputDirectory()+"/households.xml";
 
 		testWriteAndReread(w -> w.writeFile(path), w -> w.readFile(path));
@@ -77,10 +74,10 @@ public class HouseholdAttributeConversionTest {
 		final Household readHousehold = readHouseholds.getHouseholds().get(id);
 		final Object readAttribute = readHousehold.getAttributes().getAttribute("attribute");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
+		Assertions.assertEquals(
 				attribute,
-				readAttribute);
+				readAttribute,
+				"unexpected read attribute");
 	}
 
 	private static class CustomClass {

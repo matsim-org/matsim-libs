@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * For TripScoring to work correctly, activities and legs must be created in the correct order.

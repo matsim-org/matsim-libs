@@ -20,13 +20,7 @@ public class EvBaseModule extends AbstractModule {
 		install(new EvStatsModule() );
 		{
 			// this switches on all the QSimComponents that are registered at various places under EvModule.EV_Component.
-			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( this.getConfig(), QSimComponentsConfigGroup.class );
-			List<String> cmps = qsimComponentsConfig.getActiveComponents();
-			cmps.add( EvModule.EV_COMPONENT );
-			qsimComponentsConfig.setActiveComponents( cmps );
-
-			// chained version would be:
-//			qsimComponentsConfig.setActiveComponents( Stream.concat( qsimComponentsConfig.getActiveComponents().stream(), Stream.of( EV_COMPONENT) ).toList() );
+			ConfigUtils.addOrGetModule( this.getConfig(), QSimComponentsConfigGroup.class ).addActiveComponent( EvModule.EV_COMPONENT );
 		}
 	}
 

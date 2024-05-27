@@ -21,9 +21,9 @@
 
  package org.matsim.core.population.io;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,10 +35,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -47,18 +49,20 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+
+	/**
  * @author thibautd
  */
 public class PopulationV6IOTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testCoord3dIO() {
+	 @Test
+	 void testCoord3dIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -79,20 +83,20 @@ public class PopulationV6IOTest {
 		final Activity readSpeach = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 0 );
 		final Activity readTweet = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 1 );
 
-		Assert.assertFalse( "did not expect Z value in "+readSpeach.getCoord() ,
-				readSpeach.getCoord().hasZ() );
+		Assertions.assertFalse( readSpeach.getCoord().hasZ(),
+				"did not expect Z value in "+readSpeach.getCoord() );
 
-		Assert.assertTrue( "did expect T value in "+readTweet.getCoord() ,
-				readTweet.getCoord().hasZ() );
+		Assertions.assertTrue( readTweet.getCoord().hasZ(),
+				"did expect T value in "+readTweet.getCoord() );
 
-		Assert.assertEquals( "unexpected Z value in "+readTweet.getCoord(),
-				-100,
+		Assertions.assertEquals( -100,
 				readTweet.getCoord().getZ(),
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"unexpected Z value in "+readTweet.getCoord() );
 	}
 
-	@Test
-	public void testEmptyPersonAttributesIO() {
+	 @Test
+	 void testEmptyPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -106,8 +110,8 @@ public class PopulationV6IOTest {
 		new PopulationReader( readScenario ).readFile( file );
 	}
 
-	@Test
-	public void testPersonAttributesIO() {
+	 @Test
+	 void testPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -128,21 +132,21 @@ public class PopulationV6IOTest {
 
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 
-		Assert.assertEquals( "Unexpected boolean attribute in " + readPerson.getAttributes(),
-				person.getAttributes().getAttribute( "brain" ) ,
-				readPerson.getAttributes().getAttribute( "brain" ) );
+		Assertions.assertEquals( person.getAttributes().getAttribute( "brain" ) ,
+				readPerson.getAttributes().getAttribute( "brain" ),
+				"Unexpected boolean attribute in " + readPerson.getAttributes() );
 
-		Assert.assertEquals( "Unexpected String attribute in " + readPerson.getAttributes(),
-				person.getAttributes().getAttribute( "party" ) ,
-				readPerson.getAttributes().getAttribute( "party" ) );
+		Assertions.assertEquals( person.getAttributes().getAttribute( "party" ) ,
+				readPerson.getAttributes().getAttribute( "party" ),
+				"Unexpected String attribute in " + readPerson.getAttributes() );
 
-		Assert.assertEquals( "Unexpected PersonVehicle attribute in " + readPerson.getAttributes(),
-				VehicleUtils.getVehicleIds(person) ,
-				VehicleUtils.getVehicleIds(readPerson) );
+		Assertions.assertEquals( VehicleUtils.getVehicleIds(person) ,
+				VehicleUtils.getVehicleIds(readPerson),
+				"Unexpected PersonVehicle attribute in " + readPerson.getAttributes() );
 	}
 
-	@Test
-	public void testActivityAttributesIO() {
+	 @Test
+	 void testActivityAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -165,17 +169,17 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Activity readAct = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 0 );
 
-		Assert.assertEquals( "Unexpected boolean attribute in " + readAct.getAttributes(),
-				act.getAttributes().getAttribute( "makes sense" ) ,
-				readAct.getAttributes().getAttribute( "makes sense" ) );
+		Assertions.assertEquals( act.getAttributes().getAttribute( "makes sense" ) ,
+				readAct.getAttributes().getAttribute( "makes sense" ),
+				"Unexpected boolean attribute in " + readAct.getAttributes() );
 
-		Assert.assertEquals( "Unexpected Long attribute in " + readAct.getAttributes(),
-				act.getAttributes().getAttribute( "length" ) ,
-				readAct.getAttributes().getAttribute( "length" ) );
+		Assertions.assertEquals( act.getAttributes().getAttribute( "length" ) ,
+				readAct.getAttributes().getAttribute( "length" ),
+				"Unexpected Long attribute in " + readAct.getAttributes() );
 	}
 
-	@Test
-	public void testLegAttributesIO() {
+	 @Test
+	 void testLegAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -200,16 +204,16 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
 
-		Assert.assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
-		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
-				leg.getAttributes().getAttribute( "mpg" ) ,
-				readLeg.getAttributes().getAttribute( "mpg" ) );
+		Assertions.assertEquals(1, readLeg.getAttributes().size(), "Expected a single leg attribute.");
+		Assertions.assertEquals( leg.getAttributes().getAttribute( "mpg" ) ,
+				readLeg.getAttributes().getAttribute( "mpg" ),
+				"Unexpected Double attribute in " + readLeg.getAttributes() );
 
-		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
+		Assertions.assertEquals(TransportMode.car, readLeg.getRoutingMode(), "RoutingMode not set in Leg.");
 	}
-	
-	@Test
-	public void testLegAttributesLegacyIO() {
+
+	 @Test
+	 void testLegAttributesLegacyIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -234,16 +238,16 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
 
-		Assert.assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
-		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
-				leg.getAttributes().getAttribute( "mpg" ) ,
-				readLeg.getAttributes().getAttribute( "mpg" ) );
+		Assertions.assertEquals(1, readLeg.getAttributes().size(), "Expected a single leg attribute.");
+		Assertions.assertEquals( leg.getAttributes().getAttribute( "mpg" ) ,
+				readLeg.getAttributes().getAttribute( "mpg" ),
+				"Unexpected Double attribute in " + readLeg.getAttributes() );
 
-		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
+		Assertions.assertEquals(TransportMode.car, readLeg.getRoutingMode(), "RoutingMode not set in Leg.");
 	}
-	
-	@Test
-	public void testPlanAttributesIO() {
+
+	 @Test
+	 void testPlanAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -267,12 +271,12 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Plan readPlan = readPerson.getSelectedPlan() ;
 
-		Assert.assertEquals( 				plan.getAttributes().getAttribute( "beauty" ) ,
+		Assertions.assertEquals( 				plan.getAttributes().getAttribute( "beauty" ) ,
 				readPlan.getAttributes().getAttribute( "beauty" ) );
 	}
 
-	@Test
-	public void testPopulationAttributesIO() {
+	 @Test
+	 void testPopulationAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		population.getAttributes().putAttribute( "type" , "candidates" );
@@ -284,18 +288,18 @@ public class PopulationV6IOTest {
 		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new PopulationReader( readScenario ).readFile( file );
 
-		Assert.assertEquals( "Unexpected numeric attribute in " + readScenario.getPopulation().getAttributes(),
-				population.getAttributes().getAttribute( "number" ) ,
-				readScenario.getPopulation().getAttributes().getAttribute( "number" ) );
+		Assertions.assertEquals( population.getAttributes().getAttribute( "number" ) ,
+				readScenario.getPopulation().getAttributes().getAttribute( "number" ),
+				"Unexpected numeric attribute in " + readScenario.getPopulation().getAttributes() );
 
-		Assert.assertEquals( "Unexpected String attribute in " + readScenario.getPopulation().getAttributes(),
-				population.getAttributes().getAttribute( "type" ) ,
-				readScenario.getPopulation().getAttributes().getAttribute( "type" ) );
+		Assertions.assertEquals( population.getAttributes().getAttribute( "type" ) ,
+				readScenario.getPopulation().getAttributes().getAttribute( "type" ),
+				"Unexpected String attribute in " + readScenario.getPopulation().getAttributes() );
 	}
 
-	// see MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
-	@Test
-	public void testRouteIO() {
+	 // see MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
+	 @Test
+	 void testRouteIO() {
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory pf = population.getFactory();
 
@@ -325,12 +329,12 @@ public class PopulationV6IOTest {
 		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 		new PopulationReader(scenario).parse(in);
 
-		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
+		Assertions.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 
-	// inspired from MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
-	@Test
-	public void testSpecialCharactersIO() {
+	 // inspired from MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
+	 @Test
+	 void testSpecialCharactersIO() {
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory pf = population.getFactory();
 
@@ -369,14 +373,14 @@ public class PopulationV6IOTest {
 
 		Person p1 = scenario.getPopulation().getPersons().get(person1.getId()); // this already checks the id
 		Plan pl1 = p1.getSelectedPlan();
-		Assert.assertEquals(act1.getType(), ((Activity) pl1.getPlanElements().get(0)).getType());
-		Assert.assertEquals(act1.getLinkId(), ((Activity) pl1.getPlanElements().get(0)).getLinkId());
+		Assertions.assertEquals(act1.getType(), ((Activity) pl1.getPlanElements().get(0)).getType());
+		Assertions.assertEquals(act1.getLinkId(), ((Activity) pl1.getPlanElements().get(0)).getLinkId());
 
-		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
+		Assertions.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 
-	@Test
-	public void testSingleActivityLocationInfoIO() {
+	 @Test
+	 void testSingleActivityLocationInfoIO() {
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory pf = population.getFactory();
 
@@ -415,17 +419,47 @@ public class PopulationV6IOTest {
 		Person p1 = scenario.getPopulation().getPersons().get(person1.getId());
 		Plan pp1 = p1.getPlans().get(0);
 
-		Assert.assertEquals(((Activity) pp1.getPlanElements().get(0)).getFacilityId(), facilityId);
-		Assert.assertNull(((Activity) pp1.getPlanElements().get(0)).getCoord());
-		Assert.assertNull(((Activity) pp1.getPlanElements().get(0)).getLinkId());
+		Assertions.assertEquals(((Activity) pp1.getPlanElements().get(0)).getFacilityId(), facilityId);
+		Assertions.assertNull(((Activity) pp1.getPlanElements().get(0)).getCoord());
+		Assertions.assertNull(((Activity) pp1.getPlanElements().get(0)).getLinkId());
 
-		Assert.assertNull(((Activity) pp1.getPlanElements().get(2)).getFacilityId());
-		Assert.assertEquals(((Activity) pp1.getPlanElements().get(2)).getCoord(), coord);
-		Assert.assertNull(((Activity) pp1.getPlanElements().get(2)).getLinkId());
+		Assertions.assertNull(((Activity) pp1.getPlanElements().get(2)).getFacilityId());
+		Assertions.assertEquals(((Activity) pp1.getPlanElements().get(2)).getCoord(), coord);
+		Assertions.assertNull(((Activity) pp1.getPlanElements().get(2)).getLinkId());
 
-		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getFacilityId());
-		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getCoord());
-		Assert.assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
+		Assertions.assertNull(((Activity) pp1.getPlanElements().get(4)).getFacilityId());
+		Assertions.assertNull(((Activity) pp1.getPlanElements().get(4)).getCoord());
+		Assertions.assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
+	}
+
+	 @Test
+	 void testPopulationCoordinateTransformationIO() {
+		String outputDirectory = utils.getOutputDirectory();
+
+		// Create a population with CRS EPSG:25832
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		ProjectionUtils.putCRS(population, "EPSG:25832");
+		final Person person = population.getFactory().createPerson(Id.createPersonId("Donald Trump"));
+		population.addPerson(person);
+		Plan plan = population.getFactory().createPlan();
+		plan.addActivity(population.getFactory().createInteractionActivityFromCoord("home", new Coord(712568.0, 256600.0)));
+		person.addPlan(plan);
+		new PopulationWriter(population).write(outputDirectory + "output.xml");
+
+		// Read in again, but with CRS EPSG:4326
+		Config config = ConfigUtils.createConfig();
+		config.global().setCoordinateSystem("EPSG:4326");
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		final String targetCRS = config.global().getCoordinateSystem();
+		final String internalCRS = config.global().getCoordinateSystem();
+		final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, scenario);
+		reader.putAttributeConverters(Collections.emptyMap());
+		reader.readFile(outputDirectory + "output.xml");
+		Person inputPerson = scenario.getPopulation().getPersons().values().iterator().next();
+		Activity act = (Activity) inputPerson.getPlans().get(0).getPlanElements().get(0);
+		Assertions.assertEquals(10.911495969392414, act.getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2.3202288392002424, act.getCoord().getY(), MatsimTestUtils.EPSILON);
+
 	}
 
 }

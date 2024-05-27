@@ -6,8 +6,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.C;
-import org.locationtech.jts.geom.Geometry;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -16,7 +15,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -28,16 +26,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileReader;
 import picocli.CommandLine;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -115,7 +110,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         }
 
         // Read shape file // TODO this is acutally not needed. Just testing the functionality of reading shape file from URL. Delete afterwards!!!
-        List<SimpleFeature> nutsFeatures = ShapeFileReader.getAllFeatures(URI.create(nutsPath).toURL()).
+        List<SimpleFeature> nutsFeatures = GeoFileReader.getAllFeatures(URI.create(nutsPath).toURL()).
                 stream().filter(f -> relevantNutsIds.contains(f.getAttribute("NUTS_ID").toString())).
                 collect(Collectors.toList());
         System.out.println("There are " + nutsFeatures.size() + " relevant NUTS regions");
@@ -342,7 +337,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 
     private LeastCostPathCalculator createRouter(Network network) {
         Config config = ConfigUtils.createConfig();
-        config.plansCalcRoute().setRoutingRandomness(0);
+        config.routing().setRoutingRandomness(0);
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory
                 (TransportMode.car, config).createTravelDisutility(travelTime);

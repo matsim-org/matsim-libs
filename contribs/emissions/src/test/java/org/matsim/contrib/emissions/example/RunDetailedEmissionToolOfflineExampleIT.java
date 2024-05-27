@@ -18,13 +18,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaVehicleDescriptionSource;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -35,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class RunDetailedEmissionToolOfflineExampleIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/*
 	 *
@@ -46,7 +45,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
-	public final void testDetailed_vehTypeV1() {
+	final void testDetailed_vehTypeV1() {
 		boolean gotAnException = false ;
 		try {
 			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
@@ -59,19 +58,19 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
 
 			offlineExample.run();
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
-	public final void testDetailed_vehTypeV2() {
+	final void testDetailed_vehTypeV2() {
 		boolean gotAnException = false ;
 		try {
 			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
@@ -83,19 +82,19 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			config.controler().setOutputDirectory(utils.getOutputDirectory());
+			config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 			offlineExample.run();
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
-	public final void testDetailed_vehTypeV2_HBEFA4() {
+	final void testDetailed_vehTypeV2_HBEFA4() {
 		boolean gotAnException = false ;
 		try {
 			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
@@ -110,12 +109,12 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 			emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
 			emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
 
-			config.controler().setOutputDirectory(utils.getOutputDirectory());
+			config.controller().setOutputDirectory(utils.getOutputDirectory());
 			offlineExample.run();
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 
@@ -127,7 +126,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	 * */
 
 	@Test
-	public final void testDetailed_vehTypeV1_FallbackToAverage() {
+	final void testDetailed_vehTypeV1_FallbackToAverage() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
@@ -135,7 +134,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
 		var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
@@ -148,7 +147,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	}
 
 	@Test
-	public final void testDetailed_vehTypeV2_FallbackToAverage() {
+	final void testDetailed_vehTypeV2_FallbackToAverage() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
@@ -156,7 +155,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
 		var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
@@ -168,7 +167,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	}
 
 	@Test
-	public final void testDetailed_vehTypeV2_HBEFA4_FallbackToAverage() {
+	final void testDetailed_vehTypeV2_HBEFA4_FallbackToAverage() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 
 //		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
@@ -176,7 +175,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
 		var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );

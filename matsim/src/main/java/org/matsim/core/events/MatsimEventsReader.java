@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -94,7 +94,7 @@ public final class MatsimEventsReader implements MatsimReader {
 		new XmlEventsReader(this.events, this.customEventMappers).parse(stream );
 	}
 
-	public void readStream(final InputStream stream, final ControlerConfigGroup.EventsFileFormat format) {
+	public void readStream(final InputStream stream, final ControllerConfigGroup.EventsFileFormat format) {
 		switch (format) {
 			case xml:
 				new XmlEventsReader(this.events, this.customEventMappers).parse(stream);
@@ -130,6 +130,7 @@ public final class MatsimEventsReader implements MatsimReader {
 		private final Map<String, CustomEventMapper> map ;
 
 		private XmlEventsReader( final EventsManager events, Map<String, CustomEventMapper> map ) {
+			super(ValidationType.NO_VALIDATION);
 			this.events = events;
 			this.map = map;
 			this.setValidating(false); // events-files have no DTD, thus they cannot validate

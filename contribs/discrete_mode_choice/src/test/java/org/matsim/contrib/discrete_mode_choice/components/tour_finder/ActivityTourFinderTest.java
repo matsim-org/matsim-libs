@@ -1,12 +1,12 @@
 package org.matsim.contrib.discrete_mode_choice.components.tour_finder;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contribs.discrete_mode_choice.components.tour_finder.ActivityTourFinder;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
@@ -42,7 +42,7 @@ public class ActivityTourFinderTest {
 	}
 
 	@Test
-	public void testActivityTourFinder() {
+	void testActivityTourFinder() {
 		ActivityTourFinder finder = new ActivityTourFinder(Arrays.asList("home"));
 
 		List<DiscreteModeChoiceTrip> trips;
@@ -84,7 +84,7 @@ public class ActivityTourFinderTest {
 	}
 
 	@Test
-	public void testActivityTourFinderMultiple() {
+	void testActivityTourFinderMultiple() {
 		ActivityTourFinder finder = new ActivityTourFinder(Arrays.asList("home1", "home2", "home3", "home4"));
 
 		List<DiscreteModeChoiceTrip> trips;

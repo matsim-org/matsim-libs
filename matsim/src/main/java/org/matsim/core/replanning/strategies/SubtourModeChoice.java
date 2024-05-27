@@ -19,8 +19,8 @@
 
 package org.matsim.core.replanning.strategies;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;

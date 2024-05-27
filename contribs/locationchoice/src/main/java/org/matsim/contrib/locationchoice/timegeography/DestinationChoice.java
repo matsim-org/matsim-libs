@@ -42,7 +42,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 class DestinationChoice extends AbstractMultithreadedModule {
 
@@ -100,7 +100,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 	protected final void afterFinishReplanningHook() {
 		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 
-		if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
+		if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm)
 				|| DestinationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 			int unsuccessfull = 0;
             for (PlanAlgorithm plan_algo : this.planAlgoInstances) {
@@ -118,11 +118,11 @@ class DestinationChoice extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public final PlanAlgorithm getPlanAlgoInstance() {		
+	public final PlanAlgorithm getPlanAlgoInstance() {
 		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 		switch ( algorithm ) {
 		case random:
-			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  
+			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchRecursive:
@@ -130,12 +130,12 @@ class DestinationChoice extends AbstractMultithreadedModule {
 					this.timeInterpretation, this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchSingleAct:
-			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 
+			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType,
 					this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case bestResponse:
 			throw new RuntimeException("wrong class for this locachoice algo; aborting ...") ;
-		}		
+		}
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 

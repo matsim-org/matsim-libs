@@ -20,15 +20,14 @@
 
 package org.matsim.core.scoring.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,9 +45,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -73,20 +72,10 @@ import org.matsim.vehicles.Vehicle;
  * @author mrieser
  */
 
-@RunWith(Parameterized.class)
 public class CharyparNagelScoringFunctionTest {
 
 	private static final double EPSILON =1e-9;
-	
-	@Parameter
-	public TypicalDurationScoreComputation typicalDurationComputation;
-	
-	 @Parameterized.Parameters
-	 public static Object[] testParameters() {
-	      return new Object[] {TypicalDurationScoreComputation.relative,TypicalDurationScoreComputation.uniform};
-	  }
-	 
-	 
+
 	private ScoringFunction getScoringFunctionInstance(final Fixture f, final Person person) {
 		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory =
 				new CharyparNagelScoringFunctionFactory( f.scenario );
@@ -102,9 +91,9 @@ public class CharyparNagelScoringFunctionTest {
 			if (planElement instanceof Activity) {
 				testee.handleActivity((Activity) planElement);
 			} else if (planElement instanceof Leg) {
-				testee.handleLeg((Leg) planElement);	
+				testee.handleLeg((Leg) planElement);
 			}
-		}		
+		}
 		testee.finish();
 		return testee.getScore();
 	}
@@ -117,9 +106,9 @@ public class CharyparNagelScoringFunctionTest {
 	 * @param priority
 	 * @return the duration (in hours) at which the activity has a utility of 0.
 	 */
-	private double getZeroUtilDuration_hrs(final double typicalDuration_hrs, final double priority) {
+	private double getZeroUtilDuration_hrs(final double typicalDuration_hrs, final double priority, TypicalDurationScoreComputation typicalDurationComputation) {
 		// yy could/should use static function from CharyparNagelScoringUtils. kai, nov'13
-		
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			return typicalDuration_hrs * Math.exp(-10.0 / typicalDuration_hrs / priority);
 		} else {
@@ -130,26 +119,27 @@ public class CharyparNagelScoringFunctionTest {
 	/**
 	 * Test the calculation of the zero-utility-duration.
 	 */
-	@Test
-	public void testZeroUtilityDuration() {
-		double zeroUtilDurW = getZeroUtilDuration_hrs(8.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_hrs(16.0, 1.0);
-		double zeroUtilDurW2 = getZeroUtilDuration_hrs(8.0, 2.0);
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void testZeroUtilityDuration(TypicalDurationScoreComputation typicalDurationComputation) {
+		double zeroUtilDurW = getZeroUtilDuration_hrs(8.0, 1.0, typicalDurationComputation);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(16.0, 1.0, typicalDurationComputation);
+		double zeroUtilDurW2 = getZeroUtilDuration_hrs(8.0, 2.0, typicalDurationComputation);
 
 		ZeroUtilityComputation computation;
-		if(this.typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
-			computation = new ActivityUtilityParameters.SameAbsoluteScore();	
+		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
+			computation = new ActivityUtilityParameters.SameAbsoluteScore();
 		} else {
 			computation = new ActivityUtilityParameters.SameRelativeScore();
 		}
-		
-		
+
+
 		{
 			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder();
 			factory.setType("w");
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
-			factory.setZeroUtilityComputation(computation);	
+			factory.setZeroUtilityComputation(computation);
 			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
@@ -181,74 +171,75 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function when all parameters are set to 0.
 	 */
 	@Test
-	public void testZero() {
+	void testZero() {
 		Fixture f = new Fixture();
 		assertEquals(0.0, calcScore(f), EPSILON);
 	}
 
 	@Test
-	public void testTravelingAndConstantCar() {
+	void testTravelingAndConstantCar() {
 		Fixture f = new Fixture();
 		final double traveling = -6.0;
-		f.config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
+		f.config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		assertEquals(-3.0, calcScore(f), EPSILON);
 		double constantCar = -6.0;
-		f.config.planCalcScore().getModes().get(TransportMode.car).setConstant(constantCar);
+		f.config.scoring().getModes().get(TransportMode.car).setConstant(constantCar);
 		assertEquals(-9.0, calcScore(f), EPSILON);
 	}
 
 	@Test
-	public void testTravelingPtAndConstantPt() {
+	void testTravelingPtAndConstantPt() {
 		Fixture f = new Fixture();
 		final double travelingPt = -9.0;
-		f.config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		f.config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		assertEquals(-2.25, calcScore(f), EPSILON);
 		double constantPt = -3.0;
-		f.config.planCalcScore().getModes().get(TransportMode.pt).setConstant(constantPt);
+		f.config.scoring().getModes().get(TransportMode.pt).setConstant(constantPt);
 		assertEquals(-5.25, calcScore(f), EPSILON);
 	}
 
 	@Test
-	public void testTravelingWalkAndConstantWalk() {
+	void testTravelingWalkAndConstantWalk() {
 		Fixture f = new Fixture();
 		final double travelingWalk = -18.0;
-		f.config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+		f.config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 		assertEquals(-9.0, calcScore(f), EPSILON ) ;
 		double constantWalk = -1.0;
-		f.config.planCalcScore().getModes().get(TransportMode.walk).setConstant(constantWalk);
+		f.config.scoring().getModes().get(TransportMode.walk).setConstant(constantWalk);
 		assertEquals(-10.0, calcScore(f), EPSILON);
 	}
 
 	@Test
-	public void testTravelingBikeAndConstantBike(){
+	void testTravelingBikeAndConstantBike(){
 		Fixture f = new Fixture();
 		final double travelingBike = -6.0;
-		f.config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(travelingBike);
+		f.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(travelingBike);
 		assertEquals(-1.5, calcScore(f), EPSILON ) ;
 		double constantBike = -2.0;
-		f.config.planCalcScore().getModes().get(TransportMode.bike).setConstant(constantBike);
+		f.config.scoring().getModes().get(TransportMode.bike).setConstant(constantBike);
 		assertEquals(-3.5, calcScore(f), EPSILON);
 	}
 
 	/**
 	 * Test the performing part of the scoring function.
 	 */
-	@Test
-	public void testPerforming() {
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void testPerforming(TypicalDurationScoreComputation typicalDurationComputation) {
 		Fixture f = new Fixture();
 
 		double perf = +6.0;
-		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0, typicalDurationComputation);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0, typicalDurationComputation);
 
-		f.config.planCalcScore().setPerforming_utils_hr(perf);
-		
+		f.config.scoring().setPerforming_utils_hr(perf);
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
-			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
+			for(ActivityParams p : f.config.scoring().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
@@ -266,13 +257,13 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the performing part of the scoring function when an activity has an OpeningTime set.
 	 */
 	@Test
-	public void testOpeningTime() {
+	void testOpeningTime() {
 		Fixture f = new Fixture();
 		double perf = +6.0;
-		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		f.config.scoring().setPerforming_utils_hr(perf);
 		double initialScore = calcScore(f);
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early to the FIRST work activity and has to wait
 		double score = calcScore(f);
 
@@ -284,13 +275,13 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the performing part of the scoring function when an activity has a ClosingTime set.
 	 */
 	@Test
-	public void testClosingTime() {
+	void testClosingTime() {
 		Fixture f = new Fixture();
 		double perf = +6.0;
-		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		f.config.scoring().setPerforming_utils_hr(perf);
 		double initialScore = calcScore(f);
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long at the LAST work activity
 		double score = calcScore(f);
 
@@ -301,23 +292,24 @@ public class CharyparNagelScoringFunctionTest {
 	/**
 	 * Test the performing part of the scoring function when an activity has OpeningTime and ClosingTime set.
 	 */
-	@Test
-	public void testOpeningClosingTime() {
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void testOpeningClosingTime(TypicalDurationScoreComputation typicalDurationComputation) {
 		Fixture f = new Fixture();
 		double perf_hrs = +6.0;
-		f.config.planCalcScore().setPerforming_utils_hr(perf_hrs);
-		
+		f.config.scoring().setPerforming_utils_hr(perf_hrs);
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
-			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
+			for(ActivityParams p : f.config.scoring().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		double initialScore = calcScore(f);
 
 		// test1: agents has to wait before and after
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 		double score = calcScore(f);
@@ -336,10 +328,10 @@ public class CharyparNagelScoringFunctionTest {
 		//		// only the home-activity should add to the score
 		//		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
 		// not longer true, since not doing a scheduled activity now carries a penalty.  kai, nov'13
-		double score_home = perf_hrs * 15.0 * Math.log(14.75 / getZeroUtilDuration_hrs(15.0, 1.0)) ;
+		double score_home = perf_hrs * 15.0 * Math.log(14.75 / getZeroUtilDuration_hrs(15.0, 1.0, typicalDurationComputation)) ;
 
 		final double typicalDuration_work_sec = wParams.getTypicalDuration().seconds();
-		final double zeroUtilityDuration_work_sec = 3600. * getZeroUtilDuration_hrs(typicalDuration_work_sec/3600., 1. );
+		final double zeroUtilityDuration_work_sec = 3600. * getZeroUtilDuration_hrs(typicalDuration_work_sec/3600., 1., typicalDurationComputation );
 		double slope_work_at_zero_utility_h = perf_hrs * typicalDuration_work_sec / zeroUtilityDuration_work_sec ;
 		double score_work = - zeroUtilityDuration_work_sec * slope_work_at_zero_utility_h / 3600. ;
 		assertEquals( score_home+3.*score_work  , calcScore(f), EPSILON ) ;
@@ -366,12 +358,12 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the waiting part of the scoring function.
 	 */
 	@Test
-	public void testWaitingTime() {
+	void testWaitingTime() {
 		Fixture f = new Fixture();
 		double waiting = -10.0;
-		f.config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(waiting);
+		f.config.scoring().setMarginalUtlOfWaiting_utils_hr(waiting);
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 
@@ -383,12 +375,12 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function in regards to early departures.
 	 */
 	@Test
-	public void testEarlyDeparture() {
+	void testEarlyDeparture() {
 		Fixture f = new Fixture();
 		double disutility = -10.0;
-		f.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
+		f.config.scoring().setEarlyDeparture_utils_hr(disutility);
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setEarliestEndTime(10.75 * 3600.0); // require the agent to work until 16:45
 
 		// the agent left 45mins too early
@@ -399,12 +391,12 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function in regards to early departures.
 	 */
 	@Test
-	public void testMinimumDuration() {
+	void testMinimumDuration() {
 		Fixture f = new Fixture();
 		double disutility = -10.0;
-		f.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
+		f.config.scoring().setEarlyDeparture_utils_hr(disutility);
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setMinimalDuration(3 * 3600.0); // require the agent to be 3 hours at every working activity
 
 		// the agent overall works 1.25h too short
@@ -415,12 +407,12 @@ public class CharyparNagelScoringFunctionTest {
 	 * Test the scoring function in regards to late arrival.
 	 */
 	@Test
-	public void testLateArrival() {
+	void testLateArrival() {
 		Fixture f = new Fixture();
 		double disutility = -10.0;
-		f.config.planCalcScore().setLateArrival_utils_hr(disutility);
+		f.config.scoring().setLateArrival_utils_hr(disutility);
 
-		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
+		ActivityParams wParams = f.config.scoring().getActivityParams("w");
 		wParams.setLatestStartTime(13 * 3600.0); // agent should start working latest at 13 o'clock
 
 		// the agent arrived 30mins late
@@ -432,12 +424,12 @@ public class CharyparNagelScoringFunctionTest {
 	 * could gain.
 	 */
 	@Test
-	public void testStuckPenalty() {
+	void testStuckPenalty() {
 		Fixture f = new Fixture();
 		// test 1 where late arrival has the biggest impact
-		f.config.planCalcScore().setLateArrival_utils_hr(-18.0);
+		f.config.scoring().setLateArrival_utils_hr(-18.0);
 		final double traveling1 = -6.0;
-		f.config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling1);
+		f.config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling1);
 
 		ScoringFunction testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
@@ -452,9 +444,9 @@ public class CharyparNagelScoringFunctionTest {
 		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
 
 		// test 2 where traveling has the biggest impact
-		f.config.planCalcScore().setLateArrival_utils_hr(-3.0);
+		f.config.scoring().setLateArrival_utils_hr(-3.0);
 		final double traveling = -6.0;
-		f.config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
+		f.config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 
 		testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
@@ -469,39 +461,39 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testDistanceCostScoringCar() {
+	void testDistanceCostScoringCar() {
 		Fixture f = new Fixture();
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
-		f.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
+		f.config.scoring().setMarginalUtilityOfMoney(1.0);
 		//		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
 		double monetaryDistanceRateCar1 = -0.00001;
-		f.config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar1);
+		f.config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar1);
 
 		assertEquals(-0.25, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
 		double monetaryDistanceRateCar = -1.0;
-		f.config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
-		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
+		f.config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+		f.config.scoring().setMarginalUtilityOfMoney(0.5);
 
 		assertEquals(-12500.0, calcScore(f), EPSILON);
 	}
 
 	@Test
-	public void testDistanceCostScoringPt() {
+	void testDistanceCostScoringPt() {
 		Fixture f = new Fixture();
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
-		f.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
+		f.config.scoring().setMarginalUtilityOfMoney(1.0);
 		//		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
 		double monetaryDistanceRatePt1 = -0.00001;
-		f.config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt1);
+		f.config.scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt1);
 
 		assertEquals(-0.20, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
 		double monetaryDistanceRatePt = -1.0;
-		f.config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
+		f.config.scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
+		f.config.scoring().setMarginalUtilityOfMoney(0.5);
 
 		assertEquals(-10000.0, calcScore(f), EPSILON);
 	}
@@ -509,29 +501,30 @@ public class CharyparNagelScoringFunctionTest {
 	/**
 	 * Test how the scoring function reacts when the first and the last activity do not have the same act-type.
 	 */
-	@Test
-	public void testDifferentFirstLastAct() {
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void testDifferentFirstLastAct(TypicalDurationScoreComputation typicalDurationComputation) {
 		Fixture f = new Fixture();
 		// change the last act to something different than the first act
 		((Activity) f.plan.getPlanElements().get(8)).setType("h2");
 
-		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
+		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
-		
-		f.config.planCalcScore().addActivityParams(params);
-		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(6.0 * 3600);
-		
+
+		f.config.scoring().addActivityParams(params);
+		f.config.scoring().getActivityParams("h").setTypicalDuration(6.0 * 3600);
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
-			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
+			for(ActivityParams p : f.config.scoring().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		double perf = +6.0;
-		f.config.planCalcScore().setPerforming_utils_hr(perf);
-		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_hrs(6.0, 1.0);
-		double zeroUtilDurH2 = getZeroUtilDuration_hrs(8.0, 1.0);
+		f.config.scoring().setPerforming_utils_hr(perf);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0, typicalDurationComputation);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(6.0, 1.0, typicalDurationComputation);
+		double zeroUtilDurH2 = getZeroUtilDuration_hrs(8.0, 1.0, typicalDurationComputation);
 
 		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
@@ -545,11 +538,12 @@ public class CharyparNagelScoringFunctionTest {
 	 * don't end the day with an ongoing activity at all. This is half of the case
 	 * when the first and last activity aren't the same.
 	 */
-	@Test
-	public void testNoNightActivity() {
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void testNoNightActivity(TypicalDurationScoreComputation typicalDurationComputation) {
 
-		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_hrs(7.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0, typicalDurationComputation);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(7.0, 1.0, typicalDurationComputation);
 		double perf = +3.0;
 
 		Fixture f = new Fixture();
@@ -558,15 +552,15 @@ public class CharyparNagelScoringFunctionTest {
 		// this would amount to a smaller-than-zero expected contribution of
 		// the home activity at 7 hours, and smaller-than-zero contributions
 		// are truncated, so we wouldn't test anything. :-/
-		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(7.0 * 3600);
-		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		f.config.scoring().getActivityParams("h").setTypicalDuration(7.0 * 3600);
+		f.config.scoring().setPerforming_utils_hr(perf);
 
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
-			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
+			for(ActivityParams p : f.config.scoring().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		ScoringFunction testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
 		testee.handleLeg((Leg) f.plan.getPlanElements().get(1));
@@ -575,7 +569,7 @@ public class CharyparNagelScoringFunctionTest {
 
 		assertEquals(
 				perf * 3.0 * Math.log(2.5 / zeroUtilDurW) +
-				perf * 7.0 * Math.log(7.0 / zeroUtilDurH), 
+				perf * 7.0 * Math.log(7.0 / zeroUtilDurH),
 				testee.getScore(), EPSILON);
 	}
 
@@ -587,7 +581,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * aforementioned plan.
 	 */
 	@Test
-	public void testAddMoney() {
+	void testAddMoney() {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
@@ -629,7 +623,7 @@ public class CharyparNagelScoringFunctionTest {
 	 * Tests if the scoring function correctly handles {@link PersonScoreEvent}.
 	 */
 	@Test
-	public void testAddScore() {
+	void testAddScore() {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
@@ -668,7 +662,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	@Test
-	public void testUnusualMode() {
+	void testUnusualMode() {
 		Fixture f = new Fixture();
 		Leg leg = (Leg) f.plan.getPlanElements().get(1);
 		leg.setMode("sackhuepfen");
@@ -681,7 +675,7 @@ public class CharyparNagelScoringFunctionTest {
 			exception = true ;
 		}
 		assertTrue( exception ) ;
-		f.config.planCalcScore().addParam("traveling_sackhuepfen", "-30.0");
+		f.config.scoring().addParam("traveling_sackhuepfen", "-30.0");
 		assertEquals(-15.0, calcScore(f), EPSILON);
 	}
 
@@ -717,7 +711,7 @@ public class CharyparNagelScoringFunctionTest {
 			// home 15:15 to ...
 
 			this.config = ConfigUtils.createConfig();
-			PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
+			ScoringConfigGroup scoring = this.config.scoring();
 			scoring.setBrainExpBeta(2.0);
 
 			scoring.getModes().get(TransportMode.car).setConstant(0.0);
@@ -740,12 +734,12 @@ public class CharyparNagelScoringFunctionTest {
 
 
 			// setup activity types h and w for scoring
-			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
+			ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h");
 			params.setTypicalDuration(15*3600);
 			scoring.addActivityParams(params);
 
 
-			params = new PlanCalcScoreConfigGroup.ActivityParams("w");
+			params = new ScoringConfigGroup.ActivityParams("w");
 			params.setTypicalDuration(3*3600);
 			scoring.addActivityParams(params);
 
@@ -842,6 +836,6 @@ public class CharyparNagelScoringFunctionTest {
 			Activity fifthActivity = PopulationUtils.createAndAddActivityFromLinkId(this.plan, "h", link9.getId());
 			fifthActivity.setStartTime(fourthLegStartTime + fourthLegTravelTime);
 			this.scenario.getPopulation().addPerson(this.person);
-		}      
+		}
 	}
 }

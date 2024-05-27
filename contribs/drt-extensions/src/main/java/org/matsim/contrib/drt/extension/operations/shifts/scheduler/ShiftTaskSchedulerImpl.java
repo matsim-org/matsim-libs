@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.*;
@@ -26,7 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -60,9 +59,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 		this.taskFactory = taskFactory;
 		this.network = network;
 		this.drtShiftParams = drtShiftParams;
-		this.router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
-
-		ShiftSchedules.initSchedules(operationFacilities, fleet, taskFactory);
+		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
     @Override
@@ -238,7 +235,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                 schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)); // add RELOCATE
 
                 final double startTime = Math.max(shift.getEndTime(), path.getArrivalTime());
-                final double endTime = startTime + drtShiftParams.changeoverDuration;
+                final double endTime = Math.min(startTime + drtShiftParams.changeoverDuration, vehicle.getServiceEndTime());
                 if (path.getArrivalTime() > shift.getEndTime()) {
                     logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "
                             + (path.getArrivalTime() - shift.getEndTime()) + " seconds.");
@@ -261,7 +258,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         ShiftChangeOverTask dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
                     endTime, link, shift, breakFacility);
         schedule.addTask(dropoffStopTask);
-        schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, vehicle.getServiceEndTime(),
+        schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, Math.max(endTime, vehicle.getServiceEndTime()),
                 link, breakFacility));
     }
 

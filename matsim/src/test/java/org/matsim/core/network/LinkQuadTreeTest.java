@@ -21,8 +21,8 @@
 
  package org.matsim.core.network;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
+	/**
  * @author mrieser / senozon
  */
 public class LinkQuadTreeTest {
 
-	@Test
-	public void testGetNearest() {
+	 @Test
+	 void testGetNearest() {
 		
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -56,20 +56,20 @@ public class LinkQuadTreeTest {
 		qt.put(b);
 		qt.put(c);
 
-		Assert.assertEquals(foo, qt.getNearest(200, 200));
-		Assert.assertEquals(foo, qt.getNearest(300, 300));
-		Assert.assertEquals(bar, qt.getNearest(390, 300));
-		Assert.assertEquals(fbr, qt.getNearest(1000, 1100));
-		Assert.assertEquals(foo, qt.getNearest(-50, -50));
-		Assert.assertEquals(a, qt.getNearest(1105, 1104));
-		Assert.assertEquals(a, qt.getNearest(1105, 1103));
-		Assert.assertEquals(b, qt.getNearest(1105, 1102));
-		Assert.assertEquals(b, qt.getNearest(1105, 1101));
-		Assert.assertEquals(c, qt.getNearest(1205, 1101));
+		Assertions.assertEquals(foo, qt.getNearest(200, 200));
+		Assertions.assertEquals(foo, qt.getNearest(300, 300));
+		Assertions.assertEquals(bar, qt.getNearest(390, 300));
+		Assertions.assertEquals(fbr, qt.getNearest(1000, 1100));
+		Assertions.assertEquals(foo, qt.getNearest(-50, -50));
+		Assertions.assertEquals(a, qt.getNearest(1105, 1104));
+		Assertions.assertEquals(a, qt.getNearest(1105, 1103));
+		Assertions.assertEquals(b, qt.getNearest(1105, 1102));
+		Assertions.assertEquals(b, qt.getNearest(1105, 1101));
+		Assertions.assertEquals(c, qt.getNearest(1205, 1101));
 	}
 
-	@Test
-	public void testGetNearest_longNear_smallFarAway() {
+	 @Test
+	 void testGetNearest_longNear_smallFarAway() {
 		
 		/*
 		 * Test the following constellation:
@@ -93,14 +93,14 @@ public class LinkQuadTreeTest {
 		qt.put(a);
 		qt.put(b);
 		
-		Assert.assertEquals(b, qt.getNearest(600, 0));
-		Assert.assertEquals(a, qt.getNearest(600, 210));
-		Assert.assertEquals(b, qt.getNearest(300, 210)); // outside of segment (1)-(2), thus (3)-(4) is closer 
-		Assert.assertEquals(a, qt.getNearest(400, 210)); // distance to (1) is smaller than to (3)-(4) 
+		Assertions.assertEquals(b, qt.getNearest(600, 0));
+		Assertions.assertEquals(a, qt.getNearest(600, 210));
+		Assertions.assertEquals(b, qt.getNearest(300, 210)); // outside of segment (1)-(2), thus (3)-(4) is closer 
+		Assertions.assertEquals(a, qt.getNearest(400, 210)); // distance to (1) is smaller than to (3)-(4) 
 	}
-	
-	@Test
-	public void testPut_zeroLengthLink() {
+
+	 @Test
+	 void testPut_zeroLengthLink() {
 		/*
 		 * Test the following constellation:
 		 * 
@@ -141,11 +141,11 @@ public class LinkQuadTreeTest {
 		qt.put(l34);
 		
 		// mostly check that there is no exception like StackOverflowError
-		Assert.assertEquals(l13, qt.getNearest(100, 800));
+		Assertions.assertEquals(l13, qt.getNearest(100, 800));
 	}
 
-	@Test
-	public void testPut_zeroLengthLink_negativeCoords() {
+	 @Test
+	 void testPut_zeroLengthLink_negativeCoords() {
 		/* Same as test above, but with negative coords
 		 */
 
@@ -166,11 +166,11 @@ public class LinkQuadTreeTest {
 		qt.put(l34);
 
 		// mostly check that there is no exception like StackOverflowError
-		Assert.assertEquals(l13, qt.getNearest(-100, -800));
+		Assertions.assertEquals(l13, qt.getNearest(-100, -800));
 	}
 
-	@Test
-	public void testRemove() {
+	 @Test
+	 void testRemove() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);
@@ -183,17 +183,17 @@ public class LinkQuadTreeTest {
 		qt.put(l53);
 		qt.put(l63);
 
-		Assert.assertEquals(l13, qt.getNearest(100, 800));
+		Assertions.assertEquals(l13, qt.getNearest(100, 800));
 
 		qt.remove(l13);
-		Assert.assertEquals(l23, qt.getNearest(100, 800));
+		Assertions.assertEquals(l23, qt.getNearest(100, 800));
 	}
 
-	/**
-	 * Test for MATSIM-687: links not stored in top-node are not removed
-	 */
-	@Test
-	public void testRemove_inSubNode() {
+	 /**
+	  * Test for MATSIM-687: links not stored in top-node are not removed
+	  */
+	 @Test
+	 void testRemove_inSubNode() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);
@@ -202,10 +202,10 @@ public class LinkQuadTreeTest {
 		qt.put(lInTop1);
 		qt.put(lInChildSW1);
 
-		Assert.assertEquals(lInChildSW1, qt.getNearest(100, 80));
+		Assertions.assertEquals(lInChildSW1, qt.getNearest(100, 80));
 
 		qt.remove(lInChildSW1);
-		Assert.assertEquals(lInTop1, qt.getNearest(100, 80));
+		Assertions.assertEquals(lInTop1, qt.getNearest(100, 80));
 	}
 
 	private Link createLink(Scenario s, double fromX, double fromY, double toX, double toY) {

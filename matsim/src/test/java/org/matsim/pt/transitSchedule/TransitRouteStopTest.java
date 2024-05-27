@@ -20,10 +20,10 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -35,15 +35,16 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TransitRouteStopTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	protected TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
 		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
 	}
 
-	@Test public void testInitialization() {
+	@Test
+	void testInitialization() {
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
@@ -53,7 +54,8 @@ public class TransitRouteStopTest {
 		assertEquals(departureDelay, routeStop.getDepartureOffset().seconds(), MatsimTestUtils.EPSILON);
 	}
 
-	@Test public void testStopFacility() {
+	@Test
+	void testStopFacility() {
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
 		double arrivalDelay = 4;
@@ -64,7 +66,8 @@ public class TransitRouteStopTest {
 		assertEquals(stopFacility2, routeStop.getStopFacility());
 	}
 
-	@Test public void testAwaitDepartureTime() {
+	@Test
+	void testAwaitDepartureTime() {
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
@@ -76,7 +79,8 @@ public class TransitRouteStopTest {
 		assertFalse(routeStop.isAwaitDepartureTime());
 	}
 
-	@Test public void testEquals() {
+	@Test
+	void testEquals() {
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
 		TransitRouteStop stop1 = createTransitRouteStop(stopFacility1, 10, 50);

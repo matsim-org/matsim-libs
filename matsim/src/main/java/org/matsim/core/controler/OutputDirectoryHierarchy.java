@@ -29,15 +29,15 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
- * 
+ *
  * Represents the directory hierarchy where the MATSim output goes in.
- * 
+ *
  * @author dgrether, michaz
  *
  */
@@ -46,19 +46,19 @@ public final class OutputDirectoryHierarchy {
 	public enum OverwriteFileSetting {failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists}
 
 	private static final String DIRECTORY_ITERS = "ITERS";
-	
+
 	private static final  Logger log = LogManager.getLogger(OutputDirectoryHierarchy.class);
-	
+
 	private String runId = null;
-	
+
 	private final String outputPath;
 
-	private final ControlerConfigGroup.CompressionType defaultCompressionType;
-	
+	private final ControllerConfigGroup.CompressionType defaultCompressionType;
+
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
-	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+	OutputDirectoryHierarchy(ControllerConfigGroup config) {
 
 		this(config.getOutputDirectory(),
 				config.getRunId(),
@@ -72,24 +72,24 @@ public final class OutputDirectoryHierarchy {
 	 * @param config
 	 */
 	public OutputDirectoryHierarchy( Config config ) {
-		this( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting(), config.controler().getCompressionType() );
+		this( config.controller().getOutputDirectory(), config.controller().getRunId(), config.controller().getOverwriteFileSetting(), config.controller().getCompressionType() );
 	}
 
-	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
+	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControllerConfigGroup.CompressionType defaultCompressionType) {
 		this(outputPath, null, overwriteFiles, true, defaultCompressionType);
 	}
-	
-	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
+
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, ControllerConfigGroup.CompressionType defaultCompressionType) {
 		this(outputPath, runId, overwriteFiles, true, defaultCompressionType);
-	}	
+	}
 	/**
-	 * 
+	 *
 	 * @param runId the runId, may be null
 	 * @param overwriteFiles overwrite existing files instead of crashing
 	 * @param outputPath the path to the output directory
 	 * @param createDirectories create the directories or abort if they exist
 	 */
-	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories, ControlerConfigGroup.CompressionType compressionType){
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories, ControllerConfigGroup.CompressionType compressionType){
 		this.overwriteFiles = overwriteFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
@@ -144,17 +144,24 @@ public final class OutputDirectoryHierarchy {
 		return s.toString();
 	}
 
+	public String getIterationFilename(int iteration, String filename, ControllerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getIterationFilename(iteration, filename);
+		}
+		return getIterationFilename(iteration, filename + compression.fileEnding);
+	}
+
 	public final String getIterationFilename(int iteration, Controler.DefaultFiles file) {
 		return getIterationFilename(iteration, file, this.defaultCompressionType);
 	}
 
-	public final String getIterationFilename(int iteration, Controler.DefaultFiles file, ControlerConfigGroup.CompressionType compression) {
+	public final String getIterationFilename(int iteration, Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
 		if (compression == null) {
 			return getIterationFilename(iteration, file.filename);
 		}
 		return getIterationFilename(iteration, file.filename + compression.fileEnding);
 	}
-	
+
 	/**
 	 * Returns the complete filename to access a file in the output-directory.
 	 *
@@ -173,6 +180,13 @@ public final class OutputDirectoryHierarchy {
 		return s.toString();
 	}
 
+	public String getOutputFilename(String filename, ControllerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getOutputFilename(filename);
+		}
+		return getOutputFilename(filename + compression.fileEnding);
+	}
+
 	public final String getOutputFilenameWithOutputPrefix(final String filename) {
 		return getOutputFilename(Controler.OUTPUT_PREFIX + filename);
 	}
@@ -181,14 +195,14 @@ public final class OutputDirectoryHierarchy {
 		return getOutputFilename(file, this.defaultCompressionType);
 	}
 
-	public final String getOutputFilename(Controler.DefaultFiles file, ControlerConfigGroup.CompressionType compression) {
+	public final String getOutputFilename(Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
 		if (compression == null) {
 			return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename);
 		}
 		return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename + compression.fileEnding);
 	}
 
-	
+
 	public String getOutputPath() {
 		return outputPath;
 	}
@@ -225,7 +239,7 @@ public final class OutputDirectoryHierarchy {
 			log.warn("Could not delete iteration directory " + path + ".");
 		}
 	}
-	
+
 	private void createDirectories() {
 		File outputDir = new File(outputPath);
 		if (outputDir.exists()) {
@@ -280,7 +294,7 @@ public final class OutputDirectoryHierarchy {
 					"The output directory path " + outputPath
 					+ " could not be created. Check pathname and permissions! Full path: " + new File(outputPath).getAbsolutePath());
 		}
-	
+
 		File tmpDir = new File(getTempPath());
 		if (!tmpDir.mkdir() && !tmpDir.exists()) {
 			throw new RuntimeException("The tmp directory "
@@ -293,5 +307,5 @@ public final class OutputDirectoryHierarchy {
 					+ " could not be created.");
 		}
 	}
-	
+
 }

@@ -20,10 +20,12 @@
 
 package org.matsim.core.utils.io;
 
+import com.ctc.wstx.sax.WstxSAXParserFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.FeatureFlags;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -33,10 +35,10 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
-import java.util.zip.GZIPInputStream;
 
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
@@ -52,6 +54,8 @@ import java.util.zip.GZIPInputStream;
  */
 public abstract class MatsimXmlParser extends DefaultHandler implements MatsimReader {
 
+	public enum ValidationType { NO_VALIDATION, DTD_ONLY, XSD_ONLY, DTD_OR_XSD }
+
 	private static final Logger log = LogManager.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<>();
@@ -59,12 +63,13 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
+	private final ValidationType validationType;
 
 	private String localDtdBase = null;
 	// yy this is NOT working for me with "dtd", but it IS working with null.
 	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
 
-	private boolean preferLocalDtds = false;
+	private final boolean preferLocalDtds;
 
 	private String doctype = null;
 	/**
@@ -75,12 +80,12 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	/**
 	 * Creates a validating XML-parser.
+	 *
+	 * @param validationType hint whether DTD or XSD is expected for validation, helps to optimize the parser for performance.
 	 */
-	public MatsimXmlParser() {
-		String localDtd = System.getProperty("matsim.preferLocalDtds");
-		if (localDtd != null) {
-			this.preferLocalDtds = Boolean.parseBoolean(localDtd);
-		}
+	public MatsimXmlParser(ValidationType validationType) {
+		this.validationType = validationType;
+		this.preferLocalDtds = FeatureFlags.preferLocalDTDs();
 	}
 
 	/**
@@ -118,7 +123,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 * By default the value of this is set to <code>false</code>.
 	 *
 	 * @param awareness true if the parser produced by this code will provide support for XML namespaces; false otherwise.
-	 * @see{javax.xml.parsers.SAXParserFactory.setNamespaceAware(boolean)}
+	 * @see javax.xml.parsers.SAXParserFactory#setNamespaceAware(boolean)
 	 */
 	public final void setNamespaceAware(final boolean awareness) {
 		this.isNamespaceAware = awareness;
@@ -164,15 +169,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
 		System.out.flush();
-		if (url.getFile().endsWith(".gz")) {
-			try {
-				parse(new InputSource(new GZIPInputStream(url.openStream())));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			parse(new InputSource(url.toExternalForm()));
-		}
+		parse(new InputSource(IOUtils.getBufferedReader(this.theSource)));
 	}
 
 	public final void parse(final InputStream stream) throws UncheckedIOException {
@@ -182,40 +179,58 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	public final void parse(final InputSource input) throws UncheckedIOException {
 		try {
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setValidating(this.isValidating);
-			factory.setNamespaceAware(this.isNamespaceAware);
-			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
-			if (this.isValidating) {
-				// enable optional support for XML Schemas
-				factory.setFeature("http://apache.org/xml/features/validation/schema", true);
-				SAXParser parser = factory.newSAXParser();
-				XMLReader reader = parser.getXMLReader();
-				reader.setContentHandler(this);
-//				reader.setErrorHandler(getErrorHandler());      // (**)
-//				reader.setEntityResolver(getEntityResolver()); // (**)
-				reader.setErrorHandler(this);
-				reader.setEntityResolver(this);
-				reader.parse(input);
+			boolean validating = this.isValidating && this.validationType != ValidationType.NO_VALIDATION;
+			boolean useWstxParser = !validating || this.validationType == ValidationType.DTD_ONLY;
+
+			if (useWstxParser) {
+				// use Woodstox-library as XML parser when no validation or only DTD-validation is required, as it is much faster than the default (xerces)
+
+				WstxSAXParserFactory factory = new WstxSAXParserFactory();
+				factory.setValidating(validating);
+				factory.setNamespaceAware(this.isNamespaceAware);
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
+
+				if (validating) {
+					factory.setFeature("http://xml.org/sax/features/validation", true); // required to enable DTD validation in Woodstox
+					SAXParser parser = factory.newSAXParser();
+					XMLReader reader = parser.getXMLReader();
+					reader.setContentHandler(this);
+					reader.setErrorHandler(this);
+					reader.setEntityResolver(this);
+					reader.parse(input);
+				} else {
+					SAXParser parser = factory.newSAXParser();
+					parser.parse(input, this);
+				}
+
 			} else {
-				SAXParser parser = factory.newSAXParser();
-				parser.parse(input, this);
+				// use the default (Xerces) SAX parser, it is slower than Woodstox, but supports XSD validation
+
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				factory.setValidating(validating);
+				factory.setNamespaceAware(this.isNamespaceAware);
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
+
+				if (validating) {
+					// enable optional support for XML Schemas
+					factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+					SAXParser parser = factory.newSAXParser();
+					XMLReader reader = parser.getXMLReader();
+					reader.setContentHandler(this);
+					reader.setErrorHandler(this);
+					reader.setEntityResolver(this);
+					reader.parse(input);
+				} else {
+					SAXParser parser = factory.newSAXParser();
+					parser.parse(input, this);
+				}
 			}
-		} catch (SAXException | ParserConfigurationException | IOException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (SAXException | ParserConfigurationException e) {
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
-
-	// the following may be useful.  But it is nowhere used, so I am not sure if we fully understand its longterm maintenance implications,
-	// so I rather comment it out. If it is needed somewhere, just comment it back in (and probably (**) above)
-	// and leave a comment.  kai, jul'16
-//	protected ErrorHandler getErrorHandler() {
-//		return this;
-//	}
-//
-//	protected EntityResolver getEntityResolver() {
-//		return this;
-//	}
 
 	public final String getDoctype() {
 		return this.doctype;
@@ -231,7 +246,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	@Override
 	public final InputSource resolveEntity(final String publicId, final String systemId) {
-		// ConfigReader* did override this.  Not sure if it did that for good reaons.  kai, jul'16
+		// ConfigReader* did override this.  Not sure if it did that for good reasons.  kai, jul'16
 
 		// extract the last part of the systemId
 		int index = systemId.replace('\\', '/').lastIndexOf('/');
@@ -287,7 +302,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			urlConn.setAllowUserInteraction(false);
 
 			InputStream is = urlConn.getInputStream();
-			/* If there was no exception until here, than the path is valid.
+			/* If there was no exception until here, then the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
 			 * would have to fetch the same file again, requiring two accesses to the webserver */
 			return new InputSource(is);
@@ -344,7 +359,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	}
 
 	@Override
-	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) throws SAXException {
+	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) {
 		// I have not good intuition if making this one non-final might be ok.  kai, jul'16
 
 		String tag = (uri.length() == 0) ? qName : localName;
@@ -391,7 +406,9 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	private String getInputSource(final SAXParseException ex) {
 		System.out.println(ex.getPublicId());
 		System.out.println(ex.getSystemId());
-		System.out.println(ex.getCause());
+		if (ex.getCause() != null) {
+			System.out.println(ex.getCause().getMessage());
+		}
 		System.out.println(ex.getLocalizedMessage());
 		System.out.println(ex.getMessage());
 		if (ex.getSystemId() != null) {
@@ -402,6 +419,21 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		}
 		//try to use the locally stored inputSource
 		return this.theSource;
+	}
+
+	/** Parses a String into a double, taking into account the special encoding for Infinity according to the xsd-specifications for the xs:double data type
+	 */
+	public static double parseDouble(String value) throws NumberFormatException {
+		if ("INF".equals(value)) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if ("-INF".equals(value)) {
+			return Double.NEGATIVE_INFINITY;
+		}
+		if ("NaN".equals(value)) {
+			return Double.NaN;
+		}
+		return Double.parseDouble(value);
 	}
 
 }

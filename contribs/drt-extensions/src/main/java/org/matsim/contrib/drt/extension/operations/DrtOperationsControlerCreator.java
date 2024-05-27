@@ -1,6 +1,8 @@
 package org.matsim.contrib.drt.extension.operations;
 
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesModeModule;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesQSimModule;
+import org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency.DrtShiftEfficiencyModeModule;
 import org.matsim.contrib.drt.extension.operations.shifts.run.ShiftDrtModeModule;
 import org.matsim.contrib.drt.extension.operations.shifts.run.ShiftDrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -31,7 +33,9 @@ public class DrtOperationsControlerCreator {
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
 			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
+			controler.addOverridingModule(new OperationFacilitiesModeModule((DrtWithOperationsConfigGroup) drtCfg));
 			controler.addOverridingQSimModule(new OperationFacilitiesQSimModule(drtCfg));
+			controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
 		}
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));

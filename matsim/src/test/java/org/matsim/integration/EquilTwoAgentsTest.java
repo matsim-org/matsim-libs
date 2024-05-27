@@ -21,8 +21,8 @@ package org.matsim.integration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -49,9 +49,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 
 /**
@@ -59,18 +59,18 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
  * to check the calculation of scores and traveltimes in the framework.
  * The scores and traveltimes calculated by MATSim are compared
  * with values analytically computed by hand.
- * 
+ *
  * Note: This used to be a "white box" test, where intermediate results were pulled
  * from the scoring function. However, this is an undefined state of the scoring
  * function -- the contract says you have to call finish on the scoring function
  * before it delivers a meaningful result. -- michaz 2012
- * 
+ *
  * @author dgrether
  */
 public class EquilTwoAgentsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/*package*/ final static Logger log = LogManager.getLogger(EquilTwoAgentsTest.class);
 
@@ -88,21 +88,21 @@ public class EquilTwoAgentsTest {
 	private TestSingleIterationEventHandler handler;
 
 	@Test
-	public void testSingleIterationPlansV4() {
+	void testSingleIterationPlansV4() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
-		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
+		ScoringConfigGroup pcsConfig = config.scoring() ;
 		ActivityParams params = new ActivityParams("h") ;
         params.setTypicalDuration(123456789.0) ; // probably dummy
 		params.setScoringThisActivityAtAll(false);
 		pcsConfig.addActivityParams(params) ;
-		
+
 		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
+        controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

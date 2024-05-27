@@ -29,6 +29,6 @@ import org.matsim.core.router.RoutingRequest;
  */
 public interface TransitRouter {
 
-	public abstract List<? extends PlanElement> calcRoute(RoutingRequest request);
+	List<? extends PlanElement> calcRoute(RoutingRequest request);
 
 }

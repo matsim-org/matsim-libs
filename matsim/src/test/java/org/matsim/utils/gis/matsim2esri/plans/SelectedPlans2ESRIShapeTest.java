@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -34,18 +36,17 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class SelectedPlans2ESRIShapeTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testSelectedPlansActsShape() throws IOException {
+	@Test
+	void testSelectedPlansActsShape() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 
 		String outShp = utils.getOutputDirectory() + "acts.shp";
@@ -65,11 +66,12 @@ public class SelectedPlans2ESRIShapeTest {
 		sp.setWriteLegs(false);
 		sp.write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
-		Assert.assertEquals(2235, writtenFeatures.size());
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outShp);
+		Assertions.assertEquals(2235, writtenFeatures.size());
 	}
 
-	@Test public void testSelectedPlansLegsShape() throws IOException {
+	@Test
+	void testSelectedPlansLegsShape() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 
 		String outShp = utils.getOutputDirectory() + "legs.shp";
@@ -89,8 +91,8 @@ public class SelectedPlans2ESRIShapeTest {
 		sp.setWriteLegs(true);
 		sp.write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
-		Assert.assertEquals(1431, writtenFeatures.size());
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outShp);
+		Assertions.assertEquals(1431, writtenFeatures.size());
 	}
 
 }

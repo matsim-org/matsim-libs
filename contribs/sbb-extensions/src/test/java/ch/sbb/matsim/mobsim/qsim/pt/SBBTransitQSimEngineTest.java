@@ -1,15 +1,30 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -34,6 +49,8 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.pt.DefaultTransitDriverAgentFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -48,25 +65,25 @@ public class SBBTransitQSimEngineTest {
     private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineTest.class);
 
     private static void assertEqualEvent(Class<? extends Event> eventClass, double time, Event event) {
-        Assert.assertTrue(event.getClass().isAssignableFrom(event.getClass()));
-        Assert.assertEquals(time, event.getTime(), 1e-7);
+        Assertions.assertTrue(event.getClass().isAssignableFrom(event.getClass()));
+        Assertions.assertEquals(time, event.getTime(), 1e-7);
     }
 
-    @Test
-    public void testDriver() {
+	@Test
+	void testDriver() {
         TestFixture f = new TestFixture();
 
         EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
         QSim qSim = new QSimBuilder(f.config).useDefaults().build(f.scenario, eventsManager);
-        SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null);
+        SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null, new TransitStopAgentTracker(eventsManager), new DefaultTransitDriverAgentFactory());
         qSim.addMobsimEngine(trEngine);
 
         trEngine.insertAgentsIntoMobsim();
 
         Map<Id<Person>, MobsimAgent> agents = qSim.getAgents();
-        Assert.assertEquals("Expected one driver as agent.", 1, agents.size());
+        Assertions.assertEquals(1, agents.size(), "Expected one driver as agent.");
         MobsimAgent agent = agents.values().iterator().next();
-        Assert.assertTrue(agent instanceof SBBTransitDriverAgent);
+        Assertions.assertTrue(agent instanceof SBBTransitDriverAgent);
         SBBTransitDriverAgent driver = (SBBTransitDriverAgent) agent;
         TransitRoute route = driver.getTransitRoute();
         List<TransitRouteStop> stops = route.getStops();
@@ -78,7 +95,7 @@ public class SBBTransitQSimEngineTest {
         assertNextStop(driver, stops.get(3), depTime);
         assertNextStop(driver, stops.get(4), depTime);
 
-        Assert.assertNull(driver.getNextRouteStop());
+        Assertions.assertNull(driver.getNextRouteStop());
     }
 
     private void assertNextStop(SBBTransitDriverAgent driver, TransitRouteStop stop, double routeDepTime) {
@@ -86,7 +103,7 @@ public class SBBTransitQSimEngineTest {
         double depOffset = stop.getDepartureOffset().or(stop.getArrivalOffset()).seconds();
         TransitStopFacility f = stop.getStopFacility();
 
-        Assert.assertEquals(stop, driver.getNextRouteStop());
+        Assertions.assertEquals(stop, driver.getNextRouteStop());
 
         driver.arrive(stop, routeDepTime + arrOffset);
         double stopTimeSum = 0.0;
@@ -95,13 +112,13 @@ public class SBBTransitQSimEngineTest {
             stopTime = driver.handleTransitStop(f, routeDepTime + arrOffset + stopTimeSum);
             stopTimeSum += stopTime;
         } while (stopTime > 0);
-        Assert.assertEquals(depOffset - arrOffset, stopTimeSum, 1e-7);
-        Assert.assertEquals("last stop time should have been 0.0", 0.0, stopTime, 1e-7);
+        Assertions.assertEquals(depOffset - arrOffset, stopTimeSum, 1e-7);
+        Assertions.assertEquals(0.0, stopTime, 1e-7, "last stop time should have been 0.0");
         driver.depart(f, routeDepTime + depOffset);
     }
 
-    @Test
-    public void testEvents_withoutPassengers_withoutLinks() {
+	@Test
+	void testEvents_withoutPassengers_withoutLinks() {
         TestFixture f = new TestFixture();
 
         EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
@@ -124,7 +141,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 15, allEvents.size());
+        Assertions.assertEquals(15, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -142,11 +159,11 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(14));
     }
 
-    /**
-     * This test also checks that the passenger boarding/leaving times are correctly taken into account
-     */
-    @Test
-    public void testEvents_withPassengers_withoutLinks() {
+	/**
+	* This test also checks that the passenger boarding/leaving times are correctly taken into account
+	*/
+	@Test
+	void testEvents_withPassengers_withoutLinks() {
         TestFixture f = new TestFixture();
         f.addSingleTransitDemand();
 
@@ -172,7 +189,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 22, allEvents.size());
+        Assertions.assertEquals(22, allEvents.size(), "wrong number of events.");
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger
         assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(1)); // passenger
         assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(2)); // passenger
@@ -197,8 +214,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(21)); // driver
     }
 
-    @Test
-    public void testEvents_withThreePassengers_withoutLinks() {
+	@Test
+	void testEvents_withThreePassengers_withoutLinks() {
         TestFixture f = new TestFixture();
         f.addTripleTransitDemand();
 
@@ -224,7 +241,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 36, allEvents.size());
+        Assertions.assertEquals(36, allEvents.size(), "wrong number of events.");
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger 1
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(1)); // passenger 2
         assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(2)); // passenger 3
@@ -263,8 +280,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(35)); // driver
     }
 
-    @Test
-    public void testEvents_withoutPassengers_withLinks() {
+	@Test
+	void testEvents_withoutPassengers_withLinks() {
         TestFixture f = new TestFixture();
         f.sbbConfig.setCreateLinkEventsInterval(1);
 
@@ -288,7 +305,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 23, allEvents.size());
+        Assertions.assertEquals(23, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -314,8 +331,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(22));
     }
 
-    @Test
-    public void testEvents_withoutPassengers_withLinks_Sesselbahn() {
+	@Test
+	void testEvents_withoutPassengers_withLinks_Sesselbahn() {
         TestFixture f = new TestFixture();
         f.addSesselbahn(true, false);
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -340,7 +357,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 13, allEvents.size());
+        Assertions.assertEquals(13, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 35000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 35000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 35000, allEvents.get(2));
@@ -356,13 +373,13 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 35120, allEvents.get(12));
     }
 
-    /**
-     * during development, I had a case where the traveltime-offset between two stops was 0 seconds. This resulted in the 2nd stop being immediately handled, and only after that the
-     * linkLeave/linkEnter-Events were generated. As the 2nd stop happened to be the last one, the driver already left the vehicle, which then resulted in an exception in some event handler trying to
-     * figure out the driver of the vehicle driving around. This tests reproduces this situation in order to check that the code can correctly cope with such a situation.
-     */
-    @Test
-    public void testEvents_withoutPassengers_withLinks_SesselbahnMalformed() {
+	/**
+	* during development, I had a case where the traveltime-offset between two stops was 0 seconds. This resulted in the 2nd stop being immediately handled, and only after that the
+	* linkLeave/linkEnter-Events were generated. As the 2nd stop happened to be the last one, the driver already left the vehicle, which then resulted in an exception in some event handler trying to
+	* figure out the driver of the vehicle driving around. This tests reproduces this situation in order to check that the code can correctly cope with such a situation.
+	*/
+	@Test
+	void testEvents_withoutPassengers_withLinks_SesselbahnMalformed() {
         TestFixture f = new TestFixture();
         f.addSesselbahn(true, true);
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -387,7 +404,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 13, allEvents.size());
+        Assertions.assertEquals(13, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 35000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 35000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 35000, allEvents.get(2));
@@ -403,12 +420,12 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 35000, allEvents.get(12));
     }
 
-    /**
-     * During first tests, some events were out-of-order in time, leading to an exception, due to the first stop on a route having a departure offset > 0. This tests reproduces this situation in order
-     * to check that the code can correctly cope with such a situation.
-     */
-    @Test
-    public void testEvents_withoutPassengers_withLinks_DelayedFirstDeparture() {
+	/**
+	* During first tests, some events were out-of-order in time, leading to an exception, due to the first stop on a route having a departure offset > 0. This tests reproduces this situation in order
+	* to check that the code can correctly cope with such a situation.
+	*/
+	@Test
+	void testEvents_withoutPassengers_withLinks_DelayedFirstDeparture() {
         TestFixture f = new TestFixture();
         f.delayDepartureAtFirstStop();
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -433,7 +450,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 23, allEvents.size());
+        Assertions.assertEquals(23, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -459,11 +476,11 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(22));
     }
 
-    /**
-     * During tests, the travel time between two stops was not correctly calculated when the two stops were connected with a single direct link, and each of the stops is on a zero-length loop link.
-     */
-    @Test
-    public void testEvents_withoutPassengers_withLinks_FromToLoopLink() {
+	/**
+	* During tests, the travel time between two stops was not correctly calculated when the two stops were connected with a single direct link, and each of the stops is on a zero-length loop link.
+	*/
+	@Test
+	void testEvents_withoutPassengers_withLinks_FromToLoopLink() {
         TestFixture f = new TestFixture();
         f.addLoopyRoute(true);
         f.sbbConfig.setCreateLinkEventsInterval(1);
@@ -488,7 +505,7 @@ public class SBBTransitQSimEngineTest {
             System.out.println(event.toString());
         }
 
-        Assert.assertEquals("wrong number of events.", 23, allEvents.size());
+        Assertions.assertEquals(23, allEvents.size(), "wrong number of events.");
         assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
         assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));
         assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));
@@ -514,8 +531,8 @@ public class SBBTransitQSimEngineTest {
         assertEqualEvent(PersonArrivalEvent.class, 30570, allEvents.get(22));
     }
 
-    @Test
-    public void testMisconfiguration() {
+	@Test
+	void testMisconfiguration() {
         TestFixture f = new TestFixture();
         f.config.transit().setTransitModes(CollectionUtils.stringToSet("pt,train,bus"));
         f.sbbConfig.setDeterministicServiceModes(CollectionUtils.stringToSet("train,tram,ship"));
@@ -533,15 +550,15 @@ public class SBBTransitQSimEngineTest {
 
         try {
             qSim.run();
-            Assert.fail("Expected a RuntimeException due misconfiguration, but got none.");
+            Assertions.fail("Expected a RuntimeException due misconfiguration, but got none.");
         } catch (RuntimeException e) {
             log.info("Caught expected exception, all is fine.", e);
         }
 
     }
 
-    @Test
-    public void testCreateEventsInterval() {
+	@Test
+	void testCreateEventsInterval() {
         TestFixture f = new TestFixture();
         f.sbbConfig.setCreateLinkEventsInterval(3);
 
@@ -569,7 +586,7 @@ public class SBBTransitQSimEngineTest {
             if (iteration == 0 || iteration == 3 || iteration == 6 || iteration == 9) {
                 expectedEventsCount = 23;
             }
-            Assert.assertEquals("wrong number of events in iteration " + iteration, expectedEventsCount, collector.getEvents().size());
+            Assertions.assertEquals(expectedEventsCount, collector.getEvents().size(), "wrong number of events in iteration " + iteration);
         }
     }
 }

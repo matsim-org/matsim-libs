@@ -11,7 +11,7 @@
 		<param name="inputPlansFile" value="passengerPlans.xml" />
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="./output" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="100" />
@@ -24,7 +24,7 @@
 		<param name="snapshotperiod" value="00:01:00" />
 	</module>
 
-	<module name="planCalcScore" >
+	<module name="scoring" >
 		<parameterset type="scoringParameters">
 		<param name="lateArrival" value="-18" />
 		<param name="earlyDeparture" value="-0" />
@@ -55,7 +55,7 @@
 		</parameterset>
 	</module>
 
-	<module name="strategy">
+	<module name="replanning">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
 		<parameterset type="strategysettings" >

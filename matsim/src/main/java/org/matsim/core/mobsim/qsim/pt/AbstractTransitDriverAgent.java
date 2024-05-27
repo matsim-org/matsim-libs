@@ -65,7 +65,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	private final PassengerAccessEgressImpl accessEgress;
 
-	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
+	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ;
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
 	@Override
 	public final MobsimAgent.State getState() {
@@ -147,6 +147,17 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		this.nextLinkIndex++;
 	}
 
+	protected final int getNextLinkIndex() {
+		return nextLinkIndex;
+	}
+
+	/**
+	 * Overwrite the current link index. May be used by implementing classes, but should be handled with care.
+	 */
+	protected final void setNextLinkIndex(int idx) {
+		nextLinkIndex = idx;
+	}
+
 	@Override
 	public final TransitStopFacility getNextTransitStop() {
 		if (this.nextStop == null) {
@@ -165,7 +176,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		TransitRoute route = this.getTransitRoute();
 		List<TransitRouteStop> stopsToCome = route.getStops().subList(stopIterator.nextIndex(), route.getStops().size());
 		/*
-		 * If there are passengers leaving or entering, the stop time must be not greater than 1.0 in order to let them (de-)board every second. 
+		 * If there are passengers leaving or entering, the stop time must be not greater than 1.0 in order to let them (de-)board every second.
 		 * If a stopTime greater than 1.0 is used, this method is not necessarily triggered by the qsim, so (de-)boarding will not happen. Dg, 10-2012
 		 */
 		double stopTime = this.accessEgress.calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
@@ -202,7 +213,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	/**Design comments:<ul>
 	 * <li> Keeping this for the time being, since the derived methods somehow need to get the selected plan.  Might
 	 * keep track of the selected plan directly, but someone would need to look more into the design. kai, jun'11
-	 * <li> For that reason, I made the method package-private.  There is, however, probably not much harm to make 
+	 * <li> For that reason, I made the method package-private.  There is, however, probably not much harm to make
 	 * it public again as long as it is not part of the PlanDriverAgent interface.  kai, jun'11
 	 * </ul>
 	 */
@@ -276,7 +287,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	private void assertAllStopsServed() {
 		if (this.nextStop != null) {
-			RuntimeException e = new RuntimeException("Transit vehicle is not yet at last stop! vehicle-id = " 
+			RuntimeException e = new RuntimeException("Transit vehicle is not yet at last stop! vehicle-id = "
 					+ this.vehicle.getVehicle().getId() + "; next-stop = " + this.nextStop.getStopFacility().getId());
 			log.error(e);
 			throw e;
@@ -377,17 +388,17 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		public void setRouteDescription(String routeDescription) {
 			throw new UnsupportedOperationException("read only route.");
 		}
-		
+
 		@Override
 		public String getRouteDescription() {
 			return this.delegate.getRouteDescription();
 		}
-		
+
 		@Override
 		public String getRouteType() {
 			return this.delegate.getRouteType();
 		}
-		
+
 		@Override
 		@Deprecated
 		public double getDistance() {

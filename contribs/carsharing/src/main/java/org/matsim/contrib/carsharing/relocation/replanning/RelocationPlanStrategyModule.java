@@ -1,6 +1,6 @@
 package org.matsim.contrib.carsharing.relocation.replanning;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -23,25 +23,25 @@ public class RelocationPlanStrategyModule implements PlanStrategy, IterationStar
 	private final PlanStrategyImpl strategy;
 	@Inject
 	public RelocationPlanStrategyModule(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships) {
-		this.strategy = new PlanStrategyImpl(new RelocationPlanSelector());		
+		this.strategy = new PlanStrategyImpl(new RelocationPlanSelector());
 	}
-	
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		iteration = event.getIteration();
-		
+
 	}
 
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
 		strategy.run(person);
-		
+
 	}
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
 		strategy.init(replanningContext);
-		
+
 	}
 
 	@Override
@@ -54,5 +54,5 @@ public class RelocationPlanStrategyModule implements PlanStrategy, IterationStar
 		return strategy.toString();
 	}
 
-	
+
 }

@@ -12,11 +12,11 @@ package org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.contrib.drt.extension.operations.shifts.events.DrtShiftEndedEvent;
+import org.matsim.contrib.drt.extension.operations.shifts.events.DrtShiftEndedEventHandler;
 import org.matsim.contrib.drt.extension.operations.shifts.events.DrtShiftStartedEvent;
 import org.matsim.contrib.drt.extension.operations.shifts.events.DrtShiftStartedEventHandler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.operations.shifts.events.DrtShiftEndedEvent;
-import org.matsim.contrib.drt.extension.operations.shifts.events.DrtShiftEndedEventHandler;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -34,14 +34,41 @@ import static java.util.stream.Collectors.*;
 /**
  * @author nkuehnel / MOIA
  */
-final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
+public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
         PassengerDroppedOffEventHandler, DrtShiftStartedEventHandler, DrtShiftEndedEventHandler {
 
-    private final Map<Id<DrtShift>, Double> revenueByShift = new HashMap<>();
-    private final Map<Id<Request>, Id<DrtShift>> shiftByRequest = new HashMap<>();
+    private Map<Id<DrtShift>, Double> revenueByShift;
+    private Map<Id<Request>, Id<DrtShift>> shiftByRequest;
 
+    private Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts;
     private final Map<Id<DvrpVehicle>, Id<DrtShift>> activeShifts = new HashMap<>();
-    private final Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts = new HashMap<>();
+
+	private Record currentRecord;
+
+	public static record Record(Map<Id<DrtShift>, Double> revenueByShift,
+								Map<Id<Request>, Id<DrtShift>> shiftByRequest,
+								Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts){
+		public Map<Id<DrtShift>, Double> getRevenueByShift() {
+			return revenueByShift;
+		}
+
+		public Map<Id<DrtShift>, List<Id<Request>>> getRequestsByShift() {
+			return shiftByRequest.entrySet()
+					.stream()
+					.collect(groupingBy(Map.Entry::getValue, mapping(Map.Entry::getKey, toList())));
+		}
+
+		public Map<Id<DrtShift>, Id<DvrpVehicle>> getFinishedShifts() {
+			return finishedShifts;
+		}
+	}
+
+	public ShiftEfficiencyTracker() {
+		this.revenueByShift = new HashMap<>();
+		this.shiftByRequest = new HashMap<>();
+		this.finishedShifts = new HashMap<>();
+		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts);
+	}
 
     @Override
     public void handleEvent(PersonMoneyEvent personMoneyEvent) {
@@ -76,25 +103,16 @@ final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
         finishedShifts.put(event.getShiftId(), event.getVehicleId());
     }
 
-    public Map<Id<DrtShift>, Double> getRevenueByShift() {
-        return revenueByShift;
-    }
-
-    public Map<Id<DrtShift>, List<Id<Request>>> getRequestsByShift() {
-        return shiftByRequest.entrySet()
-                .stream()
-                .collect(groupingBy(Map.Entry::getValue, mapping(Map.Entry::getKey, toList())));
-    }
-
-    public Map<Id<DrtShift>, Id<DvrpVehicle>> getFinishedShifts() {
-        return finishedShifts;
-    }
-
     @Override
     public void reset(int iteration) {
-        revenueByShift.clear();
-        shiftByRequest.clear();
-        activeShifts.clear();
-        finishedShifts.clear();
+        this.revenueByShift = new HashMap<>();
+        this.shiftByRequest = new HashMap<>();
+        this.finishedShifts = new HashMap<>();
+		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts);
+        this.activeShifts.clear();
     }
+
+	public Record getCurrentRecord() {
+		return currentRecord;
+	}
 }

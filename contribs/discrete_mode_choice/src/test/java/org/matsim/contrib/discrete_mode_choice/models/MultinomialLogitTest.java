@@ -1,7 +1,5 @@
 package org.matsim.contrib.discrete_mode_choice.models;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.FallbackBehaviour;
@@ -33,7 +33,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class MultinomialLogitTest {
 	@Test
-	public void testMultinomialLogit() throws NoFeasibleChoiceException {
+	void testMultinomialLogit() throws NoFeasibleChoiceException {
 		TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
 		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
 		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();

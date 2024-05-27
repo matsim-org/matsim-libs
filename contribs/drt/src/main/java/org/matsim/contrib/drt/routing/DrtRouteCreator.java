@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -61,8 +62,23 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum travel time
 	 */
 	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour,
-				drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
+		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		return defaultConstraintsSet.maxTravelTimeAlpha * unsharedRideTime
+				+ defaultConstraintsSet.maxTravelTimeBeta;
+	}
+
+	/**
+	 * Calculates the maximum ride time defined as: drtCfg.maxDetourAlpha * unsharedRideTime + drtCfg.maxDetourBeta
+	 *
+	 * @param drtCfg
+	 * @param unsharedRideTime ride time of the direct (shortest-time) route
+	 * @return maximum ride time
+	 */
+	static double getMaxRideTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
+		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		return Math.min(unsharedRideTime + defaultConstraintsSet.maxAbsoluteDetour,
+				defaultConstraintsSet.maxDetourAlpha * unsharedRideTime
+						+ defaultConstraintsSet.maxDetourBeta);
 	}
 
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
@@ -71,13 +87,15 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
+		double maxRideDuration = getMaxRideTime(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
+		route.setMaxRideTime(maxRideDuration);
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(drtCfg.maxWaitTime);
+		route.setMaxWaitTime(drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime);
 
 		if (this.drtCfg.storeUnsharedPath) {
 			route.setUnsharedPath(unsharedPath);

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implements ParkingSearchManager {
-	
+
 	Map<Id<Link>,Integer> capacity = new HashMap<>();
 	Map<Id<Link>,MutableLong> occupation = new HashMap<>();
 	Map<Id<Vehicle>,Id<Link>> parkingPosition = new HashMap<>();
@@ -49,15 +49,15 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 	int unparkedVehicles = 0;
 	@Inject
 	public LinkLengthBasedParkingManagerWithRandomInitialUtilisation(Network network, Config config) {
-		 double assumedParkedVehicleLength = 4.0; 
+		 double assumedParkedVehicleLength = 4.0;
 		 double shareOfLinkLengthUsedForParking = 0.7;
-		 
+
 		 //TODO: Make this configurable
 		for (Link link : network.getLinks().values()){
 			int maxCapacity = (int) (link.getLength()*shareOfLinkLengthUsedForParking / assumedParkedVehicleLength);
 			this.capacity.put(link.getId(), maxCapacity);
 			this.occupation.put(link.getId(), new MutableLong(rand.nextInt(maxCapacity)));
-			
+
 		}
 	}
 
@@ -69,7 +69,7 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 
 	@Override
 	public Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId) {
-		
+
 		return this.parkingPosition.get(vehicleId);
 	}
 
@@ -92,7 +92,7 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 			unparkedVehicles++;
 			return true;
 		}
-		
+
 	}
 
 	@Override
@@ -107,6 +107,6 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 	public void reset(int iteration) {
 	}
 
-	
+
 
 }

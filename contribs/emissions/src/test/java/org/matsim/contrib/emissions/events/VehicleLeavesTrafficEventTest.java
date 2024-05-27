@@ -1,8 +1,8 @@
 package org.matsim.contrib.emissions.events;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.VspHbefaRoadTypeMapping;
@@ -19,7 +19,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.net.URL;
 
@@ -36,10 +36,10 @@ import java.net.URL;
  */
 public class VehicleLeavesTrafficEventTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public final void testRareEventsFromBerlinScenario (){
+	@Test
+	final void testRareEventsFromBerlinScenario(){
 
 		final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
 		final String resultingEvents = utils.getOutputDirectory() + emissionEventsFileName;
@@ -81,8 +81,8 @@ public class VehicleLeavesTrafficEventTest {
 			throw new RuntimeException(e) ;
         }
 		final String expected = utils.getClassInputDirectory() + emissionEventsFileName;
-		EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, resultingEvents);
-        Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+		ComparisonResult result = EventsUtils.compareEventsFiles(expected, resultingEvents);
+        Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result);
     }
 
 }

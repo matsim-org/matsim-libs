@@ -24,6 +24,8 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Point;
@@ -35,9 +37,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.matsim.core.utils.gis.GeoFileWriter;
 
 /**
  * Simple class to convert the nodess of MATSim network files to ESRI shape files. The nodes could be written points
@@ -56,11 +56,11 @@ public class Nodes2ESRIShape {
 	private final String filename;
 	private SimpleFeatureBuilder builder;
 
-	
+
 	public Nodes2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
 		this(network, filename, MGC.getCRS(coordinateSystem));
 	}
-	
+
 	public Nodes2ESRIShape(Network network, String filename, CoordinateReferenceSystem crs) {
 		this.network = network;
 		this.filename = filename;
@@ -72,7 +72,7 @@ public class Nodes2ESRIShape {
 		for (Node node : NetworkUtils.getSortedNodes(this.network)) {
 			features.add(getFeature(node));
 		}
-		ShapeFileWriter.writeGeometries(features, this.filename);
+		GeoFileWriter.writeGeometries(features, this.filename);
 
 	}
 

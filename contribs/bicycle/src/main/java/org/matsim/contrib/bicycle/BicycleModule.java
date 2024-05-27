@@ -24,17 +24,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.withinday.mobsim.WithinDayQSimModule;
 
 /**
  * @author smetzler, dziemke
@@ -48,59 +42,37 @@ public final class BicycleModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		// The idea here is the following:
+		// * scores are just added as score events.  no scoring function is replaced.
+
+		// * link speeds are computed via a plugin handler to the DefaultLinkSpeedCalculator.  If the plugin handler returns a speed, it is
+		// used, otherwise the default speed is used. This has the advantage that multiple plugins can register such special link speed calculators.
 
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 
-		// TODO: bicycle contrib can not be used with other scoring functions at the moment, as only one can be installed
-		// TODO: scoring should work via a score event so it can be used together with other scoring functions
+		this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
+		// (the motorized interaction is in the BicycleScoreEventsCreator)
 
-		switch ( bicycleConfigGroup.getBicycleScoringType() ) {
-			case legBased -> {
-
-//				yyyyyy the status here is that this seems to work.  but because of numerical imprecision the results are _slightly_
-//				different.  This needs to be documented diligently test by test.  kai, dec'22
-				// yyyyyy remember that the 10it test needs to be un-ignored.  kai, dec'22
-
-				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
-			}
-			case linkBased -> {
-				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
-			}
-			default -> throw new IllegalStateException( "Unexpected value: " + bicycleConfigGroup.getBicycleScoringType() );
-		}
+		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
-
-		if (bicycleConfigGroup.isMotorizedInteraction()) {
-			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
-		}
-		addControlerListenerBinding().to(ConsistencyCheck.class);
+		// this is still needed because the bicycle travel time calculator for routing needs to use the same bicycle speed as the mobsim.  kai, jun'23
 
 		this.installOverridingQSimModule( new AbstractQSimModule(){
-			@Inject EventsManager events;
-			@Inject Scenario scenario;
-			@Inject BicycleLinkSpeedCalculator bicycleLinkSpeedCalculator;
 			@Override protected void configureQSim(){
-				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-				factory.setLinkSpeedCalculator( bicycleLinkSpeedCalculator );
-				bind( QNetworkFactory.class ).toInstance(factory );
-				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
-				// it in every iteration via the initializeFactory(...) method. kai, mar'16
+				this.addLinkSpeedCalculator().to( BicycleLinkSpeedCalculator.class );
 			}
 		} );
+
+		addControlerListenerBinding().to(ConsistencyCheck.class);
 	}
 
 	static class ConsistencyCheck implements StartupListener {
+		@Inject private BicycleConfigGroup bicycleConfigGroup;
+		@Inject private Scenario scenario;
 
-		@Inject
-		private BicycleConfigGroup bicycleConfigGroup;
-
-		@Inject
-		private Scenario scenario;
-
-		@Override
-		public void notifyStartup(StartupEvent event) {
+		@Override public void notifyStartup(StartupEvent event) {
 
 			Id<VehicleType> bicycleVehTypeId = Id.create(bicycleConfigGroup.getBicycleMode(), VehicleType.class);
 			if (scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId) == null) {
@@ -114,7 +86,7 @@ public final class BicycleModule extends AbstractModule {
 					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
 							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
 							     + " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
-					if (scenario.getConfig().plansCalcRoute().getRoutingRandomness() == 0.) {
+					if (scenario.getConfig().routing().getRoutingRandomness() == 0.) {
 						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
 					}
 				}

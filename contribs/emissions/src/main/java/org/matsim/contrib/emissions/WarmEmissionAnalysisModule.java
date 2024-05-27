@@ -162,12 +162,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					}
 					for (String syntheticKey : freeflowSet) {
 						if (!stopgoSet.contains(syntheticKey)) {
-							throw new RuntimeException("inconsistent");
+							throw new RuntimeException("inconsistent Freeflow and Stop&Go entries in detailed HBEFA table - Stop&Go entry missing ");
 						}
 					}
 					for (String syntheticKey : stopgoSet) {
 						if (!freeflowSet.contains(syntheticKey)) {
-							throw new RuntimeException("inconsistent");
+							throw new RuntimeException("inconsistent Freeflow and Stop&Go entries in detailed HBEFA table - Freeflow entry missing");
 						}
 					}
 					break;

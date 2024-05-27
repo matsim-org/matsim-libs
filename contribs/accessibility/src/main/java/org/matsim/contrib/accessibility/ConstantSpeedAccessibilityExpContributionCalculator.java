@@ -29,7 +29,7 @@ import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -54,14 +54,14 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 	// private Network network;
 	private Network subNetwork;
 	private Scenario scenario;
-	
+
 	private double logitScaleParameter;
-	
+
 	private double betaModeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private double betaModeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist:
 	private double constMode;
 	private double modeSpeed_m_h = -1;
-	
+
 	private double betaWalkTT;
 	private double betaWalkTD;
 	private double walkSpeed_m_h;
@@ -77,27 +77,27 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		this.scenario = scenario;
 
 		this.config = scenario.getConfig();
-		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
+		final ScoringConfigGroup scoringConfigGroup = config.scoring() ;
 
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
+		if (scoringConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for " + mode + " different from zero, but not used in accessibility computations");
 		}
 
-		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
+		logitScaleParameter = scoringConfigGroup.getBrainExpBeta();
 
-		if (config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) == null) {
+		if (config.routing().getTeleportedModeSpeeds().get(mode) == null) {
 			LOG.error("No teleported mode speed for mode " + mode + " set.");
 		}
-		this.modeSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) * 3600.;
+		this.modeSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(mode) * 3600.;
 
-		final PlanCalcScoreConfigGroup.ModeParams modeParams = planCalcScoreConfigGroup.getOrCreateModeParams(mode);
-		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateModeParams(mode);
+		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		betaModeTD = modeParams.getMarginalUtilityOfDistance();
 		constMode = modeParams.getConstant();
 
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		this.walkSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
+		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		betaWalkTD = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		this.walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
 	}
 
 
@@ -124,14 +124,14 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 	}
 
 
-	
+
 	@Override
 	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
 		this.fromNode = subNetwork.getNodes().get(fromNodeId);
 		this.lcptTravelDistance.calculate(subNetwork, fromNode, departureTime);
 	}
 
-	
+
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin,
 			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {

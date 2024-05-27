@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -54,26 +54,26 @@ public class UserBenefitsCalculator {
 	private final Set<Id<Person>> stuckingAgents;
 
 	public UserBenefitsCalculator(Config config, WelfareMeasure wm, boolean considerAllPlans) {
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
+		ScoringConfigGroup pcs = config.scoring();
 		this.betaLogit = pcs.getBrainExpBeta();
 		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
 		this.welfareMeasure = wm;
 		this.considerAllPlans = considerAllPlans;
-		
+
 		logger.warn("There is no list of person IDs provided to be excluded from the user benefit calculation.");
 		this.stuckingAgents = null;
-		
+
 		if (considerAllPlans) {
 			logger.warn("All plans are considered for the calculation of user benefits. For an economic interpretation invalid plans (score <= 0.0 or score == null) should not be considered.");
 		} else {
 			logger.warn("Invalid plans that will not be considered for the calculation of user benefits are defined to have either a null score or a negative score.");
 		}
 	}
-	
+
 	public UserBenefitsCalculator(Config config, Set<Id<Person>> stuckingAgents) {
 		logger.info("Providing the IDs of agents that are stucking in the final iteration (selected plans).");
 
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
+		ScoringConfigGroup pcs = config.scoring();
 		this.betaLogit = pcs.getBrainExpBeta();
 		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
 		this.stuckingAgents = stuckingAgents;
@@ -81,7 +81,7 @@ public class UserBenefitsCalculator {
 		logger.info("A list of person IDs of stucking agents is provided. These persons will be excluded from the user benefit calculation."
 				+ "All other plans will be considered.");
 		this.considerAllPlans = false;
-		
+
 		logger.info("The welfare measure is set to " + WelfareMeasure.SELECTED.toString() + ".");
 		this.welfareMeasure = WelfareMeasure.SELECTED;
 	}
@@ -105,7 +105,7 @@ public class UserBenefitsCalculator {
 		logger.info("Finished user benefits calculation...");
 		return sumOfUtility_utils;
 	}
-	
+
 	public double calculateUtility_money(Population pop) {
 		double sumOfUtility_money = 0.0;
 		logger.info("Starting user benefits calculation...");
@@ -126,7 +126,7 @@ public class UserBenefitsCalculator {
 		double utilityOfPerson_utils = 0.0;
 		double sumOfExpScore = 0.0;
 		double bestScore = Double.NEGATIVE_INFINITY;
-		
+
 		if(this.welfareMeasure.equals(WelfareMeasure.LOGSUM)){
 			for(Plan plan : person.getPlans()){
 				boolean shouldBeConsidered;
@@ -141,7 +141,7 @@ public class UserBenefitsCalculator {
 					/* Kais version: */
 					bestScore = getBestScore(person);
 					double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
-					
+
 					sumOfExpScore += expScoreOfPlan;
 				} else {
 					// plan is not considered
@@ -188,7 +188,7 @@ public class UserBenefitsCalculator {
 			if(plan.getScore() == null){
 				nullScore++;
 				if(nullScore <= maxWarnCnt) {
-					logger.warn("Score for person " + personId + " is " + plan.getScore() 
+					logger.warn("Score for person " + personId + " is " + plan.getScore()
 							+ ". A null score cannot be used for utility calculation.");
 					if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
@@ -196,7 +196,7 @@ public class UserBenefitsCalculator {
 			} else if(plan.getScore() <= 0.0){
 				minusScore++;
 				if(minusScore <= maxWarnCnt) {
-					logger.warn("Score for person " + personId + " is " + plan.getScore() 
+					logger.warn("Score for person " + personId + " is " + plan.getScore()
 							+ ". A score <= 0.0 cannot be used for utility calculation.");
 					if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
@@ -204,7 +204,7 @@ public class UserBenefitsCalculator {
 			} else return true;
 		} else {
 			if (plan.getScore() == null){
-				throw new RuntimeException("Score for person " + personId + " is " + plan.getScore() 
+				throw new RuntimeException("Score for person " + personId + " is " + plan.getScore()
 						+ ". A null score cannot be used for utility calculation. This person has to be excluded.");
 			} else {
 				if (this.stuckingAgents.contains(personId)) {
@@ -243,7 +243,7 @@ public class UserBenefitsCalculator {
 			return personsWithoutValidPlanScore;
 		}
 	}
-	
+
 	public int getInvalidPlans() {
 		if (this.considerAllPlans) {
 			logger.warn("All plans are forced to be considered. Asking for the number of invalid plans doesn't make sense.");
@@ -253,11 +253,11 @@ public class UserBenefitsCalculator {
 			return invalidPlans;
 		}
 	}
-	
+
 	public Map<Id<Person>, Double> getPersonId2Utility() {
 		return personId2Utility;
 	}
-	
+
 	public Map<Id<Person>, Double> getPersonId2MonetizedUtility() {
 		return personId2MonetizedUtility;
 	}

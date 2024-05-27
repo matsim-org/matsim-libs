@@ -37,7 +37,7 @@ public class GenomeAnalysis implements IterationEndsListener {
         Map<String, Double> fullGeneScore = new HashMap<>();
         Map<String, Double> fullGeneAltScore = new HashMap<>();
         Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
-        boolean append = event.getIteration() != event.getServices().getConfig().controler().getFirstIteration();
+        boolean append = event.getIteration() != event.getServices().getConfig().controller().getFirstIteration();
         try {
             PrintWriter writer = null;
             PrintWriter scoreComponentWriter = null;

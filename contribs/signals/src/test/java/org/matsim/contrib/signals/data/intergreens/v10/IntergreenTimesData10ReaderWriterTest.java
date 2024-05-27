@@ -26,9 +26,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class IntergreenTimesData10ReaderWriterTest {
 
@@ -45,8 +45,8 @@ public class IntergreenTimesData10ReaderWriterTest {
 
 	private static final String TESTXML = "testIntergreenTimes_v1.0.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Id<SignalGroup> groupId1 = Id.create("1", SignalGroup.class);
 	private Id<SignalGroup> groupId2 = Id.create("2", SignalGroup.class);
@@ -56,7 +56,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 	private Id<SignalSystem> systemId42 = Id.create("42", SignalSystem.class);
 
 	@Test
-	public void testParser() throws IOException, JAXBException, SAXException,
+	void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		IntergreenTimesData atd = new IntergreenTimesDataImpl();
 		IntergreenTimesReader10 reader = new IntergreenTimesReader10(atd);
@@ -66,7 +66,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 	}
 
 	@Test
-	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
 		String testoutput = this.testUtils.getOutputDirectory() + "testAtdOutput.xml";
 		log.debug("reading file...");
@@ -88,22 +88,22 @@ public class IntergreenTimesData10ReaderWriterTest {
 	}
 
 	private void checkContent(IntergreenTimesData itd) {
-		Assert.assertNotNull(itd);
-		Assert.assertNotNull(itd.getIntergreensForSignalSystemDataMap());
-		Assert.assertEquals(2, itd.getIntergreensForSignalSystemDataMap().size());
+		Assertions.assertNotNull(itd);
+		Assertions.assertNotNull(itd.getIntergreensForSignalSystemDataMap());
+		Assertions.assertEquals(2, itd.getIntergreensForSignalSystemDataMap().size());
 		IntergreensForSignalSystemData ig23 = itd.getIntergreensForSignalSystemDataMap().get(systemId23);
-		Assert.assertNotNull(ig23);
-		Assert.assertEquals(Integer.valueOf(5), ig23.getIntergreenTime(groupId1, groupId2));
-		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId3));
-		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId4));
-		Assert.assertNull(ig23.getIntergreenTime(groupId2, groupId3));
-		
+		Assertions.assertNotNull(ig23);
+		Assertions.assertEquals(Integer.valueOf(5), ig23.getIntergreenTime(groupId1, groupId2));
+		Assertions.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId3));
+		Assertions.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId4));
+		Assertions.assertNull(ig23.getIntergreenTime(groupId2, groupId3));
+
 		IntergreensForSignalSystemData ig42 = itd.getIntergreensForSignalSystemDataMap().get(systemId42);
-		Assert.assertNotNull(ig42);
-		Assert.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(groupId1, groupId2));
-		Assert.assertEquals(Integer.valueOf(3), ig42.getIntergreenTime(groupId2, groupId1));
-		Assert.assertNull(ig42.getIntergreenTime(groupId1, groupId3));
-		Assert.assertNull(ig42.getIntergreenTime(groupId1, groupId1));
+		Assertions.assertNotNull(ig42);
+		Assertions.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(groupId1, groupId2));
+		Assertions.assertEquals(Integer.valueOf(3), ig42.getIntergreenTime(groupId2, groupId1));
+		Assertions.assertNull(ig42.getIntergreenTime(groupId1, groupId3));
+		Assertions.assertNull(ig42.getIntergreenTime(groupId1, groupId1));
 	}
 
 }

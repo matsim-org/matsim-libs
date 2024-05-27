@@ -20,6 +20,7 @@ package playground.vsp.openberlinscenario.cemdap.input;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,9 +30,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.openberlinscenario.Gender;
 import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
 
@@ -40,7 +40,7 @@ import java.util.*;
 /**
  * This class creates a children-only population of a study region (in Germany) based on the Zensus and the Pendlerstatistik.
  * Only meant as as supplement ot an already existing adults-only population.
- * 
+ *
  * @author dziemke
  */
 public class SynPopCreatorChildren {
@@ -91,14 +91,14 @@ public class SynPopCreatorChildren {
 
 	public SynPopCreatorChildren(String censusFile, String outputBase, List<String> idsOfFederalStatesIncluded) {
 		LogToOutputSaver.setOutputDirectory(outputBase);
-		
+
 		this.outputBase = outputBase;
 
 		this.idsOfFederalStatesIncluded = idsOfFederalStatesIncluded;
 		this.idsOfFederalStatesIncluded.stream().forEach(e -> {
 			if (e.length()!=2) throw new IllegalArgumentException("Length of the id for each federal state must be equal to 2. This is not the case for "+ e);
 		});
-		
+
 		this.population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 
 		// Read census
@@ -107,7 +107,7 @@ public class SynPopCreatorChildren {
 		this.municipalityList = censusReader.getMunicipalityList();
 	}
 
-	
+
 	public void generateDemand() {
 		if (this.shapeFileForSpatialRefinement != null && this.refinementFeatureKeyInShapefile != null ) {
 			this.idsOfMunicipalitiesForSpatialRefinement.stream().forEach(e->spatialRefinementZoneIds.put(e, new ArrayList<>()));
@@ -122,7 +122,7 @@ public class SynPopCreatorChildren {
 		}
 
 		int counter = counterInit;
-		
+
 		for (String munId : municipalityList) {
 			int pop0_2Male = (int) this.municipalities.getAttribute(munId, CensusAttributes.pop0_2Male.toString());
 			int pop3_5Male = (int) this.municipalities.getAttribute(munId, CensusAttributes.pop3_5Male.toString());
@@ -159,8 +159,8 @@ public class SynPopCreatorChildren {
 		Population adjustedPopulation = clonePopulationAndAdjustLocations(this.population);
 		writeMatsimPlansFile(adjustedPopulation, this.outputBase + "plans_children.xml.gz");
 	}
-	
-	
+
+
 	private Population clonePopulationAndAdjustLocations(Population inputPopulation){
 		Population clonedPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (Person person : inputPopulation.getPersons().values()) {
@@ -217,15 +217,15 @@ public class SynPopCreatorChildren {
 		List<String> spatiallyRefinedZones = this.spatialRefinementZoneIds.get(municipalityId);
 		return spatiallyRefinedZones.get(random.nextInt(spatiallyRefinedZones.size()));
 	}
-	
-	
+
+
 	private static int getAgeInBounds(int lowerBound, int upperBound) {
 		return (int) (lowerBound + random.nextDouble() * (upperBound - lowerBound + 1));
 	}
 
 
 	private Map<String,List<String>> readShapeForSpatialRefinement() {
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(this.shapeFileForSpatialRefinement);
+		Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(this.shapeFileForSpatialRefinement);
 
 		for (SimpleFeature feature : features) {
 			String municipality;
@@ -245,21 +245,21 @@ public class SynPopCreatorChildren {
 		PopulationWriter popWriter = new PopulationWriter(population);
 	    popWriter.write(fileName);
 	}
-	
-	
+
+
 	// Getters and setters
     public Population getPopulation() {
     	return this.population;
 	}
-    
+
     public void setShapeFileForSpatialRefinement(String shapeFileForSpatialRefinement) {
     	this.shapeFileForSpatialRefinement = shapeFileForSpatialRefinement;
     }
-    
+
     public void setIdsOfMunicipalitiesForSpatialRefinement(List<String> idsOfMunicipalitiesForSpatialRefinement) {
     	this.idsOfMunicipalitiesForSpatialRefinement = idsOfMunicipalitiesForSpatialRefinement;
     }
-    
+
     public void setRefinementFeatureKeyInShapefile(String refinementFeatureKeyInShapefile) {
     	this.refinementFeatureKeyInShapefile = refinementFeatureKeyInShapefile;
     }

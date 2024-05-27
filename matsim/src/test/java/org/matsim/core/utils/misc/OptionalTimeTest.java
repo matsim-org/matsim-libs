@@ -26,14 +26,14 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class OptionalTimeTest {
 	@Test
-	public void test_defined_seconds() {
+	void test_defined_seconds() {
 		//defined
 		assertThat(OptionalTime.defined(0).seconds()).isEqualTo(0);
 		assertThat(OptionalTime.defined(1).seconds()).isEqualTo(1);
@@ -50,7 +50,7 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_undefined_seconds() {
+	void test_undefined_seconds() {
 		assertThat(OptionalTime.undefined().isUndefined()).isTrue();
 
 		assertThatThrownBy(() -> OptionalTime.undefined().seconds()).isExactlyInstanceOf(NoSuchElementException.class)
@@ -58,38 +58,38 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_cachedValues() {
+	void test_cachedValues() {
 		//currently 0 and undefined are cached
 		assertThat(OptionalTime.defined(0)).isSameAs(OptionalTime.defined(0));
 		assertThat(OptionalTime.undefined()).isSameAs(OptionalTime.undefined());
 	}
 
 	@Test
-	public void test_isUndefined() {
+	void test_isUndefined() {
 		assertThat(OptionalTime.undefined().isUndefined()).isTrue();
 		assertThat(OptionalTime.defined(1).isUndefined()).isFalse();
 	}
 
 	@Test
-	public void test_isDefined() {
+	void test_isDefined() {
 		assertThat(OptionalTime.undefined().isDefined()).isFalse();
 		assertThat(OptionalTime.defined(1).isDefined()).isTrue();
 	}
 
 	@Test
-	public void test_orElse() {
+	void test_orElse() {
 		assertThat(OptionalTime.undefined().orElse(0)).isEqualTo(0);
 		assertThat(OptionalTime.defined(1).orElse(0)).isEqualTo(1);
 	}
 
 	@Test
-	public void test_orElseGet() {
+	void test_orElseGet() {
 		assertThat(OptionalTime.undefined().orElseGet(() -> 0)).isEqualTo(0);
 		assertThat(OptionalTime.defined(1).orElseGet(() -> 0)).isEqualTo(1);
 	}
 
 	@Test
-	public void test_orElseThrow() {
+	void test_orElseThrow() {
 		assertThatThrownBy(() -> OptionalTime.undefined()
 				.orElseThrow(() -> new IllegalStateException("Undefined time error"))).isExactlyInstanceOf(
 				IllegalStateException.class).hasMessage("Undefined time error");
@@ -99,7 +99,7 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_ifDefined() {
+	void test_ifDefined() {
 		MutableDouble counter = new MutableDouble(0);
 
 		OptionalTime.undefined().ifDefined(counter::add);
@@ -110,7 +110,7 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_ifDefinedOrElse() {
+	void test_ifDefinedOrElse() {
 		MutableDouble ifCounter = new MutableDouble(0);
 		MutableDouble elseCounter = new MutableDouble(0);
 
@@ -124,14 +124,14 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_stream() {
+	void test_stream() {
 		assertThat(OptionalTime.undefined().stream()).containsExactly();
 		assertThat(OptionalTime.defined(0).stream()).containsExactly(0.);
 		assertThat(OptionalTime.defined(10).stream()).containsExactly(10.);
 	}
 
 	@Test
-	public void test_or_OptionalTime() {
+	void test_or_OptionalTime() {
 		assertThat(OptionalTime.undefined().or(OptionalTime.undefined()).isUndefined()).isTrue();
 		assertThat(OptionalTime.undefined().or(OptionalTime.defined(3)).seconds()).isEqualTo(3);
 		assertThat(OptionalTime.defined(1).or(OptionalTime.undefined()).seconds()).isEqualTo(1);
@@ -142,7 +142,7 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_or_OptionalTimeSupplier() {
+	void test_or_OptionalTimeSupplier() {
 		assertThat(OptionalTime.undefined().or(OptionalTime::undefined).isUndefined()).isTrue();
 		assertThat(OptionalTime.undefined().or(() -> OptionalTime.defined(3)).seconds()).isEqualTo(3);
 		assertThat(OptionalTime.defined(1).or(OptionalTime::undefined).seconds()).isEqualTo(1);
@@ -155,7 +155,7 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_equals() {
+	void test_equals() {
 		assertThat(OptionalTime.undefined()).isEqualTo(OptionalTime.undefined());
 		assertThat(OptionalTime.undefined()).isNotEqualTo(OptionalTime.defined(0));
 
@@ -165,7 +165,7 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_hashCode() {
+	void test_hashCode() {
 		assertThat(OptionalTime.undefined()).hasSameHashCodeAs(Time.UNDEFINED_TIME);
 		assertThat(OptionalTime.defined(0)).hasSameHashCodeAs(0.);
 		assertThat(OptionalTime.defined(-Double.MAX_VALUE)).hasSameHashCodeAs(-Double.MAX_VALUE);

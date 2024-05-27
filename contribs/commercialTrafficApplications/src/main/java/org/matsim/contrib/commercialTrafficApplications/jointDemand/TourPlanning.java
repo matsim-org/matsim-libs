@@ -31,14 +31,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
+import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
+import org.matsim.freight.carriers.jsprit.VRPTransportCosts;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -91,8 +92,8 @@ class TourPlanning {
 		HashMap<Id<Carrier>, Integer> sortedMap = carrierServiceCounterMap.entrySet().stream()
 				.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
-		
-		
+
+
 		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
 		ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 		forkJoinPool.submit(() -> tempList.parallelStream().forEach(carrierId -> {
@@ -152,7 +153,7 @@ class TourPlanning {
 				log.info("setting maxIterations=1 as carrier has no services");
 				algorithm.setMaxIterations(1);
 			} else {
-				algorithm.setMaxIterations(CarrierUtils.getJspritIterations(carrier));
+				algorithm.setMaxIterations(CarriersUtils.getJspritIterations(carrier));
 			}
 
 			// variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
@@ -167,7 +168,7 @@ class TourPlanning {
 			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
 			log.info("routing plan for carrier " + carrier.getId());
-			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, transportCosts); // we need to route
+			NetworkRouter.routePlan(carrierPlan, transportCosts); // we need to route
 																									// the plans in
 																									// order to create
 																									// reasonable

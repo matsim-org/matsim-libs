@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class DvrpBenchmarkQSimModuleTest {
 	@Test
-	public void calcLinkSpeed() {
+	void calcLinkSpeed() {
 		var link = NetworkUtils.createLink(Id.createLinkId("id"), null, null, null, 150, 15, 10, 1);
 		var vehicle = mock(Vehicle.class);
 

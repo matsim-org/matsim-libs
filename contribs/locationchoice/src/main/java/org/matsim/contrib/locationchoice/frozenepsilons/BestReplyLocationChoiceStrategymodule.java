@@ -50,7 +50,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen

@@ -20,10 +20,9 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.common.collect.ImmutableList;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)

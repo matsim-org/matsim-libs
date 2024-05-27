@@ -20,6 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,8 +34,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-
-import java.util.List;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * <p>
@@ -286,5 +288,21 @@ public final class WithinDayAgentUtils {
 	
 	public static List<PlanElement> subList( MobsimAgent agent, int fromIndex, int toIndex) {
 		return getModifiablePlan(agent).getPlanElements().subList( fromIndex, toIndex ) ;
+	}
+	
+	public static List<PlanElement> convertInteractionActivities(List<? extends PlanElement> elements) {
+		List<PlanElement> updatedElements = new ArrayList<>(elements.size());
+		
+		for (int i = 0; i < elements.size(); i++) {
+			PlanElement element = elements.get(i);
+			
+			if (element instanceof Activity) {
+				element = PopulationUtils.convertInteractionToStandardActivity((Activity) element);
+			}
+			
+			updatedElements.add(element);
+		}
+		
+		return updatedElements;
 	}
 }

@@ -1,9 +1,9 @@
 package org.matsim.freightDemandGeneration;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
@@ -15,11 +15,11 @@ import java.nio.file.Path;
  */
 public class FreightDemandGenerationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMain() {
+	void testMain() {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
 			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
@@ -57,7 +57,7 @@ public class FreightDemandGenerationTest {
 			LogManager.getLogger(this.getClass()).fatal("there was an exception: \n" + ee);
 			ee.printStackTrace();
 			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 }

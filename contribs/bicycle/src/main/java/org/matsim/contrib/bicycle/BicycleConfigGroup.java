@@ -52,7 +52,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private double marginalUtilityOfUserDefinedNetworkAttribute;
 	private String userDefinedNetworkAttributeName;
 	private double userDefinedNetworkAttributeDefaultValue;
-	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
+//	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
 	private double maxBicycleSpeedForRouting = 25.0/3.6;
 	private String bicycleMode = "bicycle";
 	private boolean motorizedInteraction = false;
@@ -127,13 +127,13 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public double getUserDefinedNetworkAttributeDefaultValue() {
 		return this.userDefinedNetworkAttributeDefaultValue;
 	}
-	public BicycleConfigGroup setBicycleScoringType( final BicycleScoringType value ) {
-		this.bicycleScoringType = value;
-		return this;
-	}
-	public BicycleScoringType getBicycleScoringType() {
-		return this.bicycleScoringType;
-	}
+//	public BicycleConfigGroup setBicycleScoringType( final BicycleScoringType value ) {
+//		this.bicycleScoringType = value;
+//		return this;
+//	}
+//	public BicycleScoringType getBicycleScoringType() {
+//		return this.bicycleScoringType;
+//	}
 
 	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
 	@Deprecated
@@ -142,7 +142,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this;
 	}
 
-	public enum BicycleScoringType {legBased, linkBased}
+//	public enum BicycleScoringType {legBased, @Deprecated linkBased}
 	@StringGetter( BICYCLE_MODE )
 	public String getBicycleMode() {
 		return this.bicycleMode;

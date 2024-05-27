@@ -29,7 +29,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public class PersonEntersVehicleEvent extends Event implements HasPersonId {
+public class PersonEntersVehicleEvent extends Event implements HasPersonId, HasVehicleId {
 
 	public static final String EVENT_TYPE = "PersonEntersVehicle";
 	public static final String ATTRIBUTE_PERSON = "person";
@@ -43,7 +43,7 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 		this.personId = personId;
 		this.vehicleId = vehicleId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
@@ -55,8 +55,8 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;
-	}	
-	
+	}
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
@@ -64,9 +64,8 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		return attrs;
+		Map<String, String> atts = super.getAttributes();
+		// personId, vehicleId handled by superclass
+		return atts;
 	}
 }

@@ -138,7 +138,9 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
                             "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored." );
                     noVehWarnCnt++;
                     if ( noVehWarnCnt == 10 ) logger.warn( Gbl.FUTURE_SUPPRESSED );
-                } 
+                }
+                break;
+                // yyyy I found the above without the "break".  There is https://github.com/matsim-org/matsim-code-examples/issues/910, according to which it seems that this is a bug.  There should be a testcase, but I guess there ain't.  kai, apr'22
             default:
                 throw new RuntimeException( "Not yet implemented. Aborting..." );
         }

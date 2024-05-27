@@ -22,9 +22,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -39,14 +39,14 @@ import java.util.stream.Collectors;
 
 public class PersonMoneyEventAggregatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Test method for {@link org.matsim.analysis.personMoney.PersonMoneyEventsCollector}.
 	 */
 	@Test
-	public void testPersonMoneyEventCollector() {
+	void testPersonMoneyEventCollector() {
 
 
 		Id<Person> passenger1 = Id.createPersonId("passenger1");
@@ -98,20 +98,20 @@ public class PersonMoneyEventAggregatorTest {
 
 
 			List<CSVRecord> csvRecordListA = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals(drt_A) && record.get(parser.getHeaderMap().get("purpose")).equals("drtFare")).collect(Collectors.toList());
-			Assert.assertEquals("Either no record or more than one record",1, csvRecordListA.size());
-			Assert.assertEquals("Wrong personMoneyAmountSum for drt_A",19.07, Double.parseDouble(csvRecordListA.get(0).get(2)),MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(1, csvRecordListA.size(), "Either no record or more than one record");
+			Assertions.assertEquals(19.07, Double.parseDouble(csvRecordListA.get(0).get(2)),MatsimTestUtils.EPSILON,"Wrong personMoneyAmountSum for drt_A");
 
 			List<CSVRecord> csvRecordList0 = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals("DrtA") && record.get(parser.getHeaderMap().get("purpose")).equals("DrtFare")).collect(Collectors.toList());
-			Assert.assertEquals("Either no record or more than one record",1, csvRecordList0.size());
-			Assert.assertEquals("Wrong personMoneyAmountSum for empty purpose",4.1, Double.parseDouble(csvRecordList0.get(0).get(2)),MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(1, csvRecordList0.size(), "Either no record or more than one record");
+			Assertions.assertEquals(4.1, Double.parseDouble(csvRecordList0.get(0).get(2)),MatsimTestUtils.EPSILON,"Wrong personMoneyAmountSum for empty purpose");
 
 			List<CSVRecord> csvRecordListB = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals(drt_B) && record.get(parser.getHeaderMap().get("purpose")).equals("drtFare")).collect(Collectors.toList());
-			Assert.assertEquals("Either no record or more than one record",1, csvRecordListB.size());
-			Assert.assertEquals("Wrong personMoneyAmountSum for drt_B",16, Double.parseDouble(csvRecordListB.get(0).get(2)),MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(1, csvRecordListB.size(), "Either no record or more than one record");
+			Assertions.assertEquals(16, Double.parseDouble(csvRecordListB.get(0).get(2)),MatsimTestUtils.EPSILON,"Wrong personMoneyAmountSum for drt_B");
 
 			List<CSVRecord> csvRecordListC = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals(drt_C) && record.get(parser.getHeaderMap().get("purpose")).equals("drtFare")).collect(Collectors.toList());
-			Assert.assertEquals("Either no record or more than one record for drt_C",1, csvRecordListC.size());
-			Assert.assertEquals("Wrong personMoneyAmountSum",2.5, Double.parseDouble(csvRecordListC.get(0).get(2)),MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(1, csvRecordListC.size(), "Either no record or more than one record for drt_C");
+			Assertions.assertEquals(2.5, Double.parseDouble(csvRecordListC.get(0).get(2)),MatsimTestUtils.EPSILON,"Wrong personMoneyAmountSum");
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

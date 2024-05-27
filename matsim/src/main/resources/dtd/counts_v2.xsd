@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+           xmlns="http://www.matsim.org/files/dtd"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xml:lang="en">
+
+    <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+
+    <xs:element name="counts" type="countsType"/>
+
+    <xs:complexType name="countsType">
+
+        <xs:sequence>
+            <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="location" type="stationType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+        <xs:attribute name="source" type="xs:string" use="optional"/>
+        <xs:attribute name="year" type="xs:int" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="stationType">
+        <xs:sequence>
+            <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="measurements" type="measureableType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+
+        <xs:attribute name="refId" type="xs:string" use="required"/>
+        <xs:attribute name="refType" type="xs:string" use="optional"/>
+        <xs:attribute name="id" type="xs:string" use="optional"/>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+        <xs:attribute name="x" type="xs:double" use="optional"/>
+        <xs:attribute name="y" type="xs:double" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="measureableType">
+        <xs:sequence>
+            <xs:element name="value" type="measureType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="networkMode" type="xs:string" use="required"/>
+        <xs:attribute name="interval" type="xs:positiveInteger" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="measureType">
+        <xs:attribute name="t" type="xs:nonNegativeInteger" use="required"/>
+        <xs:attribute name="val" type="xs:float" use="required"/>
+    </xs:complexType>
+
+</xs:schema>
+

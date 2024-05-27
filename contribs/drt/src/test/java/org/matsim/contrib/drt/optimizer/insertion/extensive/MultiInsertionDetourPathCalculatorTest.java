@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -70,13 +70,13 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final MultiInsertionDetourPathCalculator detourPathCalculator = new MultiInsertionDetourPathCalculator(
 			pathSearch, pathSearch, pathSearch, pathSearch, 1);
 
-	@After
+	@AfterEach
 	public void after() {
 		detourPathCalculator.notifyMobsimBeforeCleanup(null);
 	}
 
 	@Test
-	public void calculatePaths() {
+	void calculatePaths() {
 		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
 		var pathFromPickup = mockCalcPathData(pickupLink, afterPickupLink, request.getEarliestStartTime(), true, 22);
 		var pathToDropoff = mockCalcPathData(dropoffLink, beforeDropoffLink, request.getLatestArrivalTime(), false, 33);
@@ -96,7 +96,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 	}
 
 	@Test
-	public void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
+	void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
 		//compute only 2 paths (instead of 4)
 		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
 		var pathFromPickup = mockCalcPathData(pickupLink, dropoffLink, request.getEarliestStartTime(), true, 22);
@@ -117,7 +117,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 	}
 
 	@Test
-	public void calculatePaths_noDetours() {
+	void calculatePaths_noDetours() {
 		// OneToManyPathSearch.calcPathDataMap() returns a map that contains entries for all toLinks
 		// (unless the stop criterion terminates computations earlier)
 		// If fromLink is in toLinks than PathData.EMPTY is mapped for such a link

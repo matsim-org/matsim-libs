@@ -23,7 +23,7 @@ package org.matsim.core.modal;
 import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;

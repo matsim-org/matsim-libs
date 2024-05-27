@@ -142,7 +142,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), request.getMode(), request.getId(),
-						request.getPassengerId(), vehicle.getId(), pickupEndTime, dropoffStartTime));
+						request.getPassengerIds(), vehicle.getId(), pickupEndTime, dropoffStartTime));
 	}
 
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {

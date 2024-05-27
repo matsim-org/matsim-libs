@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
-import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.Attributes;
 
 public class FreefloatingAreasReader extends MatsimXmlParser {
@@ -28,6 +28,7 @@ public class FreefloatingAreasReader extends MatsimXmlParser {
 	private ArrayList<Coord> coords;
 
 	public FreefloatingAreasReader() {
+		super(ValidationType.DTD_ONLY);
 		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder()
 				.setName("freefloating_area")
 				.setCrs(DefaultGeographicCRS.WGS84)

@@ -20,10 +20,10 @@
 
 package org.matsim.core.events;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -39,11 +39,12 @@ import org.matsim.vehicles.Vehicle;
 
 public class BasicEventsHandlerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testLinkEnterEventHandler() {
+	@Test
+	void testLinkEnterEventHandler() {
 		EventsManager events = EventsUtils.createEventsManager();
 		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);
@@ -60,7 +61,7 @@ public class BasicEventsHandlerTest {
 
 		events.processEvent(new LinkEnterEvent(8.0*3600, Id.create("veh", Vehicle.class), link1.getId()));
 		events.finishProcessing();
-		assertEquals("expected number of handled events wrong.", 1, handler.counter);
+		assertEquals(1, handler.counter, "expected number of handled events wrong.");
 	}
 
 

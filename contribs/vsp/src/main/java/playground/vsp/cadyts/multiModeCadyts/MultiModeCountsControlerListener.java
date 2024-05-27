@@ -27,15 +27,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -57,7 +56,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	 */
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 
-	private final ControlerConfigGroup controlerConfigGroup;
+	private final ControllerConfigGroup controllerConfigGroup;
 	private final CountsConfigGroup config; // useful to get the link ids of counting stations and other infor for averaging
 	private final Set<String> analyzedModes;
 	private final VolumesAnalyzer volumesAnalyzer;
@@ -71,9 +70,9 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	private int iterationsUsed = 0;
 
 	@Inject
-	private MultiModeCountsControlerListener(QSimConfigGroup qsimConfigGroup, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
-		this.controlerConfigGroup = controlerConfigGroup;
-		this.config = countsConfigGroup; 
+	private MultiModeCountsControlerListener(QSimConfigGroup qsimConfigGroup, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+		this.controllerConfigGroup = controllerConfigGroup;
+		this.config = countsConfigGroup;
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.analyzedModes =   CollectionUtils.stringToSet(this.config.getAnalyzedModes());
 		Set<String> mainModes = new HashSet<>(qsimConfigGroup.getMainModes());
@@ -105,13 +104,13 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(counts==null) {
         }
-		else if ( event.getIteration() == controlerConfigGroup.getFirstIteration()){	
+		else if ( event.getIteration() == controllerConfigGroup.getFirstIteration()){
 			// write the data for first iteration too
 			addVolumes(volumesAnalyzer);
 			writeData(event, this.linkStats);
 			reset();
 		} else if ( this.config.getWriteCountsInterval() > 0 ) {
-			if (useVolumesOfIteration(event.getIteration(), controlerConfigGroup.getFirstIteration())) {
+			if (useVolumesOfIteration(event.getIteration(), controllerConfigGroup.getFirstIteration())) {
 				addVolumes(volumesAnalyzer);
 			}
 
@@ -142,7 +141,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 				reset();
 				iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
 			}
-		} 
+		}
 	}
 
 	private void writeData(final IterationEndsEvent event, Map<Id<Link>, Map<String, double[]>> averages) {
@@ -188,7 +187,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 
 	/*package*/
 	private boolean createCountsInIteration(final int iteration) {
-		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));		
+		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));
 	}
 
 	private void addVolumes(final VolumesAnalyzer volumes) {
@@ -197,14 +196,14 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 			Id<Link> linkId = e.getKey();
 			Map<String, double[]> mode2counts =  e.getValue();
 			for (String mode : mode2counts.keySet()) {
-				double[] volumesPerHour = mode2counts.get(mode); 
-				double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode); 
+				double[] volumesPerHour = mode2counts.get(mode);
+				double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode);
 				for (int i = 0; i < 24; i++) {
 					volumesPerHour[i] += newVolume[i];
 				}
 				mode2counts.put(mode, volumesPerHour);
 			}
-			this.linkStats.put(linkId, mode2counts);	
+			this.linkStats.put(linkId, mode2counts);
 		}
 	}
 

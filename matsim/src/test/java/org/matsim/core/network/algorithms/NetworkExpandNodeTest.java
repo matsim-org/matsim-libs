@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +44,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class NetworkExpandNodeTest {
 
 	@Test
-	public void testExpandNode() {
+	void testExpandNode() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -58,102 +57,102 @@ public class NetworkExpandNodeTest {
 		
 		exp.expandNode(Id.create("3", Node.class), turns);
 		Network n = f.scenario.getNetwork();
-		Assert.assertEquals(12, n.getLinks().size());
-		Assert.assertEquals(10, n.getNodes().size());
-		Assert.assertNotNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("6", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("2", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("2", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("6", Link.class)));
+		Assertions.assertEquals(12, n.getLinks().size());
+		Assertions.assertEquals(10, n.getNodes().size());
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("6", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("6", Link.class)));
 		
 		// test correct attributes on new links
 		Link l = findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		Set<String> modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 
 		// test correct attributes on modified in-links
 		l = n.getLinks().get(Id.create("3", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 
 		// test correct attributes on modified out-links
 		l = n.getLinks().get(Id.create("6", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 		
 		// test coordinates of new nodes
 		l = n.getLinks().get(Id.create("1", Link.class));
 		Coord c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("2", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("3", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("4", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("5", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("6", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 	}
 
 	@Test
-	public void testExpandNode_sameCoordinateLinks() {
+	void testExpandNode_sameCoordinateLinks() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		Coord c = f.scenario.getNetwork().getNodes().get(Id.create("3", Node.class)).getCoord();
@@ -170,102 +169,102 @@ public class NetworkExpandNodeTest {
 		
 		exp.expandNode(Id.create("3", Node.class), turns);
 		Network n = f.scenario.getNetwork();
-		Assert.assertEquals(12, n.getLinks().size());
-		Assert.assertEquals(10, n.getNodes().size());
-		Assert.assertNotNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("6", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("2", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("2", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("6", Link.class)));
+		Assertions.assertEquals(12, n.getLinks().size());
+		Assertions.assertEquals(10, n.getNodes().size());
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("6", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("6", Link.class)));
 		
 		// test correct attributes on new links
 		Link l = findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		Set<String> modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 		
 		// test correct attributes on modified in-links
 		l = n.getLinks().get(Id.create("3", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 		
 		// test correct attributes on modified out-links
 		l = n.getLinks().get(Id.create("6", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 		
 		// test coordinates of new nodes
 		l = n.getLinks().get(Id.create("1", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("2", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("3", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("4", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("5", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("6", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 	}
 
 	@Test
-	public void testExpandNode_specificModes() {
+	void testExpandNode_specificModes() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -283,112 +282,112 @@ public class NetworkExpandNodeTest {
 		
 		exp.expandNode(Id.create("3", Node.class), turns);
 		Network n = f.scenario.getNetwork();
-		Assert.assertEquals(12, n.getLinks().size());
-		Assert.assertEquals(10, n.getNodes().size());
-		Assert.assertNotNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("6", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class)));
-		Assert.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("2", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("2", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("4", Link.class)));
-		Assert.assertNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("6", Link.class)));
+		Assertions.assertEquals(12, n.getLinks().size());
+		Assertions.assertEquals(10, n.getNodes().size());
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("6", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNotNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("1", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("2", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("3", Link.class), Id.create("4", Link.class)));
+		Assertions.assertNull(findLinkBetween(n, Id.create("5", Link.class), Id.create("6", Link.class)));
 		
 		// test correct attributes on new links
 		Link l = findLinkBetween(n, Id.create("1", Link.class), Id.create("6", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		Set<String> modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 
 		l = findLinkBetween(n, Id.create("5", Link.class), Id.create("2", Link.class));
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 1, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertEquals(1, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
 
 		l = findLinkBetween(n, Id.create("5", Link.class), Id.create("4", Link.class));
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 1, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(1, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 
 		// test correct attributes on modified in-links
 		l = n.getLinks().get(Id.create("3", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 
 		// test correct attributes on modified out-links
 		l = n.getLinks().get(Id.create("6", Link.class));
-		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
-		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
-		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Assertions.assertEquals(1800.0, l.getCapacity(), 1e-8, "Capacity attribute is not correct");
+		Assertions.assertEquals(2.0, l.getNumberOfLanes(), 1e-8, "Number of lanes is not correct");
+		Assertions.assertEquals(10.0, l.getFreespeed(), 1e-8, "Freespeed is not correct");
 		
 		modes = l.getAllowedModes();
-		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
-		Assert.assertTrue(modes.contains(TransportMode.walk));
-		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assertions.assertEquals(2, modes.size(), "Allowed modes are not correct");
+		Assertions.assertTrue(modes.contains(TransportMode.walk));
+		Assertions.assertTrue(modes.contains(TransportMode.car));
 		
 		// test coordinates of new nodes
 		l = n.getLinks().get(Id.create("1", Link.class));
 		Coord c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("2", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("3", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("4", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("5", Link.class));
 		c = l.getToNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("6", Link.class));
 		c = l.getFromNode().getCoord();
-		Assert.assertFalse(Double.isNaN(c.getX()));
-		Assert.assertFalse(Double.isNaN(c.getY()));
-		Assert.assertFalse(Double.isInfinite(c.getX()));
-		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
+		Assertions.assertFalse(Double.isNaN(c.getX()));
+		Assertions.assertFalse(Double.isNaN(c.getY()));
+		Assertions.assertFalse(Double.isInfinite(c.getX()));
+		Assertions.assertFalse(Double.isInfinite(c.getY()));
+		Assertions.assertTrue(CoordUtils.calcEuclideanDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 	}
 
 	@Test
-	public void testTurnsAreSameAsSingleNode_IncludeUTurns() {
+	void testTurnsAreSameAsSingleNode_IncludeUTurns() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -409,7 +408,7 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class), carOnly));
 
 		Id<Node> nodeId = Id.create("3", Node.class);
-		Assert.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
+		Assertions.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
 
 		turns.clear();
 		turns.add(new TurnInfo(Id.create("1", Link.class), Id.create("2", Link.class)));
@@ -422,11 +421,11 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class)));
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("6", Link.class)));
 
-		Assert.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
+		Assertions.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
 	}
 
 	@Test
-	public void testTurnsAreSameAsSingleNode_IgnoreUTurns() {
+	void testTurnsAreSameAsSingleNode_IgnoreUTurns() {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		
@@ -448,7 +447,7 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class), carOnly));
 		
 		Id<Node> nodeId = Id.create("3", Node.class);
-		Assert.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
+		Assertions.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
 		
 		turns.clear();
 		turns.add(new TurnInfo(Id.create("1", Link.class), Id.create("2", Link.class))); // u-turn
@@ -461,11 +460,11 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class)));
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("6", Link.class), emptySet)); // u-turn
 		
-		Assert.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
+		Assertions.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
 	}
-	
+
 	@Test
-	public void testTurnInfo_equals() {
+	void testTurnInfo_equals() {
 		Set<String> modes1 = new HashSet<String>();
 		Set<String> modes2 = new HashSet<String>();
 		modes2.add(TransportMode.car);
@@ -482,22 +481,22 @@ public class NetworkExpandNodeTest {
 		TurnInfo ti22 = new TurnInfo(id1, id2, modes1);
 		TurnInfo ti44 = new TurnInfo(id2, id1);
 		
-		Assert.assertNotNull(ti1);
-		Assert.assertFalse(ti1.equals(ti2));
-		Assert.assertFalse(ti1.equals(ti3));
-		Assert.assertFalse(ti1.equals(ti4));
-		Assert.assertFalse(ti1.equals(ti5));
-		Assert.assertFalse(ti1.equals(ti6));
+		Assertions.assertNotNull(ti1);
+		Assertions.assertFalse(ti1.equals(ti2));
+		Assertions.assertFalse(ti1.equals(ti3));
+		Assertions.assertFalse(ti1.equals(ti4));
+		Assertions.assertFalse(ti1.equals(ti5));
+		Assertions.assertFalse(ti1.equals(ti6));
 		
-		Assert.assertNotNull(ti2);
-		Assert.assertFalse(ti2.equals(ti1));
-		Assert.assertFalse(ti2.equals(ti3));
-		Assert.assertFalse(ti2.equals(ti4));
-		Assert.assertFalse(ti2.equals(ti5));
-		Assert.assertFalse(ti2.equals(ti6));
+		Assertions.assertNotNull(ti2);
+		Assertions.assertFalse(ti2.equals(ti1));
+		Assertions.assertFalse(ti2.equals(ti3));
+		Assertions.assertFalse(ti2.equals(ti4));
+		Assertions.assertFalse(ti2.equals(ti5));
+		Assertions.assertFalse(ti2.equals(ti6));
 		
-		Assert.assertTrue(ti2.equals(ti22));
-		Assert.assertTrue(ti4.equals(ti44));
+		Assertions.assertTrue(ti2.equals(ti22));
+		Assertions.assertTrue(ti4.equals(ti44));
 	}
 	
 	private static Link findLinkBetween(final Network network, final Id<Link> fromLinkId, final Id<Link> toLinkId) {
