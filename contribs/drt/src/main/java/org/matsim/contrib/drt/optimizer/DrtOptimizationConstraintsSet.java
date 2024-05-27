@@ -1,18 +1,25 @@
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.optimizer;
 
 import com.google.common.base.Verify;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-/**
- * @author nkuehnel / MOIA
- */
-public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
+public class DrtOptimizationConstraintsSet extends ReflectiveConfigGroup {
 
-    public final static String SET_NAME = "drtOptimizationConstraints";
+    public static final String SET_NAME = "drtOptimizationConstraintsSet";
+    public static final String DEFAULT_PARAMS_NAME = "default";
 
+    public DrtOptimizationConstraintsSet() {
+        super(SET_NAME);
+    }
+
+    @Parameter
+    @Comment("name of optimization params")
+    @NotBlank
+    public String name = DEFAULT_PARAMS_NAME;
 
     @Parameter
     @Comment("Max wait time for the bus to come (optimisation constraint).")
@@ -80,10 +87,6 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
                     + " If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).")
     @PositiveOrZero // used only for stopbased DRT scheme
     public double maxWalkDistance = Double.MAX_VALUE;// [m];
-
-    public DrtOptimizationConstraintsParams() {
-        super(SET_NAME);
-    }
 
     @Override
     protected void checkConsistency(Config config) {

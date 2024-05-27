@@ -131,19 +131,19 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		var enterIterator = enterTimes.entrySet().iterator();
 
 		while (enterIterator.hasNext()) {
-			if (onboard >= vehicle.getCapacity()) {
-				// only let people enter if there is currently free capacity
-				break;
-			}
-
 			var entry = enterIterator.next();
+			int availableCapacity = vehicle.getCapacity() - onboard;
 
 			if (entry.getValue() <= now) {
-				// let agent enter now
-				Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
-				enteredRequests.add(entry.getKey());
-				onboard += pickupRequests.get(entry.getKey()).getPassengerCount();
-				enterIterator.remove();
+				int requiredCapacity = pickupRequests.get(entry.getKey()).getPassengerCount();
+				
+				if (requiredCapacity <= availableCapacity) {
+					// let agent enter now
+					Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
+					enteredRequests.add(entry.getKey());
+					onboard += requiredCapacity;
+					enterIterator.remove();
+				}
 			}
 		}
 
