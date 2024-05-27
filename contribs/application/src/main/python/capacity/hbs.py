@@ -69,8 +69,26 @@ def calc_capacity_landstrasse(street):
     # Source: HSB table L3-4
     if street.lanes == 1:
         k = 20
-        a = 98.73
-        b = 0.8175
+
+        a = 0
+        b = 0
+
+        # Table L3-4
+        if street.curvature == 1:
+            a = 98.73
+            b = 0.8175
+        elif street.curvature == 2:
+            a = 83.88
+            b = 0.8384
+        elif street.curvature == 3:
+            a = 74.41
+            b = 0.6788
+        elif street.curvature == 4:
+            a = 68.02
+            b = 0.6539
+        else:
+            raise ValueError(f"Unknown curvature {street.curvature}")
+
         return 0.5 * (-b * math.pow(k, 3 / 2) * math.sqrt(4 * a + b * b * k) + 2 * a * k + b * b * k * k)
     if street.lanes == 2:
         k = 48
