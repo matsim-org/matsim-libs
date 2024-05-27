@@ -19,24 +19,24 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 /**
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
-	private final DrtConfigGroup drtConfigGroup;
+	private final DrtOptimizationConstraintsSet constraintsSet;
 
 	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
-										  DrtConfigGroup drtConfigGroup) {
+										  DrtOptimizationConstraintsSet constraintsSet) {
 		this.costCalculationStrategy = costCalculationStrategy;
-		this.drtConfigGroup = drtConfigGroup;
+		this.constraintsSet = constraintsSet;
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 					double nextArrival = stop.getArrivalTime();
 					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
 					//arrival is very soon
-					if (nextArrival - departureTime < drtConfigGroup.allowDetourBeforeArrivalThreshold &&
+					if (nextArrival - departureTime < constraintsSet.allowDetourBeforeArrivalThreshold &&
 							detour > 0) {
 						return INFEASIBLE_SOLUTION_COST;
 					} else {
