@@ -98,36 +98,37 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
         updateModesUsedPerPerson();
 
+		/*
+		 *	Looks through modesUsedPerPersonTrip at each person-trip. How many of those person trips have used each mode more than the
+		 *  predefined limits.
+		 */
+		int totalPersonTripCount = 0;
+		Map<Integer, Map<String, Double>> modeCountCurrentIteration = new TreeMap<>();
+		//Map<Limit, Map<Mode  , TotalTripCount >>
 
-//		for testing purposes: if there are any trips, do analysis. If not, it is probably a test or a faulty / empty population. -sme0524
-		if (!modesUsedPerPersonTrip.isEmpty()) {
-			/*
-			 *	Looks through modesUsedPerPersonTrip at each person-trip. How many of those person trips have used each mode more than the
-			 *  predefined limits.
-			 */
-			int totalPersonTripCount = 0;
-			Map<Integer, Map<String, Double>> modeCountCurrentIteration = new TreeMap<>();
-			//Map<Limit, Map<Mode  , TotalTripCount >>
-
-			for (Map<Integer, Map<String, Integer>> mapForPerson : modesUsedPerPersonTrip.values()) {
-				//Map<Trip # , Map<Mode  , Count  >>
-				for (Map<String, Integer> mapForPersonTrip : mapForPerson.values()) {
-					//Map<Mode  , Count >
-					totalPersonTripCount++;
-					for (String mode : mapForPersonTrip.keySet()) {
-						Integer realCount = mapForPersonTrip.get(mode);
-						for (Integer limit : limits) {
-							Map<String, Double> modeCountMap = modeCountCurrentIteration.computeIfAbsent(limit, k -> new TreeMap<>());
-							Double modeCount = modeCountMap.computeIfAbsent(mode, k -> 0.);
-							if (realCount >= limit) {
-								modeCount++;
-							}
-							modeCountMap.put(mode, modeCount);
-							modeCountCurrentIteration.put(limit, modeCountMap);
+		for (Map<Integer, Map<String, Integer>> mapForPerson : modesUsedPerPersonTrip.values()) {
+			//Map<Trip # , Map<Mode  , Count  >>
+			for (Map<String, Integer> mapForPersonTrip : mapForPerson.values()) {
+				//Map<Mode  , Count >
+				totalPersonTripCount++;
+				for (String mode : mapForPersonTrip.keySet()) {
+					Integer realCount = mapForPersonTrip.get(mode);
+					for (Integer limit : limits) {
+						Map<String, Double> modeCountMap = modeCountCurrentIteration.computeIfAbsent(limit, k -> new TreeMap<>());
+						Double modeCount = modeCountMap.computeIfAbsent(mode, k -> 0.);
+						if (realCount >= limit) {
+							modeCount++;
 						}
+						modeCountMap.put(mode, modeCount);
+						modeCountCurrentIteration.put(limit, modeCountMap);
 					}
 				}
 			}
+		}
+
+
+		//		for testing purposes: if there are any trips, do analysis. If not, it is probably a test or a faulty / empty population. -sme0524
+		if (!modeCountCurrentIteration.isEmpty()) {
 			// Calculates mcc share for each mode in current iteration, and updates modeCCHistory accordingly
 			for (Integer limit : limits) {
 				Map<String, Double> modeCnt = modeCountCurrentIteration.get(limit);
@@ -188,14 +189,11 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 			if (this.createPNG && event.getIteration() > this.minIteration) {
 				produceGraphs();
 			}
+
 		} else {
 			log.warn("There are no trips conducted by the analyzed population. This should only be the case for tests. If you are running a simulation run, " +
 				" this should not happen. Check your population.");
 		}
-
-
-
-
     }
 
     private void updateModesUsedPerPerson() {
