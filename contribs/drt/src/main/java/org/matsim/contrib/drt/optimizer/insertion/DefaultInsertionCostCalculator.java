@@ -74,26 +74,31 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 
 		// all stops after the new (potential) pickup but before the new dropoff
 		// are delayed by pickupDetourTimeLoss
-		double detour = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
+		double timeLoss = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
 		if(vEntry.stops != null) {
 			for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
+				if(timeLoss == 0) {
+					continue;
+				}
 				Waypoint.Stop stop = vEntry.stops.get(s);
 				// passengers are being dropped off == may be close to arrival
 				if (!stop.task.getDropoffRequests().isEmpty()) {
 					double nextArrival = stop.getArrivalTime();
 					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
-					//arrival is very soon
-					if (nextArrival - departureTime < constraintsSet.allowDetourBeforeArrivalThreshold &&
-							detour > 0) {
+					if (nextArrival - departureTime < constraintsSet.allowDetourBeforeArrivalThreshold) {
+						//arrival is too soon to allow further diversion
 						return INFEASIBLE_SOLUTION_COST;
-					} else {
+					} else if (nextArrival - departureTime >= constraintsSet.allowDetourBeforeArrivalThreshold) {
 						// all following stops are above the threshold
 						break;
 					}
 				}
 				if (s == insertion.dropoff.index) {
 					// all stops after the new (potential) dropoff are delayed by totalTimeLoss
-					detour = detourTimeInfo.getTotalTimeLoss();
+					timeLoss = detourTimeInfo.getTotalTimeLoss();
+					if(timeLoss == 0) {
+						break;
+					}
 				}
 			}
 		}
