@@ -91,13 +91,13 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private boolean violatesLateDiversion(Insertion insertion, DetourTimeInfo detourTimeInfo,
 										  VehicleEntry vEntry, double effectiveDropoffTimeLoss) {
         if (detourTimeInfo.pickupDetourInfo.pickupTimeLoss > 0) {
-			if (checkStopsForDetour(vEntry, insertion.pickup.index, insertion.dropoff.index,
+			if (violatesLateDiversionBetweenStopIndices(vEntry, insertion.pickup.index, insertion.dropoff.index,
 					constraintsSet.lateDiversionthreshold)) {
 				return true;
 			}
 		}
         if (effectiveDropoffTimeLoss > 0) {
-			if (checkStopsForDetour(vEntry, insertion.dropoff.index, vEntry.stops.size(),
+			if (violatesLateDiversionBetweenStopIndices(vEntry, insertion.dropoff.index, vEntry.stops.size(),
 					constraintsSet.lateDiversionthreshold)) {
 				return true;
 			}
@@ -105,7 +105,7 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		return false;
 	}
 
-	private boolean checkStopsForDetour(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
+	private boolean violatesLateDiversionBetweenStopIndices(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
 		for (int s = start; s < end; s++) {
 			Waypoint.Stop stop = vehicleEntry.stops.get(s);
 			if (!stop.task.getDropoffRequests().isEmpty()) {
