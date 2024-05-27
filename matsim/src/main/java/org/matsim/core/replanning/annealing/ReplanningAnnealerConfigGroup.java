@@ -229,7 +229,7 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
             map.put(HALFLIFE,
                     "this parameter enters the exponential and sigmoid formulas. May be an iteration or a share, i.e. 0.5 for halfLife at 50% of iterations.");
             map.put(SHAPE_FACTOR, "see comment of parameter annealType.");
-            map.put(ANNEAL_TYPE, "options: linear, exponential, geometric, msa, sigmoid and disabled (no annealing)." + " sigmoid: 1/(1+e^(shapeFactor*(it - halfLife))); geometric: startValue * shapeFactor^it; msa: startValue / it^shapeFactor. Exponential: startValue / exp(it/halfLife)");
+            map.put(ANNEAL_TYPE, "options: linear, exponential, geometric, msa, sigmoid and disabled (no annealing). sigmoid: 1/(1+e^(shapeFactor*(it - halfLife))); geometric: startValue * shapeFactor^it; msa: startValue / it^shapeFactor. Exponential: startValue / exp(it/halfLife)");
             map.put(ANNEAL_PARAM,
                     "list of config parameters that shall be annealed. Currently supported: globalInnovationRate, BrainExpBeta, PathSizeLogitBeta, learningRate. Default is globalInnovationRate");
             map.put(SUBPOPULATION, "subpopulation to have the global innovation rate adjusted. Not applicable when annealing with other parameters.");
