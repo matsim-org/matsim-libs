@@ -90,7 +90,9 @@ public class RunDrtExampleIT {
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//disable rejections
-			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+			drtCfg.addOrGetDrtOptimizationConstraintsParams()
+					.addOrGetDefaultDrtOptimizationConstraintsSet()
+					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -129,7 +131,9 @@ public class RunDrtExampleIT {
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
-			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+			drtCfg.addOrGetDrtOptimizationConstraintsParams()
+					.addOrGetDefaultDrtOptimizationConstraintsSet()
+					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -168,7 +172,9 @@ public class RunDrtExampleIT {
 			drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
 
 			//disable rejections
-			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+			drtCfg.addOrGetDrtOptimizationConstraintsParams()
+					.addOrGetDefaultDrtOptimizationConstraintsSet()
+					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controller().setLastIteration(3);
@@ -393,7 +399,7 @@ public class RunDrtExampleIT {
 	 * rejectionRate, rejections, waitAverage, inVehicleTravelTimeMean, & totalTravelTimeMean
 	 */
 
-	private void verifyDrtCustomerStatsCloseToExpectedStats(String outputDirectory, Stats expectedStats) {
+	 static void verifyDrtCustomerStatsCloseToExpectedStats(String outputDirectory, Stats expectedStats) {
 
 		String filename = outputDirectory + "/drt_customer_stats_drt.csv";
 
@@ -424,7 +430,7 @@ public class RunDrtExampleIT {
 		assertThat(actualStats).usingRecursiveComparison().isEqualTo(expectedStats);
 	}
 
-	private static class Stats {
+	static class Stats {
 		private final double rejectionRate;
 		private final double rejections;
 		private final double waitAverage;

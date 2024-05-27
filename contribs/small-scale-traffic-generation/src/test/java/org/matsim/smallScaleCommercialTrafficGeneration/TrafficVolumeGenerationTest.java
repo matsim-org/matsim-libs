@@ -20,6 +20,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,7 +39,6 @@ import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingA
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreator;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,8 +59,8 @@ public class TrafficVolumeGenerationTest {
 
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
-		Path output = Path.of(utils.getOutputDirectory());
-		assert(new File(output.resolve("calculatedData").toString()).mkdir());
+		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
+		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String shapeFileZoneNameColumn = "name";
@@ -70,7 +70,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
+				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
@@ -83,9 +83,9 @@ public class TrafficVolumeGenerationTest {
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
@@ -138,9 +138,9 @@ public class TrafficVolumeGenerationTest {
 		//test with different sample
 		sample = 0.25;
 		trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
@@ -190,8 +190,8 @@ public class TrafficVolumeGenerationTest {
 
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
-		Path output = Path.of(utils.getOutputDirectory());
-		assert(new File(output.resolve("calculatedData").toString()).mkdir());
+		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
+		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String shapeFileZoneNameColumn = "name";
@@ -201,7 +201,7 @@ public class TrafficVolumeGenerationTest {
 		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
+				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
@@ -213,9 +213,9 @@ public class TrafficVolumeGenerationTest {
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_start.size());
 		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_stop.size());
@@ -514,8 +514,8 @@ public class TrafficVolumeGenerationTest {
 	void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
-		Path output = Path.of(utils.getOutputDirectory());
-		assert(new File(output.resolve("calculatedData").toString()).mkdir());
+		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
+		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
@@ -542,15 +542,15 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
+				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Map<String, Map<Id<Link>, Link>> linksPerZone = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
@@ -680,8 +680,8 @@ public class TrafficVolumeGenerationTest {
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
-		Path output = Path.of(utils.getOutputDirectory());
-		assert(new File(output.resolve("calculatedData").toString()).mkdir());
+		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
+		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
@@ -708,15 +708,15 @@ public class TrafficVolumeGenerationTest {
 
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-				.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
+				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
                         SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);

@@ -1,11 +1,12 @@
 package org.matsim.contrib.noise;
 
+import org.geotools.api.geometry.Position;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.util.factory.Hints;
+import org.locationtech.jts.geom.Point;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.opengis.geometry.DirectPosition;
 
 import jakarta.inject.Inject;
 import java.io.File;
@@ -33,8 +34,8 @@ public class DEMContextImpl implements DEMContext {
     }
 
     @Override
-    public float getElevation(DirectPosition position) {
-        float[] sample =  (float[])coverage.evaluate(position);
+    public float getElevation(Position point) {
+        float[] sample =  (float[])coverage.evaluate(point);
         return sample[0];
     }
 }

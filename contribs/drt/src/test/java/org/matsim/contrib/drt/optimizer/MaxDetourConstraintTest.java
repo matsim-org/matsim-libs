@@ -36,17 +36,18 @@ public class MaxDetourConstraintTest {
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// Max wait time
-		drtConfigGroup.maxWaitTime = 300;
+		DrtOptimizationConstraintsSet defaultConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxWaitTime = 300;
 
 		// Turn on the max detour constraint
-		drtConfigGroup.maxDetourAlpha = 1.5;
-		drtConfigGroup.maxDetourBeta = 300;
-		drtConfigGroup.maxAllowedPickupDelay = 180;
-		drtConfigGroup.maxAbsoluteDetour = 1200;
+		defaultConstraintsSet.maxDetourAlpha = 1.5;
+		defaultConstraintsSet.maxDetourBeta = 300;
+		defaultConstraintsSet.maxAllowedPickupDelay = 180;
+		defaultConstraintsSet.maxAbsoluteDetour = 1200;
 
 		// Make the max total travel time constraints very loose (i.e., make it not active)
-		drtConfigGroup.maxTravelTimeAlpha = 10;
-		drtConfigGroup.maxTravelTimeBeta = 7200;
+		defaultConstraintsSet.maxTravelTimeAlpha = 10;
+		defaultConstraintsSet.maxTravelTimeBeta = 7200;
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

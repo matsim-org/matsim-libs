@@ -1,13 +1,13 @@
 package org.matsim.application.options;
 
 import org.assertj.core.data.Offset;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

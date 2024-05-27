@@ -132,7 +132,6 @@ class BicycleScoreEventsCreator implements
 	}
 
 	@Override public void handleEvent( VehicleLeavesTrafficEvent event ){
-		vehicle2driver.handleEvent( event );
 		if ( this.bicycleConfig.isMotorizedInteraction() ){
 			// dec count by one:
 			String mode = this.modeFromVehicle.get( event.getVehicleId() );
@@ -155,6 +154,8 @@ class BicycleScoreEventsCreator implements
 		} else {
 			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen" );
 		}
+		// Needs to be called last, because it will remove driver information
+		vehicle2driver.handleEvent( event );
 		// ---
 	}
 
