@@ -35,8 +35,6 @@ import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.testcases.fakes.FakeLink;
 
-import java.util.Collections;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.*;
@@ -108,7 +106,7 @@ public class InsertionCostCalculatorTest {
 		DrtOptimizationConstraintsSet drtOptimizationConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
-		drtOptimizationConstraintsSet.allowDetourBeforeArrivalThreshold = 180;
+		drtOptimizationConstraintsSet.lateDiversionthreshold = 180;
 		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtOptimizationConstraintsSet);
 
@@ -117,7 +115,7 @@ public class InsertionCostCalculatorTest {
 				30, drtRequest, drtOptimizationConstraintsSet);
 
 		// new insertion before dropoff of boarded passenger, but outside of threshold - feasible solution
-		drtOptimizationConstraintsSet.allowDetourBeforeArrivalThreshold = 120;
+		drtOptimizationConstraintsSet.lateDiversionthreshold = 120;
 		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
 				60, drtRequest, drtOptimizationConstraintsSet);
 
@@ -166,12 +164,12 @@ public class InsertionCostCalculatorTest {
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
 		DrtOptimizationConstraintsSet constraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		constraintsSet.allowDetourBeforeArrivalThreshold = 300;
+		constraintsSet.lateDiversionthreshold = 300;
 		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, constraintsSet);
 
 		// new insertion before dropoff of boarded passenger outside of threshold - feasible solution
-		constraintsSet.allowDetourBeforeArrivalThreshold = 200;
+		constraintsSet.lateDiversionthreshold = 200;
 		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
 				120, drtRequest, constraintsSet);
 	}

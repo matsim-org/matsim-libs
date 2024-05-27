@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -72,34 +73,9 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
-		// all stops after the new (potential) pickup but before the new dropoff
-		// are delayed by pickupDetourTimeLoss
-		double timeLoss = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
-		if(vEntry.stops != null) {
-			for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
-				if(timeLoss == 0) {
-					continue;
-				}
-				Waypoint.Stop stop = vEntry.stops.get(s);
-				// passengers are being dropped off == may be close to arrival
-				if (!stop.task.getDropoffRequests().isEmpty()) {
-					double nextArrival = stop.getArrivalTime();
-					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
-					if (nextArrival - departureTime < constraintsSet.allowDetourBeforeArrivalThreshold) {
-						//arrival is too soon to allow further diversion
-						return INFEASIBLE_SOLUTION_COST;
-					} else if (nextArrival - departureTime >= constraintsSet.allowDetourBeforeArrivalThreshold) {
-						// all following stops are above the threshold
-						break;
-					}
-				}
-				if (s == insertion.dropoff.index) {
-					// all stops after the new (potential) dropoff are delayed by totalTimeLoss
-					timeLoss = detourTimeInfo.getTotalTimeLoss();
-					if(timeLoss == 0) {
-						break;
-					}
-				}
+		if (vEntry.stops != null && !vEntry.stops.isEmpty() && constraintsSet.lateDiversionthreshold > 0) {
+			if(violatesLateDiversion(insertion, detourTimeInfo, vEntry, effectiveDropoffTimeLoss)) {
+				return INFEASIBLE_SOLUTION_COST;
 			}
 		}
 
@@ -110,5 +86,36 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		// Check if the max travel time constraint for the newly inserted request is violated
 		double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
 		return drtRequest.getMaxRideDuration() < rideDuration;
+	}
+
+	private boolean violatesLateDiversion(Insertion insertion, DetourTimeInfo detourTimeInfo,
+										  VehicleEntry vEntry, double effectiveDropoffTimeLoss) {
+        if (detourTimeInfo.pickupDetourInfo.pickupTimeLoss > 0) {
+			if (checkStopsForDetour(vEntry, insertion.pickup.index, insertion.dropoff.index,
+					constraintsSet.lateDiversionthreshold)) {
+				return true;
+			}
+		}
+        if (effectiveDropoffTimeLoss > 0) {
+			if (checkStopsForDetour(vEntry, insertion.dropoff.index, vEntry.stops.size(),
+					constraintsSet.lateDiversionthreshold)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean checkStopsForDetour(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
+		for (int s = start; s < end; s++) {
+			Waypoint.Stop stop = vehicleEntry.stops.get(s);
+			if (!stop.task.getDropoffRequests().isEmpty()) {
+                double remainingRideDuration = stop.getArrivalTime() - vehicleEntry.start.getDepartureTime();
+				if (remainingRideDuration < lateDiversionThreshold) {
+					return true;
+				}
+				break;
+			}
+		}
+		return false;
 	}
 }

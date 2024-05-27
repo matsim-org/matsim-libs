@@ -95,7 +95,7 @@ public class DrtOptimizationConstraintsSet extends ReflectiveConfigGroup {
                     "3 minutes away from her destination, even though her time window would allow it." +
                     " Delayed detours just before arrival are usually perceived very negatively.")
     @PositiveOrZero
-    public double allowDetourBeforeArrivalThreshold = 0; // [s];
+    public double lateDiversionthreshold = 0; // [s];
 
     @Override
     protected void checkConsistency(Config config) {
