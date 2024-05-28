@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -56,7 +57,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.pt.PtConstants;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Routes all modes of transport (except for transit_walk) as car modes and counts the number of trips per link.
@@ -118,7 +118,7 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> features = new ArrayList<>();
 
 		Object[] featureAttribs;
 

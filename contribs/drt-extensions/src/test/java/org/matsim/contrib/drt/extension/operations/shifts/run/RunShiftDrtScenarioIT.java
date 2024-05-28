@@ -9,6 +9,7 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -44,38 +45,38 @@ public class RunShiftDrtScenarioIT {
 
 		DrtWithOperationsConfigGroup drtWithShiftsConfigGroup = (DrtWithOperationsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
-		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
-		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.maxTravelTimeAlpha = 1.5;
-		drtConfigGroup.maxTravelTimeBeta = 10. * 60.;
-		drtConfigGroup.stopDuration = 30.;
-		drtConfigGroup.maxWaitTime = 600.;
-		drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		drtConfigGroup.useModeFilteredSubnetwork = false;
-		drtConfigGroup.vehiclesFile = fleetFile;
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.maxWalkDistance = 1000.;
-		drtConfigGroup.idleVehiclesReturnToDepots = false;
+        drtWithShiftsConfigGroup.mode = TransportMode.drt;
+		DrtOptimizationConstraintsSet defaultConstraintsSet = drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		drtWithShiftsConfigGroup.stopDuration = 30.;
+		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
+        defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
+        defaultConstraintsSet.maxWaitTime = 600.;
+        defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+        defaultConstraintsSet.maxWalkDistance = 1000.;
+		drtWithShiftsConfigGroup.useModeFilteredSubnetwork = false;
+		drtWithShiftsConfigGroup.vehiclesFile = fleetFile;
+		drtWithShiftsConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
+		drtWithShiftsConfigGroup.plotDetailedCustomerStats = true;
+		drtWithShiftsConfigGroup.idleVehiclesReturnToDepots = false;
 
-		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+		drtWithShiftsConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
-		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
-		drtConfigGroup.addParameterSet(rebalancing);
+		ConfigGroup rebalancing = drtWithShiftsConfigGroup.createParameterSet("rebalancing");
+		drtWithShiftsConfigGroup.addParameterSet(rebalancing);
 		((RebalancingParams) rebalancing).interval = 600;
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
 		strategyParams.targetAlpha = 0.3;
 		strategyParams.targetBeta = 0.3;
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		drtWithShiftsConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
 		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
 		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 		zoneParams.cellSize = 500.;
 		drtZoneSystemParams.addParameterSet(zoneParams);
 		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		drtWithShiftsConfigGroup.addParameterSet(drtZoneSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 

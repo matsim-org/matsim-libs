@@ -31,7 +31,7 @@
         <argLine></argLine>
 
         <log4j.version>2.23.1</log4j.version>
-        <geotools.version>29.5</geotools.version>
+        <geotools.version>31.0</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.26.1</version>
+                <version>1.26.2</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -309,20 +309,20 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.25.3</version>
+                <version>3.26.0</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.11.0</version>
+                <version>5.12.0</version>
                 <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>5.11.0</version>
+				<version>5.12.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -353,7 +353,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.15</version>
+				<version>1.14.16</version>
 				<scope>test</scope>
 			</dependency>
 

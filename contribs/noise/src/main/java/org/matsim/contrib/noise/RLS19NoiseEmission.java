@@ -2,7 +2,10 @@ package org.matsim.contrib.noise;
 
 import com.google.common.collect.Range;
 import com.google.inject.Inject;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.api.geometry.Position;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.geometry.Position2D;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -10,9 +13,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.matsim.contrib.noise.RLS19VehicleType.*;
 
@@ -164,8 +164,8 @@ class RLS19NoiseEmission implements NoiseEmission {
             Coord to = matsimLink.getToNode().getCoord();
 
             //MATSim coord's x/y are inversed to geotools/jts
-            DirectPosition positionFrom = new DirectPosition2D(crs, from.getY(), from.getX());
-            DirectPosition positionTo = new DirectPosition2D(crs, to.getY(), to.getX());
+            Position positionFrom = new Position2D(crs, from.getY(), from.getX());
+            Position positionTo = new Position2D(crs, to.getY(), to.getX());
 
             float elevationFrom = demContext.getElevation(positionFrom);
             float elevationTo = demContext.getElevation(positionTo);

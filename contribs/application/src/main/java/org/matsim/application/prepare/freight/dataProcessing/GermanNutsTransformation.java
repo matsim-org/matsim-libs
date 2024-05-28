@@ -1,5 +1,6 @@
 package org.matsim.application.prepare.freight.dataProcessing;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -7,7 +8,6 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
