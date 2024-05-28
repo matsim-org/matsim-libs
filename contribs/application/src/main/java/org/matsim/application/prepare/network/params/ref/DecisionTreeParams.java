@@ -18,7 +18,7 @@ public final class DecisionTreeParams implements NetworkModel {
 	private static final FeatureRegressor INSTANCE = new Model();
 
 	@Override
-	public FeatureRegressor speedFactor(String junctionType) {
+	public FeatureRegressor speedFactor(String junctionType, String highwayType) {
 		return INSTANCE;
 	}
 
