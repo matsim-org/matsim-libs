@@ -14,8 +14,6 @@ import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import java.util.Random;
-
 /**
  * DRT estimator that uses available data (e.g., real-world operational data, simulation-based data) to provide estimated data for DRT trips.
  */
