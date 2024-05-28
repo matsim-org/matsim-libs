@@ -90,8 +90,9 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 				squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
 			}
 			squareGridParams.cellSize = Double.parseDouble(value);
+		} else {
+			super.handleAddUnknownParam(paramName, value);
 		}
-		super.handleAddUnknownParam(paramName, value);
 	}
 
 	public ZoneSystemParams getZoneSystemParams() {
