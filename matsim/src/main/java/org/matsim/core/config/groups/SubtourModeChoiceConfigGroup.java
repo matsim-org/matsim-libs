@@ -32,7 +32,7 @@ import org.matsim.core.utils.misc.StringUtils;
 public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "subtourModeChoice";
-	
+
 	public final static String MODES = "modes";
 	public final static String CHAINBASEDMODES = "chainBasedModes";
 	public final static String CARAVAIL = "considerCarAvailability";
@@ -40,17 +40,17 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String COORD_DISTANCE = "coordDistance";
 
 	private static final String BEHAVIOR = "behavior";
-	
+
 	private String[] chainBasedModes = new String[] { TransportMode.car, TransportMode.bike };
 	private String[] allModes = new String[] { TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk };
 	// default is false for backward compatibility
 	private boolean considerCarAvailability = false;
 	private SubtourModeChoice.Behavior behavior = SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ;
-	
+
 	private double probaForRandomSingleTripMode = 0. ; // yyyyyy backwards compatibility setting; should be change. kai, may'18
 
 	private double coordDistance = 0;
-	
+
 	public SubtourModeChoiceConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -67,7 +67,7 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	private static String toString( final String[] modes ) {
 		// (not same as toString() because of argument!)
-		
+
 		StringBuilder b = new StringBuilder();
 
 		if (modes.length > 0) b.append( modes[ 0 ] );
@@ -106,7 +106,8 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
 		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
 		comments.put(SINGLE_PROBA, "Defines the probability of changing a single trip for a unchained mode instead of subtour.");
-		comments.put(COORD_DISTANCE, "If greater than 0, subtours will also consider coordinates to be at the same location when smaller than set distance.");
+		comments.put(COORD_DISTANCE, "If greater than 0, activities that are closer than coordDistance, to each other, will be considered part of the same subtour." +
+			"i.e. if two activities are close to each other, the agent is allowed to use the same 'chain-based' vehicle for both subtours.");
 
 		{
 			StringBuilder msg = new StringBuilder("Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: ");
