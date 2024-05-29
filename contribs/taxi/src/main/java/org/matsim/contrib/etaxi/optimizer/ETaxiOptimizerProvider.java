@@ -99,7 +99,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params, Config config) {
 		ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(config.getContext(), network,
-			params.getZoneSystemParams(), config.global().getCoordinateSystem());
+			params.getZoneSystemParams(), config.global().getCoordinateSystem(), zone -> true);
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zoneSystem,
 				eScheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zoneSystem);
