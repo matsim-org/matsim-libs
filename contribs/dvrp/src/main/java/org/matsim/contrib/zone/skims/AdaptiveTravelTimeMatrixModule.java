@@ -52,7 +52,7 @@ public class AdaptiveTravelTimeMatrixModule extends AbstractDvrpModeModule {
 					Network network = getter.getModal(Network.class);
 					DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
 					ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
-						matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem());
+						matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
                     return new AdaptiveTravelTimeMatrixImpl(qsimConfig.getEndTime().orElse(ALTERNATIVE_ENDTIME),
                             network,
 							zoneSystem,

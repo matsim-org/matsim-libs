@@ -89,7 +89,7 @@ public final class DvrpModule extends AbstractModule {
 				var params = dvrpConfigGroup.getTravelTimeMatrixParams();
 				DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
 				ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
-					matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem());
+					matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
 				return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize());
 			}
