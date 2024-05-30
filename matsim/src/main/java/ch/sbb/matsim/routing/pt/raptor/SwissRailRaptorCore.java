@@ -113,6 +113,7 @@ public class SwissRailRaptorCore {
         final int maxTransfersAfterFirstArrival = 2;
 
         reset();
+        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         Map<TransitStopFacility, InitialStop> destinationStops = new HashMap<>();
 
@@ -235,7 +236,7 @@ public class SwissRailRaptorCore {
             BitSet initialRouteStopIndices = new BitSet();
             initialRouteStopIndices.or(this.improvedRouteStopIndices);
 
-            handleTransfers(true, parameters);
+            handleTransfers(true, parameters, transferProvider);
             this.improvedRouteStopIndices.or(initialRouteStopIndices);
         }
 
@@ -246,7 +247,7 @@ public class SwissRailRaptorCore {
             // but because we re-use the earliestArrivalTime-array, we don't have to do anything.
 
             // second stage: process routes
-            exploreRoutes(parameters, person);
+            exploreRoutes(parameters, person, transferProvider);
 
             PathElement leastCostPath = findLeastCostArrival(destinationStops);
 
@@ -262,7 +263,7 @@ public class SwissRailRaptorCore {
             }
 
             // third stage (according to paper): handle footpaths / transfers
-            handleTransfers(true, parameters);
+            handleTransfers(true, parameters, transferProvider);
 
             // final stage: check stop criterion
             if (this.improvedRouteStopIndices.isEmpty()) {
@@ -284,6 +285,7 @@ public class SwissRailRaptorCore {
 
         reset();
 
+        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
         double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
 
         PathElement lastFoundBestPath = null;
@@ -381,7 +383,7 @@ public class SwissRailRaptorCore {
                 // but because we re-use the earliestArrivalTime-array, we don't have to do anything.
 
                 // second stage: process routes
-                exploreRoutes(parameters, person);
+                exploreRoutes(parameters, person, transferProvider);
 
                 PathElement leastCostPath = findLeastCostArrival(destinationStops);
                 if (leastCostPath != null && (lastFoundBestPath == null || leastCostPath.comingFrom != lastFoundBestPath.comingFrom)) {
@@ -407,7 +409,7 @@ public class SwissRailRaptorCore {
                 }
 
                 // third stage (according to paper): handle footpaths / transfers
-                handleTransfers(false, parameters);
+                handleTransfers(false, parameters, transferProvider);
 
                 // final stage: check stop criterion
                 if (this.improvedRouteStopIndices.isEmpty()) {
@@ -493,6 +495,7 @@ public class SwissRailRaptorCore {
     public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person, RaptorObserver observer) {
         reset();
 
+        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
         BitSet initialRouteStopIndices = new BitSet();
         BitSet initialStopIndices = new BitSet();
         for (InitialStop stop : startStops) {
@@ -538,7 +541,7 @@ public class SwissRailRaptorCore {
             // but because we re-use the earliestArrivalTime-array, we don't have to do anything.
 
             // second stage: process routes
-            exploreRoutes(parameters, person);
+            exploreRoutes(parameters, person, transferProvider);
 
             if (this.improvedStops.isEmpty()) {
                 break;
@@ -571,7 +574,7 @@ public class SwissRailRaptorCore {
 					}
 
 					// third stage (according to paper): handle footpaths / transfers
-            handleTransfers(true, parameters);
+            handleTransfers(true, parameters, transferProvider);
             transfers++;
 
             // final stage: check stop criterion
@@ -625,11 +628,9 @@ public class SwissRailRaptorCore {
         return new TravelInfo(departureStopId, departureTimeAtFirstStop, arrivalTimeAtLastStop, travelCost, accessTime, accessCost, transferCount, waitingTime, waitingCost, destination);
     }
 
-    private void exploreRoutes(RaptorParameters parameters, Person person) {
+    private void exploreRoutes(RaptorParameters parameters, Person person, CachingTransferProvider transferProvider) {
         this.improvedStops.clear();
         this.reachedRouteStopIndices.clear();
-
-        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
         boolean useTransportModeUtilities = parameters.isUseTransportModeUtilities();
@@ -783,12 +784,11 @@ public class SwissRailRaptorCore {
         return this.data.occupancyData.getNextAvailableDeparture(this.data, routeStop, time);
     }
 
-    private void handleTransfers(boolean strict, RaptorParameters raptorParams) {
+    private void handleTransfers(boolean strict, RaptorParameters raptorParams, CachingTransferProvider transferProvider) {
         this.improvedRouteStopIndices.clear();
         this.tmpImprovedStops.clear();
 
         double margUtilityTransitWalk = raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk); // replaced TransportMode.transit_walk with walk
-        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         for (int stopIndex = this.improvedStops.nextSetBit(0); stopIndex >= 0; stopIndex = this.improvedStops.nextSetBit(stopIndex + 1)) {
             PathElement fromPE = this.arrivalPathPerStop[stopIndex];
