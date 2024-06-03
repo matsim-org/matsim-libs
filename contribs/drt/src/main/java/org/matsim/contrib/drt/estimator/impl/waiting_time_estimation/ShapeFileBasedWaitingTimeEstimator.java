@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ShapeFileBasedWaitingTimeEstimator implements WaitingTimeEstimator {
-	private final static String WAITING_TIME_ZONE_NAME = "waiting_time_zone";
+	/**
+	 * Typical waiting time. Due to the length limit of the attribute name, we have to use some abbreviate
+	 */
+	private final static String TYPICAL_WAITING_TIME_NAME = "typ_wt";
 	private final Map<Id<Link>, Double> typicalWaitingTimeForEachLink = new HashMap<>();
 	/**
 	 * The default typical waiting time. This value will be used for links that are not covered by any
@@ -43,7 +46,7 @@ public class ShapeFileBasedWaitingTimeEstimator implements WaitingTimeEstimator 
 				Geometry geometry = (Geometry) feature.getDefaultGeometry();
 				if (geometry.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
 					// The link is located within the zone -> reduce typical waiting time if necessary
-					double typicalWaitingTimeForCurrentZone = (double) feature.getAttribute(WAITING_TIME_ZONE_NAME);
+					double typicalWaitingTimeForCurrentZone = (long) feature.getAttribute(TYPICAL_WAITING_TIME_NAME);
 					if (typicalWaitingTimeForCurrentZone < minTypicalWaitingTime) {
 						minTypicalWaitingTime = typicalWaitingTimeForCurrentZone;
 					}
