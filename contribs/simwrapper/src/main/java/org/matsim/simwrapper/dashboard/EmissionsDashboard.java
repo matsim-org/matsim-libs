@@ -1,6 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
+import org.matsim.application.analysis.noise.NoiseAnalysis;
 import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -36,7 +37,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.title = "Emissions per Link per Meter";
 				viz.description = "Displays the emissions for each link per meter.";
 				viz.height = 12.;
-				viz.datasets.csvFile = data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv");
+//				viz.datasets.csvFile = data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv");
+				viz.datasets.csvFile = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_per_link_per_m.%s", "csv");
 				viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
 				viz.display.color.columnName = "CO2_TOTAL [g/m]";
 				viz.display.color.dataset = "csvFile";
@@ -61,7 +63,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.csv");
+//				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.csv");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro");
 			});
 
 		layout.row("third")
@@ -77,7 +80,7 @@ public class EmissionsDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_hour.csv");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro");
 			});
 
 
