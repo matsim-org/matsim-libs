@@ -132,11 +132,11 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		writeTotal(filteredNetwork, emissionsEventHandler);
 
-//		writeRaster(filteredNetwork, config, emissionsEventHandler);
+		writeRaster(filteredNetwork, config, emissionsEventHandler);
 		writeAvroRaster(filteredNetwork, config, emissionsEventHandler);
 
 		writeTimeDependentAvroRaster(filteredNetwork, config, emissionsEventHandler);
-//		writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
+		writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
 
 		return 0;
 	}
