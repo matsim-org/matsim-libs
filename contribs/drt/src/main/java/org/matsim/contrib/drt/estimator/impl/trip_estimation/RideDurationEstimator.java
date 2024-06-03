@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.OptionalTime;
 
-public interface TripEstimator {
-	Tuple<Double, Double> getAlphaBetaValues(Id<Link> fromLinkId, Id<Link> toLinkId, OptionalTime departureTime);
+public interface RideDurationEstimator {
+	double getEstimatedRideDuration(Id<Link> fromLinkId, Id<Link> toLinkId, OptionalTime departureTime, double directTripDuration);
 
 }

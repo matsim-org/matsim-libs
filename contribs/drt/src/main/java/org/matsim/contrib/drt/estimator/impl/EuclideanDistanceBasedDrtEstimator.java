@@ -6,16 +6,14 @@ import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.distribution.DistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.distribution.LogNormalDistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
-import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantTripEstimator;
-import org.matsim.contrib.drt.estimator.impl.trip_estimation.TripEstimator;
+import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
+import org.matsim.contrib.drt.estimator.impl.trip_estimation.RideDurationEstimator;
 import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
 import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.WaitingTimeEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
-
-import java.util.Random;
 
 public class EuclideanDistanceBasedDrtEstimator implements DrtEstimator {
 	private final Network network;
@@ -24,7 +22,7 @@ public class EuclideanDistanceBasedDrtEstimator implements DrtEstimator {
 	 * Estimated network distance = Euclidean distance * network distance factor
 	 */
 	private final double networkDistanceFactor;
-	private final TripEstimator tripEstimator;
+	private final RideDurationEstimator rideDurationEstimator;
 	private final WaitingTimeEstimator waitingTimeEstimator;
 	private final DistributionGenerator rideDurationDistributionGenerator;
 	private final DistributionGenerator waitingTimeDistributionGenerator;
@@ -45,18 +43,18 @@ public class EuclideanDistanceBasedDrtEstimator implements DrtEstimator {
 											  double mu, double sigma) {
 		this.network = network;
 		this.networkDistanceFactor = networkDistanceFactor;
-		this.tripEstimator = new ConstantTripEstimator(slope, intercept);
+		this.rideDurationEstimator = new ConstantRideDurationEstimator(slope, intercept);
 		this.waitingTimeEstimator = new ConstantWaitingTimeEstimator(estimatedMeanWaitTime);
 		this.rideDurationDistributionGenerator = new LogNormalDistributionGenerator(1, mu, sigma);
 		this.waitingTimeDistributionGenerator = new NormalDistributionGenerator(2, waitTimeStd);
 	}
 
-	public EuclideanDistanceBasedDrtEstimator(Network network, double networkDistanceFactor, TripEstimator tripEstimator,
+	public EuclideanDistanceBasedDrtEstimator(Network network, double networkDistanceFactor, RideDurationEstimator rideDurationEstimator,
 											  WaitingTimeEstimator waitingTimeEstimator, DistributionGenerator rideDurationDistributionGenerator,
 											  DistributionGenerator waitingTimeDistributionGenerator) {
 		this.network = network;
 		this.networkDistanceFactor = networkDistanceFactor;
-		this.tripEstimator = tripEstimator;
+		this.rideDurationEstimator = rideDurationEstimator;
 		this.waitingTimeEstimator = waitingTimeEstimator;
 		this.rideDurationDistributionGenerator = rideDurationDistributionGenerator;
 		this.waitingTimeDistributionGenerator = waitingTimeDistributionGenerator;
@@ -68,8 +66,7 @@ public class EuclideanDistanceBasedDrtEstimator implements DrtEstimator {
 		Coord toCoord = network.getLinks().get(route.getEndLinkId()).getToNode().getCoord();
 		double euclideanDistance = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 
-		Tuple<Double, Double> alphaBeta = tripEstimator.getAlphaBetaValues(route.getStartLinkId(), route.getEndLinkId(), departureTime);
-		double typicalRideDuration = euclideanDistance * alphaBeta.getFirst() + alphaBeta.getSecond();
+		double typicalRideDuration = rideDurationEstimator.getEstimatedRideDuration(route.getStartLinkId(), route.getEndLinkId(), departureTime, euclideanDistance);
 		double typicalRideDistance = networkDistanceFactor * euclideanDistance;
 		double typicalWaitingTime = waitingTimeEstimator.estimateWaitTime(route.getStartLinkId(), route.getEndLinkId(), departureTime);
 		double randomFactor = rideDurationDistributionGenerator.generateRandomValue();
