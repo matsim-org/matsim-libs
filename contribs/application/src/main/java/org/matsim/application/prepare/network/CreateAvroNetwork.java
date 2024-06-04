@@ -1,6 +1,9 @@
 package org.matsim.application.prepare.network;
 
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.avro.file.CodecFactory;
@@ -127,11 +130,10 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 	 */
 	private void convert(AvroNetwork avro, Network network, CoordinateTransformation ct, Predicate<Link> filter) {
 
-		// Node atteibues
+		// Node attributes
 		List<Float> nodeCoords = new ArrayList<>();
-		List<CharSequence> nodeIds = new ArrayList<>();
+		Object2IntMap<CharSequence> nodeIds = new Object2IntLinkedOpenHashMap<>();
 		Set<CharSequence> nodeAttributes = new LinkedHashSet<>();
-
 
 		for (Node node : network.getNodes().values()) {
 			Coord from = ct.transform(node.getCoord());
@@ -141,25 +143,25 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 			nodeCoords.add((float) yCoord);
 
 			String nodeId = node.getId().toString();
-			nodeIds.add(nodeId);
+			nodeIds.put(nodeId, nodeIds.size());
 			nodeAttributes.addAll(node.getAttributes().getAsMap().keySet());
 		}
 
 		// Set the node attributes
 		avro.setNodeCoordinates(nodeCoords);
-		avro.setNodeId(nodeIds);
+		avro.setNodeIds(nodeIds.keySet().stream().toList());
 		avro.setNodeAttributes(nodeAttributes.stream().toList());
 
 
 		// Link attributes
-		List<Float> lengths = new ArrayList<>();
-		List<Float> freeSpeeds = new ArrayList<>();
-		List<Float> capacities = new ArrayList<>();
-		List<Float> permLanes = new ArrayList<>();
+		FloatList lengths = new FloatArrayList();
+		FloatList freeSpeeds = new FloatArrayList();
+		FloatList capacities = new FloatArrayList();
+		FloatList permLanes = new FloatArrayList();
 		List<CharSequence> ids = new ArrayList<>();
-		List<CharSequence> froms = new ArrayList<>();
-		List<CharSequence> tos = new ArrayList<>();
-		List<Integer> allowedModes = new ArrayList<>();
+		IntList froms = new IntArrayList();
+		IntList tos = new IntArrayList();
+		IntList allowedModes = new IntArrayList();
 
 		Object2IntMap<CharSequence> modeMapping = new Object2IntLinkedOpenHashMap<>();
 
@@ -176,8 +178,8 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 			allowedModes.add(modeMapping.computeIfAbsent(m, k -> modeMapping.size()));
 
 			ids.add(link.getId().toString());
-			froms.add(link.getFromNode().getId().toString());
-			tos.add(link.getToNode().getId().toString());
+			froms.add(nodeIds.getOrDefault(link.getFromNode().getId().toString(), -1));
+			tos.add(nodeIds.getOrDefault(link.getToNode().getId().toString(), -1));
 		}
 
 		// Set the mapping which assigns an integer to each possible allowed mode entry
@@ -190,7 +192,7 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 		avro.setPermlanes(permLanes);
 		avro.setAllowedModes(allowedModes);
 
-		avro.setLinkId(ids);
+		avro.setLinkIds(ids);
 		avro.setFrom(froms);
 		avro.setTo(tos);
 	}

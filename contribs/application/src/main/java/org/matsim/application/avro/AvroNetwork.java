@@ -14,10 +14,10 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -1583840499910541618L;
+  private static final long serialVersionUID = 163826291700302496L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"AvroNetwork\",\"namespace\":\"org.matsim.application.avro\",\"fields\":[{\"name\":\"crs\",\"type\":\"string\",\"doc\":\"Coordinate reference system\"},{\"name\":\"nodeId\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"nodeCoordinates\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"nodeAttributes\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"modes\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"linkId\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"length\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"freespeed\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"capacity\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"permlanes\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"allowedModes\",\"type\":{\"type\":\"array\",\"items\":\"int\"}},{\"name\":\"from\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"to\",\"type\":{\"type\":\"array\",\"items\":\"string\"}}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"AvroNetwork\",\"namespace\":\"org.matsim.application.avro\",\"fields\":[{\"name\":\"crs\",\"type\":\"string\",\"doc\":\"Coordinate reference system\"},{\"name\":\"nodeIds\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"nodeCoordinates\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"nodeAttributes\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"linkIds\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"from\",\"type\":{\"type\":\"array\",\"items\":\"int\"}},{\"name\":\"to\",\"type\":{\"type\":\"array\",\"items\":\"int\"}},{\"name\":\"modes\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"length\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"freespeed\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"capacity\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"permlanes\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"allowedModes\",\"type\":{\"type\":\"array\",\"items\":\"int\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -75,18 +75,18 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
   /** Coordinate reference system */
   private java.lang.CharSequence crs;
-  private java.util.List<java.lang.CharSequence> nodeId;
+  private java.util.List<java.lang.CharSequence> nodeIds;
   private java.util.List<java.lang.Float> nodeCoordinates;
   private java.util.List<java.lang.CharSequence> nodeAttributes;
+  private java.util.List<java.lang.CharSequence> linkIds;
+  private java.util.List<java.lang.Integer> from;
+  private java.util.List<java.lang.Integer> to;
   private java.util.List<java.lang.CharSequence> modes;
-  private java.util.List<java.lang.CharSequence> linkId;
   private java.util.List<java.lang.Float> length;
   private java.util.List<java.lang.Float> freespeed;
   private java.util.List<java.lang.Float> capacity;
   private java.util.List<java.lang.Float> permlanes;
   private java.util.List<java.lang.Integer> allowedModes;
-  private java.util.List<java.lang.CharSequence> from;
-  private java.util.List<java.lang.CharSequence> to;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -98,33 +98,33 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   /**
    * All-args constructor.
    * @param crs Coordinate reference system
-   * @param nodeId The new value for nodeId
+   * @param nodeIds The new value for nodeIds
    * @param nodeCoordinates The new value for nodeCoordinates
    * @param nodeAttributes The new value for nodeAttributes
+   * @param linkIds The new value for linkIds
+   * @param from The new value for from
+   * @param to The new value for to
    * @param modes The new value for modes
-   * @param linkId The new value for linkId
    * @param length The new value for length
    * @param freespeed The new value for freespeed
    * @param capacity The new value for capacity
    * @param permlanes The new value for permlanes
    * @param allowedModes The new value for allowedModes
-   * @param from The new value for from
-   * @param to The new value for to
    */
-  public AvroNetwork(java.lang.CharSequence crs, java.util.List<java.lang.CharSequence> nodeId, java.util.List<java.lang.Float> nodeCoordinates, java.util.List<java.lang.CharSequence> nodeAttributes, java.util.List<java.lang.CharSequence> modes, java.util.List<java.lang.CharSequence> linkId, java.util.List<java.lang.Float> length, java.util.List<java.lang.Float> freespeed, java.util.List<java.lang.Float> capacity, java.util.List<java.lang.Float> permlanes, java.util.List<java.lang.Integer> allowedModes, java.util.List<java.lang.CharSequence> from, java.util.List<java.lang.CharSequence> to) {
+  public AvroNetwork(java.lang.CharSequence crs, java.util.List<java.lang.CharSequence> nodeIds, java.util.List<java.lang.Float> nodeCoordinates, java.util.List<java.lang.CharSequence> nodeAttributes, java.util.List<java.lang.CharSequence> linkIds, java.util.List<java.lang.Integer> from, java.util.List<java.lang.Integer> to, java.util.List<java.lang.CharSequence> modes, java.util.List<java.lang.Float> length, java.util.List<java.lang.Float> freespeed, java.util.List<java.lang.Float> capacity, java.util.List<java.lang.Float> permlanes, java.util.List<java.lang.Integer> allowedModes) {
     this.crs = crs;
-    this.nodeId = nodeId;
+    this.nodeIds = nodeIds;
     this.nodeCoordinates = nodeCoordinates;
     this.nodeAttributes = nodeAttributes;
+    this.linkIds = linkIds;
+    this.from = from;
+    this.to = to;
     this.modes = modes;
-    this.linkId = linkId;
     this.length = length;
     this.freespeed = freespeed;
     this.capacity = capacity;
     this.permlanes = permlanes;
     this.allowedModes = allowedModes;
-    this.from = from;
-    this.to = to;
   }
 
   @Override
@@ -138,18 +138,18 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   public java.lang.Object get(int field$) {
     switch (field$) {
     case 0: return crs;
-    case 1: return nodeId;
+    case 1: return nodeIds;
     case 2: return nodeCoordinates;
     case 3: return nodeAttributes;
-    case 4: return modes;
-    case 5: return linkId;
-    case 6: return length;
-    case 7: return freespeed;
-    case 8: return capacity;
-    case 9: return permlanes;
-    case 10: return allowedModes;
-    case 11: return from;
-    case 12: return to;
+    case 4: return linkIds;
+    case 5: return from;
+    case 6: return to;
+    case 7: return modes;
+    case 8: return length;
+    case 9: return freespeed;
+    case 10: return capacity;
+    case 11: return permlanes;
+    case 12: return allowedModes;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -160,18 +160,18 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
     case 0: crs = (java.lang.CharSequence)value$; break;
-    case 1: nodeId = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 1: nodeIds = (java.util.List<java.lang.CharSequence>)value$; break;
     case 2: nodeCoordinates = (java.util.List<java.lang.Float>)value$; break;
     case 3: nodeAttributes = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 4: modes = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 5: linkId = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 6: length = (java.util.List<java.lang.Float>)value$; break;
-    case 7: freespeed = (java.util.List<java.lang.Float>)value$; break;
-    case 8: capacity = (java.util.List<java.lang.Float>)value$; break;
-    case 9: permlanes = (java.util.List<java.lang.Float>)value$; break;
-    case 10: allowedModes = (java.util.List<java.lang.Integer>)value$; break;
-    case 11: from = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 12: to = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 4: linkIds = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 5: from = (java.util.List<java.lang.Integer>)value$; break;
+    case 6: to = (java.util.List<java.lang.Integer>)value$; break;
+    case 7: modes = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 8: length = (java.util.List<java.lang.Float>)value$; break;
+    case 9: freespeed = (java.util.List<java.lang.Float>)value$; break;
+    case 10: capacity = (java.util.List<java.lang.Float>)value$; break;
+    case 11: permlanes = (java.util.List<java.lang.Float>)value$; break;
+    case 12: allowedModes = (java.util.List<java.lang.Integer>)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -195,20 +195,20 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   }
 
   /**
-   * Gets the value of the 'nodeId' field.
-   * @return The value of the 'nodeId' field.
+   * Gets the value of the 'nodeIds' field.
+   * @return The value of the 'nodeIds' field.
    */
-  public java.util.List<java.lang.CharSequence> getNodeId() {
-    return nodeId;
+  public java.util.List<java.lang.CharSequence> getNodeIds() {
+    return nodeIds;
   }
 
 
   /**
-   * Sets the value of the 'nodeId' field.
+   * Sets the value of the 'nodeIds' field.
    * @param value the value to set.
    */
-  public void setNodeId(java.util.List<java.lang.CharSequence> value) {
-    this.nodeId = value;
+  public void setNodeIds(java.util.List<java.lang.CharSequence> value) {
+    this.nodeIds = value;
   }
 
   /**
@@ -246,6 +246,57 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   }
 
   /**
+   * Gets the value of the 'linkIds' field.
+   * @return The value of the 'linkIds' field.
+   */
+  public java.util.List<java.lang.CharSequence> getLinkIds() {
+    return linkIds;
+  }
+
+
+  /**
+   * Sets the value of the 'linkIds' field.
+   * @param value the value to set.
+   */
+  public void setLinkIds(java.util.List<java.lang.CharSequence> value) {
+    this.linkIds = value;
+  }
+
+  /**
+   * Gets the value of the 'from' field.
+   * @return The value of the 'from' field.
+   */
+  public java.util.List<java.lang.Integer> getFrom() {
+    return from;
+  }
+
+
+  /**
+   * Sets the value of the 'from' field.
+   * @param value the value to set.
+   */
+  public void setFrom(java.util.List<java.lang.Integer> value) {
+    this.from = value;
+  }
+
+  /**
+   * Gets the value of the 'to' field.
+   * @return The value of the 'to' field.
+   */
+  public java.util.List<java.lang.Integer> getTo() {
+    return to;
+  }
+
+
+  /**
+   * Sets the value of the 'to' field.
+   * @param value the value to set.
+   */
+  public void setTo(java.util.List<java.lang.Integer> value) {
+    this.to = value;
+  }
+
+  /**
    * Gets the value of the 'modes' field.
    * @return The value of the 'modes' field.
    */
@@ -260,23 +311,6 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
    */
   public void setModes(java.util.List<java.lang.CharSequence> value) {
     this.modes = value;
-  }
-
-  /**
-   * Gets the value of the 'linkId' field.
-   * @return The value of the 'linkId' field.
-   */
-  public java.util.List<java.lang.CharSequence> getLinkId() {
-    return linkId;
-  }
-
-
-  /**
-   * Sets the value of the 'linkId' field.
-   * @param value the value to set.
-   */
-  public void setLinkId(java.util.List<java.lang.CharSequence> value) {
-    this.linkId = value;
   }
 
   /**
@@ -365,40 +399,6 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   }
 
   /**
-   * Gets the value of the 'from' field.
-   * @return The value of the 'from' field.
-   */
-  public java.util.List<java.lang.CharSequence> getFrom() {
-    return from;
-  }
-
-
-  /**
-   * Sets the value of the 'from' field.
-   * @param value the value to set.
-   */
-  public void setFrom(java.util.List<java.lang.CharSequence> value) {
-    this.from = value;
-  }
-
-  /**
-   * Gets the value of the 'to' field.
-   * @return The value of the 'to' field.
-   */
-  public java.util.List<java.lang.CharSequence> getTo() {
-    return to;
-  }
-
-
-  /**
-   * Sets the value of the 'to' field.
-   * @param value the value to set.
-   */
-  public void setTo(java.util.List<java.lang.CharSequence> value) {
-    this.to = value;
-  }
-
-  /**
    * Creates a new AvroNetwork RecordBuilder.
    * @return A new AvroNetwork RecordBuilder
    */
@@ -441,18 +441,18 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
     /** Coordinate reference system */
     private java.lang.CharSequence crs;
-    private java.util.List<java.lang.CharSequence> nodeId;
+    private java.util.List<java.lang.CharSequence> nodeIds;
     private java.util.List<java.lang.Float> nodeCoordinates;
     private java.util.List<java.lang.CharSequence> nodeAttributes;
+    private java.util.List<java.lang.CharSequence> linkIds;
+    private java.util.List<java.lang.Integer> from;
+    private java.util.List<java.lang.Integer> to;
     private java.util.List<java.lang.CharSequence> modes;
-    private java.util.List<java.lang.CharSequence> linkId;
     private java.util.List<java.lang.Float> length;
     private java.util.List<java.lang.Float> freespeed;
     private java.util.List<java.lang.Float> capacity;
     private java.util.List<java.lang.Float> permlanes;
     private java.util.List<java.lang.Integer> allowedModes;
-    private java.util.List<java.lang.CharSequence> from;
-    private java.util.List<java.lang.CharSequence> to;
 
     /** Creates a new Builder */
     private Builder() {
@@ -469,8 +469,8 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
         this.crs = data().deepCopy(fields()[0].schema(), other.crs);
         fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
-      if (isValidValue(fields()[1], other.nodeId)) {
-        this.nodeId = data().deepCopy(fields()[1].schema(), other.nodeId);
+      if (isValidValue(fields()[1], other.nodeIds)) {
+        this.nodeIds = data().deepCopy(fields()[1].schema(), other.nodeIds);
         fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
       if (isValidValue(fields()[2], other.nodeCoordinates)) {
@@ -481,40 +481,40 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
         this.nodeAttributes = data().deepCopy(fields()[3].schema(), other.nodeAttributes);
         fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
-      if (isValidValue(fields()[4], other.modes)) {
-        this.modes = data().deepCopy(fields()[4].schema(), other.modes);
+      if (isValidValue(fields()[4], other.linkIds)) {
+        this.linkIds = data().deepCopy(fields()[4].schema(), other.linkIds);
         fieldSetFlags()[4] = other.fieldSetFlags()[4];
       }
-      if (isValidValue(fields()[5], other.linkId)) {
-        this.linkId = data().deepCopy(fields()[5].schema(), other.linkId);
+      if (isValidValue(fields()[5], other.from)) {
+        this.from = data().deepCopy(fields()[5].schema(), other.from);
         fieldSetFlags()[5] = other.fieldSetFlags()[5];
       }
-      if (isValidValue(fields()[6], other.length)) {
-        this.length = data().deepCopy(fields()[6].schema(), other.length);
+      if (isValidValue(fields()[6], other.to)) {
+        this.to = data().deepCopy(fields()[6].schema(), other.to);
         fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
-      if (isValidValue(fields()[7], other.freespeed)) {
-        this.freespeed = data().deepCopy(fields()[7].schema(), other.freespeed);
+      if (isValidValue(fields()[7], other.modes)) {
+        this.modes = data().deepCopy(fields()[7].schema(), other.modes);
         fieldSetFlags()[7] = other.fieldSetFlags()[7];
       }
-      if (isValidValue(fields()[8], other.capacity)) {
-        this.capacity = data().deepCopy(fields()[8].schema(), other.capacity);
+      if (isValidValue(fields()[8], other.length)) {
+        this.length = data().deepCopy(fields()[8].schema(), other.length);
         fieldSetFlags()[8] = other.fieldSetFlags()[8];
       }
-      if (isValidValue(fields()[9], other.permlanes)) {
-        this.permlanes = data().deepCopy(fields()[9].schema(), other.permlanes);
+      if (isValidValue(fields()[9], other.freespeed)) {
+        this.freespeed = data().deepCopy(fields()[9].schema(), other.freespeed);
         fieldSetFlags()[9] = other.fieldSetFlags()[9];
       }
-      if (isValidValue(fields()[10], other.allowedModes)) {
-        this.allowedModes = data().deepCopy(fields()[10].schema(), other.allowedModes);
+      if (isValidValue(fields()[10], other.capacity)) {
+        this.capacity = data().deepCopy(fields()[10].schema(), other.capacity);
         fieldSetFlags()[10] = other.fieldSetFlags()[10];
       }
-      if (isValidValue(fields()[11], other.from)) {
-        this.from = data().deepCopy(fields()[11].schema(), other.from);
+      if (isValidValue(fields()[11], other.permlanes)) {
+        this.permlanes = data().deepCopy(fields()[11].schema(), other.permlanes);
         fieldSetFlags()[11] = other.fieldSetFlags()[11];
       }
-      if (isValidValue(fields()[12], other.to)) {
-        this.to = data().deepCopy(fields()[12].schema(), other.to);
+      if (isValidValue(fields()[12], other.allowedModes)) {
+        this.allowedModes = data().deepCopy(fields()[12].schema(), other.allowedModes);
         fieldSetFlags()[12] = other.fieldSetFlags()[12];
       }
     }
@@ -529,8 +529,8 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
         this.crs = data().deepCopy(fields()[0].schema(), other.crs);
         fieldSetFlags()[0] = true;
       }
-      if (isValidValue(fields()[1], other.nodeId)) {
-        this.nodeId = data().deepCopy(fields()[1].schema(), other.nodeId);
+      if (isValidValue(fields()[1], other.nodeIds)) {
+        this.nodeIds = data().deepCopy(fields()[1].schema(), other.nodeIds);
         fieldSetFlags()[1] = true;
       }
       if (isValidValue(fields()[2], other.nodeCoordinates)) {
@@ -541,40 +541,40 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
         this.nodeAttributes = data().deepCopy(fields()[3].schema(), other.nodeAttributes);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.modes)) {
-        this.modes = data().deepCopy(fields()[4].schema(), other.modes);
+      if (isValidValue(fields()[4], other.linkIds)) {
+        this.linkIds = data().deepCopy(fields()[4].schema(), other.linkIds);
         fieldSetFlags()[4] = true;
       }
-      if (isValidValue(fields()[5], other.linkId)) {
-        this.linkId = data().deepCopy(fields()[5].schema(), other.linkId);
+      if (isValidValue(fields()[5], other.from)) {
+        this.from = data().deepCopy(fields()[5].schema(), other.from);
         fieldSetFlags()[5] = true;
       }
-      if (isValidValue(fields()[6], other.length)) {
-        this.length = data().deepCopy(fields()[6].schema(), other.length);
+      if (isValidValue(fields()[6], other.to)) {
+        this.to = data().deepCopy(fields()[6].schema(), other.to);
         fieldSetFlags()[6] = true;
       }
-      if (isValidValue(fields()[7], other.freespeed)) {
-        this.freespeed = data().deepCopy(fields()[7].schema(), other.freespeed);
+      if (isValidValue(fields()[7], other.modes)) {
+        this.modes = data().deepCopy(fields()[7].schema(), other.modes);
         fieldSetFlags()[7] = true;
       }
-      if (isValidValue(fields()[8], other.capacity)) {
-        this.capacity = data().deepCopy(fields()[8].schema(), other.capacity);
+      if (isValidValue(fields()[8], other.length)) {
+        this.length = data().deepCopy(fields()[8].schema(), other.length);
         fieldSetFlags()[8] = true;
       }
-      if (isValidValue(fields()[9], other.permlanes)) {
-        this.permlanes = data().deepCopy(fields()[9].schema(), other.permlanes);
+      if (isValidValue(fields()[9], other.freespeed)) {
+        this.freespeed = data().deepCopy(fields()[9].schema(), other.freespeed);
         fieldSetFlags()[9] = true;
       }
-      if (isValidValue(fields()[10], other.allowedModes)) {
-        this.allowedModes = data().deepCopy(fields()[10].schema(), other.allowedModes);
+      if (isValidValue(fields()[10], other.capacity)) {
+        this.capacity = data().deepCopy(fields()[10].schema(), other.capacity);
         fieldSetFlags()[10] = true;
       }
-      if (isValidValue(fields()[11], other.from)) {
-        this.from = data().deepCopy(fields()[11].schema(), other.from);
+      if (isValidValue(fields()[11], other.permlanes)) {
+        this.permlanes = data().deepCopy(fields()[11].schema(), other.permlanes);
         fieldSetFlags()[11] = true;
       }
-      if (isValidValue(fields()[12], other.to)) {
-        this.to = data().deepCopy(fields()[12].schema(), other.to);
+      if (isValidValue(fields()[12], other.allowedModes)) {
+        this.allowedModes = data().deepCopy(fields()[12].schema(), other.allowedModes);
         fieldSetFlags()[12] = true;
       }
     }
@@ -624,41 +624,41 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
     }
 
     /**
-      * Gets the value of the 'nodeId' field.
+      * Gets the value of the 'nodeIds' field.
       * @return The value.
       */
-    public java.util.List<java.lang.CharSequence> getNodeId() {
-      return nodeId;
+    public java.util.List<java.lang.CharSequence> getNodeIds() {
+      return nodeIds;
     }
 
 
     /**
-      * Sets the value of the 'nodeId' field.
-      * @param value The value of 'nodeId'.
+      * Sets the value of the 'nodeIds' field.
+      * @param value The value of 'nodeIds'.
       * @return This builder.
       */
-    public org.matsim.application.avro.AvroNetwork.Builder setNodeId(java.util.List<java.lang.CharSequence> value) {
+    public org.matsim.application.avro.AvroNetwork.Builder setNodeIds(java.util.List<java.lang.CharSequence> value) {
       validate(fields()[1], value);
-      this.nodeId = value;
+      this.nodeIds = value;
       fieldSetFlags()[1] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'nodeId' field has been set.
-      * @return True if the 'nodeId' field has been set, false otherwise.
+      * Checks whether the 'nodeIds' field has been set.
+      * @return True if the 'nodeIds' field has been set, false otherwise.
       */
-    public boolean hasNodeId() {
+    public boolean hasNodeIds() {
       return fieldSetFlags()[1];
     }
 
 
     /**
-      * Clears the value of the 'nodeId' field.
+      * Clears the value of the 'nodeIds' field.
       * @return This builder.
       */
-    public org.matsim.application.avro.AvroNetwork.Builder clearNodeId() {
-      nodeId = null;
+    public org.matsim.application.avro.AvroNetwork.Builder clearNodeIds() {
+      nodeIds = null;
       fieldSetFlags()[1] = false;
       return this;
     }
@@ -744,6 +744,126 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
     }
 
     /**
+      * Gets the value of the 'linkIds' field.
+      * @return The value.
+      */
+    public java.util.List<java.lang.CharSequence> getLinkIds() {
+      return linkIds;
+    }
+
+
+    /**
+      * Sets the value of the 'linkIds' field.
+      * @param value The value of 'linkIds'.
+      * @return This builder.
+      */
+    public org.matsim.application.avro.AvroNetwork.Builder setLinkIds(java.util.List<java.lang.CharSequence> value) {
+      validate(fields()[4], value);
+      this.linkIds = value;
+      fieldSetFlags()[4] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'linkIds' field has been set.
+      * @return True if the 'linkIds' field has been set, false otherwise.
+      */
+    public boolean hasLinkIds() {
+      return fieldSetFlags()[4];
+    }
+
+
+    /**
+      * Clears the value of the 'linkIds' field.
+      * @return This builder.
+      */
+    public org.matsim.application.avro.AvroNetwork.Builder clearLinkIds() {
+      linkIds = null;
+      fieldSetFlags()[4] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'from' field.
+      * @return The value.
+      */
+    public java.util.List<java.lang.Integer> getFrom() {
+      return from;
+    }
+
+
+    /**
+      * Sets the value of the 'from' field.
+      * @param value The value of 'from'.
+      * @return This builder.
+      */
+    public org.matsim.application.avro.AvroNetwork.Builder setFrom(java.util.List<java.lang.Integer> value) {
+      validate(fields()[5], value);
+      this.from = value;
+      fieldSetFlags()[5] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'from' field has been set.
+      * @return True if the 'from' field has been set, false otherwise.
+      */
+    public boolean hasFrom() {
+      return fieldSetFlags()[5];
+    }
+
+
+    /**
+      * Clears the value of the 'from' field.
+      * @return This builder.
+      */
+    public org.matsim.application.avro.AvroNetwork.Builder clearFrom() {
+      from = null;
+      fieldSetFlags()[5] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'to' field.
+      * @return The value.
+      */
+    public java.util.List<java.lang.Integer> getTo() {
+      return to;
+    }
+
+
+    /**
+      * Sets the value of the 'to' field.
+      * @param value The value of 'to'.
+      * @return This builder.
+      */
+    public org.matsim.application.avro.AvroNetwork.Builder setTo(java.util.List<java.lang.Integer> value) {
+      validate(fields()[6], value);
+      this.to = value;
+      fieldSetFlags()[6] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'to' field has been set.
+      * @return True if the 'to' field has been set, false otherwise.
+      */
+    public boolean hasTo() {
+      return fieldSetFlags()[6];
+    }
+
+
+    /**
+      * Clears the value of the 'to' field.
+      * @return This builder.
+      */
+    public org.matsim.application.avro.AvroNetwork.Builder clearTo() {
+      to = null;
+      fieldSetFlags()[6] = false;
+      return this;
+    }
+
+    /**
       * Gets the value of the 'modes' field.
       * @return The value.
       */
@@ -758,9 +878,9 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return This builder.
       */
     public org.matsim.application.avro.AvroNetwork.Builder setModes(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[4], value);
+      validate(fields()[7], value);
       this.modes = value;
-      fieldSetFlags()[4] = true;
+      fieldSetFlags()[7] = true;
       return this;
     }
 
@@ -769,7 +889,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return True if the 'modes' field has been set, false otherwise.
       */
     public boolean hasModes() {
-      return fieldSetFlags()[4];
+      return fieldSetFlags()[7];
     }
 
 
@@ -779,47 +899,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       */
     public org.matsim.application.avro.AvroNetwork.Builder clearModes() {
       modes = null;
-      fieldSetFlags()[4] = false;
-      return this;
-    }
-
-    /**
-      * Gets the value of the 'linkId' field.
-      * @return The value.
-      */
-    public java.util.List<java.lang.CharSequence> getLinkId() {
-      return linkId;
-    }
-
-
-    /**
-      * Sets the value of the 'linkId' field.
-      * @param value The value of 'linkId'.
-      * @return This builder.
-      */
-    public org.matsim.application.avro.AvroNetwork.Builder setLinkId(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[5], value);
-      this.linkId = value;
-      fieldSetFlags()[5] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'linkId' field has been set.
-      * @return True if the 'linkId' field has been set, false otherwise.
-      */
-    public boolean hasLinkId() {
-      return fieldSetFlags()[5];
-    }
-
-
-    /**
-      * Clears the value of the 'linkId' field.
-      * @return This builder.
-      */
-    public org.matsim.application.avro.AvroNetwork.Builder clearLinkId() {
-      linkId = null;
-      fieldSetFlags()[5] = false;
+      fieldSetFlags()[7] = false;
       return this;
     }
 
@@ -838,9 +918,9 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return This builder.
       */
     public org.matsim.application.avro.AvroNetwork.Builder setLength(java.util.List<java.lang.Float> value) {
-      validate(fields()[6], value);
+      validate(fields()[8], value);
       this.length = value;
-      fieldSetFlags()[6] = true;
+      fieldSetFlags()[8] = true;
       return this;
     }
 
@@ -849,7 +929,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return True if the 'length' field has been set, false otherwise.
       */
     public boolean hasLength() {
-      return fieldSetFlags()[6];
+      return fieldSetFlags()[8];
     }
 
 
@@ -859,7 +939,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       */
     public org.matsim.application.avro.AvroNetwork.Builder clearLength() {
       length = null;
-      fieldSetFlags()[6] = false;
+      fieldSetFlags()[8] = false;
       return this;
     }
 
@@ -878,9 +958,9 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return This builder.
       */
     public org.matsim.application.avro.AvroNetwork.Builder setFreespeed(java.util.List<java.lang.Float> value) {
-      validate(fields()[7], value);
+      validate(fields()[9], value);
       this.freespeed = value;
-      fieldSetFlags()[7] = true;
+      fieldSetFlags()[9] = true;
       return this;
     }
 
@@ -889,7 +969,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return True if the 'freespeed' field has been set, false otherwise.
       */
     public boolean hasFreespeed() {
-      return fieldSetFlags()[7];
+      return fieldSetFlags()[9];
     }
 
 
@@ -899,7 +979,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       */
     public org.matsim.application.avro.AvroNetwork.Builder clearFreespeed() {
       freespeed = null;
-      fieldSetFlags()[7] = false;
+      fieldSetFlags()[9] = false;
       return this;
     }
 
@@ -918,9 +998,9 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return This builder.
       */
     public org.matsim.application.avro.AvroNetwork.Builder setCapacity(java.util.List<java.lang.Float> value) {
-      validate(fields()[8], value);
+      validate(fields()[10], value);
       this.capacity = value;
-      fieldSetFlags()[8] = true;
+      fieldSetFlags()[10] = true;
       return this;
     }
 
@@ -929,7 +1009,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return True if the 'capacity' field has been set, false otherwise.
       */
     public boolean hasCapacity() {
-      return fieldSetFlags()[8];
+      return fieldSetFlags()[10];
     }
 
 
@@ -939,7 +1019,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       */
     public org.matsim.application.avro.AvroNetwork.Builder clearCapacity() {
       capacity = null;
-      fieldSetFlags()[8] = false;
+      fieldSetFlags()[10] = false;
       return this;
     }
 
@@ -958,9 +1038,9 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return This builder.
       */
     public org.matsim.application.avro.AvroNetwork.Builder setPermlanes(java.util.List<java.lang.Float> value) {
-      validate(fields()[9], value);
+      validate(fields()[11], value);
       this.permlanes = value;
-      fieldSetFlags()[9] = true;
+      fieldSetFlags()[11] = true;
       return this;
     }
 
@@ -969,7 +1049,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return True if the 'permlanes' field has been set, false otherwise.
       */
     public boolean hasPermlanes() {
-      return fieldSetFlags()[9];
+      return fieldSetFlags()[11];
     }
 
 
@@ -979,7 +1059,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       */
     public org.matsim.application.avro.AvroNetwork.Builder clearPermlanes() {
       permlanes = null;
-      fieldSetFlags()[9] = false;
+      fieldSetFlags()[11] = false;
       return this;
     }
 
@@ -998,9 +1078,9 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return This builder.
       */
     public org.matsim.application.avro.AvroNetwork.Builder setAllowedModes(java.util.List<java.lang.Integer> value) {
-      validate(fields()[10], value);
+      validate(fields()[12], value);
       this.allowedModes = value;
-      fieldSetFlags()[10] = true;
+      fieldSetFlags()[12] = true;
       return this;
     }
 
@@ -1009,7 +1089,7 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       * @return True if the 'allowedModes' field has been set, false otherwise.
       */
     public boolean hasAllowedModes() {
-      return fieldSetFlags()[10];
+      return fieldSetFlags()[12];
     }
 
 
@@ -1019,86 +1099,6 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       */
     public org.matsim.application.avro.AvroNetwork.Builder clearAllowedModes() {
       allowedModes = null;
-      fieldSetFlags()[10] = false;
-      return this;
-    }
-
-    /**
-      * Gets the value of the 'from' field.
-      * @return The value.
-      */
-    public java.util.List<java.lang.CharSequence> getFrom() {
-      return from;
-    }
-
-
-    /**
-      * Sets the value of the 'from' field.
-      * @param value The value of 'from'.
-      * @return This builder.
-      */
-    public org.matsim.application.avro.AvroNetwork.Builder setFrom(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[11], value);
-      this.from = value;
-      fieldSetFlags()[11] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'from' field has been set.
-      * @return True if the 'from' field has been set, false otherwise.
-      */
-    public boolean hasFrom() {
-      return fieldSetFlags()[11];
-    }
-
-
-    /**
-      * Clears the value of the 'from' field.
-      * @return This builder.
-      */
-    public org.matsim.application.avro.AvroNetwork.Builder clearFrom() {
-      from = null;
-      fieldSetFlags()[11] = false;
-      return this;
-    }
-
-    /**
-      * Gets the value of the 'to' field.
-      * @return The value.
-      */
-    public java.util.List<java.lang.CharSequence> getTo() {
-      return to;
-    }
-
-
-    /**
-      * Sets the value of the 'to' field.
-      * @param value The value of 'to'.
-      * @return This builder.
-      */
-    public org.matsim.application.avro.AvroNetwork.Builder setTo(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[12], value);
-      this.to = value;
-      fieldSetFlags()[12] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'to' field has been set.
-      * @return True if the 'to' field has been set, false otherwise.
-      */
-    public boolean hasTo() {
-      return fieldSetFlags()[12];
-    }
-
-
-    /**
-      * Clears the value of the 'to' field.
-      * @return This builder.
-      */
-    public org.matsim.application.avro.AvroNetwork.Builder clearTo() {
-      to = null;
       fieldSetFlags()[12] = false;
       return this;
     }
@@ -1109,18 +1109,18 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       try {
         AvroNetwork record = new AvroNetwork();
         record.crs = fieldSetFlags()[0] ? this.crs : (java.lang.CharSequence) defaultValue(fields()[0]);
-        record.nodeId = fieldSetFlags()[1] ? this.nodeId : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[1]);
+        record.nodeIds = fieldSetFlags()[1] ? this.nodeIds : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[1]);
         record.nodeCoordinates = fieldSetFlags()[2] ? this.nodeCoordinates : (java.util.List<java.lang.Float>) defaultValue(fields()[2]);
         record.nodeAttributes = fieldSetFlags()[3] ? this.nodeAttributes : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[3]);
-        record.modes = fieldSetFlags()[4] ? this.modes : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[4]);
-        record.linkId = fieldSetFlags()[5] ? this.linkId : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[5]);
-        record.length = fieldSetFlags()[6] ? this.length : (java.util.List<java.lang.Float>) defaultValue(fields()[6]);
-        record.freespeed = fieldSetFlags()[7] ? this.freespeed : (java.util.List<java.lang.Float>) defaultValue(fields()[7]);
-        record.capacity = fieldSetFlags()[8] ? this.capacity : (java.util.List<java.lang.Float>) defaultValue(fields()[8]);
-        record.permlanes = fieldSetFlags()[9] ? this.permlanes : (java.util.List<java.lang.Float>) defaultValue(fields()[9]);
-        record.allowedModes = fieldSetFlags()[10] ? this.allowedModes : (java.util.List<java.lang.Integer>) defaultValue(fields()[10]);
-        record.from = fieldSetFlags()[11] ? this.from : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[11]);
-        record.to = fieldSetFlags()[12] ? this.to : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[12]);
+        record.linkIds = fieldSetFlags()[4] ? this.linkIds : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[4]);
+        record.from = fieldSetFlags()[5] ? this.from : (java.util.List<java.lang.Integer>) defaultValue(fields()[5]);
+        record.to = fieldSetFlags()[6] ? this.to : (java.util.List<java.lang.Integer>) defaultValue(fields()[6]);
+        record.modes = fieldSetFlags()[7] ? this.modes : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[7]);
+        record.length = fieldSetFlags()[8] ? this.length : (java.util.List<java.lang.Float>) defaultValue(fields()[8]);
+        record.freespeed = fieldSetFlags()[9] ? this.freespeed : (java.util.List<java.lang.Float>) defaultValue(fields()[9]);
+        record.capacity = fieldSetFlags()[10] ? this.capacity : (java.util.List<java.lang.Float>) defaultValue(fields()[10]);
+        record.permlanes = fieldSetFlags()[11] ? this.permlanes : (java.util.List<java.lang.Float>) defaultValue(fields()[11]);
+        record.allowedModes = fieldSetFlags()[12] ? this.allowedModes : (java.util.List<java.lang.Integer>) defaultValue(fields()[12]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -1155,11 +1155,11 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
   {
     out.writeString(this.crs);
 
-    long size0 = this.nodeId.size();
+    long size0 = this.nodeIds.size();
     out.writeArrayStart();
     out.setItemCount(size0);
     long actualSize0 = 0;
-    for (java.lang.CharSequence e0: this.nodeId) {
+    for (java.lang.CharSequence e0: this.nodeIds) {
       actualSize0++;
       out.startItem();
       out.writeString(e0);
@@ -1194,11 +1194,11 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
     if (actualSize2 != size2)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size2 + ", but element count was " + actualSize2 + ".");
 
-    long size3 = this.modes.size();
+    long size3 = this.linkIds.size();
     out.writeArrayStart();
     out.setItemCount(size3);
     long actualSize3 = 0;
-    for (java.lang.CharSequence e3: this.modes) {
+    for (java.lang.CharSequence e3: this.linkIds) {
       actualSize3++;
       out.startItem();
       out.writeString(e3);
@@ -1207,50 +1207,50 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
     if (actualSize3 != size3)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size3 + ", but element count was " + actualSize3 + ".");
 
-    long size4 = this.linkId.size();
+    long size4 = this.from.size();
     out.writeArrayStart();
     out.setItemCount(size4);
     long actualSize4 = 0;
-    for (java.lang.CharSequence e4: this.linkId) {
+    for (java.lang.Integer e4: this.from) {
       actualSize4++;
       out.startItem();
-      out.writeString(e4);
+      out.writeInt(e4);
     }
     out.writeArrayEnd();
     if (actualSize4 != size4)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size4 + ", but element count was " + actualSize4 + ".");
 
-    long size5 = this.length.size();
+    long size5 = this.to.size();
     out.writeArrayStart();
     out.setItemCount(size5);
     long actualSize5 = 0;
-    for (java.lang.Float e5: this.length) {
+    for (java.lang.Integer e5: this.to) {
       actualSize5++;
       out.startItem();
-      out.writeFloat(e5);
+      out.writeInt(e5);
     }
     out.writeArrayEnd();
     if (actualSize5 != size5)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size5 + ", but element count was " + actualSize5 + ".");
 
-    long size6 = this.freespeed.size();
+    long size6 = this.modes.size();
     out.writeArrayStart();
     out.setItemCount(size6);
     long actualSize6 = 0;
-    for (java.lang.Float e6: this.freespeed) {
+    for (java.lang.CharSequence e6: this.modes) {
       actualSize6++;
       out.startItem();
-      out.writeFloat(e6);
+      out.writeString(e6);
     }
     out.writeArrayEnd();
     if (actualSize6 != size6)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size6 + ", but element count was " + actualSize6 + ".");
 
-    long size7 = this.capacity.size();
+    long size7 = this.length.size();
     out.writeArrayStart();
     out.setItemCount(size7);
     long actualSize7 = 0;
-    for (java.lang.Float e7: this.capacity) {
+    for (java.lang.Float e7: this.length) {
       actualSize7++;
       out.startItem();
       out.writeFloat(e7);
@@ -1259,11 +1259,11 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
     if (actualSize7 != size7)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size7 + ", but element count was " + actualSize7 + ".");
 
-    long size8 = this.permlanes.size();
+    long size8 = this.freespeed.size();
     out.writeArrayStart();
     out.setItemCount(size8);
     long actualSize8 = 0;
-    for (java.lang.Float e8: this.permlanes) {
+    for (java.lang.Float e8: this.freespeed) {
       actualSize8++;
       out.startItem();
       out.writeFloat(e8);
@@ -1272,40 +1272,40 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
     if (actualSize8 != size8)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size8 + ", but element count was " + actualSize8 + ".");
 
-    long size9 = this.allowedModes.size();
+    long size9 = this.capacity.size();
     out.writeArrayStart();
     out.setItemCount(size9);
     long actualSize9 = 0;
-    for (java.lang.Integer e9: this.allowedModes) {
+    for (java.lang.Float e9: this.capacity) {
       actualSize9++;
       out.startItem();
-      out.writeInt(e9);
+      out.writeFloat(e9);
     }
     out.writeArrayEnd();
     if (actualSize9 != size9)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size9 + ", but element count was " + actualSize9 + ".");
 
-    long size10 = this.from.size();
+    long size10 = this.permlanes.size();
     out.writeArrayStart();
     out.setItemCount(size10);
     long actualSize10 = 0;
-    for (java.lang.CharSequence e10: this.from) {
+    for (java.lang.Float e10: this.permlanes) {
       actualSize10++;
       out.startItem();
-      out.writeString(e10);
+      out.writeFloat(e10);
     }
     out.writeArrayEnd();
     if (actualSize10 != size10)
       throw new java.util.ConcurrentModificationException("Array-size written was " + size10 + ", but element count was " + actualSize10 + ".");
 
-    long size11 = this.to.size();
+    long size11 = this.allowedModes.size();
     out.writeArrayStart();
     out.setItemCount(size11);
     long actualSize11 = 0;
-    for (java.lang.CharSequence e11: this.to) {
+    for (java.lang.Integer e11: this.allowedModes) {
       actualSize11++;
       out.startItem();
-      out.writeString(e11);
+      out.writeInt(e11);
     }
     out.writeArrayEnd();
     if (actualSize11 != size11)
@@ -1321,10 +1321,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       this.crs = in.readString(this.crs instanceof Utf8 ? (Utf8)this.crs : null);
 
       long size0 = in.readArrayStart();
-      java.util.List<java.lang.CharSequence> a0 = this.nodeId;
+      java.util.List<java.lang.CharSequence> a0 = this.nodeIds;
       if (a0 == null) {
-        a0 = new SpecificData.Array<java.lang.CharSequence>((int)size0, SCHEMA$.getField("nodeId").schema());
-        this.nodeId = a0;
+        a0 = new SpecificData.Array<java.lang.CharSequence>((int)size0, SCHEMA$.getField("nodeIds").schema());
+        this.nodeIds = a0;
       } else a0.clear();
       SpecificData.Array<java.lang.CharSequence> ga0 = (a0 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a0 : null);
       for ( ; 0 < size0; size0 = in.arrayNext()) {
@@ -1366,10 +1366,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       }
 
       long size3 = in.readArrayStart();
-      java.util.List<java.lang.CharSequence> a3 = this.modes;
+      java.util.List<java.lang.CharSequence> a3 = this.linkIds;
       if (a3 == null) {
-        a3 = new SpecificData.Array<java.lang.CharSequence>((int)size3, SCHEMA$.getField("modes").schema());
-        this.modes = a3;
+        a3 = new SpecificData.Array<java.lang.CharSequence>((int)size3, SCHEMA$.getField("linkIds").schema());
+        this.linkIds = a3;
       } else a3.clear();
       SpecificData.Array<java.lang.CharSequence> ga3 = (a3 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a3 : null);
       for ( ; 0 < size3; size3 = in.arrayNext()) {
@@ -1381,55 +1381,55 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       }
 
       long size4 = in.readArrayStart();
-      java.util.List<java.lang.CharSequence> a4 = this.linkId;
+      java.util.List<java.lang.Integer> a4 = this.from;
       if (a4 == null) {
-        a4 = new SpecificData.Array<java.lang.CharSequence>((int)size4, SCHEMA$.getField("linkId").schema());
-        this.linkId = a4;
+        a4 = new SpecificData.Array<java.lang.Integer>((int)size4, SCHEMA$.getField("from").schema());
+        this.from = a4;
       } else a4.clear();
-      SpecificData.Array<java.lang.CharSequence> ga4 = (a4 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a4 : null);
+      SpecificData.Array<java.lang.Integer> ga4 = (a4 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a4 : null);
       for ( ; 0 < size4; size4 = in.arrayNext()) {
         for ( ; size4 != 0; size4--) {
-          java.lang.CharSequence e4 = (ga4 != null ? ga4.peek() : null);
-          e4 = in.readString(e4 instanceof Utf8 ? (Utf8)e4 : null);
+          java.lang.Integer e4 = (ga4 != null ? ga4.peek() : null);
+          e4 = in.readInt();
           a4.add(e4);
         }
       }
 
       long size5 = in.readArrayStart();
-      java.util.List<java.lang.Float> a5 = this.length;
+      java.util.List<java.lang.Integer> a5 = this.to;
       if (a5 == null) {
-        a5 = new SpecificData.Array<java.lang.Float>((int)size5, SCHEMA$.getField("length").schema());
-        this.length = a5;
+        a5 = new SpecificData.Array<java.lang.Integer>((int)size5, SCHEMA$.getField("to").schema());
+        this.to = a5;
       } else a5.clear();
-      SpecificData.Array<java.lang.Float> ga5 = (a5 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a5 : null);
+      SpecificData.Array<java.lang.Integer> ga5 = (a5 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a5 : null);
       for ( ; 0 < size5; size5 = in.arrayNext()) {
         for ( ; size5 != 0; size5--) {
-          java.lang.Float e5 = (ga5 != null ? ga5.peek() : null);
-          e5 = in.readFloat();
+          java.lang.Integer e5 = (ga5 != null ? ga5.peek() : null);
+          e5 = in.readInt();
           a5.add(e5);
         }
       }
 
       long size6 = in.readArrayStart();
-      java.util.List<java.lang.Float> a6 = this.freespeed;
+      java.util.List<java.lang.CharSequence> a6 = this.modes;
       if (a6 == null) {
-        a6 = new SpecificData.Array<java.lang.Float>((int)size6, SCHEMA$.getField("freespeed").schema());
-        this.freespeed = a6;
+        a6 = new SpecificData.Array<java.lang.CharSequence>((int)size6, SCHEMA$.getField("modes").schema());
+        this.modes = a6;
       } else a6.clear();
-      SpecificData.Array<java.lang.Float> ga6 = (a6 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a6 : null);
+      SpecificData.Array<java.lang.CharSequence> ga6 = (a6 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a6 : null);
       for ( ; 0 < size6; size6 = in.arrayNext()) {
         for ( ; size6 != 0; size6--) {
-          java.lang.Float e6 = (ga6 != null ? ga6.peek() : null);
-          e6 = in.readFloat();
+          java.lang.CharSequence e6 = (ga6 != null ? ga6.peek() : null);
+          e6 = in.readString(e6 instanceof Utf8 ? (Utf8)e6 : null);
           a6.add(e6);
         }
       }
 
       long size7 = in.readArrayStart();
-      java.util.List<java.lang.Float> a7 = this.capacity;
+      java.util.List<java.lang.Float> a7 = this.length;
       if (a7 == null) {
-        a7 = new SpecificData.Array<java.lang.Float>((int)size7, SCHEMA$.getField("capacity").schema());
-        this.capacity = a7;
+        a7 = new SpecificData.Array<java.lang.Float>((int)size7, SCHEMA$.getField("length").schema());
+        this.length = a7;
       } else a7.clear();
       SpecificData.Array<java.lang.Float> ga7 = (a7 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a7 : null);
       for ( ; 0 < size7; size7 = in.arrayNext()) {
@@ -1441,10 +1441,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       }
 
       long size8 = in.readArrayStart();
-      java.util.List<java.lang.Float> a8 = this.permlanes;
+      java.util.List<java.lang.Float> a8 = this.freespeed;
       if (a8 == null) {
-        a8 = new SpecificData.Array<java.lang.Float>((int)size8, SCHEMA$.getField("permlanes").schema());
-        this.permlanes = a8;
+        a8 = new SpecificData.Array<java.lang.Float>((int)size8, SCHEMA$.getField("freespeed").schema());
+        this.freespeed = a8;
       } else a8.clear();
       SpecificData.Array<java.lang.Float> ga8 = (a8 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a8 : null);
       for ( ; 0 < size8; size8 = in.arrayNext()) {
@@ -1456,46 +1456,46 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
       }
 
       long size9 = in.readArrayStart();
-      java.util.List<java.lang.Integer> a9 = this.allowedModes;
+      java.util.List<java.lang.Float> a9 = this.capacity;
       if (a9 == null) {
-        a9 = new SpecificData.Array<java.lang.Integer>((int)size9, SCHEMA$.getField("allowedModes").schema());
-        this.allowedModes = a9;
+        a9 = new SpecificData.Array<java.lang.Float>((int)size9, SCHEMA$.getField("capacity").schema());
+        this.capacity = a9;
       } else a9.clear();
-      SpecificData.Array<java.lang.Integer> ga9 = (a9 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a9 : null);
+      SpecificData.Array<java.lang.Float> ga9 = (a9 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a9 : null);
       for ( ; 0 < size9; size9 = in.arrayNext()) {
         for ( ; size9 != 0; size9--) {
-          java.lang.Integer e9 = (ga9 != null ? ga9.peek() : null);
-          e9 = in.readInt();
+          java.lang.Float e9 = (ga9 != null ? ga9.peek() : null);
+          e9 = in.readFloat();
           a9.add(e9);
         }
       }
 
       long size10 = in.readArrayStart();
-      java.util.List<java.lang.CharSequence> a10 = this.from;
+      java.util.List<java.lang.Float> a10 = this.permlanes;
       if (a10 == null) {
-        a10 = new SpecificData.Array<java.lang.CharSequence>((int)size10, SCHEMA$.getField("from").schema());
-        this.from = a10;
+        a10 = new SpecificData.Array<java.lang.Float>((int)size10, SCHEMA$.getField("permlanes").schema());
+        this.permlanes = a10;
       } else a10.clear();
-      SpecificData.Array<java.lang.CharSequence> ga10 = (a10 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a10 : null);
+      SpecificData.Array<java.lang.Float> ga10 = (a10 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a10 : null);
       for ( ; 0 < size10; size10 = in.arrayNext()) {
         for ( ; size10 != 0; size10--) {
-          java.lang.CharSequence e10 = (ga10 != null ? ga10.peek() : null);
-          e10 = in.readString(e10 instanceof Utf8 ? (Utf8)e10 : null);
+          java.lang.Float e10 = (ga10 != null ? ga10.peek() : null);
+          e10 = in.readFloat();
           a10.add(e10);
         }
       }
 
       long size11 = in.readArrayStart();
-      java.util.List<java.lang.CharSequence> a11 = this.to;
+      java.util.List<java.lang.Integer> a11 = this.allowedModes;
       if (a11 == null) {
-        a11 = new SpecificData.Array<java.lang.CharSequence>((int)size11, SCHEMA$.getField("to").schema());
-        this.to = a11;
+        a11 = new SpecificData.Array<java.lang.Integer>((int)size11, SCHEMA$.getField("allowedModes").schema());
+        this.allowedModes = a11;
       } else a11.clear();
-      SpecificData.Array<java.lang.CharSequence> ga11 = (a11 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a11 : null);
+      SpecificData.Array<java.lang.Integer> ga11 = (a11 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a11 : null);
       for ( ; 0 < size11; size11 = in.arrayNext()) {
         for ( ; size11 != 0; size11--) {
-          java.lang.CharSequence e11 = (ga11 != null ? ga11.peek() : null);
-          e11 = in.readString(e11 instanceof Utf8 ? (Utf8)e11 : null);
+          java.lang.Integer e11 = (ga11 != null ? ga11.peek() : null);
+          e11 = in.readInt();
           a11.add(e11);
         }
       }
@@ -1509,10 +1509,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 1:
           long size0 = in.readArrayStart();
-          java.util.List<java.lang.CharSequence> a0 = this.nodeId;
+          java.util.List<java.lang.CharSequence> a0 = this.nodeIds;
           if (a0 == null) {
-            a0 = new SpecificData.Array<java.lang.CharSequence>((int)size0, SCHEMA$.getField("nodeId").schema());
-            this.nodeId = a0;
+            a0 = new SpecificData.Array<java.lang.CharSequence>((int)size0, SCHEMA$.getField("nodeIds").schema());
+            this.nodeIds = a0;
           } else a0.clear();
           SpecificData.Array<java.lang.CharSequence> ga0 = (a0 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a0 : null);
           for ( ; 0 < size0; size0 = in.arrayNext()) {
@@ -1560,10 +1560,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 4:
           long size3 = in.readArrayStart();
-          java.util.List<java.lang.CharSequence> a3 = this.modes;
+          java.util.List<java.lang.CharSequence> a3 = this.linkIds;
           if (a3 == null) {
-            a3 = new SpecificData.Array<java.lang.CharSequence>((int)size3, SCHEMA$.getField("modes").schema());
-            this.modes = a3;
+            a3 = new SpecificData.Array<java.lang.CharSequence>((int)size3, SCHEMA$.getField("linkIds").schema());
+            this.linkIds = a3;
           } else a3.clear();
           SpecificData.Array<java.lang.CharSequence> ga3 = (a3 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a3 : null);
           for ( ; 0 < size3; size3 = in.arrayNext()) {
@@ -1577,16 +1577,16 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 5:
           long size4 = in.readArrayStart();
-          java.util.List<java.lang.CharSequence> a4 = this.linkId;
+          java.util.List<java.lang.Integer> a4 = this.from;
           if (a4 == null) {
-            a4 = new SpecificData.Array<java.lang.CharSequence>((int)size4, SCHEMA$.getField("linkId").schema());
-            this.linkId = a4;
+            a4 = new SpecificData.Array<java.lang.Integer>((int)size4, SCHEMA$.getField("from").schema());
+            this.from = a4;
           } else a4.clear();
-          SpecificData.Array<java.lang.CharSequence> ga4 = (a4 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a4 : null);
+          SpecificData.Array<java.lang.Integer> ga4 = (a4 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a4 : null);
           for ( ; 0 < size4; size4 = in.arrayNext()) {
             for ( ; size4 != 0; size4--) {
-              java.lang.CharSequence e4 = (ga4 != null ? ga4.peek() : null);
-              e4 = in.readString(e4 instanceof Utf8 ? (Utf8)e4 : null);
+              java.lang.Integer e4 = (ga4 != null ? ga4.peek() : null);
+              e4 = in.readInt();
               a4.add(e4);
             }
           }
@@ -1594,16 +1594,16 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 6:
           long size5 = in.readArrayStart();
-          java.util.List<java.lang.Float> a5 = this.length;
+          java.util.List<java.lang.Integer> a5 = this.to;
           if (a5 == null) {
-            a5 = new SpecificData.Array<java.lang.Float>((int)size5, SCHEMA$.getField("length").schema());
-            this.length = a5;
+            a5 = new SpecificData.Array<java.lang.Integer>((int)size5, SCHEMA$.getField("to").schema());
+            this.to = a5;
           } else a5.clear();
-          SpecificData.Array<java.lang.Float> ga5 = (a5 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a5 : null);
+          SpecificData.Array<java.lang.Integer> ga5 = (a5 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a5 : null);
           for ( ; 0 < size5; size5 = in.arrayNext()) {
             for ( ; size5 != 0; size5--) {
-              java.lang.Float e5 = (ga5 != null ? ga5.peek() : null);
-              e5 = in.readFloat();
+              java.lang.Integer e5 = (ga5 != null ? ga5.peek() : null);
+              e5 = in.readInt();
               a5.add(e5);
             }
           }
@@ -1611,16 +1611,16 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 7:
           long size6 = in.readArrayStart();
-          java.util.List<java.lang.Float> a6 = this.freespeed;
+          java.util.List<java.lang.CharSequence> a6 = this.modes;
           if (a6 == null) {
-            a6 = new SpecificData.Array<java.lang.Float>((int)size6, SCHEMA$.getField("freespeed").schema());
-            this.freespeed = a6;
+            a6 = new SpecificData.Array<java.lang.CharSequence>((int)size6, SCHEMA$.getField("modes").schema());
+            this.modes = a6;
           } else a6.clear();
-          SpecificData.Array<java.lang.Float> ga6 = (a6 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a6 : null);
+          SpecificData.Array<java.lang.CharSequence> ga6 = (a6 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a6 : null);
           for ( ; 0 < size6; size6 = in.arrayNext()) {
             for ( ; size6 != 0; size6--) {
-              java.lang.Float e6 = (ga6 != null ? ga6.peek() : null);
-              e6 = in.readFloat();
+              java.lang.CharSequence e6 = (ga6 != null ? ga6.peek() : null);
+              e6 = in.readString(e6 instanceof Utf8 ? (Utf8)e6 : null);
               a6.add(e6);
             }
           }
@@ -1628,10 +1628,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 8:
           long size7 = in.readArrayStart();
-          java.util.List<java.lang.Float> a7 = this.capacity;
+          java.util.List<java.lang.Float> a7 = this.length;
           if (a7 == null) {
-            a7 = new SpecificData.Array<java.lang.Float>((int)size7, SCHEMA$.getField("capacity").schema());
-            this.capacity = a7;
+            a7 = new SpecificData.Array<java.lang.Float>((int)size7, SCHEMA$.getField("length").schema());
+            this.length = a7;
           } else a7.clear();
           SpecificData.Array<java.lang.Float> ga7 = (a7 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a7 : null);
           for ( ; 0 < size7; size7 = in.arrayNext()) {
@@ -1645,10 +1645,10 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 9:
           long size8 = in.readArrayStart();
-          java.util.List<java.lang.Float> a8 = this.permlanes;
+          java.util.List<java.lang.Float> a8 = this.freespeed;
           if (a8 == null) {
-            a8 = new SpecificData.Array<java.lang.Float>((int)size8, SCHEMA$.getField("permlanes").schema());
-            this.permlanes = a8;
+            a8 = new SpecificData.Array<java.lang.Float>((int)size8, SCHEMA$.getField("freespeed").schema());
+            this.freespeed = a8;
           } else a8.clear();
           SpecificData.Array<java.lang.Float> ga8 = (a8 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a8 : null);
           for ( ; 0 < size8; size8 = in.arrayNext()) {
@@ -1662,16 +1662,16 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 10:
           long size9 = in.readArrayStart();
-          java.util.List<java.lang.Integer> a9 = this.allowedModes;
+          java.util.List<java.lang.Float> a9 = this.capacity;
           if (a9 == null) {
-            a9 = new SpecificData.Array<java.lang.Integer>((int)size9, SCHEMA$.getField("allowedModes").schema());
-            this.allowedModes = a9;
+            a9 = new SpecificData.Array<java.lang.Float>((int)size9, SCHEMA$.getField("capacity").schema());
+            this.capacity = a9;
           } else a9.clear();
-          SpecificData.Array<java.lang.Integer> ga9 = (a9 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a9 : null);
+          SpecificData.Array<java.lang.Float> ga9 = (a9 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a9 : null);
           for ( ; 0 < size9; size9 = in.arrayNext()) {
             for ( ; size9 != 0; size9--) {
-              java.lang.Integer e9 = (ga9 != null ? ga9.peek() : null);
-              e9 = in.readInt();
+              java.lang.Float e9 = (ga9 != null ? ga9.peek() : null);
+              e9 = in.readFloat();
               a9.add(e9);
             }
           }
@@ -1679,16 +1679,16 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 11:
           long size10 = in.readArrayStart();
-          java.util.List<java.lang.CharSequence> a10 = this.from;
+          java.util.List<java.lang.Float> a10 = this.permlanes;
           if (a10 == null) {
-            a10 = new SpecificData.Array<java.lang.CharSequence>((int)size10, SCHEMA$.getField("from").schema());
-            this.from = a10;
+            a10 = new SpecificData.Array<java.lang.Float>((int)size10, SCHEMA$.getField("permlanes").schema());
+            this.permlanes = a10;
           } else a10.clear();
-          SpecificData.Array<java.lang.CharSequence> ga10 = (a10 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a10 : null);
+          SpecificData.Array<java.lang.Float> ga10 = (a10 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Float>)a10 : null);
           for ( ; 0 < size10; size10 = in.arrayNext()) {
             for ( ; size10 != 0; size10--) {
-              java.lang.CharSequence e10 = (ga10 != null ? ga10.peek() : null);
-              e10 = in.readString(e10 instanceof Utf8 ? (Utf8)e10 : null);
+              java.lang.Float e10 = (ga10 != null ? ga10.peek() : null);
+              e10 = in.readFloat();
               a10.add(e10);
             }
           }
@@ -1696,16 +1696,16 @@ public class AvroNetwork extends org.apache.avro.specific.SpecificRecordBase imp
 
         case 12:
           long size11 = in.readArrayStart();
-          java.util.List<java.lang.CharSequence> a11 = this.to;
+          java.util.List<java.lang.Integer> a11 = this.allowedModes;
           if (a11 == null) {
-            a11 = new SpecificData.Array<java.lang.CharSequence>((int)size11, SCHEMA$.getField("to").schema());
-            this.to = a11;
+            a11 = new SpecificData.Array<java.lang.Integer>((int)size11, SCHEMA$.getField("allowedModes").schema());
+            this.allowedModes = a11;
           } else a11.clear();
-          SpecificData.Array<java.lang.CharSequence> ga11 = (a11 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.CharSequence>)a11 : null);
+          SpecificData.Array<java.lang.Integer> ga11 = (a11 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.Integer>)a11 : null);
           for ( ; 0 < size11; size11 = in.arrayNext()) {
             for ( ; size11 != 0; size11--) {
-              java.lang.CharSequence e11 = (ga11 != null ? ga11.peek() : null);
-              e11 = in.readString(e11 instanceof Utf8 ? (Utf8)e11 : null);
+              java.lang.Integer e11 = (ga11 != null ? ga11.peek() : null);
+              e11 = in.readInt();
               a11.add(e11);
             }
           }

@@ -13,7 +13,7 @@
         "type": "array",
         "items": "string"
       },
-      "name": "nodeId"
+      "name": "nodeIds"
     },
     {
       "type": {
@@ -30,18 +30,32 @@
       }
     },
     {
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "name": "linkIds"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "int"
+      },
+      "name": "from"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "int"
+      },
+      "name": "to"
+    },
+    {
       "name": "modes",
       "type": {
         "type": "array",
         "items": "string"
       }
-    },
-    {
-      "type": {
-        "type": "array",
-        "items": "string"
-      },
-      "name": "linkId"
     },
     {
       "type": {
@@ -77,20 +91,6 @@
         "items": "int"
       },
       "name": "allowedModes"
-    },
-    {
-      "type": {
-        "type": "array",
-        "items": "string"
-      },
-      "name": "from"
-    },
-    {
-      "type": {
-        "type": "array",
-        "items": "string"
-      },
-      "name": "to"
     }
   ]
 }
