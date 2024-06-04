@@ -18,6 +18,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.application.prepare.Predictor;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.core.network.NetworkUtils;
 import picocli.CommandLine;
@@ -104,7 +105,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 						continue;
 					}
 
-					FeatureRegressor speedModel = model.speedFactor(ft.junctionType());
+					Predictor speedModel = model.speedFactor(ft.junctionType(), ft.highwayType());
 
 					if (speedModel == null) {
 						link.setFreespeed(allowedSpeed);
@@ -115,15 +116,15 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 					if (request.hasParams()) {
 						double[] p = request.getParams(ft.junctionType());
-						speedFactor = speedModel.predict(ft.features(), p);
+						speedFactor = speedModel.predict(ft.features(), ft.categories(), p);
 					} else
-						speedFactor = speedModel.predict(ft.features());
+						speedFactor = speedModel.predict(ft.features(), ft.categories());
 
 					// apply lower and upper bound
 					speedFactor = Math.max(speedFactorBounds[0], speedFactor);
 					speedFactor = Math.min(speedFactorBounds[1], speedFactor);
 
-					attributes.put(link.getId(), speedModel.getData(ft.features()));
+					attributes.put(link.getId(), speedModel.getData(ft.features(), ft.categories()));
 
 					link.setFreespeed(allowedSpeed * speedFactor);
 					link.getAttributes().putAttribute("speed_factor", speedFactor);
@@ -151,7 +152,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
 
 		validationSet = readValidation(validationFiles, refHours);
-		features = readFeatures(input.getPath("features.csv"), network.getLinks().size());
+		features = readFeatures(input.getPath("features.csv"), network.getLinks());
 
 		CSVPrinter csv;
 		Path out = output.getPath("eval.csv");

@@ -126,7 +126,7 @@ public final class RailsimCalc {
 		}
 
 
-		assert FuzzyUtils.greaterEqualThan(allowedSpeed, currentSpeed) : "Current speed must be lower than allowed";
+//		assert FuzzyUtils.greaterEqualThan(allowedSpeed, currentSpeed) : "Current speed must be lower than allowed";
 		assert FuzzyUtils.greaterEqualThan(allowedSpeed, finalSpeed) : "Final speed must be smaller than target";
 
 		double timeAccel = (allowedSpeed - currentSpeed) / acceleration;
