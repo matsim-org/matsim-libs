@@ -20,9 +20,9 @@
 package org.matsim.contrib.dynagent.run;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -56,25 +56,31 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 		dynAgents.addAll(newDynAgents);
 		newDynAgents.clear();
 
-		Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
-		while (dynAgentIter.hasNext()) {
-			DynAgent agent = dynAgentIter.next();
-			Preconditions.checkState(agent.getState() == State.ACTIVITY);
-			agent.doSimStep(time);
-			// ask agents about the current activity end time;
-			double currentEndTime = agent.getActivityEndTime();
+		List<DynAgent> agentsToRemove = dynAgents.parallelStream()
+				.map(agent -> {
 
-			if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
-				unregisterAgentAtActivityLocation(agent);
-				internalInterface.getMobsim().getAgentCounter().decLiving();
-				dynAgentIter.remove();
-			} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
-				unregisterAgentAtActivityLocation(agent);
-				agent.endActivityAndComputeNextState(time);
-				internalInterface.arrangeNextAgentState(agent);
-				dynAgentIter.remove();
-			}
-		}
+					Preconditions.checkState(agent.getState() == State.ACTIVITY);
+					agent.doSimStep(time);
+					// ask agents about the current activity end time;
+					double currentEndTime = agent.getActivityEndTime();
+
+					if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
+						unregisterAgentAtActivityLocation(agent);
+						internalInterface.getMobsim().getAgentCounter().decLiving();
+						return agent;
+					} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
+						unregisterAgentAtActivityLocation(agent);
+						agent.endActivityAndComputeNextState(time);
+						internalInterface.arrangeNextAgentState(agent);
+						return agent;
+					}
+
+					return null;
+				})
+				.filter(Objects::nonNull)
+				.toList();
+
+		dynAgents.removeAll(agentsToRemove);
 	}
 
 	@Override
