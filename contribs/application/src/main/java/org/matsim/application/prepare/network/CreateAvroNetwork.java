@@ -57,7 +57,7 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--match-id", description = "Pattern to filter links by id")
 	private String matchId;
 
-	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car,freight,drt",
+	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car,bike,truck,freight,drt",
 		description = "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
 	private Set<String> modes;
 
@@ -136,6 +136,15 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 		Set<CharSequence> nodeAttributes = new LinkedHashSet<>();
 
 		for (Node node : network.getNodes().values()) {
+
+			List<Link> relevant = new ArrayList<>();
+			relevant.addAll(node.getInLinks().values());
+			relevant.addAll(node.getOutLinks().values());
+
+			// Skip nodes without relevant links
+			if (relevant.stream().noneMatch(filter))
+				continue;
+
 			Coord from = ct.transform(node.getCoord());
 			double xCoord = round(from.getX());
 			double yCoord = round(from.getY());
@@ -151,7 +160,6 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 		avro.setNodeCoordinates(nodeCoords);
 		avro.setNodeIds(nodeIds.keySet().stream().toList());
 		avro.setNodeAttributes(nodeAttributes.stream().toList());
-
 
 		// Link attributes
 		FloatList lengths = new FloatArrayList();
