@@ -1,15 +1,20 @@
 package org.matsim.application.prepare.network;
 
+import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.apache.avro.Schema;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -27,6 +32,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -34,17 +41,18 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @CommandLine.Command(name = "network-avro", description = "Create avro representation of a network.")
 @CommandSpec(requireNetwork = true, produces = "network.avro")
 public class CreateAvroNetwork implements MATSimAppCommand {
+
+	private Set<String> FIELD_RESERVED = Set.of("name", "type", "doc", "default", "aliases");
+
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(CreateAvroNetwork.class);
 	@CommandLine.Mixin
@@ -64,7 +72,7 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--precision", description = "Number of decimals places", defaultValue = "6")
 	private int precision;
 
-	@CommandLine.Option(names = "--with-properties", description = "Put network attributes as properties into the geojson.")
+	@CommandLine.Option(names = "--with-properties", description = "Convert custom node and link attributes as well.")
 	private boolean withProperties;
 
 	@CommandLine.Option(names = "--filter-properties", description = "Only include listed properties in the output.")
@@ -87,10 +95,6 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 			throw new IllegalArgumentException("Network coordinate system is neither in the xml nor given as option.");
 		}
 
-
-		AvroNetwork avro = new AvroNetwork();
-		avro.setCrs(networkCrs);
-
 		Predicate<Link> filter = link -> true;
 
 		if (shp.isDefined()) {
@@ -111,11 +115,11 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 			filter = filter.and(link -> modes.stream().anyMatch(m -> link.getAllowedModes().contains(m)));
 		}
 
-//		AvroNetwork.getClassSchema().addProp();
+		GenericData.Record avro = convert(network, TransformationFactory.getCoordinateTransformation(networkCrs, this.crs.getTargetCRS()), filter);
 
-		convert(avro, network, TransformationFactory.getCoordinateTransformation(networkCrs, this.crs.getTargetCRS()), filter);
+		avro.put("crs", crs.getTargetCRS());
 
-		writeAvro(avro, output.getPath().toFile());
+		write(avro.getSchema(), avro, output.getPath().toFile());
 
 		return 0;
 	}
@@ -123,17 +127,18 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 	/**
 	 * Converts the given network to a GeoJson representation.
 	 *
-	 * @param avro    the AvroNetwork to write to
 	 * @param network the network to convert
 	 * @param ct      the coordinate transformation to use
 	 * @param filter  the filter to apply to the links
+	 * @return created record
 	 */
-	private void convert(AvroNetwork avro, Network network, CoordinateTransformation ct, Predicate<Link> filter) {
+	private GenericData.Record convert(Network network, CoordinateTransformation ct, Predicate<Link> filter) {
 
 		// Node attributes
 		List<Float> nodeCoords = new ArrayList<>();
 		Object2IntMap<CharSequence> nodeIds = new Object2IntLinkedOpenHashMap<>();
-		Set<CharSequence> nodeAttributes = new LinkedHashSet<>();
+
+		Map<String, AttributeColumn> nodeAttributes = getAttributeColumns(network.getNodes().values());
 
 		for (Node node : network.getNodes().values()) {
 
@@ -153,13 +158,9 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 
 			String nodeId = node.getId().toString();
 			nodeIds.put(nodeId, nodeIds.size());
-			nodeAttributes.addAll(node.getAttributes().getAsMap().keySet());
-		}
 
-		// Set the node attributes
-		avro.setNodeCoordinates(nodeCoords);
-		avro.setNodeIds(nodeIds.keySet().stream().toList());
-		avro.setNodeAttributes(nodeAttributes.stream().toList());
+			collectAttributes(nodeAttributes, node);
+		}
 
 		// Link attributes
 		FloatList lengths = new FloatArrayList();
@@ -170,6 +171,8 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 		IntList froms = new IntArrayList();
 		IntList tos = new IntArrayList();
 		IntList allowedModes = new IntArrayList();
+
+		Map<String, AttributeColumn> linkAttributes = getAttributeColumns(network.getLinks().values());
 
 		Object2IntMap<CharSequence> modeMapping = new Object2IntLinkedOpenHashMap<>();
 
@@ -188,21 +191,124 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 			ids.add(link.getId().toString());
 			froms.add(nodeIds.getOrDefault(link.getFromNode().getId().toString(), -1));
 			tos.add(nodeIds.getOrDefault(link.getToNode().getId().toString(), -1));
+
+			collectAttributes(linkAttributes, link);
 		}
 
+		// Create the Avro record
+		Schema baseSchema = AvroNetwork.getClassSchema();
+
+		// Field objects needs to be copied
+		List<Schema.Field> fields = baseSchema.getFields()
+			.stream()
+			.map(f -> new Schema.Field(f.name(), f.schema(), f.doc(), f.defaultVal(), f.order()))
+			.collect(Collectors.toList());
+
+		createFields(fields, nodeAttributes, "node_");
+		createFields(fields, linkAttributes, "link_");
+
+		// Copy of the original schema
+		Schema schema = Schema.createRecord(baseSchema.getName(), baseSchema.getDoc(),
+			baseSchema.getNamespace(), baseSchema.isError(), fields);
+
+		GenericData.Record avro = new GenericData.Record(schema);
+
+		// Set the node attributes
+		avro.put("nodeCoordinates", nodeCoords);
+		avro.put("nodeIds", nodeIds.keySet().stream().toList());
+		avro.put("nodeAttributes", nodeAttributes.values().stream().map(AttributeColumn::name).map(MutableObject::getValue).toList());
+
 		// Set the mapping which assigns an integer to each possible allowed mode entry
-		avro.setModes(modeMapping.keySet().stream().toList());
+		avro.put("modes", modeMapping.keySet().stream().toList());
 
 		// Set the link attributes
-		avro.setLength(lengths);
-		avro.setFreespeed(freeSpeeds);
-		avro.setCapacity(capacities);
-		avro.setPermlanes(permLanes);
-		avro.setAllowedModes(allowedModes);
+		avro.put("length", lengths);
+		avro.put("freespeed", freeSpeeds);
+		avro.put("capacity", capacities);
+		avro.put("permlanes", permLanes);
+		avro.put("allowedModes", allowedModes);
 
-		avro.setLinkIds(ids);
-		avro.setFrom(froms);
-		avro.setTo(tos);
+		avro.put("linkIds", ids);
+		avro.put("from", froms);
+		avro.put("to", tos);
+
+		// Put the additional entry columns
+		for (Map.Entry<String, AttributeColumn> e : Iterables.concat(nodeAttributes.entrySet(), linkAttributes.entrySet())) {
+			avro.put(e.getValue().name.getValue(), e.getValue().values);
+		}
+
+		return avro;
+	}
+
+	private <T extends Attributable> Map<String, AttributeColumn> getAttributeColumns(Collection<T> entities) {
+
+		if (!withProperties)
+			return Collections.emptyMap();
+
+		Map<String, AttributeColumn> map = new LinkedHashMap<>();
+
+		for (T entity : entities) {
+			Attributes attr = entity.getAttributes();
+			for (Map.Entry<String, Object> e : attr.getAsMap().entrySet()) {
+				String key = e.getKey();
+				if (filterProperties != null && !filterProperties.contains(key))
+					continue;
+
+				Object value = e.getValue();
+				if (value instanceof Number) {
+					map.computeIfAbsent(key, k -> new AttributeColumn(new MutableObject<>(k), ColumnType.NUMBER, new ArrayList<>()));
+				} else if (value instanceof Boolean) {
+					map.computeIfAbsent(key, k -> new AttributeColumn(new MutableObject<>(k), ColumnType.BOOLEAN, new ArrayList<>()));
+				} else {
+					map.computeIfAbsent(key, k -> new AttributeColumn(new MutableObject<>(k), ColumnType.STRING, new ArrayList<>()));
+				}
+			}
+		}
+
+		return map;
+	}
+
+	private void collectAttributes(Map<String, AttributeColumn> attributes, Attributable el) {
+		attributes.forEach((key, column) -> {
+			Object value = el.getAttributes().getAttribute(key);
+			if (column.type == ColumnType.NUMBER && value instanceof Number n)
+				value = n.floatValue();
+			else if (column.type == ColumnType.BOOLEAN && value instanceof Boolean b)
+				value = b;
+			else if (column.type == ColumnType.STRING && value != null)
+				value = value.toString();
+			else if (column.type == ColumnType.NUMBER)
+				value = Float.NaN;
+			else if (column.type == ColumnType.BOOLEAN)
+				value = false;
+			else if (column.type == ColumnType.STRING)
+				value = "";
+
+
+			// Null is not allowed for any of these entries
+			column.values.add(value);
+		});
+	}
+
+	/**
+	 * Add fields to the schema.
+	 */
+	private void createFields(List<Schema.Field> fields, Map<String, AttributeColumn> attr, String prefix) {
+		for (Map.Entry<String, AttributeColumn> e : attr.entrySet()) {
+			MutableObject<String> name = e.getValue().name;
+
+			while (fields.stream().anyMatch(f -> f.name().equals(name.getValue())) || FIELD_RESERVED.contains(name.getValue()))
+				name.setValue(prefix + name.getValue());
+
+			String key = name.getValue();
+			Schema field = switch (e.getValue().type) {
+				case NUMBER -> Schema.createArray(Schema.create(Schema.Type.FLOAT));
+				case BOOLEAN -> Schema.createArray(Schema.create(Schema.Type.BOOLEAN));
+				case STRING -> Schema.createArray(Schema.create(Schema.Type.STRING));
+			};
+
+			fields.add(new Schema.Field(key, field, e.getValue().name.getValue()));
+		}
 	}
 
 	/**
@@ -223,11 +329,32 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 	}
 
 	/**
+	 * Write the avro network given as generic data to file output.
+	 */
+	private void write(Schema schema, GenericData.Record avroNetwork, File output) {
+		GenericDatumWriter<Object> datumWriter = new GenericDatumWriter<>();
+		try (DataFileWriter<Object> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
+			dataFileWriter.create(schema, IOUtils.getOutputStream(IOUtils.getFileUrl(output.toString()), false));
+			dataFileWriter.append(avroNetwork);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
 	 * Round to desired precision.
 	 */
 	private double round(double x) {
 		BigDecimal d = BigDecimal.valueOf(x).setScale(precision, RoundingMode.HALF_UP);
 		return d.doubleValue();
+	}
+
+	private enum ColumnType {
+		NUMBER, STRING, BOOLEAN
+	}
+
+	private record AttributeColumn(MutableObject<String> name, ColumnType type, List<Object> values) {
 	}
 
 }

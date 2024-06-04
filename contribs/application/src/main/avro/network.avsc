@@ -29,20 +29,8 @@
         "items": "string"
       }
     },
-    {
-      "type": {
-        "type": "array",
-        "items": "string"
-      },
-      "name": "linkIds"
-    },
-    {
-      "type": {
-        "type": "array",
-        "items": "int"
-      },
-      "name": "from"
-    },
+    {"type": {"type": "array", "items": "string" }, "name": "linkIds"},
+    {"type": {"type": "array",  "items": "int" }, "name": "from"},
     {
       "type": {
         "type": "array",
