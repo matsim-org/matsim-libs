@@ -214,21 +214,23 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 		GenericData.Record avro = new GenericData.Record(schema);
 
 		// Set the node attributes
+		avro.put("nodeId", nodeIds.keySet().stream().toList());
 		avro.put("nodeCoordinates", nodeCoords);
-		avro.put("nodeIds", nodeIds.keySet().stream().toList());
-		avro.put("nodeAttributes", nodeAttributes.values().stream().map(AttributeColumn::name).map(MutableObject::getValue).toList());
+		avro.put("nodeAttributes", createAttributeList(nodeAttributes, "nodeId"));
+		avro.put("linkAttributes", createAttributeList(linkAttributes,
+			"linkId", "length", "freespeed", "capacity", "permlanes", "allowedModes"));
 
 		// Set the mapping which assigns an integer to each possible allowed mode entry
 		avro.put("modes", modeMapping.keySet().stream().toList());
 
 		// Set the link attributes
+		avro.put("linkId", ids);
 		avro.put("length", lengths);
 		avro.put("freespeed", freeSpeeds);
 		avro.put("capacity", capacities);
 		avro.put("permlanes", permLanes);
 		avro.put("allowedModes", allowedModes);
 
-		avro.put("linkIds", ids);
 		avro.put("from", froms);
 		avro.put("to", tos);
 
@@ -238,6 +240,14 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 		}
 
 		return avro;
+	}
+
+	private List<String> createAttributeList(Map<String, AttributeColumn> attr, String... baseAttributes) {
+		List<String> result = Arrays.stream(baseAttributes).collect(Collectors.toList());
+		attr.values().stream().map(AttributeColumn::name).map(MutableObject::getValue)
+			.forEach(result::add);
+
+		return result;
 	}
 
 	private <T extends Attributable> Map<String, AttributeColumn> getAttributeColumns(Collection<T> entities) {

@@ -9,11 +9,25 @@
       "doc": "Coordinate reference system"
     },
     {
+      "name": "nodeAttributes",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "name": "linkAttributes",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
       "type": {
         "type": "array",
         "items": "string"
       },
-      "name": "nodeIds"
+      "name": "nodeId"
     },
     {
       "type": {
@@ -22,29 +36,10 @@
       },
       "name": "nodeCoordinates"
     },
-    {
-      "name": "nodeAttributes",
-      "type": {
-        "type": "array",
-        "items": "string"
-      }
-    },
-    {"type": {"type": "array", "items": "string" }, "name": "linkIds"},
-    {"type": {"type": "array",  "items": "int" }, "name": "from"},
-    {
-      "type": {
-        "type": "array",
-        "items": "int"
-      },
-      "name": "to"
-    },
-    {
-      "name": "modes",
-      "type": {
-        "type": "array",
-        "items": "string"
-      }
-    },
+    {"type": {"type": "array", "items": "string" }, "name": "linkId"},
+    {"type": {"type": "array", "items": "int" }, "name": "from"},
+    {"type": {"type": "array", "items": "int"}, "name": "to"},
+    {"type": { "type": "array", "items": "string"}, "name": "modes"},
     {
       "type": {
         "type": "array",
