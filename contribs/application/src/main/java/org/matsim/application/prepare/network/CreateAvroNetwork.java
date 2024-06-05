@@ -322,23 +322,6 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 	}
 
 	/**
-	 * Writes the given data to the given file.
-	 *
-	 * @param avroNetwork the data to write
-	 * @param output      the file to write to
-	 */
-	private void writeAvro(AvroNetwork avroNetwork, File output) {
-		DatumWriter<AvroNetwork> datumWriter = new SpecificDatumWriter<>(AvroNetwork.class);
-		try (DataFileWriter<AvroNetwork> dataFileWriter = new DataFileWriter<>(datumWriter)) {
-			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
-			dataFileWriter.create(avroNetwork.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(output.toString()), false));
-			dataFileWriter.append(avroNetwork);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	/**
 	 * Write the avro network given as generic data to file output.
 	 */
 	private void write(Schema schema, GenericData.Record avroNetwork, File output) {
