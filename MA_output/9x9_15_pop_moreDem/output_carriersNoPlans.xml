@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="testCarrier1">
+		<attributes>
+			<attribute name="jspritIterations" class="java.lang.Integer">5</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="testVehicle1_testCarrier1_i(2,0)_start27000_1" depotLinkId="i(2,0)" typeId="testVehicle1" earliestStart="07:30:00" latestEnd="15:30:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="Shipment_i(2,0)_j(3,3)" from="i(2,0)" to="j(3,3)" size="4" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="Shipment_i(2,0)_i(5,9)R" from="i(2,0)" to="i(5,9)R" size="4" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="Shipment_i(2,0)_j(8,8)R" from="i(2,0)" to="j(8,8)R" size="4" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="Shipment_i(2,0)_j(1,8)" from="i(2,0)" to="j(1,8)" size="4" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="Shipment_i(2,0)_j(4,5)R" from="i(2,0)" to="j(4,5)R" size="3" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:09:00"/>
+			<shipment id="Shipment_i(2,0)_j(5,6)" from="i(2,0)" to="j(5,6)" size="4" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="Shipment_i(2,0)_i(9,5)R" from="i(2,0)" to="i(9,5)R" size="4" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="Shipment_i(2,0)_j(5,3)" from="i(2,0)" to="j(5,3)" size="3" startPickup="07:00:00" endPickup="18:00:00" startDelivery="07:00:00" endDelivery="18:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:09:00"/>
+		</shipments>
+	</carrier>
+</carriers>

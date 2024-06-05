@@ -83,7 +83,7 @@
 
 <!-- ====================================================================== -->
 
-	<person id="person5" employed="no">
+	<person id="person5" employed="no" age="50">
 		<plan selected="yes">
 			<act type="home" x="5200.0" y="5500.0" end_time="06:54:37" />
 			<leg mode="car">
@@ -99,7 +99,7 @@
 <!-- ====================================================================== -->
 
 
-	<person id="person6" employed="no">
+	<person id="person6" employed="no" age="40">
 		<plan selected="yes">
 			<act type="home" x="7900.0" y="7500.0" end_time="03:03:18" />
 			<leg mode="car">
@@ -114,7 +114,7 @@
 
 <!-- ====================================================================== -->
 
-	<person id="person7" employed="no">
+	<person id="person7" employed="no" age="30">
 		<plan selected="yes">
 			<act type="home" x="4900.0" y="8900.0" end_time="06:33:01" />
 			<leg mode="car">
@@ -126,7 +126,7 @@
 
 <!-- ====================================================================== -->
 
-	<person id="person8" employed="no">
+	<person id="person8" employed="no" age="20">
 		<plan selected="yes">
 			<act type="home" x="8400.0" y="5200.0" end_time="23:38:10" />
 			<leg mode="car">

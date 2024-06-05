@@ -38,6 +38,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,6 +54,28 @@ import java.util.*;
 public final class DemandReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
 	private static final Random rand = new Random(4711);
+
+	private static HashMap<Id<Person>, HashMap<Double, String>> globalNearestLinkPerPerson = new HashMap<>();
+
+	private static final HashMap totalDemandByAge = new HashMap<>(Map.of(
+			(int) 0,new HashMap<>(Map.of("lower",0,"upper",13,"share", 0.0)),
+			(int) 1,new HashMap<>(Map.of("lower",14,"upper",23,"share", 0.0)),
+			(int) 2,new HashMap<>(Map.of("lower",24,"upper",33,"share", 40.0)),
+			(int) 3,new HashMap<>(Map.of("lower",34,"upper",43,"share", 0.0)),
+			(int) 4,new HashMap<>(Map.of("lower",44,"upper",53,"share", 60.0)),
+			(int) 5,new HashMap<>(Map.of("lower",54,"upper",63,"share", 0.0)),
+			(int) 6,new HashMap<>(Map.of("lower",64,"upper",100,"share", 0.0)))
+	);
+
+	private static final HashMap DemandPerAge = new HashMap<>(Map.of(
+			"15",0,
+			"25",71.5,
+			"45",78.2,
+			65,66.2,
+			75,43.0,
+			1000,0));
+
+	private static final String age = "DemandPerAge";
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -764,7 +787,6 @@ public final class DemandReaderFromCSV {
 	private static void createShipments(Scenario scenario, DemandInformationElement newDemandInformationElement,
 										ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
 										CoordinateTransformation crsTransformationNetworkAndShape) {
-
 		int countOfLinks = 1;
 		int distributedDemand = 0;
 		double roundingError = 0;
@@ -788,7 +810,7 @@ public final class DemandReaderFromCSV {
 
 		// set number of jobs
 		if (shareOfPopulationWithThisPickup == null && shareOfPopulationWithThisDelivery == null)
-			numberOfJobs = newDemandInformationElement.getNumberOfJobs();
+		numberOfJobs = newDemandInformationElement.getNumberOfJobs();
 		else if (population == null)
 			throw new RuntimeException(
 					"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
@@ -807,6 +829,7 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 			else
 				possiblePersonsDelivery.putAll(population.getPersons());
+
 
 			int numberPossibleJobsPickup = 0;
 			int numberPossibleJobsDelivery = 0;
@@ -856,11 +879,38 @@ public final class DemandReaderFromCSV {
 					throw new RuntimeException(
 							"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			}
+
 			if (numberPossibleJobsPickup != 0)
 				numberOfPickupLocations = numberPossibleJobsPickup;
 			if (numberPossibleJobsDelivery != 0)
 				numberOfDeliveryLocations = numberPossibleJobsDelivery;
 		}
+
+		//demandPerAge
+		if (age == "DemandPerAge") {
+			//modifying the demand hash map and add share of demand
+			double error = 0;
+			for (Object i : totalDemandByAge.keySet()) {
+				HashMap temp = (HashMap) totalDemandByAge.get(i);
+				double demand = demandToDistribute * (double) temp.get("share") / 100;
+				int jobs = (int) Math.round(numberOfDeliveryLocations * (double) temp.get("share") / 100);
+				error += numberOfDeliveryLocations * (double) temp.get("share") / 100 - jobs;
+				if (error >= 1) {
+					jobs += 1;
+					error += -1;
+				}
+				else if (error<=-1) {
+					jobs += -1;
+					error += 1;
+				}
+
+				temp.put("demand",demand);
+				temp.put("jobs",jobs);
+				totalDemandByAge.put(i,temp);
+			}
+		}
+
+
 		// find possible Links for delivery and pickup
 		HashMap<Id<Link>, Link> possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
 				crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
@@ -868,6 +918,8 @@ public final class DemandReaderFromCSV {
 		HashMap<Id<Link>, Link> possibleLinksDelivery = findAllPossibleLinks(scenario, indexShape,
 				crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
 				setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonPickup);
+		log.info("Possible links for delivery: "+possibleLinksDelivery.size());
+		log.info("Possible persons for delivery: "+Math.round(possiblePersonsDelivery.size()*shareOfPopulationWithThisDelivery));
 
 		if (possibleLinksPickup.isEmpty())
 			throw new RuntimeException(
@@ -939,8 +991,12 @@ public final class DemandReaderFromCSV {
 				Link linkDelivery;
 				double sumOfPossibleLinkLengthPickup = 0;
 				double sumOfPossibleLinkLengthDelivery = 0;
-				possibleLinksPickup.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthPickup));
-				possibleLinksDelivery.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthDelivery));
+				//possibleLinksPickup.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthPickup));
+				for (Map.Entry<Id<Link>, Link> l : possibleLinksPickup.entrySet())
+					sumOfPossibleLinkLengthPickup += l.getValue().getLength();
+				//possibleLinksDelivery.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthDelivery));
+				for (Map.Entry<Id<Link>, Link> l : possibleLinksDelivery.entrySet())
+					sumOfPossibleLinkLengthDelivery += l.getValue().getLength();
 				if (numberOfPickupLocations == null && numberOfDeliveryLocations == null)
 					if (possibleLinksPickup.size() > possibleLinksDelivery.size()) {
 						demandBasesLinks = possibleLinksPickup;
@@ -1035,6 +1091,11 @@ public final class DemandReaderFromCSV {
 
 		// if a certain number of shipments is selected
 		{
+			log.info("Number of jobs: "+numberOfJobs);
+			//demandPerAge
+			if (age == "DemandPerAge") {
+				log.info(globalNearestLinkPerPerson);
+			}
 			for (int i = 0; i < numberOfJobs; i++) {
 
 				if (demandToDistribute != 0 && demandToDistribute < numberOfJobs)
@@ -1269,12 +1330,17 @@ public final class DemandReaderFromCSV {
 				}
 		} else {
 			Link newPossibleLink;
+			int z = 0;
 			while (possibleLinks.size() < numberOfLocations) {
 				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
 					indexShape, areasForLocations, numberOfLocations, scenario, setLocations,
 						crsTransformationNetworkAndShape);
-				if (!possibleLinks.containsKey(newPossibleLink.getId()))
+
+				if (!possibleLinks.containsKey(newPossibleLink.getId())){
 					possibleLinks.put(newPossibleLink.getId(), newPossibleLink);
+					if (possiblePersons.size() == possibleLinks.size())
+						break;
+					}
 			}
 		}
 
@@ -1303,7 +1369,6 @@ public final class DemandReaderFromCSV {
 			HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
 			CoordinateTransformation crsTransformationNetworkAndShape, int i) {
 		Link link = null;
-
 		if (selectedNumberOfLocations == null || usedLocations.size() < selectedNumberOfLocations) {
 			if (selectedLocations != null && selectedLocations.length > i) {
 				link = scenario.getNetwork().getLinks().get(Id.createLinkId(selectedLocations[i]));
@@ -1334,7 +1399,6 @@ public final class DemandReaderFromCSV {
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
 		HashMap<Id<Person>, Person> possiblePersons = new HashMap<Id<Person>, Person>();
-
 		for (Person person : population.getPersons().values()) {
 			Coord coord = getHomeCoord(person);
 			if (crsTransformationNetworkAndShape != null)
@@ -1357,7 +1421,7 @@ public final class DemandReaderFromCSV {
 	static void findLinksForPerson(Scenario scenario,
 								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
 		Coord homePoint = getHomeCoord(person);
-		for (Link link : scenario.getNetwork().getLinks().values())
+				for (Link link : scenario.getNetwork().getLinks().values())
 			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
 					|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))) {
 
@@ -1367,8 +1431,10 @@ public final class DemandReaderFromCSV {
 						|| distance < nearestLinkPerPerson.get(person.getId()).keySet().iterator().next()) {
 					nearestLinkPerPerson.put(person.getId(), new HashMap<>());
 					nearestLinkPerPerson.get(person.getId()).put(distance, link.getId().toString());
+					globalNearestLinkPerPerson = nearestLinkPerPerson;
 				}
 			}
+
 	}
 
 	/**
@@ -1416,6 +1482,7 @@ public final class DemandReaderFromCSV {
 												  Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
 		Link selectedlink = null;
 		Link newLink = null;
+
 		if (selectedNumberOfLocations == null)
 			selectedNumberOfLocations = 0;
 		while (selectedlink == null) {
@@ -1448,6 +1515,7 @@ public final class DemandReaderFromCSV {
 				indexShape, areasForTheDemand, crsTransformationNetworkAndShape)))
 				selectedlink = newLink;
 		}
+
 		return selectedlink;
 	}
 

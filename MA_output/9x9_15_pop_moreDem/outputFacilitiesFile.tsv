@@ -1,0 +1,17 @@
+id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation
+testCarrier1Shipment_i(2,0)_j(3,3)	1500.0	0.0	Pickup		i(2,0)	j(3,3)
+testCarrier1Shipment_i(2,0)_j(3,3)	3000.0	2500.0	Delivery		i(2,0)	j(3,3)
+testCarrier1Shipment_i(2,0)_i(5,9)R	1500.0	0.0	Pickup		i(2,0)	i(5,9)R
+testCarrier1Shipment_i(2,0)_i(5,9)R	4500.0	9000.0	Delivery		i(2,0)	i(5,9)R
+testCarrier1Shipment_i(2,0)_j(8,8)R	1500.0	0.0	Pickup		i(2,0)	j(8,8)R
+testCarrier1Shipment_i(2,0)_j(8,8)R	8000.0	7500.0	Delivery		i(2,0)	j(8,8)R
+testCarrier1Shipment_i(2,0)_j(1,8)	1500.0	0.0	Pickup		i(2,0)	j(1,8)
+testCarrier1Shipment_i(2,0)_j(1,8)	1000.0	7500.0	Delivery		i(2,0)	j(1,8)
+testCarrier1Shipment_i(2,0)_j(4,5)R	1500.0	0.0	Pickup		i(2,0)	j(4,5)R
+testCarrier1Shipment_i(2,0)_j(4,5)R	4000.0	4500.0	Delivery		i(2,0)	j(4,5)R
+testCarrier1Shipment_i(2,0)_j(5,6)	1500.0	0.0	Pickup		i(2,0)	j(5,6)
+testCarrier1Shipment_i(2,0)_j(5,6)	5000.0	5500.0	Delivery		i(2,0)	j(5,6)
+testCarrier1Shipment_i(2,0)_i(9,5)R	1500.0	0.0	Pickup		i(2,0)	i(9,5)R
+testCarrier1Shipment_i(2,0)_i(9,5)R	8500.0	5000.0	Delivery		i(2,0)	i(9,5)R
+testCarrier1Shipment_i(2,0)_j(5,3)	1500.0	0.0	Pickup		i(2,0)	j(5,3)
+testCarrier1Shipment_i(2,0)_j(5,3)	5000.0	2500.0	Delivery		i(2,0)	j(5,3)

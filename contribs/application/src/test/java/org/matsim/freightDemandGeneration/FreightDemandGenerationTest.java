@@ -26,36 +26,39 @@ public class FreightDemandGenerationTest {
 			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_1.csv");
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_1.csv");
 			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
-			//String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
+			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			//String shapeCategory = "Ortsteil";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
-					//"--demandOption", "createDemandFromCSVAndUsePopulation",
-					"--demandOption", "createDemandFromCSV",
+					"--demandOption", "createDemandFromCSVAndUsePopulation",
+					//"--demandOption", "createDemandFromCSV",
 					//"--populationOption", "usePopulationInShape",
-					"--populationOption", "useNoPopulation",
+					"--populationOption", "useHolePopulation",
+					//"--populationOption", "useNoPopulation",
 					//"--populationSamplingOption", "createMoreLocations",
-					"--populationSamplingOption", "noPopulationSampling",
+					"--populationSamplingOption", "increaseDemandOnLocation",
+					//"--populationSamplingOption", "noPopulationSampling",
 					//"--VRPSolutionsOption", "runJsprit",
+					//"--VRPSolutionsOption","runJspritAndMATSim",
 					"--VRPSolutionsOption", "createNoSolutionAndOnlyWriteCarrierFile",
 					"--combineSimilarJobs", "false",
 					"--carrierFileLocation", "",
 					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
 					//"--shapeFileLocation", shapeFilePath.toString(),
 					//"--shapeCRS", "WGS84",
-					//"--populationFileLocation", populationLocation,
-					//"--populationCRS", "WGS84",
+					"--populationFileLocation", populationLocation,
+					"--populationCRS", "WGS84",
 					"--network", network,
 					"--networkCRS", "WGS84",
 					"--networkChangeEvents", "",
 					//"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
-					"--inputDemandCSV", demandCSVLocation.toString()
-					//"--populationSample", "0.5",
-					//"--populationSamplingTo", "1.0",
-					//"--defaultJspritIterations", "3"
+					"--inputDemandCSV", demandCSVLocation.toString(),
+					"--populationSample", "0.5",
+					"--populationSamplingTo", "1.0",
+					"--defaultJspritIterations", "3"
 			);
 		} catch (Exception ee) {
 			LogManager.getLogger(this.getClass()).fatal("there was an exception: \n" + ee);
