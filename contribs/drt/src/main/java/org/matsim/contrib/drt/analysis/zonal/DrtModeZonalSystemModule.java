@@ -20,14 +20,21 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -50,7 +57,16 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 			bindModal(ZoneSystem.class).toProvider(modalProvider(getter -> {
 				Network network = getter.getModal(Network.class);
-                return ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network, zoneSystemParams, crs);
+				Predicate<Zone> zoneFilter;
+				if(drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+					List<PreparedGeometry> serviceAreaGeoms = ShpGeometryUtils.loadPreparedGeometries(
+							ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.drtServiceAreaShapeFile));
+					zoneFilter = zone -> serviceAreaGeoms.stream()
+                            .anyMatch((serviceArea) -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
+				} else {
+					zoneFilter = zone -> true;
+				}
+				return ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network, zoneSystemParams, crs, zoneFilter);
 			})).asEagerSingleton();
 
 			bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter -> {
