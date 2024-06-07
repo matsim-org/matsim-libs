@@ -752,10 +752,17 @@ public class SwissRailRaptorCore {
                 continue;
             }
             RRouteStop fromRouteStop = fromPE.toRouteStop; // this is the route stop we arrive with least cost at stop
-            int firstTransferIndex = fromRouteStop.indexFirstTransfer;
-            int lastTransferIndex = firstTransferIndex + fromRouteStop.countTransfers;
+            
+            // obtain on-demand transfers if applicable (will return null if transfers are calculated initially)
+            RTransfer[] transfers = this.data.calculateTransfers(fromRouteStop);
+            
+            int firstTransferIndex = transfers == null ? fromRouteStop.indexFirstTransfer : 0;
+            int lastTransferIndex = transfers == null ? firstTransferIndex + fromRouteStop.countTransfers : transfers.length;
+            transfers = transfers == null ? this.data.transfers : transfers;
+            
             for (int transferIndex = firstTransferIndex; transferIndex < lastTransferIndex; transferIndex++) {
-                RTransfer transfer = this.data.transfers[transferIndex];
+                RTransfer transfer = transfers[transferIndex];
+            	
                 int toRouteStopIndex = transfer.toRouteStop;
                 transferProvider.reset(transfer);
                 int newArrivalTime = arrivalTime + transfer.transferTime;
