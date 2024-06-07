@@ -20,6 +20,9 @@
 package ch.sbb.matsim.config;
 
 import com.google.common.base.Verify;
+
+import ch.sbb.matsim.routing.pt.raptor.RaptorStaticConfig.RaptorTransferCalculation;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -61,6 +64,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_TRANSFER_WALK_MARGIN_DESC = "time deducted from transfer walk leg during transfers between pt legs in order to avoid missing a vehicle by a few seconds due to delays.";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING = "intermodalLegOnlyHandling";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING_DESC = "Define how routes containing only intermodal legs are handled: Useful options: alllow, avoid, forbid";
+    private static final String PARAM_TRANSFER_CALCULATION = "transferCalculation";
+    private static final String PARAM_TRANFER_CALCULATION_DESC = "Defines whether all potential transfers are precomputed at the beginning of the simulation (Initial) or whether they are constructed on-demand (Cached). The former incurs potentially long up-front caclulations, but quicker routing. The latter avoids any initial computation, but may require longer routing time.";
 
     private boolean useRangeQuery = false;
     private boolean useIntermodality = false;
@@ -74,6 +79,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private double transferPenaltyHourlyCost = 0;
     private double transferWalkMargin = 5;
 	private IntermodalLegOnlyHandling intermodalLegOnlyHandling = IntermodalLegOnlyHandling.forbid;
+	private RaptorTransferCalculation transferCalculation = RaptorTransferCalculation.Initial;
 
     private ScoringParameters scoringParameters = ScoringParameters.Default;
 
@@ -128,9 +134,19 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 	public String getIntermodalLegOnlyHandlingString() {
 		return intermodalLegOnlyHandling.toString();
 	}
-
+	
 	public IntermodalLegOnlyHandling getIntermodalLegOnlyHandling() {
 		return intermodalLegOnlyHandling;
+	}	
+	
+	@StringSetter(PARAM_TRANSFER_CALCULATION)
+	public void setTransferCalculation(RaptorTransferCalculation transferCalculation) {
+		this.transferCalculation = transferCalculation;
+	}
+
+	@StringGetter(PARAM_TRANSFER_CALCULATION)
+	public RaptorTransferCalculation getTransferCalculation() {
+		return transferCalculation;
 	}
 
 	@StringGetter(PARAM_USE_RANGE_QUERY)
@@ -707,6 +723,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
         comments.put(PARAM_TRANSFER_WALK_MARGIN, PARAM_TRANSFER_WALK_MARGIN_DESC);
 		comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION,PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
+		comments.put(PARAM_TRANSFER_CALCULATION, PARAM_TRANFER_CALCULATION_DESC);
         return comments;
     }
 
