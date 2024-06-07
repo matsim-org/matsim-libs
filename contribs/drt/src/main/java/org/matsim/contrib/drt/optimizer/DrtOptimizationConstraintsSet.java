@@ -88,6 +88,15 @@ public class DrtOptimizationConstraintsSet extends ReflectiveConfigGroup {
     @PositiveOrZero // used only for stopbased DRT scheme
     public double maxWalkDistance = Double.MAX_VALUE;// [m];
 
+    @Parameter
+    @Comment(
+            "Time before reaching a planned dropoff from which it is not allowed to insert new detours for new requests. I.e.," +
+                    " if set to 180, then a vehicle will not divert to pickup or dropoff a new passenger once a boarded passenger is only " +
+                    "3 minutes away from her destination, even though her time window would allow it." +
+                    " Delayed detours just before arrival are usually perceived very negatively.")
+    @PositiveOrZero
+    public double lateDiversionthreshold = 0; // [s];
+
     @Override
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);

@@ -15,6 +15,5 @@ public interface ZoneSystem {
 
 	List<Link> getLinksForZoneId(Id<Zone> zone);
 
-
 	Map<Id<Zone>, Zone> getZones();
 }

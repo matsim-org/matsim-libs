@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ApplyNetworkParamsTest {
+class HBSNetworkParamsTest {
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
@@ -32,13 +32,13 @@ class ApplyNetworkParamsTest {
 		assertThat(output.resolve("network-ft.csv")).exists();
 
 		new ApplyNetworkParams().execute(
-			"capacity", "freespeed",
+			"capacity",
 			"--network", output.resolve("network.xml").toString(),
 			"--input-features", output.resolve("network-ft.csv").toString(),
-			"--output", output.resolve("network-opt.xml").toString(),
-			"--model", "org.matsim.application.prepare.network.params.ref.GermanyNetworkParams"
+			"--output", output.resolve("network-hbs.xml").toString(),
+			"--model", "org.matsim.application.prepare.network.params.hbs.HBSNetworkParams"
 		);
 
-		assertThat(output.resolve("network-opt.xml")).exists();
+		assertThat(output.resolve("network-hbs.xml")).exists();
 	}
 }

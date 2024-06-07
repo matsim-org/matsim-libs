@@ -22,10 +22,12 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import jakarta.validation.constraints.NotNull;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.zones.GridZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -65,8 +67,69 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
 	}
 
+	@Override
+	public void handleAddUnknownParam(String paramName, String value) {
+		switch (paramName) {
+			case "zonesGeneration": {
+				if (getZoneSystemParams() == null) {
+					switch (value) {
+						case "ShapeFile": {
+							addParameterSet(createParameterSet(GISFileZoneSystemParams.SET_NAME));
+							break;
+						}
+						case "GridFromNetwork": {
+							addParameterSet(createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+							break;
+						}
+						case "H3": {
+							addParameterSet(createParameterSet(H3GridZoneSystemParams.SET_NAME));
+							break;
+						}
+						default:
+							super.handleAddUnknownParam(paramName, value);
+					}
+				}
+				break;
+			}
+			case "cellSize": {
+				SquareGridZoneSystemParams squareGridParams;
+				if(getZoneSystemParams() == null) {
+                    squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+					addParameterSet(squareGridParams);
+				} else {
+					squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
+				}
+				squareGridParams.cellSize = Double.parseDouble(value);
+				break;
+			}
+			case "zonesShapeFile": {
+				GISFileZoneSystemParams gisFileParams;
+				if(getZoneSystemParams() == null) {
+					gisFileParams = (GISFileZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+					addParameterSet(gisFileParams);
+				} else {
+					gisFileParams = (GISFileZoneSystemParams) getZoneSystemParams();
+				}
+				gisFileParams.zonesShapeFile = value;
+				break;
+			}
+			case "h3Resolution": {
+				H3GridZoneSystemParams h3GridParams;
+				if(getZoneSystemParams() == null) {
+					h3GridParams = (H3GridZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+					addParameterSet(h3GridParams);
+				} else {
+					h3GridParams = (H3GridZoneSystemParams) getZoneSystemParams();
+				}
+				h3GridParams.h3Resolution = Integer.parseInt(value);
+				break;
+			}
+			default:
+				super.handleAddUnknownParam(paramName, value);
+		}
+	}
+
 	public ZoneSystemParams getZoneSystemParams() {
 		return zoneSystemParams;
 	}
-
 }

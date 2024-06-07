@@ -85,7 +85,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 						Network network = getter.getModal(Network.class);
 						DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
 						ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
-							matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem());
+							matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
 						return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem,
 							matrixParams, globalConfigGroup.getNumberOfThreads(),
                                 qSimConfigGroup.getTimeStepSize());
