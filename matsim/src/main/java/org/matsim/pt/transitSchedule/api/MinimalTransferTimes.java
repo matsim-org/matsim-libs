@@ -19,6 +19,8 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -66,6 +68,8 @@ public interface MinimalTransferTimes {
 	 * @return the previously set minimal transfer time, or <code>Double.NaN</code> if none was set.
 	 */
 	double remove(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop);
+	
+	Set<Id<TransitStopFacility>> getCandidates(Id<TransitStopFacility> fromStop);
 
 	/**
 	 * @return an iterator to iterate over all minimal transfer times set.
