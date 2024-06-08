@@ -274,7 +274,7 @@ public class TripDashboard implements Dashboard {
 
 				// TODO: Still in testing
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_age.csv")).mapping()
+					viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", "age")).mapping()
 						.facetCol("age")
 						.name("main_mode", ColorScheme.Spectral)
 						.x("dist_group")

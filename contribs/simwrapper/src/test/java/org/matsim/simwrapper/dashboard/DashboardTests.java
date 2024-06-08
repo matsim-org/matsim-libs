@@ -77,9 +77,8 @@ public class DashboardTests {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv");
-
-		dashboard.withGroupedRefData("mode_share_per_group_dist_ref.csv");
+		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv")
+			.withGroupedRefData("mode_share_per_group_dist_ref.csv");
 
 		run(dashboard);
 		Assertions.assertThat(out)

@@ -35,16 +35,18 @@ final class TripChoiceAnalysis {
 
 	public TripChoiceAnalysis(Table persons, Table trips, List<String> modeOrder) {
 		persons = persons.where(persons.stringColumn("ref_modes").isNotEqualTo(""));
-		trips = new DataFrameJoiner(trips, "person").inner(persons);;
+		trips = new DataFrameJoiner(trips, "person").inner(persons);
 		this.modeOrder = modeOrder;
 
 		log.info("Analyzing mode choices for {} persons", persons.rowCount());
+
+		boolean hasWeight = persons.containsColumn(TripAnalysis.ATTR_REF_WEIGHT);
 
 		for (Row trip : trips) {
 
 			String person = trip.getText("person");
 			int n = trip.getInt("trip_number") - 1;
-			double weight = trip.getDouble(TripAnalysis.ATTR_REF_WEIGHT);
+			double weight = hasWeight ? trip.getDouble(TripAnalysis.ATTR_REF_WEIGHT) : 1;
 
 			String predMode = trip.getString("main_mode");
 			String[] split = trip.getString(TripAnalysis.ATTR_REF_MODES).split("-");
@@ -62,9 +64,9 @@ final class TripChoiceAnalysis {
 	 */
 	public void writeChoices(Path path) throws IOException {
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
-			csv.printRecord("person", "weight", "true_mode", "pred_mode");
+			csv.printRecord("person", "weight", "n", "true_mode", "pred_mode");
 			for (Entry e : data) {
-				csv.printRecord(e.person, e.weight, e.trueMode, e.predMode);
+				csv.printRecord(e.person, e.weight, e.n, e.trueMode, e.predMode);
 			}
 		}
 	}
@@ -79,21 +81,37 @@ final class TripChoiceAnalysis {
 			csv.printRecord("Info", "Value");
 
 			csv.printRecord("Accuracy", "TODO");
+			csv.printRecord("F1 Score", "TODO");
+//			csv.printRecord("AUC-ROC", "");
+			csv.printRecord("Precision", "TODO");
+			csv.printRecord("Recall", "TODO");
 
+			// These can be micro and macro averaged
 
 		}
 
-
-		// TODO: accuracy
-		// macro and micro averaged precision, recall, f1
+		// TODO Cohen’s Kappa, Cross-Entropy, Mathews Correlation Coefficient (MCC)
 	}
 
 	/**
 	 * Writes metrics per mode.
 	 */
-	public void writeChoiceEvaluationPerMode(Path path) {
+	public void writeChoiceEvaluationPerMode(Path path) throws IOException {
 
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("Accuracy", "TODO");
+			csv.printRecord("Precision", "TODO");
+			csv.printRecord("Recall", "TODO");
+			csv.printRecord("F1 Score", "TODO");
+
+
+		}
 	}
+
+	// TODO: write confusion matrix
+
+	// TODO Class Prediction Error
 
 	private record Entry(String person, double weight, int n, String trueMode, String predMode) {
 	}
