@@ -40,7 +40,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests;
 
 	private final IdMap<Request, Double> enterTimes = new IdMap<>(Request.class);
-	private final Queue<RequestIdTime> leaveTimes = new PriorityQueue<>();
+	private final Queue<QueuedRequest> leaveTimes = new PriorityQueue<>();
 	private final Set<Id<Request>> enteredRequests = new HashSet<>();
 
 	private final PrebookingManager prebookingManager;
@@ -86,7 +86,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private void initDropoffRequests(double now) {
 		for (var request : dropoffRequests.values()) {
 			double leaveTime = now + stopDurationProvider.calcDropoffDuration(vehicle, request.getRequest());
-			leaveTimes.add(new RequestIdTime(request.getId(), leaveTime));
+			leaveTimes.add(new QueuedRequest(request.getId(), leaveTime));
 		}
 
 		updateDropoffRequests(now);
@@ -95,19 +95,19 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private boolean updateDropoffRequests(double now) {
 
 		while (!leaveTimes.isEmpty() && leaveTimes.peek().time <= now) {
-			RequestIdTime rit = leaveTimes.poll();
-			passengerHandler.dropOffPassengers(driver, rit.id, now);
-			prebookingManager.notifyDropoff(rit.id);
-			onboard -= dropoffRequests.get(rit.id).getPassengerCount();
+			Id<Request> requestId = leaveTimes.poll().id;
+			passengerHandler.dropOffPassengers(driver, requestId, now);
+			prebookingManager.notifyDropoff(requestId);
+			onboard -= dropoffRequests.get(requestId).getPassengerCount();
 		}
 
 		return leaveTimes.isEmpty();
 	}
 
-	private record RequestIdTime(Id<Request> id, double time) implements Comparable<RequestIdTime> {
+	private record QueuedRequest(Id<Request> id, double time) implements Comparable<QueuedRequest> {
 
 		@Override
-		public int compareTo(RequestIdTime o) {
+		public int compareTo(QueuedRequest o) {
 			return Double.compare(this.time, o.time);
 		}
 	}
