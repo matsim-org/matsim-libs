@@ -40,6 +40,5 @@ class ApplyNetworkParamsTest {
 		);
 
 		assertThat(output.resolve("network-opt.xml")).exists();
-
 	}
 }

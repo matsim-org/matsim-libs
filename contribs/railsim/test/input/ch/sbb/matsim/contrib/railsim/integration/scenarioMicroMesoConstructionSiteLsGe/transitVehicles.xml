@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+
+	<!-- ====================================================================== -->
+
+	<!-- Four types of vehicles are used for the different traffc types : Regional (RV160), InterRegio (FV200IR), InterCity (FV200IC), Construction (Construction_Train)
+	-->
+
+	<!-- ====================================================================== -->
+
+
+	<vehicleType id="RV160">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">1</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">1</attribute>
+		</attributes>
+		<capacity seats="200" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="150"/>
+		<width meter="2.85"/>
+		<maximumVelocity meterPerSecond="44"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="FV200IR">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.8</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.8</attribute>
+		</attributes>
+		<capacity seats="400" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="200"/>
+		<width meter="2.85"/>
+		<maximumVelocity meterPerSecond="55"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="FV200IC">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.8</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.8</attribute>
+		</attributes>
+		<capacity seats="400" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="200"/>
+		<width meter="2.85"/>
+		<maximumVelocity meterPerSecond="55"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="Construction_Train">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.8</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.8</attribute>
+		</attributes>
+		<capacity seats="1" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="200"/>
+		<width meter="2.85"/>
+		<maximumVelocity meterPerSecond="55"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+
+	<vehicle id="RE33-ANNGELS-8" type="RV160"/>
+	<vehicle id="RE33-ANNGELS-9" type="RV160"/>
+	<vehicle id="RE33-ANNGELS-10" type="RV160"/>
+	<vehicle id="RE33-ANNGELS-11" type="RV160"/>
+	<vehicle id="RE33-ANNGELS-12" type="RV160"/>
+
+	<vehicle id="RE33-ANNGESM-8" type="RV160"/>
+	<vehicle id="RE33-ANNGESM-9" type="RV160"/>
+	<vehicle id="RE33-ANNGESM-10" type="RV160"/>
+	<vehicle id="RE33-ANNGESM-11" type="RV160"/>
+	<vehicle id="RE33-ANNGESM-12" type="RV160"/>
+
+	<vehicle id="RE33-VVGEANN-8" type="RV160"/>
+	<vehicle id="RE33-VVGEANN-9" type="RV160"/>
+	<vehicle id="RE33-VVGEANN-10" type="RV160"/>
+	<vehicle id="RE33-VVGEANN-11" type="RV160"/>
+	<vehicle id="RE33-VVGEANN-12" type="RV160"/>
+
+	<vehicle id="RE33-SMGEANN-8" type="RV160"/>
+	<vehicle id="RE33-SMGEANN-9" type="RV160"/>
+	<vehicle id="RE33-SMGEANN-10" type="RV160"/>
+	<vehicle id="RE33-SMGEANN-11" type="RV160"/>
+	<vehicle id="RE33-SMGEANN-12" type="RV160"/>
+
+	<vehicle id="IR90-GEAPGEBR1-8" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR1-9" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR1-10" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR1-11" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR1-12" type="FV200IR"/>
+
+	<vehicle id="IR90-GEAPGEBR2-8" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR2-9" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR2-10" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR2-11" type="FV200IR"/>
+	<vehicle id="IR90-GEAPGEBR2-12" type="FV200IR"/>
+
+	<vehicle id="IR90-BRGEGEAP1-8" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP1-9" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP1-10" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP1-11" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP1-12" type="FV200IR"/>
+
+	<vehicle id="IR90-BRGEGEAP2-8" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP2-9" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP2-10" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP2-11" type="FV200IR"/>
+	<vehicle id="IR90-BRGEGEAP2-12" type="FV200IR"/>
+
+	<vehicle id="IR15-GEAPGELZ-8" type="FV200IR"/>
+	<vehicle id="IR15-GEAPGELZ-9" type="FV200IR"/>
+	<vehicle id="IR15-GEAPGELZ-10" type="FV200IR"/>
+	<vehicle id="IR15-GEAPGELZ-11" type="FV200IR"/>
+	<vehicle id="IR15-GEAPGELZ-12" type="FV200IR"/>
+
+	<vehicle id="IR15-LZGEGEAP-8" type="FV200IR"/>
+	<vehicle id="IR15-LZGEGEAP-9" type="FV200IR"/>
+	<vehicle id="IR15-LZGEGEAP-10" type="FV200IR"/>
+	<vehicle id="IR15-LZGEGEAP-11" type="FV200IR"/>
+	<vehicle id="IR15-LZGEGEAP-12" type="FV200IR"/>
+
+	<vehicle id="IC1-GEAPZUESG-8" type="FV200IC"/>
+	<vehicle id="IC1-GEAPZUESG-9" type="FV200IC"/>
+	<vehicle id="IC1-GEAPZUESG-10" type="FV200IC"/>
+	<vehicle id="IC1-GEAPZUESG-11" type="FV200IC"/>
+	<vehicle id="IC1-GEAPZUESG-12" type="FV200IC"/>
+
+	<vehicle id="IC1-SGZUEGEAP-8" type="FV200IC"/>
+	<vehicle id="IC1-SGZUEGEAP-9" type="FV200IC"/>
+	<vehicle id="IC1-SGZUEGEAP-10" type="FV200IC"/>
+	<vehicle id="IC1-SGZUEGEAP-11" type="FV200IC"/>
+	<vehicle id="IC1-SGZUEGEAP-12" type="FV200IC"/>
+
+	<vehicle id="IC5-GEAPZUERS-8" type="FV200IC"/>
+	<vehicle id="IC5-GEAPZUERS-9" type="FV200IC"/>
+	<vehicle id="IC5-GEAPZUERS-10" type="FV200IC"/>
+	<vehicle id="IC5-GEAPZUERS-11" type="FV200IC"/>
+	<vehicle id="IC5-GEAPZUERS-12" type="FV200IC"/>
+
+	<vehicle id="IC5-RSZUEGEAP-8" type="FV200IC"/>
+	<vehicle id="IC5-RSZUEGEAP-9" type="FV200IC"/>
+	<vehicle id="IC5-RSZUEGEAP-10" type="FV200IC"/>
+	<vehicle id="IC5-RSZUEGEAP-11" type="FV200IC"/>
+	<vehicle id="IC5-RSZUEGEAP-12" type="FV200IC"/>
+
+
+	<vehicle id="Construction_Train1" type="Construction_Train"/>
+
+
+</vehicleDefinitions>

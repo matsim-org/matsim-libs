@@ -20,6 +20,7 @@ package playground.vsp.openberlinscenario.cemdap.input;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,7 +32,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.openberlinscenario.Gender;
 import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
 

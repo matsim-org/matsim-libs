@@ -76,25 +76,10 @@ import com.google.inject.util.Modules;
 public abstract class AbstractModule implements Module {
 
 	private Binder binder;
-	private Multibinder<EventHandler> eventHandlerMultibinder;
-	private Multibinder<ControlerListener> controlerListenerMultibinder;
-
-	/**
-	 * Contents retrieved (I think) by injected method QSim#addQueueSimulationListeners(...).  Is not public, and therefore cannot be referenced from here.
-	 * <br/>
-	 * I think that that method will be called every time the mobsim will be constructed.  If the injected classes are singletons, they will
-	 * presumably be re-used, otherwise they will be newly constructed.
-	 */
-	private Multibinder<MobsimListener> mobsimListenerMultibinder;
-
-	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
-	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
-	private Multibinder<AbstractQSimModule> qsimModulesMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
-	private Multibinder<AbstractQSimModule> qsimOverridingModulesMultibinder;
 
 	public AbstractModule() {
 		// config will be injected later
@@ -121,17 +106,13 @@ public abstract class AbstractModule implements Module {
 	private void initializeMultibinders() {
 		// We do need to make these calls here in order to register the multi binders. Otherwise, guice doesn't know, that they exist. In particular,
 		// if none of the corresponding addXXXBinding methods was called, the set binder would not be registered, and guice would complain.
-		this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
-		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
-		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
-		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
-		this.attributeConverterMapBinder =
-				MapBinder.newMapBinder(
-						this.binder,
-						new TypeLiteral<Class<?>>(){},
-						new TypeLiteral<AttributeConverter<?>>() {} );
-		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
-		this.qsimOverridingModulesMultibinder = Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
+		Multibinder.newSetBinder(this.binder, MobsimListener.class);
+		Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
+		Multibinder.newSetBinder(this.binder, EventHandler.class);
+		Multibinder.newSetBinder(this.binder, ControlerListener.class);
+		MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>(){}, new TypeLiteral<AttributeConverter<?>>() {} );
+		Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
+		Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
 	}
 
 	public abstract void install();
@@ -146,21 +127,21 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
-		return eventHandlerMultibinder.addBinding();
+		return Multibinder.newSetBinder(this.binder, EventHandler.class).addBinding();
 	}
 
 	protected final void installQSimModule(AbstractQSimModule qsimModule) {
-		qsimModulesMultibinder.addBinding().toInstance(qsimModule);
+		Multibinder.newSetBinder(this.binder, AbstractQSimModule.class).addBinding().toInstance(qsimModule);
 	}
 	protected final void installOverridingQSimModule(AbstractQSimModule qsimModule) {
-		qsimOverridingModulesMultibinder.addBinding().toInstance(qsimModule);
+		Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) ).addBinding().toInstance(qsimModule);
 	}
 
 	/**
 	 * @see ControlerListener
 	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
-		return controlerListenerMultibinder.addBinding();
+		return Multibinder.newSetBinder(this.binder, ControlerListener.class).addBinding();
 	}
 
 	/**
@@ -182,16 +163,22 @@ public abstract class AbstractModule implements Module {
 		return bind(ScoringFunctionFactory.class);
 	}
 
+	/**
+	 * Contents retrieved (I think) by injected method QSim#addQueueSimulationListeners(...).  Is not public, and therefore cannot be referenced from here.
+	 * <br/>
+	 * I think that that method will be called every time the mobsim will be constructed.  If the injected classes are singletons, they will
+	 * presumably be re-used, otherwise they will be newly constructed.
+	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
-		return mobsimListenerMultibinder.addBinding();
+		return Multibinder.newSetBinder(this.binder, MobsimListener.class).addBinding();
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<SnapshotWriter> addSnapshotWriterBinding() {
-		return snapshotWriterMultibinder.addBinding();
+		return Multibinder.newSetBinder(this.binder, SnapshotWriter.class).addBinding();
 	}
 
 	protected final LinkedBindingBuilder<AttributeConverter<?>> addAttributeConverterBinding(final Class<?> clazz ) {
-		return attributeConverterMapBinder.addBinding( clazz );
+		return MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>(){}, new TypeLiteral<AttributeConverter<?>>() {} ).addBinding( clazz );
 	}
 	/**
 	 * @deprecated better use {@link #addTravelDisutilityFactoryBinding(String)}.

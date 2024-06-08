@@ -5,7 +5,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -21,7 +20,6 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import picocli.CommandLine;
@@ -70,8 +68,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		this.fromCRS = fromCRS;
 		this.toCRS = toCRS;
 		this.freeSpeedFactor = freeSpeedFactor;
-        this.laneRestriction = laneRestriction;
-    }
+		this.laneRestriction = laneRestriction;
+	}
 
 	private SumoNetworkConverter() {
 	}
@@ -117,14 +115,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new SumoNetworkConverter()).execute(args));
-	}
-
-	/**
-	 * Network area based on the cut-out.
-	 */
-	private static Geometry calculateNetworkArea(Path shapeFile) {
-		// only the first feature is used
-		return ((Geometry) GeoFileReader.getAllFeatures(shapeFile.toString()).iterator().next().getDefaultGeometry());
 	}
 
 	/**
@@ -342,6 +332,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 		Set<Id<Link>> ignored = new HashSet<>();
 
+		// map of link and source link that are restricted
+		Map<Id<Link>, Set<Id<Link>>> restrictions = new HashMap<>();
+
 		for (Map.Entry<String, List<SumoNetworkHandler.Connection>> kv : sumoHandler.connections.entrySet()) {
 
 			Link link = network.getLinks().get(Id.createLinkId(kv.getKey()));
@@ -350,16 +343,30 @@ public class SumoNetworkConverter implements Callable<Integer> {
 				Set<Id<Link>> outLinks = link.getToNode().getOutLinks().keySet();
 				Set<Id<Link>> allowed = kv.getValue().stream().map(c -> Id.createLinkId(c.to)).collect(Collectors.toSet());
 
-				Sets.SetView<Id<Link>> diff = Sets.difference(outLinks, allowed);
+				// Disallowed link ids
+				Sets.SetView<Id<Link>> dis = Sets.difference(outLinks, allowed);
 
-				if (outLinks.size() == diff.size()) {
+				if (outLinks.size() == dis.size()) {
 					ignored.add(link.getId());
 					continue;
 				}
 
-				if (!diff.isEmpty()) {
+				if (!dis.isEmpty()) {
 					DisallowedNextLinks disallowed = new DisallowedNextLinks();
-					for (Id<Link> id : diff) {
+					for (Id<Link> id : dis) {
+
+						Set<Id<Link>> restricted = restrictions.computeIfAbsent(id, (k) -> new HashSet<>());
+
+						Link targetLink = network.getLinks().get(id);
+						Map<Id<Link>, ? extends Link> turnLinks = targetLink.getFromNode().getOutLinks();
+
+						// Ensure that a link is always reachable from at least one other link
+						if (turnLinks.size() - 1 <= restricted.size()) {
+							ignored.add(id);
+							continue;
+						}
+
+						restricted.add(link.getId());
 						disallowed.addDisallowedLinkSequence(TransportMode.car, List.of(id));
 					}
 
@@ -367,6 +374,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
 				}
 			}
 		}
+
+		// clean again (possibly with turn restrictions)
+		new NetworkCleaner().run(network);
 
 		if (!ignored.isEmpty()) {
 			log.warn("Ignored turn restrictions for {} links with no connections: {}", ignored.size(), ignored);

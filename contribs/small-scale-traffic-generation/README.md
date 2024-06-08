@@ -7,7 +7,7 @@ The tool is based on :
 [https://daten.clearingstelle-verkehr.de/194/](https://daten.clearingstelle-verkehr.de/194/).
 
 The description of the implementation in MATSim is given in the following paper :
-- R. Ewert and K. Nagel, “Agentenbasierte Modellierung des kleinräumigen Wirtschaftsverkehrs,” 2024. Accepted for publication at HEUREKA Conference 2024.
+- R. Ewert and K. Nagel, “Agentenbasierte Modellierung des kleinräumigen Wirtschaftsverkehrs” 2024. Presented at HEUREKA Conference 2024. Download: [https://verlag.fgsv-datenbanken.de/tagungsbaende?kat=HEUREKA&p=3&tagungsband=2530&_titel=Agentenbasierte+Modellierung+des+kleinr%C3%A4umigen+Wirtschaftsverkehrs](https://verlag.fgsv-datenbanken.de/tagungsbaende?kat=HEUREKA&p=3&tagungsband=2530&_titel=Agentenbasierte+Modellierung+des+kleinr%C3%A4umigen+Wirtschaftsverkehrs).
 
 ## Model types
 The tool provides two different model types of small-scale commercial traffic. Therefore, you can select between the following options:
@@ -31,14 +31,18 @@ The tool provides two different model types of small-scale commercial traffic. T
     - Landuse
       - the user can define the column of landuse categories
     - Buildings
-      - should contain the following columns: `levels`, `area`
+      - can contain the following attributes: `levels`, `area`
+        - if no `levels` are given, the tool assumes a default value of 1
+        - if no `area` is given, the tool calculates the area based on the geometry
       - the user can define the column of the buildings categories
   
 ## Usage
 For generating the traffic, the following steps are necessary:
 - get necessary input data
-- run the tool by calling the main class `GenerateSmallScaleCommercialTrafficDemand`
+- Run `CreateDataDistributionOfStructureData` to create the distribution of the structure data to create the commercial facilities
+- Run `GenerateSmallScaleCommercialTrafficDemand` by using the created facilities. Here you can set the model type.
 
 ## Example
-An example is given as a test. See test `RunGenerateSmallScaleCommercialTrafficTest` and the mentioned example input data.
+An example is given as a test.
+See tests `RunCreateDataDistributionOfStructureDataTest` and `RunGenerateSmallScaleCommercialTrafficTest` and the mentioned example input data.
 

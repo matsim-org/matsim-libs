@@ -37,6 +37,7 @@ import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -113,7 +114,6 @@ public class ReRoutingIT {
 		this.evaluate("plans.xml.gz");
 	}
 
-	private final static Logger LOG = LogManager.getLogger(ReRoutingIT.class);
 	private void evaluate(String plansFilename) throws MalformedURLException {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
@@ -124,13 +124,12 @@ public class ReRoutingIT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Gbl.startMeasurement();
-		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
+		PopulationComparison.Result result = PopulationComparison.compare(referenceScenario.getPopulation(), scenario.getPopulation());
 		Gbl.printElapsedTime();
-		if ( !isEqual ) {
+		if (result == PopulationComparison.Result.notEqual) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
-		Assertions.assertTrue(isEqual, "different plans files.");
+		Assertions.assertEquals(PopulationComparison.Result.equal, result, "different plans file");
 	}
-
 }

@@ -243,15 +243,17 @@
             <parameterset type="ExtensiveInsertionSearch"/>
             <!-- If true, the startLink is changed to last link in the current schedule, so the taxi starts the next day at the link where it stopped operating the day before. False by default. -->
             <param name="changeStartLinkToLastLinkInSchedule" value="false"/>
-            <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
-            <param name="maxTravelTimeAlpha" value="1.5"/>
-            <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
-            <param name="maxTravelTimeBeta" value="1200.0"/>
-            <!-- Max wait time for the bus to come (optimisation constraint). -->
-            <param name="maxWaitTime" value="1200.0"/>
-            <!-- Maximum walk distance to next stop location in stationbased system. -->
-            <param name="maxWalkDistance" value="1500.0"/>
-            <param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
+            <parameterset type="drtOptimizationConstraints">
+                <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
+                <param name="maxTravelTimeAlpha" value="1.5"/>
+                <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
+                <param name="maxTravelTimeBeta" value="1200.0"/>
+                <!-- Max wait time for the bus to come (optimisation constraint). -->
+                <param name="maxWaitTime" value="1200.0"/>
+                <!-- Maximum walk distance to next stop location in stationbased system. -->
+                <param name="maxWalkDistance" value="1500.0"/>
+                <param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
+            </parameterset>
             <!-- Operational Scheme, either door2door or stopbased. door2door by default -->
             <param name="operationalScheme" value="stopbased"/>
 
@@ -267,11 +269,11 @@
             <!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
             <param name="writeDetailedCustomerStats" value="true"/>
 
-            <parameterset type="zonalSystem">
-                <param name="zonesGeneration" value="ShapeFile"/>
-                <!--<param name="cellSize" value="200"/>-->
-                <param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
-            </parameterset>
+			<parameterset type="zonalSystem" >
+				<parameterset type="GISFileZoneSystem" >
+					<param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
+				</parameterset>
+			</parameterset>
 
             <!--<parameterset type="rebalancing">
                 <parameterset type="minCostFlowRebalancingStrategy">
@@ -286,15 +288,17 @@
             <parameterset type="ExtensiveInsertionSearch"/>
             <!-- If true, the startLink is changed to last link in the current schedule, so the taxi starts the next day at the link where it stopped operating the day before. False by default. -->
             <param name="changeStartLinkToLastLinkInSchedule" value="false"/>
-            <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
-            <param name="maxTravelTimeAlpha" value="1.5"/>
-            <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
-            <param name="maxTravelTimeBeta" value="1200.0"/>
-            <!-- Max wait time for the bus to come (optimisation constraint). -->
-            <param name="maxWaitTime" value="1200.0"/>
-            <!-- Maximum walk distance to next stop location in stationbased system. -->
-            <param name="maxWalkDistance" value="1500.0"/>
-            <param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
+            <parameterset type="drtOptimizationConstraints">
+                <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
+                <param name="maxTravelTimeAlpha" value="1.5"/>
+                <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
+                <param name="maxTravelTimeBeta" value="1200.0"/>
+                <!-- Max wait time for the bus to come (optimisation constraint). -->
+                <param name="maxWaitTime" value="1200.0"/>
+                <!-- Maximum walk distance to next stop location in stationbased system. -->
+                <param name="maxWalkDistance" value="1500.0"/>
+                <param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
+            </parameterset>
             <!-- Operational Scheme, either of  door2door, stopbased or serviceAreaBased. door2door by default -->
             <param name="operationalScheme" value="stopbased"/>
 
@@ -312,11 +316,11 @@
             <!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
             <param name="writeDetailedCustomerStats" value="true"/>
 
-            <parameterset type="zonalSystem">
-                <param name="zonesGeneration" value="ShapeFile"/>
-                <!--<param name="cellSize" value="200"/>-->
-                <param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
-            </parameterset>
+			<parameterset type="zonalSystem" >
+				<parameterset type="GISFileZoneSystem" >
+					<param name="zonesShapeFile" value="drt-zones/drt-zonal-system.shp" />
+				</parameterset>
+			</parameterset>
 
             <!--<parameterset type="rebalancing">
                 <parameterset type="minCostFlowRebalancingStrategy">
@@ -334,7 +338,9 @@
         <!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
         <param name="travelTimeEstimationAlpha" value="0.05" />
         <parameterset type="travelTimeMatrix">
-            <param name="cellSize" value="200"/>
+			<parameterset type="SquareGridZoneSystem" >
+            	<param name="cellSize" value="200"/>
+			</parameterset>
         </parameterset>
 
     </module>

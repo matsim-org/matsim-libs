@@ -86,7 +86,7 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
 						var scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
 						return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime,
-								travelDisutility, eTaxiScheduler, scheduleTimingUpdater, chargingInfrastructure).get();
+								travelDisutility, eTaxiScheduler, scheduleTimingUpdater, chargingInfrastructure, getConfig()).get();
 					}
 				});
 

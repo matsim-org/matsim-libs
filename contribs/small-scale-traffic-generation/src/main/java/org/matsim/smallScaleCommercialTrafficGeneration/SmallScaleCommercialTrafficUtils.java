@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import com.google.common.base.Joiner;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.SolutionCostCalculator;
@@ -28,6 +27,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.BreakActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -40,28 +40,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
-import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.Tour.Pickup;
-import org.matsim.freight.carriers.Tour.ServiceActivity;
-import org.matsim.freight.carriers.Tour.TourElement;
-import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -72,7 +67,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class SmallScaleCommercialTrafficUtils {
 
 	private static final Logger log = LogManager.getLogger(SmallScaleCommercialTrafficUtils.class);
-	private static final Joiner JOIN = Joiner.on("\t");
 
 	/**
 	 * Creates and return the Index of the zone shape.
@@ -82,7 +76,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * @param shapeFileZoneNameColumn Column name of the zone in the shape file
 	 * @return indexZones
 	 */
-	static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
+	public static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpZones.readFeatures().iterator().next().getAttribute(shapeFileZoneNameColumn) == null)
@@ -98,7 +92,7 @@ public class SmallScaleCommercialTrafficUtils {
      * @param shapeFileLanduseTypeColumn 	Column name of the landuse in the shape file
      * @return indexLanduse
 	 */
-	 static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
+	 public static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
 		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpLanduse.readFeatures().iterator().next().getAttribute(shapeFileLanduseTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileLanduseTypeColumn + "' does not exist in the landuse shape file. Please check the input.");
@@ -113,7 +107,7 @@ public class SmallScaleCommercialTrafficUtils {
      * @param shapeFileBuildingTypeColumn 	Column name of the building in the shape file
      * @return indexBuildings
 	 */
-	static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
+	public static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
 		ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpBuildings.readFeatures().iterator().next().getAttribute(shapeFileBuildingTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileBuildingTypeColumn + "' does not exist in the building shape file. Please check the input.");
@@ -134,17 +128,6 @@ public class SmallScaleCommercialTrafficUtils {
 		if (shpRegions.readFeatures().iterator().next().getAttribute(regionsShapeRegionColumn) == null)
 			throw new NullPointerException("The column '" + regionsShapeRegionColumn + "' does not exist in the region shape file. Please check the input.");
 		return shpRegions.createIndex(shapeCRS, regionsShapeRegionColumn);
-	}
-
-	/**
-	 * Writes a csv file with the result of the distribution per zone of the input data.
-	 */
-	static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-											  Path outputFileInOutputFolder, Map<String, String> zoneIdRegionConnection)
-		throws IOException {
-
-		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdRegionConnection);
-		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
 
 	/** Finds the nearest possible link for the building polygon.
@@ -189,39 +172,6 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 
 		return newLink;
-	}
-
-	/**
-	 * Writer of data distribution data.
-	 */
-	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-												   Path outputFileInInputFolder,
-												   Map<String, String> zoneIdRegionConnection) throws MalformedURLException {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
-			StandardCharsets.UTF_8, true);
-		try {
-			String[] header = new String[]{"zoneID", "region", "Inhabitants", "Employee", "Employee Primary Sector",
-				"Employee Construction", "Employee Secondary Sector Rest", "Employee Retail",
-				"Employee Traffic/Parcels", "Employee Tertiary Sector Rest"};
-			JOIN.appendTo(writer, header);
-			writer.write("\n");
-			for (String zone : resultingDataPerZone.keySet()) {
-				List<String> row = new ArrayList<>();
-				row.add(zone);
-				row.add(zoneIdRegionConnection.get(zone));
-				for (String category : header) {
-					if (!category.equals("zoneID") && !category.equals("region"))
-						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(category))));
-				}
-				JOIN.appendTo(writer, row);
-				writer.write("\n");
-			}
-
-			writer.close();
-
-		} catch (IOException e) {
-			log.error("Could not write the csv file with the data distribution data.", e);
-		}
 	}
 
 	/**
@@ -277,7 +227,7 @@ public class SmallScaleCommercialTrafficUtils {
 			}
 
 			String key = String.format("%s_%s_%s", subpopulation, relatedCarrier.getAttributes().getAttribute("tourStartArea"),
-				relatedCarrier.getAttributes().getAttribute("purpose")); //TODO
+				relatedCarrier.getAttributes().getAttribute("purpose"));
 
 			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
 
@@ -312,7 +262,8 @@ public class SmallScaleCommercialTrafficUtils {
 			CreateDifferentPlansForFreightPopulation.createMorePlansWithDifferentActivityOrder(population, numberOfPlanVariantsPerAgent);
 		else if (numberOfPlanVariantsPerAgent < 1)
 			log.warn(
-				"You selected " + numberOfPlanVariantsPerAgent + " of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.");
+				"You selected {} of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.",
+				numberOfPlanVariantsPerAgent);
 
 		PopulationUtils.writePopulation(population, outputPopulationFile);
 		scenario.getPopulation().getPersons().clear();
@@ -328,239 +279,6 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Reads existing scenarios and add them to the scenario. If the scenario is
-	 * part of the goodsTraffic or commercialPersonTraffic the demand of the existing
-	 * scenario reduces the demand of the small scale commercial traffic. The
-	 * dispersedTraffic will be added additionally.
-	 */
-	static void readExistingModels(Scenario scenario, double sampleScenario,
-								   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
-
-		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
-		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
-		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-			.setSkipHeaderRecord(true).build().parse(IOUtils.getBufferedReader(locationOfExistingModels));
-		for (CSVRecord record : parse) {
-			String modelName = record.get("model");
-			double sampleSizeExistingScenario = Double.parseDouble(record.get("sampleSize"));
-			String modelTrafficType = record.get("smallScaleCommercialTrafficType");
-			final Integer modelPurpose;
-			if (!Objects.equals(record.get("purpose"), ""))
-				modelPurpose = Integer.parseInt(record.get("purpose"));
-			else
-				modelPurpose = null;
-			final String vehicleType;
-			if (!Objects.equals(record.get("vehicleType"), ""))
-				vehicleType = record.get("vehicleType");
-			else
-				vehicleType = null;
-			final String modelMode = record.get("networkMode");
-
-			Path scenarioLocation = existingModelsFolder.resolve(modelName);
-			if (!Files.exists(scenarioLocation.resolve("output_carriers.xml.gz")))
-				throw new Exception("For the existing model " + modelName
-					+ " no carrierFile exists. The carrierFile should have the name 'output_carriers.xml.gz'");
-			if (!Files.exists(scenarioLocation.resolve("vehicleTypes.xml.gz")))
-				throw new Exception("For the existing model " + modelName
-					+ " no vehicleTypesFile exists. The vehicleTypesFile should have the name 'vehicleTypes.xml.gz'");
-
-			log.info("Integrating existing scenario: " + modelName);
-
-			CarrierVehicleTypes readVehicleTypes = new CarrierVehicleTypes();
-			CarrierVehicleTypes usedVehicleTypes = new CarrierVehicleTypes();
-			new CarrierVehicleTypeReader(readVehicleTypes)
-				.readFile(scenarioLocation.resolve("vehicleTypes.xml.gz").toString());
-
-			Carriers carriers = new Carriers();
-			new CarrierPlanXmlReader(carriers, readVehicleTypes)
-				.readFile(scenarioLocation.resolve("output_carriers.xml.gz").toString());
-
-			if (sampleSizeExistingScenario < sampleScenario)
-				throw new Exception("The sample size of the existing scenario " + modelName
-					+ "is smaller than the sample size of the scenario. No upscaling for existing scenarios implemented.");
-
-			double sampleFactor = sampleScenario / sampleSizeExistingScenario;
-
-			int numberOfToursExistingScenario = 0;
-			for (Carrier carrier : carriers.getCarriers().values()) {
-				if (!carrier.getPlans().isEmpty())
-					numberOfToursExistingScenario = numberOfToursExistingScenario
-						+ carrier.getSelectedPlan().getScheduledTours().size();
-			}
-			int sampledNumberOfToursExistingScenario = (int) Math.round(numberOfToursExistingScenario * sampleFactor);
-			List<Carrier> carrierToRemove = new ArrayList<>();
-			int remainedTours = 0;
-			double roundingError = 0.;
-
-			log.info("The existing scenario " + modelName + " is a " + (int) (sampleSizeExistingScenario * 100)
-				+ "% scenario and has " + numberOfToursExistingScenario + " tours");
-			log.info("The existing scenario " + modelName + " will be sampled down to the scenario sample size of "
-				+ (int) (sampleScenario * 100) + "% which results in " + sampledNumberOfToursExistingScenario
-				+ " tours.");
-
-			int numberOfAnalyzedTours = 0;
-			for (Carrier carrier : carriers.getCarriers().values()) {
-				if (!carrier.getPlans().isEmpty()) {
-					int numberOfOriginalTours = carrier.getSelectedPlan().getScheduledTours().size();
-					numberOfAnalyzedTours += numberOfOriginalTours;
-					int numberOfRemainingTours = (int) Math.round(numberOfOriginalTours * sampleFactor);
-					roundingError = roundingError + numberOfRemainingTours - (numberOfOriginalTours * sampleFactor);
-					int numberOfToursToRemove = numberOfOriginalTours - numberOfRemainingTours;
-					List<ScheduledTour> toursToRemove = new ArrayList<>();
-
-					if (roundingError <= -1 && numberOfToursToRemove > 0) {
-						numberOfToursToRemove = numberOfToursToRemove - 1;
-						numberOfRemainingTours = numberOfRemainingTours + 1;
-						roundingError = roundingError + 1;
-					}
-					if (roundingError >= 1 && numberOfRemainingTours != numberOfToursToRemove) {
-						numberOfToursToRemove = numberOfToursToRemove + 1;
-						numberOfRemainingTours = numberOfRemainingTours - 1;
-						roundingError = roundingError - 1;
-					}
-					remainedTours = remainedTours + numberOfRemainingTours;
-					if (remainedTours > sampledNumberOfToursExistingScenario) {
-						remainedTours = remainedTours - 1;
-						numberOfRemainingTours = numberOfRemainingTours - 1;
-						numberOfToursToRemove = numberOfToursToRemove + 1;
-					}
-					// last carrier with scheduled tours
-					if (numberOfAnalyzedTours == numberOfToursExistingScenario
-						&& remainedTours != sampledNumberOfToursExistingScenario) {
-						numberOfRemainingTours = sampledNumberOfToursExistingScenario - remainedTours;
-						numberOfToursToRemove = numberOfOriginalTours - numberOfRemainingTours;
-						remainedTours = remainedTours + numberOfRemainingTours;
-					}
-					// remove carrier because no tours remaining
-					if (numberOfOriginalTours == numberOfToursToRemove) {
-						carrierToRemove.add(carrier);
-						continue;
-					}
-
-					while (toursToRemove.size() < numberOfToursToRemove) {
-						Object[] tours = carrier.getSelectedPlan().getScheduledTours().toArray();
-						ScheduledTour tour = (ScheduledTour) tours[MatsimRandom.getRandom().nextInt(tours.length)];
-						toursToRemove.add(tour);
-						carrier.getSelectedPlan().getScheduledTours().remove(tour);
-					}
-
-					// remove services/shipments from removed tours
-					if (!carrier.getServices().isEmpty()) {
-						for (ScheduledTour removedTour : toursToRemove) {
-							for (TourElement tourElement : removedTour.getTour().getTourElements()) {
-								if (tourElement instanceof ServiceActivity service) {
-									carrier.getServices().remove(service.getService().getId());
-								}
-							}
-						}
-					} else if (!carrier.getShipments().isEmpty()) {
-						for (ScheduledTour removedTour : toursToRemove) {
-							for (TourElement tourElement : removedTour.getTour().getTourElements()) {
-								if (tourElement instanceof Pickup pickup) {
-									carrier.getShipments().remove(pickup.getShipment().getId());
-								}
-							}
-						}
-					}
-					// remove vehicles of removed tours and check if all vehicleTypes are still
-					// needed
-					if (carrier.getCarrierCapabilities().getFleetSize().equals(FleetSize.FINITE)) {
-						for (ScheduledTour removedTour : toursToRemove) {
-							carrier.getCarrierCapabilities().getCarrierVehicles()
-								.remove(removedTour.getVehicle().getId());
-						}
-					} else if (carrier.getCarrierCapabilities().getFleetSize().equals(FleetSize.INFINITE)) {
-						carrier.getCarrierCapabilities().getCarrierVehicles().clear();
-						for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
-							carrier.getCarrierCapabilities().getCarrierVehicles().put(tour.getVehicle().getId(),
-								tour.getVehicle());
-						}
-					}
-					List<VehicleType> vehicleTypesToRemove = new ArrayList<>();
-					for (VehicleType existingVehicleType : carrier.getCarrierCapabilities().getVehicleTypes()) {
-						boolean vehicleTypeNeeded = false;
-						for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-							if (vehicle.getType().equals(existingVehicleType)) {
-								vehicleTypeNeeded = true;
-								usedVehicleTypes.getVehicleTypes().put(existingVehicleType.getId(),
-									existingVehicleType);
-							}
-						}
-						if (!vehicleTypeNeeded)
-							vehicleTypesToRemove.add(existingVehicleType);
-					}
-					carrier.getCarrierCapabilities().getVehicleTypes().removeAll(vehicleTypesToRemove);
-				}
-				// carriers without solutions
-				else {
-					if (!carrier.getServices().isEmpty()) {
-						int numberOfServicesToRemove = carrier.getServices().size()
-							- (int) Math.round(carrier.getServices().size() * sampleFactor);
-						for (int i = 0; i < numberOfServicesToRemove; i++) {
-							Object[] services = carrier.getServices().keySet().toArray();
-							carrier.getServices().remove(services[MatsimRandom.getRandom().nextInt(services.length)]);
-						}
-					}
-					if (!carrier.getShipments().isEmpty()) {
-						int numberOfShipmentsToRemove = carrier.getShipments().size()
-							- (int) Math.round(carrier.getShipments().size() * sampleFactor);
-						for (int i = 0; i < numberOfShipmentsToRemove; i++) {
-							Object[] shipments = carrier.getShipments().keySet().toArray();
-							carrier.getShipments().remove(shipments[MatsimRandom.getRandom().nextInt(shipments.length)]);
-						}
-					}
-				}
-			}
-			carrierToRemove.forEach(carrier -> carriers.getCarriers().remove(carrier.getId()));
-			CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
-
-			carriers.getCarriers().values().forEach(carrier -> {
-				Carrier newCarrier = CarriersUtils
-					.createCarrier(Id.create(modelName + "_" + carrier.getId().toString(), Carrier.class));
-				newCarrier.getAttributes().putAttribute("subpopulation", modelTrafficType);
-				if (modelPurpose != null)
-					newCarrier.getAttributes().putAttribute("purpose", modelPurpose);
-				newCarrier.getAttributes().putAttribute("existingModel", modelName);
-				newCarrier.getAttributes().putAttribute("networkMode", modelMode);
-				if (vehicleType != null)
-					newCarrier.getAttributes().putAttribute("vehicleType", vehicleType);
-				newCarrier.setCarrierCapabilities(carrier.getCarrierCapabilities());
-
-				if (!carrier.getServices().isEmpty())
-					newCarrier.getServices().putAll(carrier.getServices());
-				else if (!carrier.getShipments().isEmpty())
-					newCarrier.getShipments().putAll(carrier.getShipments());
-				if (carrier.getSelectedPlan() != null) {
-					newCarrier.setSelectedPlan(carrier.getSelectedPlan());
-
-					List<String> startAreas = new ArrayList<>();
-					for (ScheduledTour tour : newCarrier.getSelectedPlan().getScheduledTours()) {
-						String tourStartZone = findZoneOfLink(tour.getTour().getStartLinkId(), linksPerZone);
-						if (!startAreas.contains(tourStartZone))
-							startAreas.add(tourStartZone);
-					}
-					newCarrier.getAttributes().putAttribute("tourStartArea",
-						String.join(";", startAreas));
-
-					CarriersUtils.setJspritIterations(newCarrier, 0);
-					// recalculate score for selectedPlan
-					VehicleRoutingProblem vrp = MatsimJspritFactory
-						.createRoutingProblemBuilder(carrier, scenario.getNetwork()).build();
-					VehicleRoutingProblemSolution solution = MatsimJspritFactory
-						.createSolution(newCarrier.getSelectedPlan(), vrp);
-					SolutionCostCalculator solutionCostsCalculator = getObjectiveFunction(vrp, Double.MAX_VALUE);
-					double costs = solutionCostsCalculator.getCosts(solution) * (-1);
-					carrier.getSelectedPlan().setScore(costs);
-				} else {
-					CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
-					newCarrier.getCarrierCapabilities().setFleetSize(carrier.getCarrierCapabilities().getFleetSize());
-				}
-				CarriersUtils.addOrGetCarriers(scenario).getCarriers().put(newCarrier.getId(), newCarrier);
-			});
-		}
-	}
-
-	/**
 	 * Find the zone where the link is located
 	 */
 	static String findZoneOfLink(Id<Link> linkId, Map<String, Map<Id<Link>, Link>> linksPerZone) {
@@ -571,10 +289,40 @@ public class SmallScaleCommercialTrafficUtils {
 		return null;
 	}
 
+
+	/** Reads the data distribution of the zones.
+	 * @param pathToDataDistributionToZones
+	 * @return
+	 * @throws IOException
+	 */
+	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
+		if (!Files.exists(pathToDataDistributionToZones)) {
+			log.error("Required data per zone file {} not found", pathToDataDistributionToZones);
+		}
+
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
+		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
+			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
+
+			for (CSVRecord record : parse) {
+				String zoneID = record.get("zoneID");
+				resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
+				for (int n = 2; n < parse.getHeaderMap().size(); n++) {
+					resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
+						Double.parseDouble(record.get(n)), Double::sum);
+				}
+			}
+		}
+		log.info("Data distribution for {} zones was read from {}", resultingDataPerZone.size(), pathToDataDistributionToZones);
+		return resultingDataPerZone;
+
+	}
+
 	/**
 	 * Creates a cost calculator.
 	 */
-	private static SolutionCostCalculator getObjectiveFunction(final VehicleRoutingProblem vrp, final double maxCosts) {
+	static SolutionCostCalculator getObjectiveFunction(final VehicleRoutingProblem vrp, final double maxCosts) {
 
 		return new SolutionCostCalculator() {
 			@Override
