@@ -57,7 +57,7 @@ final class TripByGroupAnalysis {
 					groups.add(g);
 			}
 
-			log.info("Detect groups: {}", groups);
+			log.info("Detected groups: {}", groups);
 
 			this.groups = new ArrayList<>();
 

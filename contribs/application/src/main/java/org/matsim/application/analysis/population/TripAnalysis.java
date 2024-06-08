@@ -38,13 +38,23 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 @CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
-	produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
-		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv", "mode_share_per_age.csv"}
+	produces = {
+		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
+		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv",
+		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv"
+	}
 )
 public class TripAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
-
+	/**
+	 * Person attribute that contains the reference modes of a person.
+	 */
+	public static String ATTR_REF_MODES = "ref_modes";
+	/**
+	 * Person attribute containing its weight for analysis purposes.
+	 */
+	public static String ATTR_REF_WEIGHT = "ref_weight";
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
 	@CommandLine.Mixin
@@ -209,6 +219,18 @@ public class TripAnalysis implements MATSimAppCommand {
 			groups.analyzeModeShare(joined, labels, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
+		if (persons.containsColumn(ATTR_REF_MODES)) {
+			try {
+				TripChoiceAnalysis choices = new TripChoiceAnalysis(persons, trips, modeOrder);
+
+				choices.writeChoices(output.getPath("mode_choices.csv"));
+				choices.writeChoiceEvaluation(output.getPath("mode_choice_evaluation.csv"));
+				choices.writeChoiceEvaluationPerMode(output.getPath("mode_choice_evaluation_per_mode.csv"));
+			} catch (RuntimeException e) {
+				log.error("Error while analyzing mode choices", e);
+			}
+		}
+
 		writePopulationStats(persons, joined);
 
 		writeTripStats(joined);
@@ -358,7 +380,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		table.write().csv(output.getPath("mode_users.csv").toFile());
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
-
 			printer.printRecord("Info", "Value");
 			printer.printRecord("Persons", tripsPerPerson.size());
 			printer.printRecord("Mobile persons [%]", new BigDecimal(100 * totalMobile / tripsPerPerson.size()).setScale(2, RoundingMode.HALF_UP));
