@@ -12,8 +12,6 @@ import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;

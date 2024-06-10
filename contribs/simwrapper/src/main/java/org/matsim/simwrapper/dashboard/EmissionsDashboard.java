@@ -39,6 +39,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.height = 12.;
 //				viz.datasets.csvFile = data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv");
 				viz.datasets.csvFile = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_per_link_per_m.%s", "csv");
+
+				// TODO: switch this class to use map plot and avro network
 				viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
 				viz.display.color.columnName = "CO2_TOTAL [g/m]";
 				viz.display.color.dataset = "csvFile";
