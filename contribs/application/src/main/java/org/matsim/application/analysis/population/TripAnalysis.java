@@ -217,7 +217,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeModeShare(joined, labels);
 
 		if (groups != null) {
-			groups.analyzeModeShare(joined, labels, (g) -> output.getPath("mode_share_per_%s.csv", g));
+			groups.analyzeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {

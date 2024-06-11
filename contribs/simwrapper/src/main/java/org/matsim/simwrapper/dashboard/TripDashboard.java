@@ -364,32 +364,62 @@ public class TripDashboard implements Dashboard {
 
 		for (String cat : Objects.requireNonNull(categories, "Categories not set")) {
 
-			layout.row("category_" + cat, "By Groups").el(Plotly.class, (viz, data) -> {
+			layout.row("category_" + cat, "By Groups")
+				.el(Plotly.class, (viz, data) -> {
 
-				viz.title = "Mode share";
-				viz.description = "by " + cat;
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("share").build())
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-					.build();
+					viz.title = "Mode share";
+					viz.description = "by " + cat;
+					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+						.xAxis(Axis.builder().title("share").build())
+						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+						.build();
 
-				// TODO: Still in testing
-				Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
-					.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
-					.aggregate(List.of("main_mode", "source", cat), "share", Plotly.AggrFunc.SUM)
-					.rename("sim_share", "Sim")
-					.rename("ref_share", "Ref")
-					.mapping()
-					.facetCol(cat)
-					.name("main_mode")
-					.x("share")
-					.y("source");
+					Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
+						.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
+						.aggregate(List.of("main_mode", "source", cat), "share", Plotly.AggrFunc.SUM)
+						.rename("sim_share", "Sim")
+						.rename("ref_share", "Ref")
+						.mapping()
+						.facetCol(cat)
+						.name("main_mode")
+						.x("source")
+						.y("share");
 
 
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-					.orientation(BarTrace.Orientation.HORIZONTAL)
-					.build(), ds);
-			});
+					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.orientation(BarTrace.Orientation.VERTICAL)
+						.build(), ds);
+
+				}).el(Plotly.class, (viz, data) -> {
+					viz.title = "Modal distance distribution";
+					viz.description = "by " + cat;
+					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+						.xAxis(Axis.builder().title("Distance group").build())
+						.yAxis(Axis.builder().title("Share").build())
+						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+						.build();
+
+					// TODO: should use facet row, but does not work yet
+					// TODO: hard to see, because too many bars
+					Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
+						.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
+						.normalize(List.of("dist_group", "source", cat), "share")
+						.rename("sim_share", "Sim")
+						.rename("ref_share", "Ref")
+						.mapping()
+						.facetCol(cat)
+						.name("main_mode")
+						.x("dist_group")
+						.y("share");
+
+					viz.multiIndex = Map.of("dist_group", "source");
+
+					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.orientation(BarTrace.Orientation.VERTICAL)
+						.build(), ds);
+
+
+				});
 
 		}
 	}

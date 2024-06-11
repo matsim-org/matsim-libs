@@ -84,7 +84,7 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void analyzeModeShare(Table trips, List<String> dists, Function<String, Path> output) {
+	void analyzeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
 
 		for (Group group : groups) {
 
@@ -101,7 +101,7 @@ final class TripByGroupAnalysis {
 
 			// Sort by dist_group and mode
 			Comparator<Row> cmp = Comparator.comparingInt(row -> dists.indexOf(row.getString("dist_group")));
-			aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));
+			aggr = aggr.sortOn(cmp.thenComparingInt(row -> modeOrder.indexOf(row.getString("main_mode"))));
 
 			// Norm each group to 1
 			String norm = group.columns.get(0);
