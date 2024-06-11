@@ -377,6 +377,8 @@ public class TripDashboard implements Dashboard {
 				Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
 					.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
 					.aggregate(List.of("main_mode", "source", cat), "share", Plotly.AggrFunc.SUM)
+					.rename("sim_share", "Sim")
+					.rename("ref_share", "Ref")
 					.mapping()
 					.facetCol(cat)
 					.name("main_mode")
