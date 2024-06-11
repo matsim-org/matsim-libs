@@ -388,6 +388,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						break;
 					case useHolePopulation:
 						// uses the hole population as possible demand locations
+						if(population != null && shapeCategory != null ) log.warn("Population isn't reduced to shapefile even though shapefile is defined. This might lead to errors when no areas for pickup or location are defined.");
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
 								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
