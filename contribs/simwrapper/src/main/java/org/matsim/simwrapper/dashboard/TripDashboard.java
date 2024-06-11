@@ -110,7 +110,10 @@ public class TripDashboard implements Dashboard {
 			args[this.args.length + 1] = groupedRefCsv;
 		}
 
-		Layout.Row first = layout.row("first", header.title);
+		// A tab will only be present if one of the other tabs is used as well
+		String tab = (groupedRefCsv != null || choiceEvaluation) ? header.title : null;
+
+		Layout.Row first = layout.row("first", tab);
 		first.el(Plotly.class, (viz, data) -> {
 			viz.title = "Modal split";
 
@@ -162,7 +165,7 @@ public class TripDashboard implements Dashboard {
 			}
 		});
 
-		layout.row("second", header.title)
+		layout.row("second", tab)
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics";
 				viz.description = "by main mode, over whole trip (including access & egress)";
@@ -200,7 +203,7 @@ public class TripDashboard implements Dashboard {
 
 			});
 
-		layout.row("third", header.title)
+		layout.row("third", tab)
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Population statistics";
 				viz.description = "over simulated persons (not scaled by sample size)";
@@ -233,7 +236,7 @@ public class TripDashboard implements Dashboard {
 			});
 
 
-		layout.row("departures", header.title).el(Plotly.class, (viz, data) -> {
+		layout.row("departures", tab).el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Departures";
 			viz.description = "by hour and purpose";
@@ -252,7 +255,7 @@ public class TripDashboard implements Dashboard {
 
 		});
 
-		layout.row("arrivals", header.title).el(Plotly.class, (viz, data) -> {
+		layout.row("arrivals", tab).el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Arrivals";
 			viz.description = "by hour and purpose";
