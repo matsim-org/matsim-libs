@@ -369,14 +369,13 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Mode share";
 				viz.description = "by " + cat;
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("dist_group").build())
-					.yAxis(Axis.builder().title("sim_share").build())
+					.xAxis(Axis.builder().title("share").build())
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
 				// TODO: Still in testing
 				Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
-					.pivot(List.of("main_mode"), "source", "share")
+					.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
 					.aggregate(List.of("main_mode", "source", cat), "share", Plotly.AggrFunc.SUM)
 					.mapping()
 					.facetCol(cat)
