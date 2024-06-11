@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;

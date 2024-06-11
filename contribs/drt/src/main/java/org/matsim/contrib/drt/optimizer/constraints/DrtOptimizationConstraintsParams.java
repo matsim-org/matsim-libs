@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.optimizer;
+package org.matsim.contrib.drt.optimizer.constraints;
 
 import com.google.common.base.Verify;
 import org.matsim.core.config.Config;
