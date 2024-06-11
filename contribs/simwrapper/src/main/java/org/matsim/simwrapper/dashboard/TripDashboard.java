@@ -369,6 +369,7 @@ public class TripDashboard implements Dashboard {
 
 					viz.title = "Mode share";
 					viz.description = "by " + cat;
+					viz.height = 6d;
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("share").build())
 						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
@@ -399,16 +400,17 @@ public class TripDashboard implements Dashboard {
 						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 						.build();
 
-					// TODO: should use facet row, but does not work yet
-					// TODO: hard to see, because too many bars, maybe try dropdown (instead of facet)
+					viz.interactive = Plotly.Interactive.dropdown;
+
+					// TODO: modes are not separated into different traces
+					// probably dropdown config in plotly needs to be extended
 					Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
 						.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
 						.normalize(List.of("dist_group", "source", cat), "share")
 						.rename("sim_share", "Sim")
 						.rename("ref_share", "Ref")
 						.mapping()
-						.facetCol(cat)
-						.name("main_mode")
+						.name(cat)
 						.x("dist_group")
 						.y("share");
 
