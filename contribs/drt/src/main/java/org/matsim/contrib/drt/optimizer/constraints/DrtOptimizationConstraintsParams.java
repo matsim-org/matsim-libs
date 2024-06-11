@@ -45,16 +45,17 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
                 .toList();
     }
 
-    public DrtOptimizationConstraintsSet addOrGetDefaultDrtOptimizationConstraintsSet() {
+    public DefaultDrtOptimizationConstraintsSet addOrGetDefaultDrtOptimizationConstraintsSet() {
         Optional<DrtOptimizationConstraintsSet> drtOptParams = getDrtOptimizationConstraintsSets().stream()
                 .filter(params -> params.name.equals(defaultConstraintSet))
+                .filter(DefaultDrtOptimizationConstraintsSet.class::isInstance)
                 .findAny();
         if (drtOptParams.isEmpty()) {
-            addParameterSet(new DrtOptimizationConstraintsSet());
+            DefaultDrtOptimizationConstraintsSet defaultDrtOptimizationConstraintsSet = new DefaultDrtOptimizationConstraintsSet();
+            addParameterSet(defaultDrtOptimizationConstraintsSet);
+            return defaultDrtOptimizationConstraintsSet;
         }
-        return getDrtOptimizationConstraintsSets().stream()
-                .filter(params -> params.name.equals(defaultConstraintSet))
-                .findAny().orElseThrow();
+        return (DefaultDrtOptimizationConstraintsSet) drtOptParams.get();
     }
 
     /**
