@@ -41,7 +41,8 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 	produces = {
 		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
 		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv",
-		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv"
+		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
+		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
 	}
 )
 public class TripAnalysis implements MATSimAppCommand {
@@ -226,6 +227,8 @@ public class TripAnalysis implements MATSimAppCommand {
 				choices.writeChoices(output.getPath("mode_choices.csv"));
 				choices.writeChoiceEvaluation(output.getPath("mode_choice_evaluation.csv"));
 				choices.writeChoiceEvaluationPerMode(output.getPath("mode_choice_evaluation_per_mode.csv"));
+				choices.writeConfusionMatrix(output.getPath("mode_confusion_matrix.csv"));
+				choices.writeModePredictionError(output.getPath("mode_prediction_error.csv"));
 			} catch (RuntimeException e) {
 				log.error("Error while analyzing mode choices", e);
 			}

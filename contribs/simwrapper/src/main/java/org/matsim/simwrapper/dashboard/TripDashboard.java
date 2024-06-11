@@ -5,6 +5,7 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.ColorScheme;
+import org.matsim.simwrapper.viz.Heatmap;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
 import tech.tablesaw.plotly.components.Axis;
@@ -32,6 +33,8 @@ public class TripDashboard implements Dashboard {
 	private String[] categories;
 
 	private String[] args;
+
+	private boolean choiceEvaluation;
 
 	/**
 	 * Default trip dashboard constructor.
@@ -71,6 +74,15 @@ public class TripDashboard implements Dashboard {
 	}
 
 	/**
+	 * Enable choice evaluation tab. This only produces valid data if choice reference data was set in the population.
+	 * @see TripAnalysis#ATTR_REF_MODES
+	 */
+	public TripDashboard withChoiceEvaluation(boolean enable) {
+		this.choiceEvaluation = enable;
+		return this;
+	}
+
+	/**
 	 * Set argument that will be passed to the analysis script. See {@link TripAnalysis}.
 	 */
 	public TripDashboard setAnalysisArgs(String... args) {
@@ -98,7 +110,7 @@ public class TripDashboard implements Dashboard {
 			args[this.args.length + 1] = groupedRefCsv;
 		}
 
-		Layout.Row first = layout.row("first");
+		Layout.Row first = layout.row("first", header.title);
 		first.el(Plotly.class, (viz, data) -> {
 			viz.title = "Modal split";
 
@@ -150,7 +162,7 @@ public class TripDashboard implements Dashboard {
 			}
 		});
 
-		layout.row("second")
+		layout.row("second", header.title)
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics";
 				viz.description = "by main mode, over whole trip (including access & egress)";
@@ -188,7 +200,7 @@ public class TripDashboard implements Dashboard {
 
 			});
 
-		layout.row("third")
+		layout.row("third", header.title)
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Population statistics";
 				viz.description = "over simulated persons (not scaled by sample size)";
@@ -221,7 +233,7 @@ public class TripDashboard implements Dashboard {
 			});
 
 
-		layout.row("departures").el(Plotly.class, (viz, data) -> {
+		layout.row("departures", header.title).el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Departures";
 			viz.description = "by hour and purpose";
@@ -240,7 +252,7 @@ public class TripDashboard implements Dashboard {
 
 		});
 
-		layout.row("arrivals").el(Plotly.class, (viz, data) -> {
+		layout.row("arrivals", header.title).el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Arrivals";
 			viz.description = "by hour and purpose";
@@ -260,31 +272,89 @@ public class TripDashboard implements Dashboard {
 		});
 
 		if (groupedRefCsv != null) {
-
-			// age,economic_status,dist_group,main_mode,share
-			layout.row("facets").el(Plotly.class, (viz, data) -> {
-
-				viz.title = "FACETS";
-				viz.description = "by hour and purpose";
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("dist_group").build())
-					.yAxis(Axis.builder().title("sim_share").build())
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-					.build();
-
-				// TODO: Still in testing
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", "age")).mapping()
-						.facetCol("age")
-						.name("main_mode", ColorScheme.Spectral)
-						.x("dist_group")
-						.y("sim_share")
-				);
-
-			});
-
-			// TODO create the additional tab
-
+			createGroupedTab(layout, args);
 		}
+
+		if (choiceEvaluation) {
+			createChoiceTab(layout, args);
+		}
+
 	}
+
+	private void createChoiceTab(Layout layout, String[] args) {
+
+		// TODO: these explanation texts should be a separate box.
+
+		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
+			viz.title = "Choice Evaluation";
+			viz.description = "Metrics for mode choice. The macro-average computes the metric independently for each class and then take the average (hence treating all classes equally). " +
+				"The micro-average will aggregate the contributions of all classes to compute the average metric.";
+			viz.showAllRows = true;
+			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation.csv", args);
+		});
+
+		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
+			viz.title = "Choice Evaluation per Mode";
+			viz.description = "Precision is the fraction of instances correctly classified as belonging to a specific class out of all instances the model predicted to belong to that class." +
+				" Recall is the fraction of instances in a class that the model correctly classified out of all instances in that class.";
+			viz.showAllRows = true;
+			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation_per_mode.csv", args);
+		});
+
+		layout.row("choice-plots", "Mode Choice").el(Heatmap.class, (viz, data) -> {
+			viz.title = "Confusion Matrix";
+			viz.description = "Confusion matrix for mode choice.";
+			viz.xAxisTitle = "Predicted";
+			viz.yAxisTitle = "True";
+			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", args);
+		});
+
+		layout.row("choice-plots", "Mode Choice").el(Plotly.class, (viz, data) -> {
+			viz.title = "Mode Prediction Error";
+			viz.description = "Plot showing the number of (mis)classified modes.";
+
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("True mode").build())
+				.yAxis(Axis.builder().title("Predicted mode count").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+
+			Plotly.DataMapping ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_prediction_error.csv", args))
+				.mapping()
+				.x("true_mode")
+				.y("count")
+				.name("predicted_mode");
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds);
+		});
+	}
+
+	private void createGroupedTab(Layout layout, String[] args) {
+
+		// age,economic_status,dist_group,main_mode,share
+		layout.row("facets", "By Groups").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "FACETS";
+			viz.description = "by hour and purpose";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("dist_group").build())
+				.yAxis(Axis.builder().title("sim_share").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+
+			// TODO: Still in testing
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", "age")).mapping()
+					.facetCol("age")
+					.name("main_mode", ColorScheme.Spectral)
+					.x("dist_group")
+					.y("sim_share")
+			);
+
+		});
+
+		// TODO create the additional tab
+
+	}
+
 }

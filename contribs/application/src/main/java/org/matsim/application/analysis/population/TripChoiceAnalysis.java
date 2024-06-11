@@ -1,5 +1,9 @@
 package org.matsim.application.analysis.population;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +41,11 @@ final class TripChoiceAnalysis {
 	 */
 	private final Map<String, Counts> counts = new HashMap<>();
 
+	/**
+	 * Contains confusion matrix for each mode.
+	 */
+	private final List<DoubleList> confusionMatrix = new ArrayList<>();
+
 	public TripChoiceAnalysis(Table persons, Table trips, List<String> modeOrder) {
 		persons = persons.where(persons.stringColumn("ref_modes").isNotEqualTo(""));
 		trips = new DataFrameJoiner(trips, "person").inner(persons);
@@ -64,6 +73,25 @@ final class TripChoiceAnalysis {
 
 		for (String mode : modeOrder) {
 			counts.put(mode, countPredictions(mode, data));
+			DoubleArrayList preds = new DoubleArrayList();
+
+			for (String predMode : modeOrder) {
+				double c = 0;
+				for (Entry e : data) {
+					if (!e.trueMode.equals(mode))
+						continue;
+					if (e.predMode.equals(predMode))
+						c += e.weight;
+				}
+				preds.add(c);
+			}
+
+			double sum = preds.doubleStream().sum();
+			for (int i = 0; i < preds.size(); i++) {
+				preds.set(i, preds.getDouble(i) / sum);
+			}
+
+			confusionMatrix.add(preds);
 		}
 	}
 
@@ -145,7 +173,7 @@ final class TripChoiceAnalysis {
 			csv.printRecord("F1 Score (macro avg.)", f1.orElse(0));
 		}
 
-		// TODO Cohen’s Kappa, Cross-Entropy, Mathews Correlation Coefficient (MCC)
+		// TODO Cohen’s Kappa, Mathews Correlation Coefficient (MCC)
 	}
 
 	/**
@@ -173,11 +201,52 @@ final class TripChoiceAnalysis {
 		}
 	}
 
-	// TODO: write confusion matrix
+	/**
+	 * Write confusion matrix.
+	 */
+	public void writeConfusionMatrix(Path path) throws IOException {
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+			csv.print("True/Pred");
+			for (String s : modeOrder) {
+				csv.print(s);
+			}
+			csv.println();
 
-	// TODO Class Prediction Error
+			for (int i = 0; i < modeOrder.size(); i++) {
+				csv.print(modeOrder.get(i));
+				DoubleList row = confusionMatrix.get(i);
+				for (int j = 0; j < row.size(); j++) {
+					csv.print(row.getDouble(j));
+				}
+				csv.println();
+			}
+		}
+	}
+
+	public void writeModePredictionError(Path path) throws IOException {
+
+		Object2DoubleMap<Pair> counts = new Object2DoubleOpenHashMap<>();
+		// inefficient, should not be used on large datasets
+		for (Entry e : data) {
+			counts.mergeDouble(new Pair(e.trueMode(), e.predMode()), e.weight(), Double::sum);
+		}
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+			csv.printRecord("true_mode", "predicted_mode", "count");
+			for (String trueMode : modeOrder) {
+				for (String predMode : modeOrder) {
+					double c = counts.getDouble(new Pair(trueMode, predMode));
+					if (c > 0)
+						csv.printRecord(trueMode, predMode, c);
+				}
+			}
+		}
+	}
 
 	private record Entry(String person, double weight, int n, String trueMode, String predMode) {
+	}
+
+	private record Pair(String trueMode, String predMode) {
 	}
 
 	/**
