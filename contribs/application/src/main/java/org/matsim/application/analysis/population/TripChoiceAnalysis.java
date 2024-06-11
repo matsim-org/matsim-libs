@@ -13,6 +13,8 @@ import tech.tablesaw.api.Table;
 import tech.tablesaw.joining.DataFrameJoiner;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -95,6 +97,10 @@ final class TripChoiceAnalysis {
 		}
 	}
 
+	private static double round(double d) {
+		return BigDecimal.valueOf(d).setScale(5, RoundingMode.HALF_UP).doubleValue();
+	}
+
 	private static double precision(Counts c) {
 		return c.tp / (c.tp + c.fp);
 	}
@@ -164,13 +170,13 @@ final class TripChoiceAnalysis {
 
 			csv.printRecord("Info", "Value");
 
-			csv.printRecord("Accuracy", tp / total);
-			csv.printRecord("Precision (micro avg.)", tp / tpfp);
-			csv.printRecord("Precision (macro avg.)", precision.orElse(0));
-			csv.printRecord("Recall (micro avg.)", tp / tpfn);
-			csv.printRecord("Recall (macro avg.)", recall.orElse(0));
-			csv.printRecord("F1 Score (micro avg.)", 2 * tp / (tpfp + tpfn));
-			csv.printRecord("F1 Score (macro avg.)", f1.orElse(0));
+			csv.printRecord("Accuracy", round(tp / total));
+			csv.printRecord("Precision (micro avg.)", round(tp / tpfp));
+			csv.printRecord("Precision (macro avg.)", round(precision.orElse(0)));
+			csv.printRecord("Recall (micro avg.)", round(tp / tpfn));
+			csv.printRecord("Recall (macro avg.)", round(recall.orElse(0)));
+			csv.printRecord("F1 Score (micro avg.)", round(2 * tp / (tpfp + tpfn)));
+			csv.printRecord("F1 Score (macro avg.)", round(f1.orElse(0)));
 		}
 
 		// TODO Cohen’s Kappa, Mathews Correlation Coefficient (MCC)
@@ -193,9 +199,9 @@ final class TripChoiceAnalysis {
 
 				Counts c = counts.get(m);
 
-				csv.print(precision(c));
-				csv.print(recall(c));
-				csv.print(f1(c));
+				csv.print(round(precision(c)));
+				csv.print(round(recall(c)));
+				csv.print(round(f1(c)));
 				csv.println();
 			}
 		}

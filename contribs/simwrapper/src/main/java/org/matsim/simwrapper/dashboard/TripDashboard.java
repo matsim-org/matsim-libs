@@ -4,10 +4,7 @@ import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.ColorScheme;
-import org.matsim.simwrapper.viz.Heatmap;
-import org.matsim.simwrapper.viz.Plotly;
-import org.matsim.simwrapper.viz.Table;
+import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 
@@ -59,8 +56,14 @@ public class TripDashboard implements Dashboard {
 		args = new String[0];
 	}
 
+	private static String[] detectCategories(String groupedRefCsv) {
+		// TODO: Implement
+		return new String[0];
+	}
+
 	/**
 	 * Set grouped reference data. Will enable additional tab with analysis for subgroups of the population.
+	 *
 	 * @param groupedRefCsv resource containing the grouped reference data
 	 * @param categories    categories to show on dashboard, if empty all categories will be used
 	 */
@@ -75,6 +78,7 @@ public class TripDashboard implements Dashboard {
 
 	/**
 	 * Enable choice evaluation tab. This only produces valid data if choice reference data was set in the population.
+	 *
 	 * @see TripAnalysis#ATTR_REF_MODES
 	 */
 	public TripDashboard withChoiceEvaluation(boolean enable) {
@@ -88,11 +92,6 @@ public class TripDashboard implements Dashboard {
 	public TripDashboard setAnalysisArgs(String... args) {
 		this.args = args;
 		return this;
-	}
-
-	private static String[] detectCategories(String groupedRefCsv) {
-		// TODO: Implement
-		return new String[0];
 	}
 
 	@Override
@@ -286,20 +285,27 @@ public class TripDashboard implements Dashboard {
 
 	private void createChoiceTab(Layout layout, String[] args) {
 
-		// TODO: these explanation texts should be a separate box.
+		layout.row("choice-intro", "Mode Choice").el(TextBlock.class, (viz, data) -> {
+			viz.title = "Introduction";
+			viz.content = """
+				Information regarding the metrics used:
+
+				Precision is the fraction of instances correctly classified as belonging to a specific class out of all instances the model predicted to belong to that class.
+				Recall is the fraction of instances in a class that the model correctly classified out of all instances in that class.
+				The macro-average computes the metric independently for each class and then take the average (hence treating all classes equally).
+				The micro-average will aggregate the contributions of all classes to compute the average metric.""";
+		});
 
 		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
 			viz.title = "Choice Evaluation";
-			viz.description = "Metrics for mode choice. The macro-average computes the metric independently for each class and then take the average (hence treating all classes equally). " +
-				"The micro-average will aggregate the contributions of all classes to compute the average metric.";
+			viz.description = "Metrics for mode choice.";
 			viz.showAllRows = true;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation.csv", args);
 		});
 
 		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
 			viz.title = "Choice Evaluation per Mode";
-			viz.description = "Precision is the fraction of instances correctly classified as belonging to a specific class out of all instances the model predicted to belong to that class." +
-				" Recall is the fraction of instances in a class that the model correctly classified out of all instances in that class.";
+			viz.description = "Metrics for mode choice per mode.";
 			viz.showAllRows = true;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation_per_mode.csv", args);
 		});
