@@ -103,9 +103,19 @@ final class TripByGroupAnalysis {
 			Comparator<Row> cmp = Comparator.comparingInt(row -> dists.indexOf(row.getString("dist_group")));
 			aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));
 
-			// TODO: norm by category and dist_group
-			// probably need two separate files as well (with and without dist)
-			// not normed is more useful for now
+			// Norm each group to 1
+			String norm = group.columns.get(0);
+			if (group.columns.size() > 1)
+				throw new UnsupportedOperationException("Multiple columns not supported yet");
+
+			for (String label : aggr.stringColumn(norm).asSet()) {
+				DoubleColumn dist_group = aggr.doubleColumn("sim_share");
+				Selection sel = aggr.stringColumn(norm).isEqualTo(label);
+
+				double total = dist_group.where(sel).sum();
+				if (total > 0)
+					dist_group.set(sel, dist_group.divide(total));
+			}
 
 			Table joined = new DataFrameJoiner(group.data, join).leftOuter(aggr);
 			joined.column("share").setName("ref_share");

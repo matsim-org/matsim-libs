@@ -49,7 +49,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 	/**
-	 * Person attribute that contains the reference modes of a person.
+	 * Person attribute that contains the reference modes of a person. Multiple modes are delimited by "-".
 	 */
 	public static String ATTR_REF_MODES = "ref_modes";
 	/**

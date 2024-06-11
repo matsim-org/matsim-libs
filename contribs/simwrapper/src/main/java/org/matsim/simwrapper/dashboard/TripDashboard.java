@@ -1,21 +1,32 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.population.TripAnalysis;
+import org.matsim.application.options.CsvOptions;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 
 import javax.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Shows trip information, optionally against reference data.
  */
 public class TripDashboard implements Dashboard {
+
+	private static final Logger log = LoggerFactory.getLogger(TripDashboard.class);
 
 	@Nullable
 	private final String modeShareRefCsv;
@@ -57,8 +68,18 @@ public class TripDashboard implements Dashboard {
 	}
 
 	private static String[] detectCategories(String groupedRefCsv) {
-		// TODO: Implement
-		return new String[0];
+		try {
+			Character c = CsvOptions.detectDelimiter(groupedRefCsv);
+			try (BufferedReader reader = IOUtils.getBufferedReader(groupedRefCsv)) {
+				String header = reader.readLine();
+				return Arrays.stream(header.split(String.valueOf(c)))
+					.filter(s -> !s.equals("main_mode") && !s.equals("share") && !s.equals("dist_group"))
+					.toArray(String[]::new);
+			}
+
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**
@@ -71,6 +92,7 @@ public class TripDashboard implements Dashboard {
 		this.groupedRefCsv = groupedRefCsv;
 		if (categories.length == 0) {
 			categories = detectCategories(groupedRefCsv);
+			log.info("Detected categories from reference data: {}", Arrays.toString(categories));
 		}
 		this.categories = categories;
 		return this;
@@ -340,30 +362,35 @@ public class TripDashboard implements Dashboard {
 
 	private void createGroupedTab(Layout layout, String[] args) {
 
-		// age,economic_status,dist_group,main_mode,share
-		layout.row("facets", "By Groups").el(Plotly.class, (viz, data) -> {
+		for (String cat : Objects.requireNonNull(categories, "Categories not set")) {
 
-			viz.title = "FACETS";
-			viz.description = "by hour and purpose";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("dist_group").build())
-				.yAxis(Axis.builder().title("sim_share").build())
-				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-				.build();
+			layout.row("category_" + cat, "By Groups").el(Plotly.class, (viz, data) -> {
 
-			// TODO: Still in testing
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", "age")).mapping()
-					.facetCol("age")
-					.name("main_mode", ColorScheme.Spectral)
-					.x("dist_group")
-					.y("sim_share")
-			);
+				viz.title = "Mode share";
+				viz.description = "by " + cat;
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("dist_group").build())
+					.yAxis(Axis.builder().title("sim_share").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
 
-		});
+				// TODO: Still in testing
+				Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
+					.pivot(List.of("main_mode"), "source", "share")
+					.aggregate(List.of("main_mode", "source", cat), "share", Plotly.AggrFunc.SUM)
+					.mapping()
+					.facetCol(cat)
+					.name("main_mode")
+					.x("share")
+					.y("source");
 
-		// TODO create the additional tab
 
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+					.orientation(BarTrace.Orientation.HORIZONTAL)
+					.build(), ds);
+			});
+
+		}
 	}
 
 }

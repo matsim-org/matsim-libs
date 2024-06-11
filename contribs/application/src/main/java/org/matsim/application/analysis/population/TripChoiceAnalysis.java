@@ -98,6 +98,9 @@ final class TripChoiceAnalysis {
 	}
 
 	private static double round(double d) {
+		if (Double.isNaN(d))
+			return Double.NaN;
+
 		return BigDecimal.valueOf(d).setScale(5, RoundingMode.HALF_UP).doubleValue();
 	}
 
@@ -162,9 +165,9 @@ final class TripChoiceAnalysis {
 			total = c.total;
 		}
 
-		OptionalDouble precision = counts.values().stream().mapToDouble(TripChoiceAnalysis::precision).average();
-		OptionalDouble recall = counts.values().stream().mapToDouble(TripChoiceAnalysis::recall).average();
-		OptionalDouble f1 = counts.values().stream().mapToDouble(TripChoiceAnalysis::f1).average();
+		OptionalDouble precision = counts.values().stream().mapToDouble(TripChoiceAnalysis::precision).filter(Double::isFinite).average();
+		OptionalDouble recall = counts.values().stream().mapToDouble(TripChoiceAnalysis::recall).filter(Double::isFinite).average();
+		OptionalDouble f1 = counts.values().stream().mapToDouble(TripChoiceAnalysis::f1).filter(Double::isFinite).average();
 
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
 
