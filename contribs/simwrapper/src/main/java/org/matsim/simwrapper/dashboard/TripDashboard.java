@@ -400,7 +400,7 @@ public class TripDashboard implements Dashboard {
 						.build();
 
 					// TODO: should use facet row, but does not work yet
-					// TODO: hard to see, because too many bars
+					// TODO: hard to see, because too many bars, maybe try dropdown (instead of facet)
 					Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
 						.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
 						.normalize(List.of("dist_group", "source", cat), "share")
