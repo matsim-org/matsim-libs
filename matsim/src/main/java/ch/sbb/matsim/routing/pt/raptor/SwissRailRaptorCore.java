@@ -561,15 +561,7 @@ public class SwissRailRaptorCore {
 					if (observer != null) {
 						for (int stopIndex = this.improvedStops.nextSetBit(0); stopIndex >= 0; stopIndex = this.improvedStops.nextSetBit(stopIndex + 1)) {
 							PathElement fromPE = this.arrivalPathPerStop[stopIndex];
-							PathElement backpointer = fromPE.comingFrom;
-							if (backpointer != null) {
-								while (backpointer.comingFrom != null) {
-									backpointer = backpointer.comingFrom;
-								}
-								TransitStopFacility departureStopFacility = backpointer.toRouteStop.routeStop.getStopFacility();
-								TransitStopFacility arrivalStopFacility = fromPE.toRouteStop.routeStop.getStopFacility();
-								observer.arrivedAtStop(fromPE.firstDepartureTime, arrivalStopFacility, fromPE.arrivalTime, fromPE.transferCount, () -> createRaptorRoute(departureStopFacility, arrivalStopFacility, fromPE, fromPE.firstDepartureTime));
-							}
+							observeArrival(fromPE, observer);
 						}
 					}
 
@@ -581,7 +573,15 @@ public class SwissRailRaptorCore {
             if (this.improvedRouteStopIndices.isEmpty()) {
                 break;
             }
-        }
+
+					if (observer != null) {
+						for (int stopIndex = this.tmpImprovedStops.nextSetBit(0); stopIndex >= 0; stopIndex = this.tmpImprovedStops.nextSetBit(stopIndex + 1)) {
+							PathElement fromPE = this.arrivalPathPerStop[stopIndex];
+							observeArrival(fromPE, observer);
+						}
+					}
+
+				}
 
         // collect information for each stop
         Map<Id<TransitStopFacility>, TravelInfo> result = new HashMap<>();
@@ -596,6 +596,18 @@ public class SwissRailRaptorCore {
         }
         return result;
     }
+
+		private void observeArrival(PathElement pe, RaptorObserver observer) {
+			PathElement backpointer = pe.comingFrom;
+			if (backpointer != null) {
+				while (backpointer.comingFrom != null) {
+					backpointer = backpointer.comingFrom;
+				}
+				TransitStopFacility departureStopFacility = backpointer.toRouteStop.routeStop.getStopFacility();
+				TransitStopFacility arrivalStopFacility = pe.toRouteStop.routeStop.getStopFacility();
+				observer.arrivedAtStop(pe.firstDepartureTime, arrivalStopFacility, pe.arrivalTime, pe.transferCount, () -> createRaptorRoute(departureStopFacility, arrivalStopFacility, pe, pe.firstDepartureTime));
+			}
+		}
 
     private TravelInfo getTravelInfo(PathElement destination, RaptorParameters parameters) {
         PathElement firstStage = destination;
