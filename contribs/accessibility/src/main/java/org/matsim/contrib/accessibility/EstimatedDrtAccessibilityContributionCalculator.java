@@ -212,7 +212,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	}
 
 
-	public final Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestDrtStop(
+	private final Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestDrtStop(
 		final ActivityFacilities opportunities, Network network, Config config ) {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
