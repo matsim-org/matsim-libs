@@ -308,20 +308,25 @@ public class TripDashboard implements Dashboard {
 	private void createChoiceTab(Layout layout, String[] args) {
 
 		layout.row("choice-intro", "Mode Choice").el(TextBlock.class, (viz, data) -> {
-			viz.title = "Introduction";
+			viz.title = "Information";
 			viz.content = """
-				Information regarding the metrics used:
+				Note that these metrics are based on a single run and may have limited interpretability. For a more robust evaluation, consider running multiple simulations with different seeds and use metrics that consider probabilities as well.
+				(log-likelihood, Brier score, etc.)
+				For policy cases, these metrics do not have any meaning. They are solely for the base-case.
 
-				Precision is the fraction of instances correctly classified as belonging to a specific class out of all instances the model predicted to belong to that class.
-				Recall is the fraction of instances in a class that the model correctly classified out of all instances in that class.
-				The macro-average computes the metric independently for each class and then take the average (hence treating all classes equally).
-				The micro-average will aggregate the contributions of all classes to compute the average metric.""";
+				- Precision is the fraction of instances correctly classified as belonging to a specific class out of all instances the model predicted to belong to that class.
+				- Recall is the fraction of instances in a class that the model correctly classified out of all instances in that class.
+				- The macro-average computes the metric independently for each class and then take the average (hence treating all classes equally).
+				- The micro-average will aggregate the contributions of all classes to compute the average metric.
+				- Cohen's Kappa is a measure of agreement between two raters that corrects for chance agreement. 1.0 indicates perfect agreement, 0.0 or less indicates agreement by chance.
+				""";
 		});
 
 		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
 			viz.title = "Choice Evaluation";
 			viz.description = "Metrics for mode choice.";
 			viz.showAllRows = true;
+			viz.height = 6d;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation.csv", args);
 		});
 
@@ -334,7 +339,7 @@ public class TripDashboard implements Dashboard {
 
 		layout.row("choice-plots", "Mode Choice").el(Heatmap.class, (viz, data) -> {
 			viz.title = "Confusion Matrix";
-			viz.description = "Confusion matrix for mode choice.";
+			viz.description = "Share of (mis)classified modes.";
 			viz.xAxisTitle = "Predicted";
 			viz.yAxisTitle = "True";
 			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", args);
@@ -371,7 +376,6 @@ public class TripDashboard implements Dashboard {
 					viz.description = "by " + cat;
 					viz.height = 6d;
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-						.xAxis(Axis.builder().title("share").build())
 						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 						.build();
 
@@ -410,7 +414,8 @@ public class TripDashboard implements Dashboard {
 						.rename("sim_share", "Sim")
 						.rename("ref_share", "Ref")
 						.mapping()
-						.name(cat)
+						.name("main_mode")
+						.facetCol(cat)
 						.x("dist_group")
 						.y("share");
 
@@ -419,7 +424,6 @@ public class TripDashboard implements Dashboard {
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
 						.orientation(BarTrace.Orientation.VERTICAL)
 						.build(), ds);
-
 
 				});
 

@@ -18,6 +18,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Helper class to analyze trip choices from persons against reference data.
@@ -42,6 +43,7 @@ final class TripChoiceAnalysis {
 	 * Contains predication result for each mode.
 	 */
 	private final Map<String, Counts> counts = new HashMap<>();
+	private final Object2DoubleMap<Pair> pairs = new Object2DoubleOpenHashMap<>();
 
 	/**
 	 * Contains confusion matrix for each mode.
@@ -73,24 +75,17 @@ final class TripChoiceAnalysis {
 				log.warn("Person {} trip {} does not match ref data ({})", person, n, split.length);
 		}
 
+		for (Entry e : data) {
+			pairs.mergeDouble(new Pair(e.trueMode(), e.predMode()), e.weight(), Double::sum);
+		}
+
 		for (String mode : modeOrder) {
 			counts.put(mode, countPredictions(mode, data));
 			DoubleArrayList preds = new DoubleArrayList();
 
 			for (String predMode : modeOrder) {
-				double c = 0;
-				for (Entry e : data) {
-					if (!e.trueMode.equals(mode))
-						continue;
-					if (e.predMode.equals(predMode))
-						c += e.weight;
-				}
+				double c = pairs.getDouble(new Pair(mode, predMode));
 				preds.add(c);
-			}
-
-			double sum = preds.doubleStream().sum();
-			for (int i = 0; i < preds.size(); i++) {
-				preds.set(i, preds.getDouble(i) / sum);
 			}
 
 			confusionMatrix.add(preds);
@@ -114,6 +109,35 @@ final class TripChoiceAnalysis {
 
 	private static double f1(Counts c) {
 		return 2 * c.tp / (2 * c.tp + c.fp + c.fn);
+	}
+
+	/**
+	 * Implemented as in sklearn.metrics.cohen_kappa_score.
+	 * See <a href="https://en.wikipedia.org/wiki/Cohen%27s_kappa">Wikipedia</a>
+	 *
+	 * @param cm confusion matrix
+	 */
+	static double computeCohenKappa(List<DoubleList> cm) {
+		DoubleList sumRows = cm.stream().mapToDouble(l -> l.doubleStream().sum()).collect(DoubleArrayList::new, DoubleList::add, DoubleList::addAll);
+		DoubleList sumCols = IntStream.range(0, cm.size()).mapToDouble(i -> cm.stream().mapToDouble(l -> l.getDouble(i)).sum()).collect(DoubleArrayList::new, DoubleList::add, DoubleList::addAll);
+		double sumTotal = sumRows.doubleStream().sum();
+		double expected = 0;
+
+		for (int i = 0; i < cm.size(); i++) {
+			for (int j = 0; j < cm.size(); j++) {
+				if (i != j)
+					expected += sumRows.getDouble(i) * sumCols.getDouble(j) / sumTotal;
+			}
+		}
+
+		double k = 0;
+		for (int i = 0; i < cm.size(); i++) {
+			for (int j = 0; j < cm.size(); j++) {
+				if (i != j)
+					k += cm.get(i).getDouble(j) / expected;
+			}
+		}
+		return 1 - k;
 	}
 
 	private Counts countPredictions(String mode, List<Entry> data) {
@@ -180,9 +204,8 @@ final class TripChoiceAnalysis {
 			csv.printRecord("Recall (macro avg.)", round(recall.orElse(0)));
 			csv.printRecord("F1 Score (micro avg.)", round(2 * tp / (tpfp + tpfn)));
 			csv.printRecord("F1 Score (macro avg.)", round(f1.orElse(0)));
+			csv.printRecord("Cohen’s Kappa", round(computeCohenKappa(confusionMatrix)));
 		}
-
-		// TODO Cohen’s Kappa, Mathews Correlation Coefficient (MCC)
 	}
 
 	/**
@@ -211,7 +234,7 @@ final class TripChoiceAnalysis {
 	}
 
 	/**
-	 * Write confusion matrix.
+	 * Write confusion matrix. This normalizes per row.
 	 */
 	public void writeConfusionMatrix(Path path) throws IOException {
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
@@ -224,8 +247,9 @@ final class TripChoiceAnalysis {
 			for (int i = 0; i < modeOrder.size(); i++) {
 				csv.print(modeOrder.get(i));
 				DoubleList row = confusionMatrix.get(i);
+				double sum = row.doubleStream().sum();
 				for (int j = 0; j < row.size(); j++) {
-					csv.print(row.getDouble(j));
+					csv.print(row.getDouble(j) / sum);
 				}
 				csv.println();
 			}
@@ -234,17 +258,11 @@ final class TripChoiceAnalysis {
 
 	public void writeModePredictionError(Path path) throws IOException {
 
-		Object2DoubleMap<Pair> counts = new Object2DoubleOpenHashMap<>();
-		// inefficient, should not be used on large datasets
-		for (Entry e : data) {
-			counts.mergeDouble(new Pair(e.trueMode(), e.predMode()), e.weight(), Double::sum);
-		}
-
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
 			csv.printRecord("true_mode", "predicted_mode", "count");
 			for (String trueMode : modeOrder) {
 				for (String predMode : modeOrder) {
-					double c = counts.getDouble(new Pair(trueMode, predMode));
+					double c = pairs.getDouble(new Pair(trueMode, predMode));
 					if (c > 0)
 						csv.printRecord(trueMode, predMode, c);
 				}
@@ -252,10 +270,10 @@ final class TripChoiceAnalysis {
 		}
 	}
 
-	private record Entry(String person, double weight, int n, String trueMode, String predMode) {
+	record Entry(String person, double weight, int n, String trueMode, String predMode) {
 	}
 
-	private record Pair(String trueMode, String predMode) {
+	record Pair(String trueMode, String predMode) {
 	}
 
 	/**
@@ -266,7 +284,7 @@ final class TripChoiceAnalysis {
 	 * @param fn incorrectly predicted different class
 	 * @param tn correctly predicated different class
 	 */
-	private record Counts(double tp, double fp, double fn, double tn, double total) {
+	record Counts(double tp, double fp, double fn, double tn, double total) {
 
 	}
 
