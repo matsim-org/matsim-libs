@@ -43,6 +43,8 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
     private final DrtConfigGroup drtConfigGroup;
     private final ShiftEfficiencyTracker shiftEfficiencyTracker;
 
+    private final String delimiter;
+
     @Inject
     public ShiftEfficiencyAnalysisControlerListener(DrtConfigGroup drtConfigGroup,
                                                     ShiftEfficiencyTracker shiftEfficiencyTracker,
@@ -52,6 +54,7 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
         this.shiftEfficiencyTracker = shiftEfficiencyTracker;
         this.drtShiftsSpecification = drtShiftsSpecification;
         this.matsimServices = matsimServices;
+        this.delimiter = matsimServices.getConfig().global().getDefaultDelimiter();
     }
 
     @Override
@@ -131,7 +134,7 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
     }
 
-    private static String line(Object... cells) {
-        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(";", "", "\n"));
+    private String line(Object... cells) {
+        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(delimiter, "", "\n"));
     }
 }
