@@ -41,25 +41,25 @@ import org.matsim.core.utils.io.IOUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpOfflineTravelTimes {
-	private static final String DELIMITER = ";";
 
 	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes,
-			String filename) {
+			String filename, String delimiter) {
 		try (Writer writer = IOUtils.getBufferedWriter(filename)) {
-			saveLinkTravelTimes(timeDiscretizer, linkTravelTimes, writer);
+			saveLinkTravelTimes(timeDiscretizer, linkTravelTimes, writer, delimiter);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, Writer writer)
+	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes,
+										   Writer writer, String delimiter)
 			throws IOException {
 		int intervalCount = timeDiscretizer.getIntervalCount();
 		//header row
-		writer.append("linkId" + DELIMITER);
+		writer.append("linkId").append(delimiter);
 		for (int i = 0; i < intervalCount; i++) {
 			double time = i * timeDiscretizer.getTimeInterval();
-			writer.append(time + DELIMITER);
+			writer.append(String.valueOf(time)).append(delimiter);
 		}
 		writer.append('\n');
 
@@ -71,12 +71,12 @@ public class DvrpOfflineTravelTimes {
 			if (ttRow != null) {
 				checkArgument(ttRow.length == intervalCount);
 
-				writer.append(Id.get(idx, Link.class) + DELIMITER);
+				writer.append(String.valueOf(Id.get(idx, Link.class))).append(delimiter);
 				for (int t = 0; t < intervalCount; t++) {
 					// rounding up to full seconds, otherwise the output files are sometimes huge (even when gzipped)
 					// consider having a switch for enabling/disabling rounding
 					int tt = (int)Math.ceil(ttRow[t]);//rounding up to avoid zeros; also QSim rounds up
-					writer.append(tt + DELIMITER);
+					writer.append(String.valueOf(tt)).append(delimiter);
 				}
 				writer.append('\n');
 			}
@@ -101,27 +101,28 @@ public class DvrpOfflineTravelTimes {
 		};
 	}
 
-	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, URL url) {
+	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, URL url, String delimiter) {
 		try (BufferedReader reader = IOUtils.getBufferedReader(url)) {
-			return loadLinkTravelTimes(timeDiscretizer, reader);
+			return loadLinkTravelTimes(timeDiscretizer, reader, delimiter);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader)
+	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader,
+												 String delimiter)
 			throws IOException {
 		//start with IdMap and then convert to array (to avoid index out of bounds)
 		IdMap<Link, double[]> linkTravelTimes = new IdMap<>(Link.class);
 
 		//header row
-		String[] headerLine = reader.readLine().split(";");
+		String[] headerLine = reader.readLine().split(delimiter);
 		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
 		verify(headerLine[0].equals("linkId"));
 		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
 
 		//regular rows
-		reader.lines().map(line -> line.split(DELIMITER)).forEach(cells -> {
+		reader.lines().map(line -> line.split(delimiter)).forEach(cells -> {
 			verify(timeDiscretizer.getIntervalCount() == cells.length - 1);
 
 			double[] row = new double[timeDiscretizer.getIntervalCount()];

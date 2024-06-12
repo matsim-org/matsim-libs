@@ -61,7 +61,7 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 
 	@Test
 	void getLinkTravelTime_timeAreCorrectlyBinned() {
-		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer, 0.25, null);
+		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer, 0.25, null, ";");
 
 		//bin 0
 		assertThat(linkTravelTime(estimator, linkAB, -1)).isEqualTo(1);
@@ -98,7 +98,7 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 		};
 
 		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, observedTT, network, timeDiscretizer, alpha,
-				null);
+				null,";");
 
 		//expected TTs for each time bin
 		double expectedTT_0 = 1;
@@ -125,7 +125,8 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 	@Test
 	void getLinkTravelTime_linkOutsideNetwork_fail() {
 		var linkOutsideNetwork = new FakeLink(Id.createLinkId("some-link"));
-		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer, 0.25, null);
+		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer,
+				0.25, null, ";");
 
 		assertThatThrownBy(() -> linkTravelTime(estimator, linkOutsideNetwork, 0)).isExactlyInstanceOf(
 				NullPointerException.class)
