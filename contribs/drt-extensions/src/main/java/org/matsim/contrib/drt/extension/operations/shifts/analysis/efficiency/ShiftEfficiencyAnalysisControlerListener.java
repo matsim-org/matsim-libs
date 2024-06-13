@@ -92,15 +92,17 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                 stream()
                 .map(s -> (s.getEndTime() - s.getStartTime()) - (s.getBreak().isPresent() ? s.getBreak().get().getDuration() : 0.))
                 .mapToDouble(d -> d)
-                .sum();
+                .sum() / 3600.;
 
         long uniqueVehicles = record.getFinishedShifts().values().stream().distinct().count();
 
-        double meanRevenuePerShift = record.revenueByShift().values().stream().mapToDouble(d -> d).average().orElse(Double.NaN);
         double totalRevenue = record.revenueByShift().values().stream().mapToDouble(d -> d).sum();
+        double meanRevenuePerShift = record.revenueByShift().values().stream().mapToDouble(d -> d).average().orElse(Double.NaN);
+        double meanRevenuePerShiftHour = totalRevenue / numberOfShiftHours;
 
-        double meanRidesPerShift = record.getRequestsByShift().values().stream().mapToDouble(List::size).average().orElse(Double.NaN);
         double totalRides = record.getRequestsByShift().values().stream().mapToDouble(List::size).sum();
+        double meanRidesPerShift = record.getRequestsByShift().values().stream().mapToDouble(List::size).average().orElse(Double.NaN);
+        double meanRidesPerShiftHour = totalRides / numberOfShiftHours;
 
         StringJoiner stringJoiner = new StringJoiner(delimiter);
         stringJoiner
@@ -110,8 +112,10 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                 .add(numberOfShiftHours + "")
                 .add(uniqueVehicles + "")
                 .add(meanRevenuePerShift + "")
+                .add(meanRevenuePerShiftHour + "")
                 .add(totalRevenue + "")
                 .add(meanRidesPerShift + "")
+                .add(meanRidesPerShiftHour + "")
                 .add(totalRides + "");
         writeIterationShiftEfficiencyStats(stringJoiner.toString(), event.getIteration());
 
@@ -186,8 +190,10 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                         .add("numberOfShiftHours")
                         .add("uniqueVehicles")
                         .add("meanRevenuePerShift")
+                        .add("meanRevenuePerShiftHour")
                         .add("totalRevenue")
                         .add("meanRidesPerShift")
+                        .add("meanRidesPerShiftHour")
                         .add("totalRides");
                 bw.write(line("runId", "iteration", stringJoiner.toString()));
             }
