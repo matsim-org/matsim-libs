@@ -604,8 +604,10 @@ public class SwissRailRaptorCore {
 					backpointer = backpointer.comingFrom;
 				}
 				TransitStopFacility departureStopFacility = backpointer.toRouteStop.routeStop.getStopFacility();
-				TransitStopFacility arrivalStopFacility = pe.toRouteStop.routeStop.getStopFacility();
-				observer.arrivedAtStop(pe.firstDepartureTime, arrivalStopFacility, pe.arrivalTime, pe.transferCount, () -> createRaptorRoute(departureStopFacility, arrivalStopFacility, pe, pe.firstDepartureTime));
+				if (departureStopFacility != null) {
+					TransitStopFacility arrivalStopFacility = pe.toRouteStop.routeStop.getStopFacility();
+					observer.arrivedAtStop(pe.firstDepartureTime, arrivalStopFacility, pe.arrivalTime, pe.transferCount, () -> createRaptorRoute(departureStopFacility, arrivalStopFacility, pe, pe.firstDepartureTime));
+				}
 			}
 		}
 
