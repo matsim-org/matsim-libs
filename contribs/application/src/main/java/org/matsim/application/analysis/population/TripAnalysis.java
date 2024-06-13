@@ -146,6 +146,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		// Map.of only has 10 argument max
 		columnTypes.put("traveled_distance", ColumnType.LONG);
+		columnTypes.put("euclidean_distance", ColumnType.LONG);
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
