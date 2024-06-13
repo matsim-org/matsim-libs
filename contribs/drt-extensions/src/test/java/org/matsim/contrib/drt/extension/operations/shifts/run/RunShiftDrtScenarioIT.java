@@ -9,6 +9,7 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -141,6 +142,11 @@ public class RunShiftDrtScenarioIT {
 		shiftsParams.shiftInputFile = shiftsFile;
 		shiftsParams.allowInFieldChangeover = true;
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
+
+		DrtFareParams drtFareParams = new DrtFareParams();
+		drtFareParams.baseFare = 1.;
+		drtFareParams.distanceFare_m = 1. / 1000;
+		drtWithShiftsConfigGroup.addParameterSet(drtFareParams);
 
 		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
 		run.run();
