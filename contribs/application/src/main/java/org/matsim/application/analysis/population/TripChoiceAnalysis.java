@@ -70,7 +70,8 @@ final class TripChoiceAnalysis {
 
 			if (n < split.length) {
 				String trueMode = split[n];
-				data.add(new Entry(person, weight, n, trip.getLong("euclidean_distance"), trueMode, predMode));
+				data.add(new Entry((String) trip.getObject(TripAnalysis.ATTR_REF_ID),
+					person, weight, n, trip.getLong("euclidean_distance"), trueMode, predMode));
 			} else
 				log.warn("Person {} trip {} does not match ref data ({})", person, n, split.length);
 		}
@@ -166,9 +167,9 @@ final class TripChoiceAnalysis {
 	 */
 	public void writeChoices(Path path) throws IOException {
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
-			csv.printRecord("person", "weight", "n", "euclidean_distance", "true_mode", "pred_mode");
+			csv.printRecord("ref_id", "person", "weight", "n", "euclidean_distance", "true_mode", "pred_mode");
 			for (Entry e : data) {
-				csv.printRecord(e.person, e.weight, e.n, e.dist, e.trueMode, e.predMode);
+				csv.printRecord(e.refId, e.person, e.weight, e.n, e.dist, e.trueMode, e.predMode);
 			}
 		}
 	}
@@ -270,7 +271,7 @@ final class TripChoiceAnalysis {
 		}
 	}
 
-	record Entry(String person, double weight, int n, long dist, String trueMode, String predMode) {
+	record Entry(String refId, String person, double weight, int n, long dist, String trueMode, String predMode) {
 	}
 
 	record Pair(String trueMode, String predMode) {

@@ -48,6 +48,11 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 public class TripAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
+
+	/**
+	 * Attributes which relates this person to a reference person.
+	 */
+	public static String ATTR_REF_ID = "ref_id";
 	/**
 	 * Person attribute that contains the reference modes of a person. Multiple modes are delimited by "-".
 	 */
@@ -56,6 +61,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	 * Person attribute containing its weight for analysis purposes.
 	 */
 	public static String ATTR_REF_WEIGHT = "ref_weight";
+
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
 	@CommandLine.Mixin
