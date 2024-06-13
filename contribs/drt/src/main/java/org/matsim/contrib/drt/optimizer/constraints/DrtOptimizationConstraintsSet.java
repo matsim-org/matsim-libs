@@ -45,7 +45,7 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
     @PositiveOrZero
     public double lateDiversionthreshold = 0; // [s];
 
-    public DrtOptimizationConstraintsSet(String name) {
-        super(name);
+    public DrtOptimizationConstraintsSet() {
+        super(SET_NAME);
     }
 }

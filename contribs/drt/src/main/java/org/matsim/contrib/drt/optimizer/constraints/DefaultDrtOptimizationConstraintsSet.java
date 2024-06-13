@@ -7,10 +7,6 @@ import org.matsim.core.config.Config;
 
 public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstraintsSet {
 
-    public DefaultDrtOptimizationConstraintsSet() {
-        super(SET_NAME);
-    }
-
     @Parameter
     @Comment("Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
             + "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
