@@ -110,7 +110,8 @@ public class NoiseAnalysis implements MATSimAppCommand {
 	private Config prepareConfig() {
 		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString(), new NoiseConfigGroup());
 
-		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()).toAbsolutePath().toString());
+		//it is important to match "output_vehicles" because otherwise dvrpVehicle files might be matched and the code crashes later
+		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
