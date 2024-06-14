@@ -107,9 +107,11 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             if (stops.isEmpty()) {
                 TransitStopFacilityImpl nearest = (TransitStopFacilityImpl) raptorData.findNearestStop(coord.getX(), coord.getY());
                 double nearestStopDistance = CoordUtils.calcEuclideanDistance(coord, nearest.getCoord());
-                stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), nearestStopDistance + scenario.getConfig().transitRouter().getExtensionRadius());
-            }
 
+				double searchDistance = Double.min(1500.0,nearestStopDistance + scenario.getConfig().transitRouter().getExtensionRadius());
+
+				stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), searchDistance);
+            }
             AggregationObject jco = aggregatedOpportunities.get(opportunity.getId());
             if (jco == null) {
                 jco = new AggregationObject(opportunity.getId(), null, null, opportunity, 0.);
@@ -147,7 +149,15 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             //compute direct walk costs
             final Coord toCoord = destination.getNearestBasicLocation().getCoord();
             double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
-            double directWalkCost = -directDistance_m / walkSpeed_m_h * betaWalkTT;
+
+
+
+			double directWalkCost = Double.MAX_VALUE;
+			if (directDistance_m < 3000) {
+				directWalkCost = -directDistance_m / walkSpeed_m_h * betaWalkTT;
+			}
+
+
 
             double travelCost = Double.MAX_VALUE;
             ActivityFacility nearestStop = ((ActivityFacility) destination.getNearestBasicLocation());
@@ -156,16 +166,23 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             for (TransitStopFacility stop : stops) {
                 final SwissRailRaptorCore.TravelInfo travelInfo = idTravelInfoMap.get(stop.getId());
                 if (travelInfo != null) {
-                    double distance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toCoord);
-                    double egressWalkCost = - distance / walkSpeed_m_h  * betaWalkTT;
+                    double egressDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toCoord);
+                    double egressWalkCost = - egressDistance / walkSpeed_m_h  * betaWalkTT;
+
                     //total travel cost include travel, access, egress and waiting costs
-                    double cost = travelInfo.accessCost + travelInfo.travelCost + travelInfo.waitingCost + egressWalkCost;
-                    travelCost = Math.min(travelCost, cost);
+					double cost = travelInfo.accessCost + travelInfo.travelCost + travelInfo.waitingCost + egressWalkCost;
+
+					double accessDistance = (travelInfo.accessTime / 3600) * walkSpeed_m_h;
+					if (accessDistance > 1500 || egressDistance > 1500) {
+						cost = Double.MAX_VALUE;
+					}
+
+					travelCost = Math.min(travelCost, cost);
                 }
             }
 
             //check whether direct walk time is cheaper
-            travelCost = Math.min(travelCost, directWalkCost);
+//            travelCost = Math.min(travelCost, directWalkCost); // (xxx, inf)
 
             double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
             expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
