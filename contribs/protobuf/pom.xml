@@ -11,7 +11,7 @@
     <name>protobuf</name>
 
     <properties>
-        <protobuf.version>4.27.0</protobuf.version>
+        <protobuf.version>4.27.1</protobuf.version>
     </properties>
 
     <dependencies>
