@@ -97,6 +97,7 @@ public class TestScenario extends MATSimApplication {
 			List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan());
 			String ref = trips.stream().map(genMode).collect(Collectors.joining("-"));
 
+			person.getAttributes().putAttribute(TripAnalysis.ATTR_REF_ID, person.getId().toString());
 			person.getAttributes().putAttribute(TripAnalysis.ATTR_REF_MODES, ref);
 		}
 	}

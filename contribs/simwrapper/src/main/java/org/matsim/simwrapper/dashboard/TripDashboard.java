@@ -342,6 +342,8 @@ public class TripDashboard implements Dashboard {
 			viz.description = "Share of (mis)classified modes.";
 			viz.xAxisTitle = "Predicted";
 			viz.yAxisTitle = "True";
+			viz.y = "True/Pred";
+			viz.flipAxes = "True";
 			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", args);
 		});
 
