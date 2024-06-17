@@ -3,6 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
+import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -40,16 +41,18 @@ public class OverviewDashboard implements Dashboard {
 
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";
-			viz.display.lineColor.join = "link_id";
+			viz.display.lineColor.join = "linkId";
 			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
 
 			viz.display.lineWidth.dataset = "traffic";
 			viz.display.lineWidth.columnName = "simulated_traffic_volume";
 			viz.display.lineWidth.scaleFactor = 20000d;
-			viz.display.lineWidth.join = "link_id";
+			viz.display.lineWidth.join = "linkId";
+
 
 		});
 
+		// Info about the status of the run
 		layout.row("warnings").el(TextBlock.class, (viz, data) -> {
 			viz.file = data.compute(LogFileAnalysis.class, "status.md");
 		});

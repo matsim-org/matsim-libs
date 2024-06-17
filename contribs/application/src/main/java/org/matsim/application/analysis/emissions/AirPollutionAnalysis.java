@@ -1,7 +1,14 @@
 package org.matsim.application.analysis.emissions;
 
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatFloatPair;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
@@ -57,8 +64,8 @@ import java.util.*;
 )
 @CommandSpec(requireRunDirectory = true,
 	produces = {
-		"emissions_total.csv", "emissions_per_link.%s",
-		"emissions_per_link_per_m.%s",
+		"emissions_total.csv", "emissions_per_link.csv",
+		"emissions_per_link_per_m.csv",
 		"emissions_grid_per_hour.%s",
 		"emissions_vehicle_info.csv",
 		"emissions_grid_per_day.%s"
@@ -168,8 +175,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		nf.setMaximumFractionDigits(4);
 		nf.setGroupingUsed(false);
 
-		CSVPrinter absolute = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link.%s", "csv")), CSVFormat.DEFAULT);
-		CSVPrinter perMeter = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link_per_m.%s", "csv")), CSVFormat.DEFAULT);
+		CSVPrinter absolute = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link.csv")), CSVFormat.DEFAULT);
+		CSVPrinter perMeter = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link_per_m.csv")), CSVFormat.DEFAULT);
 
 		absolute.print("linkId");
 		perMeter.print("linkId");
@@ -344,8 +351,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 					Coord coord = raster.getCoordForIndex(xi, yi);
 					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 
-//					if (value == 0)
-//						continue;
+					if (value == 0)
+						continue;
 
 					printer.print(0.0);
 					printer.print(coord.getX());
@@ -445,16 +452,21 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		List<Float> valuesList = new ArrayList<>();
 		List<Integer> times = new ArrayList<>();
 
-		timeBinMap.getTimeBins().forEach(timeBin -> {
-			times.add((int) timeBin.getStartTime());
-		});
+		for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
 
-		for (int xi = 0; xi < xLength.get(0); xi++) {
-			for (int yi = 0; yi < yLength.get(0); yi++) {
-				Coord coord = raster.getCoordForIndex(xi, yi);
-				if (xi == 0) yCoords.add((float) coord.getY());
-				if (yi == 0) xCoords.add((float) coord.getX());
-				for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
+			boolean isFirst = times.isEmpty();
+
+			times.add((int) timeBin.getStartTime());
+
+			for (int xi = 0; xi < xLength.get(0); xi++) {
+				for (int yi = 0; yi < yLength.get(0); yi++) {
+					Coord coord = raster.getCoordForIndex(xi, yi);
+
+					if (xi == 0 && isFirst)
+						yCoords.add((float) coord.getY());
+					if (yi == 0 && isFirst)
+						xCoords.add((float) coord.getX());
+
 					valuesList.add((float) timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi));
 				}
 			}
@@ -475,7 +487,6 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 	}
 
 }
