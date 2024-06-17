@@ -199,11 +199,8 @@ final class TripChoiceAnalysis {
 			csv.printRecord("Info", "Value");
 
 			csv.printRecord("Accuracy", round(tp / total));
-			csv.printRecord("Precision (micro avg.)", round(tp / tpfp));
 			csv.printRecord("Precision (macro avg.)", round(precision.orElse(0)));
-			csv.printRecord("Recall (micro avg.)", round(tp / tpfn));
 			csv.printRecord("Recall (macro avg.)", round(recall.orElse(0)));
-			csv.printRecord("F1 Score (micro avg.)", round(2 * tp / (tpfp + tpfn)));
 			csv.printRecord("F1 Score (macro avg.)", round(f1.orElse(0)));
 			csv.printRecord("Cohen’s Kappa", round(computeCohenKappa(confusionMatrix)));
 		}

@@ -317,7 +317,7 @@ public class TripDashboard implements Dashboard {
 				- Precision is the fraction of instances correctly classified as belonging to a specific class out of all instances the model predicted to belong to that class.
 				- Recall is the fraction of instances in a class that the model correctly classified out of all instances in that class.
 				- The macro-average computes the metric independently for each class and then take the average (hence treating all classes equally).
-				- The micro-average will aggregate the contributions of all classes to compute the average metric.
+				- The micro-averages of Precision, Recall and F1 score are identical to the accuracy.
 				- Cohen's Kappa is a measure of agreement between two raters that corrects for chance agreement. 1.0 indicates perfect agreement, 0.0 or less indicates agreement by chance.
 				""";
 		});
@@ -326,7 +326,6 @@ public class TripDashboard implements Dashboard {
 			viz.title = "Choice Evaluation";
 			viz.description = "Metrics for mode choice.";
 			viz.showAllRows = true;
-			viz.height = 6d;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation.csv", args);
 		});
 
@@ -343,7 +342,7 @@ public class TripDashboard implements Dashboard {
 			viz.xAxisTitle = "Predicted";
 			viz.yAxisTitle = "True";
 			viz.y = "True/Pred";
-			viz.flipAxes = "True";
+			viz.flipAxes = false;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", args);
 		});
 
