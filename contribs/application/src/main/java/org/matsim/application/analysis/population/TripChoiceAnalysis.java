@@ -70,7 +70,7 @@ final class TripChoiceAnalysis {
 
 			if (n < split.length) {
 				String trueMode = split[n];
-				data.add(new Entry((String) trip.getObject(TripAnalysis.ATTR_REF_ID),
+				data.add(new Entry(trip.getObject(TripAnalysis.ATTR_REF_ID),
 					person, weight, n, trip.getLong("euclidean_distance"), trueMode, predMode));
 			} else
 				log.warn("Person {} trip {} does not match ref data ({})", person, n, split.length);
@@ -268,7 +268,7 @@ final class TripChoiceAnalysis {
 		}
 	}
 
-	record Entry(String refId, String person, double weight, int n, long dist, String trueMode, String predMode) {
+	record Entry(Object refId, String person, double weight, int n, long dist, String trueMode, String predMode) {
 	}
 
 	record Pair(String trueMode, String predMode) {
