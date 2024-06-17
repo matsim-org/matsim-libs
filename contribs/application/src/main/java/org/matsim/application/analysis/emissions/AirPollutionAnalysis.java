@@ -1,7 +1,18 @@
 package org.matsim.application.analysis.emissions;
 
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatFloatPair;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import org.apache.avro.file.CodecFactory;
+import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +25,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.avro.AvroNetwork;
+import org.matsim.application.avro.XYTData;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.SampleOptions;
@@ -43,9 +56,7 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @CommandLine.Command(
 	name = "air-pollution", description = "General air pollution analysis.",
@@ -53,10 +64,11 @@ import java.util.Map;
 )
 @CommandSpec(requireRunDirectory = true,
 	produces = {
-		"emissions_total.csv", "emissions_grid_per_day.csv", "emissions_per_link.csv",
+		"emissions_total.csv", "emissions_per_link.csv",
 		"emissions_per_link_per_m.csv",
-		"emissions_grid_per_hour.csv",
+		"emissions_grid_per_hour.%s",
 		"emissions_vehicle_info.csv",
+		"emissions_grid_per_day.%s"
 	}
 )
 public class AirPollutionAnalysis implements MATSimAppCommand {
@@ -128,7 +140,9 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		writeTotal(filteredNetwork, emissionsEventHandler);
 
 		writeRaster(filteredNetwork, config, emissionsEventHandler);
+		writeAvroRaster(filteredNetwork, config, emissionsEventHandler);
 
+		writeTimeDependentAvroRaster(filteredNetwork, config, emissionsEventHandler);
 		writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
 
 		return 0;
@@ -245,6 +259,62 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	 * Creates the data for the XY-Time plot. The time is fixed and the data is summarized over the run.
 	 * Currently only the CO2_Total Values is printed because Simwrapper can handle only one value.
 	 */
+	private void writeAvroRaster(Network network, Config config, EmissionsOnLinkEventHandler emissionsEventHandler) {
+
+		String crs = ProjectionUtils.getCRS(network);
+		if (crs == null)
+			crs = config.network().getInputCRS();
+		if (crs == null)
+			crs = config.global().getCoordinateSystem();
+
+		XYTData avroData = new XYTData();
+		avroData.setCrs(crs);
+
+		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processHandlerEmissions(emissionsEventHandler.getLink2pollutants(), network, gridSize, 20);
+		List<Integer> xLength = rasterMap.values().stream().map(Raster::getXLength).distinct().toList();
+		List<Integer> yLength = rasterMap.values().stream().map(Raster::getYLength).distinct().toList();
+		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
+
+		List<Float> xCoords = new ArrayList<>();
+		List<Float> yCoords = new ArrayList<>();
+		Map<CharSequence, List<Float>> values = new HashMap<>();
+		List<Float> valuesList = new ArrayList<>();
+		List<Integer> times = new ArrayList<>();
+
+		times.add(0);
+
+		for (int xi = 0; xi < xLength.get(0); xi++) {
+			for (int yi = 0; yi < yLength.get(0); yi++) {
+				Coord coord = raster.getCoordForIndex(xi, yi);
+				double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+				if (xi == 0) yCoords.add((float) coord.getY());
+				if (yi == 0) xCoords.add((float) coord.getX());
+				valuesList.add((float) value);
+			}
+		}
+
+
+		values.put(String.valueOf(Pollutant.CO2_TOTAL), valuesList);
+
+		avroData.setYCoords(yCoords);
+		avroData.setXCoords(xCoords);
+		avroData.setData(values);
+		avroData.setTimestamps(times);
+
+		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
+		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
+			dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(output.getPath("emissions_grid_per_day.%s", "avro").toString()), false));
+			dataFileWriter.append(avroData);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Creates the data for the XY-Time plot. The time is fixed and the data is summarized over the run.
+	 * Currently only the CO2_Total Values is printed because Simwrapper can handle only one value.
+	 */
 	private void writeRaster(Network network, Config config, EmissionsOnLinkEventHandler emissionsEventHandler) {
 
 		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processHandlerEmissions(emissionsEventHandler.getLink2pollutants(), network, gridSize, 20);
@@ -254,7 +324,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.csv")),
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.%s", "csv")),
 			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
 			String crs = ProjectionUtils.getCRS(network);
@@ -281,8 +351,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 					Coord coord = raster.getCoordForIndex(xi, yi);
 					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 
-//					if (value == 0)
-//						continue;
+					if (value == 0)
+						continue;
 
 					printer.print(0.0);
 					printer.print(coord.getX());
@@ -310,7 +380,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = firstBin.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("emissions_grid_per_hour.csv").toString()),
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("emissions_grid_per_hour.%s", "csv").toString()),
 			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
 			String crs = ProjectionUtils.getCRS(network);
@@ -356,6 +426,67 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			log.error("Error writing results", e);
 		}
 
+	}
+
+	private void writeTimeDependentAvroRaster(Network network, Config config, EmissionsOnLinkEventHandler emissionsEventHandler) {
+
+		TimeBinMap<Map<Pollutant, Raster>> timeBinMap = FastEmissionGridAnalyzer.processHandlerEmissionsPerTimeBin(emissionsEventHandler.getTimeBins(), network, gridSize, 20);
+
+		String crs = ProjectionUtils.getCRS(network);
+		if (crs == null)
+			crs = config.network().getInputCRS();
+		if (crs == null)
+			crs = config.global().getCoordinateSystem();
+
+		XYTData avroData = new XYTData();
+		avroData.setCrs(crs);
+
+		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processHandlerEmissions(emissionsEventHandler.getLink2pollutants(), network, gridSize, 20);
+		List<Integer> xLength = rasterMap.values().stream().map(Raster::getXLength).distinct().toList();
+		List<Integer> yLength = rasterMap.values().stream().map(Raster::getYLength).distinct().toList();
+		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
+
+		List<Float> xCoords = new ArrayList<>();
+		List<Float> yCoords = new ArrayList<>();
+		Map<CharSequence, List<Float>> values = new HashMap<>();
+		List<Float> valuesList = new ArrayList<>();
+		List<Integer> times = new ArrayList<>();
+
+		for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
+
+			boolean isFirst = times.isEmpty();
+
+			times.add((int) timeBin.getStartTime());
+
+			for (int xi = 0; xi < xLength.get(0); xi++) {
+				for (int yi = 0; yi < yLength.get(0); yi++) {
+					Coord coord = raster.getCoordForIndex(xi, yi);
+
+					if (xi == 0 && isFirst)
+						yCoords.add((float) coord.getY());
+					if (yi == 0 && isFirst)
+						xCoords.add((float) coord.getX());
+
+					valuesList.add((float) timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi));
+				}
+			}
+		}
+
+		values.put(String.valueOf(Pollutant.CO2_TOTAL), valuesList);
+
+		avroData.setYCoords(yCoords);
+		avroData.setXCoords(xCoords);
+		avroData.setData(values);
+		avroData.setTimestamps(times);
+
+		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
+		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
+			dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(output.getPath("emissions_grid_per_hour.%s", "avro").toString()), false));
+			dataFileWriter.append(avroData);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 }

@@ -70,7 +70,7 @@ public class EmissionsDashboardTest {
 
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**emissions_total.csv")
-			.isDirectoryContaining("glob:**emissions_grid_per_day.csv");
+			.isDirectoryContaining("glob:**emissions_grid_per_day.avro");
 
 	}
 
