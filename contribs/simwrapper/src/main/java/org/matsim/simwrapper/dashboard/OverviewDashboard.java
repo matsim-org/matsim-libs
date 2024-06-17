@@ -36,18 +36,18 @@ public class OverviewDashboard implements Dashboard {
 			viz.height = 7.5;
 			viz.width = 2.0;
 
-			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
+			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
 			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
 
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";
-			viz.display.lineColor.join = "linkId";
+			viz.display.lineColor.join = "link_id";
 			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
 
 			viz.display.lineWidth.dataset = "traffic";
 			viz.display.lineWidth.columnName = "simulated_traffic_volume";
 			viz.display.lineWidth.scaleFactor = 20000d;
-			viz.display.lineWidth.join = "linkId";
+			viz.display.lineWidth.join = "link_id";
 
 
 		});
