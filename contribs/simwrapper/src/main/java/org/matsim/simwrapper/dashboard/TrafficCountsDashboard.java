@@ -2,7 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.apache.commons.lang.StringUtils;
 import org.matsim.application.analysis.traffic.CountComparisonAnalysis;
-import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -212,7 +212,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Relative traffic volumes";
 				viz.height = 8.0;
 
-				viz.setShape(data.withDefaultContext().compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties"), "id");
+				viz.setShape(data.withDefaultContext().compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
 				viz.addDataset("counts", data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
 				viz.center = data.withDefaultContext().context().getCenter();

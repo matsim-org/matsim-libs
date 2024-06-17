@@ -121,6 +121,9 @@ public final class Data {
 		currentContext.add(command, args);
 		Path p = currentContext.getRequiredPath(command, file);
 
+		if (file.contains("%s"))
+			throw new IllegalArgumentException("Placeholder in file name not supported. Use computeWithPlaceholder instead.");
+
 		// Relative path from the simulation output
 		return this.getUnixPath(this.path.getParent().relativize(p));
 	}

@@ -2,7 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
-import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -76,7 +76,7 @@ public class TrafficDashboard implements Dashboard {
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().mapZoomLevel;
 
-			viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson"), "id");
+			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro"), "id");
 
 			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
 
