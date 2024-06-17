@@ -35,7 +35,11 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/v2/germany-europe-network.xml.gz")
     private String networkPath;
 
-    @CommandLine.Option(names = "--nuts", description = "Path to desired network file", required = true)
+	@CommandLine.Option(names = "--lookupTable", description = "Path to desired lookupTable (csv-file)",
+			defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/v2/processed-data/complete-lookup-table.csv")
+	private String lookupTablePath;
+
+	@CommandLine.Option(names = "--nuts", description = "Path to desired network file", required = true)
     // TODO Change this to URL pointing to SVN--> need to update the Location calculator
     private Path shpPath;
 
@@ -54,13 +58,26 @@ public class GenerateFreightPlans implements MATSimAppCommand {
     @CommandLine.Mixin
     private LanduseOptions landuse = new LanduseOptions();
 
+	/**
+	 * Generates a freight-agent population. Following args must be set for this method to work: <br>
+	 * {@code --data} <i>(optional)</i> - Path to raw data (ketten 2010) <br>
+	 * {@code --network} <i>(optional)</i> - Path to desired network file <br>
+	 * {@code --lookupTable} <i>(optional)</i> - Path to desired lookupTable <br>
+	 * {@code --nuts} - Path to desired NUTS shapefile <br>
+	 * {@code --output} - Output folder path <br>
+	 * {@code --truck-load} <i>(optional)</i> - Average load of truck (default=13.0) <br>
+	 * {@code --working-days} <i>(optional)</i> - Number of working days in a year (default=260) <br>
+	 * {@code --sample} <i>(optional)</i> - Scaling factor of the freight traffic from 0.0 to 1.0 (default=1.0) <br>
+	 * @return 0 if succeeded, writes output as .tsv-file containing the coordinates of the origin and destination
+	 * @throws Exception
+	 */
     @Override
     public Integer call() throws Exception {
         Network network = NetworkUtils.readNetwork(networkPath);
         log.info("Network successfully loaded!");
 
         log.info("preparing freight agent generator...");
-        FreightAgentGenerator freightAgentGenerator = new FreightAgentGenerator(network, shpPath, landuse, averageTruckLoad, workingDays, sample);
+        FreightAgentGenerator freightAgentGenerator = new FreightAgentGenerator(network, shpPath, lookupTablePath, landuse, averageTruckLoad, workingDays, sample);
         log.info("Freight agent generator successfully created!");
 
         log.info("Reading trip relations...");

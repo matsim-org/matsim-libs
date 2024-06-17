@@ -301,6 +301,12 @@ public class TripRelation {
 		return tonKMPerYearPostRun;
 	}
 
+	/**
+	 * Reads a CSV file and turns every entry into a {@link TripRelation}
+	 * @param pathToKettenData URI-path to ketten.csv file (for local files start with "file:/")
+	 * @return A List of {@link TripRelation}
+	 * @throws IOException
+	 */
 	public static List<TripRelation> readTripRelations(String pathToKettenData) throws IOException {
 		List<TripRelation> tripRelations = new ArrayList<>();
 		CSVParser parser = CSVParser.parse(URI.create(pathToKettenData).toURL(), StandardCharsets.ISO_8859_1,
@@ -377,13 +383,23 @@ public class TripRelation {
 			checkedOriginCells.add(tripRelationsFromThisOrigin.get(0).getOriginCell());
 		}
 		double sumTonsMainRunAfterCombining = tripRelations.stream().mapToDouble(TripRelation::getTonsPerYearMainRun).sum();
-		assert (sumTonsMainRun != sumTonsMainRunAfterCombining);
+		assert (sumTonsMainRun == sumTonsMainRunAfterCombining);
 		int numberOfEntriesAfterCombining = tripRelations.size();
 		log.info("Combined " + numberCombined + " entries");
 		log.info("Number of entries before combining: " + numberOfEntries + " and after combining: " + numberOfEntriesAfterCombining);
 		log.info("Sum of tons before combining: " + sumTonsMainRun + " and after combining: " + sumTonsMainRunAfterCombining);
 	}
 
+	/**
+	 * Reads a {@link CSVRecord} object and turns it into a {@link TripRelation} object. <br>
+	 * <b>Warning:</b> Only sets the following attributes: {@link TripRelation#column_originCell}, {@link TripRelation#column_originCell_MainRun},
+	 * {@link TripRelation#column_destinationCell_MainRun}, {@link TripRelation#column_destinationCell},  {@link TripRelation#column_mode_PreRun},
+	 * {@link TripRelation#column_mode_MainRun},  {@link TripRelation#column_mode_PostRun},  {@link TripRelation#column_goodsType_MainRun},  {@link TripRelation#column_tones_MainRun} <br>
+	 * All other attributes are set to {@code null} or {@code 0}!
+	 * @param record {@link CSVRecord} object containing the entry of the ketten.csv
+	 * @return A List of {@link TripRelation}
+	 * @throws IOException
+	 */
 	public static TripRelation readTripRelation(CSVRecord record) {
 		Builder builder = new Builder();
 		// Read locations

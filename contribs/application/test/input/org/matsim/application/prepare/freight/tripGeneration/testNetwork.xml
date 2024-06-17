@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="A" x="441000.0" y="5424200.0" />
+		<node id="B" x="441500.0" y="5424300.0" />
+		<node id="C" x="441800.0" y="5424200.0" />
+		<node id="D" x="442200.0" y="5424300.0" />
+		<node id="E" x="442600.0" y="5424200.0" />
+		<node id="F" x="443000.0" y="5424300.0" />
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="ab" from="A" to="B" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="bc" from="B" to="C" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="cd" from="C" to="D" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="de" from="D" to="E" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="ef" from="E" to="F" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" />
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

@@ -34,18 +34,51 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
     private final Network network;
     private final Map<String, List<Id<Link>>> mapping = new HashMap<>();
     private final ShpOptions shp;
+	private final String externalLookupTablePath; // Used if you want to use another lookupTable
     private static final String lookUpTablePath = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/" +
             "scenarios/countries/de/german-wide-freight/v2/processed-data/complete-lookup-table.csv"; // This one is now fixed
 
+	/**
+	 * The {@code DefaultLocationCalcluator} is used to convert between NUTS-regions and links using
+	 * {@link DefaultLocationCalculator#getVerkehrszelleOfLink(Id)} and {@link DefaultLocationCalculator#getLocationOnNetwork(String)}.
+	 */
     public DefaultLocationCalculator(Network network, Path shpFilePath, LanduseOptions landUse) throws IOException {
         this.shp = new ShpOptions(shpFilePath, "EPSG:4326", StandardCharsets.ISO_8859_1);
         // Reading shapefile from URL may not work properly, therefore users may need to download the shape file to the local directory
         this.landUse = landUse;
         this.network = network;
+		this.externalLookupTablePath = "";
         prepareMapping();
     }
 
+	/**
+	 * The {@code DefaultLocationCalcluator} is used to convert between NUTS-regions and links using
+	 * {@link DefaultLocationCalculator#getVerkehrszelleOfLink(Id)} and {@link DefaultLocationCalculator#getLocationOnNetwork(String)}.
+	 * This constructor allows to use external lookup tables.
+	 */
+	public DefaultLocationCalculator(Network network, Path shpFilePath, String lookupTablePathString, LanduseOptions landUse) throws IOException {
+		this.shp = new ShpOptions(shpFilePath, "EPSG:4326", StandardCharsets.ISO_8859_1);
+		// Reading shapefile from URL may not work properly, therefore users may need to download the shape file to the local directory
+		this.landUse = landUse;
+		this.network = network;
+		this.externalLookupTablePath = lookupTablePathString;
+		prepareMapping();
+	}
+
+	/**
+	 * Initiates the {@link DefaultLocationCalculator#mapping} attribute which is a {@code Map<String, List<Id<Link>>>} object.
+	 * The key is a String of the NUTS-region-ID and the List contains all Links in this NUTS-region.
+	 * @throws IOException
+	 */
     private void prepareMapping() throws IOException {
+		//This is needed to add ability to external lookupTables
+		String lookUpTablePath;
+		if(Objects.equals(externalLookupTablePath, "")){
+			lookUpTablePath = DefaultLocationCalculator.lookUpTablePath;
+		} else {
+			lookUpTablePath = this.externalLookupTablePath;
+		}
+
         logger.info("Reading NUTS shape files...");
         Set<String> relevantNutsIds = new HashSet<>();
         try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
@@ -98,6 +131,7 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
                     mapping.put(verkehrszelle, nutsToLinksMapping.get(nuts2021).stream().map(Identifiable::getId).collect(Collectors.toList()));
                     continue;
                 }
+				// Add a backup link from the backup coords in the lookupTable, so that the program can continue to work
                 Coord backupCoord = new Coord(Double.parseDouble(record.get(5)), Double.parseDouble(record.get(6)));
                 CoordinateTransformation ct = new GeotoolsTransformation("EPSG:4326", "EPSG:25832");
                 Coord transformedCoord = ct.transform(backupCoord);
@@ -109,11 +143,21 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
         logger.info("Location generator is successfully created!");
     }
 
+	/**
+	 * @param verkehrszelle The id of a NUTS-region
+	 * @return The id of a random link inside the given NUTS-region.
+	 */
     @Override
     public Id<Link> getLocationOnNetwork(String verkehrszelle) {
         int size = mapping.get(verkehrszelle).size();
         return mapping.get(verkehrszelle).get(rnd.nextInt(size));
     }
+
+	/**
+	 * @param linkId The id of a link.
+	 * @return The id of the NUTS region, that the link lies inside.
+	 * @throws IllegalArgumentException when a non-existing linkId is given/link is outside every NUTS-region.
+	 */
 	@Override
 	public String getVerkehrszelleOfLink(Id<Link> linkId) {
 		for (Map.Entry<String, List<Id<Link>>> entry : mapping.entrySet()) {

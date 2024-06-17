@@ -24,7 +24,7 @@ public class GenerateFreightDemandData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--data", description = "Path to raw data (ketten 2010)", defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
 	private String dataPath;
 
-	@CommandLine.Option(names = "--combineSimilarEntries", description = "The input dara has rows with the" +
+	@CommandLine.Option(names = "--combineSimilarEntries", description = "The input data has rows with the" +
 		"same structure (mode, O/D cells, goodsType), but different values (tonsPerYear, tonKMPerYear)." +
 		"If you select this option, you can combine the rows with the same structure to one row with the sum of the values.", defaultValue = "true")
 	private boolean combineSimilarEntries;
