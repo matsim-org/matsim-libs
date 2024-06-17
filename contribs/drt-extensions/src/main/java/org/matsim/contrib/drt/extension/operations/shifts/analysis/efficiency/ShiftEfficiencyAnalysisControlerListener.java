@@ -10,6 +10,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency;
 
 import com.google.inject.Inject;
+import jakarta.inject.Provider;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -27,7 +28,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import jakarta.inject.Provider;
+import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -43,6 +44,12 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
     private final DrtConfigGroup drtConfigGroup;
     private final ShiftEfficiencyTracker shiftEfficiencyTracker;
 
+    private final String delimiter;
+    private final String runId;
+    private boolean headerWritten = false;
+    private static final String notAvailableString = "NA";
+
+
     @Inject
     public ShiftEfficiencyAnalysisControlerListener(DrtConfigGroup drtConfigGroup,
                                                     ShiftEfficiencyTracker shiftEfficiencyTracker,
@@ -52,6 +59,8 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
         this.shiftEfficiencyTracker = shiftEfficiencyTracker;
         this.drtShiftsSpecification = drtShiftsSpecification;
         this.matsimServices = matsimServices;
+        this.delimiter = matsimServices.getConfig().global().getDefaultDelimiter();
+        this.runId = Optional.ofNullable(matsimServices.getConfig().controller().getRunId()).orElse(notAvailableString);
     }
 
     @Override
@@ -59,14 +68,57 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
 		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
 		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
 
-		writeAndPlotShiftEfficiency(
-                shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift(),
-                shiftEfficiencyTracker.getCurrentRecord().getRequestsByShift(),
-                shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts(),
+        ShiftEfficiencyTracker.Record record = shiftEfficiencyTracker.getCurrentRecord();
+        writeAndPlotShiftEfficiency(
+                record.getRevenueByShift(),
+                record.getRequestsByShift(),
+                record.getFinishedShifts(),
                 filename(event, "shiftRevenue", ".png"),
                 filename(event, "shiftRidesPerVrh", ".png"),
                 filename(event, "shiftEfficiency", ".csv"),
                 createGraphs);
+
+        List<DrtShiftSpecification> finishedShifts = record.finishedShifts()
+                .keySet()
+                .stream()
+                .map(id -> drtShiftsSpecification.get().getShiftSpecifications().get(id))
+                .toList();
+
+        double earliestShiftStart = finishedShifts.stream().map(DrtShiftSpecification::getStartTime).mapToDouble(d -> d).min().orElse(Double.NaN);
+        double latestShiftEnd = finishedShifts.stream().map(DrtShiftSpecification::getEndTime).mapToDouble(d -> d).min().orElse(Double.NaN);
+
+        double numberOfShifts = finishedShifts.size();
+        double numberOfShiftHours = finishedShifts.
+                stream()
+                .map(s -> (s.getEndTime() - s.getStartTime()) - (s.getBreak().isPresent() ? s.getBreak().get().getDuration() : 0.))
+                .mapToDouble(d -> d)
+                .sum() / 3600.;
+
+        long uniqueVehicles = record.getFinishedShifts().values().stream().distinct().count();
+
+        double totalRevenue = record.revenueByShift().values().stream().mapToDouble(d -> d).sum();
+        double meanRevenuePerShift = record.revenueByShift().values().stream().mapToDouble(d -> d).average().orElse(Double.NaN);
+        double meanRevenuePerShiftHour = totalRevenue / numberOfShiftHours;
+
+        double totalRides = record.getRequestsByShift().values().stream().mapToDouble(List::size).sum();
+        double meanRidesPerShift = record.getRequestsByShift().values().stream().mapToDouble(List::size).average().orElse(Double.NaN);
+        double meanRidesPerShiftHour = totalRides / numberOfShiftHours;
+
+        StringJoiner stringJoiner = new StringJoiner(delimiter);
+        stringJoiner
+                .add(earliestShiftStart + "")
+                .add(latestShiftEnd + "")
+                .add(numberOfShifts + "")
+                .add(numberOfShiftHours + "")
+                .add(uniqueVehicles + "")
+                .add(meanRevenuePerShift + "")
+                .add(meanRevenuePerShiftHour + "")
+                .add(totalRevenue + "")
+                .add(meanRidesPerShift + "")
+                .add(meanRidesPerShiftHour + "")
+                .add(totalRides + "");
+        writeIterationShiftEfficiencyStats(stringJoiner.toString(), event.getIteration());
+
     }
 
     private void writeAndPlotShiftEfficiency(Map<Id<DrtShift>, Double> revenuePerShift,
@@ -126,12 +178,42 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
         }
     }
 
+    private void writeIterationShiftEfficiencyStats(String summarizeShiftEfficiency, int it) {
+        try (var bw = getAppendingBufferedWriter("drt_shift_efficiency_metrics", ".csv")) {
+            if (!headerWritten) {
+                headerWritten = true;
+                StringJoiner stringJoiner = new StringJoiner(delimiter);
+                stringJoiner
+                        .add("earliestShiftStart")
+                        .add("latestShiftEnd")
+                        .add("numberOfShifts")
+                        .add("numberOfShiftHours")
+                        .add("uniqueVehicles")
+                        .add("meanRevenuePerShift")
+                        .add("meanRevenuePerShiftHour")
+                        .add("totalRevenue")
+                        .add("meanRidesPerShift")
+                        .add("meanRidesPerShiftHour")
+                        .add("totalRides");
+                bw.write(line("runId", "iteration", stringJoiner.toString()));
+            }
+            bw.write(runId + delimiter + it + delimiter + summarizeShiftEfficiency);
+            bw.newLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String filename(IterationEndsEvent event, String prefix, String extension) {
         return matsimServices.getControlerIO()
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
     }
 
-    private static String line(Object... cells) {
-        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(";", "", "\n"));
+    private String line(Object... cells) {
+        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(delimiter, "", "\n"));
+    }
+
+    private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
+        return IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtConfigGroup.getMode() + extension));
     }
 }
