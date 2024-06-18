@@ -1,0 +1,79 @@
+{
+  "namespace": "org.matsim.application.avro",
+  "type": "record",
+  "name": "AvroNetwork",
+  "fields": [
+    {
+      "name": "crs",
+      "type": "string",
+      "doc": "Coordinate reference system"
+    },
+    {
+      "name": "nodeAttributes",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "name": "linkAttributes",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "name": "nodeId"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "float"
+      },
+      "name": "nodeCoordinates"
+    },
+    {"type": {"type": "array", "items": "string" }, "name": "linkId"},
+    {"type": {"type": "array", "items": "int" }, "name": "from"},
+    {"type": {"type": "array", "items": "int"}, "name": "to"},
+    {"type": { "type": "array", "items": "string"}, "name": "modes"},
+    {
+      "type": {
+        "type": "array",
+        "items": "float"
+      },
+      "name": "length"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "float"
+      },
+      "name": "freespeed"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "float"
+      },
+      "name": "capacity"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "float"
+      },
+      "name": "permlanes"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "int"
+      },
+      "name": "allowedModes"
+    }
+  ]
+}

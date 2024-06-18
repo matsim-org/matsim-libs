@@ -1,7 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.noise.NoiseAnalysis;
-import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -53,7 +53,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.zoom = data.context().mapZoomLevel;
 				viz.minValue = minDb;
 				viz.maxValue = maxDb;
-				viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties"), "id");
+				viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
 				viz.addDataset("noise", data.compute(NoiseAnalysis.class, "emission_per_day.csv"));
 				viz.display.lineColor.dataset = "noise";
 				viz.display.lineColor.columnName = "value";
