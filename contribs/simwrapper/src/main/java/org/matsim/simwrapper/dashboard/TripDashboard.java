@@ -343,6 +343,7 @@ public class TripDashboard implements Dashboard {
 			viz.yAxisTitle = "True";
 			viz.y = "True/Pred";
 			viz.flipAxes = false;
+			viz.showLabels = true;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", args);
 		});
 

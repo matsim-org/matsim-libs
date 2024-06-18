@@ -45,6 +45,11 @@ public class Heatmap extends Viz {
 	 */
 	public Boolean flipAxes;
 
+	/**
+	 * Show labels on the heatmap.
+	 */
+	public Boolean showLabels;
+
 	public Heatmap() {
 		super("heatmap");
 	}
