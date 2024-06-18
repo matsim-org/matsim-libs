@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.run;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -32,8 +33,9 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -186,14 +188,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
-		super(GROUP_NAME);
-		initSingletonParameterSets();
+		this(DefaultDrtOptimizationConstraintsSet::new);
 	}
 
-	private void initSingletonParameterSets() {
+	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+		super(GROUP_NAME);
+		initSingletonParameterSets(constraintsSetSupplier);
+	}
+
+	private void initSingletonParameterSets(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
 
 		//optimization constraints (mandatory)
-		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, DrtOptimizationConstraintsParams::new,
+		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, () -> new DrtOptimizationConstraintsParams(constraintsSetSupplier),
 				() -> drtOptimizationConstraintsParams,
 				params -> drtOptimizationConstraintsParams = (DrtOptimizationConstraintsParams) params);
 
@@ -326,8 +332,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	}
 
 	public DrtOptimizationConstraintsParams addOrGetDrtOptimizationConstraintsParams() {
-		if(drtOptimizationConstraintsParams == null) {
-			drtOptimizationConstraintsParams = new DrtOptimizationConstraintsParams();
+		if (drtOptimizationConstraintsParams == null) {
+			DrtOptimizationConstraintsParams params = new DrtOptimizationConstraintsParams();
+			this.addParameterSet(params);
 		}
 		return drtOptimizationConstraintsParams;
 	}

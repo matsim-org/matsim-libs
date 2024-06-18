@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.net.URL;
-import java.util.List;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,12 +30,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
-import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtRouteCreator;
-import org.matsim.contrib.drt.routing.DrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtStopFacility;
-import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
-import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
@@ -59,8 +56,8 @@ import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
+import java.net.URL;
+import java.util.List;
 
 /**
  * This is a DRT-customised version of DvrpModeRoutingModule
@@ -98,6 +95,14 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
+
+		bindModal(DrtRouteConstraintsCalculator.class).toProvider(modalProvider(getter -> new DefaultDrtRouteConstraintsCalculator())).in(Singleton.class);
+		DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		bindModal(ConstraintSetChooser.class).toProvider(
+				() -> (departureTime, accessActLink, egressActLink, person, tripAttributes)
+						-> optimizationConstraintsSet
+		).in(Singleton.class);
+
 		switch( drtCfg.operationalScheme ){
 			case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
 												       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
@@ -105,7 +110,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			case stopbased, serviceAreaBased -> {
 				bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
 						getter -> new ClosestAccessEgressFacilityFinder(
-								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance,
+								optimizationConstraintsSet.maxWalkDistance,
 													     getter.get( Network.class ),
 													     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
 									     .asEagerSingleton();
@@ -152,7 +157,9 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		public DrtRouteCreator get() {
 			var travelTime = getModalInstance(TravelTime.class);
 			return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
-					travelTime, getModalInstance(TravelDisutilityFactory.class));
+					travelTime, getModalInstance(TravelDisutilityFactory.class),
+					getModalInstance(DrtRouteConstraintsCalculator.class),
+					getModalInstance(ConstraintSetChooser.class));
 		}
 	}
 
