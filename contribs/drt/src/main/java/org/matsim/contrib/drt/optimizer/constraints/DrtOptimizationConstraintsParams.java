@@ -1,11 +1,13 @@
-package org.matsim.contrib.drt.optimizer;
+package org.matsim.contrib.drt.optimizer.constraints;
 
 import com.google.common.base.Verify;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author nkuehnel / MOIA
@@ -14,11 +16,18 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
 
 	public static final String SET_NAME = "drtOptimizationConstraints";
 
-	public static String defaultConstraintSet = DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME;
+    private final Supplier<DrtOptimizationConstraintsSet> optimizationConstraintsSetSupplier;
+
+    public static String defaultConstraintSet = DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME;
 
 
     public DrtOptimizationConstraintsParams() {
+        this(DefaultDrtOptimizationConstraintsSet::new);
+    }
+
+    public DrtOptimizationConstraintsParams(Supplier<DrtOptimizationConstraintsSet> supplier) {
         super(SET_NAME);
+        this.optimizationConstraintsSetSupplier = supplier;
     }
 
     @Override
@@ -45,16 +54,27 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
                 .toList();
     }
 
-    public DrtOptimizationConstraintsSet addOrGetDefaultDrtOptimizationConstraintsSet() {
+    public DefaultDrtOptimizationConstraintsSet addOrGetDefaultDrtOptimizationConstraintsSet() {
         Optional<DrtOptimizationConstraintsSet> drtOptParams = getDrtOptimizationConstraintsSets().stream()
                 .filter(params -> params.name.equals(defaultConstraintSet))
+                .filter(DefaultDrtOptimizationConstraintsSet.class::isInstance)
                 .findAny();
         if (drtOptParams.isEmpty()) {
-            addParameterSet(new DrtOptimizationConstraintsSet());
+            DefaultDrtOptimizationConstraintsSet defaultDrtOptimizationConstraintsSet = new DefaultDrtOptimizationConstraintsSet();
+            addParameterSet(defaultDrtOptimizationConstraintsSet);
+            return defaultDrtOptimizationConstraintsSet;
         }
-        return getDrtOptimizationConstraintsSets().stream()
-                .filter(params -> params.name.equals(defaultConstraintSet))
-                .findAny().orElseThrow();
+        return (DefaultDrtOptimizationConstraintsSet) drtOptParams.get();
+    }
+
+    @Override
+    public ConfigGroup createParameterSet(final String type) {
+        switch ( type ) {
+            case DrtOptimizationConstraintsSet.SET_NAME:
+                return optimizationConstraintsSetSupplier.get();
+            default:
+                throw new IllegalArgumentException( "unknown set type "+type );
+        }
     }
 
     /**

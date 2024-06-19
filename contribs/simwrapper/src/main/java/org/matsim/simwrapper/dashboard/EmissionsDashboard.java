@@ -1,12 +1,15 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
+import org.matsim.application.analysis.noise.NoiseAnalysis;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.Links;
+import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Table;
 
 /**
@@ -32,18 +35,19 @@ public class EmissionsDashboard implements Dashboard {
 				viz.width = 1d;
 
 			})
-			.el(Links.class, (viz, data) -> {
+			.el(MapPlot.class, (viz, data) -> {
 				viz.title = "Emissions per Link per Meter";
 				viz.description = "Displays the emissions for each link per meter.";
 				viz.height = 12.;
-				viz.datasets.csvFile = data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv");
-				viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
-				viz.display.color.columnName = "CO2_TOTAL [g/m]";
-				viz.display.color.dataset = "csvFile";
-				viz.display.width.scaleFactor = 1;
-				viz.display.width.columnName = "CO2_TOTAL [g/m]";
-				viz.display.width.dataset = "csvFile";
-
+				viz.addDataset("emissions_per_link_per_m", data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv"));
+				viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
+				viz.display.lineColor.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineColor.dataset = "emissions_per_link_per_m";
+				viz.display.lineColor.setColorRamp("greenRed", 10, false);
+				viz.display.lineColor.join = "linkId";
+				viz.display.lineWidth.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineWidth.dataset = "emissions_per_link_per_m";
+				viz.display.lineWidth.join = "linkId";
 				viz.center = data.context().getCenter();
 				viz.width = 3d;
 			});
@@ -59,9 +63,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.projection = "EPSG:25832";
 				viz.zoom = data.context().mapZoomLevel;
 				viz.center = data.context().getCenter();
-
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.csv");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro");
 			});
 
 		layout.row("third")
@@ -77,7 +80,7 @@ public class EmissionsDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 
 				viz.setColorRamp("greenRed", 10, false);
-				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_hour.csv");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro");
 			});
 
 

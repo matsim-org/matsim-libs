@@ -2,8 +2,9 @@ package org.matsim.contrib.drt.run;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsParams;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
@@ -34,7 +35,7 @@ class DrtConfigGroupTest {
 		config.addModule(drtConfig);
 
 		// add second DrtOptimizationConstraintsParams
-		DrtOptimizationConstraintsSet params = new DrtOptimizationConstraintsSet();
+		DrtOptimizationConstraintsSet params = new DefaultDrtOptimizationConstraintsSet();
 		params.name = "test";
 
 		DrtOptimizationConstraintsParams optimizationConstraintsParams = drtConfig.addOrGetDrtOptimizationConstraintsParams();
@@ -60,7 +61,7 @@ class DrtConfigGroupTest {
 		config.addModule(drtConfig);
 
 		// add second DrtOptimizationConstraintsParams with same name
-		DrtOptimizationConstraintsSet params = new DrtOptimizationConstraintsSet();
+		DrtOptimizationConstraintsSet params = new DefaultDrtOptimizationConstraintsSet();
 		params.name = DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME;
 
 		DrtOptimizationConstraintsParams optimizationConstraintsParams = drtConfig.addOrGetDrtOptimizationConstraintsParams();
