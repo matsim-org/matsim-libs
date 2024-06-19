@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -30,15 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -63,8 +54,9 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.common.collect.ImmutableMap;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jbischoff
@@ -102,7 +94,7 @@ public class DrtRoutingModuleTest {
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
 				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
 				new DefaultDrtRouteConstraintsCalculator(),
-				(departureTime, accessActLink, egressActLink, person, tripAttributes) -> defaultConstraintsSet);
+				(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(defaultConstraintsSet));
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
