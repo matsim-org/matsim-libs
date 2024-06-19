@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -72,7 +71,9 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
-		DrtOptimizationConstraintsSet constraintsSet = constraintSetChooser.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes);
+		DrtOptimizationConstraintsSet constraintsSet =
+				constraintSetChooser.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes)
+						.orElse(drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 		double maxTravelTime = routeConstraintsCalculator.getMaxTravelTime(constraintsSet, unsharedRideTime);
 		double maxRideDuration = routeConstraintsCalculator.getMaxRideTime(constraintsSet, unsharedRideTime);
 

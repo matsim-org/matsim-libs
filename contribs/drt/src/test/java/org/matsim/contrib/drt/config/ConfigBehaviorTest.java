@@ -121,7 +121,7 @@ public class ConfigBehaviorTest{
     }
 
     @Test
-    final void testMaterializeAfterReadStandardParams3() {
+    final void testMaterializeAfterReadCustomDrtConstraints() {
         {
             // generate a test config that sets two values away from their defaults, and write it to file:
             Config config = ConfigUtils.createConfig();
@@ -142,13 +142,13 @@ public class ConfigBehaviorTest{
 
         {
             // load config file without materializing the drt config group
-            MultiModeDrtConfigGroup multiModeDrtConfigGroup1 =
+            MultiModeDrtConfigGroup multiModeDrtConfigGroup =
                     new MultiModeDrtConfigGroup(() -> new DrtConfigGroup(CustomConstraintsSet::new));
 
-            Config config = ConfigUtils.loadConfig( new String[] { utils.getOutputDirectory() + "ad-hoc-config-custom-optimization-constraints.xml"}, multiModeDrtConfigGroup1);
+            Config config = ConfigUtils.loadConfig( new String[] { utils.getOutputDirectory() + "ad-hoc-config-custom-optimization-constraints.xml"}, multiModeDrtConfigGroup);
 
             // materialize the config group
-            MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
+            //MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
             DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
 
             // check if you are getting back the values from the config file:
