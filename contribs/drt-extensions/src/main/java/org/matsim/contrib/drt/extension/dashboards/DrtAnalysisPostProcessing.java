@@ -111,7 +111,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			.round()
 			.setName("Total pax distance [km]"));
 
-		tableSupplyKPI.column("d_p/d_t").setName("Pooling ratio");
+		tableSupplyKPI.column("d_p/d_t").setName("Occupancy rate [pax-km/v-km]");
 		tableSupplyKPI.column("l_det").setName("Detour ratio");
 		tableSupplyKPI.column("emptyRatio").setName("Empty ratio");
 
