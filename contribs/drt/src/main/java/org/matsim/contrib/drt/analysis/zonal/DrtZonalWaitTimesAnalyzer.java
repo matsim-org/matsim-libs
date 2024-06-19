@@ -58,13 +58,16 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	private final ZoneSystem zones;
 	private static final Id<Zone> zoneIdForOutsideOfZonalSystem = Id.create("outsideOfDrtZonalSystem", Zone.class);
 	private static final String notAvailableString = "NaN";
+
+	private final String delimiter;
 	private static final Logger log = LogManager.getLogger(DrtZonalWaitTimesAnalyzer.class);
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtEventSequenceCollector requestAnalyzer,
-			ZoneSystem zones) {
+			ZoneSystem zones, String delimiter) {
 		this.drtCfg = configGroup;
 		this.requestAnalyzer = requestAnalyzer;
 		this.zones = zones;
+		this.delimiter = delimiter;
 	}
 
 	@Override
@@ -76,7 +79,6 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	}
 
 	public void write(String fileName) {
-		String delimiter = ";";
 		Map<Id<Zone>, DescriptiveStatistics> zoneStats = createZonalStats();
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
@@ -85,7 +87,11 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 			format.setMinimumIntegerDigits(1);
 			format.setMaximumFractionDigits(2);
 			format.setGroupingUsed(false);
-			bw.append("zone;centerX;centerY;nRequests;sumWaitTime;meanWaitTime;min;max;p95;p90;p80;p75;p50");
+			String header = new StringJoiner(delimiter)
+					.add("zone").add("centerX").add("centerY").add("nRequests")
+					.add("sumWaitTime").add("meanWaitTime").add("min").add("max")
+					.add("p95").add("p90").add("p80").add("p75").add("p50").toString();
+			bw.append(header);
 			// sorted output
 			SortedSet<Id<Zone>> zoneIdsAndOutside = new TreeSet<>(zones.getZones().keySet());
 			zoneIdsAndOutside.add(zoneIdForOutsideOfZonalSystem);
@@ -96,31 +102,22 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 				String centerY = drtZone != null ? String.valueOf(drtZone.getCentroid().getY()) : notAvailableString;
 				DescriptiveStatistics stats = zoneStats.get(zoneId);
 				bw.newLine();
-				bw.append(zoneId.toString())
-						.append(delimiter)
-						.append(centerX)
-						.append(delimiter)
-						.append(centerY)
-						.append(delimiter)
-						.append(format.format(stats.getN()))
-						.append(delimiter)
-						.append(format.format(stats.getSum()))
-						.append(delimiter)
-						.append(String.valueOf(stats.getMean()))
-						.append(delimiter)
-						.append(String.valueOf(stats.getMin()))
-						.append(delimiter)
-						.append(String.valueOf(stats.getMax()))
-						.append(delimiter)
-						.append(String.valueOf(stats.getPercentile(95)))
-						.append(delimiter)
-						.append(String.valueOf(stats.getPercentile(90)))
-						.append(delimiter)
-						.append(String.valueOf(stats.getPercentile(80)))
-						.append(delimiter)
-						.append(String.valueOf(stats.getPercentile(75)))
-						.append(delimiter)
-						.append(String.valueOf(stats.getPercentile(50)));
+				bw.append(
+						new StringJoiner(delimiter)
+						.add(zoneId.toString())
+						.add(centerX)
+						.add(centerY)
+						.add(format.format(stats.getN()))
+						.add(format.format(stats.getSum()))
+						.add(String.valueOf(stats.getMean()))
+						.add(String.valueOf(stats.getMin()))
+						.add(String.valueOf(stats.getMax()))
+						.add(String.valueOf(stats.getPercentile(95)))
+						.add(String.valueOf(stats.getPercentile(90)))
+						.add(String.valueOf(stats.getPercentile(80)))
+						.add(String.valueOf(stats.getPercentile(75)))
+						.add(String.valueOf(stats.getPercentile(50))).toString()
+				);
 			}
 			bw.flush();
 			bw.close();

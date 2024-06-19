@@ -45,7 +45,7 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
 
 	private Record currentRecord;
 
-	public static record Record(Map<Id<DrtShift>, Double> revenueByShift,
+	public record Record(Map<Id<DrtShift>, Double> revenueByShift,
 								Map<Id<Request>, Id<DrtShift>> shiftByRequest,
 								Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts){
 		public Map<Id<DrtShift>, Double> getRevenueByShift() {
