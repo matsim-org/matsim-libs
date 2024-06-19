@@ -72,7 +72,9 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
-		DrtOptimizationConstraintsSet constraintsSet = constraintSetChooser.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes);
+		DrtOptimizationConstraintsSet constraintsSet =
+				constraintSetChooser.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes)
+						.orElse(drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 		double maxTravelTime = routeConstraintsCalculator.getMaxTravelTime(constraintsSet, unsharedRideTime);
 		double maxRideDuration = routeConstraintsCalculator.getMaxRideTime(constraintsSet, unsharedRideTime);
 

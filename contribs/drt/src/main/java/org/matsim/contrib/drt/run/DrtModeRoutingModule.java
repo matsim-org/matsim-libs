@@ -58,6 +58,7 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This is a DRT-customised version of DvrpModeRoutingModule
@@ -100,7 +101,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(ConstraintSetChooser.class).toProvider(
 				() -> (departureTime, accessActLink, egressActLink, person, tripAttributes)
-						-> optimizationConstraintsSet
+						-> Optional.of(optimizationConstraintsSet)
 		).in(Singleton.class);
 
 		switch( drtCfg.operationalScheme ){
