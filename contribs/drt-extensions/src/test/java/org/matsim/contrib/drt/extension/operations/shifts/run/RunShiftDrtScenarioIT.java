@@ -9,8 +9,8 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -46,14 +46,14 @@ public class RunShiftDrtScenarioIT {
 
 		DrtWithOperationsConfigGroup drtWithShiftsConfigGroup = (DrtWithOperationsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
-        drtWithShiftsConfigGroup.mode = TransportMode.drt;
-		DrtOptimizationConstraintsSet defaultConstraintsSet = drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+    drtWithShiftsConfigGroup.mode = TransportMode.drt;
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		drtWithShiftsConfigGroup.stopDuration = 30.;
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-        defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-        defaultConstraintsSet.maxWaitTime = 600.;
-        defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-        defaultConstraintsSet.maxWalkDistance = 1000.;
+    defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
+    defaultConstraintsSet.maxWaitTime = 600.;
+    defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+    defaultConstraintsSet.maxWalkDistance = 1000.;
 		drtWithShiftsConfigGroup.useModeFilteredSubnetwork = false;
 		drtWithShiftsConfigGroup.vehiclesFile = fleetFile;
 		drtWithShiftsConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;

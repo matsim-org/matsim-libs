@@ -51,7 +51,7 @@ public class RaptorRoute {
     }
 
     void addNonPt(TransitStopFacility fromStop, TransitStopFacility toStop, double depTime, double travelTime, double distance, String mode) {
-        this.editableParts.add(new RoutePart(fromStop, toStop, mode, depTime, Double.NaN, depTime + travelTime, distance, null, null, null));
+        this.editableParts.add(new RoutePart(fromStop, toStop, mode, depTime, Double.NaN, Double.NaN, depTime + travelTime, distance, null, null, null));
         if (Double.isNaN(this.departureTime)) {
             this.departureTime = depTime;
         }
@@ -59,15 +59,15 @@ public class RaptorRoute {
     }
 
     void addPlanElements(double depTime, double travelTime, List<? extends PlanElement> planElements) {
-        this.editableParts.add(new RoutePart(null, null, null, depTime, Double.NaN, depTime + travelTime, Double.NaN, null, null, planElements));
+        this.editableParts.add(new RoutePart(null, null, null, depTime, Double.NaN, Double.NaN, depTime + travelTime, Double.NaN, null, null, planElements));
         if (Double.isNaN(this.departureTime)) {
             this.departureTime = depTime;
         }
         this.travelTime += travelTime;
     }
 
-    void addPt(TransitStopFacility fromStop, TransitStopFacility toStop, TransitLine line, TransitRoute route, String mode, double depTime, double boardingTime, double arrivalTime, double distance) {
-        this.editableParts.add(new RoutePart(fromStop, toStop, mode, depTime, boardingTime, arrivalTime, distance, line, route, null));
+    void addPt(TransitStopFacility fromStop, TransitStopFacility toStop, TransitLine line, TransitRoute route, String mode, double depTime, double boardingTime, double vehDepTime, double arrivalTime, double distance) {
+        this.editableParts.add(new RoutePart(fromStop, toStop, mode, depTime, boardingTime, vehDepTime, arrivalTime, distance, line, route, null));
         if (Double.isNaN(this.departureTime)) {
             this.departureTime = depTime;
         }
@@ -102,20 +102,23 @@ public class RaptorRoute {
         public final TransitStopFacility fromStop;
         public final TransitStopFacility toStop;
         public final String mode;
+        // the agent's departure time, i.e. when the agent starts waiting for this bus/train/...
         public final double depTime;
         public final double boardingTime;
+        public final double vehicleDepTime;
         public final double arrivalTime;
         public final double distance;
         public final TransitLine line;
         public final TransitRoute route;
         final List<? extends PlanElement> planElements;
 
-        RoutePart(TransitStopFacility fromStop, TransitStopFacility toStop, String mode, double depTime, double boardingTime, double arrivalTime, double distance, TransitLine line, TransitRoute route, List<? extends PlanElement> planElements) {
+        RoutePart(TransitStopFacility fromStop, TransitStopFacility toStop, String mode, double depTime, double boardingTime, double vehicleDepTime, double arrivalTime, double distance, TransitLine line, TransitRoute route, List<? extends PlanElement> planElements) {
             this.fromStop = fromStop;
             this.toStop = toStop;
             this.mode = mode;
             this.depTime = depTime;
             this.boardingTime = boardingTime;
+            this.vehicleDepTime = vehicleDepTime;
             this.arrivalTime = arrivalTime;
             this.distance = distance;
             this.line = line;

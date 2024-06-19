@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.optimizer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -36,7 +37,7 @@ public class MaxDetourConstraintTest {
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// Max wait time
-		DrtOptimizationConstraintsSet defaultConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxWaitTime = 300;
 
 		// Turn on the max detour constraint
