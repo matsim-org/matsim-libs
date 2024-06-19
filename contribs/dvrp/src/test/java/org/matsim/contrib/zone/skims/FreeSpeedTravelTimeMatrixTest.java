@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -49,9 +51,9 @@ public class FreeSpeedTravelTimeMatrixTest {
 	@Test
 	void matrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
-		params.cellSize = 100;
 		params.maxNeighborDistance = 0;
-		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
+		ZoneSystem zoneSystem = new SquareGridZoneSystem(network, 100.);
+		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, 1, 1);
 
 		// distances between central nodes: A and B
 		assertThat(matrix.getTravelTime(nodeA, nodeA, 0)).isEqualTo(0);
@@ -69,9 +71,10 @@ public class FreeSpeedTravelTimeMatrixTest {
 	@Test
 	void sparseMatrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
-		params.cellSize = 100;
 		params.maxNeighborDistance = 9999;
-		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
+
+		ZoneSystem zoneSystem = new SquareGridZoneSystem(network, 100.);
+		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, 1, 1);
 
 		// distances between central nodes: A and B
 		assertThat(matrix.getTravelTime(nodeA, nodeA, 0)).isEqualTo(0);

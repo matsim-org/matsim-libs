@@ -22,10 +22,10 @@ package playground.vsp.demandde.commuterDemandCottbus;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -60,7 +60,7 @@ public class DgLanduseReader {
 //	private static final String[] landuse_files_work = {INDUSTRIE_GEWERBEGEBIETE};
 
 
-	public Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> readLanduseDataHome(){
+	public Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> readLanduseDataHome(){
 		return this.readLanduseData(landuse_files_home);
 	}
 

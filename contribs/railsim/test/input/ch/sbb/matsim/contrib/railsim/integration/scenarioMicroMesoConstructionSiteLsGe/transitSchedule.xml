@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<!-- ====================================================================== -->
+
+	<!-- The schedule is taken from : https://network.sbb.ch/en/
+	Naming convention : Line-DepartureViaArrival-departure
+
+	In order to model a construction site between Morges and Renens, a new stop is created in the middle of the link, and a construction train stops there during the planned time, thus reducing the capacity of the link.
+
+	-->
+
+	<!-- ====================================================================== -->
+
+	<transitStops>
+		<stopFacility id="LS" x="0" y="0" linkRefId="LS1-LS2" stopAreaId="LS">
+		</stopFacility>
+		<stopFacility id="REN" x="-4510" y="0" linkRefId="REN1-REN2" stopAreaId="REN">
+		</stopFacility>
+		<stopFacility id="MOR" x="-12500" y="0" linkRefId="MOR1-MOR2" stopAreaId="MOR">
+		</stopFacility>
+		<stopFacility id="ALL" x="-21480" y="0" linkRefId="ALL1-ALL2" stopAreaId="ALL">
+		</stopFacility>
+		<stopFacility id="ROL" x="-26660" y="0" linkRefId="ROL1-ROL2" stopAreaId="ROL">
+		</stopFacility>
+		<stopFacility id="GLA" x="-33790" y="0" linkRefId="GLA1-GLA2" stopAreaId="GLA">
+		</stopFacility>
+		<stopFacility id="NY" x="-38530" y="0" linkRefId="NY1-NY2" stopAreaId="NY">
+		</stopFacility>
+		<stopFacility id="COP" x="-47000" y="0" linkRefId="COP1-COP2" stopAreaId="COP">
+		</stopFacility>
+		<stopFacility id="GE" x="-60260" y="0" linkRefId="GE1-GE2" stopAreaId="GE">
+		</stopFacility>
+		<stopFacility id="LS1" x="0" y="0" linkRefId="LS2-LS1" stopAreaId="LS">
+		</stopFacility>
+		<stopFacility id="REN1" x="-4510" y="0" linkRefId="REN2-REN1" stopAreaId="REN">
+		</stopFacility>
+		<stopFacility id="MOR1" x="-12500" y="0" linkRefId="MOR2-MOR1" stopAreaId="MOR">
+		</stopFacility>
+		<stopFacility id="ALL1" x="-21480" y="0" linkRefId="ALL2-ALL1" stopAreaId="ALL">
+		</stopFacility>
+		<stopFacility id="ROL1" x="-26660" y="0" linkRefId="ROL2-ROL1" stopAreaId="ROL">
+		</stopFacility>
+		<stopFacility id="GLA1" x="-33790" y="0" linkRefId="GLA2-GLA1" stopAreaId="GLA">
+		</stopFacility>
+		<stopFacility id="NY1" x="-38530" y="0" linkRefId="NY2-NY1" stopAreaId="NY">
+		</stopFacility>
+		<stopFacility id="COP1" x="-47000" y="0" linkRefId="COP2-COP1" stopAreaId="COP">
+		</stopFacility>
+		<stopFacility id="GE1" x="-60260" y="0" linkRefId="GE2-GE1" stopAreaId="GE">
+		</stopFacility>
+
+
+		<stopFacility id="Construction_Site_MOR_REN" x="-10000" y="0" linkRefId="MOR2_REN1-1" stopAreaId="BAU">
+		</stopFacility>
+		<stopFacility id="Construction_Site_MOR_REN2" x="-10000" y="0" linkRefId="MOR2_REN1-2" stopAreaId="BAU">
+		</stopFacility>
+
+	</transitStops>
+
+	<transitLine id="RE33">
+		<transitRoute id="RE33-ANNGELS">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="COP" arrivalOffset="00:12:00" departureOffset="00:13:00" awaitDeparture="true"/>
+				<stop refId="NY" arrivalOffset="00:18:00" departureOffset="00:19:00" awaitDeparture="true"/>
+				<stop refId="GLA" arrivalOffset="00:22:00" departureOffset="00:23:00" awaitDeparture="true"/>
+				<stop refId="ROL" arrivalOffset="00:27:00" departureOffset="00:28:00" awaitDeparture="true"/>
+				<stop refId="ALL" arrivalOffset="00:31:00" departureOffset="00:32:00" awaitDeparture="true"/>
+				<stop refId="MOR" arrivalOffset="00:37:00" departureOffset="00:38:00" awaitDeparture="true"/>
+				<stop refId="REN" arrivalOffset="00:44:00" departureOffset="00:45:00" awaitDeparture="true"/>
+				<stop refId="LS" arrivalOffset="00:51:00" departureOffset="00:54:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+				<link refId="REN2-LS1"/>
+				<link refId="LS1-LS2"/>
+			</route>
+			<departures>
+				<departure id="RE33-ANNGELS-8" departureTime="08:47:00" vehicleRefId="RE33-ANNGELS-8"/>
+				<departure id="RE33-ANNGELS-9" departureTime="09:47:00" vehicleRefId="RE33-ANNGELS-9"/>
+				<departure id="RE33-ANNGELS-10" departureTime="10:47:00" vehicleRefId="RE33-ANNGELS-10"/>
+				<departure id="RE33-ANNGELS-11" departureTime="11:47:00" vehicleRefId="RE33-ANNGELS-11"/>
+				<departure id="RE33-ANNGELS-12" departureTime="12:47:00" vehicleRefId="RE33-ANNGELS-12"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="RE33-ANNGESM">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="COP" arrivalOffset="00:12:00" departureOffset="00:13:00" awaitDeparture="true"/>
+				<stop refId="NY" arrivalOffset="00:18:00" departureOffset="00:19:00" awaitDeparture="true"/>
+				<stop refId="GLA" arrivalOffset="00:22:00" departureOffset="00:23:00" awaitDeparture="true"/>
+				<stop refId="ROL" arrivalOffset="00:27:00" departureOffset="00:28:00" awaitDeparture="true"/>
+				<stop refId="ALL" arrivalOffset="00:31:00" departureOffset="00:32:00" awaitDeparture="true"/>
+				<stop refId="MOR" arrivalOffset="00:37:00" departureOffset="00:38:00" awaitDeparture="true"/>
+				<stop refId="REN" arrivalOffset="00:44:00" departureOffset="00:45:00" awaitDeparture="true"/>
+				<stop refId="LS" arrivalOffset="00:51:00" departureOffset="00:54:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+				<link refId="REN2-LS1"/>
+				<link refId="LS1-LS2"/>
+			</route>
+			<departures>
+				<departure id="RE33-ANNGESM-8" departureTime="08:17:00" vehicleRefId="RE33-ANNGESM-8"/>
+				<departure id="RE33-ANNGESM-9" departureTime="09:17:00" vehicleRefId="RE33-ANNGESM-9"/>
+				<departure id="RE33-ANNGESM-10" departureTime="10:17:00" vehicleRefId="RE33-ANNGESM-10"/>
+				<departure id="RE33-ANNGESM-11" departureTime="11:17:00" vehicleRefId="RE33-ANNGESM-11"/>
+				<departure id="RE33-ANNGESM-12" departureTime="12:17:00" vehicleRefId="RE33-ANNGESM-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="RE33-VVGEANN">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="LS1" arrivalOffset="00:00:00" departureOffset="00:02:00" awaitDeparture="true"/>
+				<stop refId="REN1" arrivalOffset="00:08:00" departureOffset="00:08:00" awaitDeparture="true"/>
+				<stop refId="MOR1" arrivalOffset="00:15:00" departureOffset="00:16:00" awaitDeparture="true"/>
+				<stop refId="ALL1" arrivalOffset="00:21:00" departureOffset="00:22:00" awaitDeparture="true"/>
+				<stop refId="ROL1" arrivalOffset="00:25:00" departureOffset="00:26:00" awaitDeparture="true"/>
+				<stop refId="GLA1" arrivalOffset="00:31:00" departureOffset="00:32:00" awaitDeparture="true"/>
+				<stop refId="NY1" arrivalOffset="00:35:00" departureOffset="00:36:00" awaitDeparture="true"/>
+				<stop refId="COP1" arrivalOffset="00:41:00" departureOffset="00:42:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:51:00" departureOffset="00:52:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="LS2-LS1"/>
+				<link refId="LS1-REN2"/>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="RE33-VVGEANN-8" departureTime="08:19:00" vehicleRefId="RE33-VVGEANN-8"/>
+				<departure id="RE33-VVGEANN-9" departureTime="09:19:00" vehicleRefId="RE33-VVGEANN-9"/>
+				<departure id="RE33-VVGEANN-10" departureTime="10:19:00" vehicleRefId="RE33-VVGEANN-10"/>
+				<departure id="RE33-VVGEANN-11" departureTime="11:19:00" vehicleRefId="RE33-VVGEANN-11"/>
+				<departure id="RE33-VVGEANN-12" departureTime="12:19:00" vehicleRefId="RE33-VVGEANN-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="RE33-SMGEANN">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="LS1" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="REN1" arrivalOffset="00:09:00" departureOffset="00:09:00" awaitDeparture="true"/>
+				<stop refId="MOR1" arrivalOffset="00:16:00" departureOffset="00:17:00" awaitDeparture="true"/>
+				<stop refId="ALL1" arrivalOffset="00:22:00" departureOffset="00:23:00" awaitDeparture="true"/>
+				<stop refId="ROL1" arrivalOffset="00:26:00" departureOffset="00:27:00" awaitDeparture="true"/>
+				<stop refId="GLA1" arrivalOffset="00:32:00" departureOffset="00:33:00" awaitDeparture="true"/>
+				<stop refId="NY1" arrivalOffset="00:36:00" departureOffset="00:37:00" awaitDeparture="true"/>
+				<stop refId="COP1" arrivalOffset="00:42:00" departureOffset="00:43:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:52:00" departureOffset="00:54:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="LS2-LS1"/>
+				<link refId="LS1-REN2"/>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="RE33-SMGEANN-8" departureTime="08:48:00" vehicleRefId="RE33-SMGEANN-8"/>
+				<departure id="RE33-SMGEANN-9" departureTime="09:48:00" vehicleRefId="RE33-SMGEANN-9"/>
+				<departure id="RE33-SMGEANN-10" departureTime="10:48:00" vehicleRefId="RE33-SMGEANN-10"/>
+				<departure id="RE33-SMGEANN-11" departureTime="11:48:00" vehicleRefId="RE33-SMGEANN-11"/>
+				<departure id="RE33-SMGEANN-12" departureTime="12:48:00" vehicleRefId="RE33-SMGEANN-12"/>
+			</departures>
+		</transitRoute>
+
+	</transitLine>
+
+	<transitLine id="IR90">
+		<transitRoute id="IR90-GEAPGEBR1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:02:00" awaitDeparture="true"/>
+				<stop refId="LS" arrivalOffset="00:39:00" departureOffset="00:42:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+				<link refId="REN2-LS1"/>
+				<link refId="LS1-LS2"/>
+			</route>
+			<departures>
+				<departure id="IR90-GEAPGEBR1-8" departureTime="08:08:00" vehicleRefId="IR90-GEAPGEBR1-8"/>
+				<departure id="IR90-GEAPGEBR1-9" departureTime="09:08:00" vehicleRefId="IR90-GEAPGEBR1-9"/>
+				<departure id="IR90-GEAPGEBR1-10" departureTime="10:08:00" vehicleRefId="IR90-GEAPGEBR1-10"/>
+				<departure id="IR90-GEAPGEBR1-11" departureTime="11:08:00" vehicleRefId="IR90-GEAPGEBR1-11"/>
+				<departure id="IR90-GEAPGEBR1-12" departureTime="12:08:00" vehicleRefId="IR90-GEAPGEBR1-12"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="IR90-GEAPGEBR2">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="NY" arrivalOffset="00:17:00" departureOffset="00:17:00" awaitDeparture="true"/>
+				<stop refId="MOR" arrivalOffset="00:34:00" departureOffset="00:34:00" awaitDeparture="true"/>
+				<stop refId="LS" arrivalOffset="00:45:00" departureOffset="00:55:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+				<link refId="REN2-LS1"/>
+				<link refId="LS1-LS2"/>
+			</route>
+			<departures>
+				<departure id="IR90-GEAPGEBR2-8" departureTime="08:26:00" vehicleRefId="IR90-GEAPGEBR2-8"/>
+				<departure id="IR90-GEAPGEBR2-9" departureTime="09:26:00" vehicleRefId="IR90-GEAPGEBR2-9"/>
+				<departure id="IR90-GEAPGEBR2-10" departureTime="10:26:00" vehicleRefId="IR90-GEAPGEBR2-10"/>
+				<departure id="IR90-GEAPGEBR2-11" departureTime="11:26:00" vehicleRefId="IR90-GEAPGEBR2-11"/>
+				<departure id="IR90-GEAPGEBR2-12" departureTime="12:26:00" vehicleRefId="IR90-GEAPGEBR2-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="IR90-BRGEGEAP1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="LS1" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:40:00" departureOffset="00:42:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="LS2-LS1"/>
+				<link refId="LS1-REN2"/>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="IR90-BRGEGEAP1-8" departureTime="08:10:00" vehicleRefId="IR90-BRGEGEAP1-8"/>
+				<departure id="IR90-BRGEGEAP1-9" departureTime="09:10:00" vehicleRefId="IR90-BRGEGEAP1-9"/>
+				<departure id="IR90-BRGEGEAP1-10" departureTime="10:10:00" vehicleRefId="IR90-BRGEGEAP1-10"/>
+				<departure id="IR90-BRGEGEAP1-11" departureTime="11:10:00" vehicleRefId="IR90-BRGEGEAP1-11"/>
+				<departure id="IR90-BRGEGEAP1-12" departureTime="12:10:00" vehicleRefId="IR90-BRGEGEAP1-12"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="IR90-BRGEGEAP2">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="LS1" arrivalOffset="00:00:00" departureOffset="00:09:00" awaitDeparture="true"/>
+				<stop refId="MOR1" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="true"/>
+				<stop refId="NY1" arrivalOffset="00:36:00" departureOffset="00:37:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:52:00" departureOffset="00:55:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="LS2-LS1"/>
+				<link refId="LS1-REN2"/>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="IR90-BRGEGEAP2-8" departureTime="08:39:00" vehicleRefId="IR90-BRGEGEAP2-8"/>
+				<departure id="IR90-BRGEGEAP2-9" departureTime="09:39:00" vehicleRefId="IR90-BRGEGEAP2-9"/>
+				<departure id="IR90-BRGEGEAP2-10" departureTime="10:39:00" vehicleRefId="IR90-BRGEGEAP2-10"/>
+				<departure id="IR90-BRGEGEAP2-11" departureTime="11:39:00" vehicleRefId="IR90-BRGEGEAP2-11"/>
+				<departure id="IR90-BRGEGEAP2-12" departureTime="12:39:00" vehicleRefId="IR90-BRGEGEAP2-12"/>
+			</departures>
+		</transitRoute>
+
+	</transitLine>
+
+	<transitLine id="IR15">
+		<transitRoute id="IR15-GEAPGELZ">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="NY" arrivalOffset="00:17:00" departureOffset="00:17:00" awaitDeparture="true"/>
+				<stop refId="MOR" arrivalOffset="00:34:00" departureOffset="00:34:00" awaitDeparture="true"/>
+				<stop refId="LS" arrivalOffset="00:45:00" departureOffset="00:48:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+				<link refId="REN2-LS1"/>
+				<link refId="LS1-LS2"/>
+			</route>
+			<departures>
+				<departure id="IR15-GEAPGELZ-8" departureTime="08:56:00" vehicleRefId="IR15-GEAPGELZ-8"/>
+				<departure id="IR15-GEAPGELZ-9" departureTime="09:56:00" vehicleRefId="IR15-GEAPGELZ-9"/>
+				<departure id="IR15-GEAPGELZ-10" departureTime="10:56:00" vehicleRefId="IR15-GEAPGELZ-10"/>
+				<departure id="IR15-GEAPGELZ-11" departureTime="11:56:00" vehicleRefId="IR15-GEAPGELZ-11"/>
+				<departure id="IR15-GEAPGELZ-12" departureTime="12:56:00" vehicleRefId="IR15-GEAPGELZ-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="IR15-LZGEGEAP">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="LS1" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="MOR1" arrivalOffset="00:13:00" departureOffset="00:13:00" awaitDeparture="true"/>
+				<stop refId="NY1" arrivalOffset="00:29:00" departureOffset="00:30:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:45:00" departureOffset="00:48:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="LS2-LS1"/>
+				<link refId="LS1-REN2"/>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="IR15-LZGEGEAP-8" departureTime="08:16:00" vehicleRefId="IR15-LZGEGEAP-8"/>
+				<departure id="IR15-LZGEGEAP-9" departureTime="09:16:00" vehicleRefId="IR15-LZGEGEAP-9"/>
+				<departure id="IR15-LZGEGEAP-10" departureTime="10:16:00" vehicleRefId="IR15-LZGEGEAP-10"/>
+				<departure id="IR15-LZGEGEAP-11" departureTime="11:16:00" vehicleRefId="IR15-LZGEGEAP-11"/>
+				<departure id="IR15-LZGEGEAP-12" departureTime="12:16:00" vehicleRefId="IR15-LZGEGEAP-12"/>
+			</departures>
+		</transitRoute>
+
+	</transitLine>
+
+	<transitLine id="IC1">
+		<transitRoute id="IC1-GEAPZUESG">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="LS" arrivalOffset="00:38:00" departureOffset="00:40:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+				<link refId="REN2-LS1"/>
+				<link refId="LS1-LS2"/>
+			</route>
+			<departures>
+				<departure id="IC1-GEAPZUESG-8" departureTime="08:39:00" vehicleRefId="IC1-GEAPZUESG-8"/>
+				<departure id="IC1-GEAPZUESG-9" departureTime="09:39:00" vehicleRefId="IC1-GEAPZUESG-9"/>
+				<departure id="IC1-GEAPZUESG-10" departureTime="10:39:00" vehicleRefId="IC1-GEAPZUESG-10"/>
+				<departure id="IC1-GEAPZUESG-11" departureTime="11:39:00" vehicleRefId="IC1-GEAPZUESG-11"/>
+				<departure id="IC1-GEAPZUESG-12" departureTime="12:39:00" vehicleRefId="IC1-GEAPZUESG-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="IC1-SGZUEGEAP">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="LS1" arrivalOffset="00:00:00" departureOffset="00:02:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:37:00" departureOffset="00:39:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="LS2-LS1"/>
+				<link refId="LS1-REN2"/>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="IC1-SGZUEGEAP-8" departureTime="08:41:00" vehicleRefId="IC1-SGZUEGEAP-8"/>
+				<departure id="IC1-SGZUEGEAP-9" departureTime="09:41:00" vehicleRefId="IC1-SGZUEGEAP-9"/>
+				<departure id="IC1-SGZUEGEAP-10" departureTime="10:41:00" vehicleRefId="IC1-SGZUEGEAP-10"/>
+				<departure id="IC1-SGZUEGEAP-11" departureTime="11:41:00" vehicleRefId="IC1-SGZUEGEAP-11"/>
+				<departure id="IC1-SGZUEGEAP-12" departureTime="12:41:00" vehicleRefId="IC1-SGZUEGEAP-12"/>
+			</departures>
+		</transitRoute>
+
+
+	</transitLine>
+
+	<transitLine id="IC5">
+		<transitRoute id="IC5-GEAPZUERS">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="GE" arrivalOffset="00:00:00" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="MOR" arrivalOffset="00:29:00" departureOffset="00:30:00" awaitDeparture="true"/>
+				<stop refId="REN" arrivalOffset="00:37:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="GE1-GE2"/>
+				<link refId="GE2-COP1"/>
+				<link refId="COP1-COP2"/>
+				<link refId="COP2-NY1"/>
+				<link refId="NY1-NY2"/>
+				<link refId="NY2-GLA1"/>
+				<link refId="GLA1-GLA2"/>
+				<link refId="GLA2-ROL1"/>
+				<link refId="ROL1-ROL2"/>
+				<link refId="ROL2-ALL1"/>
+				<link refId="ALL1-ALL2"/>
+				<link refId="ALL2-MOR1"/>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+			</route>
+			<departures>
+				<departure id="IC5-GEAPZUERS-8" departureTime="08:12:00" vehicleRefId="IC5-GEAPZUERS-8"/>
+				<departure id="IC5-GEAPZUERS-9" departureTime="09:12:00" vehicleRefId="IC5-GEAPZUERS-9"/>
+				<departure id="IC5-GEAPZUERS-10" departureTime="10:12:00" vehicleRefId="IC5-GEAPZUERS-10"/>
+				<departure id="IC5-GEAPZUERS-11" departureTime="11:12:00" vehicleRefId="IC5-GEAPZUERS-11"/>
+				<departure id="IC5-GEAPZUERS-12" departureTime="12:12:00" vehicleRefId="IC5-GEAPZUERS-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="IC5-RSZUEGEAP">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="REN1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="MOR1" arrivalOffset="00:07:00" departureOffset="00:09:00" awaitDeparture="true"/>
+				<stop refId="GE1" arrivalOffset="00:38:00" departureOffset="00:40:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="REN2-REN1"/>
+				<link refId="REN1-MOR2-2"/>
+				<link refId="MOR2-MOR1"/>
+				<link refId="MOR1-ALL2"/>
+				<link refId="ALL2-ALL1"/>
+				<link refId="ALL1-ROL2"/>
+				<link refId="ROL2-ROL1"/>
+				<link refId="ROL1-GLA2"/>
+				<link refId="GLA2-GLA1"/>
+				<link refId="GLA1-NY2"/>
+				<link refId="NY2-NY1"/>
+				<link refId="NY1-COP2"/>
+				<link refId="COP2-COP1"/>
+				<link refId="COP1-GE2"/>
+				<link refId="GE2-GE1"/>
+			</route>
+			<departures>
+				<departure id="IC5-RSZUEGEAP-8" departureTime="08:09:00" vehicleRefId="IC5-RSZUEGEAP-8"/>
+				<departure id="IC5-RSZUEGEAP-9" departureTime="09:09:00" vehicleRefId="IC5-RSZUEGEAP-9"/>
+				<departure id="IC5-RSZUEGEAP-10" departureTime="10:09:00" vehicleRefId="IC5-RSZUEGEAP-10"/>
+				<departure id="IC5-RSZUEGEAP-11" departureTime="11:09:00" vehicleRefId="IC5-RSZUEGEAP-11"/>
+				<departure id="IC5-RSZUEGEAP-12" departureTime="12:09:00" vehicleRefId="IC5-RSZUEGEAP-12"/>
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="Construction_REN_LS">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="MOR" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="Construction_Site_MOR_REN" arrivalOffset="00:00:00" departureOffset="01:00:00" awaitDeparture="true"/>
+				<stop refId="REN" arrivalOffset="01:00:00" departureOffset="01:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="MOR1-MOR2"/>
+				<link refId="MOR2_REN1-1"/>
+				<link refId="REN1-REN2"/>
+			</route>
+			<departures>
+				<departure id="Construction_MOR_REN_10" departureTime="10:00:00" vehicleRefId="Construction_Train1"/>
+			</departures>
+		</transitRoute>
+
+
+	</transitLine>
+
+
+</transitSchedule>

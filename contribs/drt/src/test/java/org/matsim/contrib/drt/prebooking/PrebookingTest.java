@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -566,7 +569,7 @@ public class PrebookingTest {
 			assertEquals(8000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
 			assertEquals(8230.0, requestInfo.dropoffTime, 1e-3);
 		}
-		
+
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestC");
 			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
@@ -576,7 +579,7 @@ public class PrebookingTest {
 
 		assertEquals(4, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
 	}
-	
+
 	@Test
 	void destinationEqualsPrebookedOrigin_oneRequest() {
 		/*-
@@ -613,5 +616,148 @@ public class PrebookingTest {
 		}
 
 		assertEquals(4, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
+
+	@Test
+	void intraStopTiming_pickupTooEarly() {
+		/*-
+		 * In this test, we cover the intra stop timing when we use customizable stop
+		 * durations. Before the fix, there was a bug described by the following
+		 * situation: 
+		 * 
+		 * - We look for an insertion for a pickup
+		 * - We find an existing stop that already contains some dropoffs
+		 * - Inserting the pickup overall will fit (assuming that the persons are dropped off, then picked up)
+		 * - But because of variable stop durations, the pickup happens *before* the dropoffs
+		 * - Leading to a few seconds in which the occupancy is higher than the vehicle capacity
+		 * 
+		 * This test led to a VerifyException in VehicleOccupancyProfileCalculator.processOccupancyChange
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.setVehicleCapacity(2) //
+				.addRequest("requestA1", 1, 1, 8, 8, 2000.0, 1.0) // forward
+				.addRequest("requestA2", 1, 1, 8, 8, 2000.0, 2.0) // forward
+				.addRequest("requestB1", 8, 8, 1, 1, 2356.0, 3.0) // backward
+				.configure(300.0, 2.0, 1800.0, 60.0) // 
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(PassengerStopDurationProvider.class).toInstance(new PassengerStopDurationProvider() {
+					@Override
+					public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
+						if (request.getPassengerIds().get(0).toString().startsWith("requestA")) {
+							return 60.0;
+						} else {
+							return 30.0; // shorter than the dropoff duration (see below)
+						}
+					}
+					
+					@Override
+					public double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request) {
+						return 60.0;
+					}
+				});
+			}
+		});
+		
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA1");
+			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA2");
+			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
+			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3); // NOT 30s because we need to wait for the dropoffs
+			assertEquals(2753.0 + 60.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
+	
+	@Test
+	void intraStopTiming_dropoffTooLate() {
+		/*-
+		 * Inverse situation of the previous test: A new request is inserted, but the dropoff 
+		 * happens too late compared to the pickups in the following stop task.
+		 * 
+		 * This test led to a VerifyException in VehicleOccupancyProfileCalculator.processOccupancyChange
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.setVehicleCapacity(2) //
+				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1.0) // forward
+				.addRequest("requestB1", 8, 8, 1, 1, 2356.0, 2.0) // backward
+				.addRequest("requestB2", 8, 8, 1, 1, 2356.0, 3.0) // backward
+				.configure(300.0, 2.0, 1800.0, 60.0) // 
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(PassengerStopDurationProvider.class).toInstance(new PassengerStopDurationProvider() {
+					@Override
+					public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
+						return 60.0;
+					}
+					
+					@Override
+					public double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request) {
+						if (request.getPassengerIds().get(0).toString().equals("requestA")) {
+							return 90.0; // longer than the pickups
+						} else {
+							return 60.0;
+						}
+					}
+				});
+			}
+		});
+		
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(2356.0 + 90.0, requestInfo.dropoffTime, 1e-3);
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
+			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A for B2 to enter
+		}
+		
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestB2");
+			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2356.0 + 60.0 + 30.0, requestInfo.pickupTime, 1e-3); // +30 because we wait for dropoff of A
+			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A
+		}
+
+		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
 	}
 }

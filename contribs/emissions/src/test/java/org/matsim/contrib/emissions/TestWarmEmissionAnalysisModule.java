@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.emissions;
 
-import org.geotools.metadata.iso.quality.TemporalAccuracyImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;

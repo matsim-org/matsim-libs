@@ -28,12 +28,13 @@ import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
-import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
 import org.matsim.core.router.speedy.LeastCostPathTree;
 import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
@@ -115,7 +116,7 @@ public final class TravelTimeMatrices {
 
 	private static <E> void calculate(RoutingParams params, Collection<? extends E> elements, Calculation<E> calculation, String counterPrefix) {
 		var trees = IntStream.range(0, params.numberOfThreads)
-			.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
+			.mapToObj(i -> new LeastCostPathTree(SpeedyGraphBuilder.build(params.routingNetwork), params.travelTime, params.travelDisutility))
 			.toList();
 		var executorService = new ExecutorServiceWithResource<>(trees);
 		var counter = new Counter(counterPrefix, " / " + elements.size());

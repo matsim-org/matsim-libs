@@ -27,6 +27,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +40,6 @@ import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -628,8 +628,7 @@ public class TripDistributionMatrix {
 				} catch (IOException e) {
 					log.error("Problem to write OD matrix", e);
 				}
-				log.info("Write OD matrix for mode " + modeORvehType + " and for purpose " + purpose + " to "
-						+ outputFolder);
+				log.info("Write OD matrix for mode {} and for purpose {} to {}", modeORvehType, purpose, outputFolder);
 			}
 		}
 	}

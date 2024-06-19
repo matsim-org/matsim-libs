@@ -102,7 +102,7 @@ public class FreespeedOptServer implements MATSimAppCommand {
 		}
 
 		validationSet = NetworkParamsOpt.readValidation(validationFiles, refHours);
-		features = NetworkParamsOpt.readFeatures(input.getPath("features.csv"), network.getLinks().size());
+		features = NetworkParamsOpt.readFeatures(input.getPath("features.csv"), network.getLinks());
 
 		log.info("Initial score:");
 		applyAndEvaluateParams(null, "init");
