@@ -42,7 +42,7 @@ final class CreateDrtDashboard implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateDrtDashboard.class);
 
-	@CommandLine.Parameters(arity = "1..*", description = "Path to run output directories for which emission dashboards are to be generated.")
+	@CommandLine.Parameters(arity = "1..*", description = "Path to run output directories for which DRT dashboards are to be generated.")
 	private List<Path> inputPaths;
 
 	private CreateDrtDashboard(){
