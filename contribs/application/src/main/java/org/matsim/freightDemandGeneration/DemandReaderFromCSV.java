@@ -866,7 +866,7 @@ public final class DemandReaderFromCSV {
 				setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
 		HashMap<Id<Link>, Link> possibleLinksDelivery = findAllPossibleLinks(scenario, indexShape,
 				crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
-				setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonPickup);
+				setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
 
 		if (possibleLinksPickup.isEmpty())
 			throw new RuntimeException(
