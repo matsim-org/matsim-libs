@@ -1034,9 +1034,11 @@ public final class DemandReaderFromCSV {
 		{
 			for (int i = 0; i < numberOfJobs; i++) {
 
-				if (demandToDistribute != 0 && demandToDistribute < numberOfJobs)
-					throw new RuntimeException(
-							"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Please check!");
+				if (demandToDistribute != 0 && demandToDistribute < numberOfJobs) {
+					numberOfJobs = demandToDistribute;
+					log.warn(
+						"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Number of jobs is reduced to demand!");
+				}
 				Link linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
 						numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocations,
 						possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
