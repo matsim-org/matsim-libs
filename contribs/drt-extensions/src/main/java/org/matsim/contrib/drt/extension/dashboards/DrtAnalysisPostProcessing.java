@@ -111,7 +111,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			.round()
 			.setName("Total pax distance [km]"));
 
-		tableSupplyKPI.column("d_p/d_t").setName("Pooling ratio");
+		tableSupplyKPI.column("d_p/d_t").setName("Occupancy rate [pax-km/v-km]");
 		tableSupplyKPI.column("l_det").setName("Detour ratio");
 		tableSupplyKPI.column("emptyRatio").setName("Empty ratio");
 
@@ -122,17 +122,19 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		double rides = getLastDoubleValue(customerStats, "rides");
 		double rejections = getLastDoubleValue(customerStats, "rejections");
 		double requests = rides + rejections;
+		double pax = getLastDoubleValue(customerStats, "rides_pax");
 
 		DecimalFormat df = new DecimalFormat("#,###.##", new DecimalFormatSymbols(Locale.US));
 
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.DEFAULT)) {
 			csv.printRecord("Info", "value");
 
-			csv.printRecord("Requests", requests);
-			csv.printRecord("Rides", rides);
-			csv.printRecord("Rides per veh", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("vehicles")).get(0)));
-			csv.printRecord("Rides per veh-h", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total service hours")).get(0)));
-			csv.printRecord("Rides per veh-km", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total vehicle mileage [km]")).get(0)));
+			csv.printRecord("Handled Requests", requests);
+			csv.printRecord("Passengers (Pax)", pax);
+			csv.printRecord("Avg Group Size", df.format((getLastDoubleValue(customerStats, "groupSize_mean"))));
+			csv.printRecord("Pax per veh", df.format(pax / ((DoubleColumn) tableSupplyKPI.column("vehicles")).get(0)));
+			csv.printRecord("Pax per veh-h", df.format(pax / ((DoubleColumn) tableSupplyKPI.column("total service hours")).get(0)));
+			csv.printRecord("Pax per veh-km", df.format(pax / ((DoubleColumn) tableSupplyKPI.column("total vehicle mileage [km]")).get(0)));
 			csv.printRecord("Rejections", rejections);
 			csv.printRecord("Rejection rate", getLastDoubleValue(customerStats, "rejectionRate"));
 			csv.printRecord("Avg. total travel time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "totalTravelTime_mean").longValue()));
@@ -168,28 +170,13 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		//read vehicle stats
 		Path vehicleStatsPath = ApplicationUtils.matchInput("drt_vehicle_stats_" + drtMode + ".csv", input.getRunDirectory());
 		Table vehicleStats = Table.read().csv(CsvReadOptions.builder(vehicleStatsPath.toFile())
-			.columnTypesPartial(Map.of("vehicles", ColumnType.DOUBLE,
-				"totalDistance", ColumnType.DOUBLE,
-				"emptyRatio", ColumnType.DOUBLE,
-				"totalServiceDuration", ColumnType.DOUBLE,
-				"d_p/d_t", ColumnType.DOUBLE,
-				"totalPassengerDistanceTraveled", ColumnType.DOUBLE))
+			.columnTypes(columnHeader -> columnHeader.equals("runId") ? ColumnType.STRING : ColumnType.DOUBLE)
 			.separator(';').build());
 
 		//read customer stats
 		Path customerStatsPath = ApplicationUtils.matchInput("drt_customer_stats_" + drtMode + ".csv", input.getRunDirectory());
 		Table customerStats = Table.read().csv(CsvReadOptions.builder(customerStatsPath.toFile())
-			.columnTypesPartial(Map.of(
-				"rides", ColumnType.DOUBLE,
-				"wait_average", ColumnType.DOUBLE,
-				"wait_p95", ColumnType.DOUBLE,
-				"inVehicleTravelTime_mean", ColumnType.DOUBLE,
-				"distance_m_mean", ColumnType.DOUBLE,
-				"directDistance_m_mean", ColumnType.DOUBLE,
-				"totalTravelTime_mean", ColumnType.DOUBLE,
-				"fareAllReferences_mean", ColumnType.DOUBLE,
-				"rejections", ColumnType.DOUBLE,
-				"rejectionRate", ColumnType.DOUBLE))
+				.columnTypes(columnHeader -> columnHeader.equals("runId") ? ColumnType.STRING : ColumnType.DOUBLE)
 			.separator(';').build());
 
 		Table tableSupplyKPI = Table.create("supplyKPI");

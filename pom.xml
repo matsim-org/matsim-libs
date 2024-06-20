@@ -31,7 +31,7 @@
         <argLine></argLine>
 
         <log4j.version>2.23.1</log4j.version>
-        <geotools.version>31.1</geotools.version>
+        <geotools.version>31.2</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
