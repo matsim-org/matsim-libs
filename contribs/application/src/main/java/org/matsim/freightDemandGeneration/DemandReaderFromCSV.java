@@ -661,8 +661,7 @@ public final class DemandReaderFromCSV {
 				if (numberOfServiceLocations != null)
 					throw new RuntimeException(
 							"Because the demand is higher than the number of links, the demand will be distributed evenly over all links. You selected a certain number of service locations, which is not possible here!");
-				double sumOfPossibleLinkLength = 0;
-				possibleLinksForService.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLength));
+				double sumOfPossibleLinkLength = possibleLinksForService.values().stream().mapToDouble(Link::getLength).sum();
 				for (Link link : possibleLinksForService.values()) {
 					int demandForThisLink;
 					if (countOfLinks == scenario.getNetwork().getLinks().size()) {
@@ -937,10 +936,8 @@ public final class DemandReaderFromCSV {
 				boolean pickupIsDemandBase = true;
 				Link linkPickup;
 				Link linkDelivery;
-				double sumOfPossibleLinkLengthPickup = 0;
-				double sumOfPossibleLinkLengthDelivery = 0;
-				possibleLinksPickup.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthPickup));
-				possibleLinksDelivery.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthDelivery));
+				double sumOfPossibleLinkLengthPickup = possibleLinksPickup.values().stream().mapToDouble(Link::getLength).sum();
+				double sumOfPossibleLinkLengthDelivery = possibleLinksDelivery.values().stream().mapToDouble(Link::getLength).sum();
 				if (numberOfPickupLocations == null && numberOfDeliveryLocations == null)
 					if (possibleLinksPickup.size() > possibleLinksDelivery.size()) {
 						demandBasesLinks = possibleLinksPickup;
@@ -1269,15 +1266,16 @@ public final class DemandReaderFromCSV {
 				}
 		} else {
 			Link newPossibleLink;
-			while (possibleLinks.size() < numberOfLocations) {
+			while (possibleLinks.size() < numberOfLocations) { //TODO check if number of locations is higher than possible links
 				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
 					indexShape, areasForLocations, numberOfLocations, scenario, setLocations,
 						crsTransformationNetworkAndShape);
 				if (!possibleLinks.containsKey(newPossibleLink.getId()))
 					possibleLinks.put(newPossibleLink.getId(), newPossibleLink);
+				if (nearestLinkPerPerson.size() == possiblePersons.size())
+					break;
 			}
 		}
-
 		return possibleLinks;
 	}
 
