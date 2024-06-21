@@ -25,10 +25,10 @@ public class FreightDemandGenerationTest {
 			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "testVehicleTypes_1.xml");
 			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_1.csv");
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_1.csv");
-			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
+			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-			//String shapeCategory = "Ortsteil";
+			String shapeCategory = "Ortsteil";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
@@ -37,23 +37,23 @@ public class FreightDemandGenerationTest {
 					//"--populationOption", "usePopulationInShape",
 					"--populationOption", "useHolePopulation",
 					//"--populationOption", "useNoPopulation",
-					//"--populationSamplingOption", "createMoreLocations",
-					"--populationSamplingOption", "increaseDemandOnLocation",
+					"--populationSamplingOption", "createMoreLocations",
+					//"--populationSamplingOption", "increaseDemandOnLocation",
 					//"--populationSamplingOption", "noPopulationSampling",
 					//"--VRPSolutionsOption", "runJsprit",
 					//"--VRPSolutionsOption","runJspritAndMATSim",
 					"--VRPSolutionsOption", "createNoSolutionAndOnlyWriteCarrierFile",
-					"--combineSimilarJobs", "false",
+					"--combineSimilarJobs", "true",
 					"--carrierFileLocation", "",
 					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
-					//"--shapeFileLocation", shapeFilePath.toString(),
+					"--shapeFileLocation", shapeFilePath.toString(),
 					"--shapeCRS", "WGS84",
 					"--populationFileLocation", populationLocation,
 					"--populationCRS", "WGS84",
 					"--network", network,
 					"--networkCRS", "WGS84",
 					"--networkChangeEvents", "",
-					//"--shapeCategory", shapeCategory,
+					"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
 					"--inputDemandCSV", demandCSVLocation.toString(),
 					"--populationSample", "0.5",

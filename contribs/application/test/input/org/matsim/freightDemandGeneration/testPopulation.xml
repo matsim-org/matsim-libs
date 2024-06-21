@@ -20,7 +20,7 @@
 
 <!-- ====================================================================== -->
 
-	<person id="person2" sex="m" age="20" employed="no">
+	<person id="person2" sex="m" age="19" employed="no">
 		<plan selected="yes">
 			<act type="home" x="2900.0" y="2800.0" start_time="00:00:00" dur="10:09:48" end_time="10:09:48" />
 			<leg mode="car" dep_time="10:09:48" trav_time="00:20:00" arr_time="10:29:48">

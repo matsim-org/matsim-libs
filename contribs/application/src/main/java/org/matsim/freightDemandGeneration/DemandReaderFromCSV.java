@@ -59,24 +59,25 @@ public final class DemandReaderFromCSV {
 
 	private static final HashMap totalDemandByAge = new HashMap<>(Map.of(
 			(int) 0,new HashMap<>(Map.of("lower",0,"upper",13,"share", 0.0)),
-			(int) 1,new HashMap<>(Map.of("lower",14,"upper",23,"share", 20.0)),
-			(int) 2,new HashMap<>(Map.of("lower",24,"upper",33,"share", 20.0)),
-			(int) 3,new HashMap<>(Map.of("lower",34,"upper",43,"share", 20.0)),
-			(int) 4,new HashMap<>(Map.of("lower",44,"upper",53,"share", 10.0)),
-			(int) 5,new HashMap<>(Map.of("lower",54,"upper",63,"share", 10.0)),
-			(int) 6,new HashMap<>(Map.of("lower",64,"upper",100,"share", 20.0)))
+			(int) 1,new HashMap<>(Map.of("lower",14,"upper",19,"share", 20.0)),
+			(int) 2,new HashMap<>(Map.of("lower",20,"upper",29,"share", 20.0)),
+			(int) 3,new HashMap<>(Map.of("lower",30,"upper",39,"share", 20.0)),
+			(int) 4,new HashMap<>(Map.of("lower",40,"upper",49,"share", 10.0)),
+			(int) 5,new HashMap<>(Map.of("lower",50,"upper",59,"share", 10.0)),
+			(int) 6,new HashMap<>(Map.of("lower",60,"upper",69,"share", 10.0)),
+			(int) 7,new HashMap<>(Map.of("lower",70,"upper",1000,"share", 10.0)))
 	);
 
 	private static final HashMap DemandPerAge = new HashMap<>(Map.of(
 			(int) 100,new HashMap<>(Map.of("lower",0,"upper",15,"share", 0.0,"total",0)),
-			(int) 101,new HashMap<>(Map.of("lower",16,"upper",25,"share", 50.00,"total",0)),
+			(int) 101,new HashMap<>(Map.of("lower",16,"upper",25,"share", 100.00,"total",0)),
 			(int) 102,new HashMap<>(Map.of("lower",26,"upper",45,"share", 100.00,"total",0)),
 			(int) 103,new HashMap<>(Map.of("lower",46,"upper",65,"share", 100.00,"total",0)),
 			(int) 104,new HashMap<>(Map.of("lower",66,"upper",75,"share", 100.00,"total",0)),
-			(int) 105,new HashMap<>(Map.of("lower",76,"upper",1000,"share", 100.00,"total",0))
+			(int) 105,new HashMap<>(Map.of("lower",76,"upper",1000,"share", 0.00,"total",0))
 	));
 
-	private static final String age = "DemandPerAge";
+	private static final String age = "DemandbPerAge";
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -826,7 +827,8 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 			else
 				possiblePersonsPickup.putAll(population.getPersons());
-			if (areasForDeliveryLocations != null || indexShape != null) { //index shape, da sonst Endlosschleife, wenn keine area angegeben
+			//ERROR2: index shape, da sonst Endlosschleife, wenn keine area angegeben
+			if (areasForDeliveryLocations != null  || indexShape != null) {
 				//modify population in the area - age
 				if (age == "DemandPerAge") {
 					population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
@@ -913,7 +915,7 @@ public final class DemandReaderFromCSV {
 				crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
 				setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonPickup);
 		log.info("Possible links for delivery: "+possibleLinksDelivery.size());
-		log.info("Possible persons for delivery: "+Math.round(possiblePersonsDelivery.size()*shareOfPopulationWithThisDelivery));
+		//log.info("Possible persons for delivery: "+Math.round(possiblePersonsDelivery.size()*shareOfPopulationWithThisDelivery));
 		//log.info(globalNearestLinkPerPerson); //ToDO: gerade nur delivery
 		if (possibleLinksPickup.isEmpty())
 			throw new RuntimeException(
@@ -985,10 +987,13 @@ public final class DemandReaderFromCSV {
 				Link linkDelivery;
 				double sumOfPossibleLinkLengthPickup = 0;
 				double sumOfPossibleLinkLengthDelivery = 0;
+				//ERROR1: if there is more demand to distribute than links, sum is 0
 				//possibleLinksPickup.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthPickup));
+				//new ANA:
 				for (Map.Entry<Id<Link>, Link> l : possibleLinksPickup.entrySet())
 					sumOfPossibleLinkLengthPickup += l.getValue().getLength();
 				//possibleLinksDelivery.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthDelivery));
+				//new ANA:
 				for (Map.Entry<Id<Link>, Link> l : possibleLinksDelivery.entrySet())
 					sumOfPossibleLinkLengthDelivery += l.getValue().getLength();
 				if (numberOfPickupLocations == null && numberOfDeliveryLocations == null)
@@ -1086,10 +1091,7 @@ public final class DemandReaderFromCSV {
 		// if a certain number of shipments is selected
 		{
 			log.info("Number of jobs: "+numberOfJobs);
-			//demandPerAge
-			if (age == "DemandPerAge") {
-				// log.info(globalNearestLinkPerPerson); //gerade nur delivery
-			}
+
 			for (int i = 0; i < numberOfJobs; i++) {
 
 				if (demandToDistribute != 0 && demandToDistribute < numberOfJobs)
@@ -1158,7 +1160,7 @@ public final class DemandReaderFromCSV {
 						}
 					}
 				}
-				log.info(totalDemandByAge);
+				//log.info(totalDemandByAge);
 				if (!usedPickupLocations.contains(linkPickup.getId().toString()))
 					usedPickupLocations.add(linkPickup.getId().toString());
 				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
@@ -1360,9 +1362,7 @@ public final class DemandReaderFromCSV {
 																HashMap<Id<Person>, Person> possiblePersons,
 																HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson) {
 		HashMap<Id<Link>, Link> possibleLinks = new HashMap<Id<Link>, Link>();
-		//TODO: Match link and age
-		//log.info("number of locations:" + numberOfLocations);
-		//log.info(possiblePersons);
+
 		if (numberOfLocations == null) {
 			for (Link link : scenario.getNetwork().getLinks().values())
 				if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey(
