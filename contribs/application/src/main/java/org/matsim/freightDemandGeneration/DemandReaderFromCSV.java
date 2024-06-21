@@ -897,25 +897,13 @@ public final class DemandReaderFromCSV {
 							usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 							crsTransformationNetworkAndShape, i);
 
-					double serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
-					double serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
-					TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
-					TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
 					int demandForThisLink = 1;
 					if (!usedPickupLocations.contains(linkPickup.getId().toString()))
 						usedPickupLocations.add(linkPickup.getId().toString());
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
-					Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
-							linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
-					CarrierShipment thisShipment = CarrierShipment.Builder
-							.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
-							.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-							.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
-							.build();
-					CarriersUtils.getCarriers(scenario).getCarriers()
-							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
-							.put(thisShipment.getId(), thisShipment);
+
+					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink);
 				}
 			} else
 			// creates a demand on each link, demand depends on the length of the link
@@ -999,23 +987,10 @@ public final class DemandReaderFromCSV {
 						usedPickupLocations.add(linkPickup.getId().toString());
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
-					double serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit()
-							* demandForThisLink;
-					double serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit()
-							* demandForThisLink;
-					TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
-					TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
-					Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
-							linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
+
 					if (demandForThisLink > 0) {
-						CarrierShipment thisShipment = CarrierShipment.Builder
-								.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
-								.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-								.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
-								.build();
-						CarriersUtils.getCarriers(scenario).getCarriers()
-								.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class))
-								.getShipments().put(thisShipment.getId(), thisShipment);
+						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+							demandForThisLink);
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
@@ -1043,33 +1018,49 @@ public final class DemandReaderFromCSV {
 					usedPickupLocations.add(linkPickup.getId().toString());
 				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 					usedDeliveryLocations.add(linkDelivery.getId().toString());
-				double serviceTimePickup;
-				double serviceTimeDelivery;
-				if (demandForThisLink == 0) {
-					serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
-					serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
-				} else {
-					serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
-					serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit()
-							* demandForThisLink;
-				}
-				TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
-				TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
-				Id<CarrierShipment> idNewShipment = Id.create(
-						createJobId(scenario, newDemandInformationElement, linkPickup.getId(), linkDelivery.getId()),
-						CarrierShipment.class);
-				CarrierShipment thisShipment = CarrierShipment.Builder
-						.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
-						.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-						.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery).build();
-				CarriersUtils.getCarriers(scenario).getCarriers()
-						.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
-						.put(thisShipment.getId(), thisShipment);
+
+				createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+					demandForThisLink);
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
 		}
 		if (combineSimilarJobs)
 			reduceNumberOfJobsIfSameCharacteristics(scenario, newDemandInformationElement);
+	}
+
+	/** Creates a single shipment.
+	 * @param scenario                    Scenario
+	 * @param newDemandInformationElement single DemandInformationElement
+	 * @param linkPickup                  Link for the pickup
+	 * @param linkDelivery                Link for the delivery
+	 * @param demandForThisLink           Demand for this link
+	 */
+	private static void createSingleShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
+											 Link linkPickup, Link linkDelivery, int demandForThisLink) {
+
+		Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
+			linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
+
+		TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
+		TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
+
+		double serviceTimePickup;
+		double serviceTimeDelivery;
+		if (demandForThisLink == 0) {
+			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
+			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
+		} else {
+			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
+			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * demandForThisLink;
+		}
+		CarrierShipment thisShipment = CarrierShipment.Builder
+			.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
+			.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
+			.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
+			.build();
+		CarriersUtils.getCarriers(scenario).getCarriers()
+			.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
+			.put(thisShipment.getId(), thisShipment);
 	}
 
 	/**
