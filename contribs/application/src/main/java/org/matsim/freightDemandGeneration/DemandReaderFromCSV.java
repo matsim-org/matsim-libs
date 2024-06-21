@@ -1134,14 +1134,14 @@ public final class DemandReaderFromCSV {
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		int connectedJobs = 0;
 		if (newDemandInformationElement.getTypeOfDemand().equals("shipment")) {
-			HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<Id<CarrierShipment>, CarrierShipment>();
-			ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<CarrierShipment>();
+			HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<>();
+			ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<>();
 			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 			for (Id<CarrierShipment> baseShipmentId : thisCarrier.getShipments().keySet()) {
 				if (!shipmentsToRemove.containsKey(baseShipmentId)) {
 					CarrierShipment baseShipment = thisCarrier.getShipments().get(baseShipmentId);
-					HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToConnect = new HashMap<Id<CarrierShipment>, CarrierShipment>();
+					HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToConnect = new HashMap<>();
 					shipmentsToConnect.put(baseShipmentId, baseShipment);
 					for (Id<CarrierShipment> thisShipmentId : thisCarrier.getShipments().keySet()) {
 						if (!shipmentsToRemove.containsKey(thisShipmentId)) {
@@ -1185,14 +1185,14 @@ public final class DemandReaderFromCSV {
 			log.warn("Number of reduced shipments: {}", connectedJobs);
 		}
 		if (newDemandInformationElement.getTypeOfDemand().equals("service")) {
-			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<Id<CarrierService>, CarrierService>();
-			ArrayList<CarrierService> servicesToAdd = new ArrayList<CarrierService>();
+			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<>();
+			ArrayList<CarrierService> servicesToAdd = new ArrayList<>();
 			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 			for (Id<CarrierService> baseServiceId : thisCarrier.getServices().keySet()) {
 				if (!servicesToRemove.containsKey(baseServiceId)) {
 					CarrierService baseService = thisCarrier.getServices().get(baseServiceId);
-					HashMap<Id<CarrierService>, CarrierService> servicesToConnect = new HashMap<Id<CarrierService>, CarrierService>();
+					HashMap<Id<CarrierService>, CarrierService> servicesToConnect = new HashMap<>();
 					servicesToConnect.put(baseServiceId, baseService);
 					for (Id<CarrierService> thisServiceId : thisCarrier.getServices().keySet()) {
 						if (!servicesToRemove.containsKey(thisServiceId)) {
@@ -1248,7 +1248,7 @@ public final class DemandReaderFromCSV {
 																Integer numberOfLocations, String[] areasForLocations, String[] setLocations,
 																HashMap<Id<Person>, Person> possiblePersons,
 																HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson) {
-		HashMap<Id<Link>, Link> possibleLinks = new HashMap<Id<Link>, Link>();
+		HashMap<Id<Link>, Link> possibleLinks = new HashMap<>();
 		if (numberOfLocations == null) {
 			for (Link link : scenario.getNetwork().getLinks().values())
 				if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey(
@@ -1324,7 +1324,7 @@ public final class DemandReaderFromCSV {
 			String[] areasForJobElementLocations, ShpOptions.Index indexShape,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
-		HashMap<Id<Person>, Person> possiblePersons = new HashMap<Id<Person>, Person>();
+		HashMap<Id<Person>, Person> possiblePersons = new HashMap<>();
 
 		for (Person person : population.getPersons().values()) {
 			Coord coord = getHomeCoord(person);
@@ -1406,7 +1406,7 @@ public final class DemandReaderFromCSV {
 												  ShpOptions.Index indexShape, String[] areasForTheDemand, Integer selectedNumberOfLocations,
 												  Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
 		Link selectedlink = null;
-		Link newLink = null;
+		Link newLink;
 		if (selectedNumberOfLocations == null)
 			selectedNumberOfLocations = 0;
 		while (selectedlink == null) {
