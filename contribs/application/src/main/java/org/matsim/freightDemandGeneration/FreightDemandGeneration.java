@@ -448,59 +448,29 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private static void solveSelectedSolution(OptionsOfVRPSolutions selectedSolution, Config config,
 			Controler controler) throws ExecutionException, InterruptedException {
-		switch (selectedSolution) {
-			case runJspritAndMATSim -> {
-				// solves the VRP with jsprit and runs MATSim afterward
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
-				runJsprit(controler, false);
-				controler.run();
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
-			}
-			case runJspritAndMATSimWithDistanceConstraint -> {
-				// solves the VRP with jsprit by using the distance constraint and runs MATSim afterward
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
-				runJsprit(controler, true);
-				controler.run();
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
-			}
-			case runJsprit -> {
-				// solves only the VRP with jsprit
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
-				runJsprit(controler, false);
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
-				log.warn(
-						"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-				System.exit(0);
-			}
-			case runJspritWithDistanceConstraint -> {
-				// solves only the VRP with jsprit by using the distance constraint
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
-				runJsprit(controler, true);
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
-				log.warn(
-						"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-				System.exit(0);
-			}
-			case createNoSolutionAndOnlyWriteCarrierFile -> {
-				// creates no solution of the VRP and only writes the carrier file with the
-				// generated carriers and demands
-				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
-				log.warn(
-						"##Finished without solution of the VRP. If you also want to run jsprit and/or MATSim, please change case of optionsOfVRPSolutions");
-				System.exit(0);
-			}
-			default -> {
-			}
+		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
+			.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
+		if (Objects.requireNonNull(selectedSolution) == OptionsOfVRPSolutions.createNoSolutionAndOnlyWriteCarrierFile) {
+			log.warn(
+				"##Finished without solution of the VRP. If you also want to run jsprit and/or MATSim, please change case of optionsOfVRPSolutions");
+			System.exit(0);
 		}
+		boolean runMatSim = false;
+		switch (selectedSolution) {
+			case runJspritAndMATSim, runJspritAndMATSimWithDistanceConstraint -> runMatSim = true;
+		}
+		boolean useDistanceConstraint = false;
+		switch (selectedSolution) {
+			case runJspritWithDistanceConstraint, runJspritAndMATSimWithDistanceConstraint -> useDistanceConstraint = true;
+		}
+		runJsprit(controler, useDistanceConstraint);
+		if (runMatSim)
+			controler.run();
+		else
+			log.warn(
+					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
+		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
+			.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 	}
 
 	/**
