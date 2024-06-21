@@ -664,20 +664,9 @@ public final class DemandReaderFromCSV {
 							"Because the demand is higher than the number of links, the demand will be distributed evenly over all links. You selected a certain number of service locations, which is not possible here!");
 				double sumOfPossibleLinkLength = possibleLinksForService.values().stream().mapToDouble(Link::getLength).sum();
 				for (Link link : possibleLinksForService.values()) {
-					int demandForThisLink;
-					if (countOfLinks == scenario.getNetwork().getLinks().size()) {
-						demandForThisLink = demandToDistribute - distributedDemand;
-					} else {
-						demandForThisLink = (int) Math
-								.ceil(link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute);
-						roundingError = roundingError + ((double) demandForThisLink
-								- (link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute));
-						if (roundingError > 1) {
-							demandForThisLink = demandForThisLink - 1;
-							roundingError = roundingError - 1;
-						}
-						countOfLinks++;
-					}
+					int demandForThisLink = calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, possibleLinksForService.size(),
+						sumOfPossibleLinkLength, link);
+					countOfLinks++;
 					double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit()
 							* demandForThisLink;
 					Id<CarrierService> idNewService = Id.create(
@@ -936,19 +925,8 @@ public final class DemandReaderFromCSV {
 					sumOfDemandBasedLinks = sumOfPossibleLinkLengthPickup;
 				}
 				for (Link demandBasedLink : demandBasesLinks.values()) {
-					int demandForThisLink;
-					if (countOfLinks == demandBasesLinks.size()) {
-						demandForThisLink = demandToDistribute - distributedDemand;
-					} else {
-						demandForThisLink = (int) Math.ceil(
-								demandBasedLink.getLength() / sumOfDemandBasedLinks * (double) demandToDistribute);
-						roundingError = roundingError + ((double) demandForThisLink
-								- (demandBasedLink.getLength() / sumOfDemandBasedLinks * (double) demandToDistribute));
-						if (roundingError > 1) {
-							demandForThisLink = demandForThisLink - 1;
-							roundingError = roundingError - 1;
-						}
-					}
+					int demandForThisLink = calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, demandBasesLinks.size(), sumOfDemandBasedLinks,
+						demandBasedLink);
 					if (pickupIsDemandBase) {
 						linkPickup = demandBasedLink;
 						linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
@@ -1125,6 +1103,32 @@ public final class DemandReaderFromCSV {
 		return demandForThisLink;
 	}
 
+	/**
+	 * @param countOfLinks				counter
+	 * @param distributedDemand 		Already distributed demand
+	 * @param demandToDistribute 		Demand to distribute
+	 * @param maxLinks					Maximum of possible links for demand
+	 * @param sumOfPossibleLinkLength	Sum of all lengths of the links
+	 * @param link 						this link
+	 * @return							Demand for this link
+	 */
+	private static int calculateDemandBasedOnLinkLength(int countOfLinks, int distributedDemand, Integer demandToDistribute,
+														int maxLinks, double sumOfPossibleLinkLength, Link link) {
+		int demandForThisLink;
+		if (countOfLinks == maxLinks) {
+			demandForThisLink = demandToDistribute - distributedDemand;
+		} else {
+			demandForThisLink = (int) Math
+				.ceil(link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute);
+			roundingError = roundingError + ((double) demandForThisLink
+				- (link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute));
+			if (roundingError > 1) {
+				demandForThisLink = demandForThisLink - 1;
+				roundingError = roundingError - 1;
+			}
+		}
+		return demandForThisLink;
+	}
 	/**
 	 * If jobs of a carrier have the same characteristics (time window, location),
 	 * they will be combined to one job.
