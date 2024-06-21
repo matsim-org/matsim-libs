@@ -797,6 +797,8 @@ public final class DemandReaderFromCSV {
 				numberPossibleJobsDelivery = (int) Math
 						.round(shareOfPopulationWithThisDelivery * possiblePersonsDelivery.size());
 
+			int sampledNumberPossibleJobsPickup = (int)Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
+			int sampledNumberPossibleJobsDelivery = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsDelivery);
 			if (numberPossibleJobsPickup > numberPossibleJobsDelivery) {
 				if (sampleSizeInputPopulation == sampleTo) {
 					numberOfJobs = (int) Math.round(shareOfPopulationWithThisPickup * numberPossibleJobsPickup);
@@ -805,11 +807,10 @@ public final class DemandReaderFromCSV {
 						numberPossibleJobsDelivery = (int) Math
 								.round(shareOfPopulationWithThisDelivery * numberPossibleJobsDelivery);
 				} else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
-					numberOfJobs = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
+					numberOfJobs = sampledNumberPossibleJobsPickup;
 					numberPossibleJobsPickup = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
-						numberPossibleJobsDelivery = (int) Math
-								.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsDelivery);
+						numberPossibleJobsDelivery = sampledNumberPossibleJobsDelivery;
 				} else if (samplingOption.equals("changeDemandOnLocation")) {
 					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
 					numberOfJobs = numberPossibleJobsPickup;
@@ -823,12 +824,10 @@ public final class DemandReaderFromCSV {
 					numberPossibleJobsPickup = (int) Math
 							.round(shareOfPopulationWithThisPickup * numberPossibleJobsPickup);
 				} else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
-					numberOfJobs = (int) Math
-							.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsDelivery);
+					numberOfJobs = sampledNumberPossibleJobsDelivery;
 					numberPossibleJobsDelivery = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
-						numberPossibleJobsPickup = (int) Math
-								.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
+						numberPossibleJobsPickup = sampledNumberPossibleJobsPickup;
 				} else if (samplingOption.equals("changeDemandOnLocation")) {
 					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
 					numberOfJobs = numberPossibleJobsDelivery;
