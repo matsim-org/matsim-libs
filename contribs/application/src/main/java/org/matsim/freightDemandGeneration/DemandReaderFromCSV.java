@@ -1264,7 +1264,7 @@ public final class DemandReaderFromCSV {
 				}
 		} else {
 			Link newPossibleLink;
-			while (possibleLinks.size() < numberOfLocations) { //TODO check if number of locations is higher than possible links
+			while (possibleLinks.size() < numberOfLocations) {
 				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
 					indexShape, areasForLocations, numberOfLocations, scenario, setLocations,
 						crsTransformationNetworkAndShape);
