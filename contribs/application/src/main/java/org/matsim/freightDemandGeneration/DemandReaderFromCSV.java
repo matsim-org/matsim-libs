@@ -1190,7 +1190,7 @@ public final class DemandReaderFromCSV {
 			for (CarrierShipment carrierShipment : shipmentsToAdd) {
 				thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 			}
-			log.warn("Number of reduced shipments: " + connectedJobs);
+			log.warn("Number of reduced shipments: {}", connectedJobs);
 		}
 		if (newDemandInformationElement.getTypeOfDemand().equals("service")) {
 			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<Id<CarrierService>, CarrierService>();
@@ -1234,7 +1234,7 @@ public final class DemandReaderFromCSV {
 			for (CarrierService carrierService : servicesToAdd) {
 				thisCarrier.getServices().put(carrierService.getId(), carrierService);
 			}
-			log.warn("Number of reduced shipments: " + connectedJobs);
+			log.warn("Number of reduced shipments: {}", connectedJobs);
 		}
 	}
 
