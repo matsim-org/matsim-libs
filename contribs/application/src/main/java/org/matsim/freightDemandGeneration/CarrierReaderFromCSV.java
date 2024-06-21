@@ -346,15 +346,12 @@ public final class CarrierReaderFromCSV {
 				throw new RuntimeException(
 						"If a vehicle type is selected in the input file, numberOfDepots or selectedVehicleDepots should be set. Please check carrier "
 								+ carrierElement.getName());
-			if (carrierElement.getVehicleDepots() != null
-					&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
-					&& carrierElement.getAreaOfAdditionalDepots() == null)
+			if ((carrierElement.getVehicleDepots() != null
+				&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
+				&& carrierElement.getAreaOfAdditionalDepots() == null) || (carrierElement.getVehicleDepots() == null && (carrierElement.getNumberOfDepotsPerType() > 0)
+				&& carrierElement.getAreaOfAdditionalDepots() == null))
 				log.warn(
-						"No possible area for additional depot given. Random choice in the hole network of a possible position");
-			if (carrierElement.getVehicleDepots() == null && (carrierElement.getNumberOfDepotsPerType() > 0)
-					&& carrierElement.getAreaOfAdditionalDepots() == null)
-				log.warn(
-						"No possible area for additional depot given. Random choice in the hole network of a possible position");
+					"No possible area for additional depot given. Random choice in the hole network of a possible position");
 			if (carrierElement.getAreaOfAdditionalDepots() != null) {
 				if (indexShape == null)
 					throw new RuntimeException("For carrier " + carrierElement.getName()
