@@ -234,14 +234,14 @@ public final class CarrierReaderFromCSV {
 	/**
 	 * Reads and create the carriers with reading the information from the csv file.
 	 *
-	 * @param scenario
-	 * @param freightCarriersConfigGroup
-	 * @param csvLocationCarrier
-	 * @param indexShape
-	 * @param defaultJspritIterations
-	 * @param crsTransformationNetworkAndShape
-	 * @param shapeCategory
-	 * @throws IOException
+	 * @param scenario                         Scenario
+	 * @param freightCarriersConfigGroup       FreightCarriersConfigGroup
+	 * @param csvLocationCarrier               Path to the csv file with the carrier information
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param defaultJspritIterations          Default number of jsprit iterations
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape
+	 * @param shapeCategory                    Column name in the shape file for the data connection in the csv files
+	 * @throws IOException IOException
 	 */
 	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightCarriersConfigGroup freightCarriersConfigGroup,
 												   Path csvLocationCarrier, ShpOptions.Index indexShape, int defaultJspritIterations,
@@ -255,12 +255,12 @@ public final class CarrierReaderFromCSV {
 	}
 
 	/**
-	 * @param csvLocationCarrier
-	 * @return
-	 * @throws IOException
+	 * @param csvLocationCarrier Path to the csv file with the carrier information
+	 * @return Set<CarrierInformationElement> Set of CarrierInformationElements
+	 * @throws IOException IOException
 	 */
 	static Set<CarrierInformationElement> readCarrierInformation(Path csvLocationCarrier) throws IOException {
-		log.info("Start reading carrier csv file: " + csvLocationCarrier);
+		log.info("Start reading carrier csv file: {}", csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
 		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationCarrier),
 				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
@@ -305,11 +305,11 @@ public final class CarrierReaderFromCSV {
 	/**
 	 * Checks if the read carrier information is consistent.
 	 *
-	 * @param allNewCarrierInformation
-	 * @param freightCarriersConfigGroup
-	 * @param scenario
-	 * @param indexShape
-	 * @param shapeCategory
+	 * @param allNewCarrierInformation   Set of CarrierInformationElements
+	 * @param freightCarriersConfigGroup FreightCarriersConfigGroup
+	 * @param scenario                   Scenario
+	 * @param indexShape                 ShpOptions.Index for the shape file
+	 * @param shapeCategory              Column name in the shape file for the data connection in the csv files
 	 */
 	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
 								FreightCarriersConfigGroup freightCarriersConfigGroup, Scenario scenario, ShpOptions.Index indexShape, String shapeCategory) {
@@ -407,12 +407,12 @@ public final class CarrierReaderFromCSV {
 	/**
 	 * Read and creates the carrier and the vehicle types.
 	 *
-	 * @param scenario
-	 * @param allNewCarrierInformation
-	 * @param freightCarriersConfigGroup
-	 * @param indexShape
-	 * @param defaultJspritIterations
-	 * @param crsTransformationNetworkAndShape
+	 * @param scenario                         Scenario
+	 * @param allNewCarrierInformation         Set of CarrierInformationElements
+	 * @param freightCarriersConfigGroup       FreightCarriersConfigGroup
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param defaultJspritIterations          Default number of jsprit iterations
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape
 	 */
 	static void createNewCarrierAndAddVehicleTypes(Scenario scenario,
 												   Set<CarrierInformationElement> allNewCarrierInformation, FreightCarriersConfigGroup freightCarriersConfigGroup,
@@ -498,8 +498,7 @@ public final class CarrierReaderFromCSV {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			if (CarriersUtils.getJspritIterations(carrier) == Integer.MIN_VALUE) {
 				CarriersUtils.setJspritIterations(carrier, defaultJspritIterations);
-				log.warn("The jspritIterations are now set to the default value of " + defaultJspritIterations
-						+ " in this simulation!");
+				log.warn("The jspritIterations are now set to the default value of {} in this simulation!", defaultJspritIterations);
 			}
 		}
 	}

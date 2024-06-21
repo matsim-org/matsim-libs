@@ -316,14 +316,14 @@ public final class DemandReaderFromCSV {
 	 * Reads the csv with the demand information and adds this demand to the related
 	 * carriers.
 	 *
-	 * @param scenario
-	 * @param csvLocationDemand
-	 * @param indexShape
-	 * @param combineSimilarJobs
-	 * @param crsTransformationNetworkAndShape
-	 * @param population
-	 * @param shapeCategory
-	 * @throws IOException
+	 * @param scenario                         Scenario
+	 * @param csvLocationDemand                Path to the csv file with the demand information
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param combineSimilarJobs               boolean if the jobs of the same carrier with same location and time will be combined
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param population                       Population
+	 * @param shapeCategory                    Column name in the shape file for the data connection in the csv files
+	 * @throws IOException						if the csv file cannot be read
 	 */
 	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
 									ShpOptions.Index indexShape, boolean combineSimilarJobs,
@@ -339,9 +339,9 @@ public final class DemandReaderFromCSV {
 	 * Reads the demand information from the csv file and checks if the information
 	 * is consistent
 	 *
-	 * @param csvLocationDemand
-	 * @return
-	 * @throws IOException
+	 * @param csvLocationDemand Path to the csv file with the demand information
+	 * @return Set<DemandInformationElement>
+	 * @throws IOException if the csv file cannot be read
 	 */
 	static Set<DemandInformationElement> readDemandInformation(Path csvLocationDemand) throws IOException {
 
@@ -403,10 +403,10 @@ public final class DemandReaderFromCSV {
 	 * Checks if the read demand information are useful to create the shipment or
 	 * service demands
 	 *
-	 * @param scenario
-	 * @param demandInformation
-	 * @param indexShape
-	 * @param shapeCategory
+	 * @param scenario          Scenario
+	 * @param demandInformation Set<DemandInformationElement>
+	 * @param indexShape        ShpOptions.Index for the shape file
+	 * @param shapeCategory     Column name in the shape file for the data connection in the csv files
 	 */
 	static void checkNewDemand(Scenario scenario, Set<DemandInformationElement> demandInformation,
 							   ShpOptions.Index indexShape, String shapeCategory) {
@@ -537,12 +537,12 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates for every demand information the services/shipments for the carriers
 	 *
-	 * @param scenario
-	 * @param indexShape
-	 * @param demandInformation
-	 * @param population
-	 * @param combineSimilarJobs
-	 * @param crsTransformationNetworkAndShape
+	 * @param scenario                     		Scenario
+	 * @param indexShape                   		ShpOptions.Index for the shape file
+	 * @param demandInformation            		Set<DemandInformationElement> with the demand information
+	 * @param population                   		Population
+	 * @param combineSimilarJobs           		boolean if the jobs of the same carrier with same location and time will be combined
+	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
 	 */
 	static void createDemandForCarriers(Scenario scenario, ShpOptions.Index indexShape,
 			Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
@@ -562,12 +562,12 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates the services.
 	 *
-	 * @param scenario
-	 * @param newDemandInformationElement
-	 * @param indexShape
-	 * @param population
-	 * @param combineSimilarJobs
-	 * @param crsTransformationNetworkAndShape
+	 * @param scenario                  		Scenario
+	 * @param newDemandInformationElement 		single DemandInformationElement
+	 * @param indexShape              			ShpOptions.Index
+	 * @param population              			Population
+	 * @param combineSimilarJobs      			boolean if the jobs of the same carrier with same location and time will be combined
+	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
 	 */
 	private static void createServices(Scenario scenario, DemandInformationElement newDemandInformationElement,
 									   ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
@@ -753,12 +753,12 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates the shipments of a carrier.
 	 *
-	 * @param scenario
-	 * @param newDemandInformationElement
-	 * @param indexShape
-	 * @param population
-	 * @param combineSimilarJobs
-	 * @param crsTransformationNetworkAndShape
+	 * @param scenario 							Scenario
+	 * @param newDemandInformationElement 		single DemandInformationElement
+	 * @param indexShape 						ShpOptions.Index for the shape file
+	 * @param population 						Population
+	 * @param combineSimilarJobs 				boolean if the jobs of the same carrier with same location and time will be combined
+	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
 	 */
 	private static void createShipments(Scenario scenario, DemandInformationElement newDemandInformationElement,
 										ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
@@ -1029,7 +1029,6 @@ public final class DemandReaderFromCSV {
 				}
 			}
 		} else
-
 		// if a certain number of shipments is selected
 		{
 			for (int i = 0; i < numberOfJobs; i++) {
@@ -1094,11 +1093,11 @@ public final class DemandReaderFromCSV {
 	 * Creates a job Id for a new job.
 	 * If a certain Id is already used, a number will be added at the end until no existing job was the same Id.
 	 *
-	 * @param scenario
-	 * @param newDemandInformationElement
-	 * @param linkPickup
-	 * @param linkDelivery
-	 * @return
+	 * @param scenario 						Scenario
+	 * @param newDemandInformationElement 	single DemandInformationElement
+	 * @param linkPickup 					Link for the pickup
+	 * @param linkDelivery 					Link for the delivery
+	 * @return 								New Job Id
 	 */
 	private static String createJobId(Scenario scenario, DemandInformationElement newDemandInformationElement,
 			Id<Link> linkPickup, Id<Link> linkDelivery) {
@@ -1133,8 +1132,8 @@ public final class DemandReaderFromCSV {
 	 * If jobs of a carrier have the same characteristics (time window, location),
 	 * they will be combined to one job.
 	 *
-	 * @param scenario
-	 * @param newDemandInformationElement
+	 * @param scenario 						Scenario
+	 * @param newDemandInformationElement 	single DemandInformationElement
 	 */
 	private static void reduceNumberOfJobsIfSameCharacteristics(Scenario scenario,
 			DemandInformationElement newDemandInformationElement) {
@@ -1242,15 +1241,15 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Finds and returns all possible links for this job.
 	 *
-	 * @param scenario
-	 * @param indexShape
-	 * @param crsTransformationNetworkAndShape
-	 * @param numberOfLocations
-	 * @param areasForLocations
-	 * @param setLocations
-	 * @param possiblePersons
-	 * @param nearestLinkPerPerson
-	 * @return
+	 * @param scenario 							Scenario
+	 * @param indexShape 						ShpOptions.Index for the shape file
+	 * @param crsTransformationNetworkAndShape	CoordinateTransformation for the network and shape file
+	 * @param numberOfLocations					Number of locations for this demand
+	 * @param areasForLocations 				Areas for the locations
+	 * @param setLocations 						Selected locations
+	 * @param possiblePersons					Persons that are possible for this demand
+	 * @param nearestLinkPerPerson 				Nearest link for each person
+	 * @return 									HashMap with all possible links
 	 */
 	private static HashMap<Id<Link>, Link> findAllPossibleLinks(Scenario scenario,
 																ShpOptions.Index indexShape, CoordinateTransformation crsTransformationNetworkAndShape,
@@ -1284,18 +1283,18 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Finds the next link which can be used as a location.
 	 *
-	 * @param scenario
-	 * @param indexShape
-	 * @param possibleLinks
-	 * @param selectedNumberOfLocations
-	 * @param areasForLocations
-	 * @param selectedLocations
-	 * @param usedLocations
-	 * @param possiblePersons
-	 * @param nearestLinkPerPerson
-	 * @param crsTransformationNetworkAndShape
-	 * @param i
-	 * @return
+	 * @param scenario  						Scenario
+	 * @param indexShape 						ShpOptions.Index for the shape file
+	 * @param possibleLinks 					All possible links
+	 * @param selectedNumberOfLocations 		Number of locations for this demand
+	 * @param areasForLocations 				Areas for the locations
+	 * @param selectedLocations 				Selected locations
+	 * @param usedLocations 					Already used locations for this demand
+	 * @param possiblePersons 					Persons that are possible for this demand
+	 * @param nearestLinkPerPerson 				Nearest link for each person
+	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param i 								Counter for the number of locations
+	 * @return 									Next link for the demand
 	 */
 	private static Link findNextUsedLink(Scenario scenario, ShpOptions.Index indexShape,
 			HashMap<Id<Link>, Link> possibleLinks, Integer selectedNumberOfLocations, String[] areasForLocations,
@@ -1350,9 +1349,9 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Finds the nearest link for one person.
 	 *
-	 * @param scenario
-	 * @param nearestLinkPerPerson
-	 * @param person
+	 * @param scenario 				Scenario
+	 * @param nearestLinkPerPerson 	HashMap with the nearest link for each person
+	 * @param person 				Person for which the nearest link should be found
 	 */
 	static void findLinksForPerson(Scenario scenario,
 								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
@@ -1376,8 +1375,8 @@ public final class DemandReaderFromCSV {
 	 * The default is to get the home coordinate from one home activity of the selected plan.
 	 * If the selected plan does not contain a home activity, the home coordinate is read from the attributes of the person.
 	 *
-	 * @param person The person for which the home coordinate should be returned.
-	 * @return
+	 * @param person 	The person for which the home coordinate should be returned.
+	 * @return 			The home coordinate of the person.
 	 */
 	private static Coord getHomeCoord(Person person) {
 		Coord homeCoord = null;
@@ -1398,16 +1397,16 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Searches a possible link for the demand.
 	 *
-	 * @param possibleLinks
-	 * @param possiblePersons
-	 * @param nearestLinkPerPerson
-	 * @param indexShape
-	 * @param areasForTheDemand
-	 * @param selectedNumberOfLocations
-	 * @param scenario
-	 * @param selectedLocations
-	 * @param crsTransformationNetworkAndShape
-	 * @return
+	 * @param possibleLinks 					HashMap with all possible links
+	 * @param possiblePersons 					HashMap with all possible persons
+	 * @param nearestLinkPerPerson				Nearest link for each person
+	 * @param indexShape 						ShpOptions.Index for the shape file
+	 * @param areasForTheDemand 				Areas for the demand
+	 * @param selectedNumberOfLocations 		Number of locations for this demand
+	 * @param scenario 							Scenario
+	 * @param selectedLocations 				Selected locations
+	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @return 									The selected link for the demand
 	 */
 	private static Link findPossibleLinkForDemand(HashMap<Id<Link>, Link> possibleLinks,
 												  HashMap<Id<Person>, Person> possiblePersons,
