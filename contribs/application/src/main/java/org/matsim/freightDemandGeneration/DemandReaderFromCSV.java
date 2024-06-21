@@ -1322,14 +1322,14 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Finds all persons that are possible for the demand.
 	 *
-	 * @param population
-	 * @param areasForServiceLocations
-	 * @param indexShape
-	 * @param crsTransformationNetworkAndShape
-	 * @return
+	 * @param population 						Population
+	 * @param areasForJobElementLocations 		Areas for the locations
+	 * @param indexShape 						ShpOptions.Index for the shape file
+	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @return 									HashMap with all possible persons
 	 */
 	private static HashMap<Id<Person>, Person> findPossiblePersons(Population population,
-			String[] areasForServiceLocations, ShpOptions.Index indexShape,
+			String[] areasForJobElementLocations, ShpOptions.Index indexShape,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
 		HashMap<Id<Person>, Person> possiblePersons = new HashMap<Id<Person>, Person>();
@@ -1340,7 +1340,7 @@ public final class DemandReaderFromCSV {
 				coord = crsTransformationNetworkAndShape.transform(coord);
 
 			if (FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape,
-					areasForServiceLocations, crsTransformationNetworkAndShape))
+					areasForJobElementLocations, crsTransformationNetworkAndShape))
 				possiblePersons.put(person.getId(), person);
 		}
 		return possiblePersons;
