@@ -902,8 +902,8 @@ public final class DemandReaderFromCSV {
 				HashMap<Id<Link>, Link> demandBasesLinks;
 				double sumOfDemandBasedLinks;
 				boolean pickupIsDemandBase = true;
-				Link linkPickup;
-				Link linkDelivery;
+				Link linkPickup = null;
+				Link linkDelivery= null;
 				double sumOfPossibleLinkLengthPickup = possibleLinksPickup.values().stream().mapToDouble(Link::getLength).sum();
 				double sumOfPossibleLinkLengthDelivery = possibleLinksDelivery.values().stream().mapToDouble(Link::getLength).sum();
 				if (numberOfPickupLocations == null && numberOfDeliveryLocations == null)
@@ -928,11 +928,7 @@ public final class DemandReaderFromCSV {
 						demandBasedLink);
 					if (pickupIsDemandBase) {
 						linkPickup = demandBasedLink;
-						linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
-								numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-								usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
-								crsTransformationNetworkAndShape, countOfLinks - 1);
-						while (usedDeliveryLocations.contains(linkDelivery.getId().toString())) {
+						while (linkDelivery == null || usedDeliveryLocations.contains(linkDelivery.getId().toString())) {
 							linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
 									numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
 									usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
@@ -944,11 +940,7 @@ public final class DemandReaderFromCSV {
 						}
 					} else {
 						linkDelivery = demandBasedLink;
-						linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
-								numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup,
-								usedPickupLocations, possiblePersonsPickup, nearestLinkPerPersonPickup,
-								crsTransformationNetworkAndShape, countOfLinks - 1);
-						while (usedPickupLocations.contains(linkPickup.getId().toString())) {
+						while (linkPickup == null || usedPickupLocations.contains(linkPickup.getId().toString())) {
 							linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
 									numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup,
 									usedPickupLocations, possiblePersonsPickup, nearestLinkPerPersonPickup,
