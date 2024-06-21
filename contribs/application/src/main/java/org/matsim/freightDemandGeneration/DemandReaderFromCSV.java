@@ -53,6 +53,7 @@ import java.util.*;
 public final class DemandReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
 	private static final Random rand = new Random(4711);
+	private static double roundingError;
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -575,7 +576,7 @@ public final class DemandReaderFromCSV {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
-		double roundingError = 0;
+		roundingError = 0;
 		Double shareOfPopulationWithThisService = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
 		Integer numberOfJobs;
 		Integer demandToDistribute = newDemandInformationElement.getDemandToDistribute();
@@ -714,17 +715,8 @@ public final class DemandReaderFromCSV {
 					link = scenario.getNetwork().getLinks().get(Id.createLinkId(usedServiceLocations.stream()
 							.skip(rand.nextInt(usedServiceLocations.size() - 1)).findFirst().get()));
 				}
-				int demandForThisLink = (int) Math.ceil((double) demandToDistribute / (double) numberOfJobs);
-				if (numberOfJobs == (i + 1)) {
-					demandForThisLink = demandToDistribute - distributedDemand;
-				} else {
-					roundingError = roundingError
-							+ ((double) demandForThisLink - ((double) demandToDistribute / (double) numberOfJobs));
-					if (roundingError > 1) {
-						demandForThisLink = demandForThisLink - 1;
-						roundingError = roundingError - 1;
-					}
-				}
+				int demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
+
 				double serviceTime;
 				if (demandToDistribute == 0)
 					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
@@ -766,7 +758,7 @@ public final class DemandReaderFromCSV {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
-		double roundingError = 0;
+		roundingError = 0;
 		Double shareOfPopulationWithThisPickup = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
 		Double shareOfPopulationWithThisDelivery = newDemandInformationElement
 				.getShareOfPopulationWithSecondJobElement();
@@ -1045,17 +1037,8 @@ public final class DemandReaderFromCSV {
 						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
 						usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 						crsTransformationNetworkAndShape, i);
-				int demandForThisLink = (int) Math.ceil((double) demandToDistribute / (double) numberOfJobs);
-				if (numberOfJobs == (i + 1))
-					demandForThisLink = demandToDistribute - distributedDemand;
-				else {
-					roundingError = roundingError
-							+ ((double) demandForThisLink - ((double) demandToDistribute / (double) numberOfJobs));
-					if (roundingError > 1) {
-						demandForThisLink = demandForThisLink - 1;
-						roundingError = roundingError - 1;
-					}
-				}
+				int demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
+
 				if (!usedPickupLocations.contains(linkPickup.getId().toString()))
 					usedPickupLocations.add(linkPickup.getId().toString());
 				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
@@ -1126,6 +1109,29 @@ public final class DemandReaderFromCSV {
 			}
 		}
 		return newJobId;
+	}
+
+	/** Calculates the demand for this link including checking the rounding error.
+	 * @param demandToDistribute  	Demand to distribute
+	 * @param numberOfJobs 	   		Number of jobs
+	 * @param distributedDemand 	Already Distributed demand
+	 * @param i 					Counter
+	 * @return 						Demand for this link
+	 */
+	private static int calculateDemandForThisLink(int demandToDistribute, int numberOfJobs, int distributedDemand, int i) {
+
+		int demandForThisLink = (int) Math.ceil((double) demandToDistribute / (double) numberOfJobs);
+		if (numberOfJobs == (i + 1)) {
+			demandForThisLink = demandToDistribute - distributedDemand;
+		} else {
+			roundingError = roundingError
+				+ ((double) demandForThisLink - ((double) demandToDistribute / (double) numberOfJobs));
+			if (roundingError > 1) {
+				demandForThisLink = demandForThisLink - 1;
+				roundingError = roundingError - 1;
+			}
+		}
+		return demandForThisLink;
 	}
 
 	/**
