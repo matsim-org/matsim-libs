@@ -54,6 +54,8 @@
           refId            CDATA   #REQUIRED
           departureOffset  CDATA   #IMPLIED
           arrivalOffset    CDATA   #IMPLIED
+          allowBoarding    (true|false)  "true"
+          allowAlighting   (true|false)  "true"
           awaitDeparture   (true|false)  "false">
 <!--
  * stop.departureOffset is required for all stops but the last.
