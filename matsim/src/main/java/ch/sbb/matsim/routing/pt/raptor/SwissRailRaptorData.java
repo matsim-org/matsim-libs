@@ -81,7 +81,7 @@ public class SwissRailRaptorData {
     final QuadTree<TransitStopFacility> stopsQT;
     final Map<String, Map<String, QuadTree<TransitStopFacility>>> stopFilterAttribute2Value2StopsQT;
     final OccupancyData occupancyData;
-    
+
     // data needed if cached transfer construction is activated
     final IdMap<TransitStopFacility, Map<TransitStopFacility, Double>> staticTransferTimes;
     final RTransfer[][] transferCache;
@@ -105,7 +105,7 @@ public class SwissRailRaptorData {
         this.stopsQT = stopsQT;
         this.stopFilterAttribute2Value2StopsQT = new HashMap<>();
         this.occupancyData = occupancyData;
-        
+
         // data needed if cached transfer construction is activated
         this.staticTransferTimes = staticTransferTimes;
         this.transferCache = new RTransfer[routeStops.length][];
@@ -216,7 +216,7 @@ public class SwissRailRaptorData {
 
         // if cached transfer calculation is active, don't generate any transfers here
 		final Map<Integer, RTransfer[]> allTransfers;
-		
+
 		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Initial)) {
 			allTransfers = calculateRouteStopTransfers(schedule, stopsQT, routeStopsPerStopFacility, routeStops,
 					staticConfig);
@@ -244,7 +244,7 @@ public class SwissRailRaptorData {
                 indexTransfer += transferCount;
             }
         }
-        
+
         // if cached transfer calculation is used, build a map for quick lookup of minimal transfer times
 		IdMap<TransitStopFacility, Map<TransitStopFacility, Double>> staticTransferTimes = null;
 		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Cached)) {
@@ -258,7 +258,7 @@ public class SwissRailRaptorData {
 						.put(schedule.getFacilities().get(iterator.getToStopId()), iterator.getSeconds());
 			}
 		}
-        
+
         SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, departureVehicles, departureIds, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, occupancyData, staticTransferTimes);
 
         long endMillis = System.currentTimeMillis();
@@ -327,7 +327,9 @@ public class SwissRailRaptorData {
                     stopTransfers.clear();
                     for (int toRouteStopIndex : toRouteStopIndices) {
                         RRouteStop toRouteStop = routeStops[toRouteStopIndex];
-                        if (isUsefulTransfer(fromRouteStop, toRouteStop, maxBeelineWalkConnectionDistance, config.getOptimization())) {
+                        if (isUsefulTransfer(fromRouteStop, toRouteStop, maxBeelineWalkConnectionDistance, config.getOptimization())
+                            && isTransferAllowed(fromRouteStop, toRouteStop)
+                        ) {
                             RTransfer newTransfer = new RTransfer(fromRouteStopIndex, toRouteStopIndex, fixedTransferTime, beelineDistance * beelineDistanceFactor);
                             stopTransfers.add(newTransfer);
                         }
@@ -386,6 +388,10 @@ public class SwissRailRaptorData {
         }
         // if we failed all other checks, it looks like this transfer is useful
         return true;
+    }
+
+    private static boolean isTransferAllowed(RRouteStop fromRouteStop, RRouteStop toRouteStop) {
+        return fromRouteStop.routeStop.isAllowAlighting() && toRouteStop.routeStop.isAllowBoarding();
     }
 
     private static boolean isFirstStopInRoute(RRouteStop routeStop) {
@@ -641,12 +647,12 @@ public class SwissRailRaptorData {
           return this.transfer;
       }
   }
-	
+
 	RTransfer[] calculateTransfers(RRouteStop fromRouteStop) {
 		if (config.getTransferCalculation().equals(RaptorTransferCalculation.Initial)) {
 			return null;
 		}
-		
+
 		// We tested this in a parallel set-up and things seem to work as they are
 		// implemented. The routing threads will access the cache as read-only an
 		// retrieve the cached stop connections. It can happen that two of them try to
@@ -661,41 +667,41 @@ public class SwissRailRaptorData {
 
     	RTransfer[] cache = transferCache[fromRouteStop.index];
     	if (cache != null) return cache; // we had a cache hit
-    	
+
     	// setting up useful constants
     	final double minimalTransferTime = config.getMinimalTransferTime();
     	final double beelineWalkConnectionDistance = config.getBeelineWalkConnectionDistance();
     	final double beelineDistanceFactor = config.getBeelineWalkDistanceFactor();
     	final double beelineWalkSpeed = config.getBeelineWalkSpeed();
         final RaptorOptimization optimization = config.getOptimization();
-        
+
     	// the facility from which we want to transfer
         TransitStopFacility fromRouteFacility = fromRouteStop.routeStop.getStopFacility();
         Collection<TransitStopFacility> transferCandidates = new LinkedList<>();
-        
+
         // find transfer candidates by distance
         transferCandidates.addAll(stopsQT.getDisk(fromRouteFacility.getCoord().getX(), fromRouteFacility.getCoord().getY(), config.getBeelineWalkConnectionDistance()));
-        
+
         // find transfer candidates with predefined transfer time
         Map<TransitStopFacility, Double> transferTimes = staticTransferTimes.get(fromRouteFacility.getId());
-       
+
         if (transferTimes != null) { // some transfer times are predefined
         	transferCandidates.addAll(transferTimes.keySet());
         }
-        
+
         // now evaluate whether transfers are useful, distance, and travel time
         List<RTransfer> transfers = new LinkedList<>();
         for (TransitStopFacility toRouteFacility : transferCandidates) {
         	for (int toRouteStopIndex : routeStopsPerStopFacility.get(toRouteFacility)) {
         		RRouteStop toRouteStop = routeStops[toRouteStopIndex];
-        		
+
                 double beelineDistance = CoordUtils.calcEuclideanDistance(fromRouteFacility.getCoord(), toRouteFacility.getCoord());
                 double transferTime = beelineDistance / beelineWalkSpeed;
-                
+
                 if (transferTime < minimalTransferTime) {
                     transferTime = minimalTransferTime;
                 }
-                
+
                 if (transferTimes != null) {
                 	// check if we find a predefined transfer time
                 	transferTime = transferTimes.getOrDefault(toRouteFacility, transferTime);
@@ -706,10 +712,10 @@ public class SwissRailRaptorData {
         		}
         	}
         }
-        
+
         // convert to array
         RTransfer[] stopTransfers = transfers.toArray(new RTransfer[transfers.size()]);
-        
+
         // save to cache (no issue regarding parallel execution because we simply set an element)
         transferCache[fromRouteStop.index] = stopTransfers;
         return stopTransfers;
