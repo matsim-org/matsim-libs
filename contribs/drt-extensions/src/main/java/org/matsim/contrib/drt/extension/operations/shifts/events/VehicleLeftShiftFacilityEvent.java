@@ -12,16 +12,20 @@ import java.util.Map;
  */
 public class VehicleLeftShiftFacilityEvent extends Event {
 
+    private final String mode;
     private final Id<DvrpVehicle> vehicleId;
     private final Id<OperationFacility> facilityId;
+
+    public static final String ATTRIBUTE_MODE = "mode";
 
     public static final String ATTRIBUTE_FACILITY = "facility";
     public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
     public static final String EVENT_TYPE = "Vehicle left shift facility";
 
-    public VehicleLeftShiftFacilityEvent(double time, Id<DvrpVehicle> vehicleId, Id<OperationFacility> facilityId) {
+    public VehicleLeftShiftFacilityEvent(double time, String mode, Id<DvrpVehicle> vehicleId, Id<OperationFacility> facilityId) {
         super(time);
+        this.mode = mode;
         this.facilityId = facilityId;
         this.vehicleId = vehicleId;
     }
@@ -34,6 +38,7 @@ public class VehicleLeftShiftFacilityEvent extends Event {
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> attr = super.getAttributes();
+        attr.put(ATTRIBUTE_MODE, mode);
         attr.put(ATTRIBUTE_VEHICLE_ID, vehicleId + "");
         attr.put(ATTRIBUTE_FACILITY, facilityId + "");
         return attr;
