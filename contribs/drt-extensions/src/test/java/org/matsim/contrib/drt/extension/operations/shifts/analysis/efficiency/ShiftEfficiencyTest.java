@@ -41,7 +41,7 @@ public class ShiftEfficiencyTest {
 	void testDrtShiftEfficiency() {
 
 		EventsManager events = new EventsManagerImpl();
-		ShiftEfficiencyTracker shiftEfficiencyTracker = new ShiftEfficiencyTracker();
+		ShiftEfficiencyTracker shiftEfficiencyTracker = new ShiftEfficiencyTracker("drt");
 		events.addHandler(shiftEfficiencyTracker);
 		events.initProcessing();
 

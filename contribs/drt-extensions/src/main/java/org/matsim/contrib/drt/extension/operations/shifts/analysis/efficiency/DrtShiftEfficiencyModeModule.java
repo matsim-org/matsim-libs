@@ -31,7 +31,7 @@ public class DrtShiftEfficiencyModeModule extends AbstractDvrpModeModule {
     @Override
     public void install() {
         bindModal(ShiftEfficiencyTracker.class).toProvider(modalProvider(getter ->
-                new ShiftEfficiencyTracker())).asEagerSingleton();
+                new ShiftEfficiencyTracker(getMode()))).asEagerSingleton();
         addEventHandlerBinding().to(modalKey(ShiftEfficiencyTracker.class));
 		bindModal(ShiftEfficiencyAnalysisControlerListener.class).toProvider(modalProvider(getter ->
 						new ShiftEfficiencyAnalysisControlerListener(drtConfigGroup,
