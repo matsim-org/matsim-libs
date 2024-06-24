@@ -1,5 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.utils.io.IOUtils;
@@ -7,8 +9,6 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 
@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 public class TripDashboard implements Dashboard {
 
-	private static final Logger log = LoggerFactory.getLogger(TripDashboard.class);
+	private static final Logger log = LogManager.getLogger(TripDashboard.class);
 
 	@Nullable
 	private final String modeShareRefCsv;
