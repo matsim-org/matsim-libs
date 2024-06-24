@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * Categorize values into groups.
+ * Helper class to categorize values into groups.
  */
 public final class Category {
 

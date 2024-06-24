@@ -331,7 +331,7 @@ public class TripDashboard implements Dashboard {
 
 		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
 			viz.title = "Choice Evaluation per Mode";
-			viz.description = "Metrics for mode choice per mode.";
+			viz.description = "Metrics for choices per mode.";
 			viz.showAllRows = true;
 			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation_per_mode.csv", args);
 		});
