@@ -38,6 +38,16 @@ public interface TransitRouteStop {
 
 	public abstract OptionalTime getArrivalOffset();
 
+	/** @return <code>true</code> if agents are allowed to board the transit vehicle at this route stop. */
+	boolean isAllowBoarding();
+
+	void setAllowBoarding(boolean allowBoarding);
+
+	/** @return <code>true</code> if agents are allowed to exit the transit vehicle at this route stop. */
+	boolean isAllowAlighting();
+
+	void setAllowAlighting(boolean allowAlighting);
+
 	/**
 	 * Specifies if a driver should wait until the specified departure time
 	 * has come before departing, especially if the driver is too early at
@@ -68,6 +78,10 @@ public interface TransitRouteStop {
 		Builder<B> arrivalOffset(double val);
 
 		Builder<B> awaitDepartureTime(boolean val);
+
+		Builder<B> allowBoarding(boolean val);
+
+		Builder<B> allowAlighting(boolean val);
 
 		TransitRouteStop build();
 	}
