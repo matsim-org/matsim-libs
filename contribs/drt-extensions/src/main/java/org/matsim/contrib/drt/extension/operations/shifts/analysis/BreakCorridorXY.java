@@ -24,12 +24,15 @@ import java.util.Map;
  */
 public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
+    private final String mode;
+
     private final Provider<DrtShiftsSpecification> shifts;
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakStart = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakEnd = new HashMap<>();
 
-    public BreakCorridorXY(Provider<DrtShiftsSpecification> shifts) {
+    public BreakCorridorXY(String mode, Provider<DrtShiftsSpecification> shifts) {
         super();
+        this.mode = mode;
         this.shifts = shifts;
         reset(0);
     }
@@ -38,16 +41,20 @@ public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShi
 
     @Override
     public void handleEvent(DrtShiftBreakStartedEvent event) {
-        final DrtShiftBreakSpecification drtShiftBreak = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
-        final double earliestBreakStartTime = drtShiftBreak.getEarliestBreakStartTime();
-        shift2plannedVsActualBreakStart.put(event.getShiftId(), new Tuple<>(earliestBreakStartTime, event.getTime()));
+        if (event.getMode().equals(mode)) {
+            final DrtShiftBreakSpecification drtShiftBreak = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
+            final double earliestBreakStartTime = drtShiftBreak.getEarliestBreakStartTime();
+            shift2plannedVsActualBreakStart.put(event.getShiftId(), new Tuple<>(earliestBreakStartTime, event.getTime()));
+        }
     }
 
     @Override
     public void handleEvent(DrtShiftBreakEndedEvent event) {
-        final DrtShiftBreakSpecification drtShiftBreak = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
-        final double latestBreakEndTime = drtShiftBreak.getLatestBreakEndTime();
-        shift2plannedVsActualBreakEnd.put(event.getShiftId(), new Tuple<>(latestBreakEndTime, event.getTime()));
+        if (event.getMode().equals(mode)) {
+            final DrtShiftBreakSpecification drtShiftBreak = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
+            final double latestBreakEndTime = drtShiftBreak.getLatestBreakEndTime();
+            shift2plannedVsActualBreakEnd.put(event.getShiftId(), new Tuple<>(latestBreakEndTime, event.getTime()));
+        }
     }
 
     @Override

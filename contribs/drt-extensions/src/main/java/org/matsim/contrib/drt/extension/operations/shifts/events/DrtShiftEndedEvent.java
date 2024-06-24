@@ -12,9 +12,8 @@ import java.util.Map;
 /**
  * @author nkuehnel / MOIA
  */
-public class DrtShiftEndedEvent extends Event {
+public class DrtShiftEndedEvent extends AbstractShiftEvent {
 
-    private final Id<DrtShift> shiftId;
     private final Id<DvrpVehicle> vehicleId;
     private final Id<Link> linkId;
 	private final Id<OperationFacility> operationFacilityId;
@@ -26,18 +25,14 @@ public class DrtShiftEndedEvent extends Event {
 
     public static final String EVENT_TYPE = "DRT shift ended";
 
-    public DrtShiftEndedEvent(double time, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId,
-							  Id<Link> linkId, Id<OperationFacility> operationFacilityId) {
-        super(time);
-        this.shiftId = shiftId;
+    public DrtShiftEndedEvent(double time, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId,
+                              Id<Link> linkId, Id<OperationFacility> operationFacilityId) {
+        super(time, mode, shiftId);
         this.vehicleId = vehicleId;
         this.linkId = linkId;
 		this.operationFacilityId = operationFacilityId;
 	}
 
-    public Id<DrtShift> getShiftId() {
-        return shiftId;
-    }
 
     public Id<DvrpVehicle> getVehicleId() {
         return vehicleId;
@@ -59,7 +54,6 @@ public class DrtShiftEndedEvent extends Event {
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> attr = super.getAttributes();
-        attr.put(ATTRIBUTE_SHIFT_ID, shiftId + "");
         attr.put(ATTRIBUTE_VEHICLE_ID, vehicleId + "");
         attr.put(ATTRIBUTE_LINK, linkId + "");
         attr.put(ATTRIBUTE_OPERATION_FACILITY, operationFacilityId + "");
