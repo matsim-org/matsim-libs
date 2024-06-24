@@ -30,4 +30,4 @@ jobs:
         run: mvn -pl org.matsim.contrib:sbb-extensions,org.matsim.contrib:drt,org.matsim.contrib:drt-extensions,org.matsim.contrib:discrete_mode_choice,org.matsim.contrib:simulatedannealing deploy -am  --settings settings.xml -DskipTests=true -DaltSnapshotDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs
       - name: Trigger external development build
         run: |
-              curl -XPOST -u "${{ secrets.PAT_USERNAME}}:${{secrets.PAT_TOKEN}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/moia-dev/matsim-external-development/dispatches --data '{"event_type": "build_application"}'
+              curl -XPOST -u "${{ secrets.PAT_USERNAME}}:${{secrets.PAT_TOKEN}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/moia-dev/transport-modeling/dispatches --data '{"event_type": "build_application"}'
