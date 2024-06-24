@@ -168,6 +168,10 @@ public class SwissRailRaptorCore {
                     // if it's intermodal, we still start here, as we might transfer to another close-by but non-intermodal stop.
                     continue;
                 }
+                if (!routeStop.routeStop.isAllowBoarding()) {
+                    continue;
+                }
+
                 RRoute route = this.data.routes[routeStop.transitRouteIndex];
                 int depOffset = routeStop.departureOffset;
 
@@ -316,6 +320,9 @@ public class SwissRailRaptorCore {
                     RRouteStop routeStop = this.data.routeStops[routeStopIndex];
                     if (routeStop.routeStop == routeStop.route.getStops().get(routeStop.route.getStops().size() - 1)) {
                         // this is the last stop of a route
+                        continue;
+                    }
+                    if (!routeStop.routeStop.isAllowBoarding()) {
                         continue;
                     }
                     RRoute route = this.data.routes[routeStop.transitRouteIndex];
@@ -502,13 +509,15 @@ public class SwissRailRaptorCore {
             int[] routeStopIndices = this.data.routeStopsPerStopFacility.get(stop.stop);
             for (int routeStopIndex : routeStopIndices) {
 							boolean useStop = true;
-							if (parameters.isExactDeparturesOnly()) {
-								RRouteStop routeStop = this.data.routeStops[routeStopIndex];
+							RRouteStop routeStop = this.data.routeStops[routeStopIndex];
+							if (!routeStop.routeStop.isAllowBoarding()) {
+								useStop = false;
+							}
+							if (useStop && parameters.isExactDeparturesOnly()) {
 								int routeIndex = routeStop.transitRouteIndex;
 								RRoute route = this.data.routes[routeIndex];
 								int currentDepartureIndex = findNextDepartureIndex(route, routeStop, (int) depTime);
 								if (currentDepartureIndex >= 0) {
-									Vehicle currentVehicle = this.data.departureVehicles[currentDepartureIndex];
 									int firstDepartureTime = this.data.departures[currentDepartureIndex];
 									int stopDepartureTime = firstDepartureTime + routeStop.departureOffset;
 									useStop = Math.abs(depTime - stopDepartureTime) < 1e-5;
@@ -692,8 +701,11 @@ public class SwissRailRaptorCore {
                 transferProvider.reset(boardingPE.transfer);
 
                 for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
-                    routeSegmentIterator.reset(currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
                     RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
+                    if (!toRouteStop.routeStop.isAllowAlighting()) {
+                        continue;
+                    }
+                    this.routeSegmentIterator.reset(currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
                     int arrivalTime = currentDepartureTime + toRouteStop.arrivalOffset;
                     int inVehicleTime = arrivalTime - currentAgentBoardingTime;
                     double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
@@ -814,17 +826,17 @@ public class SwissRailRaptorCore {
                 continue;
             }
             RRouteStop fromRouteStop = fromPE.toRouteStop; // this is the route stop we arrive with least cost at stop
-            
+
             // obtain on-demand transfers if applicable (will return null if transfers are calculated initially)
             RTransfer[] transfers = this.data.calculateTransfers(fromRouteStop);
-            
+
             int firstTransferIndex = transfers == null ? fromRouteStop.indexFirstTransfer : 0;
             int lastTransferIndex = transfers == null ? firstTransferIndex + fromRouteStop.countTransfers : transfers.length;
             transfers = transfers == null ? this.data.transfers : transfers;
-            
+
             for (int transferIndex = firstTransferIndex; transferIndex < lastTransferIndex; transferIndex++) {
                 RTransfer transfer = transfers[transferIndex];
-            	
+
                 int toRouteStopIndex = transfer.toRouteStop;
                 transferProvider.reset(transfer);
                 int newArrivalTime = arrivalTime + transfer.transferTime;
