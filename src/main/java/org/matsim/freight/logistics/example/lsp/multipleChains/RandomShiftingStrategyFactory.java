@@ -20,7 +20,6 @@ class RandomShiftingStrategyFactory {
   //Before making it public, it should be configurable either via config or Injection.
   //KMT, KN (Jan'24)
 
-  private
   RandomShiftingStrategyFactory() {} // class contains only static methods; do not instantiate.
 
   static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
