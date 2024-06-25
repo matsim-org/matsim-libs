@@ -801,13 +801,13 @@ public final class DemandReaderFromCSV {
 			double sampleTo = (double) population.getAttributes().getAttribute("samplingTo");
 			String samplingOption = String.valueOf(population.getAttributes().getAttribute("samplingOption"));
 
-			if (areasForPickupLocations != null)
+			//ERROR2: index shape, da sonst Endlosschleife, wenn keine area angegeben
+			if (areasForPickupLocations != null || indexShape != null)
 				possiblePersonsPickup = findPossiblePersons(population, areasForPickupLocations, indexShape,
 						crsTransformationNetworkAndShape);
 			else
 				possiblePersonsPickup.putAll(population.getPersons());
-			//ERROR2: index shape, da sonst Endlosschleife, wenn keine area angegeben
-			if (areasForDeliveryLocations != null  || indexShape != null) {
+			if (areasForDeliveryLocations != null || indexShape != null) {
 				//modify population in the area - age
 				if (age == "DemandPerAge") {
 					population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
