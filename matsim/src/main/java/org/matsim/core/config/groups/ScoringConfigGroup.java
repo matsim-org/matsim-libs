@@ -78,6 +78,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch";
 
+	private static final String WRITE_SCORE_EXPLANATIONS = "writeScoreExplanations";
+
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 
 	private boolean usesDeprecatedSyntax = false ;
@@ -418,6 +420,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		map.put(WRITE_EXPERIENCED_PLANS,
 				"write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
 
+		map.put(WRITE_SCORE_EXPLANATIONS,
+				 "Write detailed score composition into plan attributes after execution.");
+
 		return map;
 	}
 
@@ -686,6 +691,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public void setBrainExpBeta(double brainExpBeta) {
 		delegate.setBrainExpBeta(brainExpBeta);
+	}
+
+	public void setExplainScores(boolean value) {
+		delegate.setWriteScoreExplanations(value);
+	}
+
+	public boolean isWriteScoreExplanations() {
+		return delegate.isWriteScoreExplanations();
 	}
 
 	public double getPathSizeLogitBeta() {
@@ -1585,6 +1598,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		private boolean usingOldScoringBelowZeroUtilityDuration = false;
 
+		private boolean explainScores = false;
+
 		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
 		public Double getFractionOfIterationsToStartScoreMSA() {
 			return fractionOfIterationsToStartScoreMSA;
@@ -1659,5 +1674,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
+		@StringSetter(WRITE_SCORE_EXPLANATIONS)
+		public void setWriteScoreExplanations(boolean explainScores) {
+			this.explainScores = explainScores;
+		}
+
+		@StringGetter(WRITE_SCORE_EXPLANATIONS)
+		public boolean isWriteScoreExplanations() {
+			return explainScores;
+		}
 	}
 }
