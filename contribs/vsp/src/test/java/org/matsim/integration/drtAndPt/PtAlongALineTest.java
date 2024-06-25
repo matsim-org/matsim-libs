@@ -112,7 +112,8 @@ public class PtAlongALineTest {
 			drtConfig.mode = "drt_A";
 			drtConfig.stopDuration = 60.;
 			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-					drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+                    (DefaultDrtOptimizationConstraintsSet) drtConfig.addOrGetDrtOptimizationConstraintsParams()
+							.addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxWaitTime = 900.;
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
@@ -251,7 +252,9 @@ public class PtAlongALineTest {
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.stopDuration = 60.;
-			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+					(DefaultDrtOptimizationConstraintsSet) drtConfig.addOrGetDrtOptimizationConstraintsParams()
+							.addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 			defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;

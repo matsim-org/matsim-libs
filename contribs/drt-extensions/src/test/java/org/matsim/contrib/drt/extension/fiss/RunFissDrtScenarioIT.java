@@ -55,7 +55,9 @@ public class RunFissDrtScenarioIT {
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
 		drtConfigGroup.stopDuration = 30.;
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
 		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
 		defaultConstraintsSet.maxWaitTime = 600.;
