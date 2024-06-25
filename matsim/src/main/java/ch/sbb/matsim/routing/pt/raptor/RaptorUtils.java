@@ -63,6 +63,7 @@ public final class RaptorUtils {
 		staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
 		staticConfig.setIntermodalLegOnlyHandling(srrConfig.getIntermodalLegOnlyHandling());
 		staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
+		staticConfig.setTransferCalculation(srrConfig.getTransferCalculation());
 
         staticConfig.setUseModeMappingForPassengers(srrConfig.isUseModeMappingForPassengers());
         if (srrConfig.isUseModeMappingForPassengers()) {

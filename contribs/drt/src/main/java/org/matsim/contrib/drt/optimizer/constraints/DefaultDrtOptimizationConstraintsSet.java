@@ -1,23 +1,11 @@
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.optimizer.constraints;
 
 import com.google.common.base.Verify;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
-/**
- * @author nkuehnel / MOIA
- */
-public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
-
-    public final static String SET_NAME = "drtOptimizationConstraints";
-
-
-    @Parameter
-    @Comment("Max wait time for the bus to come (optimisation constraint).")
-    @PositiveOrZero
-    public double maxWaitTime = Double.NaN;// seconds
+public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstraintsSet {
 
     @Parameter
     @Comment("Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
@@ -64,26 +52,6 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
                     + "By default, this limit is disabled. If enabled, a value between 0 and 240 is a good choice.")
     @PositiveOrZero
     public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
-
-    @Parameter
-    @Comment("If true, the max travel and wait times of a submitted request"
-            + " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
-            + " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
-            + " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
-            + " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-            + " InsertionCostCalculator.PenaltyCalculator")
-    public boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
-
-    @Parameter
-    @Comment(
-            "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt."
-                    + " If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).")
-    @PositiveOrZero // used only for stopbased DRT scheme
-    public double maxWalkDistance = Double.MAX_VALUE;// [m];
-
-    public DrtOptimizationConstraintsParams() {
-        super(SET_NAME);
-    }
 
     @Override
     protected void checkConsistency(Config config) {

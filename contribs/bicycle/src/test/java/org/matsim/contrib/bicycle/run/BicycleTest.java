@@ -48,6 +48,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -204,7 +205,8 @@ public class BicycleTest {
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+
+		assertEquals(PopulationComparison.Result.equal, PopulationComparison.compare(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
 	}
 
 	@Test

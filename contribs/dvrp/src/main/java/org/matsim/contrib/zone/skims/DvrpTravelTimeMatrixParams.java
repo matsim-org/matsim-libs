@@ -79,6 +79,22 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
 	}
 
+	@Override
+	public void handleAddUnknownParam(String paramName, String value) {
+		if ("cellSize".equals(paramName)) {
+			SquareGridZoneSystemParams squareGridParams;
+			if(getZoneSystemParams() == null) {
+				squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+				addParameterSet(squareGridParams);
+			} else {
+				squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
+			}
+			squareGridParams.cellSize = Double.parseDouble(value);
+		} else {
+			super.handleAddUnknownParam(paramName, value);
+		}
+	}
+
 	public ZoneSystemParams getZoneSystemParams() {
 		return zoneSystemParams;
 	}

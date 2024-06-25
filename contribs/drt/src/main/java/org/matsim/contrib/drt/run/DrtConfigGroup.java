@@ -19,11 +19,13 @@
 
 package org.matsim.contrib.drt.run;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,6 +33,9 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -43,14 +48,16 @@ import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
-import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -63,9 +70,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 				"Supported for only 1 DRT mode in the config. Number of DRT modes: %s", drtConfigGroups.size());
 		return drtConfigGroups.iterator().next();
 	}
-
-	@NotNull
-	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
 
 	@Parameter
 	@Comment("Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective)")
@@ -159,6 +163,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
+	@NotNull
+	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
+
 	@Nullable
 	private DrtZoneSystemParams zonalSystemParams;
 
@@ -181,14 +188,20 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
-		super(GROUP_NAME);
-		initSingletonParameterSets();
+		this(DefaultDrtOptimizationConstraintsSet::new);
 	}
 
-	private void initSingletonParameterSets() {
-		//drt optimization constraints
-		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, DrtOptimizationConstraintsParams::new,
-				() -> drtOptimizationConstraintsParams, params -> drtOptimizationConstraintsParams = (DrtOptimizationConstraintsParams) params);
+	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+		super(GROUP_NAME);
+		initSingletonParameterSets(constraintsSetSupplier);
+	}
+
+	private void initSingletonParameterSets(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+
+		//optimization constraints (mandatory)
+		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, () -> new DrtOptimizationConstraintsParams(constraintsSetSupplier),
+				() -> drtOptimizationConstraintsParams,
+				params -> drtOptimizationConstraintsParams = (DrtOptimizationConstraintsParams) params);
 
 		//rebalancing (optional)
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
@@ -231,7 +244,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
-
 	}
 
 	/**
@@ -248,7 +260,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			case "maxAllowedPickupDelay":
 			case "rejectRequestIfMaxWaitOrTravelTimeViolated":
 			case "maxWalkDistance":
-				getDrtOptimizationConstraintsParam().addParam(paramName, value);
+				addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().addParam(paramName, value);
             	break;
             default:
                 super.handleAddUnknownParam(paramName, value);
@@ -269,7 +281,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		Verify.verify(drtOptimizationConstraintsParams.maxWaitTime >= stopDuration, "maxWaitTime must not be smaller than stopDuration");
+		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
+		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
+			Verify.verify(constraintsSet.maxWaitTime >= stopDuration,
+					"maxWaitTime must not be smaller than stopDuration");
+		}
 
 		Verify.verify(operationalScheme != OperationalScheme.stopbased || transitStopFile != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
@@ -309,15 +325,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return mode;
 	}
 
-	public DrtOptimizationConstraintsParams getDrtOptimizationConstraintsParam() {
-		if (drtOptimizationConstraintsParams == null) {
-			addParameterSet(new DrtOptimizationConstraintsParams());
-		}
-		return drtOptimizationConstraintsParams;
-	}
+
 
 	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
 		return drtInsertionSearchParams;
+	}
+
+	public DrtOptimizationConstraintsParams addOrGetDrtOptimizationConstraintsParams() {
+		if (drtOptimizationConstraintsParams == null) {
+			DrtOptimizationConstraintsParams params = new DrtOptimizationConstraintsParams();
+			this.addParameterSet(params);
+		}
+		return drtOptimizationConstraintsParams;
 	}
 
 	public Optional<DrtZoneSystemParams> getZonalSystemParams() {

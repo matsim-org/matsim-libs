@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
@@ -15,6 +16,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 
 import java.net.URL;
+import java.nio.file.Path;
 
 public class NoiseDashboardTests {
 
@@ -24,6 +26,8 @@ public class NoiseDashboardTests {
 
 	@Test
 	void generate() {
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "noise");
+
 		Config config = TestScenario.loadConfig(utils);
 
 		config.global().setCoordinateSystem("EPSG:25832");
@@ -34,11 +38,14 @@ public class NoiseDashboardTests {
 
 		simWrapperConfigGroup.defaultParams().shp = IOUtils.extendUrl(kelheim, "area/area.shp").toString();
 
-
 		SimWrapper sw = SimWrapper.create(config).addDashboard(new NoiseDashboard());
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 
-
 		controler.run();
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**emission_per_day.csv")
+			.isDirectoryContaining("glob:**immission_per_day.avro")
+			.isDirectoryContaining("glob:**immission_per_hour.avro");
 	}
 }

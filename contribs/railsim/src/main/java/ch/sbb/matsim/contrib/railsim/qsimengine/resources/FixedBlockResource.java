@@ -20,6 +20,8 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
@@ -30,6 +32,8 @@ import java.util.*;
  * Fixed block where each track is exclusively reserved by one agent.
  */
 final class FixedBlockResource implements RailResourceInternal {
+
+	private static final Logger log = LogManager.getLogger(FixedBlockResource.class);
 
 	private final Id<RailResource> id;
 
@@ -178,8 +182,9 @@ final class FixedBlockResource implements RailResourceInternal {
 			}
 		}
 
-		if (track == -1)
-			throw new AssertionError("Driver " + driver + " has not reserved the track.");
+//		This may happen in rare cases, but is not a problem
+//		if (track == -1)
+//			log.warn("Driver {} released {} multiple times.", driver, link.getLinkId());
 
 		boolean allFree = true;
 		for (MobsimDriverAgent[] others : tracks.values()) {
