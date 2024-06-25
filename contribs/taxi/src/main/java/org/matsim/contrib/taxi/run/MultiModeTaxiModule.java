@@ -67,7 +67,9 @@ public class MultiModeTaxiModule extends AbstractModule {
 		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
 		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
 		// manually after the TaxiAsDrtConfigGroup config is created.
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxWaitTime = 3600;
 		defaultConstraintsSet.maxTravelTimeAlpha = 2;
 		defaultConstraintsSet.maxTravelTimeBeta = 3600;
