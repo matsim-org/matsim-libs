@@ -51,6 +51,8 @@ abstract class Constants {
 	static final String VEHICLE_REF_ID = "vehicleRefId";
 	static final String DEPARTURE_OFFSET = "departureOffset";
 	static final String ARRIVAL_OFFSET = "arrivalOffset";
+	static final String ALLOW_BOARDING = "allowBoarding";
+	static final String ALLOW_ALIGHTING = "allowAlighting";
 	static final String AWAIT_DEPARTURE = "awaitDeparture";
 	static final String IS_BLOCKING = "isBlocking";
 	static final String STOP_AREA_ID = "stopAreaId";

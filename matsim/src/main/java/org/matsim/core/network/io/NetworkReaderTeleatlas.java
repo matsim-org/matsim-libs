@@ -24,8 +24,10 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.data.SimpleFeatureSource;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.geometry.BoundingBox;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,9 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.geometry.BoundingBox;
+import org.matsim.core.utils.gis.GeoFileReader;
 
 /**
  * A reader for TeleAtlas network description files. The reader is based on
@@ -47,7 +47,7 @@ import org.opengis.geometry.BoundingBox;
  * <li><em>nw.shp</em>: junction shape file (typically called xyz________nw.shp)
  * </li>
  * </ul>
- * 
+ *
  * @author balmermi
  */
 public final class NetworkReaderTeleatlas implements MatsimSomeReader {
@@ -154,7 +154,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	/**
 	 * Instantiate a new Tele Atlas MultiNet Shapefile reader based on the
 	 * junction and the network shape file.
-	 * 
+	 *
 	 * @param network
 	 *          MATSim network database in which the reader stores the data
 	 * @param jcShpFileName
@@ -189,7 +189,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	/**
 	 * Reads Tele Atlas MultiNet junction Shapefile given in
 	 * <code>{@link #jcShpFileName}</code>.
-	 * 
+	 *
 	 * <p>
 	 * It uses the following feature attributes:
 	 * <ul>
@@ -212,7 +212,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * </ul>
 	 * </p>
 	 * The MATSim {@link Node#type} is set as
-	 * 
+	 *
 	 * <pre>
 	 * <code>{@link Node#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
 	 * </pre>
@@ -220,7 +220,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 */
 	private void readNodesFromJCshp() throws IOException {
 		int nCnt = network.getNodes().size();
-		SimpleFeatureSource fs = ShapeFileReader.readDataFile(jcShpFileName);
+		SimpleFeatureSource fs = GeoFileReader.readDataFile(jcShpFileName);
 		SimpleFeatureIterator fIt = fs.getFeatures().features();
 		while (fIt.hasNext()) {
 			SimpleFeature f = fIt.next();
@@ -258,7 +258,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	/**
 	 * Reads Tele Atlas MultiNet network Shapefile given in
 	 * <code>{@link #nwShpFileName}</code>.
-	 * 
+	 *
 	 * <p>
 	 * It uses the following feature attributes:
 	 * <ul>
@@ -307,7 +307,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * </li>
 	 * <li><code>{@link #LINK_LANES_NAME} (Number of Lanes)</code></li>
 	 * </ul>
-	 * 
+	 *
 	 * <b>Conversion rules:</b>
 	 * <ul>
 	 * <li>Links that refer to not existing from- or to-link will be ignored
@@ -330,21 +330,21 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * <code>{@link #LINK_ID_NAME}+"TF"</code>,
 	 * <code>{@link #LINK_ID_NAME}+"FT"</code> resp.</li>
 	 * <li>The {@link Link#type} is set as:
-	 * 
+	 *
 	 * <pre>
 	 * <code>{@link Link#type} = {@link #LINK_FRCTYP_NAME}+"-"+{@link #LINK_FEATTYP_NAME}+"-"+{@link #LINK_FERRYTYP_NAME}</code>
 	 * </pre>
-	 * 
+	 *
 	 * </li>
 	 * </ul>
 	 * </p>
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void readLinksFromNWshp() throws IOException {
 		int lCnt = network.getLinks().size();
 		int ignoreCnt = 0;
-		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.nwShpFileName);
+		SimpleFeatureSource fs = GeoFileReader.readDataFile(this.nwShpFileName);
 		SimpleFeatureIterator fIt = fs.getFeatures().features();
 		while (fIt.hasNext()) {
 			SimpleFeature f = fIt.next();
@@ -474,7 +474,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 
 	/**
 	 * prints the variable settings to the STDOUT
-	 * 
+	 *
 	 * @param prefix
 	 *          a prefix for each line of the STDOUT
 	 */

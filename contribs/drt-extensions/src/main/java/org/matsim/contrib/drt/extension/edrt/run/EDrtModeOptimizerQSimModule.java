@@ -28,13 +28,8 @@ import org.matsim.contrib.drt.extension.edrt.optimizer.depot.NearestChargerAsDep
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.*;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
@@ -44,6 +39,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
+import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
@@ -139,14 +135,18 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(PassengerStopDurationProvider.class)))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
+						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet())));
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		bindModal(CostCalculationStrategy.class).to(drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated ?
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		bindModal(CostCalculationStrategy.class)
+				.to(defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated
+						?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
@@ -178,7 +178,9 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
+				defaultConstraintsSet.maxAllowedPickupDelay)));
+		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
@@ -187,11 +189,11 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
-			
+
 			// Makes basic DrtActionCreator create legs with consumption tracker
 			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
 		})).in(Singleton.class);
-		
+
 		bindModal(EDrtActionCreator.class).toProvider(modalProvider(getter -> {
 			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
 					? getter.getModal(PrebookingActionCreator.class)
@@ -201,9 +203,9 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			// + adds ChargingActivity
 			return new EDrtActionCreator(delegate, getter.get(MobsimTimer.class));
 		})).asEagerSingleton();
-		
+
 		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(EDrtActionCreator.class));
-		
+
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}
 }

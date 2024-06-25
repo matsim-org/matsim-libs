@@ -144,6 +144,7 @@ class Worker extends Thread implements BasicEventHandler{
 				switch( key ){
 					case Event.ATTRIBUTE_X:
 					case Event.ATTRIBUTE_Y:
+					case Event.ATTRIBUTE_TIME:
 						continue;
 				}
 			}
@@ -159,6 +160,7 @@ class Worker extends Thread implements BasicEventHandler{
 			eventStr.append(" | ");
 			eventStr.append(str);
 		}
+
 		eventStr.append(" | ") ;
 		return eventStr.toString();
 	}

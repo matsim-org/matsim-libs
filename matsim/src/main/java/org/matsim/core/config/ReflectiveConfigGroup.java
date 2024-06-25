@@ -256,7 +256,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			var rawType = pType.getRawType();
 			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
 				var typeArgument = pType.getActualTypeArguments()[0];
-				return typeArgument.equals(String.class) || (typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum());
+				return typeArgument.equals(String.class) ||
+					typeArgument.equals(Double.class) ||
+					typeArgument.equals(Integer.class) ||
+					(typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum());
 			}
 
 			if (rawType.equals(Class.class))
@@ -412,6 +415,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				List<? extends Enum<?>> enumConstants = getEnumConstants(paramField);
 				return stream.map(s -> stringToEnumValue(s, enumConstants)).collect(toImmutableSet());
 			}
+			if (paramField != null && isCollectionOfDoubleType(paramField))
+				return stream.map(Double::parseDouble).collect(toImmutableSet());
+			if (paramField != null && isCollectionOfIntegerType(paramField))
+				return stream.map(Integer::parseInt).collect(toImmutableSet());
+
 			return stream.collect(toImmutableSet());
 		} else if (type.equals(List.class)) {
 			if (value.isBlank()) {
@@ -422,6 +430,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				List<? extends Enum<?>> enumConstants = getEnumConstants(paramField);
 				return stream.map(s -> stringToEnumValue(s, enumConstants)).toList();
 			}
+			if (paramField != null && isCollectionOfDoubleType(paramField))
+				return stream.map(Double::parseDouble).toList();
+			if (paramField != null && isCollectionOfIntegerType(paramField))
+				return stream.map(Integer::parseInt).toList();
+
 			return stream.toList();
 		} else if (type.equals(Class.class)) {
 			try {
@@ -488,7 +501,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		boolean accessible = enforceAccessible(paramField);
 		try {
 			var result = paramField.get(this);
-			if (result != null && isCollectionOfEnumsWithUniqueStringValues(paramField)) {
+			if (result != null && (isCollectionOfEnumsWithUniqueStringValues(paramField) ||
+					isCollectionOfDoubleType(paramField) ||
+					isCollectionOfIntegerType(paramField))) {
 				result = ((Collection<Object>) result).stream()
 						.map(Object::toString) // map enum values to string
 						.collect(Collectors.toList());
@@ -669,6 +684,30 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 					// here, paramField *is* collection of Enums
 					return enumStringsAreUnique(((Class<?>) typeArgument));
 				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean isCollectionOfIntegerType(Field paramField) {
+		var type = paramField.getGenericType();
+		if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+                return typeArgument.equals(Integer.class) || typeArgument.equals(Integer.TYPE);
+			}
+		}
+		return false;
+	}
+
+	private static boolean isCollectionOfDoubleType(Field paramField) {
+		var type = paramField.getGenericType();
+		if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+				return typeArgument.equals(Double.class) || typeArgument.equals(Double.TYPE);
 			}
 		}
 		return false;

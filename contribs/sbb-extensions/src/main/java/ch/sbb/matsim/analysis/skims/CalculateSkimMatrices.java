@@ -41,6 +41,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -70,7 +71,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.StringUtils;
@@ -80,7 +81,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Main class to calculate skim matrices. Provides a main-method to be directly started from the command line, but the main-method also acts as a template for custom code using the skims calculation.
@@ -233,7 +233,7 @@ public class CalculateSkimMatrices {
 
     public final void selectSamplingPoints(List<WeightedCoord> locations, int numberOfPointsPerZone, String zonesShapeFilename, String zonesIdAttributeName, Random r) throws IOException {
         log.info("loading zones from " + zonesShapeFilename);
-        Collection<SimpleFeature> zones = new ShapeFileReader().readFileAndInitialize(zonesShapeFilename);
+        Collection<SimpleFeature> zones = new GeoFileReader().readFileAndInitialize(zonesShapeFilename);
         SpatialIndex zonesQt = new Quadtree();
         for (SimpleFeature zone : zones) {
             Envelope envelope = ((Geometry) (zone.getDefaultGeometry())).getEnvelopeInternal();

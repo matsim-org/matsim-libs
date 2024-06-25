@@ -20,20 +20,12 @@
 
 package playground.vsp.ev;
 
-import static java.util.stream.Collectors.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.sun.istack.Nullable;
 import jakarta.inject.Provider;
-
+import one.util.streamex.StreamEx;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -43,18 +35,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.fleet.*;
+import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
@@ -69,11 +59,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.SingleModeNetworksCache;
-import org.matsim.core.router.StageActivityTypeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -82,15 +68,15 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.utils.EditPlans;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
-import com.sun.istack.Nullable;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import one.util.streamex.StreamEx;
+import static java.util.stream.Collectors.*;
 
 class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
@@ -99,9 +85,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	@Inject
 	Scenario scenario;
-
-	@Inject
-	Vehicles vehicles;
 
 	@Inject
 	private SingleModeNetworksCache singleModeNetworksCache;
@@ -151,9 +134,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		if (!(e.getQueueSimulation() instanceof QSim)) {
 			throw new IllegalStateException(UrbanEVTripsPlanner.class + " only works with a mobsim of type " + QSim.class);
 		}
+		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup)config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
 		//collect all selected plans that contain ev legs and map them to the set of ev used
 		Map<Plan, Set<Id<Vehicle>>> selectedEVPlans = StreamEx.of(scenario.getPopulation().getPersons().values())
-				.mapToEntry(p -> p.getSelectedPlan(), p -> getUsedEV(p.getSelectedPlan()))
+				.mapToEntry(p -> p.getSelectedPlan(), p -> getUsedEVToPreplan(p.getSelectedPlan()))
 				.filterValues(evSet -> !evSet.isEmpty())
 				.collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -169,16 +153,17 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	 * @param plan
 	 * @return
 	 */
-	private Set<Id<Vehicle>> getUsedEV(Plan plan) {
+	private Set<Id<Vehicle>> getUsedEVToPreplan(Plan plan) {
 		return TripStructureUtils.getLegs(plan)
 				.stream()
 				.map(leg -> VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode()))
-				.filter(vehicleId -> isEV(vehicleId))
+				.filter(vehicleId -> isEVAndToBeChargedWhileActivities(vehicleId))
 				.collect(toSet());
 	}
 
-	private boolean isEV(Id<Vehicle> vehicleId) {
-		return this.electricFleetSpecification.getVehicleSpecifications().containsKey(Id.create(vehicleId, Vehicle.class));
+	private boolean isEVAndToBeChargedWhileActivities(Id<Vehicle> vehicleId) {
+		ElectricVehicleSpecification ev = this.electricFleetSpecification.getVehicleSpecifications().getOrDefault(Id.create(vehicleId, Vehicle.class), null);
+		return (ev != null && UrbanEVUtils.isChargingDuringActivities(ev));
 	}
 
 	private void processPlans(Map<Plan, Set<Id<Vehicle>>> selectedEVPlans) {

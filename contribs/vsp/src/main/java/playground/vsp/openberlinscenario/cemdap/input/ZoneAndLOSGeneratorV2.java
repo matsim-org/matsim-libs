@@ -33,12 +33,11 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.opengis.feature.simple.SimpleFeature;
-
 import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
 
 /**
@@ -56,7 +55,7 @@ public class ZoneAndLOSGeneratorV2 {
 	private final Map<String, Map<String, Double>> zone2ZoneDistanceMap = new HashMap<>();
 	private final Map<String, Map<String, Integer>> zone2ZoneAdjacencyMap = new HashMap<>();
 	private final String outputBase;
-	
+
 	// Parameters
 //	private double defaultIntraZoneDistance = 1.72; // in miles; equals 2.76km.
 	private double defaultIntraZoneDistance = 1.; // new, lower value
@@ -72,7 +71,7 @@ public class ZoneAndLOSGeneratorV2 {
 	// spatial refinement. Amit Nov'17
 	private List<String> zoneIdsForSpatialRefinement; // this is filled if shape file for spatial refinement is provided.
 	private double defaultIntraZoneDistanceForSpatialRefinement = Double.NaN;
-	
+
 	public static void main(String[] args) {
 		// Input and output
 		String commuterFileBase = "../../shared-svn/studies/countries/de/open_berlin_scenario/input/pendlerstatistik_2009/";
@@ -86,7 +85,7 @@ public class ZoneAndLOSGeneratorV2 {
 
 		// Parameters
 		String featureKeyInShapefile = "ID";
-		
+
 		ZoneAndLOSGeneratorV2 zoneAndLOSGeneratorV2 = new ZoneAndLOSGeneratorV2(commuterFilesOutgoing, shapeFile, outputBase, featureKeyInShapefile);
 		zoneAndLOSGeneratorV2.generateSupply();
 	}
@@ -99,7 +98,7 @@ public class ZoneAndLOSGeneratorV2 {
 		readMunicipalities(commuterFilesOutgoing);
 		readShape(shapeFile, featureKeyInShapefile);
 	}
-	
+
 	public void generateSupply() {
 		compareIdsInShapefileAndCommuterFiles();
 		computeAndStoreZone2ZoneDistances();
@@ -108,7 +107,7 @@ public class ZoneAndLOSGeneratorV2 {
 		writeLOSFile("losoffpkam", false);
 		writeLOSFile("lospeakam", true);
 	}
-	
+
 	private void readMunicipalities(String[] commuterFilesOutgoing) {
 		for (String commuterFileOutgoing : commuterFilesOutgoing) {
 			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing, "\t");
@@ -118,7 +117,7 @@ public class ZoneAndLOSGeneratorV2 {
 	}
 
 	private void readShape(String shapeFile, String featureKeyInShapeFile) {
-		Collection <SimpleFeature> features = ShapeFileReader.getAllFeatures(shapeFile);
+		Collection <SimpleFeature> features = GeoFileReader.getAllFeatures(shapeFile);
 		for (SimpleFeature feature : features) {
 			String id = (String) feature.getAttribute(featureKeyInShapeFile);
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
@@ -126,7 +125,7 @@ public class ZoneAndLOSGeneratorV2 {
 			this.zoneMap.put(id, geometry);
 		}
 	}
-	
+
 	private void compareIdsInShapefileAndCommuterFiles() {
 		LOG.info("Municipality set has " + municipalities.size() + " elements.");
 		LOG.info("Zones set has " + zones.size() + " elements.");
@@ -141,7 +140,7 @@ public class ZoneAndLOSGeneratorV2 {
 			}
 		}
 	}
-	
+
 	private void computeAndStoreZone2ZoneDistances() {
 		LOG.info("Start distance and adjacency computations.");
 		LOG.info(this.zones.size() * this.zones.size() + " computations will be performed.");
@@ -159,23 +158,23 @@ public class ZoneAndLOSGeneratorV2 {
 				int adjacent;
 				double distance_mi;
 				double temp = 0.;
-				
+
 				if (originId.equals(destinationId)) { // internal traffic inside zone
 					distance_mi = getIntraZonalDistance(originId) * beelineDistanceFactor;
 					adjacent = 0;
 				} else {
 					Geometry originGeometry = this.zoneMap.get(originId);
 					Coord originCoord = new Coord(originGeometry.getCentroid().getCoordinate().x, originGeometry.getCentroid().getCoordinate().y);
-							
+
 					Geometry destinationGeometry = this.zoneMap.get(destinationId);
 					Coord destinationCoord = new Coord(destinationGeometry.getCentroid().getCoordinate().x, destinationGeometry.getCentroid().getCoordinate().y);
-					
+
 					double distanceX_m = Math.abs(originCoord.getX() - destinationCoord.getX());
 					double distanceY_m = Math.abs(originCoord.getY() - destinationCoord.getY());
 					double distance_m = Math.sqrt(distanceX_m * distanceX_m + distanceY_m * distanceY_m);
-					
+
 					distance_mi = distance_m / 1609.344 * beelineDistanceFactor; // Convert from meters to miles
-    				
+
     				if (originGeometry.touches(destinationGeometry)) {
     					adjacent = 1;
     				} else {
@@ -192,7 +191,7 @@ public class ZoneAndLOSGeneratorV2 {
 		}
 		LOG.info("Finised distance and adjacency computations.");
 	}
-	
+
 	private void writeZone2ZoneFile() {
 		BufferedWriter bufferedWriterZone2Zone = null;
 		try {
@@ -201,7 +200,7 @@ public class ZoneAndLOSGeneratorV2 {
     			for (String destinationId : this.zones) {
     				double distance_mi = this.zone2ZoneDistanceMap.get(originId).get(destinationId);
     				int adjacent = this.zone2ZoneAdjacencyMap.get(originId).get(destinationId);
-    				
+
     				// 4 columns
     				bufferedWriterZone2Zone.write(originId + "\t" + destinationId + "\t" + adjacent + "\t" + distance_mi);
         			bufferedWriterZone2Zone.newLine();
@@ -223,7 +222,7 @@ public class ZoneAndLOSGeneratorV2 {
         }
 		System.out.println("Zone2Zone file written.");
     }
-	
+
 	private void writeZonesFile() {
 		BufferedWriter bufferedWriterZones = null;
 		try {
@@ -232,7 +231,7 @@ public class ZoneAndLOSGeneratorV2 {
     			// 45 columns
     			bufferedWriterZones.write(Integer.parseInt(zoneId) + "\t" + 0 + "\t" + 0  + "\t" + 0 + "\t" + 0
     					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
-    					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 
+    					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
     					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
     					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
     					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0);
@@ -254,7 +253,7 @@ public class ZoneAndLOSGeneratorV2 {
         }
 		System.out.println("Zones file written.");
     }
-	
+
 	private void writeLOSFile(String filename, boolean isPeak) {
 		BufferedWriter bufferedWriterLos = null;
 		try {
@@ -262,15 +261,15 @@ public class ZoneAndLOSGeneratorV2 {
     		double temp = 0.0;
     		for (String originId : this.zones) {
     			for (String destinationId : this.zones) {
-    				
+
     				int inSameZone = 0;
     				if (originId.equals(destinationId)) {
     					inSameZone = 1;
     				}
-    				
+
     				double distance_mi = this.zone2ZoneDistanceMap.get(originId).get(destinationId);
     				int adjacent = this.zone2ZoneAdjacencyMap.get(originId).get(destinationId);
-    				
+
     				double driveAloneIVTT_min;
     				if (isPeak) {
     					driveAloneIVTT_min = distance_mi * durantionDistancePeakRatio_min_mile;
@@ -279,13 +278,13 @@ public class ZoneAndLOSGeneratorV2 {
     				}
     				temp = Math.round(driveAloneIVTT_min * 100); // Round to two decimal places
     				driveAloneIVTT_min = temp / 100;
-    				
+
     				double driveAloneCost_USD = distance_mi * costDistanceRatio_USD_mile;
     				temp = Math.round(driveAloneCost_USD * 100); // Round to two decimal places
     				driveAloneCost_USD = temp / 100;
-    				
+
     				// 14 columns
-    				bufferedWriterLos.write(Integer.parseInt(originId) + "\t" + Integer.parseInt(destinationId) + 
+    				bufferedWriterLos.write(Integer.parseInt(originId) + "\t" + Integer.parseInt(destinationId) +
     						"\t" + inSameZone  + "\t" + adjacent + "\t" + distance_mi + "\t" + driveAloneIVTT_min
     						+ "\t" + 3.1 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + driveAloneCost_USD
     						+ "\t" + driveAloneIVTT_min + "\t" + driveAloneCost_USD);
@@ -334,22 +333,22 @@ public class ZoneAndLOSGeneratorV2 {
 	public void setBeelineDistanceFactor(double beelineDistanceFactor) {
     	this.beelineDistanceFactor = beelineDistanceFactor;
     }
-	
+
 	public void setDurantionDistanceOffPeakRatio_min_mile(double durantionDistanceOffPeakRatio_min_mile) {
     	this.durantionDistanceOffPeakRatio_min_mile = durantionDistanceOffPeakRatio_min_mile;
     }
-	
+
 	public void setDurantionDistancePeakRatio_min_mile(double durantionDistancePeakRatio_min_mile) {
     	this.durantionDistancePeakRatio_min_mile = durantionDistancePeakRatio_min_mile;
     }
-	
+
 	public void setCostDistanceRatio_USD_mile(double costDistanceRatio_USD_mile) {
     	this.costDistanceRatio_USD_mile = costDistanceRatio_USD_mile;
     }
 
     public void setShapeFileForRefinement(String shapeFileForSpatialRefinement, String featureKeyInShapeFileForRefinement){
 		LOG.info("Using spatial refinement...");
-		this.zoneIdsForSpatialRefinement = ShapeFileReader
+		this.zoneIdsForSpatialRefinement = GeoFileReader
 				.getAllFeatures(shapeFileForSpatialRefinement)
 				.stream()
 				.map(feature -> feature.getAttribute(featureKeyInShapeFileForRefinement).toString())

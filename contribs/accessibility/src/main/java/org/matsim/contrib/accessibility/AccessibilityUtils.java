@@ -20,6 +20,7 @@ package org.matsim.contrib.accessibility;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -39,9 +40,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.facilities.*;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -225,7 +225,7 @@ public class AccessibilityUtils {
 
 
 	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
-		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		GeoFileReader shapeFileReader = new GeoFileReader();
 		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(shapeFileName);
 
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("DensitiyFacilities");

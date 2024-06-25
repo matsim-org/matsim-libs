@@ -22,10 +22,10 @@ package playground.vsp.demandde.commuterDemandCottbus;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.matsim.core.utils.gis.GeoFileReader;
 
 
 /**
@@ -33,9 +33,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  */
 public class DgLanduseReader {
-	
+
 	public static final  String BASE_DIR = "../../../shared-svn/studies/countries/de/berlin_brandenburg_corine_landcover/shapefiles/";
-	
+
 	private static final String STADTGEFUEGE_KONTINUIERLICH = BASE_DIR + "clc06_c111.shp";
 	private static final String STADTGEFUEGE_NICHT_KONTINUIERLICH = BASE_DIR + "clc06_c112.shp";
 	private static final String INDUSTRIE_GEWERBEGEBIETE = BASE_DIR + "clc06_c121.shp";
@@ -45,33 +45,33 @@ public class DgLanduseReader {
 //	private static final String MINERALE_ABBAUSTAETTEN = BASE_DIR + "clc06_c131.shp";
 	private static final String DEPONIEN = BASE_DIR + "clc06_c132.shp";
 	private static final String BAUSTELLEN = BASE_DIR + "clc06_c133.shp";
-	
-	
+
+
 	private static final String[] landuse_files_home = {STADTGEFUEGE_KONTINUIERLICH, STADTGEFUEGE_NICHT_KONTINUIERLICH};
 //	private static final String[] landuse_files_home = {STADTGEFUEGE_NICHT_KONTINUIERLICH};
-	
-	private static final String[] landuse_files_work = {STADTGEFUEGE_KONTINUIERLICH, 
+
+	private static final String[] landuse_files_work = {STADTGEFUEGE_KONTINUIERLICH,
 		STADTGEFUEGE_NICHT_KONTINUIERLICH, INDUSTRIE_GEWERBEGEBIETE,
 		STRASSEN_SCHIENENNETZE_GEBAUEDE, HAFENGEBIET,
 		FLUGHAEFEN, DEPONIEN, BAUSTELLEN
-		/* skip mines because they cause disproportional many work places and, thus, to much traffic in their region */ 
+		/* skip mines because they cause disproportional many work places and, thus, to much traffic in their region */
 //		, MINERALE_ABBAUSTAETTEN
 		};
 //	private static final String[] landuse_files_work = {INDUSTRIE_GEWERBEGEBIETE};
 
-	
-	public Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> readLanduseDataHome(){
+
+	public Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> readLanduseDataHome(){
 		return this.readLanduseData(landuse_files_home);
 	}
 
-	
+
 	public Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> readLanduseDataWork(){
 		return this.readLanduseData(landuse_files_work);
 	}
 
-	
+
 	private Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> readLanduseData(String[] shapefiles){
-		ShapeFileReader shapeReader = new ShapeFileReader();
+		GeoFileReader shapeReader = new GeoFileReader();
 		Collection<SimpleFeature> allFeatures = new HashSet<SimpleFeature>();
 		Collection<SimpleFeature> currentFeatures = null;
 		for (String filename : shapefiles){

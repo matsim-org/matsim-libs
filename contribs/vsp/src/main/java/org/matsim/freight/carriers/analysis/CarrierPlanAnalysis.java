@@ -24,8 +24,10 @@ package org.matsim.freight.carriers.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -61,7 +63,7 @@ public class CarrierPlanAnalysis  {
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) ");
+		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) \t jspritComputationTime[HH:mm:ss]");
 		bw1.newLine();
 
 		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
@@ -73,6 +75,11 @@ public class CarrierPlanAnalysis  {
 			bw1.write("\t" + carrier.getSelectedPlan().getScheduledTours().size());
 			bw1.write("\t" + carrier.getShipments().size());
 			bw1.write("\t" + carrier.getServices().size());
+			if (CarriersUtils.getJspritComputationTime(carrier) != Integer.MIN_VALUE)
+				bw1.write("\t" + Time.writeTime(CarriersUtils.getJspritComputationTime(carrier), Time.TIMEFORMAT_HHMMSS));
+			else
+				bw1.write("\t" + "null");
+
 			bw1.newLine();
 		}
 
