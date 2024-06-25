@@ -61,7 +61,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
   private static final Logger log =
       LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChains.class);
-  private static final Id<Link> HUB_LINK_ID = Id.createLinkId("91085");
+  private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
   private static final double TOLL_VALUE = 1000;
   static double HUBCOSTS_FIX = 100;
 
@@ -140,8 +140,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
       }
       ConfigUtils.applyCommandline(config, args);
     } else {
-      config.controller().setOutputDirectory("output/groceryDelivery_kmt");
-      config.controller().setLastIteration(4);
+      config.controller().setOutputDirectory("output/groceryDelivery_kmt2");
+      config.controller().setLastIteration(10);
     }
 
     config.network().setInputFile(
@@ -161,14 +161,22 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("Add LSP to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-    lsps.add(createLSP(scenario, "kaufland_VERBRAUCHERMARKT_TROCKEN", HUB_LINK_ID));
-    lsps.add(createLSP(scenario, "edeka_SUPERMARKT_TROCKEN", HUB_LINK_ID));
+    lsps.add(createLSP(scenario, "myLSP2", "edeka_SUPERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
+    lsps.add(createLSP(scenario, "myLSP1", "kaufland_VERBRAUCHERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
     return scenario;
   }
 
-  private static LSP createLSP(Scenario scenario, String carrierIdString, Id<Link> hubLinkId) {
+/**
+*
+ * @param scenario
+ * @param lspName String of LSP's Id
+ * @param carrierIdString Name of the carrier, the (lsp's) demand (shipments) are created from.
+ * @param hubLinkId
+ * @return
+*/
+  private static LSP createLSP(Scenario scenario, String lspName, String carrierIdString, Id<Link> hubLinkId) {
     String carrierPlanFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
     String vehicleTypeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 
@@ -321,7 +329,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     lspPlans.add(multipleMixedEchelonChainsPlan);
 
     LSP lsp =
-        LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
+        LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
             .setInitialPlan(multipleMixedEchelonChainsPlan)
             .setLogisticChainScheduler(
                 ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
