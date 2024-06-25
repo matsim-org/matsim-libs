@@ -23,19 +23,23 @@ public class FreightDemandGenerationTest {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
 			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "testVehicleTypes_1.xml");
-			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_1.csv");
-			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_1.csv");
-			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
-			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-			String shapeCategory = "Ortsteil";
+			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_2.csv");
+			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_2.csv");
+			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
+			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "lor_planungsraeume/Planungsraum_EPSG_25833.shp");
+			//String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
+			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-1pct.plans-initial.xml.gz";
+			//String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+			String network = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-network.xml.gz";
+			//String shapeCategory = "Ortsteil";
+			String shapeCategory = "BEZIRK";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
 					"--demandOption", "createDemandFromCSVAndUsePopulation",
 					//"--demandOption", "createDemandFromCSV",
-					//"--populationOption", "usePopulationInShape",
-					"--populationOption", "useHolePopulation",
+					"--populationOption", "usePopulationInShape",
+					//"--populationOption", "useHolePopulation",
 					//"--populationOption", "useNoPopulation",
 					//"--populationSamplingOption", "createMoreLocations",
 					"--populationSamplingOption", "increaseDemandOnLocation",
@@ -46,17 +50,20 @@ public class FreightDemandGenerationTest {
 					"--combineSimilarJobs", "true",
 					"--carrierFileLocation", "",
 					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
-					//"--shapeFileLocation", shapeFilePath.toString(),
+					"--shapeFileLocation", shapeFilePath.toString(),
 					//"--shapeCRS", "WGS84",
+					"--shapeCRS", "EPSG:25833",
 					"--populationFileLocation", populationLocation,
-					"--populationCRS", "WGS84",
+					"--populationCRS", "EPSG:25832",
+					//"--populationCRS", "WGS84",
 					"--network", network,
-					"--networkCRS", "WGS84",
+					//"--networkCRS", "WGS84",
+					"--networkCRS", "EPSG:25832",
 					"--networkChangeEvents", "",
-					//"--shapeCategory", shapeCategory,
+					"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
 					"--inputDemandCSV", demandCSVLocation.toString(),
-					"--populationSample", "0.5",
+					"--populationSample", "0.1",
 					"--populationSamplingTo", "1.0",
 					"--defaultJspritIterations", "3"
 			);

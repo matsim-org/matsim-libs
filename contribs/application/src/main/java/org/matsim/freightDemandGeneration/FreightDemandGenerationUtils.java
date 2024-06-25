@@ -179,7 +179,7 @@ public class FreightDemandGenerationUtils {
 			if (!index.contains(new Coord(x, y)))
 				personsToRemove.add(person.getId());
 		}
-
+		log.info(personsToRemove.size()+" out of "+population.getPersons().size()+" persons are removed because of their home location outside of the shpfile.");
 		for (Id<Person> id : personsToRemove)
 			population.removePerson(id);
 	}
