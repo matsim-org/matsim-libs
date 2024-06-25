@@ -3,7 +3,9 @@
 <config>
 	<module name="dvrp">
 		<parameterset type="travelTimeMatrix">
-			<param name="cellSize" value="100"/>
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="100"/>
+			</parameterset>
 		</parameterset>
 	</module>
 
@@ -11,12 +13,14 @@
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="stopDuration" value="60"/>
-			<param name="maxWaitTime" value="600"/>
-			<param name="maxTravelTimeAlpha" value="1.3"/>
-			<param name="maxTravelTimeBeta" value="400"/>
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="600"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="400"/>
+				<!-- Maximum walk distance to next stop location in stationbased system. -->
+				<param name="maxWalkDistance" value="1500.0"/>
+			</parameterset>
 
-			<!-- Maximum walk distance to next stop location in stationbased system. -->
-			<param name="maxWalkDistance" value="1500.0"/>
 			<!-- Operational Scheme, either door2door or stopbased. door2door by default -->
 			<param name="operationalScheme" value="stopbased"/>
 			<!-- Stop locations file (transit schedule format, but without lines) for DRT stops. Used only for the stopbased mode -->
@@ -26,8 +30,9 @@
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
 
 			<parameterset type="zonalSystem">
-				<param name="zonesGeneration" value="GridFromNetwork"/>
-				<param name="cellSize" value="500"/>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
+				</parameterset>
 			</parameterset>
 
 			<parameterset type="rebalancing">

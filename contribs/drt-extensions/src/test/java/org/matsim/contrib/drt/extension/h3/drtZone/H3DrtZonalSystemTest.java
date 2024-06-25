@@ -25,8 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
-import org.matsim.contrib.common.zones.h3.H3GridUtils;
-import org.matsim.contrib.common.zones.h3.H3ZoneSystemUtils;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -49,17 +48,16 @@ public class H3DrtZonalSystemTest {
 		Network network = getNetwork();
 		String crs = TransformationFactory.DHDN_GK4;
 		int resolution = 3;
-		ZoneSystem drtZonalSystem = H3ZoneSystemUtils.createFromPreparedGeometries(network,
-			H3GridUtils.createH3GridFromNetwork(network, resolution, crs), crs, resolution);
+		ZoneSystem drtZonalSystem = new H3ZoneSystem(crs, resolution, network, z -> true);
 
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("831f8dfffffffff"))).isTrue();
+		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("590526392240701439"))).isTrue();
 
 		// center of Holzkirchen
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).getId()).isEqualTo(createZoneId("831f8dfffffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).orElseThrow().getId()).isEqualTo(createZoneId("590526667118608383"));
 		// Thanning (Western border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).getId()).isEqualTo(createZoneId("831f8dfffffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).orElseThrow().getId()).isEqualTo(createZoneId("590526667118608383"));
 		// between Gross- and Kleinpienzenau (Southeastern border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).getId()).isEqualTo(createZoneId("831f89fffffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).orElseThrow().getId()).isEqualTo(createZoneId("590526392240701439"));
 
 		//check all links are mapped
 		for (Link link : network.getLinks().values()) {
@@ -72,20 +70,20 @@ public class H3DrtZonalSystemTest {
 		Network network = getNetwork();
 		String crs = TransformationFactory.DHDN_GK4;
 		int resolution = 5;
-		ZoneSystem drtZonalSystem = H3ZoneSystemUtils.createFromPreparedGeometries(network,
-			H3GridUtils.createH3GridFromNetwork(network, resolution, crs), crs, resolution);
 
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("851f88b7fffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("851f8d6bfffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("851f88a7fffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("851f89d3fffffff"))).isTrue();
+		ZoneSystem drtZonalSystem = new H3ZoneSystem(crs, resolution, network, z -> true);
+
+		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("599533579684282367"))).isTrue();
+		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("599533826644901887"))).isTrue();
+		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("599533499153645567"))).isTrue();
+		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("599533503448612863"))).isTrue();
 
 		// center of Holzkirchen
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).getId()).isEqualTo(createZoneId("851f8d6bfffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).orElseThrow().getId()).isEqualTo(createZoneId("599533826644901887"));
 		// Thanning (Western border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).getId()).isEqualTo(createZoneId("851f88b7fffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).orElseThrow().getId()).isEqualTo(createZoneId("599533503448612863"));
 		// between Gross- and Kleinpienzenau (Southeastern border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).getId()).isEqualTo(createZoneId("851f89d3fffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).orElseThrow().getId()).isEqualTo(createZoneId("599533579684282367"));
 
 		//check all links are mapped
 		for (Link link : network.getLinks().values()) {
@@ -98,22 +96,15 @@ public class H3DrtZonalSystemTest {
 		Network network = getNetwork();
 		String crs = TransformationFactory.DHDN_GK4;
 		int resolution = 6;
-		ZoneSystem drtZonalSystem = H3ZoneSystemUtils.createFromPreparedGeometries(network,
-			H3GridUtils.createH3GridFromNetwork(network, resolution, crs), crs, resolution);
 
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("861f8d697ffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("861f8d687ffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("861f8d69fffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("861f88a6fffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("861f88a6fffffff"))).isTrue();
-		assertThat(drtZonalSystem.getZones().containsKey(createZoneId("861f89d37ffffff"))).isTrue();
+		ZoneSystem drtZonalSystem = new H3ZoneSystem(crs, resolution, network, z -> true);
 
 		// center of Holzkirchen
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).getId()).isEqualTo(createZoneId("861f8d697ffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).orElseThrow().getId()).isEqualTo(createZoneId("604037425601183743"));
 		// Thanning (Western border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).getId()).isEqualTo(createZoneId("861f88b47ffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).orElseThrow().getId()).isEqualTo(createZoneId("604037102136459263"));
 		// between Gross- and Kleinpienzenau (Southeastern border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).getId()).isEqualTo(createZoneId("861f89d07ffffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).orElseThrow().getId()).isEqualTo(createZoneId("604037178372128767"));
 
 		//check all links are mapped
 		for (Link link : network.getLinks().values()) {
@@ -126,15 +117,14 @@ public class H3DrtZonalSystemTest {
 		Network network = getNetwork();
 		String crs = TransformationFactory.DHDN_GK4;
 		int resolution = 10;
-		ZoneSystem drtZonalSystem = H3ZoneSystemUtils.createFromPreparedGeometries(network,
-			H3GridUtils.createH3GridFromNetwork(network, resolution, crs), crs, resolution);
+		ZoneSystem drtZonalSystem = new H3ZoneSystem(crs, resolution, network, z -> true);
 
 		// center of Holzkirchen
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).getId()).isEqualTo(createZoneId("8a1f8d6930b7fff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).orElseThrow().getId()).isEqualTo(createZoneId("622051824027533311"));
 		// Thanning (Western border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).getId()).isEqualTo(createZoneId("8a1f88b4025ffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).orElseThrow().getId()).isEqualTo(createZoneId("622051500514213887"));
 		// between Gross- and Kleinpienzenau (Southeastern border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).getId()).isEqualTo(createZoneId("8a1f89d06d5ffff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).orElseThrow().getId()).isEqualTo(createZoneId("622051576862081023"));
 
 		//check all links are mapped
 		for (Link link : network.getLinks().values()) {
@@ -147,15 +137,16 @@ public class H3DrtZonalSystemTest {
 		Network network = getNetwork();
 		String crs = TransformationFactory.DHDN_GK4;
 		int resolution = 12;
-		ZoneSystem drtZonalSystem = H3ZoneSystemUtils.createFromPreparedGeometries(network,
-			H3GridUtils.createH3GridFromNetwork(network, resolution, crs), crs, resolution);
+
+		ZoneSystem drtZonalSystem = new H3ZoneSystem(crs, resolution, network, z -> true);
+
 
 		// center of Holzkirchen
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).getId()).isEqualTo(createZoneId("8c1f8d6930b63ff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(358598)).orElseThrow().getId()).isEqualTo(createZoneId("631059023282267135"));
 		// Thanning (Western border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).getId()).isEqualTo(createZoneId("8c1f88b4025d1ff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(78976)).orElseThrow().getId()).isEqualTo(createZoneId("631058699768943103"));
 		// between Gross- and Kleinpienzenau (Southeastern border of network)
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).getId()).isEqualTo(createZoneId("8c1f89d06d581ff"));
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId(59914)).orElseThrow().getId()).isEqualTo(createZoneId("631058776116789759"));
 
 		//check all links are mapped
 		for (Link link : network.getLinks().values()) {

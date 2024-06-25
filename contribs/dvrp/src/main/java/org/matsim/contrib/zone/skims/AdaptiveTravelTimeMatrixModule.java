@@ -22,6 +22,8 @@ package org.matsim.contrib.zone.skims;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -46,10 +48,17 @@ public class AdaptiveTravelTimeMatrixModule extends AbstractDvrpModeModule {
     @Override
     public void install() {
         bindModal(AdaptiveTravelTimeMatrix.class).toProvider(modalProvider(
-                getter -> new AdaptiveTravelTimeMatrixImpl(qsimConfig.getEndTime().orElse(ALTERNATIVE_ENDTIME),
-                        getter.getModal(Network.class),
-                        dvrpConfigGroup.getTravelTimeMatrixParams(),
-                        getter.getModal(TravelTimeMatrix.class),SMOOTHING_ALPHA)))
+                getter -> {
+					Network network = getter.getModal(Network.class);
+					DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+					ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
+						matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
+                    return new AdaptiveTravelTimeMatrixImpl(qsimConfig.getEndTime().orElse(ALTERNATIVE_ENDTIME),
+                            network,
+							zoneSystem,
+                            matrixParams,
+                            getter.getModal(TravelTimeMatrix.class), SMOOTHING_ALPHA);
+                }))
                 .in(Singleton.class);
     }
 }

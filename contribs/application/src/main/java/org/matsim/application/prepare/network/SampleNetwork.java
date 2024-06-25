@@ -144,6 +144,10 @@ public class SampleNetwork implements MATSimAppCommand {
 
 				List<? extends Node> list = e.getValue();
 
+				// for now only consider traffic lights
+				if (!e.getKey().equals("traffic_light"))
+					continue;
+
 				log.info("Sampling {} out of {} intersections for type {}", sample, list.size(), e.getKey());
 
 				for (int i = 0; i < sample && !list.isEmpty(); i++) {
@@ -193,7 +197,7 @@ public class SampleNetwork implements MATSimAppCommand {
 
 		RandomizedTravelTime tt = new RandomizedTravelTime(rnd);
 
-		LeastCostPathCalculator router = createRandomizedRouter(network, tt);
+		LeastCostPathCalculator router = createRandomizedRouter(cityNetwork, tt);
 
 		sampleCityRoutes(cityNetwork, router, tt, rnd);
 
@@ -223,9 +227,16 @@ public class SampleNetwork implements MATSimAppCommand {
 
 				Link to = NetworkUtils.getNearestLink(network, dest);
 
+				// Links could be on the very edge so that nodes are outside the network
+				if (to == null || !network.getNodes().containsKey(link.getFromNode().getId()) ||
+					!network.getNodes().containsKey(to.getToNode().getId())) {
+					i--;
+					continue;
+				}
+
 				LeastCostPathCalculator.Path path = router.calcLeastCostPath(link.getFromNode(), to.getToNode(), 0, null, null);
 
-				if (path.nodes.size() < 2) {
+				if (path == null || path.nodes.size() < 2) {
 					i--;
 					continue;
 				}

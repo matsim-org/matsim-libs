@@ -3,6 +3,7 @@ package org.matsim.smallScaleCommercialTrafficGeneration.prepare;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -11,7 +12,6 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.*;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils;
-import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -29,12 +29,17 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateDataDistributionOfStructureData.class);
 
+	private static LanduseDataConnectionCreator landuseDataConnectionCreator;
+
 	private enum LanduseConfiguration {
 		useOnlyOSMLanduse, useOSMBuildingsAndLanduse
 	}
 
-	@CommandLine.Option(names = "--pathOutput", description = "Path for the output", defaultValue = "output/TestDistributionClass")
-	private Path output;
+	@CommandLine.Option(names = "--outputFacilityFile", description = "Path for the outputFacilityFile", defaultValue = "output/TestDistributionClass/commercialFacilities.xml.gz")
+	private Path outputFacilityFile;
+
+	@CommandLine.Option(names = "--outputDataDistributionFile", description = "Path for the outputDataDistributionFile", defaultValue = "output/TestDistributionClass/dataDistributionPerZone.csv")
+	private Path outputDataDistributionFile;
 
 	@CommandLine.Option(names = "--landuseConfiguration", description = "Set option of used OSM data. Options: useOnlyOSMLanduse, useOSMBuildingsAndLanduse, useExistingDataDistribution", defaultValue = "useOSMBuildingsAndLanduse")
 	private LanduseConfiguration usedLanduseConfiguration;
@@ -69,11 +74,20 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data", defaultValue = "contribs/small-scale-traffic-generation/test/input/org/matsim/smallScaleCommercialTrafficGeneration/investigationAreaData.csv")
 	private Path pathToInvestigationAreaData;
 
-	private final Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+	private Map<String, List<String>> landuseCategoriesAndDataConnection;
 	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
+	public CreateDataDistributionOfStructureData(LanduseDataConnectionCreator landuseDataConnectionCreator) {
+		CreateDataDistributionOfStructureData.landuseDataConnectionCreator = landuseDataConnectionCreator;
+		log.info("Using LanduseDataConnectionCreator {} to connect the types of the landuse data to the categories of the small scale commercial traffic generation", landuseDataConnectionCreator.getClass().getSimpleName());
+	}
+	public CreateDataDistributionOfStructureData() {
+		landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		log.info("Using default LanduseDataConnectionCreatorForOSM_Data to connect the types of the landuse data to the categories of the small scale commercial traffic generation");
+	}
+
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new CreateDataDistributionOfStructureData()).execute(args));
+		System.exit(new CommandLine(new CreateDataDistributionOfStructureData(landuseDataConnectionCreator)).execute(args));
 	}
 
 	@Override
@@ -101,13 +115,13 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		ShpOptions.Index indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS,
 			regionsShapeRegionColumn);
 
-		if(Files.notExists(output))
-			new File(output.toString()).mkdir();
+		if(Files.notExists(outputFacilityFile.getParent()))
+			new File(outputFacilityFile.toString()).mkdir();
 
-		createDefaultDataConnectionForOSM(landuseCategoriesAndDataConnection); //TODO: find way to import this connection
+		landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-			.createInputDataDistribution(output, landuseCategoriesAndDataConnection,
+			.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 				usedLanduseConfiguration.toString(), indexLanduse, indexZones,
 				indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
@@ -116,11 +130,10 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		ActivityFacilitiesFactory facilitiesFactory = facilities.getFactory();
 
 		calculateAreaSharesOfTheFacilities(facilities, facilitiesFactory);
-		Path facilityOutput = output.resolve("commercialFacilities.xml.gz");
-		log.info("Created {} facilities, writing to {}", facilities.getFacilities().size(), facilityOutput);
+		log.info("Created {} facilities, writing to {}", facilities.getFacilities().size(), outputFacilityFile);
 
 		FacilitiesWriter writer = new FacilitiesWriter(facilities);
-		writer.write(facilityOutput.toString());
+		writer.write(outputFacilityFile.toString());
 
 		return 0;
 	}

@@ -22,24 +22,19 @@ package org.matsim.core.utils.gis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FileDataStore;
-import org.geotools.data.FileDataStoreFinder;
+import org.geotools.api.data.*;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.type.Name;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
 import org.geotools.jdbc.JDBCDataStore;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
-import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.Name;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,6 +121,19 @@ public class GeoFileReader implements MatsimSomeReader {
 	 * @return list of contained features.
 	 */
 	public static List<SimpleFeature> getSimpleFeatures(DataStore dataStore, Name layerName) throws IOException {
+		SimpleFeatureSource featureSource = dataStore.getFeatureSource(layerName);
+		Gbl.assertNotNull(featureSource);
+		List<SimpleFeature> featureSet = getSimpleFeatures(featureSource);
+		dataStore.dispose();
+		return featureSet;
+	}
+
+	/**
+	 * Read all simple features from a data store. This method makes sure the store is closed afterwards.
+	 * @return list of contained features.
+	 * @see #getSimpleFeatures(DataStore, Name)
+	 */
+	public static List<SimpleFeature> getSimpleFeatures(DataStore dataStore, String layerName) throws IOException {
 		SimpleFeatureSource featureSource = dataStore.getFeatureSource(layerName);
 		Gbl.assertNotNull(featureSource);
 		List<SimpleFeature> featureSet = getSimpleFeatures(featureSource);

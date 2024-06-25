@@ -126,7 +126,7 @@ public final class NoiseOfflineCalculation{
 		if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
 			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "output_events.xml.gz";
 		} else {
-			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
+			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "/" + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
 		}
 		reader.readFile(eventsFile);
 		log.info("Reading events file... Done.");

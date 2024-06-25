@@ -130,8 +130,8 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 
 		for (File calculatedFile : Objects.requireNonNull(
 			Objects.requireNonNull(new File(utils.getOutputDirectory() + "calculatedData").listFiles()))) {
-			Map<String, Object2DoubleMap<String>> existingDataDistribution = readCSVInputAndCreateMap(calculatedFile.getAbsolutePath());
-			Map<String, Object2DoubleMap<String>> simulatedDataDistribution = readCSVInputAndCreateMap(
+			Map<String, Object2DoubleMap<String>> simulatedDataDistribution = readCSVInputAndCreateMap(calculatedFile.getAbsolutePath());
+			Map<String, Object2DoubleMap<String>> existingDataDistribution = readCSVInputAndCreateMap(
 				utils.getPackageInputDirectory() + "calculatedData/" + calculatedFile.getName());
 			compareDataDistribution(calculatedFile.getName(), existingDataDistribution, simulatedDataDistribution);
 		}

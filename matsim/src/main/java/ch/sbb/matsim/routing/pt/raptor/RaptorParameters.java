@@ -53,7 +53,7 @@ public class RaptorParameters {
      * it is compared to the pt generalized cost.
      * Set to a very high value to reduce direct walk results.
      */
-	private double directWalkFactor = 1.0;
+    private double directWalkFactor = 1.0;
 
     private double beelineWalkSpeed; // meter / second
 
@@ -65,10 +65,13 @@ public class RaptorParameters {
     private double transferPenaltyPerTravelTimeHour = 0.0;
     private double transferPenaltyMinimum = Double.NEGATIVE_INFINITY;
     private double transferPenaltyMaximum = Double.POSITIVE_INFINITY;
-    
+
     private boolean useTransportModeUtilities = false;
 
     private final SwissRailRaptorConfigGroup config;
+
+    private int maxTransfers = Integer.MAX_VALUE;
+    private boolean exactDeparturesOnly = false;
 
     public RaptorParameters(SwissRailRaptorConfigGroup config) {
         this.config = config;
@@ -161,13 +164,28 @@ public class RaptorParameters {
     public void setTransferPenaltyMaximum(double transferPenaltyMaximum) {
         this.transferPenaltyMaximum = transferPenaltyMaximum;
     }
-    
+
     public boolean isUseTransportModeUtilities() {
     	return useTransportModeUtilities;
     }
-    
+
     public void setUseTransportModeUtilities(boolean useTransportModeUtilities) {
     	this.useTransportModeUtilities = useTransportModeUtilities;
     }
 
+    int getMaxTransfers() {
+        return this.maxTransfers;
+    }
+
+    public void setMaxTransfers(int maxTransfers) {
+        this.maxTransfers = maxTransfers;
+    }
+
+    boolean isExactDeparturesOnly() {
+        return this.exactDeparturesOnly;
+    }
+
+    void setExactDeparturesOnly(boolean exactDeparturesOnly) {
+        this.exactDeparturesOnly = exactDeparturesOnly;
+    }
 }

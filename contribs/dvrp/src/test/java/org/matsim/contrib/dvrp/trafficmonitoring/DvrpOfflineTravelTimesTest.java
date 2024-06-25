@@ -59,7 +59,8 @@ public class DvrpOfflineTravelTimesTest {
 		linkTTs[linkIdB.index()] = new double[] { 5.5, 6.6, 7.7, 8.8, 9.9 };
 
 		var stringWriter = new StringWriter();
-		DvrpOfflineTravelTimes.saveLinkTravelTimes(new TimeDiscretizer(3600, 900), linkTTs, stringWriter);
+		DvrpOfflineTravelTimes.saveLinkTravelTimes(new TimeDiscretizer(3600, 900),
+				linkTTs, stringWriter, ";");
 
 		var lines = stringWriter.toString().split("\n");
 		assertThat(lines).hasSize(3);
@@ -76,7 +77,8 @@ public class DvrpOfflineTravelTimesTest {
 		var lines = String.join("\n", line0, line1, line2);
 
 		var stringReader = new BufferedReader(new StringReader(lines));
-		var linkTTs = DvrpOfflineTravelTimes.loadLinkTravelTimes(new TimeDiscretizer(3600, 900), stringReader);
+		var linkTTs = DvrpOfflineTravelTimes.loadLinkTravelTimes(new TimeDiscretizer(3600, 900),
+				stringReader, ";");
 
 		//the matrix may have more than 2 rows (depends on how many link ids are cached)
 		//all rows are null (except for links A and B)

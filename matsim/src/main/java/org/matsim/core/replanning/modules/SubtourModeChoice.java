@@ -33,16 +33,16 @@ import org.matsim.core.router.TripStructureUtils;
  * different mode given a list of possible modes.
  *
  * A subtour is a consecutive subset of a plan which starts and ends at the same link.
- * 
+ *
  * Certain modes are considered only if the choice would not require some resource to appear
  * out of thin air. For example, you can only drive your car back from work if you have previously parked it
  * there. These are called chain-based modes.
- * 
+ *
  * The assumption is that each chain-based mode requires one resource (car, bike, ...) and that this
  * resource is initially positioned at home. Home is the location of the first activity in the plan.
- * 
- * If the plan initially violates this constraint, this module may (!) repair it. 
- * 
+ *
+ * If the plan initially violates this constraint, this module may (!) repair it.
+ *
  * @author michaz
  *
  */
@@ -51,7 +51,27 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	private final double probaForChangeSingleTripMode;
 	private final double coordDist;
 
-	public enum Behavior {fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes, betweenAllAndFewerConstraints}
+	public enum Behavior {
+		/**
+		 * Allow agents to switch to specified modes from all other modes.
+		 * This implies that agents might switch to a specified mode, but won't be able to switch back
+		 * to their original mode. This option should not be used.
+		 */
+		@Deprecated
+		fromAllModesToSpecifiedModes,
+
+		/**
+		 * Allow agents switching from one of a specified mode to another specified mode.
+		 * Note, that agents that have an unclosed subtour, are not able to switch mode.
+		 * If you have unclosed/open subtours in your data, consider using {@link #betweenAllAndFewerConstraints}.
+		 */
+		fromSpecifiedModesToSpecifiedModes,
+
+		/**
+		 * Same as "fromSpecifiedModesToSpecifiedModes", but also allow agents with open subtours to switch modes.
+		 */
+		betweenAllAndFewerConstraints
+	}
 
 	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes;
 
@@ -85,19 +105,19 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;
 		this.coordDist = coordDist;
 	}
-	
+
 	@Deprecated // only use when backwards compatibility is needed. kai, may'18
 	public final void setBehavior ( Behavior behavior ) {
 		this.behavior = behavior ;
 	}
-	
+
 	protected String[] getModes() {
 		return modes.clone();
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		
+
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
 						TripStructureUtils.getRoutingModeIdentifier(),

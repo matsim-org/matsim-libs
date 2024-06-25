@@ -27,13 +27,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -57,19 +57,19 @@ public class LanduseBuildingAnalysis {
 	 * Creates a distribution of the given input data for each zone based on the
 	 * used OSM data.
 	 */
-	public static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path output,
+	public static Map<String, Object2DoubleMap<String>> createInputDataDistribution(Path outputDataDistributionFile,
 																					Map<String, List<String>> landuseCategoriesAndDataConnection,
 																					String usedLanduseConfiguration, Index indexLanduse,
 																					Index indexZones,
 																					Index indexBuildings, Index indexInvestigationAreaRegions,
 																					String shapeFileZoneNameColumn,
 																					Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone,
-																					Path pathToInvestigationAreaData, String shapeFileBuildingTypeColumn)
+																					Path pathToInvestigationAreaData,
+																					String shapeFileBuildingTypeColumn)
 		throws IOException {
 
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
 		Map<String, String> zoneIdRegionConnection = new HashMap<>();
-		Path outputFileInOutputFolder = output.resolve("dataDistributionPerZone.csv");
 
 		log.info("New analyze for data distribution is started. The used method is: {}", usedLanduseConfiguration);
 		Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone = new HashMap<>();
@@ -83,29 +83,11 @@ public class LanduseBuildingAnalysis {
 		createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
 			landuseCategoriesAndDataConnection, zoneIdRegionConnection);
 
-		writeResultOfDataDistribution(resultingDataPerZone, outputFileInOutputFolder,
+		writeResultOfDataDistribution(resultingDataPerZone, outputDataDistributionFile,
 			zoneIdRegionConnection);
 
 
 		return resultingDataPerZone;
-	}
-
-	public static void createDefaultDataConnectionForOSM(Map<String, List<String>> landuseCategoriesAndDataConnection) {
-		landuseCategoriesAndDataConnection.put("Inhabitants",
-                new ArrayList<>(Arrays.asList("residential", "apartments", "dormitory", "dwelling_house", "house",
-                        "retirement_home", "semidetached_house", "detached")));
-		landuseCategoriesAndDataConnection.put("Employee Primary Sector", new ArrayList<>(
-                Arrays.asList("farmyard", "farmland", "farm", "farm_auxiliary", "greenhouse", "agricultural")));
-		landuseCategoriesAndDataConnection.put("Employee Construction",
-                new ArrayList<>(List.of("construction")));
-		landuseCategoriesAndDataConnection.put("Employee Secondary Sector Rest",
-                new ArrayList<>(Arrays.asList("industrial", "factory", "manufacture", "bakehouse")));
-		landuseCategoriesAndDataConnection.put("Employee Retail",
-                new ArrayList<>(Arrays.asList("retail", "kiosk", "mall", "shop", "supermarket")));
-		landuseCategoriesAndDataConnection.put("Employee Traffic/Parcels", new ArrayList<>(
-                Arrays.asList("commercial", "post_office", "storage", "storage_tank", "warehouse")));
-		landuseCategoriesAndDataConnection.put("Employee Tertiary Sector Rest", new ArrayList<>(
-                Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
 	}
 
 	/**
@@ -138,10 +120,8 @@ public class LanduseBuildingAnalysis {
 					resultingDataPerZone.get(zoneId).mergeDouble(categoryData, 0., Double::sum);
 					if (landuseCategoriesAndDataConnection.get(categoryData).contains(categoryLanduse)) {
 						double additionalArea = landuseCategoriesPerZone.get(zoneId).getDouble(categoryLanduse);
-						// because the category commercial is in two categories (traffic/parcels and
-						// Tertiary Sector Rest
-						if (categoryLanduse.equals("commercial"))
-							additionalArea = additionalArea * 0.5;
+//						// because the categoryLanduse can be in two categories (e.g., traffic/parcels and Tertiary Sector Rest
+						additionalArea = additionalArea / LanduseDataConnectionCreator.getNumberOfEmployeeCategoriesOfThisTyp(landuseCategoriesAndDataConnection, categoryLanduse);
 						resultingDataPerZone.get(zoneId).mergeDouble(categoryData, additionalArea, Double::sum);
 						totalSquareMetersPerCategory.get(regionOfZone).mergeDouble(categoryData, additionalArea,
 								Double::sum);
@@ -271,21 +251,31 @@ public class LanduseBuildingAnalysis {
 	 *
 	 * @param building      the building to be analyzed
 	 * @param buildingTypes the types of the building
-	 * @return
+	 * @return the area of the building for each category
 	 */
 	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
 		double buildingLevels;
+		double buildingLevelsPerType;
 		if (building.getAttribute("levels") == null)
 			buildingLevels = 1;
-		else
-			buildingLevels = (long) building.getAttribute("levels")
-				/ (double) buildingTypes.length;
+		else {
+			Object levelsAttribute = building.getAttribute("levels");
+			if (levelsAttribute instanceof String) {
+				buildingLevels = Double.parseDouble((String) levelsAttribute);
+			} else if (levelsAttribute instanceof Long) {
+				buildingLevels = (long) levelsAttribute;
+			} else {
+				throw new RuntimeException("The attribute 'levels' of the building shape is not a string or a long.");
+			}
+		}
+		buildingLevelsPerType = buildingLevels / (double) buildingTypes.length;
+
 		double groundArea;
 		if (building.getAttribute("area") != null)
 			groundArea = (int) (long) building.getAttribute("area");
 		else
 			groundArea = ((Geometry) building.getDefaultGeometry()).getArea();
-		double area = groundArea * buildingLevels;
+		double area = groundArea * buildingLevelsPerType;
 		return (int) Math.round(area);
 	}
 

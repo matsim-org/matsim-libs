@@ -31,7 +31,7 @@ public class SharingVehicleSource implements AgentSource {
         for (SharingVehicleSpecification veh : specification.getVehicles()) {
             Id<Link> startLink = veh.getStartLinkId().get();
             Id<Vehicle> vehId = Id.createVehicleId(veh.getId().toString());
-            Vehicle basicVehicle = factory.createVehicle(vehId, VehicleUtils.getDefaultVehicleType());
+            Vehicle basicVehicle = factory.createVehicle(vehId, VehicleUtils.createDefaultVehicleType());
             QVehicleImpl qvehicle = new QVehicleImpl(basicVehicle);
             qvehicle.setCurrentLink(this.qsim.getScenario().getNetwork().getLinks().get(startLink));
             qsim.addParkedVehicle(qvehicle, startLink);

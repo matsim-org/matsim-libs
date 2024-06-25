@@ -37,10 +37,12 @@ public class CsvOptionsTest {
 
 			printer.printRecord("header", "column");
 			printer.printRecord("1", "2");
+			printer.printRecord("3", "4");
+			printer.printRecord("5", "6");
 			printer.close();
 
 			assertThat(tmp)
-				.hasContent("header" + delimiter + "column\n1" + delimiter + "2");
+				.hasContent("header" + delimiter + "column\n1" + delimiter + "2" + "\n3" + delimiter + "4" + "\n5" + delimiter + "6");
 
 			assertThat(delimiter).isEqualTo(CsvOptions.detectDelimiter(tmp.toString()).toString());
 		}
