@@ -1,0 +1,47 @@
+{
+  "namespace": "org.matsim.application.avro",
+  "type": "record",
+  "name": "XYTData",
+  "fields": [
+    {
+      "name": "crs",
+      "type": "string",
+      "doc": "Coordinate reference system"
+    },
+    {
+      "name": "xCoords",
+      "doc": "List of x coordinates",
+      "type": {
+        "type": "array",
+        "items": "float"
+      }
+    },
+    {
+      "name": "yCoords",
+      "doc": "List of y coordinates",
+      "type": {
+        "type": "array",
+        "items": "float"
+      }
+    },
+    {
+      "name": "timestamps",
+      "doc": "List of timestamps in seconds",
+      "type": {
+        "type": "array",
+        "items": "int"
+      }
+    },
+    {
+      "name": "data",
+      "doc": "XYT data for each dataset. The key is the name, the data is stored in one chunk of data.",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "array",
+          "items": "float"
+        }
+      }
+    }
+  ]
+}

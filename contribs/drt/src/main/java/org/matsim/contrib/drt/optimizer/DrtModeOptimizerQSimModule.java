@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
@@ -110,13 +111,17 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(PassengerStopDurationProvider.class)))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
+						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet())));
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl());
 
-		bindModal(CostCalculationStrategy.class).to(drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated ?
+		DefaultDrtOptimizationConstraintsSet defaultOptimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		bindModal(CostCalculationStrategy.class)
+				.to(defaultOptimizationConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated
+						?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
@@ -148,7 +153,8 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(drtCfg.maxAllowedPickupDelay)));
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
+				defaultOptimizationConstraintsSet.maxAllowedPickupDelay)));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(

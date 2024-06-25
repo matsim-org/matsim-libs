@@ -21,4 +21,9 @@ public final class Header {
 	 */
 	public Boolean fullScreen;
 
+	/**
+	 * Set the dashboard to appear only when a certain file / directory is present.
+	 */
+	public String triggerPattern;
+
 }

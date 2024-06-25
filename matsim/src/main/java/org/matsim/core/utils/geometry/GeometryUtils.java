@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.geometry.jts.GeometryBuilder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -40,13 +41,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author kainagel
  *
  */
 public class GeometryUtils {
+
+	private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+
 	private GeometryUtils() {} // do not instantiate
 
 	/**
@@ -101,13 +104,13 @@ public class GeometryUtils {
 	public static LineString createGeotoolsLineString(Link link) {
 		Coordinate fromCoord = MGC.coord2Coordinate( link.getFromNode().getCoord() ) ;
 		Coordinate toCoord = MGC.coord2Coordinate( link.getToNode().getCoord() ) ;
-		LineString theSegment = new GeometryFactory().createLineString(new Coordinate[]{ fromCoord, toCoord });
+		LineString theSegment = GEOMETRY_FACTORY.createLineString(new Coordinate[] { fromCoord, toCoord });
 		return theSegment;
 	}
 
 	public static Point createGeotoolsPoint(Coord coord ) {
 		Coordinate coordinate = MGC.coord2Coordinate(coord) ;
-		Point point = new GeometryFactory().createPoint( coordinate ) ;
+		Point point = GEOMETRY_FACTORY.createPoint(coordinate);
 		return point ;
 	}
 

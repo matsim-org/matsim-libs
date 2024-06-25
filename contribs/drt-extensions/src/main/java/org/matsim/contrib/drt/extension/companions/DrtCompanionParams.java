@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.drt.extension.companions;
 
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import java.util.Arrays;
 import java.util.List;

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.vehicles.Vehicle;
 
@@ -67,5 +68,14 @@ public class ChargingEndEvent extends Event {
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
 		attr.put(ATTRIBUTE_CHARGE, charge + "");
 		return attr;
+	}
+
+	public static ChargingEndEvent convert(GenericEvent genericEvent) {
+		Map<String, String> attributes = genericEvent.getAttributes();
+		double time = genericEvent.getTime();
+		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ChargingEndEvent.ATTRIBUTE_VEHICLE));
+		Id<Charger> chargerId = Id.create(attributes.get(ChargingEndEvent.ATTRIBUTE_CHARGER), Charger.class);
+		double charge = Double.parseDouble(attributes.get(ChargingEndEvent.ATTRIBUTE_CHARGE));
+		return new ChargingEndEvent(time, chargerId, vehicleId, charge);
 	}
 }

@@ -3,7 +3,9 @@
 <config>
 	<module name="dvrp">
 		<parameterset type="travelTimeMatrix">
-			<param name="cellSize" value="10"/>
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="10"/>
+			</parameterset>
 		</parameterset>
 	</module>
 
@@ -11,10 +13,12 @@
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="stopDuration" value="60"/>
-			<param name="maxWaitTime" value="900"/>
-			<param name="maxTravelTimeAlpha" value="1.3"/>
-			<param name="maxTravelTimeBeta" value="600"/>
-			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="900"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="600"/>
+				<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
+			</parameterset>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>

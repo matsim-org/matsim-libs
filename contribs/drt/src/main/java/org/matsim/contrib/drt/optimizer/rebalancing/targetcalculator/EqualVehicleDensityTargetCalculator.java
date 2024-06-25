@@ -23,19 +23,18 @@
  */
 package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.ToDoubleFunction;
-
+import com.google.common.base.Preconditions;
 import jakarta.validation.constraints.NotNull;
-
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 /**
  * This class does not really calculate the expected demand but aims to
@@ -46,32 +45,32 @@ import com.google.common.base.Preconditions;
  */
 public final class EqualVehicleDensityTargetCalculator implements RebalancingTargetCalculator {
 
-	private final Map<DrtZone, Double> zoneAreaShares = new HashMap<>();
+	private final Map<Id<Zone>, Double> zoneAreaShares = new IdMap<>(Zone.class);
 	private final FleetSpecification fleetSpecification;
 
-	public EqualVehicleDensityTargetCalculator(@NotNull DrtZonalSystem zonalSystem,
+	public EqualVehicleDensityTargetCalculator(@NotNull ZoneSystem zonalSystem,
 			@NotNull FleetSpecification fleetSpecification) {
 		initAreaShareMap(zonalSystem);
 		this.fleetSpecification = fleetSpecification;
 	}
 
 	@Override
-	public ToDoubleFunction<DrtZone> calculate(double time,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		return zone -> zoneAreaShares.getOrDefault(zone, 0.) * fleetSpecification.getVehicleSpecifications().size();
+	public ToDoubleFunction<Zone> calculate(double time,
+			Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		return zone -> zoneAreaShares.getOrDefault(zone.getId(), 0.) * fleetSpecification.getVehicleSpecifications().size();
 	}
 
-	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
+	private void initAreaShareMap(ZoneSystem zonalSystem) {
 		double areaSum = zonalSystem.getZones()
 				.values()
 				.stream()
 				.mapToDouble(z -> z.getPreparedGeometry().getGeometry().getArea())
 				.sum();
 
-		for (DrtZone zone : zonalSystem.getZones().values()) {
+		for (Zone zone : zonalSystem.getZones().values()) {
 			double areaShare = zone.getPreparedGeometry().getGeometry().getArea() / areaSum;
 			Preconditions.checkState(areaShare >= 0. && areaShare <= 1.);
-			zoneAreaShares.put(zone, areaShare);
+			zoneAreaShares.put(zone.getId(), areaShare);
 		}
 	}
 }

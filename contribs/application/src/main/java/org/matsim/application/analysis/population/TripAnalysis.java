@@ -27,28 +27,48 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
 import tech.tablesaw.selection.Selection;
 
-import java.io.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
 @CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
-	produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv"}
+	produces = {
+		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
+		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv",
+		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
+		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
+	}
 )
 public class TripAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 
+	/**
+	 * Attributes which relates this person to a reference person.
+	 */
+	public static String ATTR_REF_ID = "ref_id";
+	/**
+	 * Person attribute that contains the reference modes of a person. Multiple modes are delimited by "-".
+	 */
+	public static String ATTR_REF_MODES = "ref_modes";
+	/**
+	 * Person attribute containing its weight for analysis purposes.
+	 */
+	public static String ATTR_REF_WEIGHT = "ref_weight";
+
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
 	@CommandLine.Mixin
 	private OutputOptions output = OutputOptions.ofCommand(TripAnalysis.class);
+
+	@CommandLine.Option(names = "--input-ref-data", description = "Optional path to reference data", required = false)
+	private String refData;
 
 	@CommandLine.Option(names = "--match-id", description = "Pattern to filter agents by id")
 	private String matchId;
@@ -95,7 +115,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
 			.sample(false)
-			.separator(new CsvOptions().detectDelimiter(input.getPath("persons.csv"))).build());
+			.separator(CsvOptions.detectDelimiter(input.getPath("persons.csv"))).build());
 
 		int total = persons.rowCount();
 
@@ -132,13 +152,14 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		// Map.of only has 10 argument max
 		columnTypes.put("traveled_distance", ColumnType.LONG);
+		columnTypes.put("euclidean_distance", ColumnType.LONG);
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("trips.csv"))).build());
 
-		// Trip filter with start and end
+		// Trip filter with start AND end
 		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
 			Geometry geometry = shp.getGeometry();
 			GeometryFactory f = new GeometryFactory();
@@ -154,6 +175,28 @@ public class TripAnalysis implements MATSimAppCommand {
 			}
 
 			trips = trips.where(Selection.with(idx.toIntArray()));
+//		trip filter with start OR end
+		} else if (shp.isDefined() && filter == LocationFilter.trip_start_or_end) {
+			Geometry geometry = shp.getGeometry();
+			GeometryFactory f = new GeometryFactory();
+			IntList idx = new IntArrayList();
+
+			for (int i = 0; i < trips.rowCount(); i++) {
+				Row row = trips.row(i);
+				Point start = f.createPoint(new Coordinate(row.getDouble("start_x"), row.getDouble("start_y")));
+				Point end = f.createPoint(new Coordinate(row.getDouble("end_x"), row.getDouble("end_y")));
+				if (geometry.contains(start) || geometry.contains(end)) {
+					idx.add(i);
+				}
+			}
+
+			trips = trips.where(Selection.with(idx.toIntArray()));
+		}
+
+		TripByGroupAnalysis groups = null;
+		if (refData != null) {
+			groups = new TripByGroupAnalysis(refData);
+			groups.groupPersons(persons);
 		}
 
 		// Use longest_distance_mode where main_mode is not present
@@ -179,6 +222,24 @@ public class TripAnalysis implements MATSimAppCommand {
 		joined.addColumns(dist_group);
 
 		writeModeShare(joined, labels);
+
+		if (groups != null) {
+			groups.analyzeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+		}
+
+		if (persons.containsColumn(ATTR_REF_MODES)) {
+			try {
+				TripChoiceAnalysis choices = new TripChoiceAnalysis(persons, trips, modeOrder);
+
+				choices.writeChoices(output.getPath("mode_choices.csv"));
+				choices.writeChoiceEvaluation(output.getPath("mode_choice_evaluation.csv"));
+				choices.writeChoiceEvaluationPerMode(output.getPath("mode_choice_evaluation_per_mode.csv"));
+				choices.writeConfusionMatrix(output.getPath("mode_confusion_matrix.csv"));
+				choices.writeModePredictionError(output.getPath("mode_prediction_error.csv"));
+			} catch (RuntimeException e) {
+				log.error("Error while analyzing mode choices", e);
+			}
+		}
 
 		writePopulationStats(persons, joined);
 
@@ -329,7 +390,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		table.write().csv(output.getPath("mode_users.csv").toFile());
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
-
 			printer.printRecord("Info", "Value");
 			printer.printRecord("Persons", tripsPerPerson.size());
 			printer.printRecord("Mobile persons [%]", new BigDecimal(100 * totalMobile / tripsPerPerson.size()).setScale(2, RoundingMode.HALF_UP));
@@ -370,8 +430,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		TextColumn purpose = trips.textColumn("end_activity_type");
 
 		// Remove suffix durations like _345
-		Selection withDuration = purpose.matchesRegex("^.+_[0-9]+$");
-		purpose.set(withDuration, purpose.where(withDuration).replaceAll("_[0-9]+$", ""));
+		purpose.set(Selection.withRange(0, purpose.size()), purpose.replaceAll("_[0-9]{2,}$", ""));
 
 		Table tArrival = trips.summarize("trip_id", count).by("end_activity_type", "arrival_h");
 
@@ -404,6 +463,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	 */
 	enum LocationFilter {
 		trip_start_and_end,
+		trip_start_or_end,
 		home,
 		none
 	}

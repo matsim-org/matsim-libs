@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.contrib.gtfs.TransitSchedulePostProcessTools;
 import org.matsim.core.config.ConfigUtils;
@@ -42,10 +43,10 @@ import java.util.function.Predicate;
  * @author rakow
  */
 @CommandLine.Command(
-		name = "transit-from-gtfs",
-		description = "Create transit schedule and vehicles from GTFS data and merge pt network into existing network",
-		showDefaultValues = true,
-		mixinStandardHelpOptions = true
+	name = "transit-from-gtfs",
+	description = "Create transit schedule and vehicles from GTFS data and merge pt network into existing network",
+	showDefaultValues = true,
+	mixinStandardHelpOptions = true
 )
 public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
@@ -102,8 +103,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		// Output files
 		File scheduleFile = new File(output, name + "-transitSchedule.xml.gz");
 		File networkPTFile = new File(output,
-				FilenameUtils.getName(IOUtils.resolveFileOrResource(networkFile).getPath())
-						.replace(".xml", "-with-pt.xml"));
+			FilenameUtils.getName(IOUtils.resolveFileOrResource(networkFile).getPath())
+				.replace(".xml", "-with-pt.xml"));
 		File transitVehiclesFile = new File(output, name + "-transitVehicles.xml.gz");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -118,13 +119,13 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			log.info("Converting {} at date {}", gtfsFile, date);
 
 			GtfsConverter.Builder converter = GtfsConverter.newBuilder()
-					.setScenario(scenario)
-					.setTransform(ct)
-					.setDate(date) // use first date for all sets
-					.setFeed(gtfsFile)
-					//.setIncludeAgency(agency -> agency.equals("rbg-70"))
-					.setIncludeStop(createFilter(i))
-					.setMergeStops(mergeStops);
+				.setScenario(scenario)
+				.setTransform(ct)
+				.setDate(date) // use first date for all sets
+				.setFeed(gtfsFile)
+				//.setIncludeAgency(agency -> agency.equals("rbg-70"))
+				.setIncludeStop(createFilter(i))
+				.setMergeStops(mergeStops);
 
 			if (prefixes.size() > 0) {
 				String prefix = prefixes.get(i);
@@ -216,6 +217,9 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(reRbVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(reRbVehicleType, 1.0 / 10.0); // 1s per boarding agent, distributed on 10 doors
 			VehicleUtils.setEgressTime(reRbVehicleType, 1.0 / 10.0); // 1s per alighting agent, distributed on 10 doors
+
+			addHbefaMapping(reRbVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
+
 			scenario.getTransitVehicles().addVehicleType(reRbVehicleType);
 		}
 		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType(Id.create("S-Bahn_veh_type", VehicleType.class));
@@ -237,6 +241,9 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(uBahnVehicleType, 1.0 / 18.0); // 1s per boarding agent, distributed on 6*3 doors
 			VehicleUtils.setEgressTime(uBahnVehicleType, 1.0 / 18.0); // 1s per alighting agent, distributed on 6*3 doors
 			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
+
+			addHbefaMapping(uBahnVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
+
 		}
 		VehicleType tramVehicleType = vehicleFactory.createVehicleType(Id.create("Tram_veh_type", VehicleType.class));
 		{
@@ -291,7 +298,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				gtfsTransitType = Integer.parseInt((String) line.getAttributes().getAttribute("gtfs_route_type"));
 			} catch (NumberFormatException e) {
 				log.error("unknown transit mode! Line id was " + line.getId().toString() +
-						"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
+					"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
 				throw new RuntimeException("unknown transit mode");
 			}
 
@@ -357,7 +364,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					break;
 				default:
 					log.warn("unknown transit mode! Line id was " + line.getId().toString() +
-							"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
+						"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
 
 					lineVehicleType = ptVehicleType;
 			}
@@ -393,13 +400,13 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					// if there is no departure offset set (or infinity), it is the last stop of the line,
 					// so we don't need to care about the stop duration
 					double stopDuration = routeStop.getDepartureOffset().isDefined() ?
-							routeStop.getDepartureOffset().seconds() - routeStop.getArrivalOffset().seconds() : minStopTime;
+						routeStop.getDepartureOffset().seconds() - routeStop.getArrivalOffset().seconds() : minStopTime;
 					// ensure arrival at next stop early enough to allow for 30s stop duration -> time for passengers to board / alight
 					// if link freespeed had been set such that the pt veh arrives exactly on time, but departure tiome is identical
 					// with arrival time the pt vehicle would have been always delayed
 					// Math.max to avoid negative values of travelTime
 					double travelTime = Math.max(1, routeStop.getArrivalOffset().seconds() - lastDepartureOffset - 1.0 -
-							(stopDuration >= minStopTime ? 0 : (minStopTime - stopDuration)));
+						(stopDuration >= minStopTime ? 0 : (minStopTime - stopDuration)));
 					Link link = network.getLinks().get(routeStop.getStopFacility().getLinkId());
 					increaseLinkFreespeedIfLower(link, link.getLength() / travelTime);
 					lastDepartureOffset = routeStop.getDepartureOffset().seconds();
@@ -417,6 +424,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		}
 
 		return scenario;
+	}
+
+	private static void addHbefaMapping(VehicleType vehicleType, HbefaVehicleCategory category) {
+		EngineInformation carEngineInformation = vehicleType.getEngineInformation();
+		VehicleUtils.setHbefaVehicleCategory(carEngineInformation, String.valueOf(category));
+		VehicleUtils.setHbefaTechnology(carEngineInformation, "average");
+		VehicleUtils.setHbefaSizeClass(carEngineInformation, "average");
+		VehicleUtils.setHbefaEmissionsConcept(carEngineInformation, "average");
 	}
 
 	private static void increaseLinkFreespeedIfLower(Link link, double newFreespeed) {

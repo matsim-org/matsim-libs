@@ -186,7 +186,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
 					if ( wrnCnt < 10 ) {
 						wrnCnt++ ;
-						if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
+						if ( spaceConsumptionOfHoles > spaceAvailableForHoles ) {
 							log.warn("we have a problem: holes consume too much space:" ) ;
 							log.warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
 							log.warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;

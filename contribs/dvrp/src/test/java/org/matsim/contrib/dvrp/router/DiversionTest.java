@@ -287,7 +287,7 @@ public class DiversionTest {
 				return Fleets.createDefaultFleet(fleetSpecification, getter.getModal(Network.class).getLinks()::get);
 			})).in(Singleton.class);
 
-			bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
+			bindModal(VehicleType.class).toInstance(VehicleUtils.createDefaultVehicleType());
 
 			install(new VrpAgentSourceQSimModule(getMode()));
 

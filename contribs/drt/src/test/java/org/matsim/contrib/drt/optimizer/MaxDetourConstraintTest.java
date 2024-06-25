@@ -2,10 +2,13 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -24,22 +27,28 @@ public class MaxDetourConstraintTest {
 	@Test
 	public void testMaxDetourConstraint() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+
+		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfig,
 			new OTFVisConfigGroup());
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// Max wait time
-		drtConfigGroup.maxWaitTime = 300;
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxWaitTime = 300;
 
 		// Turn on the max detour constraint
-		drtConfigGroup.maxDetourAlpha = 1.5;
-		drtConfigGroup.maxDetourBeta = 300;
-		drtConfigGroup.maxAllowedPickupDelay = 180;
-		drtConfigGroup.maxAbsoluteDetour = 1200;
+		defaultConstraintsSet.maxDetourAlpha = 1.5;
+		defaultConstraintsSet.maxDetourBeta = 300;
+		defaultConstraintsSet.maxAllowedPickupDelay = 180;
+		defaultConstraintsSet.maxAbsoluteDetour = 1200;
 
 		// Make the max total travel time constraints very loose (i.e., make it not active)
-		drtConfigGroup.maxTravelTimeAlpha = 10;
-		drtConfigGroup.maxTravelTimeBeta = 7200;
+		defaultConstraintsSet.maxTravelTimeAlpha = 10;
+		defaultConstraintsSet.maxTravelTimeBeta = 7200;
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

@@ -21,6 +21,7 @@ package playground.vsp.demandde.pendlermatrix;
 
 import java.util.Collection;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -33,7 +34,6 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.pipeline.PopulationReaderTask;
 import playground.vsp.pipeline.PopulationWriterTask;
