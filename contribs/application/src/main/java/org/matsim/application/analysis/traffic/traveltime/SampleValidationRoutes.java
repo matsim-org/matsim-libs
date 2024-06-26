@@ -19,10 +19,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.CrsOptions;
-import org.matsim.application.options.InputOptions;
-import org.matsim.application.options.OutputOptions;
-import org.matsim.application.options.ShpOptions;
+import org.matsim.application.options.*;
 import org.matsim.application.prepare.network.SampleNetwork;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -310,7 +307,8 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 
 		GeotoolsTransformation ct = new GeotoolsTransformation(crs, "EPSG:4326");
 
-		try (CSVParser parser = CSVParser.parse(IOUtils.getBufferedReader(inputOD), CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
+		try (CSVParser parser = CSVParser.parse(IOUtils.getBufferedReader(inputOD), CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).
+			setDelimiter(CsvOptions.detectDelimiter(inputOD)).build())) {
 
 			List<String> header = parser.getHeaderNames();
 			if (!header.contains("from_node"))
