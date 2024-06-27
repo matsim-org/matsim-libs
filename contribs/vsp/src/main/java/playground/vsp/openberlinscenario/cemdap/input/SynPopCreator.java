@@ -30,6 +30,7 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,13 +40,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.openberlinscenario.Gender;
 import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
@@ -53,12 +53,12 @@ import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
 /**
  * This class creates a full population of a study region (in Germany) based on the Zensus and the Pendlerstatistik. People are assigned
  * places or residence and with demographic attributes based on the Zensus and with commuter relations based on the Pendlerstatistik.
- * 
+ *
  * @author dziemke
  */
 public class SynPopCreator {
 	private static final Logger LOG = LogManager.getLogger(SynPopCreator.class);
-	
+
 	private static final Random random = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible.
 
 	// Storage objects
@@ -71,7 +71,7 @@ public class SynPopCreator {
 	// Optional (links municipality ID to LOR/PLZ IDs in that municipality)
 	private final Map<String, List<String>> spatialRefinementZoneIds = new HashMap<>();
 	private List<String> idsOfMunicipalitiesForSpatialRefinement;
-	
+
 	// Parameters
 	private String outputBase;
 	private List<String> idsOfFederalStatesIncluded;
@@ -93,7 +93,7 @@ public class SynPopCreator {
 	private int allEmployees = 0;
 	private int allPersons = 0;
 	private int allStudents = 0;
-	
+
 
 	public static void main(String[] args) {
 		// Input and output files
@@ -104,11 +104,11 @@ public class SynPopCreator {
 		String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4};
 		String censusFile = "../../shared-svn/studies/countries/de/open_berlin_scenario/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung_BE_BB.csv";
 		String outputBase = "../../shared-svn/studies/countries/de/open_berlin_scenario/be_5/cemdap_input/505/";
-		
+
 		// Parameters
 		int numberOfPlansPerPerson = 10; // Note: Set this higher to a value higher than 1 if spatial refinement is used.
 		List<String> idsOfFederalStatesIncluded = Arrays.asList("11", "12"); // 11=Berlin, 12=Brandenburg
-		
+
 		// Default ratios are used for cases where information is missing, which is the case for smaller municipalities.
 		double defaultAdultsToEmployeesRatio = 1.23;  // Calibrated based on sum value from Zensus 2011.
 		double defaultCensusEmployeesToCommutersRatio = 2.5;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
@@ -126,14 +126,14 @@ public class SynPopCreator {
 		demandGeneratorCensus.generateDemand();
 	}
 
-	
-	public SynPopCreator(String[] commuterFilesOutgoing, String censusFile, String outputBase, int numberOfPlansPerPerson, 
+
+	public SynPopCreator(String[] commuterFilesOutgoing, String censusFile, String outputBase, int numberOfPlansPerPerson,
 			List<String> idsOfFederalStatesIncluded, double defaultAdultsToEmployeesRatio, double defaultEmployeesToCommutersRatio) {
 		LogToOutputSaver.setOutputDirectory(outputBase);
-		
+
 		this.outputBase = outputBase;
 		this.numberOfPlansPerPerson = numberOfPlansPerPerson;
-		
+
 		this.idsOfFederalStatesIncluded = idsOfFederalStatesIncluded;
 		this.idsOfFederalStatesIncluded.stream().forEach(e -> {
 			if (e.length()!=2) throw new IllegalArgumentException("Length of the id for each federal state must be equal to 2. This is not the case for "+ e);
@@ -141,7 +141,7 @@ public class SynPopCreator {
 
 		this.defaultAdultsToEmployeesRatio = defaultAdultsToEmployeesRatio;
 		this.defaultEmployeesToCommutersRatio = defaultEmployeesToCommutersRatio;
-		
+
 		this.population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		this.households = new HashMap<>();
 
@@ -158,7 +158,7 @@ public class SynPopCreator {
 		}
 	}
 
-	
+
 	public void generateDemand() {
 		if (this.shapeFileForSpatialRefinement != null && this.refinementFeatureKeyInShapefile != null ) {
 			this.idsOfMunicipalitiesForSpatialRefinement.stream().forEach(e->spatialRefinementZoneIds.put(e, new ArrayList<>()));
@@ -173,7 +173,7 @@ public class SynPopCreator {
 		}
 
 		int counter = 1;
-		
+
 		for (String munId : relationsMap.keySet()) { // Loop over municipalities from commuter file
 			Map<String, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(munId);
 
@@ -300,7 +300,7 @@ public class SynPopCreator {
 		LOG.warn("Total number of employees: " + this.allEmployees);
 		LOG.warn("Total population: " + this.allPersons);
 		LOG.warn("Total number of students: " + this.allStudents);
-		
+
 		// Write output files
 		if (this.writeCemdapInputFiles) {
 			writeCemdapHouseholdsFile(this.households, this.outputBase + "households.dat.gz");
@@ -318,8 +318,8 @@ public class SynPopCreator {
 			}
 		}
 	}
-	
-	
+
+
 	private Population clonePopulationAndAdjustLocations(Population inputPopulation){
 		Population clonedPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (Person person : inputPopulation.getPersons().values()) {
@@ -334,7 +334,7 @@ public class SynPopCreator {
 			for(CEMDAPPersonAttributes attributeKey : CEMDAPPersonAttributes.values()){
 				clonedPerson.getAttributes().putAttribute(attributeKey.toString(), person.getAttributes().getAttribute(attributeKey.toString()));
 			}
-			
+
 			// change locations or use spatially refined location
 			if ((boolean) person.getAttributes().getAttribute(CEMDAPPersonAttributes.employed.toString())) {
 				String locationOfWork = (String) person.getAttributes().getAttribute(CEMDAPPersonAttributes.locationOfWork.toString());
@@ -363,7 +363,7 @@ public class SynPopCreator {
 	}
 
 
-	private void createHouseholdsAndPersons(int counter, String municipalityId, int numberOfPersons, Gender gender, int lowerAgeBound, int upperAgeBound, 
+	private void createHouseholdsAndPersons(int counter, String municipalityId, int numberOfPersons, Gender gender, int lowerAgeBound, int upperAgeBound,
 			double adultsToEmployeesRatio, List<String> commuterRelationList) {
 		for (int i = 0; i < numberOfPersons; i++) {
 			this.allPersons++;
@@ -375,7 +375,7 @@ public class SynPopCreator {
 			household.getAttributes().putAttribute(CEMDAPHouseholdAttributes.homeTSZLocation.toString(), getExactLocation(municipalityId));
 			household.getAttributes().putAttribute(CEMDAPHouseholdAttributes.numberOfChildren.toString(), 0); // None, ignore them in this version
 			household.getAttributes().putAttribute(CEMDAPHouseholdAttributes.householdStructure.toString(), 1); // 1 = single, no children
-			
+
 			Id<Person> personId = Id.create(householdId + "01", Person.class); // TODO Currently only singel-person households
 			Person person = this.population.getFactory().createPerson(personId);
 
@@ -385,14 +385,14 @@ public class SynPopCreator {
 				employed = getEmployed(adultsToEmployeesRatio);
 			}
 			person.getAttributes().putAttribute(CEMDAPPersonAttributes.employed.toString(), employed);
-			
+
 			boolean student = false;
 			if (lowerAgeBound < 30 && upperAgeBound > 17 && !employed) { // Younger and older people are never a student, employed people neither
 				student = true; // TODO quite simplistic assumption, which may be improved later
 				allStudents++;
-			}			
+			}
 			person.getAttributes().putAttribute(CEMDAPPersonAttributes.student.toString(), student);
-			
+
 			if (employed) {
 				allEmployees++;
 				if (commuterRelationList.size() == 0) { // No relations left in list, which employee could choose from
@@ -419,22 +419,22 @@ public class SynPopCreator {
 			} else {
 				person.getAttributes().putAttribute(CEMDAPPersonAttributes.locationOfSchool.toString(), "-99");
 			}
-			
+
 			person.getAttributes().putAttribute(CEMDAPPersonAttributes.hasLicense.toString(), true); // for CEMDAP's "driversLicence" variable
 			person.getAttributes().putAttribute(CEMDAPPersonAttributes.gender.toString(), gender.name()); // for CEMDAP's "female" variable
 			person.getAttributes().putAttribute(CEMDAPPersonAttributes.age.toString(), getAgeInBounds(lowerAgeBound, upperAgeBound));
 			person.getAttributes().putAttribute(CEMDAPPersonAttributes.parent.toString(), false);
-			
+
 			this.population.addPerson(person);
-			
+
 			List<Id<Person>> personIds = new ArrayList<>(); // Does in current implementation (only 1 p/hh) not make much sense
 			personIds.add(personId);
 			household.setMemberIds(personIds);
 			this.households.put(householdId, household);
 		}
-	}	
-	
-			
+	}
+
+
 	private static void scaleRelations(Map<String, CommuterRelationV2> relationsFromMunicipality, int employeesMale,
 			int employeesFemale, double defaultEmployeesToCommutersRatio) {
 		// Count all commuters starting in the given municipality
@@ -460,7 +460,7 @@ public class SynPopCreator {
 			}
 			commutersFemale += relation.getTripsFemale();
 		}
-		
+
 		// Compute ratios
 		double employeesToCommutersMaleRatio;
 		double employeesToCommutersFemaleRatio;
@@ -474,7 +474,7 @@ public class SynPopCreator {
 		} else {
 			employeesToCommutersFemaleRatio = defaultEmployeesToCommutersRatio;
 		}
-		
+
 		// Scale
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
 			relation.setTripsMale((int) Math.ceil(relation.getTripsMale() * employeesToCommutersMaleRatio));
@@ -532,15 +532,15 @@ public class SynPopCreator {
 	private static boolean getEmployed(double adultsToEmployeesRatio) {
 		return random.nextDouble() * adultsToEmployeesRatio < 1;
 	}
-	
-	
+
+
 	private static int getAgeInBounds(int lowerBound, int upperBound) {
 		return (int) (lowerBound + random.nextDouble() * (upperBound - lowerBound + 1));
 	}
 
 
 	private Map<String,List<String>> readShapeForSpatialRefinement() {
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(this.shapeFileForSpatialRefinement);
+		Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(this.shapeFileForSpatialRefinement);
 
 		for (SimpleFeature feature : features) {
 			String municipality;
@@ -554,14 +554,14 @@ public class SynPopCreator {
 		}
 		return spatialRefinementZoneIds;
 	}
-	
-	
+
+
 	private void writeCemdapHouseholdsFile(Map<Id<Household>, Household> households, String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 
 		try {
 			bufferedWriterHouseholds = IOUtils.getBufferedWriter(fileName);
-    		
+
     		for (Household household : households.values()) {
     			int householdId = Integer.parseInt(household.getId().toString());
     			int numberOfAdults = (Integer) household.getAttributes().getAttribute(CEMDAPHouseholdAttributes.numberOfAdults.toString());
@@ -579,7 +579,7 @@ public class SynPopCreator {
     					+ "\t" + 0);
     			bufferedWriterHouseholds.newLine();
     		}
-    		
+
     	} catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -594,43 +594,43 @@ public class SynPopCreator {
         }
 		LOG.info("Households file " + fileName + " written.");
     }
-	
-	
+
+
 	private void writeCemdapPersonsFile(Population population, String fileName) {
 		BufferedWriter bufferedWriterPersons = null;
 
 		try {
 			bufferedWriterPersons = IOUtils.getBufferedWriter(fileName);
-			    		    		
+
 			for (Person person : population.getPersons().values()) {
 				Attributes attr = person.getAttributes();
 				int householdId = Integer.parseInt(attr.getAttribute(CEMDAPPersonAttributes.householdId.toString()).toString());
 				int personId = Integer.parseInt(person.getId().toString());
-				
+
 				int employed;
 				if ((boolean) attr.getAttribute(CEMDAPPersonAttributes.employed.toString())) {
 					employed = 1;
 				} else {
 					employed = 0;
 				}
-				
+
 				int student;
 				if ((boolean) attr.getAttribute(CEMDAPPersonAttributes.student.toString())) {
 					student = 1;
 				} else {
 					student = 0;
 				}
-				
+
 				int driversLicence;
 				if ((boolean) attr.getAttribute(CEMDAPPersonAttributes.hasLicense.toString())) {
 					driversLicence = 1;
 				} else {
 					driversLicence = 0;
 				}
-				
+
 				int locationOfWork = Integer.parseInt(attr.getAttribute(CEMDAPPersonAttributes.locationOfWork.toString()).toString());
 				int locationOfSchool = Integer.parseInt(attr.getAttribute(CEMDAPPersonAttributes.locationOfSchool.toString()).toString());
-				
+
 				int female;
 				if (Gender.valueOf((String) attr.getAttribute(CEMDAPPersonAttributes.gender.toString())) == Gender.male) {
 					female = 0;
@@ -639,25 +639,25 @@ public class SynPopCreator {
 				} else {
 					throw new IllegalArgumentException("Gender must either be male or female.");
 				}
-				
+
 				int age = (Integer) attr.getAttribute(CEMDAPPersonAttributes.age.toString());
-				
+
 				int parent;
 				if ((boolean) attr.getAttribute(CEMDAPPersonAttributes.parent.toString())) {
 					parent = 1;
 				} else {
 					parent = 0;
 				}
-				
+
 				// Altogether this creates 59 columns = number in query file
 				bufferedWriterPersons.write(householdId + "\t" + personId + "\t" + employed  + "\t" + student
 						+ "\t" + driversLicence + "\t" + locationOfWork + "\t" + locationOfSchool
-						+ "\t" + female + "\t" + age + "\t" + parent + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
-						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
-						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
-						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
-						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
-						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
+						+ "\t" + female + "\t" + age + "\t" + parent + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0
+						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0
+						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0
+						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0
+						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0
+						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0
 						+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 );
 				bufferedWriterPersons.newLine();
 			}
@@ -676,26 +676,26 @@ public class SynPopCreator {
 		LOG.info("Persons file " + fileName + " written.");
 	}
 
-	
+
 	private static void writeMatsimPlansFile(Population population, String fileName) {
 		PopulationWriter popWriter = new PopulationWriter(population);
 	    popWriter.write(fileName);
 	}
-	
-	
+
+
 	// Getters and setters
     public Population getPopulation() {
     	return this.population;
 	}
-    
+
     public void setShapeFileForSpatialRefinement(String shapeFileForSpatialRefinement) {
     	this.shapeFileForSpatialRefinement = shapeFileForSpatialRefinement;
     }
-    
+
     public void setIdsOfMunicipalitiesForSpatialRefinement(List<String> idsOfMunicipalitiesForSpatialRefinement) {
     	this.idsOfMunicipalitiesForSpatialRefinement = idsOfMunicipalitiesForSpatialRefinement;
     }
-    
+
     public void setRefinementFeatureKeyInShapefile(String refinementFeatureKeyInShapefile) {
     	this.refinementFeatureKeyInShapefile = refinementFeatureKeyInShapefile;
     }
@@ -703,7 +703,7 @@ public class SynPopCreator {
 	public void setMunicipalityFeatureKeyInShapefile(String municipalityFeatureKeyInShapefile) {
 		this.municipalityFeatureKeyInShapefile = municipalityFeatureKeyInShapefile;
 	}
-	
+
 	public void setWriteCemdapInputFiles(boolean writeCemdapInputFiles) {
     	this.writeCemdapInputFiles = writeCemdapInputFiles;
     }
@@ -715,14 +715,14 @@ public class SynPopCreator {
     public void setIncludeChildren(boolean includeChildren) {
     	this.includeChildren = includeChildren;
     }
-    
+
     public List<Population> getAllPopulations() {
     	if (!memorizeAllPopulations) {
     		throw new RuntimeException("The corresponding container object has not been filles. 'memorizeAllPopulations' needs to be activated.");
     	}
     	return this.allPopulations;
 	}
-    
+
     public void setMemorizeAllPopulations(boolean memorizeAllPopulations) {
     	this.memorizeAllPopulations = memorizeAllPopulations;
     }

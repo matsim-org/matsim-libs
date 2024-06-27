@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import java.util.Objects;
 
 /**
- * Rail links which can has multiple tracks and corresponds to exactly one link.
+ * Rail links can have multiple tracks and corresponds to exactly one link.
  */
 public final class RailLink implements HasLinkId {
 	private final Id<Link> id;

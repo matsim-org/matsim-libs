@@ -22,10 +22,10 @@ package org.matsim.contrib.drt.optimizer.insertion.selective;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -49,10 +49,19 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
+		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
+			var insertionParams = (SelectiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
+			var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
+					insertionParams.restrictiveBeelineSpeedFactor, getter.getModal(TravelTimeMatrix.class),
+					getter.getModal(TravelTime.class));
+			return restrictiveDetourTimeEstimator;
+		}));
+		
 		addModalComponent(SelectiveInsertionSearch.class, modalProvider(getter -> {
-			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(drtCfg,
-					getter.getModal(InsertionCostCalculator.class), getter.getModal(TravelTimeMatrix.class),
-					getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(), getter.getModal(StopTimeCalculator.class));
+			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(
+					getter.getModal(InsertionCostCalculator.class),
+					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
+					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
 			// Use 0 as the cost for the selected insertion:
 			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
 			//   no other insertion to compare with.

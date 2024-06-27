@@ -25,11 +25,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.data.SimpleFeatureSource;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
@@ -40,74 +40,73 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileReader;
 
 public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
-	
+
 	private static final Logger log = LogManager.getLogger(WorkHomeShapeCounter.class);
 
 	private final Coord minXY;
 	private final Coord maxXY;
 	private String actTypeOne;
 	private String actTypeTwo;
-	
+
 	private boolean initDone = false;
 	private String shapeFile;
 	private SimpleFeatureSource featureSource;
 	private HashMap<Polygon, Integer> polygonCountMap = new HashMap<Polygon, Integer>();
 	private HashMap<Polygon, String> polyNameMap = new HashMap<Polygon, String>();
-	
+
 	@Override
 	public void run(Person person) {
-		
+
 		if(!this.initDone){
 			init();
 		}
-		
+
 		int nofPlans = person.getPlans().size();
-	
+
 		for (int planId = 0; planId < nofPlans; planId++) {
 			Plan plan = person.getPlans().get(planId);
-			
+
 			// search selected plan
 			if (PersonUtils.isSelected(plan)) {
-				
-				// do something				
+
+				// do something
 				for (PlanElement pEOne : plan.getPlanElements()) {
 					if(pEOne instanceof Activity){
-						
-						// check - actTypeOne in search area? 
-						Activity actOne = (Activity) pEOne;						
+
+						// check - actTypeOne in search area?
+						Activity actOne = (Activity) pEOne;
 						if(actOne.getType().equalsIgnoreCase(this.actTypeOne)){
 							// it is of type actTypeOne -> check coords
-							
+
 							if(actIsSituatedInGivenSearchArea(actOne)){
 								// act one ok, check type two;
-								
+
 								for (PlanElement pETwo : plan.getPlanElements()) {
 									if(pETwo instanceof Activity){
-										
-										Activity actTwo = (Activity) pETwo;										
+
+										Activity actTwo = (Activity) pETwo;
 										if(actTwo.getType().equalsIgnoreCase(this.actTypeTwo)){
-											
-											// act two ok - search corresponding shape											
+
+											// act two ok - search corresponding shape
 											searchCorrespondingShape(actTwo);
 											break;
 										}
-										
-									}									
-								}								
+
+									}
+								}
 								break;
-							}							
-							
-						}						
-						
+							}
+
+						}
+
 					}
 				}
-				
+
 			}
-		}		
+		}
 	}
 
 	public WorkHomeShapeCounter(Coord minXY, Coord maxXY, String actTypeOne, String actTypeTwo, String shapeFile){
@@ -130,14 +129,14 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 		}
 		return strB.toString();
 	}
-	
+
 	public void toFile(String filename){
-		
+
 		int numberOfActs = 0;
 		for (Polygon poly : this.polygonCountMap.keySet()) {
 			numberOfActs += this.polygonCountMap.get(poly).intValue();
 		}
-		
+
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename)));
 			writer.write("#Results with " + this.actTypeOne + " act in minXY " + this.minXY + " maxXY " + this.maxXY + " and " + this.actTypeTwo + " act located in"); writer.newLine();
@@ -159,10 +158,10 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 	 * Put all polygon in an iterable list
 	 */
 	private void init() {
-		
+
 		try {
-			this.featureSource = ShapeFileReader.readDataFile(this.shapeFile);			
-	
+			this.featureSource = GeoFileReader.readDataFile(this.shapeFile);
+
 			SimpleFeatureIterator fIt = this.featureSource.getFeatures().features();
 			while (fIt.hasNext()) {
 				SimpleFeature ft = fIt.next();
@@ -174,13 +173,13 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 						this.polyNameMap.put(poly, (String) ft.getAttribute("Bezirk"));
 					}
 				}
-			}			
-			
+			}
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		this.initDone = true;
 	}
 
@@ -189,8 +188,8 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 		if(this.minXY.getY() > act.getCoord().getY()){ return false;}
 		if(this.maxXY.getX() < act.getCoord().getX()){ return false;}
 		if(this.maxXY.getY() < act.getCoord().getY()){ return false;}
-		
-		return true;		
+
+		return true;
 	}
 
 	private void searchCorrespondingShape(Activity actTwo) {

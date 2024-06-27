@@ -77,10 +77,17 @@ public class DashboardTests {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		run(new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv"));
+		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv")
+			.withGroupedRefData("mode_share_per_group_dist_ref.csv")
+			.withChoiceEvaluation(true);
+
+		run(dashboard);
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv");
+			.isDirectoryContaining("glob:**mode_share.csv")
+			.isDirectoryContaining("glob:**mode_choices.csv")
+			.isDirectoryContaining("glob:**mode_choice_evaluation.csv")
+			.isDirectoryContaining("glob:**mode_confusion_matrix.csv");
 
 	}
 

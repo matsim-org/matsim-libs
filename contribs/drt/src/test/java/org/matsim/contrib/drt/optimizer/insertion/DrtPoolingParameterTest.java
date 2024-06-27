@@ -9,12 +9,16 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -208,7 +212,12 @@ public class DrtPoolingParameterTest {
 	private PersonEnterDrtVehicleEventHandler setupAndRunScenario(double maxWaitTime, double maxTravelTimeAlpha,
 			double maxTravelTimeBeta) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+
+		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfig,
 				new OTFVisConfigGroup());
 
 		config.plans().setInputFile(null);
@@ -218,9 +227,12 @@ public class DrtPoolingParameterTest {
 
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		mm.getModalElements().forEach(x -> {
-			x.maxWaitTime = maxWaitTime;
-			x.maxTravelTimeAlpha = maxTravelTimeAlpha;
-			x.maxTravelTimeBeta = maxTravelTimeBeta;
+			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+					(DefaultDrtOptimizationConstraintsSet) x.addOrGetDrtOptimizationConstraintsParams()
+							.addOrGetDefaultDrtOptimizationConstraintsSet();
+			defaultConstraintsSet.maxWaitTime = maxWaitTime;
+			defaultConstraintsSet.maxTravelTimeAlpha = maxTravelTimeAlpha;
+			defaultConstraintsSet.maxTravelTimeBeta = maxTravelTimeBeta;
 			x.stopDuration = 1.;
 		});
 

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * <p>
  * Based on the estimator in the discrete_mode_choice module.
  */
-public class PtTripEstimator implements TripEstimator<ModeAvailability> {
+public class PtTripEstimator implements TripEstimator {
 
 	private static final Logger log = LogManager.getLogger(PtTripEstimator.class);
 

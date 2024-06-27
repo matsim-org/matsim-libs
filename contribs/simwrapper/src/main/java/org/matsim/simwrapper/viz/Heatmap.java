@@ -43,7 +43,12 @@ public class Heatmap extends Viz {
 	 * and y axes. Can be useful if your data is stored
 	 * one way, but you want it displayed the other.
 	 */
-	public String flipAxes;
+	public Boolean flipAxes;
+
+	/**
+	 * Show labels on the heatmap.
+	 */
+	public Boolean showLabels;
 
 	public Heatmap() {
 		super("heatmap");

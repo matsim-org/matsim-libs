@@ -175,6 +175,8 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			if (departure != null) {
 				Time.parseOptionalTime(departure).ifDefined(stopBuilder::departureOffset);
 			}
+			stopBuilder.allowBoarding(Boolean.parseBoolean(atts.getValue(Constants.ALLOW_BOARDING)));
+			stopBuilder.allowAlighting(Boolean.parseBoolean(atts.getValue(Constants.ALLOW_ALIGHTING)));
 			stopBuilder.awaitDepartureTime(Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE)));
 			this.currentTransitRoute.stopBuilders.add(stopBuilder);
 		} else if (Constants.RELATION.equals(name)) {

@@ -24,6 +24,8 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
 /**
+ * We think that this updates travel times after reach iteration (i.e. during "replanning" which seems a bit the wrong place where to do this).  kai, feb'24
+ *
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtRouteUpdater extends ReplanningListener {

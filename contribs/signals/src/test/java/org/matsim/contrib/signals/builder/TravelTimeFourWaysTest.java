@@ -38,8 +38,7 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.*;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 /**
  * @author aneumann
@@ -125,7 +124,7 @@ public class TravelTimeFourWaysTest {
 
 		eventsXmlWriter.closeFile();
 //	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
-		Assertions.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
+		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
 	}
 
 }

@@ -26,6 +26,7 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -37,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -45,7 +46,6 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.Facility;
-import org.opengis.feature.simple.SimpleFeature;
 
 
 public class PendlerMatrixReader {
@@ -80,8 +80,8 @@ public class PendlerMatrixReader {
 	}
 
 	private void readShape() {
-		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(this.shapeFile);
-		ActivityFacilitiesFactory factory = ((MutableScenario)this.sc).getActivityFacilities().getFactory();
+		Collection<SimpleFeature> landkreise = GeoFileReader.getAllFeatures(this.shapeFile);
+		ActivityFacilitiesFactory factory = this.sc.getActivityFacilities().getFactory();
 		for (SimpleFeature landkreis : landkreise) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			Geometry geo = (Geometry) landkreis.getDefaultGeometry();

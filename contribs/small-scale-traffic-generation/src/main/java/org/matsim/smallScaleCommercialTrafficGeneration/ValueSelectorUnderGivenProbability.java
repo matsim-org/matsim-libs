@@ -45,8 +45,8 @@ public class ValueSelectorUnderGivenProbability {
 			sum += l.getProbability();
 			cumulativeProbabilities.add(sum);
 		}
-		//Generate a random number between 0 and 1
-		double r = Math.random() * sum;
+		//Generate a random number between 0 and sum
+		double r = rnd.nextDouble(0.0, sum);
 		//Select a value based on the cumulative probabilities
 		String selectedLetter = ProbabilityDistribution.stream()
 			//Find the first value whose cumulative probability is greater than the random number
@@ -58,14 +58,6 @@ public class ValueSelectorUnderGivenProbability {
 			.filter(a -> a.getValue().equals(selectedLetter))
 			.findFirst()
 			.ifPresent(l -> l.setExpectedCount(l.getExpectedCount() + 1));
-
-		//After 'testCount' loops, print out the number of times each value was selected and the percentage it represents
-//		 for (ProbabilityForValue probabilityForValue : ProbabilityDistribution) {
-//			System.out.println(probabilityForValue.getValue()
-//				+ " -> expected: " + probabilityForValue.getExpectedCount()
-//				+ "(" + String.format("%.2f", (probabilityForValue.getExpectedCount() * Math.pow(anIntAsSum,
-//				-1)) * 100) + " %); prob: " + ((double)Math.round(probabilityForValue.getProbability() * 1000)/10) + "%");
-//		}
 	}
 	public void writeResults(){
 		for (ProbabilityForValue probabilityForValue : ProbabilityDistribution) {

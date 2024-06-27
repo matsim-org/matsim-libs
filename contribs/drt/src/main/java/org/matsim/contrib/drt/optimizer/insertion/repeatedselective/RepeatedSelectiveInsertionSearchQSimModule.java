@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion.repeatedselective;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SingleInsertionDetourPathCalculator;
@@ -41,6 +42,8 @@ import org.matsim.core.router.util.TravelTime;
  * @author steffenaxer
  */
 public class RepeatedSelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModule {
+    private static final double SPEED_FACTOR = 1.;
+    
     private final DrtConfigGroup drtCfg;
 
     public RepeatedSelectiveInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
@@ -50,11 +53,17 @@ public class RepeatedSelectiveInsertionSearchQSimModule extends AbstractDvrpMode
 
     @Override
     protected void configureQSim() {
+		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
+			var detourTimeEstimatorWithUpdatedTravelTimes = DetourTimeEstimatorWithAdaptiveTravelTimes.create(
+					SPEED_FACTOR, getter.getModal(AdaptiveTravelTimeMatrix.class), getter.getModal(TravelTime.class));
+			return detourTimeEstimatorWithUpdatedTravelTimes;
+		}));
+    	
         addModalComponent(RepeatedSelectiveInsertionSearch.class, modalProvider(getter -> {
-            RepeatedSelectiveInsertionProvider provider = RepeatedSelectiveInsertionProvider.create(
-                    getter.getModal(InsertionCostCalculator.class), getter.getModal(AdaptiveTravelTimeMatrix.class),
-                    getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
-                    getter.getModal(StopTimeCalculator.class));
+			RepeatedSelectiveInsertionProvider provider = RepeatedSelectiveInsertionProvider.create(
+					getter.getModal(InsertionCostCalculator.class),
+					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
+					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
             var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
             return new RepeatedSelectiveInsertionSearch(provider,
                     getter.getModal(SingleInsertionDetourPathCalculator.class),

@@ -21,6 +21,7 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.DrtModeQSimModule;
@@ -66,16 +67,19 @@ public class MultiModeTaxiModule extends AbstractModule {
 		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
 		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
 		// manually after the TaxiAsDrtConfigGroup config is created.
-		drtCfg.maxWaitTime = 3600;
-		drtCfg.maxTravelTimeAlpha = 2;
-		drtCfg.maxTravelTimeBeta = 3600;
-		drtCfg.maxAbsoluteDetour = Double.MAX_VALUE;
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxWaitTime = 3600;
+		defaultConstraintsSet.maxTravelTimeAlpha = 2;
+		defaultConstraintsSet.maxTravelTimeBeta = 3600;
+		defaultConstraintsSet.maxAbsoluteDetour = Double.MAX_VALUE;
 
-		drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		drtCfg.changeStartLinkToLastLinkInSchedule = taxiCfg.changeStartLinkToLastLinkInSchedule;
 		drtCfg.idleVehiclesReturnToDepots = false;
 		drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtCfg.maxWalkDistance = Double.MAX_VALUE;
+		defaultConstraintsSet.maxWalkDistance = Double.MAX_VALUE;
 		drtCfg.vehiclesFile = taxiCfg.taxisFile;
 		drtCfg.transitStopFile = null;
 		drtCfg.drtServiceAreaShapeFile = null;

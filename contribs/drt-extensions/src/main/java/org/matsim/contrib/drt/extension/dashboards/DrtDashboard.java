@@ -386,7 +386,7 @@ public class DrtDashboard implements Dashboard {
 				.el(Line.class, (viz, data) -> {
 					viz.title = "Relative Statistics per iteration";
 					viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
-					viz.description = "Pooling ratio (Pax distance / Vehicle mileage), Detour ratio, and Empty Ratio";
+					viz.description = "Occupancy rate (Pax distance / Vehicle mileage), Detour ratio, and Empty Ratio";
 					viz.x = "iteration";
 					viz.columns = List.of("d_p/d_t", "l_det", "emptyRatio");
 					viz.legendName = List.of("Pooling ratio", "Detour ratio", "Empty Ratio");
