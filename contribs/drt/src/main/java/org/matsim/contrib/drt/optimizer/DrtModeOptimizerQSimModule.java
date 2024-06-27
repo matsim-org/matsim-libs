@@ -20,15 +20,13 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
-import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -36,8 +34,8 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
+import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
@@ -65,9 +63,6 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)

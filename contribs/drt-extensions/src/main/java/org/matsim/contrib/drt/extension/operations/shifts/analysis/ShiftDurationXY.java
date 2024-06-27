@@ -30,9 +30,12 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualDuration = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakDuration = new HashMap<>();
 
-    public ShiftDurationXY(Provider<DrtShiftsSpecification> shifts) {
+    private final String mode;
+
+    public ShiftDurationXY(Provider<DrtShiftsSpecification> shifts, String mode) {
         super();
         this.shifts = shifts;
+        this.mode = mode;
         reset(0);
     }
 
@@ -40,30 +43,38 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
 
     @Override
     public void handleEvent(final DrtShiftStartedEvent event) {
-        shift2StartTime.put(event.getShiftId(), event.getTime());
+        if (event.getMode().equals(mode)) {
+            shift2StartTime.put(event.getShiftId(), event.getTime());
+        }
     }
 
     @Override
     public void handleEvent(DrtShiftBreakStartedEvent event) {
-        shift2BreakStartTime.put(event.getShiftId(), event.getTime());
+        if (event.getMode().equals(mode)) {
+            shift2BreakStartTime.put(event.getShiftId(), event.getTime());
+        }
     }
 
     @Override
     public void handleEvent(final DrtShiftEndedEvent event) {
-        final Double start = shift2StartTime.get(event.getShiftId());
-        double duration = event.getTime() - start;
-        final DrtShiftSpecification drtShift = shifts.get().getShiftSpecifications().get(event.getShiftId());
-        double plannedDuration = drtShift.getEndTime() - drtShift.getStartTime();
-        shift2plannedVsActualDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
+        if (event.getMode().equals(mode)) {
+            final Double start = shift2StartTime.get(event.getShiftId());
+            double duration = event.getTime() - start;
+            final DrtShiftSpecification drtShift = shifts.get().getShiftSpecifications().get(event.getShiftId());
+            double plannedDuration = drtShift.getEndTime() - drtShift.getStartTime();
+            shift2plannedVsActualDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
+        }
     }
 
     @Override
     public void handleEvent(DrtShiftBreakEndedEvent event) {
-        final Double start = shift2BreakStartTime.get(event.getShiftId());
-        double duration = event.getTime() - start;
-        final DrtShiftBreakSpecification drtShift = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
-        double plannedDuration = drtShift.getDuration();
-        shift2plannedVsActualBreakDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
+        if (event.getMode().equals(mode)) {
+            final Double start = shift2BreakStartTime.get(event.getShiftId());
+            double duration = event.getTime() - start;
+            final DrtShiftBreakSpecification drtShift = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
+            double plannedDuration = drtShift.getDuration();
+            shift2plannedVsActualBreakDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
+        }
     }
 
     @Override

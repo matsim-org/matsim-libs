@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;

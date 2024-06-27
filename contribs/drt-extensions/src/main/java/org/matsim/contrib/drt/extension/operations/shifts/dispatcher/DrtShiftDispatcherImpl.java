@@ -49,6 +49,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final static Logger logger = LogManager.getLogger(DrtShiftDispatcherImpl.class);
 
+    private final String mode;
+
     private Queue<DrtShift> unscheduledShifts;
     private Queue<ShiftEntry> assignedShifts;
     private Queue<ShiftEntry> activeShifts;
@@ -74,10 +76,11 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 	private final ShiftStartLogic shiftStartLogic;
 	private final AssignShiftToVehicleLogic assignShiftToVehicleLogic;
 
-    public DrtShiftDispatcherImpl(DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
-								  OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
-								  Network network, EventsManager eventsManager, ShiftsParams drtShiftParams,
-								  ShiftStartLogic shiftStartLogic, AssignShiftToVehicleLogic assignShiftToVehicleLogic) {
+    public DrtShiftDispatcherImpl(String mode, DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
+                                  OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
+                                  Network network, EventsManager eventsManager, ShiftsParams drtShiftParams,
+                                  ShiftStartLogic shiftStartLogic, AssignShiftToVehicleLogic assignShiftToVehicleLogic) {
+        this.mode = mode;
         this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;
@@ -140,7 +143,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 OperationFacility breakFacility = decideOnBreak(activeShift);
                 if (breakFacility != null) {
                     shiftTaskScheduler.relocateForBreak(activeShift.vehicle(), breakFacility, shift);
-                    eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), shift.getId(),
+                    eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), mode, shift.getId(),
                             activeShift.vehicle().getId(), breakFacility.getLinkId(),
                             shift.getBreak().orElseThrow().getScheduledLatestArrival()));
                 }
@@ -169,7 +172,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 iterator.remove();
                 logger.debug("Started shift " + next.shift());
                 StayTask currentTask = (StayTask) next.vehicle().getSchedule().getCurrentTask();
-                eventsManager.processEvent(new DrtShiftStartedEvent(timeStep, next.shift().getId(), next.vehicle().getId(),
+                eventsManager.processEvent(new DrtShiftStartedEvent(timeStep, mode, next.shift().getId(), next.vehicle().getId(),
                         currentTask.getLink().getId()));
             }
         }
@@ -262,7 +265,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         Gbl.assertNotNull(vehicle);
         vehicle.addShift(shift);
         assignedShifts.add(new ShiftEntry(shift, vehicle));
-        eventsManager.processEvent(new DrtShiftAssignedEvent(timer.getTimeOfDay(), shift.getId(), vehicle.getId()));
+        eventsManager.processEvent(new DrtShiftAssignedEvent(timer.getTimeOfDay(), mode, shift.getId(), vehicle.getId()));
     }
 
     private void endShifts(double timeStep) {
@@ -370,7 +373,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                     shiftChangeFacility.register(next.vehicle().getId());
                     changeOverTask.getFacility().deregisterVehicle(next.vehicle().getId());
                     eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(),
-                            next.vehicle().getId(), shiftChangeFacility.getId()));
+                            mode, next.vehicle().getId(), shiftChangeFacility.getId()));
                 }
             }
         }
@@ -426,7 +429,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 		if (shiftChangeoverFacility != null && shiftChangeoverFacility.register(endingShift.vehicle().getId())) {
             shiftTaskScheduler.relocateForShiftChange(endingShift.vehicle(),
                     network.getLinks().get(shiftChangeoverFacility.getLinkId()), endingShift.shift(), shiftChangeoverFacility);
-            eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(), endingShift.vehicle().getId(),
+            eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(), mode, endingShift.vehicle().getId(),
                     shiftChangeoverFacility.getId()));
         } else {
             throw new RuntimeException("Could not find shift end location!");
@@ -458,7 +461,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 }
                 if (shiftBreakFacility.register(activeShift.vehicle().getId())) {
                     eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(),
-                            activeShift.vehicle().getId(), shiftBreakFacility.getId()));
+                            mode, activeShift.vehicle().getId(), shiftBreakFacility.getId()));
                     return shiftBreakFacility;
                 }
             }
@@ -471,7 +474,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final DrtShift shift = vehicle.getShifts().poll();
         logger.debug("Ended shift " + shift.getId());
         shift.end();
-        eventsManager.processEvent(new DrtShiftEndedEvent(timer.getTimeOfDay(), shift.getId(), vehicle.getId(), id, operationFacilityId));
+        eventsManager.processEvent(new DrtShiftEndedEvent(timer.getTimeOfDay(),mode,  shift.getId(), vehicle.getId(), id, operationFacilityId));
         if (vehicle.getShifts().isEmpty()) {
             idleVehiclesQueues.get(operationFacilityId).add(vehicle);
         }
@@ -482,13 +485,18 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final OperationFacility facility = previousTask.getFacility();
         facility.deregisterVehicle(vehicle.getId());
         eventsManager.processEvent(
-                new VehicleLeftShiftFacilityEvent(timer.getTimeOfDay(), vehicle.getId(), facility.getId()));
-        eventsManager.processEvent(new DrtShiftBreakEndedEvent(timer.getTimeOfDay(), vehicle.getShifts().peek().getId(),
-                vehicle.getId(), previousTask.getFacility().getLinkId()));
+                new VehicleLeftShiftFacilityEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
+        eventsManager.processEvent(
+                new DrtShiftBreakEndedEvent(timer.getTimeOfDay(), mode, vehicle.getShifts().peek().getId(),
+                vehicle.getId(), previousTask.getFacility().getLinkId())
+        );
     }
 
     public void startBreak(ShiftDvrpVehicle vehicle, Id<Link> linkId) {
-        eventsManager.processEvent(new DrtShiftBreakStartedEvent(timer.getTimeOfDay(), vehicle.getShifts().peek().getId(), vehicle.getId(), linkId));
+        eventsManager.processEvent(
+                new DrtShiftBreakStartedEvent(timer.getTimeOfDay(), mode,
+                vehicle.getShifts().peek().getId(), vehicle.getId(), linkId)
+        );
     }
 
     private boolean isSchedulable(DrtShift shift, double timeStep) {
