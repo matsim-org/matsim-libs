@@ -109,7 +109,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                       strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
                       //					strategyManager.addStrategy(new
                       // RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
-                      strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+                      strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 4);
                       //					strategyManager.addStrategy(new
                       // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
                       strategyManager.setMaxPlansPerAgent(5);
@@ -146,8 +146,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     config.network().setInputFile(
             "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
-    config.controller().setOverwriteFileSetting(
-            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    config.global().setCoordinateSystem("EPSG:31468");
+    config.global().setRandomSeed(4177);
+    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
     config.controller().setWriteEventsInterval(1);
 
     FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
@@ -206,12 +207,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     {
       LogisticChain directChain;
       {
-        Carrier singleCarrier = CarriersUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
+        Carrier singleCarrier = CarriersUtils.createCarrier(Id.create(lspName+"_singleCarrier", Carrier.class));
         singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
         CarriersUtils.addCarrierVehicle(singleCarrier,
             CarrierVehicle.newInstance(
-                Id.createVehicleId("singleCarrier"),
+                Id.createVehicleId("singleCarrierTruck"),
                 depotLinkFromVehicles,
                 vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
         LSPResource singleCarrierResource =
@@ -235,7 +236,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
       LogisticChain hubChain;
       {
-        Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+        Carrier mainCarrier = CarriersUtils.createCarrier(Id.create(lspName+"_mainCarrier", Carrier.class));
         mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
         CarriersUtils.addCarrierVehicle(
@@ -268,7 +269,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
         LSPResource hubResource =
             ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
-                    Id.create("Hub", LSPResource.class), hubLinkId, scenario)
+                    Id.create(lspName+"_Hub", LSPResource.class), hubLinkId, scenario)
                 .setTransshipmentHubScheduler(hubScheduler)
                 .build();
 
@@ -281,7 +282,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                 .build();
 
         Carrier distributionCarrier =
-            CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+            CarriersUtils.createCarrier(Id.create(lspName+"_distributionCarrier", Carrier.class));
         distributionCarrier
             .getCarrierCapabilities()
             .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
