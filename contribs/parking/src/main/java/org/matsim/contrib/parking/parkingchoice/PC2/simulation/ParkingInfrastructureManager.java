@@ -119,27 +119,27 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
 	}
 
-	@Override
-	public synchronized void setRentableParking(LinkedList<RentableParking> rentableParkings) {
-		for (RentableParking pp : rentableParkings) {
-			rentablePrivateParking.put(pp.getOwnerId(), pp);
-			getAllParkings().put(pp.getId(), pp);
-		}
-	}
+//	@Override
+//	public synchronized void setRentableParking(LinkedList<RentableParking> rentableParkings) {
+//		for (RentableParking pp : rentableParkings) {
+//			rentablePrivateParking.put(pp.getOwnerId(), pp);
+//			getAllParkings().put(pp.getId(), pp);
+//		}
+//	}
+//
+//	@Override
+//	public synchronized void setPrivateParkingRestrictedToFacilities(
+//			LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
+//		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
+//			for (Id<ActivityFacility> facilityId : pp.getFacilityIds()) {
+//				privateParkingsRestrictedToFacilities.put(facilityId, pp);
+//				getAllParkings().put(pp.getId(), pp);
+//			}
+//		}
+//	}
 
 	@Override
-	public synchronized void setPrivateParkingRestrictedToFacilities(
-			LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
-		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
-			for (Id<ActivityFacility> facilityId : pp.getFacilityIds()) {
-				privateParkingsRestrictedToFacilities.put(facilityId, pp);
-				getAllParkings().put(pp.getId(), pp);
-			}
-		}
-	}
-
-	@Override
-	public synchronized void reset() {
+	public synchronized void notifyBeforeMobsim() {
 		parkedVehicles.clear();
 
 		for (PC2Parking parking : getAllParkings().values()) {
@@ -174,45 +174,45 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 		return publicParkingsQuadTree;
 	}
 
-	@Override
-	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate,
-			String groupName) {
-		PC2Parking parking = null;
-		if (groupName == null) {
-			parking = publicParkingsQuadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
-		} else {
-			QuadTree<PC2Parking> quadTree = publicParkingGroupQuadTrees.get(groupName);
-			parking = quadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
+//	@Override
+//	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate,
+//			String groupName) {
+//		PC2Parking parking = null;
+//		if (groupName == null) {
+//			parking = publicParkingsQuadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
+//		} else {
+//			QuadTree<PC2Parking> quadTree = publicParkingGroupQuadTrees.get(groupName);
+//			parking = quadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
+//
+//			if (parking == null) {
+//				throw new Error("system is in inconsistent state: " +
+//						"not enough parking available for parkingGroupName:" + groupName);
+//			}
+//		}
+//		parkVehicle(parking);
+//
+//		return parking;
+//	}
 
-			if (parking == null) {
-				throw new Error("system is in inconsistent state: " +
-						"not enough parking available for parkingGroupName:" + groupName);
-			}
-		}
-		parkVehicle(parking);
-
-		return parking;
-	}
-
-	@Override
-	public synchronized void logArrivalEventAtTimeZero(PC2Parking parking) {
-		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(), null, null, 0));
-	}
-
-	@Override
-	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName,
-			Id<Person> personId, double parkingDurationInSeconds, double arrivalTime) {
-		PC2Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
-
-		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking, personId,
-				parkingDurationInSeconds);
-		parkingScoreManager.addScore(personId, walkScore);
-
-		eventsManager.processEvent(
-				new ParkingArrivalEvent(arrivalTime, parking.getId(), personId, destCoordinate, walkScore));
-
-		return parking;
-	}
+//	@Override
+//	public synchronized void logArrivalEventAtTimeZero(PC2Parking parking) {
+//		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(), null, null, 0));
+//	}
+//
+//	@Override
+//	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName,
+//			Id<Person> personId, double parkingDurationInSeconds, double arrivalTime) {
+//		PC2Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
+//
+//		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking, personId,
+//				parkingDurationInSeconds);
+//		parkingScoreManager.addScore(personId, walkScore);
+//
+//		eventsManager.processEvent(
+//				new ParkingArrivalEvent(arrivalTime, parking.getId(), personId, destCoordinate, walkScore));
+//
+//		return parking;
+//	}
 
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to
@@ -227,8 +227,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 		boolean parkingFound = false;
 
 		// first search for parking at selected facility:
-		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities
-				.get(parkingOperationRequestAttributes.facilityId)) {
+		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)) {
 			if (pp.getAvailableParkingCapacity() > 0) {
 
 				// this tells the parking lot to decrease the number of
@@ -248,7 +247,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 		if (!parkingFound) {
 			Collection<PC2Parking> collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
 
-			while (collection.size() == 0) {
+			while ( collection.isEmpty() ) {
 				distance *= 2;
 				collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
 
@@ -278,8 +277,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			selectedParking = poll.getKey();
 
 			if (rentablePrivateParking.containsKey(parkingOperationRequestAttributes.personId)) {
-				RentableParking rentableParking = rentablePrivateParking
-						.get(parkingOperationRequestAttributes.personId);
+				RentableParking rentableParking = rentablePrivateParking.get(parkingOperationRequestAttributes.personId);
 
 				if (rentableParking.getAvailableParkingCapacity() > 0) {
 
@@ -508,16 +506,12 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			if (!(parking instanceof PrivateParking)) {
 				addParkingToQuadTree(publicParkingsQuadTree, parking);
 				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
-				// I could speculate that full parking lots are removed from the
-				// quad tree, and it is re-added as soon
-				// as space becomes available. But this is not commented, and it
-				// also does not look like it would work in that way.
-				// kai, jul'15
-				// No, actually I now think that it works. When
-				// remainingCapacity==0, then the parking is removed from the
-				// list, and
-				// when (again) ==1, it is re-inserted. In addition, it is
-				// re-inserted in reset.
+
+				// I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon as space
+				// becomes available. But this is not commented, and it also does not look like it would work in that way. kai, jul'15
+
+				// No, actually I now think that it works. When remainingCapacity==0, then the parking is removed from the list, and
+				// when (again) ==1, it is re-inserted. In addition, it is re-inserted in reset.
 			}
 		}
 
@@ -528,10 +522,10 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId(), personId));
 	}
 
-	@Override
-	public synchronized ParkingScore getParkingScoreManager() {
-		return parkingScoreManager;
-	}
+//	@Override
+//	public synchronized ParkingScore getParkingScoreManager() {
+//		return parkingScoreManager;
+//	}
 
 	@Override
 	public synchronized EventsManager getEventsManager() {
