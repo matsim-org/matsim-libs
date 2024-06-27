@@ -113,7 +113,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				}));
 
 			bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
-				getter -> new DrtShiftDispatcherImpl(getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
+				getter -> new DrtShiftDispatcherImpl(getMode(), getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
 						shiftsParams, new DefaultShiftStartLogic(), new DefaultAssignShiftToVehicleLogic(shiftsParams)))
@@ -121,7 +121,8 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
 				getter -> new ShiftInsertionCostCalculator(getter.get(MobsimTimer.class),
-						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class)))));
+						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
+								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet()))));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl()));
 

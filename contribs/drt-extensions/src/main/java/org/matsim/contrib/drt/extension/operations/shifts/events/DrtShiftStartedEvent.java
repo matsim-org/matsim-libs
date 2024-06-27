@@ -11,9 +11,8 @@ import java.util.Map;
 /**
  * @author nkuehnel / MOIA
  */
-public class DrtShiftStartedEvent extends Event {
+public class DrtShiftStartedEvent extends AbstractShiftEvent {
 
-    private final Id<DrtShift> shiftId;
     private final Id<DvrpVehicle> vehicleId;
     private final Id<Link> linkId;
 
@@ -23,15 +22,10 @@ public class DrtShiftStartedEvent extends Event {
 
     public static final String EVENT_TYPE = "DRT shift started";
 
-    public DrtShiftStartedEvent(double time, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, Id<Link> linkId) {
-        super(time);
-        this.shiftId = shiftId;
+    public DrtShiftStartedEvent(double time, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, Id<Link> linkId) {
+        super(time, mode, shiftId);
         this.vehicleId = vehicleId;
         this.linkId = linkId;
-    }
-
-    public Id<DrtShift> getShiftId() {
-        return shiftId;
     }
 
     public Id<DvrpVehicle> getVehicleId() {
@@ -50,7 +44,6 @@ public class DrtShiftStartedEvent extends Event {
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> attr = super.getAttributes();
-        attr.put(ATTRIBUTE_SHIFT_ID, shiftId + "");
         attr.put(ATTRIBUTE_VEHICLE_ID, vehicleId + "");
         attr.put(ATTRIBUTE_LINK, linkId + "");
         return attr;

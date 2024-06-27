@@ -8,6 +8,7 @@ import picocli.CommandLine;
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -49,7 +50,7 @@ public class LanduseOptions {
 
 		ShpOptions landShp = new ShpOptions(landuse, null, StandardCharsets.UTF_8);
 
-		index = landShp.createIndex(queryCRS, attr, filter);
+		index = landShp.createIndex(queryCRS, attr, ft-> filter == null || filter.contains(Objects.toString(ft.getAttribute(attr))));
 
 		log.info("Read {} features for landuse", index.size());
 

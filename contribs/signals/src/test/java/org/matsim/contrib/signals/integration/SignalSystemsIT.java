@@ -36,6 +36,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.File;
 
@@ -88,7 +89,7 @@ public class SignalSystemsIT {
 			//iteration 0
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 
-			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL,
+			Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL,
 					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "0.events.xml.gz",
 							iterationOutput + "0.events.xml.gz"),
 					"different events files after iteration 0 "
@@ -113,7 +114,7 @@ public class SignalSystemsIT {
 			//iteration 10
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 
-			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL,
+			Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL,
 					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz" ),
 					"different event files after iteration 10"
 					   );
@@ -181,7 +182,7 @@ public class SignalSystemsIT {
 			//iteration 0
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 
-			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL,
+			Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL,
 					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "0.events.xml.gz",
 							iterationOutput + "0.events.xml.gz"),
 					"different events files after iteration 0 "
@@ -206,7 +207,7 @@ public class SignalSystemsIT {
 			//iteration 10
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 
-			Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL,
+			Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL,
 					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz"),
 					"different event files after iteration 10"
 					   );

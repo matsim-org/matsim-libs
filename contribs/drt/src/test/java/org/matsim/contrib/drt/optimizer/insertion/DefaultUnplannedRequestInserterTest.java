@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
@@ -285,7 +286,7 @@ public class DefaultUnplannedRequestInserterTest {
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, insertionSearch, DrtOfferAcceptor.DEFAULT_ACCEPTOR,
+				vehicleEntryFactory, insertionRetryQueue, insertionSearch, new DefaultOfferAcceptor(),
 				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
 	}
 

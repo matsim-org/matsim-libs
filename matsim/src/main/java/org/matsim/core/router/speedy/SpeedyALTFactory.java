@@ -21,7 +21,7 @@ public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 	public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
 		SpeedyGraph graph = this.graphs.get(network);
 		if (graph == null) {
-			graph = new SpeedyGraph(network);
+			graph = SpeedyGraphBuilder.build(network);
 			this.graphs.put(network, graph);
 		}
 		SpeedyALTData landmarks = this.landmarksData.get(graph);

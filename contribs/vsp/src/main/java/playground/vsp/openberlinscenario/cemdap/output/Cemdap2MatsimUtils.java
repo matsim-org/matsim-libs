@@ -21,6 +21,7 @@ package playground.vsp.openberlinscenario.cemdap.output;
 
 import java.util.Random;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -28,7 +29,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author dziemke

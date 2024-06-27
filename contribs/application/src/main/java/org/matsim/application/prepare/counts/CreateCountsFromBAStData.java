@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.CountsOption;
+import org.matsim.application.options.CountsOptions;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -63,7 +63,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 	@CommandLine.Mixin
-	private final CountsOption counts = new CountsOption();
+	private final CountsOptions counts = new CountsOptions();
 	@CommandLine.Mixin
 	private final CrsOptions crs = new CrsOptions("EPSG:25832");
 	@CommandLine.Option(names = "--network", description = "path to MATSim network", required = true)
@@ -284,7 +284,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 	}
 
-	private void match(Network network, NetworkIndex<BAStCountStation> index, BAStCountStation station, CountsOption counts) {
+	private void match(Network network, NetworkIndex<BAStCountStation> index, BAStCountStation station, CountsOptions counts) {
 
 		Id<Link> manuallyMatched = counts.isManuallyMatched(station.getId());
 		Link matched;
@@ -330,7 +330,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		return filter;
 	}
 
-	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOption countsOption, CrsOptions crs) {
+	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOptions countsOption, CrsOptions crs) {
 
 		if (crs.getTargetCRS() != null)
 			throw new RuntimeException("Please don't specify --target-crs. Only use --input-crs to determinate the network crs!");
@@ -366,7 +366,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			match(filteredNetwork, index, station, countsOption);
 	}
 
-	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CountsOption counts) {
+	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CountsOptions counts) {
 
 		List<BAStCountStation> stations = new ArrayList<>();
 

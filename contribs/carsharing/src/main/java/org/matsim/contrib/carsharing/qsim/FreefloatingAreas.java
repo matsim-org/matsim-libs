@@ -2,6 +2,7 @@ package org.matsim.contrib.carsharing.qsim;
 
 import java.util.ArrayList;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.MultiPolygon;
@@ -9,7 +10,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.operation.distance.DistanceOp;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.opengis.feature.simple.SimpleFeature;
 
 public class FreefloatingAreas {
 	private PointFeatureFactory pointFeatureFactory;

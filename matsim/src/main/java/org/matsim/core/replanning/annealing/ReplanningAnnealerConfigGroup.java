@@ -20,7 +20,11 @@
 package org.matsim.core.replanning.annealing;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -81,27 +85,35 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         addAnnealingVariable((AnnealingVariable) set);
     }
 
-    public Map<AnnealParameterOption, AnnealingVariable> getAnnealingVariables() {
-        final EnumMap<AnnealParameterOption, AnnealingVariable> map =
-                new EnumMap<>(AnnealParameterOption.class);
-        for (ConfigGroup pars : getParameterSets(AnnealingVariable.GROUP_NAME)) {
-            final AnnealParameterOption name = ((AnnealingVariable) pars).getAnnealParameter();
-            final AnnealingVariable old = map.put(name, (AnnealingVariable) pars);
-            if (old != null) {
-                throw new IllegalStateException("several parameter sets for variable " + name);
-            }
-        }
-        return map;
-    }
+	public List<AnnealingVariable> getAllAnnealingVariables(){
+		return getAnnealingVariablesPerSubpopulation().values().stream().flatMap(a->a.values().stream()).collect(Collectors.toList());
+	}
+	public Map<AnnealParameterOption, Map<String,AnnealingVariable>> getAnnealingVariablesPerSubpopulation() {
+		final EnumMap<AnnealParameterOption, Map<String,AnnealingVariable>> map =
+			new EnumMap<>(AnnealParameterOption.class);
+		for (ConfigGroup pars : getParameterSets(AnnealingVariable.GROUP_NAME)) {
+			AnnealParameterOption name = ((AnnealingVariable) pars).getAnnealParameter();
+			String subpopulation = ((AnnealingVariable) pars).getSubpopulation();
+			var paramsPerSubpopulation = map.computeIfAbsent(name,a->new HashMap<>());
+			final AnnealingVariable old = paramsPerSubpopulation.put(subpopulation, (AnnealingVariable) pars);
+			if (old != null) {
+				throw new IllegalStateException("several parameter sets for variable " + name + " and subpopulation "+subpopulation);
+			}
+		}
+		return map;
+	}
 
     public void addAnnealingVariable(final AnnealingVariable params) {
-        final AnnealingVariable previous = this.getAnnealingVariables().get(params.getAnnealParameter());
+        var previousMap = this.getAnnealingVariablesPerSubpopulation().get(params.getAnnealParameter());
+		if (previousMap!=null){
+		AnnealingVariable previous = previousMap.get(params.getSubpopulation());
         if (previous != null) {
             final boolean removed = removeParameterSet(previous);
             if (!removed) {
                 throw new RuntimeException("problem replacing annealing variable");
             }
         }
+		}
         super.addParameterSet(params);
     }
 
@@ -117,11 +129,11 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         private static final String START_VALUE = "startValue";
         private static final String END_VALUE = "endValue";
         private static final String ANNEAL_TYPE = "annealType";
-        private static final String DEFAULT_SUBPOP = "defaultSubpopulation";
+        private static final String SUBPOPULATION = "subpopulation";
         private static final String ANNEAL_PARAM = "annealParameter";
         private static final String HALFLIFE = "halfLife";
         private static final String SHAPE_FACTOR = "shapeFactor";
-        private String defaultSubpop = null;
+        private String subpopulation = null;
         private Double startValue = null;
         private double endValue = 0.0001;
         private double shapeFactor = 0.9;
@@ -167,14 +179,14 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
             this.annealType = annealType;
         }
 
-        @StringGetter(DEFAULT_SUBPOP)
-        public String getDefaultSubpopulation() {
-            return this.defaultSubpop;
+        @StringGetter(SUBPOPULATION)
+        public String getSubpopulation() {
+            return this.subpopulation;
         }
 
-        @StringSetter(DEFAULT_SUBPOP)
+        @StringSetter(SUBPOPULATION)
         public void setDefaultSubpopulation(String defaultSubpop) {
-            this.defaultSubpop = defaultSubpop;
+            this.subpopulation = defaultSubpop;
         }
 
         @StringGetter(ANNEAL_PARAM)
@@ -215,12 +227,12 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         public Map<String, String> getComments() {
             Map<String, String> map = super.getComments();
             map.put(HALFLIFE,
-                    "this parameter enters the exponential and sigmoid formulas. May be an iteration or a share, i.e. 0.5 for halfLife at 50% of iterations. Exponential: startValue / exp(it/halfLife)");
-            map.put(SHAPE_FACTOR, "sigmoid: 1/(1+e^(shapeFactor*(it - halfLife))); geometric: startValue * shapeFactor^it; msa: startValue / it^shapeFactor");
-            map.put(ANNEAL_TYPE, "options: linear, exponential, geometric, msa, sigmoid and disabled (no annealing).");
+                    "this parameter enters the exponential and sigmoid formulas. May be an iteration or a share, i.e. 0.5 for halfLife at 50% of iterations.");
+            map.put(SHAPE_FACTOR, "see comment of parameter annealType.");
+            map.put(ANNEAL_TYPE, "options: linear, exponential, geometric, msa, sigmoid and disabled (no annealing). sigmoid: 1/(1+e^(shapeFactor*(it - halfLife))); geometric: startValue * shapeFactor^it; msa: startValue / it^shapeFactor. Exponential: startValue / exp(it/halfLife)");
             map.put(ANNEAL_PARAM,
                     "list of config parameters that shall be annealed. Currently supported: globalInnovationRate, BrainExpBeta, PathSizeLogitBeta, learningRate. Default is globalInnovationRate");
-            map.put(DEFAULT_SUBPOP, "subpopulation to have the global innovation rate adjusted. Not applicable when annealing with other parameters.");
+            map.put(SUBPOPULATION, "subpopulation to have the global innovation rate adjusted. Not applicable when annealing with other parameters.");
             map.put(START_VALUE, "start value for annealing.");
             map.put(END_VALUE, "final annealing value. When the annealing function reaches this value, further results remain constant.");
             return map;

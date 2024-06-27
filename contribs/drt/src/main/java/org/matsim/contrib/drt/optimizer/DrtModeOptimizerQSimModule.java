@@ -20,15 +20,13 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
-import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -36,6 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -64,9 +63,6 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -109,13 +105,17 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(PassengerStopDurationProvider.class)))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
+						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet())));
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl());
 
-		bindModal(CostCalculationStrategy.class).to(drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated ?
+		DrtOptimizationConstraintsSet defaultOptimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		bindModal(CostCalculationStrategy.class)
+				.to(defaultOptimizationConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated
+						?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
@@ -138,7 +138,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				}).asEagerSingleton();
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
-		
+
 		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.scheduleWaitBeforeDrive).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
@@ -147,7 +147,9 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
+				defaultOptimizationConstraintsSet.maxAllowedPickupDelay)));
+		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
@@ -160,7 +162,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
 					timer);
 		})).in(Singleton.class);
-		
+
 		if (drtCfg.getPrebookingParams().isEmpty()) {
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtActionCreator.class));
 		} else {

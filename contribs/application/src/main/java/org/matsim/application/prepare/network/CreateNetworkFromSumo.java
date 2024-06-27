@@ -56,9 +56,6 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	private Path output;
 
 	@CommandLine.Mixin
-	private final ShpOptions shp = new ShpOptions();
-
-	@CommandLine.Mixin
 	private final CrsOptions crs = new CrsOptions();
 
 	@CommandLine.Option(names = {"--capacities"}, description = "CSV file with lane capacities", required = false)
@@ -67,6 +64,9 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@CommandLine.Option(names = "--free-speed-factor", description = "Free-speed reduction for urban links")
 	private double freeSpeedFactor = LinkProperties.DEFAULT_FREESPEED_FACTOR;
 
+	@CommandLine.Option(names = "--lane-restrictions", description = "Define how restricted lanes are handled: ${COMPLETION-CANDIDATES}", defaultValue = "IGNORE")
+	private SumoNetworkConverter.LaneRestriction laneRestriction = SumoNetworkConverter.LaneRestriction.IGNORE;
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateNetworkFromSumo()).execute(args));
 	}
@@ -74,21 +74,11 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, Path.of(shp.getShapeFile()), crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor);
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor, laneRestriction);
 
 		Network network = NetworkUtils.createNetwork();
-        Lanes lanes = LanesUtils.createLanesContainer();
 
-		SumoNetworkHandler handler = converter.convert(network, lanes);
-
-		converter.calculateLaneCapacities(network, lanes);
-
-		// This needs to run without errors, otherwise network is broken
-		network.getLinks().values().forEach(link -> {
-			LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
-			if (l2l != null)
-				LanesUtils.createLanes(link, l2l);
-		});
+		SumoNetworkHandler handler = converter.convert(network);
 
 		if (capacities != null) {
 
@@ -97,10 +87,8 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 			log.info("Read lane capacities from {}, containing {} lanes", capacities, map.size());
 
 			int n = setLinkCapacities(network, map);
-			int n2 = setLaneCapacities(lanes, map);
 
-			log.info("Unmatched links: {}, lanes: {}", n, n2);
-
+			log.info("Unmatched links: {}", n);
 		}
 
 		if (crs.getTargetCRS() != null)
@@ -108,9 +96,9 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 
 		NetworkUtils.writeNetwork(network, output.toAbsolutePath().toString());
 		new NetworkWriter(network).write(output.toAbsolutePath().toString());
-		new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
 
 		converter.writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv").replace(".gz", ""));
+		converter.writeFeatures(handler, output.toAbsolutePath().toString().replace(".xml", "-ft.csv"));
 
 		return 0;
 	}

@@ -20,9 +20,10 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.zones.Zone;
 
 public interface DrtZoneTargetLinkSelector {
 
-	Link selectTargetLink(DrtZone zone);
+	Link selectTargetLink(Zone zone);
 
 }

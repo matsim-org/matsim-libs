@@ -47,16 +47,14 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.api.core.v01.events.HasPersonId;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -96,9 +94,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			person.getSelectedPlan()
-					.getAttributes()
-					.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
+			PreplanningUtils.setPrebookingOffset_s( person.getSelectedPlan(), 900. );
 		}
 
 		//PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
@@ -157,6 +153,12 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				});
 			}
 		});
+
+		if ("true".equals(System.getProperty("runOTFVis"))) {
+			// This will start otfvis
+			controler.addOverridingModule(new OTFVisLiveModule() );
+			// !! does not work together with parameterized tests :-( !!
+		}
 
 		// run simulation
 		controler.run();

@@ -20,28 +20,19 @@
 
 package org.matsim.core.utils.gis;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.geotools.data.DataStore;
-import org.geotools.data.FileDataStore;
-import org.geotools.data.FileDataStoreFinder;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.FileDataStore;
+import org.geotools.api.data.SimpleFeatureSource;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Counter;
-import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,41 +41,17 @@ import java.util.List;
  * @author dgrether
  * @author mrieser // switch to GeoTools 2.7.3
  */
+@Deprecated
 public class ShapeFileReader implements MatsimSomeReader {
-    	private static final Logger log = LogManager.getLogger(ShapeFileReader.class);
 
-	private SimpleFeatureSource featureSource = null;
-
-	private ReferencedEnvelope bounds = null;
-
-	private DataStore dataStore = null;
-
-	private SimpleFeatureCollection featureCollection = null;
-
-	private SimpleFeatureType schema = null;
-
-	private Collection<SimpleFeature> featureSet = null;
-
-	private CoordinateReferenceSystem crs;
+	private final GeoFileReader geoFileReader = new GeoFileReader();
 
 	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
-		try {
-			File dataFile = new File(filename);
-			log.info( "will try to read from " + dataFile.getAbsolutePath() ) ;
-			Gbl.assertIf( dataFile.exists() );
-			return getSimpleFeatures(FileDataStoreFinder.getDataStore(dataFile));
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return GeoFileReader.getAllFeatures(filename, null);
 	}
 
 	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
-		try {
-			log.info( "will try to read from " + url.getPath() ) ;
-			return getSimpleFeatures(FileDataStoreFinder.getDataStore(url));
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return GeoFileReader.getAllFeatures(url);
 	}
 
 	/**
@@ -92,42 +59,14 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * @return list of contained features.
 	 */
 	public static List<SimpleFeature> getSimpleFeatures(FileDataStore dataStore) throws IOException {
-		SimpleFeatureSource featureSource = dataStore.getFeatureSource();
-
-		SimpleFeatureIterator it = featureSource.getFeatures().features();
-		List<SimpleFeature> featureSet = new ArrayList<>();
-		while (it.hasNext()) {
-			SimpleFeature ft = it.next();
-			featureSet.add(ft);
-		}
-		it.close();
-		dataStore.dispose();
-		return featureSet;
+		return GeoFileReader.getSimpleFeatures(dataStore);
 	}
 
 	/**
 	 * Reads all Features in the file into the returned Set and initializes the instance of this class.
 	 */
 	public Collection<SimpleFeature> readFileAndInitialize(final String filename) throws UncheckedIOException {
-		try {
-			this.featureSource = ShapeFileReader.readDataFile(filename);
-			this.init();
-			SimpleFeature ft = null;
-			SimpleFeatureIterator it = this.featureSource.getFeatures().features();
-			this.featureSet = new ArrayList<SimpleFeature>();
-			log.info("features to read #" + this.featureSource.getFeatures().size());
-			Counter cnt = new Counter("features read #");
-			while (it.hasNext()) {
-				ft = it.next();
-				this.featureSet.add(ft);
-				cnt.incCounter();
-			}
-			cnt.printCounter();
-			it.close();
-			return this.featureSet;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return geoFileReader.readFileAndInitialize(filename);
 	}
 
 	/**
@@ -168,54 +107,35 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * @throws UncheckedIOException if the file cannot be found or another error happens during reading
 	 */
 	public static SimpleFeatureSource readDataFile(final String filename) throws UncheckedIOException {
-		try {
-			log.warn("Unsafe method! store.dispose() is not called from within this method");
-			File dataFile = new File(filename);
-			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
-			return store.getFeatureSource();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	private void init() {
-		try {
-			this.bounds = this.featureSource.getBounds();
-			this.dataStore = (DataStore) this.featureSource.getDataStore();
-			this.featureCollection = this.featureSource.getFeatures();
-			this.schema = this.featureSource.getSchema();
-			this.crs = this.featureSource.getSchema().getCoordinateReferenceSystem();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return GeoFileReader.readDataFile(filename);
 	}
 
 	public SimpleFeatureSource getFeatureSource() {
-		return featureSource;
+		return geoFileReader.getFeatureSource();
 	}
 
 	public ReferencedEnvelope getBounds() {
-		return bounds;
+		return geoFileReader.getBounds();
 	}
 
 	public DataStore getDataStore() {
-		return dataStore;
+		return geoFileReader.getDataStore();
 	}
 
 	public SimpleFeatureCollection getFeatureCollection() {
-		return featureCollection;
+		return geoFileReader.getFeatureCollection();
 	}
 
 	public SimpleFeatureType getSchema() {
-		return schema;
+		return geoFileReader.getSchema();
 	}
 
 	public Collection<SimpleFeature> getFeatureSet() {
-		return featureSet;
+		return geoFileReader.getFeatureSet();
 	}
 
 	public CoordinateReferenceSystem getCoordinateSystem(){
-		return this.crs;
+		return geoFileReader.getCoordinateSystem();
 	}
 
 

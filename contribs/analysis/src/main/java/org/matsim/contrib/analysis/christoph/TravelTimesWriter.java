@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -41,10 +43,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.core.utils.io.IOUtils;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Analyzes the average link travel times and writes them to files (absolute and
@@ -190,7 +190,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 	public void writeAbsoluteSHPTravelTimes(String file, CoordinateReferenceSystem crs, boolean ignoreExitLinks) {
 		try {
 			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, true, ignoreExitLinks);
-			ShapeFileWriter.writeGeometries(ft, file);
+			GeoFileWriter.writeGeometries(ft, file);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -199,7 +199,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 	public void writeRelativeSHPTravelTimes(String file, CoordinateReferenceSystem crs, boolean ignoreExitLinks) {
 		try {
 			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, false, ignoreExitLinks);
-			ShapeFileWriter.writeGeometries(ft, file);
+			GeoFileWriter.writeGeometries(ft, file);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

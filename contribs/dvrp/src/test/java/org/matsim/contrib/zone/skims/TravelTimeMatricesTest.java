@@ -29,8 +29,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.zone.Zone;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
@@ -45,8 +46,8 @@ public class TravelTimeMatricesTest {
 		Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), nodeA, nodeB, 150, 15, 20, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), nodeB, nodeA, 300, 15, 40, 1);
-		Zone zoneA = new Zone(Id.create("Zone_A", Zone.class), null);
-		Zone zoneB = new Zone(Id.create("Zone_Z", Zone.class), null);
+		Zone zoneA = new ZoneImpl(Id.create("Zone_A", Zone.class), null, null, null);
+		Zone zoneB = new ZoneImpl(Id.create("Zone_Z", Zone.class), null, null, null);
 
 		var centralNodes = Map.of(zoneA, nodeA, zoneB, nodeB);
 		var matrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams(network), centralNodes, 0);

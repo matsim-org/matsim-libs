@@ -64,6 +64,7 @@ public class ObjectAttributesConverter {
 		this.converters.put(PersonVehicles.class.getName(), new PersonVehiclesAttributeConverter());
 		this.converters.put(DisallowedNextLinks.class.getName(), new DisallowedNextLinksAttributeConverter());
 		this.converters.put(PersonVehicleTypes.class.getName(), new PersonVehicleTypesAttributeConverter());
+		this.converters.put(StringDoubleMap.class.getName(), new StringDoubleMapConverter());
 	}
 
 	//this is for reading

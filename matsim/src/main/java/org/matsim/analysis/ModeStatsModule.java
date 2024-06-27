@@ -30,5 +30,7 @@ public class ModeStatsModule extends AbstractModule {
     public void install() {
         bind(ModeStatsControlerListener.class).in(Singleton.class);
         addControlerListenerBinding().to(ModeStatsControlerListener.class);
+//		KN: if this is a somewhat standard analysis it should be added by default rather than adding it in every scenario run class
+		addControlerListenerBinding().to(ModeChoiceCoverageControlerListener.class);
     }
 }

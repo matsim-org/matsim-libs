@@ -1,6 +1,7 @@
 package org.matsim.simwrapper;
 
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.simwrapper.dashboard.*;
@@ -28,6 +29,10 @@ public class DefaultDashboardProvider implements DashboardProvider {
 
 		if (ConfigUtils.hasModule(config, EmissionsConfigGroup.class)) {
 			result.add(new EmissionsDashboard());
+		}
+
+		if (ConfigUtils.hasModule(config, NoiseConfigGroup.class)) {
+			result.add(new NoiseDashboard());
 		}
 
 		return result;
