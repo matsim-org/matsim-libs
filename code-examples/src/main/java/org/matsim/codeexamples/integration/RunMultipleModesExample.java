@@ -2,21 +2,26 @@ package org.matsim.codeexamples.integration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -60,6 +65,16 @@ final class RunMultipleModesExample{
 			Set<String> modes = new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ));
 			link.setAllowedModes( modes );
 		}
+
+		// add vehicle types for both modes (they are only used, if the vehicles source is set correspondingly)
+		scenario.getVehicles().addVehicleType( VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class)) );
+
+		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class))
+									   .setNetworkMode("bike")
+									   .setMaximumVelocity(5.);
+
+		scenario.getVehicles().addVehicleType(bike);
+
 		return scenario;
 	}
 
@@ -67,6 +82,10 @@ final class RunMultipleModesExample{
 		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 		log.warn("url=" + url) ;
 		Config config = ConfigUtils.loadConfig( url );
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		// in case you want the different modes to use different vehicle types, you need to set this
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		{ // add strategy that switches between car and bike:
 			StrategySettings stratSets = new StrategySettings(  ) ;
