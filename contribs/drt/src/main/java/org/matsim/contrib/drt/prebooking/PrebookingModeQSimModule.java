@@ -22,7 +22,9 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
@@ -97,6 +99,10 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(RequestUnscheduler.class).to(modalKey(SimpleRequestUnscheduler.class));
 			break;
 		case Routing:
+			bindModal(LeastCostPathCalculator.class).toProvider(modalProvider(getter ->
+					new SpeedyALTFactory().createPathCalculator(getter.getModal(Network.class),
+                    getter.getModal(TravelDisutility.class), getter.getModal(TravelTime.class)
+            )));
 			bindModal(RequestUnscheduler.class).to(modalKey(ComplexRequestUnscheduler.class));
 			break;
 		default:
