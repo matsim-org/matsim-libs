@@ -53,8 +53,8 @@ public class EquiDistAgentSnapshotInfoBuilderTest {
                 1 / setUp.linkCapacity, // this would mean the flow capacity is 100
                 setUp.freespeed,
                 1,
-                new LinkedList<>()
-        );
+                new LinkedList<>(),
+                        null );
 
         // assert
         assertEquals(1, outCollection.size());
@@ -85,8 +85,8 @@ public class EquiDistAgentSnapshotInfoBuilderTest {
                 1 / setUp.linkCapacity, // this would mean the flow capacity is 100
                 setUp.freespeed,
                 1,
-                new LinkedList<>()
-        );
+                new LinkedList<>(),
+                        null );
 
         // assert
         assertEquals(vehicles.size(), outCollection.size());

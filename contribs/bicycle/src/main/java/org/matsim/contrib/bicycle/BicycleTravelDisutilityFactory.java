@@ -21,6 +21,8 @@ package org.matsim.contrib.bicycle;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -35,21 +37,20 @@ import org.matsim.core.router.util.TravelTime;
  */
 public final class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	// public-final is ok since ctor is package-private: can only be used through injection
-
 	private static final Logger LOG = LogManager.getLogger(BicycleTravelDisutilityFactory.class);
-
-	@Inject	BicycleConfigGroup bicycleConfigGroup;
-	@Inject
-	ScoringConfigGroup cnScoringGroup;
-	@Inject
-	RoutingConfigGroup routingConfigGroup;
-
+	private BicycleConfigGroup bicycleConfigGroup;
+	@Inject Config config;
+	@Inject ScoringConfigGroup cnScoringGroup;
+	@Inject RoutingConfigGroup routingConfigGroup;
 	private static int normalisationWrnCnt = 0;
 
-	/* package-private */ BicycleTravelDisutilityFactory(){}
+	/* package-private */ BicycleTravelDisutilityFactory(){
+	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+		this.bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+
 		double sigma = routingConfigGroup.getRoutingRandomness();
 
 		double normalization = 1;

@@ -127,4 +127,11 @@ public final class BicycleUtils {
 		}
 		return userDefinedNetworkAttributeFactor;
 	}
+	// ===
+	public static void setSmoothness( Link link, String smoothness ){
+		link.getAttributes().putAttribute( SMOOTHNESS, smoothness );
+	}
+	public static void setBicycleInfrastructureFactor( Link link, double factor ){
+		link.getAttributes().putAttribute( BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, factor );
+	}
 }

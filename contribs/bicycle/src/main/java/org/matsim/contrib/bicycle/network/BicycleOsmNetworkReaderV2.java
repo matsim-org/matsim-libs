@@ -225,7 +225,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		// Smoothness
 		String smoothness = way.tags.get(BicycleUtils.SMOOTHNESS);
 		if (smoothness != null) {
-			l.getAttributes().putAttribute(BicycleUtils.SMOOTHNESS, smoothness);
+			BicycleUtils.setSmoothness( l, smoothness );
 			this.countSmoothness++;
 		}
 

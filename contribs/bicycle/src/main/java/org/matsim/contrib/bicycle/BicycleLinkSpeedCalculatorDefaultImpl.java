@@ -18,7 +18,10 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 	private static final Logger log = LogManager.getLogger(BicycleLinkSpeedCalculatorDefaultImpl.class );
 	@Inject private BicycleConfigGroup bicycleConfigGroup;
 	@Inject private QSimConfigGroup qSimConfigGroup;
-	@Inject private BicycleLinkSpeedCalculatorDefaultImpl() { }
+	@Inject private Config config;
+	@Inject private BicycleLinkSpeedCalculatorDefaultImpl() {
+	}
+
 	/**
 	 * for unit testing
 	 */
