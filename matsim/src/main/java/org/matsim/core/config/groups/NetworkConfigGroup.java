@@ -41,7 +41,7 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 
 	private String inputFile = null;
 
-	private String inputCRS = null;
+	@Deprecated private String inputCRS = null;
 
 	private String changeEventsInputFile = null;
 
@@ -57,7 +57,7 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	public Map<String,String> getComments() {
 		final Map<String,String> comments = super.getComments();
 
-		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
+		comments.put( INPUT_CRS , "(deprecated: rather express CRS in file) The Coordinates Reference System in which the coordinates are expressed in the input file." +
 				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
 				"be converted back at export. If not specified, no conversion happens." );
 
@@ -121,11 +121,20 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 
+	/**
+	 * @deprecated Coordinate System can now be set directly in file, which is the better place for this information, and thus the switch here is no longer needed.  kai, feb'24
+	 */
+	@Deprecated // set directly in file.
 	@StringGetter( INPUT_CRS )
 	public String getInputCRS() {
 		return inputCRS;
 	}
+	// I think that this should be deprecated since the same functionality can be achieved by writing it directly into the corresponding file.  kai, feb'24
 
+	/**
+	 * @deprecated Coordinate System can now be set directly in file, which is the better place for this information, and thus the switch here is no longer needed.  kai, feb'24
+	 */
+	@Deprecated // set directly in file
 	@StringSetter( INPUT_CRS )
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
