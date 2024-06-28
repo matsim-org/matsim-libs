@@ -81,6 +81,22 @@ final class TripByGroupAnalysis {
 				}
 			}
 
+			// Norm shares per instance of each group to sum of 1
+			for (Group group : this.groups) {
+
+				String norm = group.columns.get(0);
+				if (group.columns.size() > 1)
+					throw new UnsupportedOperationException("Multiple columns not supported yet");
+
+				Table df = group.data;
+				for (String label : df.stringColumn(norm).asSet()) {
+					DoubleColumn dist_group = df.doubleColumn("share");
+					Selection sel = df.stringColumn(norm).isEqualTo(label);
+					double total = dist_group.where(sel).sum();
+					if (total > 0)
+						dist_group.set(sel, dist_group.divide(total));
+				}
+			}
 		}
 	}
 

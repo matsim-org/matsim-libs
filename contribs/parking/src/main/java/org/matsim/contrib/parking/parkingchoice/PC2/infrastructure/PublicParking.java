@@ -25,12 +25,12 @@ import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
 
 public class PublicParking implements PC2Parking {
 
-	private Id<PC2Parking> id = null;
-	private int capacity =0;
+	private final Id<PC2Parking> id;
+	private final int capacity;
 	private int availableParking=0;
 	private Coord coord=null;
 	private ParkingCostModel parkingCostModel=null;
-	private String groupName;
+	private final String groupName;
 
 	public PublicParking(Id<PC2Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName){
 		this.id=id;
@@ -56,14 +56,14 @@ public class PublicParking implements PC2Parking {
 		return coord;
 	}
 
-	public boolean isParkingAvailable(){
-		return availableParking>0;
-	}
-
-	@Override
-	public int getMaximumParkingCapacity(){
-		return capacity;
-	}
+//	public boolean isParkingAvailable(){
+//		return availableParking>0;
+//	}
+//
+//	@Override
+//	public int getMaximumParkingCapacity(){
+//		return capacity;
+//	}
 
 	@Override
 	public int getAvailableParkingCapacity(){
