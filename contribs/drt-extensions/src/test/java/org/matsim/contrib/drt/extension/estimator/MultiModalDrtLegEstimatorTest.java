@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
-import org.matsim.contrib.drt.estimator.impl.ConstantDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.ExampleDrtEstimator;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.extension.modechoice.MultiModalDrtLegEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -51,7 +51,7 @@ public class MultiModalDrtLegEstimatorTest {
 
 				for (DrtConfigGroup el : drtConfig.getModalElements()) {
 					install(new DrtEstimatorModule(el.mode, el, el.getDrtEstimatorParams().get()));
-					DrtEstimatorModule.bindEstimator(binder(), el.mode).toInstance(new ConstantDrtEstimator(1.05, 300));
+					DrtEstimatorModule.bindEstimator(binder(), el.mode).toInstance(new ExampleDrtEstimator(1.05, 300));
 				}
 			}
 		});
