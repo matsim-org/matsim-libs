@@ -23,6 +23,7 @@
 		<param name="endTime" value="00:00:00" />
 
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData"/>
 	</module>
 
 	<module name="scoring">
@@ -63,6 +64,10 @@
 				<param name="closingTime"     value="18:00:00" />
 			</parameterset>
 		</parameterset>
+	</module>
+
+	<module name="vehicles" >
+		<param name="vehiclesFile" value="vehicles.xml" />
 	</module>
 
 	<module name="replanning">

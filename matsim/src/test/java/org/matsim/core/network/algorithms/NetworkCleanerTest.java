@@ -197,7 +197,7 @@ public class NetworkCleanerTest {
 	/**
 	 * This test essentially does the same by modifying the equil scenario.
 	 * Visualization:
-	 *		  /...			        ...\
+	 *		  /...                  ...\
 	 * ------o------------o------------o-----------
 	 * l1  (n2)   l6    (n7)   l15  (n12)   l20
 	 */

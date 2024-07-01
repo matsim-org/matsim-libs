@@ -142,7 +142,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 		return biggestCluster;
 	}
 
-	/** 
+	/**
 	 * Reducing the network so it only contains nodes included in the biggest Cluster.
 	 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 	 */
@@ -157,7 +157,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 				network.getLinks().size() + " links.");
 		log.info("done.");
 	}
-	
+
 	@Override
 	public void run(final Network network) {
 		Map<Id<Node>, Node> biggestCluster = this.searchBiggestCluster(network);
