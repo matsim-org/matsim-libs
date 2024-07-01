@@ -3,6 +3,8 @@ package org.matsim.freight.logistics.example.lsp.multipleChains;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -16,71 +18,69 @@ import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 class RandomShiftingStrategyFactory {
-  //This is ok so as long as it is **non-public**.
-  //Before making it public, it should be configurable either via config or Injection.
-  //KMT, KN (Jan'24)
+    private static final Random random = MatsimRandom.getLocalInstance();
 
-  RandomShiftingStrategyFactory() {} // class contains only static methods; do not instantiate.
+    //This is ok so as long as it is **non-public**.
+    //Before making it public, it should be configurable either via config or Injection.
+    //KMT, KN (Jan'24)
 
-  static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+    RandomShiftingStrategyFactory() {}  // class contains only static methods; do not instantiate.
 
-    GenericPlanStrategyImpl<LSPPlan, LSP> strategy =
-        new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
-    GenericPlanStrategyModule<LSPPlan> randomModule =
-        new GenericPlanStrategyModule<>() {
+    static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 
-          @Override
-          public void prepareReplanning(ReplanningContext replanningContext) {}
+        GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
+        GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {
 
-          @Override
-          public void handlePlan(LSPPlan lspPlan) {
+            @Override
+            public void prepareReplanning(ReplanningContext replanningContext) {}
 
-            // Shifting shipments only makes sense for multiple chains
-            if (lspPlan.getLogisticChains().size() < 2) return;
+            @Override
+            public void handlePlan(LSPPlan lspPlan) {
 
-            LSP lsp = lspPlan.getLSP();
+                // Shifting shipments only makes sense for multiple chains
+                if (lspPlan.getLogisticChains().size() < 2) return;
 
-            // Make a new list of shipments and pick a random shipment from it
-            List<LSPShipment> shipments = new ArrayList<>(lsp.getShipments());
-            int shipmentIndex = MatsimRandom.getRandom().nextInt(lsp.getShipments().size());
-            LSPShipment shipment = shipments.get(shipmentIndex);
+                LSP lsp = lspPlan.getLSP();
 
-            // Find and remove the random shipment from its current logistic chain
-            LogisticChain sourceLogisticChain = null;
-            for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
-              if (logisticChain.getShipmentIds().remove(shipment.getId())) {
-                sourceLogisticChain = logisticChain;
-                break;
-              }
+                // Make a new list of shipments and pick a random shipment from it
+                List<LSPShipment> shipments = new ArrayList<>(lsp.getShipments());
+                int shipmentIndex = random.nextInt(lsp.getShipments().size());
+                LSPShipment shipment = shipments.get(shipmentIndex);
+
+                // Find and remove the random shipment from its current logistic chain
+                LogisticChain sourceLogisticChain = null;
+                for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+                    if (logisticChain.getShipmentIds().remove(shipment.getId())) {
+                        sourceLogisticChain = logisticChain;
+                        break;
+                    }
+                }
+
+                // Find a new logistic chain for the shipment
+                // Ensure that the chain selected is not the same as the one it was removed from
+                int chainIndex;
+                LogisticChain targetLogisticChain = null;
+                do {
+                    chainIndex = random.nextInt(lsp.getSelectedPlan().getLogisticChains().size());
+                    Iterator<LogisticChain> iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
+                    for (int i = 0; iterator.hasNext(); i++) {
+                        targetLogisticChain = iterator.next();
+                        if (i == chainIndex) {
+                            break;
+                        }
+                    }
+                } while (targetLogisticChain == sourceLogisticChain);
+
+                // Add the shipment to the new logistic chain
+                assert targetLogisticChain != null;
+                targetLogisticChain.addShipmentToChain(shipment);
             }
 
-            // Find a new logistic chain for the shipment
-            // Ensure that the chain selected is not the same as the one it was removed from
-            int chainIndex;
-            LogisticChain targetLogisticChain = null;
-            do {
-              chainIndex =
-                  MatsimRandom.getRandom()
-                      .nextInt(lsp.getSelectedPlan().getLogisticChains().size());
-              Iterator<LogisticChain> iterator =
-                  lsp.getSelectedPlan().getLogisticChains().iterator();
-              for (int i = 0; iterator.hasNext(); i++) {
-                targetLogisticChain = iterator.next();
-                if (i == chainIndex) {
-                  break;
-                }
-              }
-            } while (targetLogisticChain == sourceLogisticChain);
-
-            // Add the shipment to the new logistic chain
-            targetLogisticChain.addShipmentToChain(shipment);
-          }
-
-          @Override
-          public void finishReplanning() {}
+            @Override
+            public void finishReplanning() {}
         };
 
-    strategy.addStrategyModule(randomModule);
-    return strategy;
-  }
+        strategy.addStrategyModule(randomModule);
+        return strategy;
+    }
 }
