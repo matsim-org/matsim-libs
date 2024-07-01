@@ -17,6 +17,11 @@ public class TextBlock extends Viz {
 	 */
 	public String content;
 
+	/**
+	 * The background color of the text block.
+	 */
+	public String backgroundColor;
+
 	public TextBlock() {
 		super("text");
 	}
