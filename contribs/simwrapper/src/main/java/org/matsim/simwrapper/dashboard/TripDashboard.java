@@ -399,9 +399,6 @@ public class TripDashboard implements Dashboard {
 
 				})
 
-
-				//TODO: This part needs some more work in simwrapper and is not yet ready
-
 				.el(Plotly.class, (viz, data) -> {
 					viz.title = "Modal distance distribution";
 					viz.description = "by " + cat;
