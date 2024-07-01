@@ -397,10 +397,10 @@ public class TripDashboard implements Dashboard {
 						.orientation(BarTrace.Orientation.VERTICAL)
 						.build(), ds);
 
-				});
+				})
 
-				/*
-				 TODO: This part needs some more work in simwrapper and is not yet ready
+
+				//TODO: This part needs some more work in simwrapper and is not yet ready
 
 				.el(Plotly.class, (viz, data) -> {
 					viz.title = "Modal distance distribution";
@@ -433,7 +433,7 @@ public class TripDashboard implements Dashboard {
 						.build(), ds);
 
 				});
-				 */
+
 
 		}
 	}
