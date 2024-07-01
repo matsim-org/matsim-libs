@@ -80,20 +80,14 @@ final class ExampleGroceryDeliveryMultipleChains {
                 .toProvider(
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-                      strategyManager.addStrategy(
-                          new GenericPlanStrategyImpl<>(
-                              new ExpBetaPlanSelector<>(new ScoringConfigGroup())),
-                          null,
-                          1);
+                      strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
                       //					strategyManager.addStrategy(new
                       // RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
-                      //					strategyManager.addStrategy(new
-                      // RandomShiftingStrategyFactory().createStrategy(), null, 1);
+                      strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
                       //					strategyManager.addStrategy(new
                       // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
-                      //					strategyManager.setMaxPlansPerAgent(5);
-                      strategyManager.setPlanSelectorForRemoval(
-                          new GenericWorstPlanForRemovalSelector<>());
+                      strategyManager.setMaxPlansPerAgent(5);
+                      strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                       return strategyManager;
                     });
           }
@@ -120,22 +114,17 @@ final class ExampleGroceryDeliveryMultipleChains {
       }
       ConfigUtils.applyCommandline(config, args);
     } else {
-      config.controller().setOutputDirectory("output/groceryDelivery");
-      config.controller().setLastIteration(5);
+      config.controller().setOutputDirectory("output/groceryDelivery_kmt");
+      config.controller().setLastIteration(20);
     }
 
-    config
-        .network()
-        .setInputFile(
+    config.network().setInputFile(
             "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
-    config
-        .controller()
-        .setOverwriteFileSetting(
+    config.controller().setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
     config.controller().setWriteEventsInterval(1);
 
-    FreightCarriersConfigGroup freightConfig =
-        ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
     return config;
@@ -151,10 +140,8 @@ final class ExampleGroceryDeliveryMultipleChains {
   }
 
   private static LSP createLSP(Scenario scenario) {
-    String carrierPlanFile =
-        "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
-    String vehicleTypeFile =
-        "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
+    String carrierPlanFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+    String vehicleTypeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 
     CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
     CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(vehicleTypes);
@@ -164,14 +151,11 @@ final class ExampleGroceryDeliveryMultipleChains {
     CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypes);
     carrierReader.readFile(carrierPlanFile);
 
-    Carrier carrier =
-        carriers
-            .getCarriers()
+    Carrier carrier = carriers.getCarriers()
             .get(Id.create("kaufland_VERBRAUCHERMARKT_TROCKEN", CarrierImpl.class));
     //		Id<Link> depotLinkFromShipments =
     // carrier.getShipments().values().iterator().next().getFrom();
-    Id<Link> depotLinkFromVehicles =
-        carrier
+    Id<Link> depotLinkFromVehicles = carrier
             .getCarrierCapabilities()
             .getCarrierVehicles()
             .values()
@@ -185,12 +169,10 @@ final class ExampleGroceryDeliveryMultipleChains {
     {
       LogisticChain directChain;
       {
-        Carrier singleCarrier =
-            CarriersUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
+        Carrier singleCarrier = CarriersUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
         singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-        CarriersUtils.addCarrierVehicle(
-            singleCarrier,
+        CarriersUtils.addCarrierVehicle(singleCarrier,
             CarrierVehicle.newInstance(
                 Id.createVehicleId("singleCarrier"),
                 depotLinkFromVehicles,

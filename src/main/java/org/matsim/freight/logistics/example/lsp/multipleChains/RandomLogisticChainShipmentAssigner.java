@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.InitialShipmentAssigner;
@@ -18,14 +17,17 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  */
 class RandomLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
-  RandomLogisticChainShipmentAssigner() {}
+  private final Random random;
+
+  RandomLogisticChainShipmentAssigner() {
+    this.random = MatsimRandom.getLocalInstance();
+  }
 
   @Override
   public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
     Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     List<LogisticChain> logisticChains = new ArrayList<>(lspPlan.getLogisticChains());
-    Random rand = MatsimRandom.getRandom();
-    int index = rand.nextInt(logisticChains.size());
+    int index = random.nextInt(logisticChains.size());
     LogisticChain logisticChain = logisticChains.get(index);
     logisticChain.addShipmentToChain(shipment);
   }
