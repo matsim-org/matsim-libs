@@ -829,7 +829,7 @@ public class PrepareForSimImplTest {
 		}
 	}
 
-	private Link createAndAddNetwork(Scenario sc) {
+	private void createAndAddNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		Link link1;
 		{
@@ -851,6 +851,5 @@ public class PrepareForSimImplTest {
 			net.addLink(link1);
 			net.addLink(l2);
 		}
-		return link1;
 	}
 }

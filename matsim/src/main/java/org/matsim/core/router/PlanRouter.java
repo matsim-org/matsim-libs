@@ -71,17 +71,6 @@ public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		this( routingHandler , null, timeInterpretation );
 	}
 
-//	/**
-//	 * Gives access to the {@link TripRouter} used
-//	 * to compute routes.
-//	 *
-//	 * @return the internal TripRouter instance.
-//	 */
-//	@Deprecated // get TripRouter out of injection instead. kai, feb'16
-//	public TripRouter getTripRouter() {
-//		return tripRouter;
-//	}
-
 	@Override
 	public void run(final Plan plan) {
 		final List<Trip> trips = TripStructureUtils.getTrips( plan );

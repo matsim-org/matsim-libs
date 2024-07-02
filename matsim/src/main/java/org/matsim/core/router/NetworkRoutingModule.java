@@ -81,11 +81,13 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		if ( fromLink==null ) {
+			//if an activity takes place on a link which is not part of the modal network, use coord as fallback
 			Gbl.assertNotNull( fromFacility.getCoord() ) ;
 			fromLink = NetworkUtils.getNearestLink( network, fromFacility.getCoord()) ;
 		}
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
 		if ( toLink==null ) {
+			//if an activity takes place on a link which is not part of the modal network, use coord as fallback
 			Gbl.assertNotNull( toFacility.getCoord() ) ;
 			toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
 		}

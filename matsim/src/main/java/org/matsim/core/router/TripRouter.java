@@ -169,26 +169,25 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		RoutingModule module = routingModules.get( mainMode );
 
-		if (module != null) {
-			RoutingRequest request = DefaultRoutingRequest.of(
-					fromFacility,
-					toFacility,
-					departureTime,
-					person,
-					routingAttributes);
-
-			List<? extends PlanElement> trip = module.calcRoute(request);
-
-			if ( trip == null ) {
-				trip = fallbackRoutingModule.calcRoute(request) ;
-			}
-			for (Leg leg: TripStructureUtils.getLegs(trip)) {
-				TripStructureUtils.setRoutingMode(leg, mainMode);
-			}
-			return trip;
+		if (module == null) {
+			throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
 		}
+		RoutingRequest request = DefaultRoutingRequest.of(
+				fromFacility,
+				toFacility,
+				departureTime,
+				person,
+				routingAttributes);
 
-		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
+		List<? extends PlanElement> trip = module.calcRoute(request);
+
+		if ( trip == null ) {
+			trip = fallbackRoutingModule.calcRoute(request) ;
+		}
+		for (Leg leg: TripStructureUtils.getLegs(trip)) {
+			TripStructureUtils.setRoutingMode(leg, mainMode);
+		}
+		return trip;
 	}
 
 	public static class UnknownModeException extends RuntimeException {
