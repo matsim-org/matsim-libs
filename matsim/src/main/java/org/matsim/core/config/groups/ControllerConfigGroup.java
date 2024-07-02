@@ -58,6 +58,10 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		delete,
 	}
 
+	public enum NetworkConsistencyCheck {
+		disable, fixWithWarning, abortOnInconsistency
+	}
+
 	public static final String GROUP_NAME = "controller";
 
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";
@@ -80,6 +84,8 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final String EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS = "createScoringFunctionType";
 
 	private static final String MEMORY_OBSERVER_INTERVAL = "memoryObserverInterval";
+
+	private static final String NETWORK_CONSISTENCY_CHECK = "networkConsistencyCheck";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim, hermes}
@@ -112,6 +118,8 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private CleanIterations cleanItersAtEnd = CleanIterations.keep;
 
 	private int memoryObserverInterval = 60;
+
+	private NetworkConsistencyCheck networkConsistencyCheck = NetworkConsistencyCheck.fixWithWarning;
 
 	public ControllerConfigGroup() {
 		super(GROUP_NAME);
@@ -156,6 +164,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");
 		map.put(CLEAN_ITERS_AT_END, "Defines what should be done with the ITERS directory when a simulation finished successfully");
 		map.put(MEMORY_OBSERVER_INTERVAL, "Defines the interval for printing memory usage to the log in [seconds]. Must be positive. Defaults to 60.");
+		map.put(NETWORK_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked. If enabled, the network cleaner is run and inconsistent routes are removed.");
 		return map;
 	}
 
@@ -441,6 +450,16 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(MEMORY_OBSERVER_INTERVAL)
 	public void setMemoryObserverInterval(int memoryObserverInterval) {
 		this.memoryObserverInterval = memoryObserverInterval;
+	}
+
+	@StringGetter(NETWORK_CONSISTENCY_CHECK)
+	public NetworkConsistencyCheck getNetworkConsistencyCheck() {
+		return networkConsistencyCheck;
+	}
+
+	@StringSetter(NETWORK_CONSISTENCY_CHECK)
+	public void setNetworkConsistencyCheck(NetworkConsistencyCheck networkConsistencyCheck) {
+		this.networkConsistencyCheck = networkConsistencyCheck;
 	}
 
 	// ---

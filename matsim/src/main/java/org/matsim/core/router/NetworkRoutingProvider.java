@@ -29,9 +29,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -50,13 +52,13 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 
 	private final String routingMode;
 
+	@Inject
+	ControllerConfigGroup controllerConfigGroup;
 	@Inject Map<String, TravelTime> travelTimes;
 	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	@Inject SingleModeNetworksCache singleModeNetworksCache;
 	@Inject
 	RoutingConfigGroup routingConfigGroup;
-	@Inject Network network;
-	@Inject NetworkConfigGroup networkConfigGroup;
 	@Inject PopulationFactory populationFactory;
 	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	@Inject Scenario scenario ;
@@ -101,6 +103,21 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		// the network refers to the (transport)mode:
 		Network filteredNetwork = singleModeNetworksCache.getOrCreateSingleModeNetwork(mode);
 
+		switch (controllerConfigGroup.getNetworkConsistencyCheck()) {
+			case disable -> {
+			}
+			case fixWithWarning -> {
+				if (cleanNetwork(filteredNetwork)) {
+					log.warn("Network for mode '{}' has unreachable links and nodes. They were removed for routing. This may be caused by mode restrictions on certain links.", mode);
+				}
+			}
+			case abortOnInconsistency -> {
+				if (cleanNetwork(filteredNetwork)) {
+					throw new RuntimeException("Network for mode '"+mode+"' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.");
+				}
+			}
+		}
+
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
 		if (travelDisutilityFactory == null) {
@@ -137,5 +154,12 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}
+	}
+
+	private boolean cleanNetwork(Network filteredNetwork) {
+		int nLinks = filteredNetwork.getLinks().size();
+		int nNodes = filteredNetwork.getNodes().size();
+		new NetworkCleaner().run(filteredNetwork);
+		return nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
 	}
 }

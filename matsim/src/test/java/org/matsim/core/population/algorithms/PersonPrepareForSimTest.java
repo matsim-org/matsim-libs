@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.core.population.algorithms;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -38,11 +39,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.algorithms.PersonPrepareForSim;
-import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
@@ -144,9 +147,7 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assertions.assertEquals(TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg),
-					"wrong routing mode!");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg),"wrong routing mode!");
 		}
 
 		// test routing mode set
@@ -167,9 +168,7 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assertions.assertEquals(TransportMode.pt,
-					TripStructureUtils.getRoutingMode(leg),
-					"wrong routing mode!");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg),"wrong routing mode!");
 		}
 	}
 
@@ -203,10 +202,7 @@ public class PersonPrepareForSimTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 
-			try {
-				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-				Assertions.fail("expected Exception, got none.");
-			} catch (RuntimeException expected) {}
+			Assertions.assertThrows(RuntimeException.class, () -> new PersonPrepareForSim(new DummyRouter(), sc).run(person));
 		}
 
 		// test outdated fallback mode single leg trip (arbitrary drt mode)
@@ -228,9 +224,7 @@ public class PersonPrepareForSimTest {
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
 			Assertions.assertEquals("drt67_fallback", leg.getMode(), "wrong leg mode replacement");
-			Assertions.assertEquals("drt67_fallback",
-					TripStructureUtils.getRoutingMode(leg),
-					"wrong routing mode set");
+			Assertions.assertEquals("drt67_fallback", TripStructureUtils.getRoutingMode(leg),"wrong routing mode set");
 		}
 	}
 
@@ -368,6 +362,9 @@ public class PersonPrepareForSimTest {
 		Population pop = sc.getPopulation();
 
 		// test trip with inconsistent routing modes causes exception
+		// modes: walk - drt - walk
+		// routing modes: pt - drt - drt
+		// expected behaviour: throws RuntimeException, because routing modes are inconsistent
 		{
 			PopulationFactory pf = pop.getFactory();
 			Person person = pf.createPerson(Id.create("3", Person.class));
@@ -392,13 +389,13 @@ public class PersonPrepareForSimTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 
-			try {
-				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-				Assertions.fail("expected Exception, got none.");
-			} catch (RuntimeException expected) {}
+			Assertions.assertThrows(RuntimeException.class, () -> new PersonPrepareForSim(new DummyRouter(), sc).run(person));
 		}
 
 		// test trip with legs with and others without routing modes causes exception
+		// modes: walk - drt - walk
+		// routing modes: null - drt - drt
+		// expected behaviour: throws RuntimeException, because routing modes are inconsistent
 		{
 			PopulationFactory pf = pop.getFactory();
 			Person person = pf.createPerson(Id.create("4", Person.class));
@@ -423,10 +420,7 @@ public class PersonPrepareForSimTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 
-			try {
-				new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-				Assertions.fail("expected Exception, got none.");
-			} catch (RuntimeException expected) {}
+			Assertions.assertThrows(RuntimeException.class, () -> new PersonPrepareForSim(new DummyRouter(), sc).run(person));
 		}
 	}
 
@@ -478,13 +472,90 @@ public class PersonPrepareForSimTest {
 		Assertions.assertEquals(route, ((DefaultTransitPassengerRoute) leg.getRoute()).getRouteId());
 	}
 
+	@Test
+	void testLegModeConsistency_ok() {
+		// set config, such that router is called due to inconsistency
+		Config config = ConfigUtils.createConfig();
+		config.controller().setNetworkConsistencyCheck(ControllerConfigGroup.NetworkConsistencyCheck.fixWithWarning);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
+
+		DummyRouter router = new DummyRouter();
+		new PersonPrepareForSim(router, scenario).run(person);
+		// check router call
+		Assertions.assertEquals(1, router.getCounter());
+	}
+
+	@Test
+	void testLegModeConsistency_throws() {
+		// set config, such that exception is thrown due to inconsistency
+		Config config = ConfigUtils.createConfig();
+		config.controller().setNetworkConsistencyCheck(ControllerConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
+
+		// check exception
+		Assertions.assertThrows(RuntimeException.class, () -> new PersonPrepareForSim(new DummyRouter(), scenario).run(person));
+	}
+
+	@Test
+	void testLegModeConsistency_ignored() {
+		// set config, such that inconsistency is ignored
+		Config config = ConfigUtils.createConfig();
+		config.controller().setNetworkConsistencyCheck(ControllerConfigGroup.NetworkConsistencyCheck.disable);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
+
+		DummyRouter router = new DummyRouter();
+		new PersonPrepareForSim(router, scenario).run(person);
+		// check no router call
+		Assertions.assertEquals(0, router.getCounter());
+	}
+
+	/**
+	 * Creates a person with one leg, that has mode pt, but route goes over link with only mode car.
+	 */
+	private Person createInconsistentPersonForModeConsistencyCheck(Scenario scenario) {
+		createAndAddNetwork(scenario);
+
+		Population pop = scenario.getPopulation();
+		PopulationFactory pf = pop.getFactory();
+		Person person = pf.createPerson(Id.create("1", Person.class));
+		Plan plan = pf.createPlan();
+
+		Id<Link> l1Id = Id.createLinkId("1");
+		Activity act1 = pf.createActivityFromLinkId("home", l1Id);
+		// Leg mode is pt, but route goes over links with car mode
+		Leg leg = pf.createLeg(TransportMode.pt);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(l1Id, List.of(l1Id), l1Id);
+		leg.setRoute(route);
+		Activity act2 = pf.createActivityFromLinkId("home", l1Id);
+		plan.addActivity(act1);
+		plan.addLeg(leg);
+		plan.addActivity(act2);
+		person.addPlan(plan);
+		return person;
+	}
+
 	private static class DummyRouter implements PlanAlgorithm {
+		private int counter = 0;
 		@Override
 		public void run(final Plan plan) {
+			counter++;
+		}
+
+		public int getCounter() {
+			return counter;
 		}
 	}
 
-	private Link createAndAddNetwork(Scenario sc) {
+	/**
+	 * Creates Network:
+	 * (n1)---l1---(n2)---l2---(n3)
+	 * l1 modes: car
+	 * l2 modes: pt
+	 */
+	private void createAndAddNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		Link link1;
 		{
@@ -506,6 +577,5 @@ public class PersonPrepareForSimTest {
 			net.addLink(link1);
 			net.addLink(l2);
 		}
-		return link1;
 	}
 }
