@@ -30,11 +30,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -43,9 +40,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
@@ -103,20 +98,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		// the network refers to the (transport)mode:
 		Network filteredNetwork = singleModeNetworksCache.getOrCreateSingleModeNetwork(mode);
 
-		switch (controllerConfigGroup.getNetworkConsistencyCheck()) {
-			case disable -> {
-			}
-			case fixWithWarning -> {
-				if (cleanNetwork(filteredNetwork)) {
-					log.warn("Network for mode '{}' has unreachable links and nodes. They were removed for routing. This may be caused by mode restrictions on certain links.", mode);
-				}
-			}
-			case abortOnInconsistency -> {
-				if (cleanNetwork(filteredNetwork)) {
-					throw new RuntimeException("Network for mode '"+mode+"' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.");
-				}
-			}
-		}
+		checkNetwork(filteredNetwork);
 
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
@@ -156,10 +138,18 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		}
 	}
 
-	private boolean cleanNetwork(Network filteredNetwork) {
+	private void checkNetwork(Network filteredNetwork) {
+		if(controllerConfigGroup.getNetworkRouteConsistencyCheck() == ControllerConfigGroup.NetworkRouteConsistencyCheck.disable) {
+			return;
+		}
+
 		int nLinks = filteredNetwork.getLinks().size();
 		int nNodes = filteredNetwork.getNodes().size();
 		new NetworkCleaner().run(filteredNetwork);
-		return nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
+		boolean changed = nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
+
+		if(changed) {
+			throw new RuntimeException("Network for mode '"+mode+"' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.");
+		}
 	}
 }

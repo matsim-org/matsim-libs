@@ -75,7 +75,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 		pendingBackward.add(startNode);
 
 		// step through the network in forward mode
-		while (pendingForward.size() > 0) {
+		while (!pendingForward.isEmpty()) {
 			int idx = pendingForward.size() - 1;
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getOutLinks().values()) {
@@ -89,7 +89,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 		}
 
 		// now step through the network in backward mode
-		while (pendingBackward.size() > 0) {
+		while (!pendingBackward.isEmpty()) {
 			int idx = pendingBackward.size()-1;
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getInLinks().values()) {

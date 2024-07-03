@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -60,7 +61,7 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: The agents (both car & bike) have a route from the plan. Link before and at the activity is restricted respectively.
+	 * Setting: The agents (both car & bike) have a route from the plan. Link before and at the activity is restricted respectively. Consistency check is turned off.
 	 * Expected behaviour: Since it is not checked, if the route contains link, which are not allowed to use anymore, it can still use the restricted link.
 	 */
 	@ParameterizedTest
@@ -80,7 +81,7 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: The agents (both car & bike) have no route. The mode of the link in front of the activity is restricted.
+	 * Setting: The agents (both car & bike) have no route. The mode of the link in front of the activity is restricted. Consistency check is turned off.
 	 * Expected behaviour: By default, the network is not cleaned. The router throws an exception since there is no route from home to the activity.
 	 */
 	@ParameterizedTest
@@ -99,7 +100,7 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: The agents (both car & bike) have no route. The mode of the link behind the activity is restricted.
+	 * Setting: The agents (both car & bike) have no route. The mode of the link behind the activity is restricted. Consistency check is turned off.
 	 * Expected behaviour: By default, the network is not cleaned. The router throws an exception since there is no route from the activity to home.
 	 */
 	@ParameterizedTest
@@ -118,7 +119,7 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: The agents (both car & bike) have no route. The mode of the activity's link is restricted. Activity has x-y-coordinate.
+	 * Setting: The agents (both car & bike) have no route. The mode of the activity's link is restricted. Activity has x-y-coordinate. Consistency check is turned off.
 	 * Expected behaviour: The agents (both car & bike) are rerouted to the nearest link to the activity's coordinate.
 	 */
 	@ParameterizedTest
@@ -141,7 +142,7 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: The agents (both car & bike) have no route. The mode of the activity's link is restricted. Activity has no x-y-coordinate.
+	 * Setting: The agents (both car & bike) have no route. The mode of the activity's link is restricted. Activity has no x-y-coordinate. Consistency check is turned off.
 	 * Expected behaviour: The router throws an exception since there is no fallback x-y-coordinate.
 	 */
 	@ParameterizedTest
@@ -161,6 +162,7 @@ public class ModeRestrictionTest {
 
 	private Config prepareConfig(String plansFile) {
 		final Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
+		config.controller().setNetworkRouteConsistencyCheck(ControllerConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.plans().setInputFile(plansFile);
 
 		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams("bike") ;

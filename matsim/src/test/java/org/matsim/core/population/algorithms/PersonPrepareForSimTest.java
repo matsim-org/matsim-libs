@@ -473,24 +473,10 @@ public class PersonPrepareForSimTest {
 	}
 
 	@Test
-	void testLegModeConsistency_ok() {
-		// set config, such that router is called due to inconsistency
-		Config config = ConfigUtils.createConfig();
-		config.controller().setNetworkConsistencyCheck(ControllerConfigGroup.NetworkConsistencyCheck.fixWithWarning);
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
-
-		DummyRouter router = new DummyRouter();
-		new PersonPrepareForSim(router, scenario).run(person);
-		// check router call
-		Assertions.assertEquals(1, router.getCounter());
-	}
-
-	@Test
-	void testLegModeConsistency_throws() {
+	void testLegRouteModeConsistency_throws() {
 		// set config, such that exception is thrown due to inconsistency
 		Config config = ConfigUtils.createConfig();
-		config.controller().setNetworkConsistencyCheck(ControllerConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
+		config.controller().setNetworkRouteConsistencyCheck(ControllerConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 
@@ -499,10 +485,10 @@ public class PersonPrepareForSimTest {
 	}
 
 	@Test
-	void testLegModeConsistency_ignored() {
+	void testLegRouteModeConsistency_ignored() {
 		// set config, such that inconsistency is ignored
 		Config config = ConfigUtils.createConfig();
-		config.controller().setNetworkConsistencyCheck(ControllerConfigGroup.NetworkConsistencyCheck.disable);
+		config.controller().setNetworkRouteConsistencyCheck(ControllerConfigGroup.NetworkRouteConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 

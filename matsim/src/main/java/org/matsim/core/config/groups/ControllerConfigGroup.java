@@ -58,8 +58,8 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		delete,
 	}
 
-	public enum NetworkConsistencyCheck {
-		disable, fixWithWarning, abortOnInconsistency
+	public enum NetworkRouteConsistencyCheck {
+		disable, abortOnInconsistency
 	}
 
 	public static final String GROUP_NAME = "controller";
@@ -85,7 +85,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String MEMORY_OBSERVER_INTERVAL = "memoryObserverInterval";
 
-	private static final String NETWORK_CONSISTENCY_CHECK = "networkConsistencyCheck";
+	private static final String NETWORK_ROUTE_CONSISTENCY_CHECK = "networkConsistencyCheck";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim, hermes}
@@ -119,7 +119,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 
 	private int memoryObserverInterval = 60;
 
-	private NetworkConsistencyCheck networkConsistencyCheck = NetworkConsistencyCheck.fixWithWarning;
+	private NetworkRouteConsistencyCheck networkRouteConsistencyCheck = NetworkRouteConsistencyCheck.abortOnInconsistency;
 
 	public ControllerConfigGroup() {
 		super(GROUP_NAME);
@@ -164,7 +164,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");
 		map.put(CLEAN_ITERS_AT_END, "Defines what should be done with the ITERS directory when a simulation finished successfully");
 		map.put(MEMORY_OBSERVER_INTERVAL, "Defines the interval for printing memory usage to the log in [seconds]. Must be positive. Defaults to 60.");
-		map.put(NETWORK_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked. If enabled, the network cleaner is run and inconsistent routes are removed.");
+		map.put(NETWORK_ROUTE_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked. If enabled, the network cleaner is run and inconsistent routes are removed.");
 		return map;
 	}
 
@@ -452,14 +452,14 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		this.memoryObserverInterval = memoryObserverInterval;
 	}
 
-	@StringGetter(NETWORK_CONSISTENCY_CHECK)
-	public NetworkConsistencyCheck getNetworkConsistencyCheck() {
-		return networkConsistencyCheck;
+	@StringGetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
+	public NetworkRouteConsistencyCheck getNetworkRouteConsistencyCheck() {
+		return networkRouteConsistencyCheck;
 	}
 
-	@StringSetter(NETWORK_CONSISTENCY_CHECK)
-	public void setNetworkConsistencyCheck(NetworkConsistencyCheck networkConsistencyCheck) {
-		this.networkConsistencyCheck = networkConsistencyCheck;
+	@StringSetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
+	public void setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck networkRouteConsistencyCheck) {
+		this.networkRouteConsistencyCheck = networkRouteConsistencyCheck;
 	}
 
 	// ---

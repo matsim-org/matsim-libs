@@ -1022,4 +1022,16 @@ public final class NetworkUtils {
 	public static void removeDisallowedNextLinks(Link link) {
 		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
 	}
+
+	public static void addAllowedMode(Link link, String mode) {
+		Set<String> modes = new HashSet<>(link.getAllowedModes());
+		modes.add(mode);
+		link.setAllowedModes(modes);
+	}
+
+	public static void removeAllowedMode(Link link, String mode) {
+		Set<String> modes = new HashSet<>(link.getAllowedModes());
+		modes.remove(mode);
+		link.setAllowedModes(modes);
+	}
 }

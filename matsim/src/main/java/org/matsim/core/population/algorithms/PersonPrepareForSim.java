@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -154,9 +155,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			return true;
 		}
 
-		if (!isLegModeConsistent(person, leg)){
-			return true;
-		}
+		checkModeConsistent(person, leg);
 
 		if(!Double.isNaN(leg.getRoute().getDistance())){
 			return false;
@@ -193,31 +192,22 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		}
 	}
 
-	private boolean isLegModeConsistent(Person person, Leg leg) {
+	private void checkModeConsistent(Person person, Leg leg) {
+		if(this.scenario.getConfig().controller().getNetworkRouteConsistencyCheck() == ControllerConfigGroup.NetworkRouteConsistencyCheck.disable) {
+			return;
+		}
+
 		if(!(leg.getRoute() instanceof NetworkRoute networkRoute)) {
-			return true;
+			return;
 		}
 
 		boolean linkModesConsistent = networkRoute.getLinkIds().stream()
 												  .map(l -> scenario.getNetwork().getLinks().get(l))
 												  .allMatch(l -> l.getAllowedModes().contains(leg.getMode()));
 
-		switch (this.scenario.getConfig().controller().getNetworkConsistencyCheck()) {
-			case disable -> {
-				return true;
-			}
-			case fixWithWarning -> {
-				if(!linkModesConsistent) {
-					log.warn("Trigger reroute due to inconsistent modes for: Person {}; Leg '{}'", person.getId(), leg);
-				}
-			}
-			case abortOnInconsistency -> {
-				if(!linkModesConsistent) {
-					throw new RuntimeException("Route inconsistent with link modes for: Person " + person.getId() + "; Leg '" + leg + "'");
-				}
-			}
+		if(!linkModesConsistent){
+			throw new RuntimeException("Route inconsistent with link modes for: Person " + person.getId() + "; Leg '" + leg + "'");
 		}
-		return linkModesConsistent;
 	}
 
 	private boolean needsReComputation(Activity act) {
