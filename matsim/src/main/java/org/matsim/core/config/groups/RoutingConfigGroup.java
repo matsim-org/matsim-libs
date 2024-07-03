@@ -91,8 +91,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	}
 
 	private static final String ACCESSEGRESSTYPE = "accessEgressType";
-	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=accessEgressModeToLink which means walk over euclidean distance from nearest point on link to facility is simulated.";
-	private AccessEgressType accessEgressType = AccessEgressType.accessEgressModeToLink;
+	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";
+	private AccessEgressType accessEgressType = AccessEgressType.none;
 
 	// ---
 	private static final String RANDOMNESS = "routingRandomness" ;
