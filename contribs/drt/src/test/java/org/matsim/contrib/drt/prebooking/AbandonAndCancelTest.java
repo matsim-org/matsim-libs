@@ -265,4 +265,69 @@ public class AbandonAndCancelTest {
 			assertTrue(requestInfo.rejected);
 		}
 	}
+
+	@Test
+	void cancelLateWithComplexUnschedulerTest() {
+		/*
+		 * One person requests to depart at 2000 and also is there at 2000. Another
+		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
+		 * has 1000s delay.
+		 *
+		 * In this test we manually cancel the second request at 3000.0 (so after
+		 * departure of the first agent).
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicle", 1, 1) //
+				.addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
+				.addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
+				.configure(600.0, 1.3, 600.0, 60.0) //
+				.endTime(10.0 * 3600.0);
+
+		Controler controller = environment.build();
+		PrebookingParams prebookingParams = new PrebookingParams();
+		prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
+		PrebookingTest.installPrebooking(controller, prebookingParams);
+
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {
+			@Override
+			protected void configureQSim() {
+				addModalQSimComponentBinding().toProvider(modalProvider(getter -> {
+					PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
+					QSim qsim = getter.get(QSim.class);
+
+					return new MobsimBeforeSimStepListener() {
+						@Override
+						public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+							if (e.getSimulationTime() == 3000.0) {
+								PlanAgent planAgent = (PlanAgent) qsim.getAgents()
+										.get(Id.createPersonId("personLate"));
+
+								Leg leg = TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
+
+								prebookingManager.cancel(leg);
+							}
+						}
+					};
+				}));
+			}
+		});
+
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
+			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
+			assertEquals(3212.0, requestInfo.dropoffTime, 1e-3); // still waited quite a bit
+		}
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
+			assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
+			// agent tries a non-prebooked request upon arrival
+			assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
+			assertTrue(requestInfo.rejected);
+		}
+	}
 }
