@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.shifts.io.OperationFacilitiesReader;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 
@@ -8,9 +8,9 @@ public class OperationFacilitiesModeModule extends AbstractDvrpModeModule {
 
 	private final OperationFacilitiesParams operationFacilitiesParams;
 
-	public OperationFacilitiesModeModule(DrtWithOperationsConfigGroup drtCfg) {
+	public OperationFacilitiesModeModule(DrtWithExtensionsConfigGroup drtCfg) {
 		super(drtCfg.getMode());
-		this.operationFacilitiesParams = drtCfg.getDrtOperationsParams().getOperationFacilitiesParams().orElseThrow();
+		this.operationFacilitiesParams = drtCfg.getDrtOperationsParams().orElseThrow().getOperationFacilitiesParams().orElseThrow();
 	}
 
 	@Override

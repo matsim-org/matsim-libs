@@ -2,12 +2,12 @@ package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
 import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtAssignShiftToVehicleLogic;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftDispatcherImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftStartLogic;
@@ -53,7 +53,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 
 	public ShiftEDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
-		this.drtOperationsParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
+		this.drtOperationsParams = ((DrtWithExtensionsConfigGroup) drtCfg).getDrtOperationsParams().orElseThrow();
 		this.drtCfg = drtCfg;
 	}
 
