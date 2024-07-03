@@ -47,8 +47,6 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 
 	private final String routingMode;
 
-	@Inject
-	ControllerConfigGroup controllerConfigGroup;
 	@Inject Map<String, TravelTime> travelTimes;
 	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	@Inject SingleModeNetworksCache singleModeNetworksCache;
@@ -134,12 +132,13 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			}
 
 		} else {
+			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}
 	}
 
 	private void checkNetwork(Network filteredNetwork) {
-		if(controllerConfigGroup.getNetworkRouteConsistencyCheck() == ControllerConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if(routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
 			return;
 		}
 
@@ -149,7 +148,9 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		boolean changed = nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
 
 		if(changed) {
-			throw new RuntimeException("Network for mode '"+mode+"' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.");
+			String errorMessage = "Network for mode '" + mode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.";
+			log.error(errorMessage + "\n If you restricted modes on some links, consider doing that with NetworkUtils.restrictModesAndCleanNetwork(). This makes sure, that the network is consistent for each mode.");
+			throw new RuntimeException(errorMessage);
 		}
 	}
 }

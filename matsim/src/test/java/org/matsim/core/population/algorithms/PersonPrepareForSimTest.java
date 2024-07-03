@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -476,7 +476,7 @@ public class PersonPrepareForSimTest {
 	void testLegRouteModeConsistency_throws() {
 		// set config, such that exception is thrown due to inconsistency
 		Config config = ConfigUtils.createConfig();
-		config.controller().setNetworkRouteConsistencyCheck(ControllerConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 
@@ -488,7 +488,7 @@ public class PersonPrepareForSimTest {
 	void testLegRouteModeConsistency_ignored() {
 		// set config, such that inconsistency is ignored
 		Config config = ConfigUtils.createConfig();
-		config.controller().setNetworkRouteConsistencyCheck(ControllerConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 

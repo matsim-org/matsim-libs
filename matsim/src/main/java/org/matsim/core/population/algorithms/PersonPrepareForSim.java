@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -193,7 +193,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	}
 
 	private void checkModeConsistent(Person person, Leg leg) {
-		if(this.scenario.getConfig().controller().getNetworkRouteConsistencyCheck() == ControllerConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if(this.scenario.getConfig().routing().getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
 			return;
 		}
 
@@ -206,7 +206,9 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 												  .allMatch(l -> l.getAllowedModes().contains(leg.getMode()));
 
 		if(!linkModesConsistent){
-			throw new RuntimeException("Route inconsistent with link modes for: Person " + person.getId() + "; Leg '" + leg + "'");
+			String errorMessage = "Route inconsistent with link modes for: Person " + person.getId() + "; Leg '" + leg + "'";
+			log.error(errorMessage + "\n Consider cleaning inconsistent routes by using PopulationUtils.checkRouteModeAndReset().");
+			throw new RuntimeException(errorMessage);
 		}
 	}
 

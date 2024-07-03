@@ -91,8 +91,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	}
 
 	private static final String ACCESSEGRESSTYPE = "accessEgressType";
-	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";
-	private AccessEgressType accessEgressType = AccessEgressType.none;
+	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=accessEgressModeToLink which means walk over euclidean distance from nearest point on link to facility is simulated.";
+	private AccessEgressType accessEgressType = AccessEgressType.accessEgressModeToLink;
 
 	// ---
 	private static final String RANDOMNESS = "routingRandomness" ;
@@ -103,6 +103,13 @@ public final class RoutingConfigGroup extends ConfigGroup {
 																		"Setting this switch to \"true\" will clear them.  Note that this will also clear " +
 																		"settings for helper modes such as for " + TransportMode.non_network_walk;
 	private boolean clearingDefaultModeRoutingParams = false ;
+
+	private static final String NETWORK_ROUTE_CONSISTENCY_CHECK = "networkRouteConsistencyCheck";
+	private NetworkRouteConsistencyCheck networkRouteConsistencyCheck = NetworkRouteConsistencyCheck.abortOnInconsistency;
+
+	public enum NetworkRouteConsistencyCheck {
+		disable, abortOnInconsistency
+	}
 
 	/**
 	 * @deprecated -- use {@link TeleportedModeParams} to be consistent with xml config.  kai, jun'23
@@ -547,6 +554,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
 		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
 		map.put(ACCESSEGRESSTYPE, ACCESSEGRESSTYPE_CMT);
+		map.put(NETWORK_ROUTE_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked.");
 		return map;
 	}
 
@@ -648,6 +656,16 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	@StringSetter(RANDOMNESS)
 	public void setRoutingRandomness(double routingRandomness) {
 		this.routingRandomness = routingRandomness;
+	}
+
+	@StringGetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
+	public NetworkRouteConsistencyCheck getNetworkRouteConsistencyCheck() {
+		return networkRouteConsistencyCheck;
+	}
+
+	@StringSetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
+	public void setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck networkRouteConsistencyCheck) {
+		this.networkRouteConsistencyCheck = networkRouteConsistencyCheck;
 	}
 
 	@Override protected void checkConsistency(Config config) {

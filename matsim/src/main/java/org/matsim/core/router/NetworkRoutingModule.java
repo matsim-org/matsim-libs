@@ -42,6 +42,7 @@ import org.matsim.facilities.Facility;
  *
  * @author thibautd
  */
+@Deprecated // use NetworkRoutingInclAccessEgressModule instead
 public final class NetworkRoutingModule implements RoutingModule {
 	// I think it makes sense to NOT add the bushwhacking mode directly into here ...
 	// ... since it makes sense be able to to route from facility.getLinkId() to facility.getLinkId(). kai, dec'15

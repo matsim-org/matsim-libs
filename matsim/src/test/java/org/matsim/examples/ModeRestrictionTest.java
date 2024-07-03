@@ -25,10 +25,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -47,8 +48,6 @@ import java.util.stream.Stream;
  */
 // @formatter:on
 public class ModeRestrictionTest {
-	private static final Logger log = LogManager.getLogger(ModeRestrictionTest.class);
-
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -162,7 +161,7 @@ public class ModeRestrictionTest {
 
 	private Config prepareConfig(String plansFile) {
 		final Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.controller().setNetworkRouteConsistencyCheck(ControllerConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.plans().setInputFile(plansFile);
 
 		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams("bike") ;

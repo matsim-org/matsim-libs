@@ -10,7 +10,6 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,53 +18,42 @@ import java.util.stream.Collectors;
  * I.e. for each mode, it removes by running the {@link NetworkCleaner} that mode for links, that are not reachable from all other links
  * or from which all other links are not reachable.
  */
-public class NetworkModeChanger implements NetworkRunnable {
-	private static final Logger log = LogManager.getLogger(NetworkModeChanger.class);
+public class NetworkModeRestriction implements NetworkRunnable {
+	private static final Logger log = LogManager.getLogger(NetworkModeRestriction.class);
 
-	private final Map<Id<Link>, Set<String>> changes;
+	private final Map<Id<Link>, Set<String>> modesToRemoveByLinkId;
 
-	public NetworkModeChanger(Map<Id<Link>, Set<String>> changes) {
-		this.changes = changes;
+	public NetworkModeRestriction(Map<Id<Link>, Set<String>> modesToRemoveByLinkId) {
+		this.modesToRemoveByLinkId = modesToRemoveByLinkId;
 	}
 
 	@Override
 	public void run(Network network) {
+		Map<String, Long> modeCountBefore = countModes(network);
+
 		applyModeChanges(network);
 		cleanNetworkPerMode(network);
 		removeLinksWithNoModes(network);
 		removeNodesWithNoLinks(network);
+
+		Map<String, Long> modeCountAfter = countModes(network);
+		logModeCountDifference(modeCountBefore, modeCountAfter);
 	}
 
 	private void applyModeChanges(Network network) {
-		for (Map.Entry<Id<Link>, Set<String>> entry : changes.entrySet()) {
+		for (Map.Entry<Id<Link>, Set<String>> entry : modesToRemoveByLinkId.entrySet()) {
 			Link link = network.getLinks().get(entry.getKey());
-			link.setAllowedModes(entry.getValue());
+			for (String modeToRemove : entry.getValue()) {
+				NetworkUtils.removeAllowedMode(link, modeToRemove);
+			}
 		}
 	}
 
 	private void cleanNetworkPerMode(Network network) {
 		Set<String> modes = network.getLinks().values().stream().flatMap(l -> l.getAllowedModes().stream()).collect(Collectors.toSet());
 		for (String mode : modes) {
-			cleanNetworkForMode(network, mode);
-		}
-	}
-
-	private void cleanNetworkForMode(Network network, String mode) {
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		Network modalSubNetwork = NetworkUtils.createNetwork();
-		filter.filter(modalSubNetwork, Set.of(mode));
-
-		log.info("Cleaning network for mode: {}", mode);
-		int sizeBeforeCleaning = modalSubNetwork.getLinks().size();
-		new NetworkCleaner().run(modalSubNetwork);
-		int sizeAfterCleaning = modalSubNetwork.getLinks().size();
-		log.info("Removed mode {} from {} links.", mode, sizeBeforeCleaning - sizeAfterCleaning);
-
-		//remove mode from links that are not in the modal subnetwork
-		for (Link link : network.getLinks().values()) {
-			if (Objects.isNull(modalSubNetwork.getLinks().get(link.getId()))) {
-				NetworkUtils.removeAllowedMode(link, mode);
-			}
+			MultimodalNetworkCleaner multimodalNetworkCleaner = new MultimodalNetworkCleaner(network);
+			multimodalNetworkCleaner.run(Set.of(mode));
 		}
 	}
 
@@ -81,5 +69,18 @@ public class NetworkModeChanger implements NetworkRunnable {
 			   .filter(n -> n.getInLinks().isEmpty() && n.getOutLinks().isEmpty())
 			   .map(Node::getId)
 			   .forEach(network::removeNode);
+	}
+
+	private void logModeCountDifference(Map<String, Long> modeCountBefore, Map<String, Long> modeCountAfter) {
+		modeCountBefore.forEach((mode, countBefore) -> {
+			long countAfter = modeCountAfter.getOrDefault(mode, 0L);
+			log.info("Removed mode {} from {} links.", mode, countBefore - countAfter);
+		});
+	}
+
+	private static Map<String, Long> countModes(Network network) {
+		return network.getLinks().values().stream()
+					  .flatMap(l -> l.getAllowedModes().stream())
+					  .collect(Collectors.groupingBy(m -> m, Collectors.counting()));
 	}
 }
