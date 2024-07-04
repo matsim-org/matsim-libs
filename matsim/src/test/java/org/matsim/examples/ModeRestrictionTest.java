@@ -253,6 +253,7 @@ public class ModeRestrictionTest {
 		config.qsim().setMainModes( new HashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) ) ;
 		config.routing().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
 		config.routing().removeTeleportedModeParams("bike");
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.controller().setLastIteration(0);
 		return config;
