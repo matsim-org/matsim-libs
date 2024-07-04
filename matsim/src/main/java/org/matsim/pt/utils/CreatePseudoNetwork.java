@@ -29,28 +29,33 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopArea;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Builds a network where transit vehicles can drive along and assigns the correct
- * links to the transit stop facilities and routes of transit lines. As each transit
- * stop facility can only be connected to at most one link, the algorithm is forced
- * to duplicated transit stop facilities in certain cases to build the network.
+ * links to the transit stop facilities and routes of transit lines. Each stop facility
+ * is assigned to a loop link, located in a node with the same coordinates as the stop.
+ * The stop facility ID is used for node and link IDs.
  *
- * @author mrieser
+ * @author mrieser, davibicudo
  */
 public class CreatePseudoNetwork {
 
@@ -59,14 +64,9 @@ public class CreatePseudoNetwork {
 	private final String prefix;
 	private final double linkFreeSpeed;
 	private final double linkCapacity;
-	
 
-	private final Map<Tuple<Node, Node>, Link> links = new HashMap<Tuple<Node, Node>, Link>();
-	private final Map<Tuple<Node, Node>, TransitStopFacility> stopFacilities = new HashMap<Tuple<Node, Node>, TransitStopFacility>();
-	private final Map<TransitStopFacility, Node> nodes = new HashMap<TransitStopFacility, Node>();
-	private final Map<TransitStopFacility, List<TransitStopFacility>> facilityCopies = new HashMap<TransitStopFacility, List<TransitStopFacility>>();
-
-	private long linkIdCounter = 0;
+	private final Map<Tuple<Node, Node>, Link> links = new HashMap<>();
+	private final Map<TransitStopFacility, Node> nodes = new HashMap<>();
 
 	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
 
@@ -77,8 +77,8 @@ public class CreatePseudoNetwork {
 		this.linkFreeSpeed = 100.0 / 3.6;
 		this.linkCapacity = 100000.0;
 	}
-	
-	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix, 
+
+	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix,
 			final double linkFreeSpeed, final double linkCapacity) {
 		this.schedule = schedule;
 		this.network = network;
@@ -89,24 +89,27 @@ public class CreatePseudoNetwork {
 
 	public void createNetwork() {
 
-		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
+		createStopNodesAndLoopLinks();
 
+		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<>();
 		for (TransitLine tLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+				ArrayList<Id<Link>> routeLinks = new ArrayList<>();
 				TransitRouteStop prevStop = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
-					Link link = getNetworkLink(prevStop, stop);
-					routeLinks.add(link.getId());
+					if (prevStop != null) {
+						Link link = getNetworkLink(prevStop, stop);
+						routeLinks.add(link.getId());
+					}
 					prevStop = stop;
 				}
 
-				if (routeLinks.size() > 0) {
-					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks );
+				if (!routeLinks.isEmpty()) {
+					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks);
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
-					toBeRemoved.add(new Tuple<TransitLine, TransitRoute>(tLine, tRoute));
+					toBeRemoved.add(new Tuple<>(tLine, tRoute));
 				}
 			}
 		}
@@ -116,64 +119,40 @@ public class CreatePseudoNetwork {
 		}
 	}
 
+	private void createStopNodesAndLoopLinks() {
+		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
+			Node node = this.network.getFactory().createNode(Id.createNodeId(this.prefix + stop.getId()), stop.getCoord());
+			this.network.addNode(node);
+			this.nodes.put(stop, node);
+
+			Link loopLink = this.network.getFactory().createLink(Id.createLinkId (this.prefix + stop.getId()), node, node);
+			stop.setLinkId(loopLink.getId());
+			this.network.addLink(loopLink);
+			Tuple<Node, Node> connection = new Tuple<>(node, node);
+			this.links.put(connection, loopLink);
+		}
+	}
+
 	private Link getNetworkLink(final TransitRouteStop fromStop, final TransitRouteStop toStop) {
-		TransitStopFacility fromFacility = (fromStop == null) ? toStop.getStopFacility() : fromStop.getStopFacility();
+		TransitStopFacility fromFacility = fromStop.getStopFacility();
 		TransitStopFacility toFacility = toStop.getStopFacility();
 
 		Node fromNode = this.nodes.get(fromFacility);
-		if (fromNode == null) {
-			fromNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), fromFacility.getCoord());
-			this.network.addNode(fromNode);
-			this.nodes.put(toFacility, fromNode);
-		}
-
 		Node toNode = this.nodes.get(toFacility);
-		if (toNode == null) {
-			toNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), toFacility.getCoord());
-			this.network.addNode(toNode);
-			this.nodes.put(toFacility, toNode);
-		}
 
-		Tuple<Node, Node> connection = new Tuple<Node, Node>(fromNode, toNode);
+		Tuple<Node, Node> connection = new Tuple<>(fromNode, toNode);
 		Link link = this.links.get(connection);
-		if (link == null) {
-			link = createAndAddLink(fromNode, toNode, connection);
-
-			if (toFacility.getLinkId() == null) {
-				toFacility.setLinkId(link.getId());
-				this.stopFacilities.put(connection, toFacility);
-			} else {
-				List<TransitStopFacility> copies = this.facilityCopies.get(toFacility);
-				if (copies == null) {
-					copies = new ArrayList<TransitStopFacility>();
-					this.facilityCopies.put(toFacility, copies);
-				}
-				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
-				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
-				newFacility.setStopAreaId(Id.create(toFacility.getId(), TransitStopArea.class));
-				newFacility.setLinkId(link.getId());
-				newFacility.setName(toFacility.getName());
-				copies.add(newFacility);
-				this.nodes.put(newFacility, toNode);
-				this.schedule.addStopFacility(newFacility);
-				toStop.setStopFacility(newFacility);
-				this.stopFacilities.put(connection, newFacility);
-			}
-		} else {
-			toStop.setStopFacility(this.stopFacilities.get(connection));
-		}
-		return link;
+		return link == null ? createAndAddLink(connection) : link;
 	}
 
-	private Link createAndAddLink(Node fromNode, Node toNode,
-			Tuple<Node, Node> connection) {
+	private Link createAndAddLink(Tuple<Node, Node> connection) {
+		Node fromNode = connection.getFirst();
+		Node toNode = connection.getSecond();
 		Link link;
-		link = this.network.getFactory().createLink(Id.create(this.prefix + this.linkIdCounter++, Link.class), fromNode, toNode);
-		if (fromNode == toNode) {
-			link.setLength(50);
-		} else {
-			link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
-		}
+		link = this.network.getFactory().createLink(Id.createLinkId(this.prefix + fromNode.getId() + "-" + toNode.getId()), fromNode,
+			toNode);
+		link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
+
 		link.setFreespeed(linkFreeSpeed);
 		link.setCapacity(linkCapacity);
 		link.setNumberOfLanes(1);
@@ -181,13 +160,6 @@ public class CreatePseudoNetwork {
 		link.setAllowedModes(this.transitModes);
 		this.links.put(connection, link);
 		return link;
-	}
-
-	public Link getLinkBetweenStops(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
-		Node fromNode = this.nodes.get(fromStop);
-		Node toNode = this.nodes.get(toStop);
-		Tuple<Node, Node> connection = new Tuple<Node, Node>(fromNode, toNode);
-		return this.links.get(connection);
 	}
 
 }
