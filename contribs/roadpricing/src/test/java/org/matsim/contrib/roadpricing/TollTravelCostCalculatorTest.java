@@ -74,6 +74,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		RoadPricingTestUtils.createNetwork2((MutableScenario)scenario);
@@ -124,6 +125,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testDistanceTollRouter() {
 		Config config = utils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
@@ -209,6 +211,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testLinkTollRouter() {
 		Config config = utils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
@@ -304,6 +307,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testCordonTollRouter() {
 		Config config = utils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();

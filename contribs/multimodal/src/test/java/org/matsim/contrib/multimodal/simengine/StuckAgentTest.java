@@ -46,6 +46,7 @@ import org.matsim.contrib.multimodal.MultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -69,7 +70,7 @@ public class StuckAgentTest {
 	void testStuckEvents() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setEndTime(24*3600);
 
 		config.controller().setLastIteration(0);
