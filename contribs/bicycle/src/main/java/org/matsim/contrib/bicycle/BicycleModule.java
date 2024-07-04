@@ -40,12 +40,19 @@ import org.matsim.vehicles.VehicleType;
 public final class BicycleModule extends AbstractModule {
 	private static final Logger LOG = LogManager.getLogger(BicycleModule.class);
 
+	@Inject private BicycleConfigGroup bicycleConfigGroup;
+
 	@Override public void install() {
-		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( this.getConfig(), BicycleConfigGroup.class );
-		this.bind( BicycleConfigGroup.class ).toInstance( bicycleConfigGroup );
+//		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( this.getConfig(), BicycleConfigGroup.class );
+//		this.bind( BicycleConfigGroup.class ).toInstance( bicycleConfigGroup );
 		// the above feels odd.  But it seems to work.  I actually have no idea where the config groups are bound, neither for the core config
 		// groups nor for the added config groups.  In general, the original idea was that AbstractModule provides the config from
 		// getConfig(), not from injection.  kai, jun'24
+
+		// It actually does not work in general.  The ExplodedConfigModule injects all config groups that are materialized by then.  Which
+		// means that it needs to be materialized "quite early", and in particular before this install method is called.  For the time being,
+		// a run script using the contrib thus needs to materialize the config group.  kai, jul'24
+
 
 		// The idea here is the following:
 		// * scores are just added as score events.  no scoring function is replaced.
