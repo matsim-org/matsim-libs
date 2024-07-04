@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.operations;
 
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.charging.ShiftOperatingVehicleProvider;
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpFleetQSimModule;
@@ -33,7 +34,7 @@ public class EDrtOperationsControlerCreator {
 			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
 			controler.addOverridingQSimModule(new ShiftEDrtModeOptimizerQSimModule(drtCfg));
 			controler.addOverridingQSimModule(new EvShiftDvrpFleetQSimModule(drtCfg.getMode()));
-			controler.addOverridingModule(new OperationFacilitiesModeModule((DrtWithOperationsConfigGroup) drtCfg));
+			controler.addOverridingModule(new OperationFacilitiesModeModule((DrtWithExtensionsConfigGroup) drtCfg));
 			controler.addOverridingQSimModule(new OperationFacilitiesQSimModule(drtCfg));
 			controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
 		}
