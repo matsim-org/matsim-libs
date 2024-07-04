@@ -45,14 +45,6 @@ public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstra
     @PositiveOrZero
     public double maxDetourBeta = Double.POSITIVE_INFINITY;// [s]
 
-    @Parameter
-    @Comment(
-            "Defines the maximum delay allowed from the initial scheduled pick up time. Once the initial pickup time is offered, the latest promised"
-                    + "pickup time is calculated based on initial scheduled pickup time + maxAllowedPickupDelay. "
-                    + "By default, this limit is disabled. If enabled, a value between 0 and 240 is a good choice.")
-    @PositiveOrZero
-    public double maxAllowedPickupDelay = Double.POSITIVE_INFINITY;// [s]
-
     @Override
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);

@@ -76,7 +76,9 @@ public class DrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.mode = drtMode;
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
 		defaultConstraintsSet.maxTravelTimeBeta = 5 * 60;
 		defaultConstraintsSet.maxWaitTime = 5 * 60;

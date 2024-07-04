@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
+
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
@@ -43,7 +44,7 @@ public class RunEShiftDrtScenarioIT {
 	@Test
 	void test() {
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
 		String fleetFile =  "holzkirchenFleet.xml";
 		String plansFile =  "holzkirchenPlans.xml.gz";
@@ -53,11 +54,13 @@ public class RunEShiftDrtScenarioIT {
 		String chargersFile =  "holzkirchenChargers.xml";
 		String evsFile =  "holzkirchenElectricFleet.xml";
 
-		DrtWithOperationsConfigGroup drtWithShiftsConfigGroup = (DrtWithOperationsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		DefaultDrtOptimizationConstraintsSet constraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DefaultDrtOptimizationConstraintsSet constraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		constraintsSet.maxTravelTimeAlpha = 1.5;
         constraintsSet.maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;

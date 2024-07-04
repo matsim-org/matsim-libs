@@ -6,8 +6,8 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
@@ -52,7 +52,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 	public ShiftDrtModeModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtConfigGroup = drtCfg;
-		this.drtOperationsParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
+		this.drtOperationsParams = ((DrtWithExtensionsConfigGroup) drtCfg).getDrtOperationsParams().orElseThrow();
 	}
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing((Task.TaskType type) -> {
@@ -91,15 +91,15 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(
-				getter -> new ShiftDurationXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
+				getter -> new ShiftDurationXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}), getMode())
 		)).asEagerSingleton();
 
 		bindModal(BreakCorridorXY.class).toProvider(modalProvider(
-				getter -> new BreakCorridorXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
+				getter -> new BreakCorridorXY(getMode(), getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
 		)).asEagerSingleton();
 
 		bindModal(ShiftHistogram.class).toProvider(modalProvider(
-				getter -> new ShiftHistogram(getter.get(Population.class), getter.get(Config.class)))).asEagerSingleton();
+				getter -> new ShiftHistogram(getter.get(Population.class), getMode(), getter.get(Config.class)))).asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(ShiftDurationXY.class));
 		addEventHandlerBinding().to(modalKey(BreakCorridorXY.class));

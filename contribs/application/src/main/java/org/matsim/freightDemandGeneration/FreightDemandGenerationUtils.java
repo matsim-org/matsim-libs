@@ -58,10 +58,10 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Adds the home coordinates to attributes and removes plans
 	 *
-	 * @param population
-	 * @param sampleSizeInputPopulation
-	 * @param sampleTo
-	 * @param samplingOption
+	 * @param population 				The population to be prepared
+	 * @param sampleSizeInputPopulation The sample size of the input population
+	 * @param sampleTo 					The sample to which the population should be prepared
+	 * @param samplingOption 			The sampling option to be used for the population
 	 */
 	static void preparePopulation(Population population, double sampleSizeInputPopulation, double sampleTo,
 			String samplingOption) {
@@ -107,7 +107,7 @@ public class FreightDemandGenerationUtils {
 				person.getAttributes().putAttribute("homeX", homeCoord.getX());
 				person.getAttributes().putAttribute("homeY", homeCoord.getY());
 			} else {
-				log.warn("No home found for person " + person.getId());
+				log.warn("No home found for person {}", person.getId());
 			}
 			person.removePlan(person.getSelectedPlan());
 		}
@@ -118,7 +118,7 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Creates a tsv file with the locations of all created demand elements.
 	 *
-	 * @param controler
+	 * @param controler The controller to get the network from
 	 */
 	static void createDemandLocationsFile(Controler controler) {
 
@@ -160,8 +160,8 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Reduces the population to all persons having their home in the shape
 	 *
-	 * @param population
-	 * @param index
+	 * @param population 	The population to be reduced
+	 * @param index 		The index of the shape
 	 */
 	static void reducePopulationToShapeArea(Population population, ShpOptions.Index index) {
 
@@ -187,12 +187,12 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Checks if a link is one of the possible areas.
 	 *
-	 * @param link
-	 * @param givenCoord
-	 * @param indexShape
-	 * @param possibleAreas
-	 * @param crsTransformationNetworkAndShape
-	 * @return
+	 * @param link 								The link to be checked
+	 * @param givenCoord 						The coord to be checked
+	 * @param indexShape 						The index of the shape
+	 * @param possibleAreas 					The possible areas
+	 * @param crsTransformationNetworkAndShape 	The transformation to be used for the network and the shape
+	 * @return 									True if the link is in one of the possible areas
 	 */
 	static boolean checkPositionInShape(Link link, Coord givenCoord, ShpOptions.Index indexShape,
 										String[] possibleAreas, CoordinateTransformation crsTransformationNetworkAndShape) {
@@ -221,8 +221,8 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Creates the middle coord of a link.
 	 *
-	 * @param link
-	 * @return Middle coord of the Link
+	 * @param link 	The link to be used
+	 * @return 		Middle coord of the Link
 	 */
 	static Coord getCoordOfMiddlePointOfLink(Link link) {
 
