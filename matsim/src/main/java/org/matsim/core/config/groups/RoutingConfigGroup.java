@@ -526,6 +526,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		}
 		else if (ACCESSEGRESSTYPE.equals( key ) ) {
 			this.setAccessEgressType(AccessEgressType.valueOf(value));
+		} else if (NETWORK_ROUTE_CONSISTENCY_CHECK.equals(key)){
+			this.setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck.valueOf(value));
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -539,6 +541,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
 		map.put(  ACCESSEGRESSTYPE, getAccessEgressType().toString()) ;
+		map.put(NETWORK_ROUTE_CONSISTENCY_CHECK, NetworkRouteConsistencyCheck.abortOnInconsistency.toString());
 		return map;
 	}
 
