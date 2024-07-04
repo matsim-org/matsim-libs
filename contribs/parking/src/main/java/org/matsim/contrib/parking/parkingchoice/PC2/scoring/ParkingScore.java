@@ -18,7 +18,7 @@ public interface ParkingScore {
 
 	void addScore(Id<Person> id, double incValue);
 
-	void prepareForNewIteration();
+	void notifyBeforeMobsim();
 
 	double getParkingScoreScalingFactor();
 

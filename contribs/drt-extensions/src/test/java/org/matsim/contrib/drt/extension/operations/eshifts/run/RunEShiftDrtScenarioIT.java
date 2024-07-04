@@ -57,7 +57,9 @@ public class RunEShiftDrtScenarioIT {
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		DefaultDrtOptimizationConstraintsSet constraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DefaultDrtOptimizationConstraintsSet constraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		constraintsSet.maxTravelTimeAlpha = 1.5;
         constraintsSet.maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
