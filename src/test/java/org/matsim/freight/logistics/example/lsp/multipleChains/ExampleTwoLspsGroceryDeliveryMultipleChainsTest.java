@@ -29,29 +29,29 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleTwoLspsGroceryDeliveryMultipleChainsTest {
-	private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsTest.class);
-	@RegisterExtension
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+    private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsTest.class);
+    @RegisterExtension
+    public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testOutputIsEqual() {
+    @Test
+    public void testOutputIsEqual() {
 
-		try {
-			ExampleTwoLspsGroceryDeliveryMultipleChains.main(new String[]{
-					"--config:controller.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controller.lastIteration=1"
-			});
+        try {
+            ExampleTwoLspsGroceryDeliveryMultipleChains.main(new String[]{
+                    "--config:controller.outputDirectory=" + utils.getOutputDirectory()
+                    , "--config:controller.lastIteration=1"
+            });
 
-		} catch (Exception ee) {
-			log.fatal(ee);
-			fail();
-		}
+        } catch (Exception ee) {
+            log.fatal(ee);
+            fail();
+        }
 
-		//Compare LSP files
-		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
+        //Compare LSP files
+        MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
-		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
-	}
+        //Compare events files
+        MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+    }
 
 }
