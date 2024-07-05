@@ -22,8 +22,11 @@ package org.matsim.freight.logistics;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +46,8 @@ import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 class LSPControlerListener
-    implements BeforeMobsimListener,
+    implements StartupListener,
+        BeforeMobsimListener,
         AfterMobsimListener,
         ScoringListener,
         ReplanningListener,
@@ -68,6 +72,47 @@ class LSPControlerListener
   @Inject
   LSPControlerListener(Scenario scenario) {
     this.scenario = scenario;
+  }
+
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    //Ensure that all ressource Ids are only there once.
+
+    checkForUniqueResourceIds();
+
+  }
+
+/**
+* For later steps, e.g. scoring the Ids of the {@link LSPResource} ids must be unique.
+ * Otherwise, there are scored several times.
+ * <p></p>
+ * For the future we may reduce it to unique {@link LSPResource} ids PER {@link LSP}.
+ * This means, that the events (also from the carriers) need to have an information obout the LSP it belongs to and that
+ * in scoring and analysis this must be taken into account. What itself is another source for errors...
+ * KMT jul'24
+*/
+  private void checkForUniqueResourceIds() {
+    List<String> duplicates = new ArrayList<>();
+    Set<String> set = new HashSet<>();
+
+    LSPs lsps = LSPUtils.getLSPs(scenario);
+    for (LSP lsp : lsps.getLSPs().values()) {
+      for (LSPResource lspResource : lsp.getResources()) {
+        String idString = lspResource.getId().toString();
+        if (set.contains(idString)) {
+          duplicates.add(idString);
+        } else {
+          set.add(idString);
+        }
+      }
+    }
+
+    if (!duplicates.isEmpty()) {
+      log.error("There are non-unique ressource Ids. This must not be! The duplicate ids are: {}.", duplicates.toString());
+      log.error("You may also use output_lsp.xml to check were the duplicates are located");
+      log.error("Aborting now ...");
+      throw new RuntimeException();
+    }
   }
 
   @Override
@@ -114,13 +159,13 @@ class LSPControlerListener
         hasSimulationTrackers.getSimulationTrackers()) {
       // ... register them ...
       if (!registeredHandlers.contains(simulationTracker)) {
-        log.info("adding eventsHandler: " + simulationTracker);
+        log.info("adding eventsHandler: {}", simulationTracker);
         eventsManager.addHandler(simulationTracker);
         registeredHandlers.add(simulationTracker);
         matsimServices.addControlerListener(simulationTracker);
         simulationTracker.setEventsManager(eventsManager);
       } else if ( addListenerCnt < maxAddListenerCnt ){
-        log.warn("not adding eventsHandler since already added: " + simulationTracker);
+        log.warn("not adding eventsHandler since already added: {}", simulationTracker);
         addListenerCnt++;
         if (addListenerCnt == maxAddListenerCnt) {
           log.warn(Gbl.FUTURE_SUPPRESSED);
@@ -205,4 +250,5 @@ class LSPControlerListener
     new CarrierPlanWriter(CarriersUtils.getCarriers(scenario))
         .write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
   }
+
 }
