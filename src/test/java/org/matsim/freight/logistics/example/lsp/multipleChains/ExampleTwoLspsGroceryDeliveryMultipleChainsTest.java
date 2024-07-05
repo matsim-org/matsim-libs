@@ -38,8 +38,8 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsTest {
 
 		try {
 			ExampleTwoLspsGroceryDeliveryMultipleChains.main(new String[]{
-					"--config:controler.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controler.lastIteration=1"
+					"--config:controller.outputDirectory=" + utils.getOutputDirectory()
+					, "--config:controller.lastIteration=1"
 			});
 
 		} catch (Exception ee) {
