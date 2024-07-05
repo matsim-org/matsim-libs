@@ -62,7 +62,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChains.class);
   private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
   private static final double TOLL_VALUE = 1000;
-  static double HUBCOSTS_FIX = 100;
+  private static final double HUBCOSTS_FIX = 100;
+  private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+  private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
+  public static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
+  public static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
   private ExampleTwoLspsGroceryDeliveryMultipleChains() {}
 
@@ -75,10 +79,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-    lsps.add(createLspWithTwoChains(scenario, "myLSP2", "edeka_SUPERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
-    lsps.add(createLspWithTwoChains(scenario, "myLSP1", "kaufland_VERBRAUCHERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
-    lsps.add(createLspWithDirectChain(scenario, "myLSP2_DIRECT", "edeka_SUPERMARKT_TROCKEN"));
-    lsps.add(createLspWithDirectChain(scenario, "myLSP1_DIRECT", "kaufland_VERBRAUCHERMARKT_TROCKEN"));
+    lsps.add(createLspWithTwoChains(scenario, "myLSP2", EDEKA_SUPERMARKT_TROCKEN, HUB_LINK_ID_NEUKOELLN));
+    lsps.add(createLspWithTwoChains(scenario, "myLSP1", KAUFLAND_VERBRAUCHERMARKT_TROCKEN, HUB_LINK_ID_NEUKOELLN));
+    lsps.add(createLspWithDirectChain(scenario, "myLSP2_DIRECT", EDEKA_SUPERMARKT_TROCKEN));
+    lsps.add(createLspWithDirectChain(scenario, "myLSP1_DIRECT", KAUFLAND_VERBRAUCHERMARKT_TROCKEN));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
 
@@ -117,7 +121,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                   strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
                                   //					strategyManager.addStrategy(new
                                   // RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
-                                  strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 4);
+                                  strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
                                   //					strategyManager.addStrategy(new
                                   // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
                                   strategyManager.setMaxPlansPerAgent(5);
@@ -177,21 +181,18 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
    * @return the LSP
    */
   private static LSP createLspWithTwoChains(Scenario scenario, String lspName, String carrierIdString, Id<Link> hubLinkId) {
-    String carrierPlanFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
-    String vehicleTypeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 
     CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
     CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(vehicleTypes);
-    vehicleTypeReader.readFile(vehicleTypeFile);
+    vehicleTypeReader.readFile(VEHICLE_TYPE_FILE);
 
     Carriers carriers = new Carriers();
     CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypes);
-    carrierReader.readFile(carrierPlanFile);
+    carrierReader.readFile(CARRIER_PLAN_FILE);
 
     Carrier carrier = carriers.getCarriers()
             .get(Id.create(carrierIdString, CarrierImpl.class));
-    //		Id<Link> depotLinkFromShipments =
-    // carrier.getShipments().values().iterator().next().getFrom();
+
     Id<Link> depotLinkFromVehicles = carrier
             .getCarrierCapabilities()
             .getCarrierVehicles()
@@ -210,14 +211,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
             LSPUtils.createLSPPlan()
                     .addLogisticChain(directChain)
                     .addLogisticChain(twoEchelonChain)
-                    .addLogisticChain(twoEchelonChain)
                     .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 
-    List<LSPPlan> lspPlans = new ArrayList<>();
-    lspPlans.add(multipleMixedEchelonChainsPlan);
+    List<LSPPlan> lspPlans = List.of(multipleMixedEchelonChainsPlan);
 
-    LSP lsp =
-            LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
+    LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
                     .setInitialPlan(multipleMixedEchelonChainsPlan)
                     .setLogisticChainScheduler(
                             ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
@@ -344,8 +342,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     Carrier carrier = carriers.getCarriers()
             .get(Id.create(carrierIdString, CarrierImpl.class));
-    //		Id<Link> depotLinkFromShipments =
-    // carrier.getShipments().values().iterator().next().getFrom();
+
     Id<Link> depotLinkFromVehicles = carrier
             .getCarrierCapabilities()
             .getCarrierVehicles()
@@ -367,8 +364,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                       .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
     }
 
-    List<LSPPlan> lspPlans = new ArrayList<>();
-    lspPlans.add(lspPlan);
+    List<LSPPlan> lspPlans = List.of(lspPlan);
 
     LSP lsp =
             LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
@@ -389,6 +385,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     return lsp;
   }
+
 
   private static LogisticChain createDirectChain(Scenario scenario, String lspName, Id<Link> depotLinkFromVehicles, CarrierVehicleTypes vehicleTypes) {
     LogisticChain directChain;
