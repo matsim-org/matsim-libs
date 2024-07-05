@@ -119,11 +119,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 () -> {
                                   LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                                   strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                                  //					strategyManager.addStrategy(new
-                                  // RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
                                   strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
-                                  //					strategyManager.addStrategy(new
-                                  // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
                                   strategyManager.setMaxPlansPerAgent(5);
                                   strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                                   return strategyManager;
@@ -174,9 +170,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
    * - direct delivery
    * - 2-echelon delivery
    *
-   * @param scenario the scenria, used e.g. for getting the network and register some stuff
+   * @param scenario the scenario, used e.g. for getting the network and register some stuff
    * @param lspName String of LSP's Id
-   * @param carrierIdString Name of the carrier, the (lsp's) demand (shipments) are created from.
+   * @param carrierIdString Name of the carrier, the (LSP's) demand (shipments) are created from.
    * @param hubLinkId location of the hub
    * @return the LSP
    */
@@ -186,26 +182,19 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(vehicleTypes);
     vehicleTypeReader.readFile(VEHICLE_TYPE_FILE);
 
+
     Carriers carriers = new Carriers();
     CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypes);
     carrierReader.readFile(CARRIER_PLAN_FILE);
 
-    Carrier carrier = carriers.getCarriers()
-            .get(Id.create(carrierIdString, CarrierImpl.class));
-
-    Id<Link> depotLinkFromVehicles = carrier
-            .getCarrierCapabilities()
-            .getCarrierVehicles()
-            .values()
-            .iterator()
-            .next()
-            .getLinkId();
+    Carrier carrier = carriers.getCarriers().get(Id.create(carrierIdString, CarrierImpl.class));
+    Id<Link> depotLinkFromVehicle = getDepotLinkFromVehicle(carrier);
 
     log.info("create LSP");
 
     //Chains
-    LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkFromVehicles, vehicleTypes);
-    LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkFromVehicles, vehicleTypes);
+    LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkFromVehicle, vehicleTypes);
+    LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkFromVehicle, vehicleTypes);
 
     LSPPlan multipleMixedEchelonChainsPlan =
             LSPUtils.createLSPPlan()
@@ -232,6 +221,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     lsp.scheduleLogisticChains();
 
     return lsp;
+  }
+
+  private static Id<Link> getDepotLinkFromVehicle(Carrier carrier) {
+    return carrier
+            .getCarrierCapabilities()
+            .getCarrierVehicles()
+            .values()
+            .iterator()
+            .next()
+            .getLinkId();
   }
 
   private static LogisticChain createTwoEchelonChain(Scenario scenario, String lspName, Id<Link> hubLinkId, Id<Link> depotLinkFromVehicles, CarrierVehicleTypes vehicleTypes) {
@@ -323,9 +322,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   /**
    * Creates an LSP with direct chains:
    *
-   * @param scenario the scenria, used e.g. for getting the network and register some stuff
+   * @param scenario the scenario, used e.g. for getting the network and register some stuff
    * @param lspName String of LSP's Id
-   * @param carrierIdString Name of the carrier, the (lsp's) demand (shipments) are created from.
+   * @param carrierIdString Name of the carrier, the (LSP's) demand (shipments) are created from.
    * @return the LSP
    */
   private static LSP createLspWithDirectChain(Scenario scenario, String lspName, String carrierIdString) {
@@ -343,13 +342,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     Carrier carrier = carriers.getCarriers()
             .get(Id.create(carrierIdString, CarrierImpl.class));
 
-    Id<Link> depotLinkFromVehicles = carrier
-            .getCarrierCapabilities()
-            .getCarrierVehicles()
-            .values()
-            .iterator()
-            .next()
-            .getLinkId();
+    Id<Link> depotLinkFromVehicles = getDepotLinkFromVehicle(carrier);
 
     log.info("create LSP");
 
