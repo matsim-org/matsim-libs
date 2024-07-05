@@ -38,6 +38,7 @@ public class AcceptedDrtRequest {
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestStartTime(request.getLatestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
+				.maxRideDuration(request.getMaxRideDuration())
 				.build();
 	}
 
@@ -46,12 +47,14 @@ public class AcceptedDrtRequest {
 	private final double earliestStartTime;
 	private final double latestStartTime;
 	private final double latestArrivalTime;
+	private final double maxRideDuration;
 
 	private AcceptedDrtRequest(Builder builder) {
 		request = builder.request;
 		earliestStartTime = builder.earliestStartTime;
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
+		maxRideDuration = builder.maxRideDuration;
 	}
 
 	public static Builder newBuilder() {
@@ -64,6 +67,7 @@ public class AcceptedDrtRequest {
 		builder.earliestStartTime = copy.getEarliestStartTime();
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
+		builder.maxRideDuration = copy.getMaxRideDuration();
 		return builder;
 	}
 
@@ -81,6 +85,9 @@ public class AcceptedDrtRequest {
 
 	public double getLatestArrivalTime() {
 		return latestArrivalTime;
+	}
+	public double getMaxRideDuration() {
+		return maxRideDuration;
 	}
 
 	public Id<Request> getId() {
@@ -126,6 +133,7 @@ public class AcceptedDrtRequest {
 		private double earliestStartTime;
 		private double latestStartTime;
 		private double latestArrivalTime;
+		private double maxRideDuration;
 
 		private Builder() {
 		}
@@ -147,6 +155,11 @@ public class AcceptedDrtRequest {
 
 		public Builder latestArrivalTime(double val) {
 			latestArrivalTime = val;
+			return this;
+		}
+
+		public Builder maxRideDuration(double val) {
+			this.maxRideDuration = val;
 			return this;
 		}
 

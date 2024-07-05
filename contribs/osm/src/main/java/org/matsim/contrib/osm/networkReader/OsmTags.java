@@ -42,4 +42,20 @@ public class OsmTags {
 	public static final String CROSSING = "crossing";
 	public static final String TYPE = "type";
 	public static final String RESTRICTION = "restriction";
+	
+	public static final String RAILWAY = "railway";
+	public static final String RAIL = "rail";
+	public static final String NARROW_GAUGE = "narrow_gauge";
+	public static final String TRAM = "tram";
+	public static final String FUNICULAR = "funicular";
+	public static final String SUBWAY = "subway";
+	public static final String LIGHT_RAIL = "light_rail";
+	public static final String MONORAIL = "monorail";
+	public static final String USAGE = "usage";
+	public static final String GAUGE = "gauge";
+	public static final String ELECTRIFIED = "electrified";
+	public static final String ETCS = "etcs";
+	public static final String OPERATOR = "operator";
+
+
 }

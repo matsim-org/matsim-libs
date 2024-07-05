@@ -14,6 +14,7 @@ import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 public class DashboardTests {
 	@RegisterExtension
@@ -25,7 +26,7 @@ public class DashboardTests {
 		config.controller().setLastIteration(2);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.defaultParams().sampleSize = 0.001;
+		group.sampleSize = 0.001;
 
 		SimWrapper sw = SimWrapper.create(config);
 		for (Dashboard d : dashboards) {
@@ -45,7 +46,7 @@ public class DashboardTests {
 
 		// Ensure default dashboards have been added
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**stuck_agents.csv");
+			.isDirectoryContaining("glob:**stuck_agents.csv");
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class DashboardTests {
 		run(new StuckAgentDashboard());
 
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**stuck_agents.csv");
+			.isDirectoryContaining("glob:**stuck_agents.csv");
 
 	}
 
@@ -67,8 +68,8 @@ public class DashboardTests {
 
 		run(new TripDashboard());
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**trip_stats.csv")
-				.isDirectoryContaining("glob:**mode_share.csv");
+			.isDirectoryContaining("glob:**trip_stats.csv")
+			.isDirectoryContaining("glob:**mode_share.csv");
 	}
 
 	@Test
@@ -90,9 +91,9 @@ public class DashboardTests {
 
 		run(new PopulationAttributeDashboard());
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**amount_per_age_group.csv")
-				.isDirectoryContaining("glob:**amount_per_sex_group.csv")
-				.isDirectoryContaining("glob:**total_agents.csv");
+			.isDirectoryContaining("glob:**amount_per_age_group.csv")
+			.isDirectoryContaining("glob:**amount_per_sex_group.csv")
+			.isDirectoryContaining("glob:**total_agents.csv");
 
 
 	}
@@ -105,10 +106,23 @@ public class DashboardTests {
 		run(new TrafficDashboard());
 
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**traffic_stats_by_link_daily.csv")
-				.isDirectoryContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
-				.isDirectoryContaining("glob:**traffic_stats_by_road_type_daily.csv");
+			.isDirectoryContaining("glob:**traffic_stats_by_link_daily.csv")
+			.isDirectoryContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
+			.isDirectoryContaining("glob:**traffic_stats_by_road_type_daily.csv");
 
+
+	}
+
+	@Test
+	void odTrips() {
+		run(new ODTripDashboard(Set.of("car", "pt", "walk", "bike", "ride"), "EPSG:25832"));
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**trips_per_mode_car.csv")
+			.isDirectoryContaining("glob:**trips_per_mode_bike.csv")
+			.isDirectoryContaining("glob:**trips_per_mode_ride.csv");
 
 	}
 

@@ -19,13 +19,14 @@
 
 package ch.sbb.matsim.contrib.railsim;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 
 /**
  * Example script that shows how to use railsim included in this contrib.
@@ -37,12 +38,13 @@ public final class RunRailsimExample {
 
 	public static void main(String[] args) {
 
-		if (args.length == 0) {
-			System.err.println("Path to config is required as first argument.");
-			System.exit(2);
+		String configFilename;
+		if (args.length != 0) {
+			configFilename = args[0];
+		} else {
+			configFilename = "test/input/ch/sbb/matsim/contrib/railsim/integration/microOlten/config.xml";
 		}
 
-		String configFilename = args[0];
 		Config config = ConfigUtils.loadConfig(configFilename);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 

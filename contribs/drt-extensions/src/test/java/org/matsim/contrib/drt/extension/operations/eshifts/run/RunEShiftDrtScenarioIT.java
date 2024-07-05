@@ -2,7 +2,8 @@ package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
@@ -12,11 +13,13 @@ import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSe
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.temperature.TemperatureService;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -54,16 +57,17 @@ public class RunEShiftDrtScenarioIT {
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.maxTravelTimeAlpha = 1.5;
-		drtConfigGroup.maxTravelTimeBeta = 10. * 60.;
+		DrtOptimizationConstraintsParams constraintsParam = drtConfigGroup.getDrtOptimizationConstraintsParam();
+		constraintsParam.maxTravelTimeAlpha = 1.5;
+        constraintsParam.maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
-		drtConfigGroup.maxWaitTime = 600.;
-		drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+        constraintsParam.maxWaitTime = 600.;
+        constraintsParam.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.maxWalkDistance = 1000.;
+        constraintsParam.maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -78,16 +82,21 @@ public class RunEShiftDrtScenarioIT {
 
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
-		DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
-		drtZonalSystemParams.zonesGeneration = DrtZonalSystemParams.ZoneGeneration.GridFromNetwork;
-		drtZonalSystemParams.cellSize = 500.;
-		drtZonalSystemParams.targetLinkSelection = DrtZonalSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZonalSystemParams);
+		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
+		ConfigGroup parameterSet = drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		((SquareGridZoneSystemParams) parameterSet).cellSize = 500.;
+		drtZoneSystemParams.addParameterSet(parameterSet);
+		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
+		drtConfigGroup.addParameterSet(drtZoneSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
-				new DvrpConfigGroup());
+			dvrpConfigGroup);
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();

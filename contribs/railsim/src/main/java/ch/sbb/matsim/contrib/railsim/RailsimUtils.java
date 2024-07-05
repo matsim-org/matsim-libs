@@ -20,11 +20,13 @@
 package ch.sbb.matsim.contrib.railsim;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.VehicleType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
 
 /**
  * Utility class for working with Railsim and its specific attributes.
@@ -40,6 +42,7 @@ public final class RailsimUtils {
 	public static final String LINK_ATTRIBUTE_MINIMUM_TIME = "railsimMinimumTime";
 	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
+	public static final String RESOURCE_TYPE = "railsimResourceType";
 
 	private RailsimUtils() {
 	}
@@ -153,6 +156,21 @@ public final class RailsimUtils {
 	 */
 	public static void setTrainAcceleration(VehicleType vehicle, double acceleration) {
 		vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_ACCELERATION, acceleration);
+	}
+
+	/**
+	 * Return the resource type for a link, if not set, fixed block is assumed.
+	 */
+	public static ResourceType getResourceType(Link link) {
+		Object attr = link.getAttributes().getAttribute(RESOURCE_TYPE);
+		return attr != null ? ResourceType.valueOf(attr.toString()) : ResourceType.fixedBlock;
+	}
+
+	/**
+	 * Sets the resource type for the link.
+	 */
+	public static void setResourceType(Link link, ResourceType type) {
+		link.getAttributes().putAttribute(RESOURCE_TYPE, type.toString());
 	}
 
 }

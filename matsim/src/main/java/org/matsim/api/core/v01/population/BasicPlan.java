@@ -23,8 +23,17 @@
 
 public interface BasicPlan {
 
-	public abstract void setScore(Double score);
+	String UNDEFINED_PLAN_TYPE = "undefined";
 
-	public abstract Double getScore();
-	
+	void setScore(Double score );
+
+	Double getScore();
+
+	/**
+	 * Plan type, which may be used to ensure there is at least one plan of a certain type.
+	 */
+	default String getType() {
+		return UNDEFINED_PLAN_TYPE;
+	}
+
 }

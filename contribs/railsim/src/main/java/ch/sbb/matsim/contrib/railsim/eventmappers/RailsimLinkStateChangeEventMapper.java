@@ -20,7 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.eventmappers;
 
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.TrackState;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceState;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -38,8 +38,7 @@ public class RailsimLinkStateChangeEventMapper implements MatsimEventsReader.Cus
 			event.getTime(),
 			asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_LINK), Link.class),
 			asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-			TrackState.valueOf(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_STATE)),
-			Integer.parseInt(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_TRACK))
+			ResourceState.valueOf(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_STATE))
 		);
 	}
 

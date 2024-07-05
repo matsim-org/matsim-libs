@@ -33,7 +33,7 @@
 		</link>
 		<link id="t2_OUT-t3_IN" from="t2_OUT" to="t3_IN" length="50000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
 		<link id="t1_IN-t1_OUT" from="t1_IN" to="t1_OUT" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
@@ -43,7 +43,7 @@
 		</link>
 		<link id="t2_IN-t2_OUT" from="t2_IN" to="t2_OUT" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
 			</attributes>
 		</link>
 		<link id="t3_IN-t3_OUT" from="t3_IN" to="t3_OUT" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">

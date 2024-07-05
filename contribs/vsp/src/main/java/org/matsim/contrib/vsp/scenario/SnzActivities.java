@@ -74,10 +74,6 @@ public enum SnzActivities {
 			}
 		}
 
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("ride interaction").setTypicalDuration(60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("bike interaction").setTypicalDuration(60));
-
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
 
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));

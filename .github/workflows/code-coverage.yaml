@@ -17,7 +17,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'zulu'
           cache: 'maven'
 
@@ -26,7 +26,7 @@ jobs:
         run: mvn verify -P jacoco --batch-mode --also-make --projects matsim -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
       - name: Push coverage to CodeCov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./matsim/target/site/jacoco/jacoco.xml
 

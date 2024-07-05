@@ -45,13 +45,32 @@ The package `org.matsim.simwrapper.viz` contains all the viz elements available 
 
 The philosophy of this module is to provide as much functionality as possible without any need for configuration.
 
-To define which dashboard are available you need to implement
-a [DashboardProvider](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FDashboardProvider.java), which simply returns a
-list of dashboards.
 
-There are two preferred ways to add these providers by default:
+### 1. Guice Binding
 
-### 1. Java Service Provider Interface
+If SimWrapper is used within MATSim, the easiest way to add dashboards is to use Guice modules add them as a binding like so:
+
+```java
+
+import org.matsim.simwrapper.SimWrapper;
+
+public class MyModule extends AbstractModule {
+
+    @Override
+    protected void configure() {
+        // Use utility method, which just uses multi-binder internally
+        SimWrapper.addDashboardBinding(binder()).toInstance(new CustomDashboard());
+    }
+}
+
+```
+
+This method works the best for you own scenarios, as long as you ensure that the needed modules are installed.
+The next method provides a way to add dashboards even without Guice modules and does not require the developer to add modules to its scenario.
+
+### 2. Java Service Provider Interface
+
+To define which dashboard are available you can implement a [DashboardProvider](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FDashboardProvider.java), which simply returns a list of dashboards.
 
 A Java Service Provider Interface (SPI) allows to pickup implementation of classes, as soon as they are on the
 classpath.
@@ -61,7 +80,7 @@ required from the users side.
 To use this method you need a file `META-INF/services/org.matsim.simwrapper.DashboardProvider`, which lists all your
 provider implementations.
 
-### 2. Package Scanning
+### 3. Package Scanning
 
 If dashboards should not be added automatically without any configuration, then you still need to implement the
 provider, but not add it to the services file.
