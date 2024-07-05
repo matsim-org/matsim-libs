@@ -119,11 +119,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 () -> {
                                   LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                                   strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                                  //					strategyManager.addStrategy(new
-                                  // RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
                                   strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
-                                  //					strategyManager.addStrategy(new
-                                  // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
                                   strategyManager.setMaxPlansPerAgent(5);
                                   strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                                   return strategyManager;
@@ -174,9 +170,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
    * - direct delivery
    * - 2-echelon delivery
    *
-   * @param scenario the scenria, used e.g. for getting the network and register some stuff
+   * @param scenario the scenario, used e.g. for getting the network and register some stuff
    * @param lspName String of LSP's Id
-   * @param carrierIdString Name of the carrier, the (lsp's) demand (shipments) are created from.
+   * @param carrierIdString Name of the carrier, the (LSP's) demand (shipments) are created from.
    * @param hubLinkId location of the hub
    * @return the LSP
    */
@@ -323,9 +319,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   /**
    * Creates an LSP with direct chains:
    *
-   * @param scenario the scenria, used e.g. for getting the network and register some stuff
+   * @param scenario the scenario, used e.g. for getting the network and register some stuff
    * @param lspName String of LSP's Id
-   * @param carrierIdString Name of the carrier, the (lsp's) demand (shipments) are created from.
+   * @param carrierIdString Name of the carrier, the (LSP's) demand (shipments) are created from.
    * @return the LSP
    */
   private static LSP createLspWithDirectChain(Scenario scenario, String lspName, String carrierIdString) {
