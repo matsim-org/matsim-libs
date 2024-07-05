@@ -71,7 +71,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     Config config = prepareConfig(args);
 
     log.info("Prepare scenario");
-    Scenario scenario = prepareScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+
+    log.info("Add LSP(s) to the scenario");
+    Collection<LSP> lsps = new LinkedList<>();
+    lsps.add(createLspWithTwoChains(scenario, "myLSP2", "edeka_SUPERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
+    lsps.add(createLspWithTwoChains(scenario, "myLSP1", "kaufland_VERBRAUCHERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
+    lsps.add(createLspWithDirectChain(scenario, "myLSP2_DIRECT", "edeka_SUPERMARKT_TROCKEN"));
+    lsps.add(createLspWithDirectChain(scenario, "myLSP1_DIRECT", "kaufland_VERBRAUCHERMARKT_TROCKEN"));
+    LSPUtils.addLSPs(scenario, new LSPs(lsps));
+
 
     log.info("Prepare controler");
     Controler controler = new Controler(scenario);
@@ -154,20 +163,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
     return config;
-  }
-
-  private static Scenario prepareScenario(Config config) {
-    Scenario scenario = ScenarioUtils.loadScenario(config);
-
-    log.info("Add LSP to the scenario");
-    Collection<LSP> lsps = new LinkedList<>();
-    lsps.add(createLspWithTwoChains(scenario, "myLSP2", "edeka_SUPERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
-    lsps.add(createLspWithTwoChains(scenario, "myLSP1", "kaufland_VERBRAUCHERMARKT_TROCKEN", HUB_LINK_ID_NEUKOELLN));
-    lsps.add(createLspWithDirectChain(scenario, "myLSP2_DIRECT", "edeka_SUPERMARKT_TROCKEN"));
-    lsps.add(createLspWithDirectChain(scenario, "myLSP1_DIRECT", "kaufland_VERBRAUCHERMARKT_TROCKEN"));
-    LSPUtils.addLSPs(scenario, new LSPs(lsps));
-
-    return scenario;
   }
 
   /**
