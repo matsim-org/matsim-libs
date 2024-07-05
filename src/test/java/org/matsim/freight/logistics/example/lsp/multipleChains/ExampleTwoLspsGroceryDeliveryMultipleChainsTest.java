@@ -48,7 +48,7 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsTest {
 		}
 
 		//Compare LSP files
-		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsp.xml.gz" );
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
 		//Compare events files
 		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
