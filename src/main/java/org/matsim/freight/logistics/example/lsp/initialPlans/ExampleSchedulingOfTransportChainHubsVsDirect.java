@@ -191,10 +191,7 @@ import org.matsim.vehicles.VehicleType;
         switch (solutionType) {
           case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(
               Id.create("LSPwithReloading", LSP.class));
-          case onePlan_direct -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
-          case twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(
-              Id.create("LSPdirect", LSP.class));
-          default -> throw new IllegalStateException("Unexpected value: " + solutionType);
+          case onePlan_direct, twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
         };
 
     //		lspBuilder.setSolutionScorer(new MyLSPScorer());
