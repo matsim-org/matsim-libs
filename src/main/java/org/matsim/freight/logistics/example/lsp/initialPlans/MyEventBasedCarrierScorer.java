@@ -71,13 +71,13 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
     @Override
     public void handleEvent(Event event) {
       log.debug(event.toString());
-      if (event instanceof CarrierTourStartEvent freightTourStartEvent) {
-        handleEvent(freightTourStartEvent);
-      } else if (event instanceof CarrierTourEndEvent freightTourEndEvent) {
-        handleEvent(freightTourEndEvent);
-      } else if (event instanceof LinkEnterEvent linkEnterEvent) {
-        handleEvent(linkEnterEvent);
-      }
+        switch (event) {
+            case CarrierTourStartEvent freightTourStartEvent -> handleEvent(freightTourStartEvent);
+            case CarrierTourEndEvent freightTourEndEvent -> handleEvent(freightTourEndEvent);
+            case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+            default -> {
+            }
+        }
     }
 
     private void handleEvent(CarrierTourStartEvent event) {
