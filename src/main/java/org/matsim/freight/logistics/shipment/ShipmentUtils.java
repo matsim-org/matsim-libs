@@ -102,27 +102,6 @@ public final class ShipmentUtils {
       return new LoggedShipmentHandle(this);
     }
 
-    //		// --- Getters --- //
-    //
-    //		public double getStartTime() {
-    //			return startTime;
-    //		}
-    //
-    //		public double getEndTime() {
-    //			return endTime;
-    //		}
-    //
-    //		public LogisticChainElement getElement() {
-    //			return element;
-    //		}
-    //
-    //		public Id<LSPResource> getResourceId() {
-    //			return resourceId;
-    //		}
-    //
-    //		public Id<Link> getLinkId() {
-    //			return linkId;
-    //		}
   }
 
   public static final class LoggedShipmentLoadBuilder {

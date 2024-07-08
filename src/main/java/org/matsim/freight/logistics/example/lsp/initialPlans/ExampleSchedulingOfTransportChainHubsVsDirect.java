@@ -484,13 +484,6 @@ import org.matsim.vehicles.VehicleType;
     log.info("The order of the logisticsSolutionElements is now specified");
     depotElement.connectWithNextElement(directDistributionElement);
 
-    // TODO WIP: KostenInfo an das Element dran hängen.(old) --> brauchen wir das dann noch? (KMT,
-    // Feb22)
-
-    // 				LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
-    //				SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
-    //				directDistributionElement.getInfos().add(costInfo);
-
     log.info("");
     log.info("set up logistic Solution - direct distribution from the depot is created");
 

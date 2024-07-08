@@ -208,19 +208,7 @@ import org.matsim.vehicles.VehicleType;
     controler.run();
 
     // Retrieve cost info from lsp
-    //		LSPInfo costInfo;
-    //		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getAttributes()) {
-    //			if( Objects.equals( info.getName(), "cost_function" ) ) {
-    //				costInfo = info;
-    //				for(  Map.Entry value : costInfo.getAttributes().getAttributes().getAsMap().entrySet() ){
-    //					System.out.println(value.getKey() + " " + value.getValue());
-    //				}
-    //			}
-    //			for( Map.Entry<String, Object> entry : info.getAttributes().getAsMap().entrySet() ){
-    //				System.out.println( entry.getKey() + " " + entry.getValue() );
-    //			}
-    //		}
-    for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+      for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
       System.out.println(solution.getAttributes().getAttribute("cost_function"));
     }
   }

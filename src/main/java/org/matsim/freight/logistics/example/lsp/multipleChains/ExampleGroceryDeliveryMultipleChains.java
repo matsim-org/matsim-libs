@@ -81,12 +81,8 @@ final class ExampleGroceryDeliveryMultipleChains {
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                       strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                      //					strategyManager.addStrategy(new
-                      // RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
-                      strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
-                      //					strategyManager.addStrategy(new
-                      // ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
-                      strategyManager.setMaxPlansPerAgent(5);
+                        strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+                        strategyManager.setMaxPlansPerAgent(5);
                       strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                       return strategyManager;
                     });
@@ -153,9 +149,7 @@ final class ExampleGroceryDeliveryMultipleChains {
 
     Carrier carrier = carriers.getCarriers()
             .get(Id.create("kaufland_VERBRAUCHERMARKT_TROCKEN", CarrierImpl.class));
-    //		Id<Link> depotLinkFromShipments =
-    // carrier.getShipments().values().iterator().next().getFrom();
-    Id<Link> depotLinkFromVehicles = carrier
+      Id<Link> depotLinkFromVehicles = carrier
             .getCarrierCapabilities()
             .getCarrierVehicles()
             .values()
