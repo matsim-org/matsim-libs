@@ -79,7 +79,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     if (!logisticChainElements.isEmpty()) {
       strb.append("{SolutionElements=");
       for (LogisticChainElement solutionElement : logisticChainElements) {
-        strb.append("\n [" + solutionElement.toString() + "]");
+        strb.append("\n [").append(solutionElement.toString()).append("]");
       }
       strb.append("}");
     }
@@ -87,7 +87,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     if (!shipmentIds.isEmpty()) {
       strb.append("{ShipmentIds=");
       for (Id<LSPShipment> lspShipmentId : shipmentIds) {
-        strb.append("[" + lspShipmentId.toString() + "]");
+        strb.append("[").append(lspShipmentId.toString()).append("]");
       }
       strb.append("}");
     }
