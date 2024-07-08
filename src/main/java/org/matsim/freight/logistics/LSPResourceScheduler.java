@@ -63,7 +63,7 @@ public abstract class LSPResourceScheduler {
    * still stored from the previous iteration or the infrastructure for the used algorithm has to be
    * set up.
    *
-   * @param resource
+   * @param resource The LSPRessource
    */
   protected abstract void initializeValues(LSPResource resource);
 
