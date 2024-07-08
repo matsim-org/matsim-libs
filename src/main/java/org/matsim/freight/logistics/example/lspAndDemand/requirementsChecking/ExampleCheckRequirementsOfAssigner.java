@@ -65,7 +65,6 @@ class ExampleCheckRequirementsOfAssigner {
 
     CarrierCapabilities redCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(collectionType)
             .addVehicle(redVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();
@@ -102,7 +101,6 @@ class ExampleCheckRequirementsOfAssigner {
 
     CarrierCapabilities blueCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(collectionType)
             .addVehicle(blueVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();

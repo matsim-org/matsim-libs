@@ -171,11 +171,10 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle carrierVehicle =
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
-    CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
-    capabilitiesBuilder.addVehicle(carrierVehicle);
-    capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities capabilities = capabilitiesBuilder.build();
+    CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(carrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
 
     Carrier carrier = CarriersUtils.createCarrier(carrierId);
     carrier.setCarrierCapabilities(capabilities);

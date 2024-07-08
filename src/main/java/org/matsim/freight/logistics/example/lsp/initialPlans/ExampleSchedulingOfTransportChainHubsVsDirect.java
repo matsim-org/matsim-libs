@@ -256,7 +256,6 @@ import org.matsim.vehicles.VehicleType;
 
       mainRunCarrier.setCarrierCapabilities(
           CarrierCapabilities.Builder.newInstance()
-              .addType(mainRunVehicleType)
               .addVehicle(mainRunCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build());
@@ -321,7 +320,6 @@ import org.matsim.vehicles.VehicleType;
           CarriersUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
       distributionCarrier.setCarrierCapabilities(
           CarrierCapabilities.Builder.newInstance()
-              .addType(distributionVehicleType)
               .addVehicle(distributionCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build());
@@ -362,7 +360,6 @@ import org.matsim.vehicles.VehicleType;
 
       CarrierCapabilities directDistributionCarrierCapabilities =
           CarrierCapabilities.Builder.newInstance()
-              .addType(directDistributionVehicleType)
               .addVehicle(directDistributionCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build();

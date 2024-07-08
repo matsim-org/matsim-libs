@@ -70,11 +70,10 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle carrierVehicle =
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
-    CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
-    capabilitiesBuilder.addVehicle(carrierVehicle);
-    capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities capabilities = capabilitiesBuilder.build();
+    CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(carrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
 
     Carrier collectionCarrier = CarriersUtils.createCarrier(collectionCarrierId);
     collectionCarrier.setCarrierCapabilities(capabilities);
@@ -142,7 +141,6 @@ import org.matsim.vehicles.VehicleType;
 
     CarrierCapabilities mainRunCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(mainRunType)
             .addVehicle(mainRunCarrierVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();
@@ -209,12 +207,11 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle distributionCarrierVehicle =
         CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
-    CarrierCapabilities.Builder distributionCapabilitiesBuilder =
-        CarrierCapabilities.Builder.newInstance();
-    distributionCapabilitiesBuilder.addType(distributionType);
-    distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
-    distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
+    CarrierCapabilities distributionCapabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(distributionCarrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
+
     Carrier distributionCarrier = CarriersUtils.createCarrier(distributionCarrierId);
     distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
