@@ -170,7 +170,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
     Leg legAfterService = (Leg) tour.getTourElements().get(serviceIndex + 1);
     double startTimeOfTransport = legAfterService.getExpectedDepartureTime();
     builder.setStartTime(startTimeOfTransport);
-    Leg lastLeg = (Leg) tour.getTourElements().get(tour.getTourElements().size() - 1);
+    Leg lastLeg = (Leg) tour.getTourElements().getLast();
     double endTimeOfTransport =
         lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime();
     builder.setEndTime(endTimeOfTransport);
@@ -228,7 +228,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
         builder.setLogisticsChainElement(element);
       }
     }
-    Leg lastLeg = (Leg) tour.getTourElements().get(tour.getTourElements().size() - 1);
+    Leg lastLeg = (Leg) tour.getTourElements().getLast();
     double startTime = lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime();
     builder.setStartTime(startTime);
     builder.setEndTime(startTime + getUnloadEndTime(tour));

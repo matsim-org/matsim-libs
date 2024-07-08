@@ -566,7 +566,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, rand);
-        Link pendingToLink = linkList.get(0);
+        Link pendingToLink = linkList.getFirst();
         if ((pendingToLink.getFromNode().getCoord().getX() <= 18000
             && pendingToLink.getFromNode().getCoord().getY() <= 4000
             && pendingToLink.getFromNode().getCoord().getX() >= 14000
