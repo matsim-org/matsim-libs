@@ -92,7 +92,7 @@ import org.matsim.vehicles.VehicleType;
 
     } else {
       solutionType = SolutionType.onePlan_direct;
-      log.warn("SolutionType was set in code to: " + solutionType);
+      log.warn("SolutionType was set in code to: {}", solutionType);
       config.controller().setOutputDirectory("output/ChainVsDirect/" + solutionType);
       config.controller().setLastIteration(2);
     }
@@ -104,7 +104,7 @@ import org.matsim.vehicles.VehicleType;
     var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
-    log.warn("solutionType= " + solutionType);
+    log.warn("solutionType= {}", solutionType);
 
     config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 

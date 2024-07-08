@@ -254,7 +254,7 @@ import org.matsim.vehicles.VehicleType;
     @Override
     public void handleEvent(CarrierServiceEndEvent event) {
       double tip = tipRandom.nextDouble() * 5;
-      log.warn("tipSum=" + tipSum + "; tip=" + tip);
+      log.warn("tipSum={}; tip={}", tipSum, tip);
       tipSum += tip;
     }
 

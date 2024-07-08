@@ -93,7 +93,7 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
 
       double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 
-      log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
+      log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
       score = score - vehicleType.getCostInformation().getFixedCosts();
 
       // variable costs per time
@@ -205,7 +205,7 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
       if (!tolledVehicles.contains(event.getVehicleId()))
         if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
           if (tolledLinkList.contains(event.getLinkId().toString())) {
-            log.info("Tolling caused by event: " + event);
+            log.info("Tolling caused by event: {}", event);
             tolledVehicles.add(event.getVehicleId());
             score = score - toll;
           }
