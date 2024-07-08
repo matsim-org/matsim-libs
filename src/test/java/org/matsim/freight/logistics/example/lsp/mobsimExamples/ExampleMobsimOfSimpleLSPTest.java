@@ -20,7 +20,7 @@ public class ExampleMobsimOfSimpleLSPTest {
 	public void testForRuntimeExceptionsAndCompareEvents() {
 		try {
 			ExampleMobsimOfSimpleLSP.main(new String[]{
-					"--config:controler.outputDirectory=" + utils.getOutputDirectory()
+					"--config:controller.outputDirectory=" + utils.getOutputDirectory()
 			});
 
 		} catch (Exception ee) {

@@ -37,8 +37,8 @@ public class ExampleTwoEchelonGridTest {
 	public void testForRuntimeExceptions() {
 		try {
 			ExampleTwoEchelonGrid.main(new String[]{
-					"--config:controler.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controler.lastIteration=2"
+					"--config:controller.outputDirectory=" + utils.getOutputDirectory()
+					, "--config:controller.lastIteration=2"
 			});
 
 		} catch (Exception ee) {
