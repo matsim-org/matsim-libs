@@ -147,15 +147,7 @@ final class ExampleTwoEchelonGrid {
         });
 
     log.info("Run MATSim");
-    log.warn(
-        "Runs settings were: Demand: "
-            + demandSetting
-            + "\n CarrierCosts: "
-            + costSetting
-            + "\n HubCosts: "
-            + HUBCOSTS_FIX
-            + "\n tollValue: "
-            + TOLL_VALUE);
+    log.warn("Runs settings were: Demand: {}\n CarrierCosts: {}\n HubCosts: " + HUBCOSTS_FIX + "\n tollValue: " + TOLL_VALUE, demandSetting, costSetting);
 
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23

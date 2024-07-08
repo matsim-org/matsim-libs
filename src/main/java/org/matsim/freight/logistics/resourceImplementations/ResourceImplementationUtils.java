@@ -200,11 +200,7 @@ public class ResourceImplementationUtils {
     } else {
       String result = (String) carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR);
       if (result == null) {
-        log.warn(
-            "Requested attribute "
-                + CARRIER_TYPE_ATTR
-                + " does not exists. Will return "
-                + CARRIER_TYPE.undefined);
+        log.warn("Requested attribute " + CARRIER_TYPE_ATTR + " does not exists. Will return {}", CARRIER_TYPE.undefined);
         return CARRIER_TYPE.undefined;
       } else {
         return CARRIER_TYPE.valueOf(result);

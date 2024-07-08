@@ -157,7 +157,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, random);
-        Link pendingFromLink = linkList.get(0);
+        Link pendingFromLink = linkList.getFirst();
         if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
             && pendingFromLink.getFromNode().getCoord().getY() <= 4000
             && pendingFromLink.getToNode().getCoord().getX() <= 4000
@@ -211,7 +211,7 @@ import org.matsim.vehicles.VehicleType;
           public void install() {
             bind(LSPStrategyManager.class)
                 .toProvider(
-                    new Provider<LSPStrategyManager>() {
+                    new Provider<>() {
                       @Override
                       public LSPStrategyManager get() {
                         LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
