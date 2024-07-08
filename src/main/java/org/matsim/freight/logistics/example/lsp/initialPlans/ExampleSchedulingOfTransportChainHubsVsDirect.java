@@ -140,7 +140,7 @@ import org.matsim.vehicles.VehicleType;
         new AbstractModule() {
           @Override
           public void install() {
-            bind(LSPScorerFactory.class).toInstance(() -> new MyLSPScorer());
+            bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 
             //				bind( LSPStrategyManager.class ).toInstance( new
             // LSPModule.LSPStrategyManagerEmptyImpl() );

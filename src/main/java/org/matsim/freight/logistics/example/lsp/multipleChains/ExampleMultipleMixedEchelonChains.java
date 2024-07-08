@@ -80,7 +80,7 @@ final class ExampleMultipleMixedEchelonChains {
                 new EventBasedCarrierScorer_MultipleChains();
             bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
             carrierScorer.setToll(TOLL_VALUE);
-            bind(LSPScorerFactory.class).toInstance(() -> new MyLSPScorer());
+            bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
             bind(CarrierStrategyManager.class)
                 .toProvider(
                     () -> {
