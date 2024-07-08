@@ -1265,7 +1265,7 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 				if (!possibleLinks.containsKey(newPossibleLink.getId()))
 					possibleLinks.put(newPossibleLink.getId(), newPossibleLink);
-				if (nearestLinkPerPerson.size() == possiblePersons.size())
+				if (!possiblePersons.isEmpty() && nearestLinkPerPerson.size() == possiblePersons.size())
 					break;
 			}
 		}
