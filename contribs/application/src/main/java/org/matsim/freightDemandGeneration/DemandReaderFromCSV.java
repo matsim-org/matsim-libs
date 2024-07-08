@@ -1086,7 +1086,7 @@ public final class DemandReaderFromCSV {
 		} else {
 			roundingError = roundingError
 				+ ((double) demandForThisLink - ((double) demandToDistribute / (double) numberOfJobs));
-			if (roundingError > 1) {
+			if (roundingError >= 1) {
 				demandForThisLink = demandForThisLink - 1;
 				roundingError = roundingError - 1;
 			}
@@ -1113,7 +1113,7 @@ public final class DemandReaderFromCSV {
 				.ceil(link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute);
 			roundingError = roundingError + ((double) demandForThisLink
 				- (link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute));
-			if (roundingError > 1) {
+			if (roundingError >= 1) {
 				demandForThisLink = demandForThisLink - 1;
 				roundingError = roundingError - 1;
 			}
