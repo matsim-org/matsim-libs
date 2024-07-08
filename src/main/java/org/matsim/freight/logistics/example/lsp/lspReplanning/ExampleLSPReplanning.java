@@ -211,7 +211,7 @@ import org.matsim.vehicles.VehicleType;
           public void install() {
             bind(LSPStrategyManager.class)
                 .toProvider(
-                    new Provider<LSPStrategyManager>() {
+                    new Provider<>() {
                       @Override
                       public LSPStrategyManager get() {
                         LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
