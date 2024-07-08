@@ -211,21 +211,18 @@ import org.matsim.vehicles.VehicleType;
           public void install() {
             bind(LSPStrategyManager.class)
                 .toProvider(
-                    new Provider<>() {
-                      @Override
-                      public LSPStrategyManager get() {
-                        LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-                        {
-                          InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-                          strategyManager.addStrategy(
-                              new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner)
-                                  .createStrategy(),
-                              null,
-                              1);
-                        }
-                        return strategyManager;
-                      }
-                    });
+                        (Provider<LSPStrategyManager>) () -> {
+                          LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+                          {
+                            InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+                            strategyManager.addStrategy(
+                                new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner)
+                                    .createStrategy(),
+                                null,
+                                1);
+                          }
+                          return strategyManager;
+                        });
           }
         });
     GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
