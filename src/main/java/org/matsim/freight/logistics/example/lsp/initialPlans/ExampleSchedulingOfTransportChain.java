@@ -275,7 +275,7 @@ import org.matsim.vehicles.VehicleType;
     resourcesList.add(distributionResource);
 
     //		SolutionScheduler forwardSolutionScheduler = LSPUtils.createForwardSolutionScheduler();
-    // //Ist der "nicht einfache" Scheduler. TODO braucht der keine RessourcenLsite oder ähnliches?
+    // //Ist der "nicht einfache" Scheduler. TODO braucht der keine RessourcenListe oder ähnliches?
     // --> Offenbar ja, weil Null Pointer. argh!
     //		completeLSPBuilder.setSolutionScheduler(forwardSolutionScheduler);
 

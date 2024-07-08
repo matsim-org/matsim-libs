@@ -49,11 +49,11 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHand
 
     CarrierVehicle carrierVehicle = null;
     /*
-     * This somehow a workaround, because the Vehicle can't get recieved from the (MATSim) allVehicle container.
+     * This somehow a workaround, because the Vehicle can't get received from the (MATSim) allVehicle container.
      * At the TourStartEvent stage, the event.getVehicle is still not known ("null"), because it bases on ActivityEndEvent.
      * And since it is the first ActEndEvent of the person, it never entered a vehicle before -.-
      *
-     * My preferred apporach would have been something like
+     * My preferred approach would have been something like
      * final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId());
      *  kmt sep'22
      */

@@ -102,7 +102,7 @@ import org.matsim.vehicles.VehicleType;
     collectionPlan.setInitialShipmentAssigner(assigner);
     collectionPlan.addLogisticChain(collectionSolution);
 
-    // The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);

@@ -382,7 +382,7 @@ final class ExampleTwoEchelonGrid_NR {
               .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
     }
 
-    // Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem
+    // Todo: Auch das ist wirr: Muss hier alle sammeln, damit man die dann im LSPBuilder dem
     // SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu
     // ... urgs KMT'Jul22
     List<LSPPlan> lspPlans = new ArrayList<>();
