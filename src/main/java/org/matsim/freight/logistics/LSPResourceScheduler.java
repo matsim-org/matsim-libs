@@ -78,7 +78,7 @@ public abstract class LSPResourceScheduler {
    */
   protected abstract void updateShipments();
 
-  private final void presortIncomingShipments() {
+  private void presortIncomingShipments() {
     this.lspShipmentsWithTime = new ArrayList<>();
     for (LogisticChainElement element : resource.getClientElements()) {
       lspShipmentsWithTime.addAll(element.getIncomingShipments().getShipments());
