@@ -217,18 +217,18 @@ class ExampleCheckRequirementsOfAssigner {
       if (solution.getId().toString().equals("RedSolution")) {
         for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
           LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-          if (!(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
-            break;
-          }
+            if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
+                break;
+            }
         }
         System.out.println("All shipments in " + solution.getId() + " are red");
       }
       if (solution.getId().toString().equals("BlueSolution")) {
         for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
           LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-          if (!(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
-            break;
-          }
+            if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
+                break;
+            }
         }
         System.out.println("All shipments in " + solution.getId() + " are blue");
       }
