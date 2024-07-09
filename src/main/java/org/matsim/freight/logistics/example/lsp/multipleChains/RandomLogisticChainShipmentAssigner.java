@@ -20,6 +20,7 @@ class RandomLogisticChainShipmentAssigner implements InitialShipmentAssigner {
   private final Random random;
 
   RandomLogisticChainShipmentAssigner() {
+    MatsimRandom.reset();
     this.random = MatsimRandom.getLocalInstance();
   }
 
