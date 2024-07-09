@@ -81,7 +81,7 @@ final class ExampleGroceryDeliveryMultipleChains {
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                       strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                        strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+                        strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 1);
                         strategyManager.setMaxPlansPerAgent(5);
                       strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                       return strategyManager;
