@@ -37,7 +37,7 @@ final class ExampleGroceryDeliveryMultipleChains {
       LogManager.getLogger(ExampleGroceryDeliveryMultipleChains.class);
   private static final Id<Link> HUB_LINK_ID = Id.createLinkId("91085");
   private static final double TOLL_VALUE = 1000;
-  static double HUBCOSTS_FIX = 100;
+  static final double HUBCOSTS_FIX = 100;
 
   private ExampleGroceryDeliveryMultipleChains() {}
 

@@ -241,7 +241,7 @@ public class ResourceImplementationUtils {
     final Id<LSPResource> id;
     final ArrayList<LogisticChainElement> clientElements;
     final Network network;
-    Carrier carrier;
+    final Carrier carrier;
     Id<Link> locationLinkId;
     DistributionCarrierScheduler distributionHandler;
 
@@ -278,7 +278,7 @@ public class ResourceImplementationUtils {
     final Id<LSPResource> id;
     final ArrayList<LogisticChainElement> clientElements;
     final Network network;
-    Carrier carrier;
+    final Carrier carrier;
     Id<Link> locationLinkId;
     CollectionCarrierScheduler collectionScheduler;
 
