@@ -195,13 +195,9 @@ public class SmallScaleCommercialTrafficUtils {
 			Carrier relatedCarrier = CarriersUtils.addOrGetCarriers(scenario).getCarriers()
 				.get(Id.create(carrierName, Carrier.class));
 			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
-			final String mode;
-			if (subpopulation.contains("commercialPersonTraffic"))
-				mode = "car";
-			else if (subpopulation.contains("goodsTraffic"))
-				mode = "freight";
-			else
-				mode = relatedCarrier.getAttributes().getAttribute("networkMode").toString();
+			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
+			String mode = allVehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
+
 			List<PlanElement> tourElements = person.getSelectedPlan().getPlanElements();
 			double tourStartTime = 0;
 			for (PlanElement tourElement : tourElements) {
@@ -240,8 +236,6 @@ public class SmallScaleCommercialTrafficUtils {
 			if (relatedCarrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 				newPerson.getAttributes().putAttribute("tourStartArea",
 					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
-
-			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
 
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
 			VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
