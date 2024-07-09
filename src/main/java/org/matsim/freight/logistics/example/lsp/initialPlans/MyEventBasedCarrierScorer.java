@@ -16,6 +16,7 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
+import org.matsim.freight.logistics.example.lsp.ExampleConstants;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -177,10 +178,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
     }
 
     private void handleEvent(LinkEnterEvent event) {
-      //			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
-      List<String> tolledLinkList =
-          Arrays.asList(
-              "i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R", "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
+      List<String> tolledLinkList = ExampleConstants.TOLLED_LINK_LIST_GRID;
 
       final Id<VehicleType> vehicleTypeId =
           (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
