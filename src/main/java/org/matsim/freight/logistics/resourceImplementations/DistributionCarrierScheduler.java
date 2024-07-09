@@ -93,7 +93,7 @@ import org.matsim.vehicles.VehicleType;
   protected void scheduleResource() {
     int load = 0;
     double cumulatedLoadingTime = 0;
-    double availiabilityTimeOfLastShipment = 0;
+    double availabilityTimeOfLastShipment = 0;
     ArrayList<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(lspShipmentsWithTime);
     ArrayList<LspShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
     List<CarrierPlan> scheduledPlans = new LinkedList<>();
@@ -110,7 +110,7 @@ import org.matsim.vehicles.VehicleType;
         Carrier auxiliaryCarrier =
             CarrierSchedulerUtils.routeCarrier(
                 createAuxiliaryCarrier(
-                    shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime),
+                    shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
                 resource.getNetwork());
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         carrier.getServices().putAll(auxiliaryCarrier.getServices());
@@ -120,14 +120,14 @@ import org.matsim.vehicles.VehicleType;
       shipmentsInCurrentTour.add(tuple);
       load = load + tuple.getShipment().getSize();
       cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
-      availiabilityTimeOfLastShipment = tuple.getTime();
+      availabilityTimeOfLastShipment = tuple.getTime();
     }
 
     if (!shipmentsInCurrentTour.isEmpty()) {
       Carrier auxiliaryCarrier =
           CarrierSchedulerUtils.routeCarrier(
               createAuxiliaryCarrier(
-                  shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime),
+                  shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
               resource.getNetwork());
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
       carrier.getServices().putAll(auxiliaryCarrier.getServices());

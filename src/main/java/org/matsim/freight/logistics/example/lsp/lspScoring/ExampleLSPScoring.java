@@ -111,7 +111,7 @@ import org.matsim.vehicles.VehicleType;
             .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
             .addLogisticChain(logisticChain);
 
-    // The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
 
     return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
@@ -187,7 +187,7 @@ import org.matsim.vehicles.VehicleType;
         new AbstractModule() {
           @Override
           public void install() {
-            bind(LSPScorerFactory.class).toInstance(() -> new TipScorer());
+            bind(LSPScorerFactory.class).toInstance(TipScorer::new);
           }
         });
     return controler;

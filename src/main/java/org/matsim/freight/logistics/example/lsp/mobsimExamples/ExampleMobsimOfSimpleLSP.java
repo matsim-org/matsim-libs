@@ -171,11 +171,10 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle carrierVehicle =
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
-    CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
-    capabilitiesBuilder.addVehicle(carrierVehicle);
-    capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities capabilities = capabilitiesBuilder.build();
+    CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(carrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
 
     Carrier carrier = CarriersUtils.createCarrier(carrierId);
     carrier.setCarrierCapabilities(capabilities);
@@ -215,7 +214,7 @@ import org.matsim.vehicles.VehicleType;
         LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
     collectionLSPBuilder.setInitialPlan(collectionPlan);
 
-    // The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);

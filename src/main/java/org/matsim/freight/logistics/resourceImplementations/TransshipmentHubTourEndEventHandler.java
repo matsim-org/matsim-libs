@@ -67,7 +67,7 @@ public class TransshipmentHubTourEndEventHandler
   // to do the junit testing. kmt jun'23
 
   //This class *should* also get merged into {@link LSPTourEndEventHandler}.
-  //Currently, this is not possible very easyily, because of missing injection (of the scenario.)
+  //Currently, this is not possible very easily, because of missing injection (of the scenario.)
   //KMT, KN (Jan'24)
 
   private final Scenario scenario;

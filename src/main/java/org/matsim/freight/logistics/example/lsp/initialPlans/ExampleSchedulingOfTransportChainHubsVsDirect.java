@@ -140,7 +140,7 @@ import org.matsim.vehicles.VehicleType;
         new AbstractModule() {
           @Override
           public void install() {
-            bind(LSPScorerFactory.class).toInstance(() -> new MyLSPScorer());
+            bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 
             //				bind( LSPStrategyManager.class ).toInstance( new
             // LSPModule.LSPStrategyManagerEmptyImpl() );
@@ -191,10 +191,7 @@ import org.matsim.vehicles.VehicleType;
         switch (solutionType) {
           case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(
               Id.create("LSPwithReloading", LSP.class));
-          case onePlan_direct -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
-          case twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(
-              Id.create("LSPdirect", LSP.class));
-          default -> throw new IllegalStateException("Unexpected value: " + solutionType);
+          case onePlan_direct, twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
         };
 
     //		lspBuilder.setSolutionScorer(new MyLSPScorer());
@@ -259,7 +256,6 @@ import org.matsim.vehicles.VehicleType;
 
       mainRunCarrier.setCarrierCapabilities(
           CarrierCapabilities.Builder.newInstance()
-              .addType(mainRunVehicleType)
               .addVehicle(mainRunCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build());
@@ -324,7 +320,6 @@ import org.matsim.vehicles.VehicleType;
           CarriersUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
       distributionCarrier.setCarrierCapabilities(
           CarrierCapabilities.Builder.newInstance()
-              .addType(distributionVehicleType)
               .addVehicle(distributionCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build());
@@ -365,7 +360,6 @@ import org.matsim.vehicles.VehicleType;
 
       CarrierCapabilities directDistributionCarrierCapabilities =
           CarrierCapabilities.Builder.newInstance()
-              .addType(directDistributionVehicleType)
               .addVehicle(directDistributionCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build();
@@ -397,7 +391,7 @@ import org.matsim.vehicles.VehicleType;
 
     // TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
-    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP
+    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP.
     // Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten
     // Vorgänger/Nachfolger bestimmt wurden.
 
@@ -486,13 +480,6 @@ import org.matsim.vehicles.VehicleType;
     log.info("");
     log.info("The order of the logisticsSolutionElements is now specified");
     depotElement.connectWithNextElement(directDistributionElement);
-
-    // TODO WIP: KostenInfo an das Element dran hängen.(old) --> brauchen wir das dann noch? (KMT,
-    // Feb22)
-
-    // 				LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
-    //				SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
-    //				directDistributionElement.getInfos().add(costInfo);
 
     log.info("");
     log.info("set up logistic Solution - direct distribution from the depot is created");

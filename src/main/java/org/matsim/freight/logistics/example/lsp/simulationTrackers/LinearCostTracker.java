@@ -66,10 +66,7 @@ import org.matsim.freight.logistics.LogisticChain;
 
   public LinearCostTracker(double shareOfFixedCosts) {
     this.shareOfFixedCosts = shareOfFixedCosts;
-    //		CostInfo costInfo = new CostInfo();
-    //		infos = new ArrayList<>();
-    //		infos.add(costInfo);
-    this.eventHandlers = new ArrayList<>();
+      this.eventHandlers = new ArrayList<>();
   }
 
   public final Collection<EventHandler> getEventHandlers() {
@@ -98,18 +95,7 @@ import org.matsim.freight.logistics.LogisticChain;
     fixedUnitCosts = (totalCosts * shareOfFixedCosts) / totalNumberOfShipments;
     linearUnitCosts = (totalCosts * (1 - shareOfFixedCosts)) / totalWeightOfShipments;
 
-    //		CostInfo info = (CostInfo) infos.iterator().next();
-    //		for(LSPInfoFunctionValue value : info.getFunction().getValues()) {
-    //			if(value instanceof example.lsp.simulationTrackers.FixedCostFunctionValue) {
-    //				((example.lsp.simulationTrackers.FixedCostFunctionValue)value).setValue(fixedUnitCosts);
-    //			}
-    //			if(value instanceof example.lsp.simulationTrackers.LinearCostFunctionValue) {
-    //				((example.lsp.simulationTrackers.LinearCostFunctionValue)value).setValue(linearUnitCosts);
-    //			}
-    //		}
-    //		info.setFixedCost( fixedUnitCosts );
-    //		info.setVariableCost( linearUnitCosts );
-    LSPUtils.setFixedCost(this.logisticChain, fixedUnitCosts);
+      LSPUtils.setFixedCost(this.logisticChain, fixedUnitCosts);
     LSPUtils.setVariableCost(this.logisticChain, linearUnitCosts);
   }
 
@@ -125,9 +111,6 @@ import org.matsim.freight.logistics.LogisticChain;
     linearUnitCosts = 0;
   }
 
-  //	@Override public Attributes getAttributes(){
-  //		return attributes;
-  //	}
   @Override
   public void setEmbeddingContainer(LogisticChain pointer) {
     this.logisticChain = pointer;
@@ -186,7 +169,4 @@ import org.matsim.freight.logistics.LogisticChain;
       }
     }
   }
-  //	@Override public LogisticsSolution getEmbeddingContainer(){
-  //		throw new RuntimeException( "not implemented" );
-  //	}
 }
