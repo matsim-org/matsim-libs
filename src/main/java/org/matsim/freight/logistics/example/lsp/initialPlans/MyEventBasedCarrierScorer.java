@@ -35,7 +35,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
   public ScoringFunction createScoringFunction(Carrier carrier) {
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
-    sf.addScoringFunction(new LinkBasedTollScoring(toll));
+    sf.addScoringFunction(new LinkBasedTollScoring(toll, List.of("large50")));
     return sf;
   }
 
@@ -153,13 +153,14 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
     final Logger log = LogManager.getLogger(EventBasedScoring.class);
 
     private final double toll;
-    private final List<String> vehicleTypesToBeTolled = List.of("large50");
+    private final List<String> vehicleTypesToBeTolled;
     private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
     private double score;
 
-    public LinkBasedTollScoring(double toll) {
+    public LinkBasedTollScoring(double toll, List<String> vehicleTypesToBeTolled) {
       super();
       this.toll = toll;
+      this.vehicleTypesToBeTolled = vehicleTypesToBeTolled;
     }
 
     @Override

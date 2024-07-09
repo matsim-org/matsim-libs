@@ -35,7 +35,7 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
   public ScoringFunction createScoringFunction(Carrier carrier) {
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
-    sf.addScoringFunction(new LinkBasedTollScoring(toll));
+    sf.addScoringFunction(new LinkBasedTollScoring(toll, List.of("heavy40t")));
     return sf;
   }
 
@@ -122,13 +122,13 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
     final Logger log = LogManager.getLogger(EventBasedScoring.class);
 
     private final double toll;
-    //		private final List<String> vehicleTypesToBeTolled = Arrays.asList("large50");
-    private final List<String> vehicleTypesToBeTolled = List.of("heavy40t");
+    private final List<String> vehicleTypesToBeTolled;
     private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
     private double score;
 
-    public LinkBasedTollScoring(double toll) {
+    public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled) {
       super();
+      this.vehicleTypesToBeTolled = vehicleTypeToBeTolled;
       this.toll = toll;
     }
 
@@ -146,25 +146,7 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
         handleEvent(linkEnterEvent);
       }
     }
-
-    //		private void handleEvent(LinkEnterEvent event) {
-    //			List<String> tolledLinkList = Arrays.asList("i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R",
-    // "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
-    //
-    //			final Id<VehicleType> vehicleTypeId = (VehicleUtils.findVehicle(event.getVehicleId(),
-    // scenario)).getType().getId();
-    //
-    //			//toll a vehicle only once.
-    //			if (!tolledVehicles.contains(event.getVehicleId()))
-    //				if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
-    //					if (tolledLinkList.contains(event.getLinkId().toString())) {
-    //						log.info("Tolling caused by event: " + event);
-    //						tolledVehicles.add(event.getVehicleId());
-    //						score = score - toll;
-    //					}
-    //				}
-    //		}
-
+    
     private void handleEvent(LinkEnterEvent event) {
       List<String> tolledLinkList = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
 
