@@ -144,20 +144,12 @@ final class ExampleTwoEchelonGrid_NR {
                           new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
                       return strategyManager;
                     });
-            bind(LSPScorerFactory.class).toInstance(() -> new MyLSPScorer());
+            bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
           }
         });
 
     log.info("Run MATSim");
-    log.warn(
-        "Runs settings were: Demand: "
-            + demandSetting
-            + "\n CarrierCosts: "
-            + costSetting
-            + "\n HubCosts: "
-            + HUBCOSTS_FIX
-            + "\n tollValue: "
-            + TOLL_VALUE);
+    log.warn("Runs settings were: Demand: {}\n CarrierCosts: {}\n HubCosts: " + HUBCOSTS_FIX + "\n tollValue: " + TOLL_VALUE, demandSetting, costSetting);
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
     controler
@@ -390,7 +382,7 @@ final class ExampleTwoEchelonGrid_NR {
               .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
     }
 
-    // Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem
+    // Todo: Auch das ist wirr: Muss hier alle sammeln, damit man die dann im LSPBuilder dem
     // SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu
     // ... urgs KMT'Jul22
     List<LSPPlan> lspPlans = new ArrayList<>();
@@ -461,7 +453,7 @@ final class ExampleTwoEchelonGrid_NR {
               ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 
           int capacityDemand =
-              rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to b0und (excl) -> adding 1.
+              rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to bound (excl) -> adding 1.
           builder.setCapacityDemand(capacityDemand);
 
           builder.setFromLinkId(DEPOT_LINK_ID);

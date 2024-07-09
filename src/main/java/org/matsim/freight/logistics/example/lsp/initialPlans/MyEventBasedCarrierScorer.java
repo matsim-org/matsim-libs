@@ -71,13 +71,13 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
     @Override
     public void handleEvent(Event event) {
       log.debug(event.toString());
-      if (event instanceof CarrierTourStartEvent freightTourStartEvent) {
-        handleEvent(freightTourStartEvent);
-      } else if (event instanceof CarrierTourEndEvent freightTourEndEvent) {
-        handleEvent(freightTourEndEvent);
-      } else if (event instanceof LinkEnterEvent linkEnterEvent) {
-        handleEvent(linkEnterEvent);
-      }
+        switch (event) {
+            case CarrierTourStartEvent freightTourStartEvent -> handleEvent(freightTourStartEvent);
+            case CarrierTourEndEvent freightTourEndEvent -> handleEvent(freightTourEndEvent);
+            case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+            default -> {
+            }
+        }
     }
 
     private void handleEvent(CarrierTourStartEvent event) {
@@ -116,11 +116,11 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
             Math.ceil(vehicleType2TourDuration.get(vehicleType) / MAX_SHIFT_DURATION);
         final Integer nuAlreadyScored = vehicleType2ScoredFixCosts.get(vehicleType);
         if (nuAlreadyScored == null) {
-          log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
+          log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
           score = score - vehicleType.getCostInformation().getFixedCosts();
           vehicleType2ScoredFixCosts.put(vehicleType, 1);
         } else if (currentNuOfVehiclesNeeded > nuAlreadyScored) {
-          log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
+          log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
           score = score - vehicleType.getCostInformation().getFixedCosts();
           vehicleType2ScoredFixCosts.put(
               vehicleType, vehicleType2ScoredFixCosts.get(vehicleType) + 1);
@@ -189,7 +189,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
       if (!tolledVehicles.contains(event.getVehicleId()))
         if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
           if (tolledLinkList.contains(event.getLinkId().toString())) {
-            log.info("Tolling caused by event: " + event);
+            log.info("Tolling caused by event: {}", event);
             tolledVehicles.add(event.getVehicleId());
             score = score - toll;
           }

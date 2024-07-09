@@ -19,7 +19,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 
   // map of logistic chains and their number of assigned shipments in order of addition
-  Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
+  final Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
   RoundRobinLogisticChainShipmentAssigner() {}
 

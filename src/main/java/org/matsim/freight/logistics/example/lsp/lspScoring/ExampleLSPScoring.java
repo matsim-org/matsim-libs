@@ -111,7 +111,7 @@ import org.matsim.vehicles.VehicleType;
             .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
             .addLogisticChain(logisticChain);
 
-    // The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
 
     return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
@@ -137,7 +137,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, random);
-        Link pendingFromLink = linkList.get(0);
+        Link pendingFromLink = linkList.getFirst();
         if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
             && pendingFromLink.getFromNode().getCoord().getY() <= 4000
             && pendingFromLink.getToNode().getCoord().getX() <= 4000
@@ -187,7 +187,7 @@ import org.matsim.vehicles.VehicleType;
         new AbstractModule() {
           @Override
           public void install() {
-            bind(LSPScorerFactory.class).toInstance(() -> new TipScorer());
+            bind(LSPScorerFactory.class).toInstance(TipScorer::new);
           }
         });
     return controler;
@@ -254,7 +254,7 @@ import org.matsim.vehicles.VehicleType;
     @Override
     public void handleEvent(CarrierServiceEndEvent event) {
       double tip = tipRandom.nextDouble() * 5;
-      log.warn("tipSum=" + tipSum + "; tip=" + tip);
+      log.warn("tipSum={}; tip={}", tipSum, tip);
       tipSum += tip;
     }
 

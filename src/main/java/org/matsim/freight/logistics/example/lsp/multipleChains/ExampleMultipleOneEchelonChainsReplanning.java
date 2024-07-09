@@ -104,14 +104,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
                               new ExpBetaPlanSelector<>(new ScoringConfigGroup())),
                           null,
                           1);
-                      //
-                      //	strategyManager.addStrategy(RoundRobinDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
-                      //
-                      //	strategyManager.addStrategy(RandomDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
-                      //
-                      //	strategyManager.addStrategy(RebalancingStrategyFactory.createStrategy(),
-                      // null, 1);
-                      strategyManager.addStrategy(
+                        strategyManager.addStrategy(
                           RandomShiftingStrategyFactory.createStrategy(), null, 1);
                       //
                       //	strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);

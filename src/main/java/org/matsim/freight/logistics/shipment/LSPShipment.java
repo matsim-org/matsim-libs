@@ -56,12 +56,8 @@ public interface LSPShipment
 
   double getPickupServiceTime(); // same as in CarrierShipment
 
-  //	ShipmentPlan getShipmentPlan();
-
   ShipmentPlan getShipmentLog();
 
   Collection<Requirement> getRequirements();
 
-  //	void setLspId(Id<LSP> id);
-  //	Id<LSP> getLspId();
 }

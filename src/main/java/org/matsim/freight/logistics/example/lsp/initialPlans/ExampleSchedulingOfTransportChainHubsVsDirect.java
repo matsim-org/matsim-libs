@@ -92,7 +92,7 @@ import org.matsim.vehicles.VehicleType;
 
     } else {
       solutionType = SolutionType.onePlan_direct;
-      log.warn("SolutionType was set in code to: " + solutionType);
+      log.warn("SolutionType was set in code to: {}", solutionType);
       config.controller().setOutputDirectory("output/ChainVsDirect/" + solutionType);
       config.controller().setLastIteration(2);
     }
@@ -104,7 +104,7 @@ import org.matsim.vehicles.VehicleType;
     var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
-    log.warn("solutionType= " + solutionType);
+    log.warn("solutionType= {}", solutionType);
 
     config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 
@@ -140,7 +140,7 @@ import org.matsim.vehicles.VehicleType;
         new AbstractModule() {
           @Override
           public void install() {
-            bind(LSPScorerFactory.class).toInstance(() -> new MyLSPScorer());
+            bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 
             //				bind( LSPStrategyManager.class ).toInstance( new
             // LSPModule.LSPStrategyManagerEmptyImpl() );
@@ -191,10 +191,7 @@ import org.matsim.vehicles.VehicleType;
         switch (solutionType) {
           case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(
               Id.create("LSPwithReloading", LSP.class));
-          case onePlan_direct -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
-          case twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(
-              Id.create("LSPdirect", LSP.class));
-          default -> throw new IllegalStateException("Unexpected value: " + solutionType);
+          case onePlan_direct, twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
         };
 
     //		lspBuilder.setSolutionScorer(new MyLSPScorer());
@@ -259,7 +256,6 @@ import org.matsim.vehicles.VehicleType;
 
       mainRunCarrier.setCarrierCapabilities(
           CarrierCapabilities.Builder.newInstance()
-              .addType(mainRunVehicleType)
               .addVehicle(mainRunCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build());
@@ -324,7 +320,6 @@ import org.matsim.vehicles.VehicleType;
           CarriersUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
       distributionCarrier.setCarrierCapabilities(
           CarrierCapabilities.Builder.newInstance()
-              .addType(distributionVehicleType)
               .addVehicle(distributionCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build());
@@ -365,7 +360,6 @@ import org.matsim.vehicles.VehicleType;
 
       CarrierCapabilities directDistributionCarrierCapabilities =
           CarrierCapabilities.Builder.newInstance()
-              .addType(directDistributionVehicleType)
               .addVehicle(directDistributionCarrierVehicle)
               .setFleetSize(FleetSize.INFINITE)
               .build();
@@ -397,7 +391,7 @@ import org.matsim.vehicles.VehicleType;
 
     // TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
-    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP
+    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP.
     // Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten
     // Vorgänger/Nachfolger bestimmt wurden.
 
@@ -487,13 +481,6 @@ import org.matsim.vehicles.VehicleType;
     log.info("The order of the logisticsSolutionElements is now specified");
     depotElement.connectWithNextElement(directDistributionElement);
 
-    // TODO WIP: KostenInfo an das Element dran hängen.(old) --> brauchen wir das dann noch? (KMT,
-    // Feb22)
-
-    // 				LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
-    //				SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
-    //				directDistributionElement.getInfos().add(costInfo);
-
     log.info("");
     log.info("set up logistic Solution - direct distribution from the depot is created");
 
@@ -566,7 +553,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, rand);
-        Link pendingToLink = linkList.get(0);
+        Link pendingToLink = linkList.getFirst();
         if ((pendingToLink.getFromNode().getCoord().getX() <= 18000
             && pendingToLink.getFromNode().getCoord().getY() <= 4000
             && pendingToLink.getFromNode().getCoord().getX() >= 14000

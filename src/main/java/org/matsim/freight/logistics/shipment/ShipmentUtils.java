@@ -102,29 +102,9 @@ public final class ShipmentUtils {
       return new LoggedShipmentHandle(this);
     }
 
-    //		// --- Getters --- //
-    //
-    //		public double getStartTime() {
-    //			return startTime;
-    //		}
-    //
-    //		public double getEndTime() {
-    //			return endTime;
-    //		}
-    //
-    //		public LogisticChainElement getElement() {
-    //			return element;
-    //		}
-    //
-    //		public Id<LSPResource> getResourceId() {
-    //			return resourceId;
-    //		}
-    //
-    //		public Id<Link> getLinkId() {
-    //			return linkId;
-    //		}
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class LoggedShipmentLoadBuilder {
     private double startTime;
     private double endTime;
@@ -194,6 +174,7 @@ public final class ShipmentUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class LoggedShipmentTransportBuilder {
     private double startTime;
     private LogisticChainElement element;
@@ -262,6 +243,7 @@ public final class ShipmentUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentUnloadBuilder {
     double startTime;
     double endTime;
@@ -310,6 +292,7 @@ public final class ShipmentUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentTransportBuilder {
     double startTime;
     double endTime;
@@ -363,6 +346,7 @@ public final class ShipmentUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentLoadBuilder {
     double startTime;
     double endTime;
@@ -411,6 +395,7 @@ public final class ShipmentUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentHandleBuilder {
     double startTime;
     double endTime;
@@ -444,6 +429,7 @@ public final class ShipmentUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class LoggedShipmentUnloadBuilder {
     double startTime;
     double endTime;

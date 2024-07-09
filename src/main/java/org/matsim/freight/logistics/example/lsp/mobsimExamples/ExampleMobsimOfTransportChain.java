@@ -70,11 +70,10 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle carrierVehicle =
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
-    CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
-    capabilitiesBuilder.addVehicle(carrierVehicle);
-    capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities capabilities = capabilitiesBuilder.build();
+    CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(carrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
 
     Carrier collectionCarrier = CarriersUtils.createCarrier(collectionCarrierId);
     collectionCarrier.setCarrierCapabilities(capabilities);
@@ -142,7 +141,6 @@ import org.matsim.vehicles.VehicleType;
 
     CarrierCapabilities mainRunCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(mainRunType)
             .addVehicle(mainRunCarrierVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();
@@ -209,12 +207,11 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle distributionCarrierVehicle =
         CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
-    CarrierCapabilities.Builder distributionCapabilitiesBuilder =
-        CarrierCapabilities.Builder.newInstance();
-    distributionCapabilitiesBuilder.addType(distributionType);
-    distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
-    distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
+    CarrierCapabilities distributionCapabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(distributionCarrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
+
     Carrier distributionCarrier = CarriersUtils.createCarrier(distributionCarrierId);
     distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
@@ -267,7 +264,7 @@ import org.matsim.vehicles.VehicleType;
         LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
     completeLSPBuilder.setInitialPlan(completePlan);
 
-    // The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);
@@ -294,7 +291,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, rand);
-        Link pendingToLink = linkList.get(0);
+        Link pendingToLink = linkList.getFirst();
         if ((pendingToLink.getFromNode().getCoord().getX() <= 18000
             && pendingToLink.getFromNode().getCoord().getY() <= 4000
             && pendingToLink.getFromNode().getCoord().getX() >= 14000
@@ -308,7 +305,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, rand);
-        Link pendingFromLink = linkList.get(0);
+        Link pendingFromLink = linkList.getFirst();
         if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
             && pendingFromLink.getFromNode().getCoord().getY() <= 4000
             && pendingFromLink.getToNode().getCoord().getX() <= 4000

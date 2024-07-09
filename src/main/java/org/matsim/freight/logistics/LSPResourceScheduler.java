@@ -53,7 +53,7 @@ public abstract class LSPResourceScheduler {
     presortIncomingShipments();
     scheduleResource();
     updateShipments();
-    switchHandeledShipments(bufferTime);
+    switchHandledShipments(bufferTime);
     lspShipmentsWithTime.clear();
   }
 
@@ -63,7 +63,7 @@ public abstract class LSPResourceScheduler {
    * still stored from the previous iteration or the infrastructure for the used algorithm has to be
    * set up.
    *
-   * @param resource
+   * @param resource The LSPRessource
    */
   protected abstract void initializeValues(LSPResource resource);
 
@@ -78,7 +78,7 @@ public abstract class LSPResourceScheduler {
    */
   protected abstract void updateShipments();
 
-  private final void presortIncomingShipments() {
+  private void presortIncomingShipments() {
     this.lspShipmentsWithTime = new ArrayList<>();
     for (LogisticChainElement element : resource.getClientElements()) {
       lspShipmentsWithTime.addAll(element.getIncomingShipments().getShipments());
@@ -86,7 +86,7 @@ public abstract class LSPResourceScheduler {
     lspShipmentsWithTime.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
   }
 
-  private final void switchHandeledShipments(int bufferTime) {
+  private void switchHandledShipments(int bufferTime) {
     for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
       var shipmentPlan =
           ShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getShipment().getId());

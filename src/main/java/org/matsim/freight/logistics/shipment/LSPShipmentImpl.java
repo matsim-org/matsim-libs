@@ -79,12 +79,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
     return endTimeWindow;
   }
 
-  //	@Override
-  //	public ShipmentPlan getShipmentPlan() {
-  //		return shipmentPlan;
-  //	}
-
-  @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
+    @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
   @Override
   public ShipmentPlan getShipmentLog() {
     return shipmentLog;
@@ -110,15 +105,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
     return pickupServiceTime;
   }
 
-  //	@Override public void setLspId(Id<LSP> lspId) {
-  //		this.lspId = lspId;
-  //	}
-  //
-  //	@Override public Id<LSP> getLspId() {
-  //		return this.lspId;
-  //	}
-
-  @Override
+    @Override
   public String toString() {
     return "LSPShipmentImpl{"
         + "Id="

@@ -65,7 +65,6 @@ class ExampleCheckRequirementsOfAssigner {
 
     CarrierCapabilities redCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(collectionType)
             .addVehicle(redVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();
@@ -102,7 +101,6 @@ class ExampleCheckRequirementsOfAssigner {
 
     CarrierCapabilities blueCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(collectionType)
             .addVehicle(blueVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();
@@ -167,7 +165,7 @@ class ExampleCheckRequirementsOfAssigner {
 
       while (true) {
         Collections.shuffle(linkList);
-        Link pendingFromLink = linkList.get(0);
+        Link pendingFromLink = linkList.getFirst();
         if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
             && pendingFromLink.getFromNode().getCoord().getY() <= 4000
             && pendingFromLink.getToNode().getCoord().getX() <= 4000
@@ -219,18 +217,18 @@ class ExampleCheckRequirementsOfAssigner {
       if (solution.getId().toString().equals("RedSolution")) {
         for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
           LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-          if (!(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
-            break;
-          }
+            if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
+                break;
+            }
         }
         System.out.println("All shipments in " + solution.getId() + " are red");
       }
       if (solution.getId().toString().equals("BlueSolution")) {
         for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
           LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-          if (!(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
-            break;
-          }
+            if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
+                break;
+            }
         }
         System.out.println("All shipments in " + solution.getId() + " are blue");
       }

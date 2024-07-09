@@ -65,11 +65,10 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle carrierVehicle =
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
-    CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
-    capabilitiesBuilder.addVehicle(carrierVehicle);
-    capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities capabilities = capabilitiesBuilder.build();
+    CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(carrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
 
     Carrier carrier = CarriersUtils.createCarrier(carrierId);
     carrier.setCarrierCapabilities(capabilities);
@@ -118,7 +117,7 @@ import org.matsim.vehicles.VehicleType;
         LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
     collectionLSPBuilder.setInitialPlan(collectionPlan);
 
-    // The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);
@@ -143,7 +142,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, random);
-        Link pendingFromLink = linkList.get(0);
+        Link pendingFromLink = linkList.getFirst();
         if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
             && pendingFromLink.getFromNode().getCoord().getY() <= 4000
             && pendingFromLink.getToNode().getCoord().getX() <= 4000
@@ -208,19 +207,7 @@ import org.matsim.vehicles.VehicleType;
     controler.run();
 
     // Retrieve cost info from lsp
-    //		LSPInfo costInfo;
-    //		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getAttributes()) {
-    //			if( Objects.equals( info.getName(), "cost_function" ) ) {
-    //				costInfo = info;
-    //				for(  Map.Entry value : costInfo.getAttributes().getAttributes().getAsMap().entrySet() ){
-    //					System.out.println(value.getKey() + " " + value.getValue());
-    //				}
-    //			}
-    //			for( Map.Entry<String, Object> entry : info.getAttributes().getAsMap().entrySet() ){
-    //				System.out.println( entry.getKey() + " " + entry.getValue() );
-    //			}
-    //		}
-    for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+      for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
       System.out.println(solution.getAttributes().getAttribute("cost_function"));
     }
   }

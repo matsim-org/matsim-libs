@@ -302,7 +302,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         Gbl.assertNotNull(currentLsp);
         Gbl.assertNotNull(lsPs);
         Gbl.assertNotNull(lsPs.getLSPs());
-        currentLsp.getPlans().remove(0); // empty plan zero was set for initialization of currentLSP
+        currentLsp.getPlans().removeFirst(); // empty plan zero was set for initialization of currentLSP
         lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
         currentLsp = null;
       }
@@ -391,7 +391,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         LogisticChain currentLogisticChain =
             LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
-                .addLogisticChainElement(logisticChainElements.get(0))
+                .addLogisticChainElement(logisticChainElements.getFirst())
                 .build();
 
         for (int i = 1;

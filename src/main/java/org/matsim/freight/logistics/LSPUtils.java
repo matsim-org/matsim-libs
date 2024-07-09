@@ -205,7 +205,7 @@ public final class LSPUtils {
 
     private LogisticChainBuilder(Id<LogisticChain> id) {
       this.elements = new ArrayList<>();
-      this.trackers = new ArrayList<LSPSimulationTracker<LogisticChain>>();
+      this.trackers = new ArrayList<>();
       this.id = id;
     }
 

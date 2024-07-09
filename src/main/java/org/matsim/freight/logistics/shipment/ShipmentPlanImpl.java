@@ -66,7 +66,7 @@ import org.matsim.api.core.v01.Id;
     ArrayList<ShipmentPlanElement> logList = new ArrayList<>(planElements.values());
     logList.sort(new LogElementComparator());
     Collections.reverse(logList);
-    return logList.get(0);
+    return logList.getFirst();
   }
 
   @Override

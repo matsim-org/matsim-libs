@@ -75,9 +75,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
     if (builder.getVehicleReturn() != null) {
       this.vehicleReturn = builder.getVehicleReturn();
     } else {
-      log.warn(
-          "Return behaviour was not specified. Using the following setting as default: "
-              + ResourceImplementationUtils.VehicleReturn.endAtToLink);
+      log.warn("Return behaviour was not specified. Using the following setting as default: {}", ResourceImplementationUtils.VehicleReturn.endAtToLink);
       this.vehicleReturn = ResourceImplementationUtils.VehicleReturn.endAtToLink;
     }
     this.network = builder.getNetwork();

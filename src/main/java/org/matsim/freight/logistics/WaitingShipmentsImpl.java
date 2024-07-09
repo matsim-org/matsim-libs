@@ -60,7 +60,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   public String toString() {
     StringBuilder strb = new StringBuilder();
     strb.append("WaitingShipmentsImpl{").append("No of Shipments= ").append(shipments.size());
-    if (shipments.size() > 0) {
+    if (!shipments.isEmpty()) {
       strb.append("; ShipmentIds=");
       for (LspShipmentWithTime shipment : getSortedShipments()) {
         strb.append("[").append(shipment.getShipment().getId()).append("]");

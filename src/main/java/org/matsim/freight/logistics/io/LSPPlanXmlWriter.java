@@ -85,7 +85,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
   }
 
   private void writeRootElement() throws IOException {
-    List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+    List<Tuple<String, String>> atts = new ArrayList<>();
     atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
     atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
     atts.add(

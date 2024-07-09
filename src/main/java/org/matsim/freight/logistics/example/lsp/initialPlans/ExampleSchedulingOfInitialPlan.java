@@ -62,11 +62,10 @@ import org.matsim.vehicles.VehicleType;
     CarrierVehicle carrierVehicle =
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
-    CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
-    capabilitiesBuilder.addVehicle(carrierVehicle);
-    capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-    CarrierCapabilities capabilities = capabilitiesBuilder.build();
+    CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
+            .addVehicle(carrierVehicle)
+            .setFleetSize(FleetSize.INFINITE)
+            .build();
 
     Carrier carrier = CarriersUtils.createCarrier(carrierId);
     carrier.setCarrierCapabilities(capabilities);
@@ -102,7 +101,7 @@ import org.matsim.vehicles.VehicleType;
     collectionPlan.setInitialShipmentAssigner(assigner);
     collectionPlan.addLogisticChain(collectionSolution);
 
-    // The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);
@@ -129,7 +128,7 @@ import org.matsim.vehicles.VehicleType;
 
       while (true) {
         Collections.shuffle(linkList, random);
-        Link pendingFromLink = linkList.get(0);
+        Link pendingFromLink = linkList.getFirst();
         if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
             && pendingFromLink.getFromNode().getCoord().getY() <= 4000
             && pendingFromLink.getToNode().getCoord().getX() <= 4000

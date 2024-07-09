@@ -51,13 +51,7 @@ public final class LSPPlanXmlReader implements MatsimReader {
       this.parser.setValidating(true);
       this.parser.readFile(filename);
     } catch (Exception e) {
-      log.warn(
-          "### Exception found while trying to read LSPPlan: Message: "
-              + e.getMessage()
-              + " ; cause: "
-              + e.getCause()
-              + " ; class "
-              + e.getClass());
+      log.warn("### Exception found while trying to read LSPPlan: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
       throw e;
     }
   }
@@ -66,21 +60,13 @@ public final class LSPPlanXmlReader implements MatsimReader {
     try {
       this.parser.readURL(url);
     } catch (Exception e) {
-      log.warn(
-          "### Exception found while trying to read LSPPlan: Message: "
-              + e.getMessage()
-              + " ; cause: "
-              + e.getCause()
-              + " ; class "
-              + e.getClass());
+      log.warn("### Exception found while trying to read LSPPlan: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
       if (e.getCause()
           .getMessage()
           .contains(
               "cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most
                               // probably because no validation information was found
-        log.warn(
-            "read with validation = true failed. Try it again without validation... url: "
-                + url.toString());
+        log.warn("read with validation = true failed. Try it again without validation... url: {}", url.toString());
         parser.setValidating(true);
         parser.readURL(url);
       } else { // other problem: e.g. validation does not work, because of missing validation file.
@@ -104,7 +90,7 @@ public final class LSPPlanXmlReader implements MatsimReader {
     public void startTag(String name, Attributes attributes, Stack<String> context) {
       if (LSPConstants.LSPS_DEFINITIONS.equalsIgnoreCase(name)) {
         String str = attributes.getValue("xsi:schemaLocation");
-        log.info("Found following schemaLocation in lsPs definition file: " + str);
+        log.info("Found following schemaLocation in lsPs definition file: {}", str);
         if (str.contains("lspsDefinitions_v1.xsd")) {
           delegate = new LSPPlanXmlParserV1(lsPs, carriers);
         } else {
