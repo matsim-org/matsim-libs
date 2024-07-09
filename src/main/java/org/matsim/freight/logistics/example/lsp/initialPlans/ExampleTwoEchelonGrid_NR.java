@@ -453,7 +453,7 @@ final class ExampleTwoEchelonGrid_NR {
               ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 
           int capacityDemand =
-              rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to b0und (excl) -> adding 1.
+              rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to bound (excl) -> adding 1.
           builder.setCapacityDemand(capacityDemand);
 
           builder.setFromLinkId(DEPOT_LINK_ID);

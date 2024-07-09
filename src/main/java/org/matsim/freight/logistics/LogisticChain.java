@@ -33,6 +33,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * implement the interface {@link LSPResource}. This introduction of an intermediate layer allows
  * physical Resources to be used by several {@link LogisticChain}s and thus transport chains.
  */
+@SuppressWarnings("GrazieInspection")
 public interface LogisticChain
     extends Identifiable<LogisticChain>,
         KnowsLSP,

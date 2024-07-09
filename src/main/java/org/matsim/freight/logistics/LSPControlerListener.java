@@ -189,7 +189,7 @@ class LSPControlerListener
     for (LSP lsp : lsps.getLSPs().values()) {
       lsp.getSelectedPlan()
           .getShipmentPlans()
-          .clear(); // clear ShipmentPlans to start with clear(n) state. Otherwise, some times were
+          .clear(); // clear ShipmentPlans to start with clear(n) state. Otherwise, some of the times were
                     // accumulating over the time. :(
       lsp.scheduleLogisticChains();
     }

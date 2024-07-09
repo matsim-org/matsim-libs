@@ -391,7 +391,7 @@ import org.matsim.vehicles.VehicleType;
 
     // TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
-    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP
+    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP.
     // Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten
     // Vorgänger/Nachfolger bestimmt wurden.
 

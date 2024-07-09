@@ -188,7 +188,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
    * @param scenario                    the scenario, used e.g. for getting the network and register some stuff
    * @param lspName                     String of LSP's Id
    * @param lspShipments                Collection of LSPShipments to be assigned to the LSP
-   * @param depotLinkId                   Id of the depot link
+   * @param depotLinkId                 Id of the depot link
    * @param hubLinkId                   location of the hub
    * @param vehicleTypesMainRun         vehicle types for the main run (2e-chain)
    * @param vehicleTypesDistributionRun vehicle types for the distribution run (2e-chain)
