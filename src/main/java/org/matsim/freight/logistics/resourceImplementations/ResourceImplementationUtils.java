@@ -42,6 +42,7 @@ import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
+@SuppressWarnings("ClassEscapesDefinedScope")
 public class ResourceImplementationUtils {
 
   private static final Logger log = LogManager.getLogger(ResourceImplementationUtils.class);
@@ -236,6 +237,7 @@ public class ResourceImplementationUtils {
     undefined
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static class DistributionCarrierResourceBuilder {
 
     final Id<LSPResource> id;
@@ -273,6 +275,7 @@ public class ResourceImplementationUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static class CollectionCarrierResourceBuilder {
 
     final Id<LSPResource> id;
@@ -310,6 +313,7 @@ public class ResourceImplementationUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static class MainRunCarrierResourceBuilder {
 
     private final Id<LSPResource> id;
@@ -399,6 +403,7 @@ public class ResourceImplementationUtils {
     }
   }
 
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static class TranshipmentHubSchedulerBuilder {
     private double capacityNeedLinear;
     private double capacityNeedFixed;
