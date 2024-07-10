@@ -11,6 +11,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -21,10 +22,14 @@ import java.util.stream.Collectors;
 public class NetworkModeRestriction implements NetworkRunnable {
 	private static final Logger log = LogManager.getLogger(NetworkModeRestriction.class);
 
-	private final Map<Id<Link>, Set<String>> modesToRemoveByLinkId;
+	private final Function<Id<Link>, Set<String>> modesToRemoveByLinkId;
+
+	public NetworkModeRestriction(Function<Id<Link>, Set<String>> modesToRemoveByLinkId) {
+		this.modesToRemoveByLinkId = modesToRemoveByLinkId;
+	}
 
 	public NetworkModeRestriction(Map<Id<Link>, Set<String>> modesToRemoveByLinkId) {
-		this.modesToRemoveByLinkId = modesToRemoveByLinkId;
+		this.modesToRemoveByLinkId = l -> modesToRemoveByLinkId.getOrDefault(l, Set.of());
 	}
 
 	@Override
@@ -41,11 +46,8 @@ public class NetworkModeRestriction implements NetworkRunnable {
 	}
 
 	private void applyModeChanges(Network network) {
-		for (Map.Entry<Id<Link>, Set<String>> entry : modesToRemoveByLinkId.entrySet()) {
-			Link link = network.getLinks().get(entry.getKey());
-			for (String modeToRemove : entry.getValue()) {
-				NetworkUtils.removeAllowedMode(link, modeToRemove);
-			}
+		for (Map.Entry<Id<Link>, ? extends Link> link : network.getLinks().entrySet()) {
+			this.modesToRemoveByLinkId.apply(link.getKey()).forEach(m -> NetworkUtils.removeAllowedMode(link.getValue(), m));
 		}
 	}
 

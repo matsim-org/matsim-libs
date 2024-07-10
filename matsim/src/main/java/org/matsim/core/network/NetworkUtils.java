@@ -21,6 +21,7 @@
 package org.matsim.core.network;
 
 import java.util.*;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -1042,7 +1043,7 @@ public final class NetworkUtils {
 	 * @param network the network
 	 * @param modesToRemoveByLinkId map of modes that should be removed from the links
 	 */
-	public static void restrictModesAndCleanNetwork(Network network, Map<Id<Link>, Set<String>> modesToRemoveByLinkId) {
+	public static void restrictModesAndCleanNetwork(Network network, Function<Id<Link>, Set<String>> modesToRemoveByLinkId) {
 		new NetworkModeRestriction(modesToRemoveByLinkId).run(network);
 	}
 }

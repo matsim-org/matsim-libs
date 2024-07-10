@@ -156,7 +156,7 @@ public class ModeRestrictionTest {
 		Id<Link> link = Id.createLinkId("6");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), Map.of(link, Set.of(restrictedMode)));
+		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), l -> Map.of(link, Set.of(restrictedMode)).getOrDefault(l, Set.of()));
 		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
 
 		// New route. Note that the end link is 20, but the activity's link in the input was 15.
@@ -183,7 +183,7 @@ public class ModeRestrictionTest {
 		Id<Link> link = Id.createLinkId("15");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), Map.of(link, Set.of(restrictedMode)));
+		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(),  l -> Map.of(link, Set.of(restrictedMode)).getOrDefault(l, Set.of()));
 		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
 
 		// New route. Note that the end link is 20, but the activity's link in the input was 6.
