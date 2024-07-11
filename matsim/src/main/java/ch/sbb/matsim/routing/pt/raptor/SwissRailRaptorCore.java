@@ -832,7 +832,7 @@ public class SwissRailRaptorCore {
 
             final int firstTransferIndex;
             final int lastTransferIndex;
-            RTransfer[] transfers;
+            final RTransfer[] transfers;
             
             if (!useAdaptiveTransferCalculation) {
             	// efficient lookup from the precomputed transfer candidates
