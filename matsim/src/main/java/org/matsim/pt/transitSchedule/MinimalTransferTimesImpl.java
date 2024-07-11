@@ -19,11 +19,9 @@
 
 package org.matsim.pt.transitSchedule;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
@@ -165,16 +163,5 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 			}
 			throw new NoSuchElementException();
 		}
-	}
-
-	@Override
-	public Set<Id<TransitStopFacility>> getCandidates(Id<TransitStopFacility> fromStop) {
-		var inner = minimalTransferTimes.get(fromStop);
-		
-		if (inner == null) {
-			return Collections.emptySet();
-		}
-		
-		return inner.keySet();
 	}
 }
