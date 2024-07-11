@@ -12,7 +12,6 @@ import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -57,12 +56,20 @@ public class PrebookingTest {
 	}
 
 	static PrebookingParams installPrebooking(Controler controller) {
-		return installPrebooking(controller, true);
+		return installPrebooking(controller, true, new PrebookingParams());
+	}
+
+	static PrebookingParams installPrebooking(Controler controller, PrebookingParams prebookingParams) {
+		return installPrebooking(controller, true, prebookingParams);
 	}
 
 	static PrebookingParams installPrebooking(Controler controller, boolean installLogic) {
+		return installPrebooking(controller, installLogic, new PrebookingParams());
+	}
+
+	static PrebookingParams installPrebooking(Controler controller, boolean installLogic, PrebookingParams prebookingParams) {
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
-		drtConfig.addParameterSet(new PrebookingParams());
+		drtConfig.addParameterSet(prebookingParams);
 
 		if (installLogic) {
 			AttributeBasedPrebookingLogic.install(controller, drtConfig);
