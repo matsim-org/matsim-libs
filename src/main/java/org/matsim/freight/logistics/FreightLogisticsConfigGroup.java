@@ -33,7 +33,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
 
     private String lspsFile;
     static final String LSPS_FILE = "lspsFile";
-    private static final String CARRIERS_FILE_DESC = "Freight LogisticsServiceProvider File, according to MATSim logistics extension as part of MATSim's freight contrib.";
+    private static final String LSPS_FILE_DESC = "Freight LogisticsServiceProviders (LSP)s File, according to MATSim logistics extension as part of MATSim's freight contrib.";
 
 
     public enum LogicOfVrp {serviceBased, shipmentBased}
@@ -57,7 +57,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
 
     //### CarriersFile ###
     /**
-     * @return -- {@value #CARRIERS_FILE_DESC}
+     * @return -- {@value #LSPS_FILE_DESC}
      */
     @StringGetter(LSPS_FILE)
     public String getLspsFile() {
@@ -69,7 +69,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #CARRIERS_FILE_DESC}
+     * @param -- {@value #LSPS_FILE_DESC}
      */
     @StringSetter(LSPS_FILE)
     public void setLspsFile(String lspsFile) {
@@ -135,7 +135,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
-        map.put(LSPS_FILE, CARRIERS_FILE_DESC);
+        map.put(LSPS_FILE, LSPS_FILE_DESC);
         map.put(VRP_LOGIC_OF_DISTRIBUTION_CARRIER, VRP_LOGIC_OF_DISTRIBUTION_CARRIER_DESC);
         map.put(VRP_LOGIC_OF_MAINRUN_CARRIER, VRP_LOGIC_OF_MAINRUN_CARRIER_DESC);
         map.put(VRP_LOGIC_OF_COLLECTION_CARRIER, VRP_LOGIC_OF_COLLECTION_CARRIER_DESC);
