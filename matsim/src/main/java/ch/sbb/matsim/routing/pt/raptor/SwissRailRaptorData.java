@@ -245,15 +245,17 @@ public class SwissRailRaptorData {
             }
         }
 
-        // if cached transfer calculation is used, build a map for quick lookup of minimal transfer times
+        // if adaptive transfer calculation is used, build a map for quick lookup of and collection of minimal transfer times
 		IdMap<TransitStopFacility, Map<TransitStopFacility, Double>> staticTransferTimes = null;
-		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Cached)) {
+		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Adaptive)) {
 			staticTransferTimes = new IdMap<>(TransitStopFacility.class);
 
 			MinimalTransferTimes.MinimalTransferTimesIterator iterator = schedule.getMinimalTransferTimes().iterator();
 			while (iterator.hasNext()) {
 				iterator.next();
 
+				// we only put the predefined transfer times here, the location-based ones will be calculated
+				// adaptively during routing
 				staticTransferTimes.computeIfAbsent(iterator.getFromStopId(), id -> new HashMap<>())
 						.put(schedule.getFacilities().get(iterator.getToStopId()), iterator.getSeconds());
 			}
@@ -649,10 +651,6 @@ public class SwissRailRaptorData {
   }
 
 	RTransfer[] calculateTransfers(RRouteStop fromRouteStop) {
-		if (config.getTransferCalculation().equals(RaptorTransferCalculation.Initial)) {
-			return null;
-		}
-
 		// We tested this in a parallel set-up and things seem to work as they are
 		// implemented. The routing threads will access the cache as read-only an
 		// retrieve the cached stop connections. It can happen that two of them try to
