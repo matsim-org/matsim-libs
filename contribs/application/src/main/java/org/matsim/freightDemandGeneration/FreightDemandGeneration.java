@@ -381,6 +381,13 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 */
 							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
 									upSamplePopulationTo, "changeDemandOnLocation");
+					case noPopulationSampling ->
+						/*
+						 * If the demand sample is equal to the population sample, the demand is created
+						 * based on the given population and the set input population sampleSize
+						 */
+							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+								sampleSizeInputPopulation, "noPopulationSampling");
 					default -> throw new RuntimeException("No valid sampling option selected!");
 				}
 				switch (selectedPopulationOption) {
