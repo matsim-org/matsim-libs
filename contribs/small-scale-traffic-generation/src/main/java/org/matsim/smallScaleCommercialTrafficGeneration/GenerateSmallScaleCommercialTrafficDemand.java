@@ -79,7 +79,6 @@ import org.matsim.vehicles.VehicleUtils;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -660,7 +659,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						}
 						// find a start category with existing employees in this zone
 						Collections.shuffle(startCategory, rnd);
-						String selectedStartCategory = startCategory.get(0);
+						String selectedStartCategory = startCategory.getFirst();
 						for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
 							if (count <= startCategory.size())
 								selectedStartCategory = startCategory.get(rnd.nextInt(startCategory.size()));

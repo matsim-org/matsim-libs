@@ -79,7 +79,7 @@ public class SmallScaleCommercialTrafficUtils {
 	public static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpZones.readFeatures().iterator().next().getAttribute(shapeFileZoneNameColumn) == null)
+		if (shpZones.readFeatures().getFirst().getAttribute(shapeFileZoneNameColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileZoneNameColumn + "' does not exist in the zones shape file. Please check the input.");
 		return shpZones.createIndex(shapeCRS, shapeFileZoneNameColumn);
 	}
@@ -94,7 +94,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	 public static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
 		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpLanduse.readFeatures().iterator().next().getAttribute(shapeFileLanduseTypeColumn) == null)
+		if (shpLanduse.readFeatures().getFirst().getAttribute(shapeFileLanduseTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileLanduseTypeColumn + "' does not exist in the landuse shape file. Please check the input.");
 		return shpLanduse.createIndex(shapeCRS, shapeFileLanduseTypeColumn);
 	}
@@ -109,7 +109,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	public static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
 		ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpBuildings.readFeatures().iterator().next().getAttribute(shapeFileBuildingTypeColumn) == null)
+		if (shpBuildings.readFeatures().getFirst().getAttribute(shapeFileBuildingTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileBuildingTypeColumn + "' does not exist in the building shape file. Please check the input.");
 
 		return shpBuildings.createIndex(shapeCRS, shapeFileBuildingTypeColumn);
@@ -125,7 +125,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	public static Index getIndexRegions(Path shapeFileRegionsPath, String shapeCRS, String regionsShapeRegionColumn) {
 		ShpOptions shpRegions = new ShpOptions(shapeFileRegionsPath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpRegions.readFeatures().iterator().next().getAttribute(regionsShapeRegionColumn) == null)
+		if (shpRegions.readFeatures().getFirst().getAttribute(regionsShapeRegionColumn) == null)
 			throw new NullPointerException("The column '" + regionsShapeRegionColumn + "' does not exist in the region shape file. Please check the input.");
 		return shpRegions.createIndex(shapeCRS, regionsShapeRegionColumn);
 	}
