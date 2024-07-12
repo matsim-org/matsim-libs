@@ -206,7 +206,7 @@ public class SmallScaleCommercialTrafficUtils {
 					Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getType(),
 						scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
 					if (activity.getType().equals("start")) {
-						tourStartTime = activity.getEndTime().seconds();
+						newActivity.setEndTime(activity.getEndTime().seconds());
 						newActivity.setType("commercial_start");
 					} else
 						newActivity.setEndTimeUndefined();
