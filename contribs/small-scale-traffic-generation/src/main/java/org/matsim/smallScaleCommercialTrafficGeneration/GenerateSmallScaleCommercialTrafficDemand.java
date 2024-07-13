@@ -887,7 +887,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
 																Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
-																String shapeFileZoneNameColumn) throws URISyntaxException {
+																String shapeFileZoneNameColumn) {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
 		log.info("Filtering and assign links to zones. This take some time...");
 
