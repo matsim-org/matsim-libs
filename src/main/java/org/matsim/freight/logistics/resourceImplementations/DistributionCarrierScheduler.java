@@ -237,9 +237,6 @@ import org.matsim.vehicles.VehicleType;
     }
     builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
     builder.setEndTime(startTimeOfTransport);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(tour.getStartLinkId());
-    builder.setCarrierService(serviceActivity.getService());
 
     ShipmentPlanElement load = builder.build();
     String idString =

@@ -145,9 +145,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
         legBeforeService.getExpectedDepartureTime() + legBeforeService.getExpectedTransportTime();
     builder.setStartTime(startTimeOfLoading);
     builder.setEndTime(startTimeOfLoading + tuple.getShipment().getDeliveryServiceTime());
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(serviceActivity.getLocation());
-    builder.setCarrierService(serviceActivity.getService());
+
     ShipmentPlanElement load = builder.build();
     String idString =
         load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();

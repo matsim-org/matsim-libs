@@ -21,8 +21,6 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
@@ -32,17 +30,13 @@ class ScheduledShipmentLoad implements ShipmentPlanElement {
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
-  private final Id<Carrier> carrierId;
-  private final CarrierService carrierService;
 
-  ScheduledShipmentLoad(ShipmentUtils.ScheduledShipmentLoadBuilder builder) {
+    ScheduledShipmentLoad(ShipmentUtils.ScheduledShipmentLoadBuilder builder) {
     this.startTime = builder.startTime;
     this.endTime = builder.endTime;
     this.element = builder.element;
     this.resourceId = builder.resourceId;
-    this.carrierId = builder.carrierId;
-    this.carrierService = builder.carrierService;
-  }
+    }
 
   @Override
   public String getElementType() {
@@ -69,11 +63,4 @@ class ScheduledShipmentLoad implements ShipmentPlanElement {
     return resourceId;
   }
 
-  public Id<Carrier> getCarrierId() {
-    return carrierId;
-  }
-
-  public CarrierService getCarrierService() {
-    return carrierService;
-  }
 }
