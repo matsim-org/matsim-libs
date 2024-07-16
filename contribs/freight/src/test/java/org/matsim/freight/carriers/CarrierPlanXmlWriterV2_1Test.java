@@ -43,7 +43,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	private Carrier testCarrier;
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	public void setUp() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( this.testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );

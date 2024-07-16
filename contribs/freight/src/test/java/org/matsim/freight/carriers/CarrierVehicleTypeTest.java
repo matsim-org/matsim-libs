@@ -39,7 +39,7 @@ public class CarrierVehicleTypeTest {
 	CarrierVehicleTypes types;
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	public void setUp() {
 		final Id<VehicleType> vehicleTypeId = Id.create( "medium", VehicleType.class );
 		VehicleType mediumType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		{
