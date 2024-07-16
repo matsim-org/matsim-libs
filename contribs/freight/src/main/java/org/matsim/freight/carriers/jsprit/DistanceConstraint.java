@@ -258,7 +258,7 @@ import org.matsim.vehicles.VehicleUtils;
 			}
 			// checks the distance if the delivery is the last activity before the end of
 			// the tour
-			if (route.getTourActivities().getActivities().size() > 0) {
+			if (!route.getTourActivities().getActivities().isEmpty()) {
 				TourActivity activityLastDelivery = route.getTourActivities().getActivities()
 						.get(route.getTourActivities().getActivities().size() - 1);
 				TourActivity activityEnd = route.getEnd();

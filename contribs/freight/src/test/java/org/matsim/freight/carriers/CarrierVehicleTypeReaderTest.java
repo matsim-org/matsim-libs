@@ -104,7 +104,7 @@ public class CarrierVehicleTypeReaderTest {
 		log.info("") ;
 		log.info("now starting for real") ;
 		log.info("") ;
-		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";;
+		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";
 		CarrierVehicleTypes types1 = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( types1 ).readFile( inFilename1 );
 

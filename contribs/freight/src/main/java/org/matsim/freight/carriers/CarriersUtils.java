@@ -236,10 +236,10 @@ public class CarriersUtils {
 		Carriers carriersWithShipments = new Carriers();
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			Carrier carrierWS = createCarrier(carrier.getId());
-			if (carrier.getShipments().size() > 0) {
+			if (!carrier.getShipments().isEmpty()) {
 				copyShipments(carrierWS, carrier);
 			}
-			if (carrier.getServices().size() > 0) {
+			if (!carrier.getServices().isEmpty()) {
 				createShipmentsFromServices(carrierWS, carrier);
 			}
 			carrierWS.setCarrierCapabilities(carrier.getCarrierCapabilities()); // vehicles and other carrierCapabilities
@@ -512,7 +512,7 @@ public class CarriersUtils {
 		List<String> skills = convertSkillsAttributeToList(attributes);
 		if (!skills.contains(skill)) {
 			String skillString;
-			if (skills.size() == 0) {
+			if (skills.isEmpty()) {
 				skillString = skill;
 			} else {
 				skillString = attributes.getAttribute(ATTR_SKILLS) + "," + skill;
@@ -555,7 +555,7 @@ public class CarriersUtils {
 	}
 
 	private static void setSkills(Attributes attributes, Set<String> skills) {
-		if (skills.size() != 0) {
+		if (!skills.isEmpty()) {
 			Iterator<String> skillIterator = skills.iterator();
 			StringBuilder skillString = new StringBuilder(skillIterator.next());
 			while (skillIterator.hasNext()) {
