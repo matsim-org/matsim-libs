@@ -730,7 +730,7 @@ public final class MatsimJspritFactory {
 		VehicleRoutingAlgorithm algorithm;
 		final String vehicleRoutingAlgorithmFile = freightConfig.getVehicleRoutingAlgorithmFile();
 
-		if (vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.equals("")) {
+		if (vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.isEmpty()) {
 			log.info("Will read in VehicleRoutingAlgorithm from {}", vehicleRoutingAlgorithmFile);
 			URL vraURL;
 			try {
