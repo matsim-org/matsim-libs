@@ -402,11 +402,6 @@ public class MatsimTransformerTest {
 	}
 
 	@Test
-	void createVehicleRoutingProblemWithServices_isMadeCorrectly() {
-		// TODO create
-	}
-
-	@Test
 	void createVehicleRoutingProblemBuilderWithServices_isMadeCorrectly() {
 		Carrier carrier = createCarrierWithServices();
         Network network = NetworkUtils.createNetwork();
@@ -451,11 +446,6 @@ public class MatsimTransformerTest {
 		assertEquals(10, service2.getSize().get(0));
 		assertEquals(20.0, service2.getServiceDuration(), 0.0);
 		assertEquals("i(3,9)", service2.getLocation().getId().toString());
-	}
-
-	@Test
-	void createVehicleRoutingProblemWithShipments_isMadeCorrectly() {
-		// TODO create
 	}
 
 	//	@Disabled		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
