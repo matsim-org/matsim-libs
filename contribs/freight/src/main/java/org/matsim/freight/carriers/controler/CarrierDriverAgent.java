@@ -83,7 +83,7 @@ final class CarrierDriverAgent{
 		this.carrier = carrier;
 		this.events = events;
 		this.carrierEventCreators = carrierEventCreators;
-		log.debug( "creating CarrierDriverAgent with driverId=" + driverId );
+		log.debug("creating CarrierDriverAgent with driverId={}", driverId);
 		this.driverId = driverId;
 		this.scheduledTour = tour;
 	}
@@ -163,7 +163,7 @@ final class CarrierDriverAgent{
 
 		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
 
-		log.debug( "handling activity end event=" + event );
+		log.debug("handling activity end event={}", event);
 		if( CarrierConstants.START.equals( event.getActType() ) ){
 			planElementCounter += 1;
 			return;

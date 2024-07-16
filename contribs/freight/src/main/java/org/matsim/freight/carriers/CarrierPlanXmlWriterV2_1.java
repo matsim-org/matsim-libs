@@ -283,8 +283,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 								createTuple(SHIPMENT_ID, act.getShipment().getId().toString())), true
 						);
 						if (!carrier.getShipments().containsKey(act.getShipment().getId())) {
-							logger.error("Shipment with id " + act.getShipment().getId().toString() + " is contained in the carriers plan, " +
-								"but not available in the list of shipments. Carrier with carrierId: " + carrier.getId());
+							logger.error("Shipment with id {} is contained in the carriers plan, but not available in the list of shipments. Carrier with carrierId: {}", act.getShipment().getId().toString(), carrier.getId());
 						}
 					}
 					else if (tourElement instanceof Tour.ServiceActivity act) {
@@ -293,8 +292,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 								createTuple(SERVICE_ID, act.getService().getId().toString())), true
 						);
 						if (!carrier.getServices().containsKey(act.getService().getId())) {
-							logger.error("service with id " + act.getService().getId().toString() + " is contained in the carriers plan, " +
-								"but not available in the list of services. Carrier with carrierId: " + carrier.getId());
+							logger.error("service with id {} is contained in the carriers plan, but not available in the list of services. Carrier with carrierId: {}", act.getService().getId().toString(), carrier.getId());
 						}
 					}
 				}

@@ -75,15 +75,15 @@ import java.util.Collection;
 				Vehicle vehicle;
 				if( CarriersUtils.getVehicle( freightDriverPlan ) == null ){
 					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.createDefaultVehicleType() );
-					log.warn( "vehicle for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed." );
+					log.warn("vehicle for agent {} is missing. set default vehicle where maxVelocity is solely defined by link.speed.", freightDriverPlan.getPerson().getId());
 				} else if( CarriersUtils.getVehicle( freightDriverPlan ).getType() == null ){
 					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.createDefaultVehicleType() );
-					log.warn( "vehicleType for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed." );
+					log.warn("vehicleType for agent {} is missing. set default vehicleType where maxVelocity is solely defined by link.speed.", freightDriverPlan.getPerson().getId());
 				} else {
 					vehicle = CarriersUtils.getVehicle( freightDriverPlan );
 				}
 
-				log.warn( "inserting vehicleId=" + vehicle.getId() + " into mobsim." );
+				log.warn("inserting vehicleId={} into mobsim.", vehicle.getId());
 				qsim.addParkedVehicle( new QVehicleImpl( vehicle ), agent.getCurrentLinkId() );
 				// yyyyyy should rather use QVehicleFactory.  kai, nov'18
 

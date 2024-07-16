@@ -161,7 +161,7 @@ public class FixedCostsTest  {
 		netBuilder.setTimeSliceWidth(86400) ; // !!!!, otherwise it will not do anything.
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			log.info("creating and solving VRP for carrier: " + carrier.getId().toString());
+			log.info("creating and solving VRP for carrier: {}", carrier.getId().toString());
 			//Build VRP
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 			vrpBuilder.setRoutingCost(netBasedCosts) ;

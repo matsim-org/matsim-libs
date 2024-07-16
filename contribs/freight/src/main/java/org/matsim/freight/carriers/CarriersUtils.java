@@ -314,7 +314,7 @@ public class CarriersUtils {
 	 */
 	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
 		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
-			log.debug("Copy CarrierShipment: " + carrierShipment.toString());
+			log.debug("Copy CarrierShipment: {}", carrierShipment.toString());
 			addShipment(carrierWS, carrierShipment);
 		}
 	}
@@ -349,7 +349,7 @@ public class CarriersUtils {
 			}
 		}
 		for (CarrierService carrierService : carrier.getServices().values()) {
-			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
+			log.debug("Converting CarrierService to CarrierShipment: {}", carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 									  .newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
 											  depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
