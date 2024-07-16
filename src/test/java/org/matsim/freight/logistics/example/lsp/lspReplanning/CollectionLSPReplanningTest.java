@@ -53,6 +53,19 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
+/**
+ * This class is deprecated and will be removed in the future.
+ *  It follows the old and no longer wanted approach.
+ *  Now, an Assigner is used to assign all LSPShipments to one LogisticChain of the LSPPlan.
+ *  <p></p>
+ *  This class here is in contrast used as a Replanning strategy. This behavior is not wanted anymore.
+ *  <p></p>
+ *  Please use the new Approach as shown in
+ *  org.matsim.freight.logistics.example.lsp.multipleChains.ExampleMultipleOneEchelonChainsReplanning instead.
+ *  <p></p>
+ *  * KMT, Jul'24
+ */
+@Deprecated
 public class CollectionLSPReplanningTest {
 
 	@RegisterExtension
