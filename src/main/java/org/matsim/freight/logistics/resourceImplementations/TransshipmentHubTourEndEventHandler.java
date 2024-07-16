@@ -165,7 +165,7 @@ public class TransshipmentHubTourEndEventHandler
                 final double startTime = event.getTime();
                 final double endTime = startTime + expHandlingDuration;
 
-                logHandlingInHub(serviceActivity.getService(), event, startTime, endTime);
+                logHandlingInHub(serviceActivity.getService(), startTime, endTime);
                 throwHandlingEvent(event, lspShipment, expHandlingDuration);
               }
             }
@@ -192,7 +192,7 @@ public class TransshipmentHubTourEndEventHandler
               final double startTime = event.getTime() + expUnloadingTime;
               final double endTime = startTime + expHandlingDuration;
 
-              logHandlingInHub(carrierService, event, startTime, endTime);
+              logHandlingInHub(carrierService, startTime, endTime);
               throwHandlingEvent(event, lspShipment, expHandlingDuration);
             }
           }
@@ -224,7 +224,7 @@ public class TransshipmentHubTourEndEventHandler
   }
 
   private void logHandlingInHub(
-      CarrierService carrierService, CarrierTourEndEvent event, double startTime, double endTime) {
+          CarrierService carrierService, double startTime, double endTime) {
 
     LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 
@@ -259,16 +259,6 @@ public class TransshipmentHubTourEndEventHandler
     eventsManager.processEvent(
         new HandlingInHubStartsEvent(
             event.getTime(), linkId, lspShipment.getId(), resourceId, expHandlingDuration));
-  }
-
-  private double getUnloadEndTime(Tour tour) {
-    double unloadEndTime = 0;
-    for (TourElement element : tour.getTourElements()) {
-      if (element instanceof ServiceActivity serviceActivity) {
-        unloadEndTime = unloadEndTime + serviceActivity.getDuration();
-      }
-    }
-    return unloadEndTime;
   }
 
   private boolean allServicesAreInOnePoint(Tour tour) {
