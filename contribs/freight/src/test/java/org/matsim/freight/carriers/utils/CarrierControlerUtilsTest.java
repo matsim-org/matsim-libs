@@ -58,7 +58,6 @@ import org.matsim.vehicles.*;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 
 public class CarrierControlerUtilsTest {
 

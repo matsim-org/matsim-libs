@@ -26,8 +26,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collections;
 
 public class CarrierReadWriteV2_1Test {
