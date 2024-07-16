@@ -494,7 +494,7 @@ public class DistanceConstraintTest {
 				MatsimTestUtils.EPSILON,
 				"Wrong maximum distance of the tour of this vehicleType");
 
-		ArrayList<Double> distancesOfTours = new ArrayList();
+		ArrayList<Double> distancesOfTours = new ArrayList<>();
 		for (ScheduledTour scheduledTour: carrierV5.getSelectedPlan().getScheduledTours()) {
 			double distanceTour = 0.0;
 			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
@@ -576,7 +576,7 @@ public class DistanceConstraintTest {
 				MatsimTestUtils.EPSILON,
 				"Wrong maximum distance of the tour of this vehicleType");
 
-		ArrayList<Double> distancesOfTours = new ArrayList();
+		ArrayList<Double> distancesOfTours = new ArrayList<>();
 		for (ScheduledTour scheduledTour: carrierV5.getSelectedPlan().getScheduledTours()) {
 			double distanceTour = 0.0;
 			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
