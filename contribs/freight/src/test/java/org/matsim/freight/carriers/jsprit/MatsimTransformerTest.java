@@ -418,7 +418,7 @@ public class MatsimTransformerTest {
 		assertEquals("i(6,0)", vehicle.getStartLocation().getId());
 		assertEquals(10.0, vehicle.getEarliestDeparture(), 0.0);
 		assertEquals(20.0, vehicle.getLatestArrival(), 0.0);
-		assertEquals("matsimType", vehicle.getType().getTypeId().toString());
+		assertEquals("matsimType", vehicle.getType().getTypeId());
 		assertEquals(10.0, vehicle.getType().getVehicleCostParams().perDistanceUnit, 0.0);
 		assertEquals(5.0, vehicle.getType().getVehicleCostParams().perTransportTimeUnit, 0.0);
 		assertEquals(100.0, vehicle.getType().getVehicleCostParams().fix, 0.0);
@@ -435,7 +435,7 @@ public class MatsimTransformerTest {
 		Service service1 = (Service) jobS1;
 		assertEquals(20, service1.getSize().get(0));
 		assertEquals(10.0, service1.getServiceDuration(), 0.0);
-		assertEquals("i(7,4)R", service1.getLocation().getId().toString());
+		assertEquals("i(7,4)R", service1.getLocation().getId());
 
 		Job jobS2 = vrp.getJobs().get("serviceId2");
 		assertNotNull(jobS2);
@@ -445,7 +445,7 @@ public class MatsimTransformerTest {
 		Service service2 = (Service) jobS2;
 		assertEquals(10, service2.getSize().get(0));
 		assertEquals(20.0, service2.getServiceDuration(), 0.0);
-		assertEquals("i(3,9)", service2.getLocation().getId().toString());
+		assertEquals("i(3,9)", service2.getLocation().getId());
 	}
 
 	//	@Disabled		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
@@ -466,7 +466,7 @@ public class MatsimTransformerTest {
 		assertEquals("i(6,0)", vehicle.getStartLocation().getId());
 		assertEquals(10.0, vehicle.getEarliestDeparture(), 0.0);
 		assertEquals(20.0, vehicle.getLatestArrival(), 0.0);
-		assertEquals("matsimType", vehicle.getType().getTypeId().toString());
+		assertEquals("matsimType", vehicle.getType().getTypeId());
 		assertEquals(10.0, vehicle.getType().getVehicleCostParams().perDistanceUnit, 0.0);
 		assertEquals(5.0, vehicle.getType().getVehicleCostParams().perTransportTimeUnit, 0.0);
 		assertEquals(100.0, vehicle.getType().getVehicleCostParams().fix, 0.0);
@@ -498,7 +498,7 @@ public class MatsimTransformerTest {
 		assertInstanceOf(Shipment.class, jobS2);
 		Shipment shipment2 = (Shipment) jobS2;
 		assertEquals(20, shipment2.getSize().get(0));
-		assertEquals("i(3,9)", shipment2.getDeliveryLocation().getId().toString());
+		assertEquals("i(3,9)", shipment2.getDeliveryLocation().getId());
 	}
 
 	private Carrier createCarrierWithServices() {
