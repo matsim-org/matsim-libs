@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -181,6 +182,15 @@ import org.matsim.vehicles.VehicleType;
     // Set up required MATSim classes
     Config config = new Config();
     config.addCoreModules();
+
+    config.controller().setFirstIteration(0);
+    config.controller().setLastIteration(4);
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+    config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+
+    var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
+
     Scenario scenario = ScenarioUtils.createScenario(config);
     new MatsimNetworkReader(scenario.getNetwork())
             .readFile("scenarios/2regions/2regions-network.xml");
@@ -213,9 +223,8 @@ import org.matsim.vehicles.VehicleType;
                                 (Provider<LSPStrategyManager>) () -> {
                                   LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                                   {
-                                    InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-                                    strategyManager.addStrategy(
-                                            new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner)
+                                      strategyManager.addStrategy(
+                                            new TomorrowShipmentAssignerStrategyFactory(new MaybeTodayAssigner())
                                                     .createStrategy(),
                                             null,
                                             1);
@@ -224,17 +233,12 @@ import org.matsim.vehicles.VehicleType;
                                 });
               }
             });
-    GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+//    GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+//
+//      strategyManager.addStrategy(
+//            new TomorrowShipmentAssignerStrategyFactory(new MaybeTodayAssigner()).createStrategy(), null, 1);
 
-    InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
 
-    strategyManager.addStrategy(
-            new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);
-
-    config.controller().setFirstIteration(0);
-    config.controller().setLastIteration(4);
-    config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-    config.network().setInputFile("scenarios/2regions/2regions-network.xml");
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
     controler
