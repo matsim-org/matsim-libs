@@ -36,7 +36,7 @@ public class CarrierReadWriteV2_1Test {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void readWriteTest() throws FileNotFoundException, IOException {
+	void readWriteTest() {
 
 		Carriers carriers = new Carriers(Collections.emptyList());
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
@@ -57,7 +57,7 @@ public class CarrierReadWriteV2_1Test {
 
 
 	@Test
-	void readWriteReadTest() throws FileNotFoundException, IOException {
+	void readWriteReadTest() {
 
 		Carriers carriers = new Carriers(Collections.emptyList());
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
