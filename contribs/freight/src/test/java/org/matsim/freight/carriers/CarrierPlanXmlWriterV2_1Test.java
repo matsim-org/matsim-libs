@@ -139,7 +139,8 @@ public class CarrierPlanXmlWriterV2_1Test {
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.getFirst();
 		plan1.getAttributes().getAttribute("jspritScore");
-		assertEquals(Double.NaN, CarriersUtils.getJspritScore(plan1), testUtils.EPSILON);
+		assertEquals(Double.NaN, CarriersUtils.getJspritScore(plan1), MatsimTestUtils.EPSILON);
+		assertEquals(Double.NaN, CarriersUtils.getJspritScore(plan1), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -147,7 +148,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		plan2.getAttributes().getAttribute("jspritScore");
-		assertEquals(80.0, CarriersUtils.getJspritScore(plan2), testUtils.EPSILON);
+		assertEquals(80.0, CarriersUtils.getJspritScore(plan2), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -155,7 +156,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		plan3.getAttributes().getAttribute("jspritScore");
-		assertEquals(105.0, CarriersUtils.getJspritScore(plan3), testUtils.EPSILON);
+		assertEquals(105.0, CarriersUtils.getJspritScore(plan3), MatsimTestUtils.EPSILON);
 	}
 
 
