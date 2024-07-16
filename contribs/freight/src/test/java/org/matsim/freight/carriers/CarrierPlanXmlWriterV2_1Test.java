@@ -104,7 +104,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingPlans_nuOfToursIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		assertEquals(1, plans.get(0).getScheduledTours().size());
 		assertEquals(1, plans.get(1).getScheduledTours().size());
 		assertEquals(1, plans.get(2).getScheduledTours().size());
@@ -112,7 +112,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		assertEquals(5,tour1.getTour().getTourElements().size());
@@ -120,7 +120,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		ScheduledTour tour1 = plan2.getScheduledTours().iterator().next();
 		assertEquals(9,tour1.getTour().getTourElements().size());
@@ -128,7 +128,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
 		assertEquals(9,tour1.getTour().getTourElements().size());
@@ -136,7 +136,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingToursOfPlan1_SpritScoreIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		plan1.getAttributes().getAttribute("jspritScore");
 		assertEquals(Double.NaN, CarriersUtils.getJspritScore(plan1), testUtils.EPSILON);
@@ -144,7 +144,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingToursOfPlan2_jSpritScoreIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		plan2.getAttributes().getAttribute("jspritScore");
 		assertEquals(80.0, CarriersUtils.getJspritScore(plan2), testUtils.EPSILON);
@@ -152,7 +152,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 	@Test
 	void test_whenReadingToursOfPlan3_jSpritIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		plan3.getAttributes().getAttribute("jspritScore");
 		assertEquals(105.0, CarriersUtils.getJspritScore(plan3), testUtils.EPSILON);
@@ -160,7 +160,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
-		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
+		List<CarrierVehicle> vehicles = new ArrayList<>(carrierVehicles);
 		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
 		return vehicles.isEmpty();
 	}

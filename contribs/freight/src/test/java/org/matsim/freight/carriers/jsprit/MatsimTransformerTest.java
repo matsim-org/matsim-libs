@@ -228,7 +228,7 @@ public class MatsimTransformerTest {
 	}
 
 	private Collection<? extends Job> getJobsFrom(ScheduledTour sTour) {
-		Collection<Service> services = new ArrayList<Service>();
+		Collection<Service> services = new ArrayList<>();
 		for (Tour.TourElement e : sTour.getTour().getTourElements()) {
 			if (e instanceof Tour.TourActivity) {
 				if (e instanceof Tour.ServiceActivity) {
@@ -308,7 +308,7 @@ public class MatsimTransformerTest {
 
 	@Test
 	void whenTransforming_matsimPlan2vehicleRouteSolution_itIsMadeCorrectly() {
-		List<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
+		List<ScheduledTour> sTours = new ArrayList<>();
 		ScheduledTour matsimTour = getMatsimTour("matsimVehicle");
 		sTours.add(matsimTour);
 		ScheduledTour matsimTour1 = getMatsimTour("matsimVehicle1");

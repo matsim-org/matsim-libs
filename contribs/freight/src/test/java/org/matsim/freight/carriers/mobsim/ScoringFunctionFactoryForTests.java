@@ -61,7 +61,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<CarrierVehicle>();
+				employedVehicles = new HashSet<>();
 			}
 
 
