@@ -136,7 +136,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 		 double startTimeOfEnd;
 
-		 double amountPerHour = 20.0;
+		 final double amountPerHour = 20.0;
 
 		@Override
 		public void startActivity(double time, Activity act) {
@@ -174,7 +174,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();
@@ -199,7 +199,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 	}
 
-	 private Network network;
+	 private final Network network;
 
 	public ScoringFunctionFactoryForTests(Network network) {
 		super();

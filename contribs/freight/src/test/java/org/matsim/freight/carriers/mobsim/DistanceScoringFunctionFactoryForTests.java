@@ -154,7 +154,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		 double startTimeOfEnd;
 
-		 double amountPerHour = 20.0;
+		 final double amountPerHour = 20.0;
 
 		@Override
 		public void startActivity(double time, Activity act) {
@@ -192,7 +192,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();

@@ -200,7 +200,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();
