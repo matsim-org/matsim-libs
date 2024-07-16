@@ -262,7 +262,7 @@ import org.matsim.vehicles.VehicleType;
             for (LSPShipmentCarrierServicePair pair : pairs) {
               if (pair.tuple == carrierPair.tuple
                   && pair.service.getId() == carrierPair.service.getId()) {
-                addShipmentLoadElement(lspShipmentWithTime, tour, serviceActivity);
+                addShipmentLoadElement(lspShipmentWithTime, tour);
                 addShipmentTransportElement(lspShipmentWithTime, tour, serviceActivity);
                 addShipmentUnloadElement(lspShipmentWithTime, tour, serviceActivity);
                 addMainTourRunStartEventHandler(pair.service, lspShipmentWithTime, resource, tour);
@@ -276,7 +276,7 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentLoadElement(
-      LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
+      LspShipmentWithTime tuple, Tour tour) {
     ShipmentUtils.ScheduledShipmentLoadBuilder builder =
         ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
     builder.setResourceId(resource.getId());
@@ -297,9 +297,7 @@ import org.matsim.vehicles.VehicleType;
     }
     builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
     builder.setEndTime(startTimeOfTransport);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(tour.getStartLinkId());
-    builder.setCarrierService(serviceActivity.getService());
+
     ShipmentPlanElement load = builder.build();
     String idString =
         load.getResourceId()
@@ -365,9 +363,7 @@ import org.matsim.vehicles.VehicleType;
         legAfterStart.getExpectedDepartureTime()
             + legAfterStart.getExpectedTransportTime()
             + cumulatedLoadingTime);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(tour.getEndLinkId());
-    builder.setCarrierService(serviceActivity.getService());
+
     ShipmentPlanElement unload = builder.build();
     String idString =
         unload.getResourceId()

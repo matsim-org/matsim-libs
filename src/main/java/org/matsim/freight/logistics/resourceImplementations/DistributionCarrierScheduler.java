@@ -237,9 +237,6 @@ import org.matsim.vehicles.VehicleType;
     }
     builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
     builder.setEndTime(startTimeOfTransport);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(tour.getStartLinkId());
-    builder.setCarrierService(serviceActivity.getService());
 
     ShipmentPlanElement load = builder.build();
     String idString =
@@ -312,9 +309,7 @@ import org.matsim.vehicles.VehicleType;
 
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(serviceActivity.getLocation());
-    builder.setCarrierService(serviceActivity.getService());
+
     ShipmentPlanElement unload = builder.build();
     String idString =
         unload.getResourceId()
