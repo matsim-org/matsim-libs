@@ -163,7 +163,7 @@ public class Tour {
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
 			Gbl.assertNotNull(leg);
-			tourElements.add(0,leg);
+			tourElements.addFirst(leg);
 			return this;
 		}
 
@@ -183,7 +183,7 @@ public class Tour {
 			}
 //			assertLastElementIsLeg();
 			Pickup pickup = createPickup(shipment);
-			tourElements.add(0, pickup);
+			tourElements.addFirst(pickup);
 //			previousElementIsActivity = true;
 			return this;
 		}
