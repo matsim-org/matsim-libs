@@ -94,8 +94,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 			@Override
 			public void endLeg(double time) {
-				if(currentLeg.getRoute() instanceof NetworkRoute){
-					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
+				if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
