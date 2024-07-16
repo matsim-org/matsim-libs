@@ -336,8 +336,6 @@ public final class CarrierReaderFromCSV {
 							+ " more certain depots than the given number of depots are selected. (numberOfDepots < selectedVehicleDepots)");
 
 				for (String linkDepot : carrierElement.getVehicleDepots()) {
-					log.info(scenario.getNetwork().getLinks().keySet());
-					log.info(Id.create(linkDepot, Link.class));
 					if (!scenario.getNetwork().getLinks().containsKey(Id.create(linkDepot, Link.class)))
 						throw new RuntimeException("The selected link " + linkDepot + " for a depot of the carrier "
 								+ carrierElement.getName() + " is not part of the network. Please check!");

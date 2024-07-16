@@ -165,6 +165,8 @@ public class FreightDemandGenerationUtils {
 	 */
 	static void reducePopulationToShapeArea(Population population, ShpOptions.Index index) {
 
+		log.info("Population is reduced to shape area...");
+
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		for (Person person : population.getPersons().values()) {
 

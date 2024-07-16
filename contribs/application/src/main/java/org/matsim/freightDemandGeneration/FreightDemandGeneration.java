@@ -198,8 +198,9 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		// create the demand
 		log.info("Start creating carriers. Selected option: {}", selectedCarrierInputOption);
+		//ERROR log.info(Boolean.getBoolean(combineSimilarJobs));
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
-				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
+				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.valueOf(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
 		// prepare the VRP and get a solution
@@ -387,7 +388,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					case useNoPopulation:
 						break;
 					case useHolePopulation:
-						// uses the hole population as possible demand locations
+						// uses the whole population as possible demand locations
 						//ERROR2
 						if(population != null && shapeCategory != null )
 							log.warn("Population isn't reduced to shapefile even though shapefile is defined. This might lead to errors when no areas or locations for pickup or delivery are defined.");

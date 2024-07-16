@@ -78,9 +78,12 @@ public final class DemandReaderFromCSV {
 			(int) 105,new HashMap<>(Map.of("lower",76,"upper",1000,"share", 0.00,"total",0))
 	));
 
-	private static final String age = "DemandPerAge";
-	private static final String typeOfDemandDistribution = "DemandPerPerson";
-	private static final double demandDistribution = 0.16;
+	//private static final String demandDistributionOption = "byPopulationAndAge";
+	//private static final String demandDistributionOption = "byPopulation";
+	private static final String demandDistributionOption = "toRandomLinks";
+	private static final String totalDemandGenerationOption = "DemandPerPerson";
+	private static final double demandPerPerson = 0.16;
+	public static final double PACKAGES_PER_STOP = 1.5;
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -776,8 +779,6 @@ public final class DemandReaderFromCSV {
 		Double shareOfPopulationWithThisPickup = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
 		Double shareOfPopulationWithThisDelivery = newDemandInformationElement
 				.getShareOfPopulationWithSecondJobElement();
-		Integer sizeOfWholePopulation = population.getPersons().size();
-		Integer sizeOfPopulationFilteredByArea;
 		Integer numberOfJobs;
 		Integer demandToDistribute = newDemandInformationElement.getDemandToDistribute();
 		Integer numberOfPickupLocations = newDemandInformationElement.getNumberOfFirstJobElementLocations();
@@ -801,6 +802,8 @@ public final class DemandReaderFromCSV {
 			throw new RuntimeException(
 					"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
 		else {
+			Integer sizeOfWholePopulation = population.getPersons().size();
+			Integer sizeOfPopulationFilteredByArea;
 			double sampleSizeInputPopulation = (double) population.getAttributes().getAttribute("sampleSize");
 			double sampleTo = (double) population.getAttributes().getAttribute("samplingTo");
 			String samplingOption = String.valueOf(population.getAttributes().getAttribute("samplingOption"));
@@ -811,39 +814,38 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 			else
 				possiblePersonsPickup.putAll(population.getPersons());
+
 			if (areasForDeliveryLocations != null || indexShape != null) {
+				log.info("Population is reduced to selected delivery areas...");
 				//possiblePersonsDelivery = findPossiblePersons(population, areasForDeliveryLocations, indexShape,
 				//		crsTransformationNetworkAndShape);
 				population = findPopulationWithPossiblePersons(population, areasForDeliveryLocations, indexShape,
 						crsTransformationNetworkAndShape);
 				sizeOfPopulationFilteredByArea = population.getPersons().size();
-				log.info("Population size decreased from "+ sizeOfWholePopulation+" to "+sizeOfPopulationFilteredByArea+ " due to shpfile or area(s).");
-
-				if (age == "DemandPerAge") {
-					population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
-							crsTransformationNetworkAndShape);
-				}
-
-				possiblePersonsDelivery.putAll(population.getPersons());
+				log.info("Population size decreased from "+ sizeOfWholePopulation+" to "+sizeOfPopulationFilteredByArea+ " due to selected area(s).");
 			}
 			else{
 				sizeOfPopulationFilteredByArea = population.getPersons().size();
-
-				if (age == "DemandPerAge")
-					population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
-							crsTransformationNetworkAndShape);
-
-				possiblePersonsDelivery.putAll(population.getPersons());
+				log.info("Population size not decreased due to areas.");
+			}
+			if (demandDistributionOption == "byPopulationAndAge") {
+				population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
+						crsTransformationNetworkAndShape);
 			}
 
+			possiblePersonsDelivery.putAll(population.getPersons());
+
 			//demand to distribute
-			if (typeOfDemandDistribution == "DemandPerPerson"){
-				demandToDistribute = (int) Math.round(demandDistribution * sizeOfPopulationFilteredByArea);
-				log.info("Demand for this carrier is set to " + demandToDistribute + " with " + demandDistribution + " demand units per person.");
-			} else if (typeOfDemandDistribution == "TotalDemand"){
-				demandToDistribute = (int) (demandToDistribute *
-										Math.round(sizeOfPopulationFilteredByArea/sizeOfWholePopulation *
-										sampleSizeInputPopulation));
+			if (demandDistributionOption == "toRandomLinks" || demandDistributionOption == "byPopulationAndAge" || demandDistributionOption == "byPopulation") {
+				if (totalDemandGenerationOption == "DemandPerPerson") {
+					demandToDistribute =
+							(int) Math.round(demandPerPerson * sizeOfPopulationFilteredByArea);
+					log.info("Demand for this carrier is set to " + demandToDistribute + " with " + demandPerPerson + " demand units per person (" + sampleSizeInputPopulation + "-sample).");
+				} else if (totalDemandGenerationOption == "TotalDemand") {
+					demandToDistribute = (int) (demandToDistribute *
+							Math.round(sizeOfPopulationFilteredByArea / sizeOfWholePopulation *
+									sampleSizeInputPopulation));
+				}
 			}
 
 			int numberPossibleJobsPickup = 0;
@@ -886,62 +888,112 @@ public final class DemandReaderFromCSV {
 					numberPossibleJobsDelivery = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
 						numberPossibleJobsPickup = sampledNumberPossibleJobsPickup;
+					log.info("The number of jobs was upsampled to " + sampledNumberPossibleJobsPickup+".");
 				} else if (samplingOption.equals("changeDemandOnLocation")) {
 					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
 					numberOfJobs = numberPossibleJobsDelivery;
+					log.info("The demand to distribute was upsampled to " + demandToDistribute+".");
 				} else
 					throw new RuntimeException(
 							"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			}
 
+
+			log.info("Number of possible jobs pickup: "+numberPossibleJobsPickup);
+			log.info("Number of possible jobs delivery: "+numberPossibleJobsDelivery);
 			if (numberPossibleJobsPickup != 0)
 				numberOfPickupLocations = numberPossibleJobsPickup;
 			if (numberPossibleJobsDelivery != 0)
 				numberOfDeliveryLocations = numberPossibleJobsDelivery;
+
 		}
 
-		//demandPerAge
-		if (age == "DemandPerAge") {
-			getDemandandPersonsPerAgeGroup(demandToDistribute,population);
+		//byPopulationAndAge
+		if (demandDistributionOption == "byPopulationAndAge") {
+			getDemandAndPersonsPerAgeGroup(demandToDistribute,population);
 		}
-
+		else if(demandDistributionOption == "toRandomLinks"){
+			log.warn("Because the option toRandomLinks was selected, population is deleted.");
+			log.warn("Number of jobs is set to 0.");
+			numberOfDeliveryLocations = null;
+			possiblePersonsDelivery.clear();
+			nearestLinkPerPersonDelivery.clear();
+			//numberOfJobs = Math.toIntExact(Math.round(demandToDistribute * (Double) population.getAttributes().getAttribute("sampleSize")));
+			numberOfJobs = null;
+		}
 
 		// find possible Links for delivery and pickup
-		HashMap<Id<Link>, Link> possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
-				crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
-				setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
-		log.info("Possible links for pickup: "+possibleLinksPickup.size());
-		// dauert sehr lange
-		HashMap<Id<Link>, Link> possibleLinksDelivery = findAllPossibleLinks(scenario, indexShape,
-				crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
-				setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
-		log.info("Possible links for delivery: "+possibleLinksDelivery.size());
-		//log.info("Possible persons for delivery: "+Math.round(possiblePersonsDelivery.size()*shareOfPopulationWithThisDelivery));
-		//log.info(globalNearestLinkPerPerson); //ToDO: gerade nur delivery
-		if (possibleLinksPickup.isEmpty())
-			throw new RuntimeException(
-					"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
-		if (possibleLinksDelivery.isEmpty())
-			throw new RuntimeException(
-					"Not enough possible links to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
+		HashMap<Id<Link>, Link> possibleLinksDelivery = null;
+		HashMap<Id<Link>, Link> possibleLinksPickup = null;
 
-		if (setLocationsOfPickup != null)
-			for (String selectedLinkIdPickups : setLocationsOfPickup)
-				if (!possibleLinksPickup.containsKey(Id.createLinkId(selectedLinkIdPickups)))
-					throw new RuntimeException("The selected link " + selectedLinkIdPickups
-							+ " for pickup is not part of the possible links for pickup. Please check!");
 
-		if (setLocationsOfDelivery != null)
-			if (numberOfDeliveryLocations < setLocationsOfDelivery.length)
-				log.warn("You selected more certain locations than the set number of locations. Randomly selected locations will be used.");
-			else
-				for (String selectedLinkIdDelivery : setLocationsOfDelivery)
-					if (!possibleLinksDelivery.containsKey(Id.createLinkId(selectedLinkIdDelivery)))
-						throw new RuntimeException("The selected link " + selectedLinkIdDelivery
-							+ " for delivery is not part of the possible links for delivery. Please check!");
+		if (demandDistributionOption == "byPopulationAndAge"||demandDistributionOption=="byPopulation") {
+			//pickup
+			possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
+					crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
+					setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
+			log.info("Possible links for pickup: "+possibleLinksPickup.size());
+
+			//delivery
+			for (Id<Person> personId:possiblePersonsDelivery.keySet()) {
+				Person person = possiblePersonsDelivery.get(personId);
+				findLinksForPerson(scenario, nearestLinkPerPersonDelivery, person);
+				}
+			log.info("Possible persons for delivery ("+nearestLinkPerPersonDelivery.size()+") were matched with link.");
+
+			if (possibleLinksPickup.isEmpty())
+				throw new RuntimeException(
+						"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
+
+			if (setLocationsOfPickup != null)
+				for (String selectedLinkIdPickups : setLocationsOfPickup)
+					if (!possibleLinksPickup.containsKey(Id.createLinkId(selectedLinkIdPickups)))
+						throw new RuntimeException("The selected link " + selectedLinkIdPickups
+								+ " for pickup is not part of the possible links for pickup. Please check!");
+
+			if (possiblePersonsDelivery.isEmpty())
+				throw new RuntimeException(
+						"Not enough possible persons to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
+		}
+		else {
+			//pickup
+			possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
+					crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
+					setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
+			log.info("Possible links for pickup: " + possibleLinksPickup.size());
+
+			//delivery
+			possibleLinksDelivery = findAllPossibleLinks(scenario, indexShape,
+					crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
+					setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
+			log.info("Possible links for delivery: " + possibleLinksDelivery.size());
+
+			if (possibleLinksPickup.isEmpty())
+				throw new RuntimeException(
+						"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
+			if (possibleLinksDelivery.isEmpty())
+				throw new RuntimeException(
+						"Not enough possible links to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
+
+			if (setLocationsOfPickup != null)
+				for (String selectedLinkIdPickups : setLocationsOfPickup)
+					if (!possibleLinksPickup.containsKey(Id.createLinkId(selectedLinkIdPickups)))
+						throw new RuntimeException("The selected link " + selectedLinkIdPickups
+								+ " for pickup is not part of the possible links for pickup. Please check!");
+
+			if (setLocationsOfDelivery != null)
+				if (numberOfDeliveryLocations < setLocationsOfDelivery.length)
+					log.warn("You selected more certain locations than the set number of locations. Randomly selected locations will be used.");
+				else
+					for (String selectedLinkIdDelivery : setLocationsOfDelivery)
+						if (!possibleLinksDelivery.containsKey(Id.createLinkId(selectedLinkIdDelivery)))
+							throw new RuntimeException("The selected link " + selectedLinkIdDelivery
+									+ " for delivery is not part of the possible links for delivery. Please check!");
+		}
 
 		// distribute the demand over the network because no number of jobs is selected
 		if (numberOfJobs == null) {
+			log.info("Creates shipments with a demand of 1 or proportional to link length.");
 			// creates shipments with a demand of 1
 			if (possibleLinksPickup.size() > demandToDistribute || possibleLinksDelivery.size() > demandToDistribute) {
 				for (int i = 0; i < demandToDistribute; i++) {
@@ -955,26 +1007,20 @@ public final class DemandReaderFromCSV {
 							usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 							crsTransformationNetworkAndShape, i);
 
-					/*double serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
-					double serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
-					TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
-					TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();*/
 					int demandForThisLink = 1;
 					if (!usedPickupLocations.contains(linkPickup.getId().toString()))
 						usedPickupLocations.add(linkPickup.getId().toString());
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
-					/*Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
-							linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
-					CarrierShipment thisShipment = CarrierShipment.Builder
-							.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
-							.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-							.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
-							.build();
-					CarriersUtils.getCarriers(scenario).getCarriers()
-							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
-							.put(thisShipment.getId(), thisShipment);*/
-					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink);
+
+					if(demandDistributionOption =="") {
+						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+								demandForThisLink);
+					}
+					else {
+						createSinglePackageShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+								demandForThisLink, (Double) population.getAttributes().getAttribute("sampleSize"));
+					}
 				}
 			} else
 			// creates a demand on each link, demand depends on the length of the link
@@ -1040,9 +1086,13 @@ public final class DemandReaderFromCSV {
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
 
-					if (demandForThisLink > 0) {
-						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-								demandForThisLink);
+					if(demandDistributionOption =="" && demandForThisLink > 0) {
+						 createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+									demandForThisLink);
+						}
+					else if (demandForThisLink > 0) {
+						createSinglePackageShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+								demandForThisLink, (Double) population.getAttributes().getAttribute("sampleSize"));
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
@@ -1052,24 +1102,29 @@ public final class DemandReaderFromCSV {
 		{
 			log.info("Number of jobs: "+numberOfJobs);
 
+			//ERROR: Verschoben vor die Schleife
+			if (demandToDistribute != 0 && demandToDistribute < numberOfJobs) {
+				numberOfJobs = demandToDistribute;
+				log.warn(
+						"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Number of jobs is reduced to demand!");
+				log.info("New number of jobs: "+numberOfJobs);
+			}
+
+
+
 			for (int i = 0; i < numberOfJobs; i++) {
 
-				if (demandToDistribute != 0 && demandToDistribute < numberOfJobs) {
-					numberOfJobs = demandToDistribute;
-					log.warn(
-							"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Number of jobs is reduced to demand!");
-				}
 				Link linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
 						numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocations,
 						possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
+
 				//nicht nach Link suchen, sondern nach Personen
 				Link linkDelivery = null;
 				Id<Person> person;
-				if (age == "DemandPerAge") {
-					nearestLinkPerPersonDelivery = globalNearestLinkPerPerson;
+				if (demandDistributionOption == "byPopulationAndAge") {
 					person = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
 					possiblePersonsDelivery.remove(person);
-					linkDelivery = findNextPossiblePersonLink(scenario, indexShape, possibleLinksDelivery,
+					linkDelivery = findLinkForSelectedPerson(scenario, indexShape,
 							numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
 							usedDeliveryLocations, possiblePersonsDelivery, person, nearestLinkPerPersonDelivery,
 							crsTransformationNetworkAndShape, i);
@@ -1079,11 +1134,12 @@ public final class DemandReaderFromCSV {
 						usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 						crsTransformationNetworkAndShape, i);
 				}
+
 				//demand nicht zufällig sondern nach Alter
 				int demandForThisLink = 0;
-				if (age == "DemandPerAge") {
-					//int age = (int) population.getPersons().get(person).getCustomAttributes().get("age");
-					int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
+				if (demandDistributionOption == "byPopulationAndAge") {
+					demandForThisLink = calculateDemandBasedOnAge(person, population);
+					/*int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
 					int restOfDemandForThisAge = 0;
 					int restOfPersonsInThisAge = 0;
 					for (Object ageGroup: demandDistributionPerAgeGroup.keySet()) {
@@ -1109,8 +1165,9 @@ public final class DemandReaderFromCSV {
 							temp.put("possiblePersons", restOfPersonsInThisAge - 1);
 							temp.put("error", error);
 						}
-					}
-				}else {
+					}*/
+				}
+					else {
 					demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
 				}
 				if (!usedPickupLocations.contains(linkPickup.getId().toString()))
@@ -1118,9 +1175,14 @@ public final class DemandReaderFromCSV {
 				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 					usedDeliveryLocations.add(linkDelivery.getId().toString());
 
-				createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-						demandForThisLink);
-				distributedDemand = distributedDemand + demandForThisLink;
+				if(demandDistributionOption !="") {
+					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+							demandForThisLink);
+					distributedDemand = distributedDemand + demandForThisLink;
+				}else {
+					createSinglePackageShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+							demandForThisLink, (Double) population.getAttributes().getAttribute("sampleSize"));
+				}
 			}
 		}
 		if (combineSimilarJobs)
@@ -1149,8 +1211,9 @@ public final class DemandReaderFromCSV {
 			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
 			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
 		} else {
-			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
-			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * demandForThisLink;
+				serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
+				serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * demandForThisLink;
+
 		}
 		CarrierShipment thisShipment = CarrierShipment.Builder
 				.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
@@ -1161,6 +1224,49 @@ public final class DemandReaderFromCSV {
 				.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
 				.put(thisShipment.getId(), thisShipment);
 	}
+
+
+	/** Creates a single shipment for packages.
+	 * @param scenario                    Scenario
+	 * @param newDemandInformationElement single DemandInformationElement
+	 * @param linkPickup                  Link for the pickup
+	 * @param linkDelivery                Link for the delivery
+	 * @param demandForThisLink           Demand for this link
+	 * @param sampleSize                  SampleSize
+	 */
+	private static void createSinglePackageShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
+											 Link linkPickup, Link linkDelivery, int demandForThisLink, double sampleSize) {
+
+		Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
+				linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
+
+		TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
+		TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
+
+		double serviceTimePickup;
+		double serviceTimeDelivery;
+		if (demandForThisLink == 0) {
+			log.error("Demand for this link is empty. Check.");
+		} else {
+			//person = 1 -> upsampelt 10
+			//Nachfrage = 11 -> jede Person durchschnittlich 1,1 Pakete
+			//Stops = 7
+			double stops = demandForThisLink / PACKAGES_PER_STOP;
+			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * stops;
+			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * stops;
+
+			CarrierShipment thisShipment = CarrierShipment.Builder
+					.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
+					.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
+					.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
+					.build();
+			CarriersUtils.getCarriers(scenario).getCarriers()
+					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
+					.put(thisShipment.getId(), thisShipment);
+		}
+	}
+
+
 
 
 
@@ -1252,6 +1358,44 @@ public final class DemandReaderFromCSV {
 		}
 		return demandForThisLink;
 	}
+
+	/**
+	 * @param person				selected person
+	 * @param population 		    population
+	 * @return						Demand for this link
+	 */
+	private static int calculateDemandBasedOnAge(Id<Person> person, Population population){
+		int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
+		int restOfDemandForThisAge = 0;
+		int restOfPersonsInThisAge = 0;
+		for (Object ageGroup: demandDistributionPerAgeGroup.keySet()) {
+			HashMap temp = (HashMap) demandDistributionPerAgeGroup.get(ageGroup);
+			int lower = (int) temp.get("lower");
+			int upper = (int) temp.get("upper");
+			double error = (double) temp.get("error");
+			if (age <= upper && age >= lower) {
+				restOfDemandForThisAge = (int) temp.get("demand");
+				restOfPersonsInThisAge = (int) temp.get("possiblePersons");
+				int demandForThisLink =
+						Math.round(restOfDemandForThisAge / restOfPersonsInThisAge);
+				error += restOfDemandForThisAge / restOfPersonsInThisAge - demandForThisLink;
+
+				if (error <= -1) {
+					demandForThisLink += 1;
+					error += 1;
+				} else if (error>=1) {
+					demandForThisLink -= 1;
+					error -= 1;
+				}
+				temp.put("demand", restOfDemandForThisAge - demandForThisLink);
+				temp.put("possiblePersons", restOfPersonsInThisAge - 1);
+				temp.put("error", error);
+			}
+		}
+
+		return 0;
+	}
+
 
 	/**
 	 * If jobs of a carrier have the same characteristics (time window, location),
@@ -1520,7 +1664,7 @@ public final class DemandReaderFromCSV {
 						|| distance < nearestLinkPerPerson.get(person.getId()).keySet().iterator().next()) {
 					nearestLinkPerPerson.put(person.getId(), new HashMap<>());
 					nearestLinkPerPerson.get(person.getId()).put(distance, link.getId().toString());
-					globalNearestLinkPerPerson = nearestLinkPerPerson;
+					globalNearestLinkPerPerson = nearestLinkPerPerson; //TODO: Check if necessary
 				}
 			}
 
@@ -1636,7 +1780,7 @@ public final class DemandReaderFromCSV {
 
 	private static Population modifyPopulation(Population population,String[] areasForDeliveryLocations, ShpOptions.Index indexShape,
 											   CoordinateTransformation crsTransformationNetworkAndShape){
-
+		log.info("Population is modified by age...");
 		//getting the age distribution of the given population and the number of persons available for delivery
 		int totalNumberOfPersonsWithDemand = getAgeDistribution(population, areasForDeliveryLocations, indexShape,
 				crsTransformationNetworkAndShape);
@@ -1764,7 +1908,7 @@ public final class DemandReaderFromCSV {
 		return totalNumberOfPersonsWithDemand;
 	}
 
-	public static int getDemandandPersonsPerAgeGroup(int demandToDistribute, Population population) {
+	public static int getDemandAndPersonsPerAgeGroup(int demandToDistribute, Population population) {
 
 		log.info("Getting the demand per age group...");
 		//modifying the demand hash map and add share of demand
@@ -1811,13 +1955,12 @@ public final class DemandReaderFromCSV {
 		return demandToDistribute;
 	}
 
-	public static Link findNextPossiblePersonLink(Scenario scenario, ShpOptions.Index indexShape,
-												  HashMap<Id<Link>, Link> possibleLinks, Integer selectedNumberOfLocations, String[] areasForLocations,
-												  String[] selectedLocations, ArrayList<String> usedLocations, HashMap<Id<Person>, Person> possiblePersonsDel,
-												  Id<Person> person,  HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, CoordinateTransformation crsTransformationNetworkAndShape, int i) {
+	public static Link findLinkForSelectedPerson(Scenario scenario, ShpOptions.Index indexShape, Integer selectedNumberOfLocations, String[] areasForLocations,
+												 String[] selectedLocations, ArrayList<String> usedLocations, HashMap<Id<Person>, Person> possiblePersonsDel,
+												 Id<Person> person, HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, CoordinateTransformation crsTransformationNetworkAndShape, int i) {
 
 		Link link = scenario.getNetwork().getLinks()
-				.get(Id.createLinkId(globalNearestLinkPerPerson.get(person).values().iterator().next()));
+				.get(Id.createLinkId(nearestLinkPerPerson.get(person).values().iterator().next()));
 
 		return link;
 	}
