@@ -133,8 +133,8 @@ public class MatsimTransformerTest {
 		assertEquals(10.0, service.getTimeWindow().getStart(), 0.01);
 
 		Service service2 = MatsimJspritFactory.createJspritService(carrierService, null);
-		assertTrue(service != service2);
-		assertTrue(service.equals(service2));
+		assertNotSame(service, service2);
+		assertEquals(service, service2);
 	}
 
 	@Test
@@ -153,8 +153,8 @@ public class MatsimTransformerTest {
 		assertEquals(10.0, service.getServiceStartTimeWindow().getStart(), 0.01);
 
 		CarrierService service2 = MatsimJspritFactory.createCarrierService(carrierService);
-		assertTrue(service != service2);
-		assertTrue(service.equals(service2));
+		assertNotSame(service, service2);
+		assertEquals(service, service2);
 	}
 
 	@Test
@@ -177,8 +177,8 @@ public class MatsimTransformerTest {
 		assertEquals(50, shipment.getSize().get(0));
 
 		Shipment shipment2 = MatsimJspritFactory.createJspritShipment(carrierShipment);
-		assertTrue(shipment != shipment2);
-		assertTrue(shipment.equals(shipment2));
+		assertNotSame(shipment, shipment2);
+		assertEquals(shipment, shipment2);
 	}
 
 	@Test
@@ -205,8 +205,8 @@ public class MatsimTransformerTest {
 		assertEquals(50, carrierShipment.getSize());
 
 		CarrierShipment carrierShipment2 = MatsimJspritFactory.createCarrierShipment(shipment);
-		assertTrue(carrierShipment != carrierShipment2);
-		assertTrue(carrierShipment.equals(carrierShipment2));
+		assertNotSame(carrierShipment, carrierShipment2);
+		assertEquals(carrierShipment, carrierShipment2);
 	}
 
 	@Test
@@ -431,7 +431,7 @@ public class MatsimTransformerTest {
 		assertNotNull(jobS1);
 		assertEquals("serviceId", jobS1.getId());
 		assertEquals(20, jobS1.getSize().get(0));
-		assertTrue(jobS1 instanceof Service);
+		assertInstanceOf(Service.class, jobS1);
 		Service service1 = (Service) jobS1;
 		assertEquals(20, service1.getSize().get(0));
 		assertEquals(10.0, service1.getServiceDuration(), 0.0);
@@ -441,7 +441,7 @@ public class MatsimTransformerTest {
 		assertNotNull(jobS2);
 		assertEquals("serviceId2", jobS2.getId());
 		assertEquals(10, jobS2.getSize().get(0));
-		assertTrue(jobS2 instanceof Service);
+		assertInstanceOf(Service.class, jobS2);
 		Service service2 = (Service) jobS2;
 		assertEquals(10, service2.getSize().get(0));
 		assertEquals(20.0, service2.getServiceDuration(), 0.0);
@@ -479,7 +479,7 @@ public class MatsimTransformerTest {
 		assertNotNull(jobS1);
 		assertEquals("shipment1", jobS1.getId());
 		assertEquals(10, jobS1.getSize().get(0));
-		assertTrue(jobS1 instanceof Shipment);
+		assertInstanceOf(Shipment.class, jobS1);
 		Shipment shipment1 = (Shipment) jobS1;
 		assertEquals(10, shipment1.getSize().get(0));
 		assertEquals("i(6,0)", shipment1.getPickupLocation().getId());
@@ -495,7 +495,7 @@ public class MatsimTransformerTest {
 		assertNotNull(jobS2);
 		assertEquals("shipment2", jobS2.getId());
 		assertEquals(20, jobS2.getSize().get(0));
-		assertTrue(jobS2 instanceof Shipment);
+		assertInstanceOf(Shipment.class, jobS2);
 		Shipment shipment2 = (Shipment) jobS2;
 		assertEquals(20, shipment2.getSize().get(0));
 		assertEquals("i(3,9)", shipment2.getDeliveryLocation().getId().toString());
