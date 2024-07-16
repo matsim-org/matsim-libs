@@ -28,8 +28,9 @@
  *  <p></p>
  *  Please use the new approach as shown in
  *  {@link org.matsim.freight.logistics.example.lsp.multipleChains} ExampleMultipleOneEchelonChainsReplanning instead.
+ *  ((The old approach is still available in CollectionLSPReplanningTest but will get removed earlier or later)).
  *  <p></p>
- *  * KMT, Jul'24
- */
+ *  KMT, Jul'24
+ * */
 @Deprecated
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
