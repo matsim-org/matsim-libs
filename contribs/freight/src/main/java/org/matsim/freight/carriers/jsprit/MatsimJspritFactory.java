@@ -32,6 +32,7 @@ import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.job.Service;
+import com.graphhopper.jsprit.core.problem.job.Service.Builder;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
@@ -164,7 +165,7 @@ public final class MatsimJspritFactory {
 		}
 		Location location = locationBuilder.build();
 
-		Service.Builder serviceBuilder = Service.Builder.newInstance(carrierService.getId().toString());
+		Builder serviceBuilder = Builder.newInstance(carrierService.getId().toString());
 		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
 		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
 				.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
