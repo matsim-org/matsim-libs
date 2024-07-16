@@ -32,17 +32,13 @@ class ScheduledShipmentUnload implements ShipmentPlanElement {
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
-  private final Id<Carrier> carrierId;
-  private final CarrierService carrierService;
 
-  ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
+    ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
     this.startTime = builder.startTime;
     this.endTime = builder.endTime;
     this.element = builder.element;
     this.resourceId = builder.resourceId;
-    this.carrierId = builder.carrierId;
-    this.carrierService = builder.carrierService;
-  }
+    }
 
   @Override
   public String getElementType() {
@@ -69,11 +65,4 @@ class ScheduledShipmentUnload implements ShipmentPlanElement {
     return resourceId;
   }
 
-  public Id<Carrier> getCarrierId() {
-    return carrierId;
-  }
-
-  public CarrierService getCarrierService() {
-    return carrierService;
-  }
 }

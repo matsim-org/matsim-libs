@@ -249,9 +249,6 @@ public final class ShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
-    Id<Carrier> carrierId;
-    Id<Link> linkId;
-    CarrierService carrierService;
 
     private ScheduledShipmentUnloadBuilder() {}
 
@@ -273,18 +270,6 @@ public final class ShipmentUtils {
 
     public void setResourceId(Id<LSPResource> resourceId) {
       this.resourceId = resourceId;
-    }
-
-    public void setCarrierId(Id<Carrier> carrierId) {
-      this.carrierId = carrierId;
-    }
-
-    public void setLinkId(Id<Link> linkId) {
-      this.linkId = linkId;
-    }
-
-    public void setCarrierService(CarrierService carrierService) {
-      this.carrierService = carrierService;
     }
 
     public ScheduledShipmentUnload build() {

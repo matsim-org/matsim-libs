@@ -363,9 +363,7 @@ import org.matsim.vehicles.VehicleType;
         legAfterStart.getExpectedDepartureTime()
             + legAfterStart.getExpectedTransportTime()
             + cumulatedLoadingTime);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(tour.getEndLinkId());
-    builder.setCarrierService(serviceActivity.getService());
+
     ShipmentPlanElement unload = builder.build();
     String idString =
         unload.getResourceId()

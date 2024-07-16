@@ -309,9 +309,7 @@ import org.matsim.vehicles.VehicleType;
 
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
-    builder.setCarrierId(carrier.getId());
-    builder.setLinkId(serviceActivity.getLocation());
-    builder.setCarrierService(serviceActivity.getService());
+
     ShipmentPlanElement unload = builder.build();
     String idString =
         unload.getResourceId()
