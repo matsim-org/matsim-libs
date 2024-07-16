@@ -175,10 +175,10 @@ public class CarrierPlanXmlWriterV2_1Test {
 	void test_ServicesAndShipmentsHaveAttributes(){
 		Object serviceCustomerAtt = testCarrier.getServices().get(Id.create("serv1",CarrierService.class)).getAttributes().getAttribute("customer");
 		assertNotNull(serviceCustomerAtt);
-		assertEquals("someRandomCustomer", (String) serviceCustomerAtt);
+		assertEquals("someRandomCustomer", serviceCustomerAtt);
 		Object shipmentCustomerAtt = testCarrier.getShipments().get(Id.create("s1",CarrierShipment.class)).getAttributes().getAttribute("customer");
 		assertNotNull(shipmentCustomerAtt);
-		assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
+		assertEquals("someRandomCustomer", shipmentCustomerAtt);
 	}
 
 	@Test

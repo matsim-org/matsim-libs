@@ -63,7 +63,7 @@ public class MatsimTransformerTest {
 		VehicleType matsimType = MatsimJspritFactory.createMatsimVehicleType(jspritType);
 		assertNotNull(matsimType);
 		assertEquals("myType", matsimType.getId().toString());
-		assertEquals(50., (double) matsimType.getCapacity().getWeightInTons(), Double.MIN_VALUE);
+		assertEquals(50., matsimType.getCapacity().getWeightInTons(), Double.MIN_VALUE);
 		assertEquals(10.0, matsimType.getCostInformation().getCostsPerMeter(), 0.01);
 		assertEquals(5.0, matsimType.getCostInformation().getCostsPerSecond(), 0.01);
 		assertEquals(100.0, matsimType.getCostInformation().getFixedCosts(), 0.01);
