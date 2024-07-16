@@ -53,6 +53,19 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
+/**
+ * This class is deprecated and will be removed in the future.
+ *  It follows the old and no longer wanted approach.
+ *  Now, an Assigner is used to assign all LSPShipments to one LogisticChain of the LSPPlan.
+ *  <p></p>
+ *  This class here is in contrast used as a Replanning strategy. This behavior is not wanted anymore.
+ *  <p></p>
+ *  Please use the new Approach as shown in
+ *  org.matsim.freight.logistics.example.lsp.multipleChains.ExampleMultipleOneEchelonChainsReplanning instead.
+ *  <p></p>
+ *  * KMT, Jul'24
+ */
+@Deprecated
 public class CollectionLSPReplanningTest {
 
 	@RegisterExtension
@@ -189,8 +202,7 @@ public class CollectionLSPReplanningTest {
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager manager = new LSPStrategyManagerImpl();
 					{
-						InitialShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-						final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
+                        final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory(new MaybeTodayAssigner()).createStrategy();
 						// (a factory makes sense if it is passed around; in this case it feels like overkill.  kai, jul'22)
 						manager.addStrategy( strategy, null, 1 );
 					}
