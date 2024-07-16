@@ -191,9 +191,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((from == null) ? 0 : from.hashCode());
-			long temp;
-			temp = Double.doubleToLongBits(time);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + Double.hashCode(time);
 			result = prime * result + ((to == null) ? 0 : to.hashCode());
 			result = prime * result + ((vehicleType == null) ? 0 : vehicleType.hashCode());
 			return result;
