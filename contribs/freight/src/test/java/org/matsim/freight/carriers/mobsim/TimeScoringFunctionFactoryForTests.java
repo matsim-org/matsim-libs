@@ -94,8 +94,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 			@Override
 			public void endLeg(double time) {
-				if(currentLeg.getRoute() instanceof NetworkRoute){
-					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
+				if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
@@ -200,7 +199,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();

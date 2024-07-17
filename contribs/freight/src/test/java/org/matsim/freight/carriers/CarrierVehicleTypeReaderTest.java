@@ -69,7 +69,7 @@ public class CarrierVehicleTypeReaderTest {
 	@Test
 	void test_whenReadingTypeMedium_itReadsCapacityCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(30., (double) medium.getCapacity().getOther(), Double.MIN_VALUE );
+		assertEquals(30., medium.getCapacity().getOther(), Double.MIN_VALUE );
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class CarrierVehicleTypeReaderTest {
 		log.info("") ;
 		log.info("now starting for real") ;
 		log.info("") ;
-		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";;
+		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";
 		CarrierVehicleTypes types1 = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( types1 ).readFile( inFilename1 );
 
