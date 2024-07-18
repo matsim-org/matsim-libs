@@ -1,7 +1,5 @@
 package org.matsim.freight.logistics.events;
 
-import static org.matsim.freight.logistics.HasLspShipmentId.ATTRIBUTE_LSP_SHIPMENT_ID;
-
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -18,12 +16,12 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  *
  * @author Kai Martins-Turner (kturner)
  */
-public abstract class AbstractLspEvent extends Event implements HasLinkId, HasLspShipmentId {
+public abstract class AbstractLogisticEvent extends Event implements HasLinkId, HasLspShipmentId {
 
   private final Id<Link> linkId;
   private final Id<LSPShipment> lspShipmentId;
 
-  public AbstractLspEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId) {
+  public AbstractLogisticEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId) {
     super(time);
     this.linkId = linkId;
     this.lspShipmentId = lspShipmentId;
