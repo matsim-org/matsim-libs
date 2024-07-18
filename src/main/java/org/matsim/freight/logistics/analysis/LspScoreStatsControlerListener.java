@@ -62,6 +62,8 @@ import org.matsim.freight.logistics.LSPs;
  */
 public class LspScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, LspScoreStats {
 
+	private static final String LSP_SCORESTATS = "lsp_scorestats";
+
 	public enum ScoreItem { worst, best, average, executed }
 
 	private final LSPs lsps;
@@ -86,7 +88,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		this.lsps = LSPUtils.getLSPs(scenario);
 		this.controllerIO = controllerIO;
 		this.delimiter = globalConfig.getDefaultDelimiter();
-		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("lsp_scorestats.csv"));
+		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename(LSP_SCORESTATS + ".csv"));
 
 		//TODO: Das hier dann mal ansehen, weil es ja nun nicht mehr via Subpobulations ist.. Vermutlich brauche ich nur die LSPIds...
 		Set<String> lspIds = lsps.getLSPs().values().stream()
@@ -95,7 +97,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 			.collect(Collectors.toSet());
 
 		for (String lspId : lspIds) {
-			this.perLsp.put(lspId, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(controllerIO.getOutputFilename("lsp_scorestats_" + lspId + ".csv"))));
+			this.perLsp.put(lspId, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(controllerIO.getOutputFilename(LSP_SCORESTATS + "_" + lspId + ".csv"))));
 		}
 
 		try {
@@ -182,7 +184,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		chart.addSeries("avg. of plans' average score", this.scoreHistory.get( ScoreItem.average) );
 		chart.addSeries("avg. executed score", this.scoreHistory.get( ScoreItem.executed ) );
 		chart.addMatsimLogo();
-		chart.saveAsPng(this.controllerIO.getOutputFilename("scorestats.png"), 800, 600);
+		chart.saveAsPng(this.controllerIO.getOutputFilename(LSP_SCORESTATS + ".png"), 800, 600);
 	}
 
 	@Override
