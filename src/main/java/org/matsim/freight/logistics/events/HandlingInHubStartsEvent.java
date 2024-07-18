@@ -36,7 +36,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  *
  * @author Kai Martins-Turner (kturner)
  */
-public final class HandlingInHubStartsEvent extends AbstractLspEvent {
+public final class HandlingInHubStartsEvent extends AbstractLogisticEvent {
 
   public static final String EVENT_TYPE = "Handling_started";
   private final Id<LSPResource> hubId;

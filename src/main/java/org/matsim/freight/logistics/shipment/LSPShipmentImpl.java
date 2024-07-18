@@ -40,7 +40,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
   //	private final ShipmentPlan shipmentPlan;
   @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
   private final ShipmentPlan shipmentLog;
-  private final List<Requirement> requirements;
+  private final List<LSPShipmentRequirement> lspShipmentRequirements;
 
   //	private Id<LSP> lspId;
 
@@ -55,8 +55,8 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
     this.pickupServiceTime = builder.pickupServiceTime;
     //		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
     this.shipmentLog = new ShipmentPlanImpl(this.getId());
-    this.requirements = new ArrayList<>();
-    this.requirements.addAll(builder.requirements);
+    this.lspShipmentRequirements = new ArrayList<>();
+    this.lspShipmentRequirements.addAll(builder.lspShipmentRequirements);
   }
 
   @Override
@@ -96,8 +96,8 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
   }
 
   @Override
-  public Collection<Requirement> getRequirements() {
-    return requirements;
+  public Collection<LSPShipmentRequirement> getRequirements() {
+    return lspShipmentRequirements;
   }
 
   @Override
