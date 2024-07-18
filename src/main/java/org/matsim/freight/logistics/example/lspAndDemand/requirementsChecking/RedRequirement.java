@@ -21,9 +21,9 @@
 package org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking;
 
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.Requirement;
+import org.matsim.freight.logistics.shipment.LSPShipmentRequirement;
 
-/*package-private*/ class RedRequirement implements Requirement {
+/*package-private*/ class RedRequirement implements LSPShipmentRequirement {
 
   static final String RED = "red";
 

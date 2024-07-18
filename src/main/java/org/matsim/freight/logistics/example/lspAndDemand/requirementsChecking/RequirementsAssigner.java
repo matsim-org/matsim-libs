@@ -26,7 +26,7 @@ import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.Requirement;
+import org.matsim.freight.logistics.shipment.LSPShipmentRequirement;
 
 class RequirementsAssigner implements InitialShipmentAssigner {
 
@@ -42,7 +42,7 @@ class RequirementsAssigner implements InitialShipmentAssigner {
 
     label:
     for (LogisticChain solution : lspPlan.getLogisticChains()) {
-      for (Requirement requirement : shipment.getRequirements()) {
+      for (LSPShipmentRequirement requirement : shipment.getRequirements()) {
         if (!requirement.checkRequirement(solution)) {
 
           continue label;

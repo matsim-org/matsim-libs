@@ -62,7 +62,7 @@ public final class ShipmentUtils {
 
   public static final class LSPShipmentBuilder {
     final Id<LSPShipment> id;
-    final List<Requirement> requirements;
+    final List<LSPShipmentRequirement> lspShipmentRequirements;
     Id<Link> fromLinkId;
     Id<Link> toLinkId;
     TimeWindow startTimeWindow;
@@ -72,7 +72,7 @@ public final class ShipmentUtils {
     double pickupServiceTime;
 
     private LSPShipmentBuilder(Id<LSPShipment> id) {
-      this.requirements = new ArrayList<>();
+      this.lspShipmentRequirements = new ArrayList<>();
       this.id = id;
     }
 
@@ -109,8 +109,8 @@ public final class ShipmentUtils {
       return this;
     }
 
-    public void addRequirement(Requirement requirement) {
-      requirements.add(requirement);
+    public void addRequirement(LSPShipmentRequirement requirement) {
+      lspShipmentRequirements.add(requirement);
     }
 
     public LSPShipment build() {

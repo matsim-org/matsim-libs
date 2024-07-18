@@ -22,7 +22,7 @@ package org.matsim.freight.logistics.shipment;
 
 import org.matsim.freight.logistics.LogisticChain;
 
-public interface Requirement {
+public interface LSPShipmentRequirement {
 
   boolean checkRequirement(LogisticChain solution);
 }
