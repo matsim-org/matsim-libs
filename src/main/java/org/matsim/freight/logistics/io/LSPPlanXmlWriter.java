@@ -65,7 +65,6 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
       this.openFile(filename);
       this.writeXmlHead();
       this.writeRootElement();
-      this.writeStartTag(LSPS, null);
       for (LSP lsp : lsPs) {
         this.startLSP(lsp, this.writer);
         this.writeResources(lsp, this.writer);
@@ -73,8 +72,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
         this.writePlans(lsp, this.writer);
         this.writeEndTag(LSP);
       }
-      this.writeEndTag(LSPS);
-      this.writeEndTag(LSPConstants.LSPS_DEFINITIONS);
+      this.writeEndTag(LSPConstants.LSPS);
       this.close();
       logger.info("done");
     } catch (IOException e) {
@@ -92,7 +90,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
         createTuple(
             "xsi:schemaLocation",
             MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "lspsDefinitions_v1.xsd"));
-    this.writeStartTag(LSPConstants.LSPS_DEFINITIONS, atts);
+    this.writeStartTag(LSPConstants.LSPS, atts);
     this.writer.write(NL);
   }
 

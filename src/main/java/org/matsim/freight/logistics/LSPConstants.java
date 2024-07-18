@@ -16,8 +16,7 @@ public abstract class LSPConstants extends CarrierConstants {
   public static final String LOGISTIC_CHAINS = "logisticChains";
   public static final String LOGISTIC_CHAIN_ELEMENT = "logisticChainElement";
   public static final String LSP = "lsp";
-  public static final String LSPS = "LSPs";
-  public static final String LSPS_DEFINITIONS = "lspsDefinitions";
+  public static final String LSPS = "lsps";
   public static final String LSP_PLAN = "LspPlan";
   public static final String LSP_PLANS = "LspPlans";
   public static final String RESOURCES = "resources";
