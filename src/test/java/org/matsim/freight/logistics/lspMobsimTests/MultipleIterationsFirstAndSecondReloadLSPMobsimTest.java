@@ -49,7 +49,7 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.example.lsp.lspReplanning.AssignmentStrategyFactory;
+import org.matsim.freight.logistics.examples.lspReplanning.AssignmentStrategyFactory;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
