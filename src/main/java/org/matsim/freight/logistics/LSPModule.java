@@ -45,6 +45,7 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.controler.*;
+import org.matsim.freight.logistics.analysis.LspScoreStatsModule;
 
 public class LSPModule extends AbstractModule {
   private static final Logger log = LogManager.getLogger(LSPModule.class);
@@ -64,6 +65,8 @@ public class LSPModule extends AbstractModule {
 
     bind(CarrierAgentTracker.class).in(Singleton.class);
     addEventHandlerBinding().to(CarrierAgentTracker.class);
+
+    install(new LspScoreStatsModule());
 
     // this switches on certain qsim components:
     QSimComponentsConfigGroup qsimComponents =

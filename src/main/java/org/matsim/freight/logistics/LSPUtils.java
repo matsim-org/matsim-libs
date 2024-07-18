@@ -39,6 +39,17 @@ public final class LSPUtils {
     return new LSPPlanImpl();
   }
 
+
+  /**
+  * Checks, is the plan the selcted plan.
+  * (This is adapted copy from PersonUtils.isSelected(plan) )
+  * @param lspPlan the plan to check
+  * @return true if the plan is the selected plan. false, if not.
+  */
+  public static boolean isPlanTheSelectedPlan(LSPPlan lspPlan) {
+    return lspPlan.getLSP().getSelectedPlan() == lspPlan;
+  }
+
   public static LogisticChainScheduler createForwardLogisiticChainScheduler() {
     return new ForwardLogisticChainSchedulerImpl();
   }
