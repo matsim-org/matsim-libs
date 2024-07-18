@@ -58,6 +58,6 @@ public interface LSPShipment
 
   ShipmentPlan getShipmentLog();
 
-  Collection<Requirement> getRequirements();
+  Collection<LSPShipmentRequirement> getRequirements();
 
 }
