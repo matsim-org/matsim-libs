@@ -24,13 +24,12 @@
 package org.matsim.freight.logistics.analysis;
 
 import java.util.Map;
-import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 
 public interface LspScoreStats {
 
     /**
      * @return the history of scores in last iterations
      */
-    Map<ScoreItem, Map<Integer, Double>> getScoreHistory();
+    Map<LspScoreStatsControlerListener.ScoreItem, Map<Integer, Double>> getScoreHistory();
 
 }

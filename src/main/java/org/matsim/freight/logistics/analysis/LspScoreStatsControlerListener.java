@@ -28,9 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -40,10 +38,13 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LSPUtils;
+import org.matsim.freight.logistics.LSPs;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -63,7 +64,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 
 	public enum ScoreItem { worst, best, average, executed }
 
-	private final Population population;
+	private final LSPs lsps;
 	private final OutputDirectoryHierarchy controllerIO;
 	private final String delimiter;
 	private final BufferedWriter out;
@@ -72,34 +73,35 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 
 	private final Map<ScoreItem, Map< Integer, Double>> scoreHistory = new HashMap<>();
 
-	private final Map<String, ScoreHist> perSubpop = new HashMap<>();
+	private final Map<String, ScoreHist> perLsp = new HashMap<>();
 
 	private int minIteration = 0;
 
 	private final static Logger log = LogManager.getLogger(LspScoreStatsControlerListener.class);
 
 	@Inject
-	LspScoreStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population, OutputDirectoryHierarchy controllerIO,
+	LspScoreStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Scenario scenario, OutputDirectoryHierarchy controllerIO,
 								   GlobalConfigGroup globalConfig ) {
 		this.controllerConfigGroup = controllerConfigGroup;
-		this.population = population;
+		this.lsps = LSPUtils.getLSPs(scenario);
 		this.controllerIO = controllerIO;
 		this.delimiter = globalConfig.getDefaultDelimiter();
-		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats.csv"));
+		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("lsp_scorestats.csv"));
 
-		Set<String> subpopulations = population.getPersons().values().stream()
+		//TODO: Das hier dann mal ansehen, weil es ja nun nicht mehr via Subpobulations ist.. Vermutlich brauche ich nur die LSPIds...
+		Set<String> lspIds = lsps.getLSPs().values().stream()
 			.map(PopulationUtils::getSubpopulation)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toSet());
 
-		for (String sub : subpopulations) {
-			this.perSubpop.put(sub, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats_" + sub + ".csv"))));
+		for (String lspId : lspIds) {
+			this.perLsp.put(lspId, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(controllerIO.getOutputFilename("lsp_scorestats_" + lspId + ".csv"))));
 		}
 
 		try {
 			this.out.write("iteration" + this.delimiter + "avg_executed" + this.delimiter
 				+ "avg_worst" + this.delimiter + "avg_average" + this.delimiter + "avg_best\n");
-			for (Map.Entry<String, ScoreHist> e : this.perSubpop.entrySet()) {
+			for (Map.Entry<String, ScoreHist> e : this.perLsp.entrySet()) {
 				e.getValue().out.write("iteration" + this.delimiter + "avg_executed" + this.delimiter
 					+ "avg_worst" + this.delimiter + "avg_average" + this.delimiter + "avg_best\n");
 			}
@@ -117,7 +119,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		//		if (iterations > 5000) iterations = 5000; // limit the history size
 		for ( ScoreItem item : ScoreItem.values() ) {
 			this.scoreHistory.put( item, new TreeMap<>() ) ;
-			this.perSubpop.forEach((s, data) -> data.hist.put(item, new TreeMap<>()));
+			this.perLsp.forEach((s, data) -> data.hist.put(item, new TreeMap<>()));
 		}
 	}
 
@@ -139,14 +141,14 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	private void collectScoreInfo(final IterationEndsEvent event) {
 		ScoreInfo info = new ScoreInfo();
 
-		Map<String, ScoreInfo> perSubpop = new HashMap<>();
-		this.perSubpop.forEach((subpop, d) -> perSubpop.put(subpop, new ScoreInfo()));
+		Map<String, ScoreInfo> perLsp = new HashMap<>();
+		this.perLsp.forEach((subpop, d) -> perLsp.put(subpop, new ScoreInfo()));
 
-		for (Person person : this.population.getPersons().values()) {
-			info.update(person);
-			String subpop = PopulationUtils.getSubpopulation(person);
+		for (LSP lsp : this.lsps.getLSPs().values()) {
+			info.update(lsp);
+			String subpop = PopulationUtils.getSubpopulation(lsp);
 			if (subpop != null)
-				perSubpop.get(subpop).update(person);
+				perLsp.get(subpop).update(lsp);
 		}
 
 
@@ -157,8 +159,8 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 
 		try {
 			info.write(event.getIteration(), this.out, this.delimiter);
-			for (Map.Entry<String, ScoreHist> e : this.perSubpop.entrySet()) {
-				perSubpop.get(e.getKey()).write(event.getIteration(), e.getValue().out, this.delimiter);
+			for (Map.Entry<String, ScoreHist> e : this.perLsp.entrySet()) {
+				perLsp.get(e.getKey()).write(event.getIteration(), e.getValue().out, this.delimiter);
 			}
 
 		} catch (IOException e) {
@@ -187,7 +189,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
 			this.out.close();
-			for (ScoreHist data : this.perSubpop.values()) {
+			for (ScoreHist data : this.perLsp.values()) {
 				data.out.close();
 			}
 		} catch (IOException e) {
@@ -212,14 +214,14 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		int nofAvgScores = 0;
 		int nofExecutedScores = 0;
 
-		private void update(Person person) {
-			Plan worstPlan = null;
-			Plan bestPlan = null;
+		private void update(LSP lsp) {
+			LSPPlan worstPlan = null;
+			LSPPlan bestPlan = null;
 			double worstScore = Double.POSITIVE_INFINITY;
 			double bestScore = Double.NEGATIVE_INFINITY;
 			double sumScores = 0.0;
 			double cntScores = 0;
-			for (Plan plan : person.getPlans()) {
+			for (LSPPlan plan : lsp.getPlans()) {
 
 				if (plan.getScore() == null) {
 					continue;
@@ -249,7 +251,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 				cntScores++;
 
 				// executed plan?
-				if (PersonUtils.isSelected(plan)) {
+				if (LSPUtils.isPlanTheSelectedPlan(plan)) {
 					this.sumExecutedScores += score;
 					this.nofExecutedScores++;
 				}
