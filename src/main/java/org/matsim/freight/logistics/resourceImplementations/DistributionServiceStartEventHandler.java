@@ -35,12 +35,10 @@ import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
-public class DistributionServiceStartEventHandler
+/*package-private*/ class DistributionServiceStartEventHandler
     implements AfterMobsimListener,
         CarrierServiceStartEventHandler,
         LSPSimulationTracker<LSPShipment> {
-  // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
-  // to do the junit testing. kmt jun'23
 
   private final CarrierService carrierService;
   private final LogisticChainElement logisticChainElement;
