@@ -41,10 +41,8 @@ import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.events.HandlingInHubStartsEvent;
 import org.matsim.freight.logistics.shipment.*;
 
-public class TransshipmentHubTourEndEventHandler
+/*package-private*/ class TransshipmentHubTourEndEventHandler
     implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, CarrierTourEndEventHandler {
-  // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
-  // to do the junit testing. kmt jun'23
 
   //This class *should* also get merged into {@link LSPTourEndEventHandler}.
   //Currently, this is not possible very easily, because of missing injection (of the scenario.)

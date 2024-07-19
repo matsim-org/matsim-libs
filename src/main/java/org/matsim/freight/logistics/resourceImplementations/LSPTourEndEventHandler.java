@@ -37,10 +37,8 @@ import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
-public class LSPTourEndEventHandler
+/*package-private*/ class LSPTourEndEventHandler
     implements AfterMobsimListener, CarrierTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
-  // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way
-  // to do the junit testing. kmt jun'23
 
   private final CarrierService carrierService;
   private final LogisticChainElement logisticChainElement;

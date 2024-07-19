@@ -45,7 +45,7 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFactory {
+class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory {
 
   @Inject private Network network;
 

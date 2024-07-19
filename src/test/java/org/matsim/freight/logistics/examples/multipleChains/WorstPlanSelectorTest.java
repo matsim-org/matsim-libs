@@ -257,7 +257,7 @@ public class WorstPlanSelectorTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
+				final EventBasedCarrierScorer4MultipleChains carrierScorer = new EventBasedCarrierScorer4MultipleChains();
 
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
