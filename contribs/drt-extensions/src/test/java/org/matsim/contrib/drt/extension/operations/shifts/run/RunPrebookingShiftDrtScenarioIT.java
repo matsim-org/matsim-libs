@@ -16,10 +16,7 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftSpecificationImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -146,6 +143,7 @@ public class RunPrebookingShiftDrtScenarioIT {
         operationsParams.addParameterSet(operationFacilitiesParams);
 
         shiftsParams.considerUpcomingShiftsForInsertion = true;
+        shiftsParams.shiftEndLookAhead = 900.;
         drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
         PrebookingParams prebookingParams = new PrebookingParams();
@@ -180,6 +178,8 @@ public class RunPrebookingShiftDrtScenarioIT {
         Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(2)));
         Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(3)));
         Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(4)));
+        Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(5)));
+        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(6)));
     }
 
     private void preparePopulation(Scenario scenario) {
@@ -238,7 +238,37 @@ public class RunPrebookingShiftDrtScenarioIT {
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(8000);
             start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 8000.);
+            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 11000.);
+            plan.addActivity(start);
+            plan.addLeg(factory.createLeg("drt"));
+            plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
+            person.addPlan(plan);
+            population.addPerson(person);
+        }
+
+        //person 5 - prebooking submitted during shift for time which falls into break beginning of break corridor with enough remaining time - ok
+        {
+            Person person = factory.createPerson(Id.createPersonId(5));
+            Plan plan = factory.createPlan();
+            Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
+            start.setEndTime(6000.);
+            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
+            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 6000.);
+            plan.addActivity(start);
+            plan.addLeg(factory.createLeg("drt"));
+            plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
+            person.addPlan(plan);
+            population.addPerson(person);
+        }
+
+        //person 6 - prebooking submitted during shift for time which would preclude meaningful break - rejected
+        {
+            Person person = factory.createPerson(Id.createPersonId(6));
+            Plan plan = factory.createPlan();
+            Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
+            start.setEndTime(6500.);
+            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
+            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 6500.);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -270,8 +300,9 @@ public class RunPrebookingShiftDrtScenarioIT {
         DrtShiftsSpecification shiftsSpecification = new DrtShiftsSpecificationImpl();
         shiftsSpecification.addShiftSpecification(DrtShiftSpecificationImpl.newBuilder()
                 .start(3600)
-                .end(7200)
+                .end(10800)
                 .id(Id.create(1, DrtShift.class))
+                .shiftBreak(DrtShiftBreakSpecificationImpl.newBuilder().duration(600.).earliestStart(6000.).latestEnd(7000.).build())
                 .operationFacility(Id.create(1, OperationFacility.class))
                 .build()
         );
