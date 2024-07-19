@@ -140,12 +140,21 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         for (ShiftEntry activeShift : activeShifts) {
             final DrtShift shift = activeShift.shift();
             if (shift != null && shift.isStarted()) {
-                OperationFacility breakFacility = decideOnBreak(activeShift);
-                if (breakFacility != null) {
-                    shiftTaskScheduler.relocateForBreak(activeShift.vehicle(), breakFacility, shift);
-                    eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), mode, shift.getId(),
-                            activeShift.vehicle().getId(), breakFacility.getLinkId(),
-                            shift.getBreak().orElseThrow().getScheduledLatestArrival()));
+                if (hasSchedulableBreak(shift, timer.getTimeOfDay())) {
+                    Optional<OperationFacility> breakFacility = findBreakFacility(activeShift);
+                    if (breakFacility.isPresent()) {
+                        OperationFacility facility = breakFacility.get();
+                        if (facility.register(activeShift.vehicle().getId())) {
+                            eventsManager.processEvent(new ShiftFacilityRegistrationEvent(
+                                    timer.getTimeOfDay(), mode, activeShift.vehicle().getId(), facility.getId()));
+                            shiftTaskScheduler.relocateForBreak(activeShift.vehicle(), facility, shift);
+                            eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), mode, shift.getId(),
+                                    activeShift.vehicle().getId(), facility.getLinkId(),
+                                    shift.getBreak().orElseThrow().getScheduledLatestArrival()));
+                            return;
+                        }
+                    }
+                    throw new RuntimeException("Could not schedule break!");
                 }
             }
         }
@@ -188,7 +197,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 				logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
                 return true;
 			}
-		return false;
+		    return false;
 		});
 
         // Assign shifts
@@ -440,37 +449,28 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
     }
 
-    private OperationFacility decideOnBreak(ShiftEntry activeShift) {
+    private Optional<OperationFacility> findBreakFacility(ShiftEntry activeShift) {
         if (activeShift.shift() != null) {
-            if (hasSchedulableBreak(activeShift.shift(), timer.getTimeOfDay())) {
-                final Schedule schedule = activeShift.vehicle().getSchedule();
-                Task currentTask = schedule.getCurrentTask();
-                Link lastLink;
-                if (currentTask instanceof DriveTask
-                        && currentTask.getTaskType().equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)
-                        && currentTask.equals(schedule.getTasks().get(schedule.getTaskCount()-2))) {
-                    LinkTimePair start = ((OnlineDriveTaskTracker) currentTask.getTaskTracker()).getDiversionPoint();
-                    if(start != null) {
-                        lastLink = start.link;
-                    } else {
-                        lastLink = ((DriveTask) currentTask).getPath().getToLink();
-                    }
-                }  else {
-                    lastLink = ((DrtStayTask) schedule.getTasks()
-                            .get(schedule.getTaskCount() - 1)).getLink();
+            final Schedule schedule = activeShift.vehicle().getSchedule();
+            Task currentTask = schedule.getCurrentTask();
+            Link lastLink;
+            if (currentTask instanceof DriveTask
+                    && currentTask.getTaskType().equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)
+                    && currentTask.equals(schedule.getTasks().get(schedule.getTaskCount()-2))) {
+                LinkTimePair start = ((OnlineDriveTaskTracker) currentTask.getTaskTracker()).getDiversionPoint();
+                if(start != null) {
+                    lastLink = start.link;
+                } else {
+                    lastLink = ((DriveTask) currentTask).getPath().getToLink();
                 }
-                final OperationFacility shiftBreakFacility = breakFacilityFinder.findFacility(lastLink.getCoord());
-                if (shiftBreakFacility == null) {
-                    throw new RuntimeException("Could not schedule break!");
-                }
-                if (shiftBreakFacility.register(activeShift.vehicle().getId())) {
-                    eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(),
-                            mode, activeShift.vehicle().getId(), shiftBreakFacility.getId()));
-                    return shiftBreakFacility;
-                }
+            }  else {
+                lastLink = ((DrtStayTask) schedule.getTasks()
+                        .get(schedule.getTaskCount() - 1)).getLink();
             }
+            final OperationFacility shiftBreakFacility = breakFacilityFinder.findFacility(lastLink.getCoord());
+            return Optional.of(shiftBreakFacility);
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override

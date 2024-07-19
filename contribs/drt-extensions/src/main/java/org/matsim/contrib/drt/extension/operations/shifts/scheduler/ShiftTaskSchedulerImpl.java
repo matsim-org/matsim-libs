@@ -92,7 +92,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
             double startTime = path.getArrivalTime();
             double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
-			double latestDetourArrival = path.getDepartureTime() + path.getTravelTime() + 1.5;
+			double latestDetourArrival = path.getDepartureTime() + path.getTravelTime() * 1.5;
             relocateForBreakImpl(vehicle, startTime, endTime, latestDetourArrival, toLink, shift, breakFacility);
 
         } else {
@@ -153,10 +153,10 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         // append SHIFT_BREAK task
 
 		DrtShiftBreak shiftBreak = shift.getBreak().orElseThrow();
-		ShiftBreakTask dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
+		ShiftBreakTask shiftBreakTask = taskFactory.createShiftBreakTask(vehicle, startTime,
                     endTime, link, shiftBreak, breakFacility);
 
-        schedule.addTask(dropoffStopTask);
+        schedule.addTask(shiftBreakTask);
 
         schedule.addTask(taskFactory.createStayTask(vehicle, endTime, shift.getEndTime(),
                 link));
