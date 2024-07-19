@@ -152,28 +152,30 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private void startShifts(double timeStep) {
-        // Start shifts
         final Iterator<ShiftEntry> iterator = this.assignedShifts.iterator();
         while (iterator.hasNext()) {
-            final ShiftEntry next = iterator.next();
-            if (next.shift().getStartTime() > timeStep) {
+            final ShiftEntry assignedShiftEntry = iterator.next();
+            if (assignedShiftEntry.shift().getStartTime() > timeStep) {
+                shiftTaskScheduler.planAssignedShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
                 break;
-            } else if (next.shift().getEndTime() < timeStep) {
-                logger.warn("Too late to start shift " + next.shift().getId());
-                next.vehicle().getShifts().remove(next.shift());
+            } else if (assignedShiftEntry.shift().getEndTime() < timeStep) {
+                logger.warn("Too late to start shift " + assignedShiftEntry.shift().getId());
+                assignedShiftEntry.vehicle().getShifts().remove(assignedShiftEntry.shift());
                 iterator.remove();
 				continue;
             }
 
-            if (shiftStartLogic.shiftStarts(next)) {
-                next.shift().start();
-                shiftTaskScheduler.startShift(next.vehicle(), timeStep, next.shift());
-                activeShifts.add(next);
+            if (shiftStartLogic.shiftStarts(assignedShiftEntry)) {
+                assignedShiftEntry.shift().start();
+                shiftTaskScheduler.startShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
+                activeShifts.add(assignedShiftEntry);
                 iterator.remove();
-                logger.debug("Started shift " + next.shift());
-                StayTask currentTask = (StayTask) next.vehicle().getSchedule().getCurrentTask();
-                eventsManager.processEvent(new DrtShiftStartedEvent(timeStep, mode, next.shift().getId(), next.vehicle().getId(),
+                logger.debug("Started shift " + assignedShiftEntry.shift());
+                StayTask currentTask = (StayTask) assignedShiftEntry.vehicle().getSchedule().getCurrentTask();
+                eventsManager.processEvent(new DrtShiftStartedEvent(timeStep, mode, assignedShiftEntry.shift().getId(), assignedShiftEntry.vehicle().getId(),
                         currentTask.getLink().getId()));
+            } else {
+                shiftTaskScheduler.planAssignedShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
             }
         }
     }
@@ -264,6 +266,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private void assignShiftToVehicle(DrtShift shift, ShiftDvrpVehicle vehicle) {
         Gbl.assertNotNull(vehicle);
         vehicle.addShift(shift);
+        shiftTaskScheduler.planAssignedShift(vehicle, timer.getTimeOfDay(), shift);
         assignedShifts.add(new ShiftEntry(shift, vehicle));
         eventsManager.processEvent(new DrtShiftAssignedEvent(timer.getTimeOfDay(), mode, shift.getId(), vehicle.getId()));
     }
@@ -438,7 +441,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private OperationFacility decideOnBreak(ShiftEntry activeShift) {
         if (activeShift.shift() != null) {
-            if (shiftNeedsBreak(activeShift.shift(), timer.getTimeOfDay())) {
+            if (hasSchedulableBreak(activeShift.shift(), timer.getTimeOfDay())) {
                 final Schedule schedule = activeShift.vehicle().getSchedule();
                 Task currentTask = schedule.getCurrentTask();
                 Link lastLink;
@@ -500,12 +503,10 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private boolean isSchedulable(DrtShift shift, double timeStep) {
-        return shift.getStartTime() <= timeStep + drtShiftParams.shiftScheduleLookAhead; // && shift.getEndTime() > timeStep;
+        return shift.getStartTime() <= timeStep + drtShiftParams.shiftScheduleLookAhead;
     }
 
-
-
-    private boolean shiftNeedsBreak(DrtShift shift, double timeStep) {
+    private boolean hasSchedulableBreak(DrtShift shift, double timeStep) {
         return shift.getBreak().isPresent() && shift.getBreak().get().getEarliestBreakStartTime() == timeStep
                 && !shift.getBreak().get().isScheduled();
     }

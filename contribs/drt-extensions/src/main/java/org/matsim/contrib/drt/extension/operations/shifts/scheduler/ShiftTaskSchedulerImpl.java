@@ -18,10 +18,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -266,10 +263,13 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 	public void startShift(ShiftDvrpVehicle vehicle, double now, DrtShift shift) {
         Schedule schedule = vehicle.getSchedule();
         StayTask stayTask = (StayTask) schedule.getCurrentTask();
-        if (stayTask instanceof WaitForShiftStayTask) {
-            ((WaitForShiftStayTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
+        if (stayTask instanceof WaitForShiftTask) {
+            ((WaitForShiftTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
             stayTask.setEndTime(now);
-            schedule.addTask(taskFactory.createStayTask(vehicle, now, shift.getEndTime(), stayTask.getLink()));
+            if(Schedules.getLastTask(schedule).equals(stayTask)) {
+                //nothing planned yet.
+                schedule.addTask(taskFactory.createStayTask(vehicle, now, shift.getEndTime(), stayTask.getLink()));
+            }
         } else {
 			throw new IllegalStateException("Vehicle cannot start shift during task:" + stayTask.getTaskType().name());
 		}
@@ -289,6 +289,24 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
           //  }
         }
         return false;
+    }
+
+    @Override
+    public void planAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift) {
+        Schedule schedule = vehicle.getSchedule();
+        StayTask stayTask = (StayTask) schedule.getCurrentTask();
+        if (stayTask instanceof WaitForShiftTask) {
+            stayTask.setEndTime(Math.max(timeStep, shift.getStartTime()));
+        }
+    }
+
+    @Override
+    public void cancelAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift) {
+        Schedule schedule = vehicle.getSchedule();
+        StayTask stayTask = (StayTask) schedule.getCurrentTask();
+        if (stayTask instanceof WaitForShiftTask) {
+            stayTask.setEndTime(vehicle.getServiceEndTime());
+        }
     }
 
     private void updateShiftChangeImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath,
