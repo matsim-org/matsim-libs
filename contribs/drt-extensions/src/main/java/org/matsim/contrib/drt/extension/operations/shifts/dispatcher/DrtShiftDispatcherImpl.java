@@ -370,23 +370,25 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             }
         }
 
-        final OperationFacility shiftChangeFacility;
+        final Optional<OperationFacility> maybeFacility;
         if (drtShiftParams.allowInFieldChangeover) {
-            shiftChangeFacility = breakFacilityFinder.findFacility(start.link.getCoord());
+            maybeFacility = breakFacilityFinder.findFacility(start.link.getCoord());
         } else {
-            shiftChangeFacility = breakFacilityFinder.findFacilityOfType(start.link.getCoord(),
+            maybeFacility = breakFacilityFinder.findFacilityOfType(start.link.getCoord(),
                     OperationFacilityType.hub);
         }
-        if (shiftChangeFacility != null && changeOverTask != null
-                && !(shiftChangeFacility.getId().equals(changeOverTask.getFacility().getId()))) {
-            if (shiftChangeFacility.hasCapacity()) {
-                if (shiftTaskScheduler.updateShiftChange(next.vehicle(),
-                        network.getLinks().get(shiftChangeFacility.getLinkId()), next.shift(), start,
-                        shiftChangeFacility, lastTask)) {
-                    shiftChangeFacility.register(next.vehicle().getId());
-                    changeOverTask.getFacility().deregisterVehicle(next.vehicle().getId());
-                    eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(),
-                            mode, next.vehicle().getId(), shiftChangeFacility.getId()));
+        if (maybeFacility.isPresent()) {
+            OperationFacility shiftChangeFacility = maybeFacility.get();
+            if(changeOverTask != null && !(shiftChangeFacility.getId().equals(changeOverTask.getFacility().getId()))) {
+                if (shiftChangeFacility.hasCapacity()) {
+                    if (shiftTaskScheduler.updateShiftChange(next.vehicle(),
+                            network.getLinks().get(shiftChangeFacility.getLinkId()), next.shift(), start,
+                            shiftChangeFacility, lastTask)) {
+                        shiftChangeFacility.register(next.vehicle().getId());
+                        changeOverTask.getFacility().deregisterVehicle(next.vehicle().getId());
+                        eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(),
+                                mode, next.vehicle().getId(), shiftChangeFacility.getId()));
+                    }
                 }
             }
         }
@@ -436,41 +438,35 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
 		if(shiftChangeoverFacility == null) {
 			shiftChangeoverFacility = breakFacilityFinder.findFacilityOfType(coord,
-					OperationFacilityType.hub);
+					OperationFacilityType.hub).orElseThrow(() -> new RuntimeException("Could not find shift end location!"));
 		}
 
-		if (shiftChangeoverFacility != null && shiftChangeoverFacility.register(endingShift.vehicle().getId())) {
-            shiftTaskScheduler.relocateForShiftChange(endingShift.vehicle(),
-                    network.getLinks().get(shiftChangeoverFacility.getLinkId()), endingShift.shift(), shiftChangeoverFacility);
-            eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(), mode, endingShift.vehicle().getId(),
-                    shiftChangeoverFacility.getId()));
-        } else {
-            throw new RuntimeException("Could not find shift end location!");
-        }
+        Verify.verify(shiftChangeoverFacility.register(endingShift.vehicle().getId()), "Could not register vehicle at facility.");
+
+        shiftTaskScheduler.relocateForShiftChange(endingShift.vehicle(),
+                network.getLinks().get(shiftChangeoverFacility.getLinkId()), endingShift.shift(), shiftChangeoverFacility);
+        eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(), mode, endingShift.vehicle().getId(),
+                shiftChangeoverFacility.getId()));
     }
 
     private Optional<OperationFacility> findBreakFacility(ShiftEntry activeShift) {
-        if (activeShift.shift() != null) {
-            final Schedule schedule = activeShift.vehicle().getSchedule();
-            Task currentTask = schedule.getCurrentTask();
-            Link lastLink;
-            if (currentTask instanceof DriveTask
-                    && currentTask.getTaskType().equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)
-                    && currentTask.equals(schedule.getTasks().get(schedule.getTaskCount()-2))) {
-                LinkTimePair start = ((OnlineDriveTaskTracker) currentTask.getTaskTracker()).getDiversionPoint();
-                if(start != null) {
-                    lastLink = start.link;
-                } else {
-                    lastLink = ((DriveTask) currentTask).getPath().getToLink();
-                }
-            }  else {
-                lastLink = ((DrtStayTask) schedule.getTasks()
-                        .get(schedule.getTaskCount() - 1)).getLink();
+        final Schedule schedule = activeShift.vehicle().getSchedule();
+        Task currentTask = schedule.getCurrentTask();
+        Link lastLink;
+        if (currentTask instanceof DriveTask
+                && currentTask.getTaskType().equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)
+                && currentTask.equals(schedule.getTasks().get(schedule.getTaskCount()-2))) {
+            LinkTimePair start = ((OnlineDriveTaskTracker) currentTask.getTaskTracker()).getDiversionPoint();
+            if(start != null) {
+                lastLink = start.link;
+            } else {
+                lastLink = ((DriveTask) currentTask).getPath().getToLink();
             }
-            final OperationFacility shiftBreakFacility = breakFacilityFinder.findFacility(lastLink.getCoord());
-            return Optional.of(shiftBreakFacility);
+        }  else {
+            lastLink = ((DrtStayTask) schedule.getTasks()
+                    .get(schedule.getTaskCount() - 1)).getLink();
         }
-        return Optional.empty();
+        return breakFacilityFinder.findFacility(lastLink.getCoord());
     }
 
     @Override
