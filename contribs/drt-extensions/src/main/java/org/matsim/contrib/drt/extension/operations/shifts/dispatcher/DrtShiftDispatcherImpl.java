@@ -160,6 +160,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 break;
             } else if (assignedShiftEntry.shift().getEndTime() < timeStep) {
                 logger.warn("Too late to start shift " + assignedShiftEntry.shift().getId());
+                shiftTaskScheduler.cancelAssignedShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
                 assignedShiftEntry.vehicle().getShifts().remove(assignedShiftEntry.shift());
                 iterator.remove();
 				continue;
@@ -185,7 +186,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         unscheduledShifts.removeIf(shift -> {
 			if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
 				logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
-				return true;
+                return true;
 			}
 		return false;
 		});
