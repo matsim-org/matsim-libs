@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -44,7 +45,8 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 		final int pickupIdx = insertion.pickup.index;
 		final int dropoffIdx = insertion.dropoff.index;
 
-		double shiftEndTime = ((ShiftDvrpVehicle) vEntry.vehicle).getShifts().peek().getEndTime();
+		DrtShift currentShift = ((ShiftDvrpVehicle) vEntry.vehicle).getShifts().peek();
+		double shiftEndTime = currentShift.getEndTime();
 		if(shiftEndTime < detourTimeInfo.dropoffDetourInfo.arrivalTime) {
 			// fast fail which also captures requests that are prebooked for times outside of the shift.
 			return false;
@@ -118,6 +120,31 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				return false;
 			}
 		}
+
+
+		// avoid shrinking break corridor too much (rather coarse for now)
+		if(currentShift.getBreak().isPresent()) {
+			DrtShiftBreak drtShiftBreak = currentShift.getBreak().get();
+			if(!drtShiftBreak.isScheduled()) {
+
+
+				if(detourTimeInfo.dropoffDetourInfo.arrivalTime < drtShiftBreak.getEarliestBreakStartTime()) {
+					// insertion finished before break corridor
+					//ok
+				} else if(detourTimeInfo.pickupDetourInfo.departureTime > drtShiftBreak.getLatestBreakEndTime()) {
+					// insertion start after break corridor
+					//ok
+				} else {
+					double remainingTime = drtShiftBreak.getLatestBreakEndTime() - detourTimeInfo.dropoffDetourInfo.arrivalTime;
+					if (remainingTime < drtShiftBreak.getDuration()) {
+						// no meaningful break possible after insertion
+						// (there could still be enough time before a prebooking though)
+						return false;
+					}
+				}
+			}
+		}
+
 		return true; //all time constraints of all stops are satisfied
 	}
 }
