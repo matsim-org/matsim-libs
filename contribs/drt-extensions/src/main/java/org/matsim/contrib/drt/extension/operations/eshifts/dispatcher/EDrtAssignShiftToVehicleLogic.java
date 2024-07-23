@@ -9,7 +9,7 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.dispatcher;
 
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.AssignShiftToVehicleLogic;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
@@ -37,8 +37,8 @@ public class EDrtAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic 
 		// no, if charging
 		if(vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
 			final Task currentTask = vehicle.getSchedule().getCurrentTask();
-			if (currentTask instanceof EDrtWaitForShiftStayTask) {
-				if (((EDrtWaitForShiftStayTask) currentTask).getChargingTask() != null) {
+			if (currentTask instanceof EDrtWaitForShiftTask) {
+				if (((EDrtWaitForShiftTask) currentTask).getChargingTask() != null) {
 					if (currentTask.getEndTime() > shift.getStartTime()) {
 						return false;
 					}

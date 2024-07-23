@@ -60,11 +60,22 @@ public final class DrtControlerCreator {
 	 * @return
 	 */
 	public static Controler createControler(Config config, boolean otfvis) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
-
 		Scenario scenario = createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
+		return createControler(config, scenario, otfvis);
+	}
+
+	/**
+	 * Creates a controller in one step.
+	 *
+	 * @param config
+	 * @param scenario
+	 * @param otfvis
+	 * @return
+	 */
+	public static Controler createControler(Config config, Scenario scenario, boolean otfvis) {
+		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
