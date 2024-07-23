@@ -309,7 +309,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				// do nothing
 				break ;
 			default:
-				logger.warn("Unexpected value while reading in. This field will be ignored: " + name);
+				logger.warn("Unexpected value while reading in. This field will be ignored: {}", name);
 		}
 	}
 

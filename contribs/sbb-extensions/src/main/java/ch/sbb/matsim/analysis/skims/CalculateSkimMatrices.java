@@ -39,6 +39,9 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
+
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.api.feature.simple.SimpleFeature;
@@ -350,8 +353,8 @@ public class CalculateSkimMatrices {
         return BeelineDistanceMatrix.calculateBeelineDistanceMatrix(this.coordsPerZone.keySet(), coordsPerZone, numberOfThreads);
     }
 
-    public final void calculateAndWriteNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate)
-            throws IOException {
+    public final void calculateAndWriteNetworkMatrices(String networkFilename, @Nullable String eventsFilename,
+            double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate) throws IOException {
         String prefix = outputPrefix == null ? "" : outputPrefix;
         var netIndicators = prepareAndCalculateNetworkMatrices(networkFilename, eventsFilename, times, config, xy2linksPredicate);
         writeNetworkMatricesAsCSV(netIndicators, prefix);
@@ -363,7 +366,8 @@ public class CalculateSkimMatrices {
         FloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
     }
 
-    public final NetworkIndicators<String> prepareAndCalculateNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, Predicate<Link> xy2linksPredicate)  {
+    public final NetworkIndicators<String> prepareAndCalculateNetworkMatrices(String networkFilename,
+            @Nullable String eventsFilename, double[] times, Config config, Predicate<Link> xy2linksPredicate) {
         Scenario scenario = ScenarioUtils.createScenario(config);
         log.info("loading network from " + networkFilename);
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -382,11 +386,16 @@ public class CalculateSkimMatrices {
             log.info("No events specified. Travel Times will be calculated with free speed travel times.");
         }
 
+        return prepareAndCalculateNetworkMatrices(scenario.getNetwork(), tt, times, config, xy2linksPredicate);
+    }
+
+    public final NetworkIndicators<String> prepareAndCalculateNetworkMatrices(Network network, TravelTime tt,
+            double[] times, Config config, Predicate<Link> xy2linksPredicate) {
         TravelDisutility td = new OnlyTimeDependentTravelDisutility(tt);
 
         log.info("extracting car-only network");
         final Network carNetwork = NetworkUtils.createNetwork(config);
-        new TransportModeNetworkFilter(scenario.getNetwork()).filter(carNetwork, Collections.singleton(TransportMode.car));
+        new TransportModeNetworkFilter(network).filter(carNetwork, Collections.singleton(TransportMode.car));
 
         log.info("filter car-only network for assigning links to locations");
         final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate, config);

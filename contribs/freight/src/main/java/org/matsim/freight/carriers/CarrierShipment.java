@@ -81,9 +81,9 @@ public final class CarrierShipment implements Attributable {
 		}
 
 		Id<CarrierShipment> id;
-		Id<Link> from;
-		Id<Link> to;
-		int size;
+		final Id<Link> from;
+		final Id<Link> to;
+		final int size;
 		TimeWindow pickTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double pickServiceTime = 0.0;

@@ -36,8 +36,8 @@ import java.util.TreeMap;
 
 /*package-private*/  final class CarrierTourStartEventCreator implements CarrierEventCreator {
 
-	TreeMap<Id<Person>, ActivityEndEvent> endEventMap = new TreeMap<>();
-	TreeMap<Id<Person>, PersonEntersVehicleEvent> personEntersVehicleEventMap = new TreeMap<>();
+	final TreeMap<Id<Person>, ActivityEndEvent> endEventMap = new TreeMap<>();
+	final TreeMap<Id<Person>, PersonEntersVehicleEvent> personEntersVehicleEventMap = new TreeMap<>();
 
 
 	@Override

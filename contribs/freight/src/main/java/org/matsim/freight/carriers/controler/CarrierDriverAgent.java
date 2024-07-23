@@ -83,7 +83,7 @@ final class CarrierDriverAgent{
 		this.carrier = carrier;
 		this.events = events;
 		this.carrierEventCreators = carrierEventCreators;
-		log.debug( "creating CarrierDriverAgent with driverId=" + driverId );
+		log.debug("creating CarrierDriverAgent with driverId={}", driverId);
 		this.driverId = driverId;
 		this.scheduledTour = tour;
 	}
@@ -91,18 +91,13 @@ final class CarrierDriverAgent{
 	void handleAnEvent(Event event){
 		// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
 
-		if( event instanceof PersonArrivalEvent ){
-			handleEvent( (PersonArrivalEvent) event);
-		} else if( event instanceof PersonDepartureEvent ){
-			handleEvent( (PersonDepartureEvent) event );
-		} else if( event instanceof LinkEnterEvent ){
-			handleEvent( (LinkEnterEvent) event );
-		} else if( event instanceof ActivityEndEvent ){
-			handleEvent( (ActivityEndEvent) event );
-		} else if( event instanceof ActivityStartEvent ){
-			handleEvent( (ActivityStartEvent) event );
-		} else{
-			createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter);
+		switch (event) {
+			case PersonArrivalEvent personArrivalEvent -> handleEvent(personArrivalEvent);
+			case PersonDepartureEvent personDepartureEvent -> handleEvent(personDepartureEvent);
+			case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+			case ActivityEndEvent activityEndEvent -> handleEvent(activityEndEvent);
+			case ActivityStartEvent activityStartEvent -> handleEvent(activityStartEvent);
+			case null, default -> createAdditionalEvents(event, null, scheduledTour, driverId, planElementCounter);
 		}
 	}
 
@@ -119,8 +114,8 @@ final class CarrierDriverAgent{
 			currentRoute = null;
 		} else{
 			Id<Link> startLink;
-			if( currentRoute.size() != 0 ){
-				startLink = currentRoute.get( 0 );
+			if(!currentRoute.isEmpty()){
+				startLink = currentRoute.getFirst();
 			} else{
 				startLink = event.getLinkId();
 			}
@@ -163,7 +158,7 @@ final class CarrierDriverAgent{
 
 		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
 
-		log.debug( "handling activity end event=" + event );
+		log.debug("handling activity end event={}", event);
 		if( CarrierConstants.START.equals( event.getActType() ) ){
 			planElementCounter += 1;
 			return;

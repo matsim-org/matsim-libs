@@ -87,8 +87,8 @@ public class CarrierControlerUtilsIT {
 
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehTypeId = Id.create( "gridType", VehicleType.class );
-		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );;
-		EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
+		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );
+        EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
 		engineInformation.setFuelType( FuelType.diesel );
 		engineInformation.setFuelConsumption( 0.015 );
 		VehicleCapacity capacity = carrierVehType.getCapacity() ;

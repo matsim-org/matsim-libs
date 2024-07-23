@@ -63,7 +63,7 @@ public class Carriers {
 		if(!carriers.containsKey(carrier.getId())){
 			carriers.put(carrier.getId(), carrier);
 		}
-		else log.warn("carrier " + carrier.getId() + " already exists");
+		else log.warn("carrier {} already exists", carrier.getId());
 	}
 
 }

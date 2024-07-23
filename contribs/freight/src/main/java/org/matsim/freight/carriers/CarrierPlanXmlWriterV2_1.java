@@ -104,7 +104,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 		}
 	}
 
-	private void writeRootElement() throws UncheckedIOException, IOException {
+	private void writeRootElement() throws UncheckedIOException {
 		List<Tuple<String, String>> atts = new ArrayList<>();
 		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
@@ -112,15 +112,14 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 		this.writeStartTag(CARRIERS, atts);
 	}
 
-	private void startCarrier(Carrier carrier, BufferedWriter writer)
-			throws IOException {
+	private void startCarrier(Carrier carrier, BufferedWriter writer) {
 		this.writeStartTag(CARRIER, List.of(
 				createTuple(ID, carrier.getId().toString())), false, true
 		);
 		attributesWriter.writeAttributes("\t\t", writer, carrier.getAttributes(), false);
 	}
 
-	private void writeVehiclesAndTheirTypes(Carrier carrier)throws IOException {
+	private void writeVehiclesAndTheirTypes(Carrier carrier) {
 		this.writeStartTag(CAPABILITIES, List.of(
 				createTuple(FLEET_SIZE, carrier.getCarrierCapabilities().getFleetSize().toString())
 		));
@@ -142,7 +141,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 		this.writeEndTag(CAPABILITIES);
 	}
 
-	private void writeShipments(Carrier carrier, BufferedWriter writer) throws IOException {
+	private void writeShipments(Carrier carrier, BufferedWriter writer) {
 		if(carrier.getShipments().isEmpty()) return;
 		this.writeStartTag(SHIPMENTS, null);
 		for (CarrierShipment s : carrier.getShipments().values()) {
@@ -173,7 +172,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 		);
 	}
 
-	private void writeServices(Carrier carrier, BufferedWriter writer) throws IOException {
+	private void writeServices(Carrier carrier, BufferedWriter writer) {
 		if(carrier.getServices().isEmpty()) return;
 		this.writeStartTag(SERVICES, null);
 		for (CarrierService s : carrier.getServices().values()) {
@@ -283,8 +282,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 								createTuple(SHIPMENT_ID, act.getShipment().getId().toString())), true
 						);
 						if (!carrier.getShipments().containsKey(act.getShipment().getId())) {
-							logger.error("Shipment with id " + act.getShipment().getId().toString() + " is contained in the carriers plan, " +
-								"but not available in the list of shipments. Carrier with carrierId: " + carrier.getId());
+							logger.error("Shipment with id {} is contained in the carriers plan, but not available in the list of shipments. Carrier with carrierId: {}", act.getShipment().getId().toString(), carrier.getId());
 						}
 					}
 					else if (tourElement instanceof Tour.ServiceActivity act) {
@@ -293,8 +291,7 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 								createTuple(SERVICE_ID, act.getService().getId().toString())), true
 						);
 						if (!carrier.getServices().containsKey(act.getService().getId())) {
-							logger.error("service with id " + act.getService().getId().toString() + " is contained in the carriers plan, " +
-								"but not available in the list of services. Carrier with carrierId: " + carrier.getId());
+							logger.error("service with id {} is contained in the carriers plan, but not available in the list of services. Carrier with carrierId: {}", act.getService().getId().toString(), carrier.getId());
 						}
 					}
 				}
@@ -308,11 +305,11 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 		this.writeEndTag(PLANS);
 	}
 
-	private void endCarrier() throws IOException {
+	private void endCarrier() {
 		this.writeEndTag(CARRIER);
 	}
 
-	private void writeEndElement() throws IOException {
+	private void writeEndElement() {
 		this.writeEndTag(CARRIERS);
 	}
 }
