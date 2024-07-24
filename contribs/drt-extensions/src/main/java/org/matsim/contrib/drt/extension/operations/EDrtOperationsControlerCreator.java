@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.operations;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.charging.ShiftOperatingVehicleProvider;
@@ -24,11 +25,19 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 public class EDrtOperationsControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
+		prepareController(config, controler);
+		return controler;
+	}
 
+	public static Controler createControler(Config config, Scenario scenario, boolean otfvis) {
+		Controler controler = EDrtControlerCreator.createControler(config, scenario, otfvis);
+		prepareController(config, controler);
+		return controler;
+	}
+
+	private static void prepareController(Config config, Controler controler) {
+		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
 			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
@@ -39,14 +48,11 @@ public class EDrtOperationsControlerCreator {
 			controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
 		}
 
-
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				this.bind(IdleDischargingHandler.VehicleProvider.class).to(ShiftOperatingVehicleProvider.class);
 			}
 		});
-
-		return controler;
 	}
 }

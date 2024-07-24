@@ -43,7 +43,7 @@ final class PassengerScenarioCreator {
 
 	static int agentCounter = 1;
 
-	static int nuOfAgentsPerHomeLink = 1;
+	static final int nuOfAgentsPerHomeLink = 1;
 
 	public static void main(String[] args) {
 
