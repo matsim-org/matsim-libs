@@ -314,7 +314,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.26.0</version>
+                <version>3.26.3</version>
                 <scope>test</scope>
             </dependency>
 
@@ -358,7 +358,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.17</version>
+				<version>1.14.18</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -425,7 +425,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

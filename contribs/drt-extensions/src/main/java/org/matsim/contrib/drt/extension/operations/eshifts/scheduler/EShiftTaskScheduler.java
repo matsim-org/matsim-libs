@@ -351,8 +351,8 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
     public void startShift(ShiftDvrpVehicle vehicle, double now, DrtShift shift) {
 		Schedule schedule = vehicle.getSchedule();
 		StayTask stayTask = (StayTask) schedule.getCurrentTask();
-		if (stayTask instanceof WaitForShiftStayTask) {
-			((WaitForShiftStayTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
+		if (stayTask instanceof WaitForShiftTask) {
+			((WaitForShiftTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
 			stayTask.setEndTime(now);
 			schedule.addTask(taskFactory.createStayTask(vehicle, now, shift.getEndTime(), stayTask.getLink()));
 		} else {
@@ -373,6 +373,24 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
           //  }
         }
         return false;
+    }
+
+    @Override
+    public void planAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift) {
+        Schedule schedule = vehicle.getSchedule();
+        StayTask stayTask = (StayTask) schedule.getCurrentTask();
+        if (stayTask instanceof WaitForShiftTask) {
+            stayTask.setEndTime(Math.max(timeStep, shift.getStartTime()));
+        }
+    }
+
+    @Override
+    public void cancelAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift) {
+        Schedule schedule = vehicle.getSchedule();
+        StayTask stayTask = (StayTask) schedule.getCurrentTask();
+        if (stayTask instanceof WaitForShiftTask) {
+            stayTask.setEndTime(vehicle.getServiceEndTime());
+        }
     }
 
     private void updateShiftChangeImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath,
@@ -413,19 +431,19 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
                 vrpPath.getToLink(), facility));
     }
 
-    public void chargeAtHub(WaitForShiftStayTask currentTask, ShiftDvrpVehicle vehicle,
+    public void chargeAtHub(WaitForShiftTask currentTask, ShiftDvrpVehicle vehicle,
                             ElectricVehicle electricVehicle, Charger charger, double beginTime,
                             double endTime, double energy) {
         final double initialEndTime = currentTask.getEndTime();
         currentTask.setEndTime(beginTime);
         ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(electricVehicle);
-        final WaitForShiftStayTask chargingWaitForShiftStayTask = ((ShiftEDrtTaskFactoryImpl) taskFactory).createChargingWaitForShiftStayTask(vehicle,
+        final WaitForShiftTask chargingWaitForShiftTask = ((ShiftEDrtTaskFactoryImpl) taskFactory).createChargingWaitForShiftStayTask(vehicle,
                 beginTime, endTime, currentTask.getLink(), currentTask.getFacility(), energy, charger);
 
-        final WaitForShiftStayTask waitForShiftStayTask = taskFactory.createWaitForShiftStayTask(vehicle, endTime,
+        final WaitForShiftTask waitForShiftTask = taskFactory.createWaitForShiftStayTask(vehicle, endTime,
                 initialEndTime, currentTask.getLink(), currentTask.getFacility());
 
-        vehicle.getSchedule().addTask(currentTask.getTaskIdx() + 1, chargingWaitForShiftStayTask);
-        vehicle.getSchedule().addTask(currentTask.getTaskIdx() + 2, waitForShiftStayTask);
+        vehicle.getSchedule().addTask(currentTask.getTaskIdx() + 1, chargingWaitForShiftTask);
+        vehicle.getSchedule().addTask(currentTask.getTaskIdx() + 2, waitForShiftTask);
     }
 }

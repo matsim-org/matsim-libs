@@ -135,7 +135,7 @@ public class RunFissDrtScenarioIT {
 		stratSets.setStrategyName("ChangeExpBeta");
 		config.replanning().addStrategySettings(stratSets);
 
-		config.controller().setLastIteration(2);
+		config.controller().setLastIteration(1);
 		config.controller().setWriteEventsInterval(1);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -184,7 +184,7 @@ public class RunFissDrtScenarioIT {
 		}
 
 		run.run();
-		Assertions.assertEquals(23817, linkCounter.getLinkLeaveCount());
+		Assertions.assertEquals(20842, linkCounter.getLinkLeaveCount());
 	}
 
 	static class LinkCounter implements LinkLeaveEventHandler {

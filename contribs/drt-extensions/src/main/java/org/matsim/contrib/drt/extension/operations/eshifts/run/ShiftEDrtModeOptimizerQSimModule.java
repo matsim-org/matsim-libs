@@ -76,7 +76,9 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams)),
 						getter.getModal(Fleet.class)))).asEagerSingleton();
 
-		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0)))).asEagerSingleton();
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
+				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0),
+						drtShiftParams.considerUpcomingShiftsForInsertion))).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class)))).in(Singleton.class);
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));

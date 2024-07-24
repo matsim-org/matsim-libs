@@ -9,7 +9,7 @@ import org.matsim.contrib.drt.extension.operations.operationFacilities.Operation
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -69,14 +69,14 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
-		WaitForShiftStayTask waitForShiftStayTask = createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+		WaitForShiftTask waitForShiftTask = createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 				vehicle.getStartLink(), operationFacility);
 		boolean success = operationFacility.register(vehicle.getId());
 		if (!success) {
 			throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
 					"facility capacity and initial fleet distribution.", vehicle.getId().toString(), operationFacility.getId().toString()));
 		}
-		return waitForShiftStayTask;
+		return waitForShiftTask;
 	}
 
 	@Override
@@ -92,16 +92,16 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
     }
 
     @Override
-    public WaitForShiftStayTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-														   OperationFacility facility) {
-        return new EDrtWaitForShiftStayTask(beginTime, endTime, link, 0, facility, null);
+    public WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
+                                                       OperationFacility facility) {
+        return new EDrtWaitForShiftTask(beginTime, endTime, link, 0, facility, null);
     }
 
-    public WaitForShiftStayTask createChargingWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime,
-                                                           double endTime, Link link, OperationFacility facility,
-                                                           double totalEnergy, Charger charger) {
+    public WaitForShiftTask createChargingWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime,
+                                                               double endTime, Link link, OperationFacility facility,
+                                                               double totalEnergy, Charger charger) {
         ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
-        return new EDrtWaitForShiftStayTask(beginTime, endTime, link, totalEnergy, facility, chargingTask);
+        return new EDrtWaitForShiftTask(beginTime, endTime, link, totalEnergy, facility, chargingTask);
     }
 
     public EDrtShiftBreakTaskImpl createChargingShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
