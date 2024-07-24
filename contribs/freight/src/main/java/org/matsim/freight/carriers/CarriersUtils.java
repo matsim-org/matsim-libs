@@ -47,7 +47,6 @@ import javax.management.InvalidAttributeValueException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class CarriersUtils {
 
@@ -237,10 +236,10 @@ public class CarriersUtils {
 		Carriers carriersWithShipments = new Carriers();
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			Carrier carrierWS = createCarrier(carrier.getId());
-			if (carrier.getShipments().size() > 0) {
+			if (!carrier.getShipments().isEmpty()) {
 				copyShipments(carrierWS, carrier);
 			}
-			if (carrier.getServices().size() > 0) {
+			if (!carrier.getServices().isEmpty()) {
 				createShipmentsFromServices(carrierWS, carrier);
 			}
 			carrierWS.setCarrierCapabilities(carrier.getCarrierCapabilities()); // vehicles and other carrierCapabilities
@@ -314,7 +313,7 @@ public class CarriersUtils {
 	 */
 	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
 		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
-			log.debug("Copy CarrierShipment: " + carrierShipment.toString());
+			log.debug("Copy CarrierShipment: {}", carrierShipment.toString());
 			addShipment(carrierWS, carrierShipment);
 		}
 	}
@@ -349,7 +348,7 @@ public class CarriersUtils {
 			}
 		}
 		for (CarrierService carrierService : carrier.getServices().values()) {
-			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
+			log.debug("Converting CarrierService to CarrierShipment: {}", carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 									  .newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
 											  depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
@@ -513,7 +512,7 @@ public class CarriersUtils {
 		List<String> skills = convertSkillsAttributeToList(attributes);
 		if (!skills.contains(skill)) {
 			String skillString;
-			if (skills.size() == 0) {
+			if (skills.isEmpty()) {
 				skillString = skill;
 			} else {
 				skillString = attributes.getAttribute(ATTR_SKILLS) + "," + skill;
@@ -556,7 +555,7 @@ public class CarriersUtils {
 	}
 
 	private static void setSkills(Attributes attributes, Set<String> skills) {
-		if (skills.size() != 0) {
+		if (!skills.isEmpty()) {
 			Iterator<String> skillIterator = skills.iterator();
 			StringBuilder skillString = new StringBuilder(skillIterator.next());
 			while (skillIterator.hasNext()) {

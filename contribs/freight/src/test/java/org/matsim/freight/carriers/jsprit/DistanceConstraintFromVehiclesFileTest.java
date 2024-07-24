@@ -136,8 +136,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
 		for (Tour.TourElement element : elements) {
-			if (element instanceof Tour.Leg) {
-				Tour.Leg legElement = (Tour.Leg) element;
+			if (element instanceof Tour.Leg legElement) {
 				if (legElement.getRoute().getDistance() != 0)
 					distanceTour = distanceTour + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0, 0,
 							scenario.getNetwork());
@@ -214,8 +213,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
 		for (Tour.TourElement element : elements) {
-			if (element instanceof Tour.Leg) {
-				Tour.Leg legElement = (Tour.Leg) element;
+			if (element instanceof Tour.Leg legElement) {
 				if (legElement.getRoute().getDistance() != 0)
 					distanceTour = distanceTour + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0, 0,
 							scenario.getNetwork());
@@ -293,8 +291,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 			double distanceTour = 0.0;
 			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
 			for (Tour.TourElement element : elements) {
-				if (element instanceof Tour.Leg) {
-					Tour.Leg legElement = (Tour.Leg) element;
+				if (element instanceof Tour.Leg legElement) {
 					if (legElement.getRoute().getDistance() != 0)
 						distanceTour = distanceTour + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0,
 								0, scenario.getNetwork());
@@ -380,8 +377,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 			double distanceTour = 0.0;
 			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
 			for (Tour.TourElement element : elements) {
-				if (element instanceof Tour.Leg) {
-					Tour.Leg legElement = (Tour.Leg) element;
+				if (element instanceof Tour.Leg legElement) {
 					if (legElement.getRoute().getDistance() != 0)
 						distanceTour = distanceTour + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0,
 								0, scenario.getNetwork());

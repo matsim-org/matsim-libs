@@ -11,7 +11,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
@@ -34,11 +34,11 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 
 		// current task is WaitForShiftTask
 		Task currentTask = schedule.getCurrentTask();
-		if(currentTask instanceof WaitForShiftStayTask) {
+		if(currentTask instanceof WaitForShiftTask) {
 			//check if optional location requirement is met
 			if(peek.shift().getOperationFacilityId().isPresent()) {
 				Id<OperationFacility> operationFacilityId = peek.shift().getOperationFacilityId().get();
-				Verify.verify((operationFacilityId.equals(((WaitForShiftStayTask) currentTask).getFacility().getId())),
+				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacility().getId())),
 						"Vehicle and shift start locations do not match.");
 			}
 			return true;
