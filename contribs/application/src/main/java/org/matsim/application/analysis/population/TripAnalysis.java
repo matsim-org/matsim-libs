@@ -293,6 +293,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		Object2IntMap<String> n = new Object2IntLinkedOpenHashMap<>();
 		Object2LongMap<String> travelTime = new Object2LongOpenHashMap<>();
 		Object2LongMap<String> travelDistance = new Object2LongOpenHashMap<>();
+		Object2LongMap<String> beelineDistance = new Object2LongOpenHashMap<>();
 
 		for (Row trip : trips) {
 			String mainMode = trip.getString("main_mode");
@@ -300,6 +301,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			n.mergeInt(mainMode, 1, Integer::sum);
 			travelTime.mergeLong(mainMode, durationToSeconds(trip.getString("trav_time")), Long::sum);
 			travelDistance.mergeLong(mainMode, trip.getLong("traveled_distance"), Long::sum);
+			beelineDistance.mergeLong(mainMode, trip.getLong("euclidean_distance"), Long::sum);
 		}
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats.csv")), CSVFormat.DEFAULT)) {
@@ -335,6 +337,13 @@ public class TripAnalysis implements MATSimAppCommand {
 				double speed = (travelDistance.getLong(m) / 1000d) / (travelTime.getLong(m) / (60d * 60d));
 				printer.print(new BigDecimal(speed).setScale(2, RoundingMode.HALF_UP));
 
+			}
+			printer.println();
+
+			printer.print("Avg. beeline speed [km/h]");
+			for (String m : modeOrder) {
+				double speed = (beelineDistance.getLong(m) / 1000d) / (travelTime.getLong(m) / (60d * 60d));
+				printer.print(new BigDecimal(speed).setScale(2, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
