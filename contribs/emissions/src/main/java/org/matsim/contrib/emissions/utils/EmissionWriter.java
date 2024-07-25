@@ -42,18 +42,18 @@ public final class EmissionWriter {
 	// is this useful as a publicly available class?  kai, jan'19
 
 	private static final Logger logger = LogManager.getLogger(EmissionWriter.class);
-	
+
 
 	public EmissionWriter(){
 	}
-	
+
 	public void writeHomeLocation2TotalEmissions(
 			Population population,
 			Map<Id<Person>, SortedMap<String, Double>> totalEmissions,
 			Collection<String> pollutants,
 			String outFile) {
 		try{
-			FileWriter fstream = new FileWriter(outFile);			
+			FileWriter fstream = new FileWriter(outFile);
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("personId \t xHome \t yHome \t");
 			for (String pollutant : pollutants){
@@ -64,7 +64,7 @@ public final class EmissionWriter {
 			for(Person person: population.getPersons().values()){
 				Id<Person> personId = person.getId();
 				Plan plan = person.getSelectedPlan();
-				Activity homeAct = (Activity) plan.getPlanElements().get(0);
+				Activity homeAct = (Activity) plan.getPlanElements().getFirst();
 				Coord homeCoord = homeAct.getCoord();
 				Double xHome = homeCoord.getX();
 				Double yHome = homeCoord.getY();
