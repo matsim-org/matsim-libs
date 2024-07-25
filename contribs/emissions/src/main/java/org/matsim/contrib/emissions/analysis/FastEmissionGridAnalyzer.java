@@ -54,7 +54,7 @@ public abstract class FastEmissionGridAnalyzer {
 	 * 2. The aggregated emissions for each link are rastered onto all the raster-cells covered by the link.
 	 * 3. In the smoothing step the emissions are blurred onto the surrounding raster-cells.
 	 * <p>
-	 * The blurring algorithm is a gaussian blur https://en.wikipedia.org/wiki/Gaussian_blur
+	 * The blurring algorithm is a gaussian blur <a href="https://en.wikipedia.org/wiki/Gaussian_blur">...</a>
 	 * <p>
 	 * If only a certain area of the scenario is of interest for the analysis. The supplied network must be filtered beforehand.
 	 * The resulting raster's size depends on the bounding box of the supplied network.
