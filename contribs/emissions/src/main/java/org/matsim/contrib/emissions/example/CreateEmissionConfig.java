@@ -119,13 +119,7 @@ public final class CreateEmissionConfig {
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
 
-			if ( (Boolean) false ==null ) {
-				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-			} else if ( false ) {
-				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-			} else {
-				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-			}
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 
 			ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
