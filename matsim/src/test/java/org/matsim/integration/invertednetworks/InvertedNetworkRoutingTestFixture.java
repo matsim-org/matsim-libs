@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -78,6 +79,7 @@ public class InvertedNetworkRoutingTestFixture {
 
 	public InvertedNetworkRoutingTestFixture(boolean doCreateModes, boolean doCreateLanes, boolean doCreateSignals) {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.controller().setLastIteration(0);
 		config.controller().setLinkToLinkRoutingEnabled(true);
 		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);

@@ -1018,6 +1018,7 @@ public class ControlerIT {
 		Link link3 = null;
 
 		protected Fixture(final Config config) {
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = this.scenario.getNetwork();
 
