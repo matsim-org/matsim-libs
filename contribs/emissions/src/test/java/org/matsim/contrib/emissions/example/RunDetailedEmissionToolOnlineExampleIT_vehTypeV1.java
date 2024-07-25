@@ -52,8 +52,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 	final void testDetailed_vehTypeV1() {
 		boolean gotAnException = false ;
 		try {
-			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
-			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controller().setOutputDirectory( utils.getOutputDirectory() );
 			config.controller().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
@@ -61,7 +60,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 
             Scenario scenario = ScenarioUtils.loadScenario(config);
-			onlineExample.run( scenario ) ;
+			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
