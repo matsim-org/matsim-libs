@@ -96,7 +96,7 @@ public final class RunAverageEmissionToolOfflineExample{
 				bind( EmissionModule.class ) ;
 //				bind( OutputDirectoryHierarchy.class );
 			}
-		};;
+		};
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module );
 

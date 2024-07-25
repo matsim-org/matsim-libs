@@ -89,7 +89,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 				bind( EventsManager.class ).toInstance( eventsManager );
 				bind( EmissionModule.class ) ;
 			}
-		};;
+		};
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module );
 
