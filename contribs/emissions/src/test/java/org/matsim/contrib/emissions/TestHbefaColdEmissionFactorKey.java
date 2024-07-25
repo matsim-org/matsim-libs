@@ -126,7 +126,7 @@ public class TestHbefaColdEmissionFactorKey {
 		noVehCat.setVehicleAttributes(hbefaVehicleAttributes);
 
 		String message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal + " and " + noVehCat;
-		assertFalse(noVehCat.equals(normal), message);
+		assertNotEquals(noVehCat, normal, message);
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class TestHbefaColdEmissionFactorKey {
 		noColdPollutant.setVehicleAttributes(hbefaVehicleAttributes);
 
 		String message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noColdPollutant;
-		assertFalse(noColdPollutant.equals(normal), message);
+		assertNotEquals(noColdPollutant, normal, message);
 	}
 
 	@Test
@@ -164,7 +164,7 @@ public class TestHbefaColdEmissionFactorKey {
 		noParkingTime.setVehicleAttributes(hbefaVehicleAttributes);
 
 		String message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime;
-		assertFalse(noParkingTime.equals(normal), message);
+		assertNotEquals(noParkingTime, normal, message);
 	}
 
 	@Test
@@ -183,7 +183,7 @@ public class TestHbefaColdEmissionFactorKey {
 		noDistance.setVehicleAttributes(hbefaVehicleAttributes);
 
 		String message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance;
-		assertFalse(noDistance.equals(normal), message);
+		assertNotEquals(noDistance, normal, message);
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class TestHbefaColdEmissionFactorKey {
 		HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
 
 		String message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey;
-		assertFalse(emptyKey.equals(normal), message);
+		assertNotEquals(emptyKey, normal, message);
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class TestHbefaColdEmissionFactorKey {
 		noVehAtt.setVehicleCategory(hbefaVehCategory);
 
 		String message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal + " and " + noVehAtt;
-		assertFalse(noVehAtt.equals(normal), message);
+		assertNotEquals(noVehAtt, normal, message);
 
 
 		//set the vehicle attributes of the normal hbefaColdWmissionFactorKey to 'average'
@@ -237,7 +237,7 @@ public class TestHbefaColdEmissionFactorKey {
 			hbefaVehicleAttributesAverage.setHbefaTechnology("average");
 			normal.setVehicleAttributes(hbefaVehicleAttributesAverage);
 
-			Assertions.assertTrue(noVehAtt.equals(normal), message);
+			assertEquals(noVehAtt, normal, message);
 		}
 
 	}

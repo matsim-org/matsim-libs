@@ -52,8 +52,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * missing data is not tested here
  * negative emission values are allowed
  * 1 test constructor
- * 2 test sumUpEmissions 
- * 3 test sumUpEmissionPerId 
+ * 2 test sumUpEmissions
+ * 3 test sumUpEmissionPerId
  * 4 test getTotalEmissions
  * 5 test SetNonCalculatedEmissionsForPopulation
  * - correct input - population does not match map of emissions - empty map of emissions
@@ -430,7 +430,7 @@ public class EmissionUtilsTest {
 		//check: all values for person 1 and 2 are not null or zero
 		// and of type double
 		for(Object id : finalMap.keySet()) {
-			Assertions.assertTrue(id instanceof Id);
+			Assertions.assertInstanceOf(Id.class, id);
 			for (Object pollutant : finalMap.get(id).values()) {
 				Assertions.assertSame(pollutant.getClass(), Double.class);
 				Assertions.assertNotSame(0.0, pollutant);
@@ -553,7 +553,7 @@ public class EmissionUtilsTest {
 		//test setNonCalculatedEmissionsForPopulation with 'null'
 		// throw nullpointer exception
 		setUpForNonCaculatedEmissions();
-		
+
 		Id<Person> idp5 = Id.create("p5", Person.class);
 		Person p5 = populationFactory.createPerson(idp5);
 		pop.addPerson(p5);
@@ -576,7 +576,7 @@ public class EmissionUtilsTest {
 		// empty list should be returned
 		setUpForNonCaculatedEmissions();
 
-		//person 7 in totalEmissions but not in population		
+		//person 7 in totalEmissions but not in population
 		SortedMap<Pollutant, Double> p7Emissions = new TreeMap<>();
 		//complete list of all pollutants - missing data is not tested here
 		p7Emissions.put( CO, .0 );
@@ -815,6 +815,6 @@ public class EmissionUtilsTest {
 		NetworkUtils.createAndAddLink(network, Id.create("link24", Link.class), node2, node4, 1000., 20., 3600, 2);
 		NetworkUtils.createAndAddLink(network, Id.create("link34", Link.class), node3, node4, 1000., 20., 3600, 2); //w/o orig id and type
 	}
-	
+
 }
-	
+

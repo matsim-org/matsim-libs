@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.matsim.contrib.emissions.Pollutant.CO;
 import static org.matsim.contrib.emissions.Pollutant.FC;
 
@@ -80,8 +81,8 @@ public class TestHbefaWarmEmissionFactorKey{
 		compare.setVehicleCategory(hbefaVehicleCategory);
 
 		String message = "these two objects should be the same but are not: " + normal.toString() + " and " + compare;
-		Assertions.assertTrue(normal.equals(compare), message);
-		Assertions.assertTrue(compare.equals(normal), message);
+		Assertions.assertEquals(normal, compare, message);
+		Assertions.assertEquals(compare, normal, message);
 
 		//two unequal but complete objects
 		HbefaWarmEmissionFactorKey different = new HbefaWarmEmissionFactorKey();
@@ -97,8 +98,8 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		message = "these two objects should not be the same: " + normal.toString() + " and " + different;
 
-		assertFalse(different.equals(normal), message);
-		assertFalse(normal.equals(different), message);
+		assertNotEquals(different, normal, message);
+		assertNotEquals(normal, different, message);
 	}
 
 	// the following tests each compare a incomplete key to a complete key
@@ -170,7 +171,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		String message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noRoadCat;
 		String message2 = "this key should not be comparable since no road category is set";
 		Assertions.assertTrue(equalErr, message2);
-		assertFalse(normal.equals(noRoadCat), message);
+		assertNotEquals(normal, noRoadCat, message);
 	}
 
 	@Test
@@ -233,11 +234,11 @@ public class TestHbefaWarmEmissionFactorKey{
 		}
 
 		String message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt;
-		assertFalse(noVehAtt.equals(normal), message);
+		assertNotEquals(noVehAtt, normal, message);
 		assertFalse(equalErr);
 		// veh attributes are allowed to be not initiated
 		// therefore this should not throw a nullpointer but return false
-		assertFalse(normal.equals(noVehAtt), message);
+		assertNotEquals(normal, noVehAtt, message);
 
 		//set the vehicle attributes of the normal hbefacoldemissionfactorkey to 'average'
 		//then noVehAtt is equal to normal
@@ -248,8 +249,8 @@ public class TestHbefaWarmEmissionFactorKey{
 		normal.setVehicleAttributes(hbefaVehicleAttributesAverage);
 
 		message = "these two HbefaWarmEmissionFactorKeys should be the same: " + normal.toString() + " and " + noVehAtt;
-		Assertions.assertTrue(normal.equals(noVehAtt), message);
-		Assertions.assertTrue(noVehAtt.equals(normal), message);
+		Assertions.assertEquals(normal, noVehAtt, message);
+		Assertions.assertEquals(noVehAtt, normal, message);
 
 
 	}
