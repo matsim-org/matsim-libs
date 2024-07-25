@@ -108,7 +108,7 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
         /*
          * speed attributes are sometimes rounded beforehand.
-         * make sure the speed is a multiple of 10, as the HBEFA emission key factors are and otherwise we get problems later...
+         * make sure the speed is a multiple of 10, as the HBEFA emission key factors are, and otherwise we get problems later...
          */
 		freeVelocity_kmh = Math.round(freeVelocity_kmh/10.0) * 10;
 

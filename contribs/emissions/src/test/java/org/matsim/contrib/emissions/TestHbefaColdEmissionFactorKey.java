@@ -104,7 +104,7 @@ public class TestHbefaColdEmissionFactorKey {
 		}
 	}
 
-	// the following tests each compare a incomplete key to a complete key
+	// the following tests each compare an incomplete key to a complete key
 	// wanted result:
 	// completeData.equals(partialData) -> return false
 	// uncompleteData.equals(completeData) -> throw nullpointer

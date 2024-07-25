@@ -87,7 +87,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 
 	// fifth case: cold emission factor not set
 //	private static final String nullcase_emConcept = "nullCase";
-	// this testcase does not exist any more.  kai, jul'18
+	// this testcase does not exist anymore.  kai, jul'18
 
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;

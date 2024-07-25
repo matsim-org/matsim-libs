@@ -486,7 +486,7 @@ public class EmissionUtilsTest {
 		message = "the calculated map should contain " + pop.getPersons().size() + " person(s) but contains " + finalMap.keySet().size() + "person(s).";
 		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
-		//check: all values for the this person are zero and of type double
+		//check: all values for this person are zero and of type double
 		for (Double pollutantValues : finalMap.get(idp3).values()) {
 			Assertions.assertSame(pollutantValues.getClass(), Double.class);
 			Assertions.assertEquals(0.0, pollutantValues, MatsimTestUtils.EPSILON);

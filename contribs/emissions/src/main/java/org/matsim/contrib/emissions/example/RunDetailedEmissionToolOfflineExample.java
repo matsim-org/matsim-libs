@@ -48,7 +48,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 //	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 
 //	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+	// (remove dependency of one test/execution path from others. kai/ihab, nov'18)
 
 	//	private static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
 	private Config config;

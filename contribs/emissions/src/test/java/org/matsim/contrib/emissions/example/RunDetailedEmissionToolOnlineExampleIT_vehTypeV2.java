@@ -40,8 +40,8 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
 	 */
 
-//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-	@Disabled //Ignore this test, because the thrown exception during events handling does not always leads to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
+//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback, it has to fail!
+	@Disabled //Ignore this test, because the thrown exception during events handling does not always lead to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
 	@Test
 	final void testDetailed_vehTypeV2() {
 		boolean gotAnException = false ;

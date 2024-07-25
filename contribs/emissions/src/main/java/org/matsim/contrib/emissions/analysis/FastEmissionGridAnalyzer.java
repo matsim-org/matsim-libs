@@ -59,8 +59,8 @@ public abstract class FastEmissionGridAnalyzer {
 	 * If only a certain area of the scenario is of interest for the analysis. The supplied network must be filtered beforehand.
 	 * The resulting raster's size depends on the bounding box of the supplied network.
 	 * <p>
-	 * Note: The algorithm is not accurate at the edges of the raster. The kernel is cut of a the edges meaning that emissions
-	 * are underestimated at the edges of the raster. I didn't bother to implement this correctly. Otherwise the overall
+	 * Note: The algorithm is not accurate at the edges of the raster. The kernel is cut of the edges meaning that emissions
+	 * are underestimated at the edges of the raster. I didn't bother to implement this correctly. Otherwise, the overall
 	 * amount of emissions doesn't change.
 	 *
 	 * @param eventsFile The events file which contains the emission events

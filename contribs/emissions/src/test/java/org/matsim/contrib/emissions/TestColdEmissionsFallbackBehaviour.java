@@ -65,7 +65,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	private static final Double parkingDuration = 1.;
 	private static final int distance = 1;
 
-	//This are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.csv" and
+	//These are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.csv" and
 	// "./scenarios/sampleScenario/sample_41_EFA_ColdStart_SubSegm_2020detailed.csv"
 	//Both for AmbientConditionPattern 0-1h, 0-1km
 	private final double emissionsFactorInGrammPerKilometer_Detailed = 3.337293625; 		//detailed table

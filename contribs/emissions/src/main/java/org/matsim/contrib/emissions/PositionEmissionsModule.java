@@ -111,7 +111,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		}
 
 		private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
-			// the following block fixes the vehicle types's emission information whenusing an  old vehicle type format
+			// the following block fixes the vehicle type's emission information whenusing an  old vehicle type format
 			// the unit test I found uses an old format, so have it here.
 			{
 				String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription(vehicle.getType(), emissionsConfigGroup);
@@ -209,7 +209,7 @@ public class PositionEmissionsModule extends AbstractModule {
 				return; // only calculate emissions for cars
 
 			if (!vehiclesInTraffic.containsKey(event.getVehicleId()))
-				return; // only collect positions if vehicle has entered traffic (if vehicle is wait2link its position is calculated but it hasn't entered traffic yet.
+				return; // only collect positions if vehicle has entered traffic (if vehicle is wait2link its position is calculated, but it hasn't entered traffic yet.)
 
 			if (trajectories.containsKey(event.getVehicleId())) {
 				computeCombinedEmissionEvent(event);

@@ -61,7 +61,7 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * get free flow occurences - testCounters*()
  * get fraction occurences - testCounters*()
- * get stop go occurences - testCounters*()
+ * get stop-go occurences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
  * get top go km couter - testCounters*()
@@ -149,7 +149,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	/*
 	* this test method creates a mock link and mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
-	* the counters for all possible combinations of avg, stop go and free flow speed are tested
+	* the counters for all possible combinations of avg, stop-go and free flow speed are tested
 	* for the cases: > s&g speed, <ff speed ; the different ComputationMethods are tested as well
 	 */
 	@ParameterizedTest
@@ -158,7 +158,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = setUp(emissionsComputationMethod);
 
 		/*
-		 * using the same case as above - case 1 and check the counters for all possible combinations of avg, stop go and free flow speed
+		 * using the same case as above - case 1 and check the counters for all possible combinations of avg, stop-go and free flow speed
 		 */
 
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);

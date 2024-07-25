@@ -55,7 +55,7 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * get free flow occurences - testCounters*()
  * get fraction occurences - testCounters*()
- * get stop go occurences - testCounters*()
+ * get stop-go occurences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
  * get top go km couter - testCounters*()
@@ -102,7 +102,7 @@ public class TestWarmEmissionAnalysisModule {
 
 	private final Double noeFreeSpeed = AVG_PASSENGER_CAR_SPEED_FF_KMH;
 
-	// case 6 - data in detailed table, stop go speed = free flow speed
+	// case 6 - data in detailed table, stop-go speed = free flow speed
 	private final String sgffRoadCatgory = "URB_case7";
 	private final String sgffTechnology = "sg ff technology";
 	private final String sgffConcept = "sg ff concept";
@@ -265,7 +265,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp(emissionsComputationMethod);
 		emissionsModule.reset();
 
-		// case 10 - data in detailed table, stop go speed > free flow speed
+		// case 10 - data in detailed table, stop-go speed > free flow speed
 		Id<Vehicle> tableVehicleId = Id.create("vehicle 8", Vehicle.class);
 		double tableLinkLength= 30.*1000;
 		Id<VehicleType> tableVehicleTypeId = Id.create(

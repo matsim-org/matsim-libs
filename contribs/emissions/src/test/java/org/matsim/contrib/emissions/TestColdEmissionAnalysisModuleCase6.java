@@ -147,7 +147,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		}
 		{
 			// add heavy goods vehicle entry "petrol;none;none":
-			//(pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol; --> Should be used, since HGV shpuld be supported and not fallback to average any more, kmt apr'20.
+			//(pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol; --> Should be used, since HGV shpuld be supported and not fallback to average anymore, kmt apr'20.)
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(heavyGoodsFactor), HEAVY_GOODS_VEHICLE );
 		}

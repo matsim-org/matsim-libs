@@ -17,7 +17,7 @@ public class EmissionsByPollutantTest {
 
 	// The EmissionsByPollutant potentially adds up the same emissions coming from cold and warm.  Thus, this cannot be combined into the enum approach
 	// without some thinking.  kai, jan'20
-	// Quite possibly, should just combine them into an enum "pollutant"?!  There is, anyways, the JM map of those emissions that are actually present in the
+	// Quite possibly, should just combine them into an enum "pollutant"?!  There is, anyway, the JM map of those emissions that are actually present in the
 	// input file.  kai, jan'20
 
 	@Test

@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
- * Additionally those emissions are divided into time bins
+ * Additionally, those emissions are divided into time bins
  */
 public class EmissionGridAnalyzer {
 
@@ -316,7 +316,7 @@ public class EmissionGridAnalyzer {
         /**
          * Sets the used grid type. Default is Square
          *
-         * @param type The grid type. Currently either Square or Hexagonal
+         * @param type The grid type. Currently, either Square or Hexagonal
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
          */
         public Builder withGridType(GridType type) {

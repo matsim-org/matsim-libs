@@ -49,7 +49,7 @@ public final class RunAverageEmissionToolOfflineExample{
 
 	public static final String emissionEventsFilename = "emission.events.offline.xml.gz";
 
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+	// (remove dependency of one test/execution path from others. kai/ihab, nov'18)
 
 	private Config config;
 

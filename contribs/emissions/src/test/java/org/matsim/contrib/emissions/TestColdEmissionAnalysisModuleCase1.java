@@ -135,7 +135,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 
 		// This represents the previous behavior, which fallbacks to the average table,
 		// if values are not found in the detailed table, kmt apr'20
-		// This test seems to refer to an direct lookup in average table
+		// This test seems to refer to a direct lookup in average table
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		return new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager);
 	}

@@ -57,7 +57,7 @@ class RawEmissionEventsReader extends MatsimXmlParser {
     RawEmissionEventsReader(HandleEmissionEvent handler) {
 			super(ValidationType.NO_VALIDATION);
         this.handler = handler;
-        // events don't have dtd. Therefore validation is not possible
+        // events don't have dtd. Therefore, validation is not possible
         this.setValidating(false);
     }
 
