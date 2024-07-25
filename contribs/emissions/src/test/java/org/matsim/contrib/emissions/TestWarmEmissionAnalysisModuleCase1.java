@@ -21,11 +21,8 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -38,7 +35,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.matsim.contrib.emissions.Pollutant.CO2_TOTAL;
 import static org.matsim.contrib.emissions.TestWarmEmissionAnalysisModule.HBEFA_ROAD_CATEGORY;

@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;

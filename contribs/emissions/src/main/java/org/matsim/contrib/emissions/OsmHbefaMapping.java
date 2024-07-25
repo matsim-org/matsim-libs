@@ -22,13 +22,11 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Provides;
-import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
