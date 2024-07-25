@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -51,7 +52,8 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
 			config.controller().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			Scenario scenario = onlineExample.prepareScenario( config ) ;
+
+            Scenario scenario = ScenarioUtils.loadScenario(config);
 			onlineExample.run( scenario ) ;
 		} catch (Exception ee ) {
 			gotAnException = true ;
