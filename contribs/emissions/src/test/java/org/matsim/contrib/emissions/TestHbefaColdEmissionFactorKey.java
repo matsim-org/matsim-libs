@@ -43,7 +43,6 @@ public class TestHbefaColdEmissionFactorKey {
 	private Pollutant coldPollutant;
 	private HbefaVehicleAttributes hbefaVehicleAttributes;
 	private HbefaVehicleCategory hbefaVehCategory;
-	private boolean equalErr;
 	private HbefaColdEmissionFactorKey normal;
 
 	private void setUp(){
@@ -56,7 +55,6 @@ public class TestHbefaColdEmissionFactorKey {
 		parkingTime = 5;
 		coldPollutant = FC;
 		hbefaVehCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		equalErr = false;
 	}
 
 
