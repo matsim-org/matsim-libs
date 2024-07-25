@@ -346,7 +346,7 @@ public abstract class EmissionUtils {
 		//    setCo2TotalKeys( Set<String> keys )
 		// as we have it, e.g., with network modes.  kai, feb'20
 
-		Pollutant pollutant = switch (pollutantString) {
+		return switch (pollutantString) {
 			case "CO2(total)" -> Pollutant.CO2_TOTAL;
 			case "CO2(rep)" -> Pollutant.CO2_rep;
 			case "PM2.5 (non-exhaust)" -> Pollutant.PM2_5_non_exhaust;
@@ -360,7 +360,6 @@ public abstract class EmissionUtils {
 			// (2) It is a different spelling of an already existing pollutant.  In that case, see above.
 			// kai, jan'20
 		};
-			return pollutant;
 	}
 
 	/**

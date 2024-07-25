@@ -155,20 +155,15 @@ final class ColdEmissionAnalysisModule {
 		//HBEFA 3 provides cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
 		//HBEFA 4.1 provides cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
 		//see https://www.hbefa.net/e/documents/HBEFA41_Development_Report.pdf (WP 4 , page 23)  kturner, may'20
-		//Mapping everything except "motorcycle" to "pass.car", since this was done in the last years for HGV.
-		//This may can be improved: What should be better set to LGV or zero???? kturner, may'20
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
-			changeVehCategory(key, HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, HbefaVehicleCategory.PASSENGER_CAR);
-		}
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)) {
-			changeVehCategory(key, HbefaVehicleCategory.URBAN_BUS, HbefaVehicleCategory.PASSENGER_CAR );
-		}
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.COACH)) {
-			changeVehCategory(key, HbefaVehicleCategory.COACH, HbefaVehicleCategory.PASSENGER_CAR);
-		}
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)){
-			changeVehCategory(key, HbefaVehicleCategory.MOTORCYCLE, HbefaVehicleCategory.PASSENGER_CAR);
-			return coldEmissionsOfEvent;
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE) ||
+			vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.COACH) ||
+			vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS) ||
+			vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
+			if (vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("Automagic changing of VehCategory is disabled. Please make sure that your table contains the necessary values for {}", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE.name());
+				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
 		}
 
 		if(this.detailedHbefaColdTable != null) {
@@ -195,32 +190,6 @@ final class ColdEmissionAnalysisModule {
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
 		}
 		return coldEmissionsOfEvent;
-	}
-
-	/**
-	 * Replace the vehicleCategory with HbefaVehicleCategory.PASSENGER_CAR
-	 * This is the old behaviour as it was until Aug 21.
-	 * (Aug'21, KMT) This does not help, since the emConcepts are not the same. So it is _not_ usable if using
-	 *  some kind of detailed values.
-	 * @param key
-	 * @param originVehCat
-	 * @param targetvehCat
-	 */
-	//TODO Maybe make the behaviour settable by an enum? -> keep some kind of backwards capability or just return a 0.0 as it is for motorcycle?
-	private void changeVehCategory(HbefaColdEmissionFactorKey key, HbefaVehicleCategory originVehCat, HbefaVehicleCategory targetvehCat) {
-//		key.setVehicleCategory(targetvehCat);
-//		if (vehInfoWarnHDVCnt < maxWarnCnt) {
-//			vehInfoWarnHDVCnt++;
-//			logger.warn("HBEFA does not provide cold start emission factors for " +
-//					originVehCat +
-//					". Setting vehicle category to " + targetvehCat + "...");
-//			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-//		}
-		if (vehInfoWarnHDVCnt < maxWarnCnt) {
-			vehInfoWarnHDVCnt++;
-			logger.warn("Automagic changing of VehCategory is disabled. Please make sure that your table contains the necessary values for {}", originVehCat.name());
-			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-		}
 	}
 
 	private HbefaColdEmissionFactor getEmissionsFactor(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey efkey, Pollutant coldPollutant) {
