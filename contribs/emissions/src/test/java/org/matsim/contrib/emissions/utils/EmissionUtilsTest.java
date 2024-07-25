@@ -487,10 +487,10 @@ public class EmissionUtilsTest {
 		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
 		//check: all values for the this person are zero and of type double
-		for (Object pollutant : finalMap.get(idp3).values()) {
-			Assertions.assertSame(pollutant.getClass(), Double.class);
-			Assertions.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON);
-			Assertions.assertNotNull(pollutant);
+		for (Double pollutantValues : finalMap.get(idp3).values()) {
+			Assertions.assertSame(pollutantValues.getClass(), Double.class);
+			Assertions.assertEquals(0.0, pollutantValues, MatsimTestUtils.EPSILON);
+			Assertions.assertNotNull(pollutantValues);
 		}
 		//check: all types of emissions appear
 		for (Pollutant emission : pollsFromEU) {
@@ -625,9 +625,9 @@ public class EmissionUtilsTest {
 
 		//check: all values for all persons are zero and of type double
 		for (Id<Person> id : finalMap.keySet()) {
-			for (Object pollutant : finalMap.get(id).values()) {
+			for (Double pollutant : finalMap.get(id).values()) {
 				Assertions.assertSame(pollutant.getClass(), Double.class);
-				Assertions.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON, "map of pollutants was missing. Therefore all values should be set to zero.");
+				Assertions.assertEquals(0.0, pollutant, MatsimTestUtils.EPSILON, "map of pollutants was missing. Therefore all values should be set to zero.");
 				Assertions.assertNotNull(pollutant);
 			}
 			//check: alle types of emissions appear
