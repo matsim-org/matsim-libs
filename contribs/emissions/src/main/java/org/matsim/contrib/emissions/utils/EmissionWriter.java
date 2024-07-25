@@ -57,7 +57,7 @@ public final class EmissionWriter {
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("personId \t xHome \t yHome \t");
 			for (String pollutant : pollutants){
-				out.append(pollutant + "[g] \t");
+				out.append(pollutant).append("[g] \t");
 			}
 			out.append("\n");
 
@@ -69,12 +69,12 @@ public final class EmissionWriter {
 				Double xHome = homeCoord.getX();
 				Double yHome = homeCoord.getY();
 
-				out.append(personId + "\t" + xHome + "\t" + yHome + "\t");
+				out.append(String.valueOf(personId)).append("\t").append(String.valueOf(xHome)).append("\t").append(String.valueOf(yHome)).append("\t");
 
 				Map<String, Double> emissionType2Value = totalEmissions.get(personId);
 				for(String pollutant : pollutants){
 					if(emissionType2Value.get(pollutant) != null){
-						out.append(emissionType2Value.get(pollutant) + "\t");
+						out.append(String.valueOf(emissionType2Value.get(pollutant))).append("\t");
 					} else{
 						out.append("0.0" + "\t"); // TODO: do I still need this?
 					}
