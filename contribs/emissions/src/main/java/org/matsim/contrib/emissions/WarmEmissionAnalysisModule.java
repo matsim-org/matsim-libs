@@ -593,8 +593,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		freeFlowKmCounter += linkLength_km * (1-fractionStopGo);
 		stopGoKmCounter += linkLength_km * fractionStopGo;
 
-		freeFlowCounter += 1-fractionStopGo;
-		stopGoCounter += fractionStopGo;
+		freeFlowCounter += (int) (1-fractionStopGo);
+		stopGoCounter += (int) fractionStopGo;
 		fractionCounter += (fractionStopGo < 1.0 && fractionStopGo > 0.0) ? 1 : 0;
 	}
 
