@@ -107,7 +107,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		// first case: complete data
 		// corresponding entry in average table
 		Collections.addAll(testCase1, "PASSENGER_CAR", petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor);
-		logger.info("Running testcase:" + testCase1.toString());
+		logger.info("Running testcase:" + testCase1);
 		Id<Link> linkId = Id.create("linkId" + testCase1, Link.class);
 		Id<Vehicle> vehicleId = Id.create("vehicleId" + testCase1, Vehicle.class);
 		Id<VehicleType> vehicleTypeId = Id.create(testCase1.get(0) + ";" + testCase1.get(1) + ";" + testCase1.get(2) + ";" + testCase1.get(3), VehicleType.class);
@@ -118,7 +118,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		final Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
 
-		String message = "The expected emissions for " + testCase1.toString() + " are " + pollutants.size() * (Double) testCase1.get(4) + " but were " + sumOfEmissions;
+		String message = "The expected emissions for " + testCase1 + " are " + pollutants.size() * (Double) testCase1.get(4) + " but were " + sumOfEmissions;
 		Assertions.assertEquals(pollutants.size() * (Double) testCase1.get(4), sumOfEmissions, MatsimTestUtils.EPSILON, message);
 	}
 
@@ -227,5 +227,5 @@ public class TestColdEmissionAnalysisModuleCase1 {
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
-	
+
 }

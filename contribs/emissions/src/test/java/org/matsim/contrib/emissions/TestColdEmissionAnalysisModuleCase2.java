@@ -70,7 +70,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
 	// size classes, and "<1,4L" or ">=2L" for the emissions concept.  Tried to make it consistent,
 	// but I don't know if it is still testing the original functionality.  kai, jul'18
-	
+
 	// first case: complete data - corresponding entry in average table
 	private static final String petrol_technology = "petrol";
 	private static final String none_sizeClass = "average";
@@ -110,8 +110,8 @@ public class TestColdEmissionAnalysisModuleCase2 {
 
 		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
-		
-		String message = "The expected emissions for " + testCase2.toString() + " are " + pollutants.size() * (Double) testCase2.get( 4 ) + " but were " + sumOfEmissions;
+
+		String message = "The expected emissions for " + testCase2 + " are " + pollutants.size() * (Double) testCase2.get( 4 ) + " but were " + sumOfEmissions;
 		Assertions.assertEquals( pollutants.size() * (Double) testCase2.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON, message );
 		}
 
@@ -120,10 +120,10 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	private ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
-		
+
 		fillAveragesTable( avgHbefaColdTable );
 		fillDetailedTable( detailedHbefaColdTable );
-		
+
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -133,7 +133,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 
 		return new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 	}
-	
+
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {
 		// create all needed and one unneeded entry for the detailed table
 		{
@@ -154,19 +154,19 @@ public class TestColdEmissionAnalysisModuleCase2 {
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
 	}
-	
+
 	private static void fillAveragesTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable ) {
 
 		// create all needed and one unneeded entry for the average table
 		{
 			// add passenger car entry "average;average;average":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( "average", "average", "average" ) ;
-			
+
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(averageAverageFactor), PASSENGER_CAR );
 		}
 		{
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
+
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( averagePetrolFactor ), PASSENGER_CAR );
 		}
 		{
@@ -182,7 +182,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
 	}
-	
+
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
@@ -194,5 +194,5 @@ public class TestColdEmissionAnalysisModuleCase2 {
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
-	
+
 }

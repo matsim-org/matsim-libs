@@ -17,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- *                                                                         
+ *
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
@@ -420,7 +420,7 @@ final class ColdEmissionAnalysisModule {
 
 		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
 				"the config OR you should use another fallback setting when using detailed calculation OR " +
-				"values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+				"values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey);
 	}
 
 	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {
