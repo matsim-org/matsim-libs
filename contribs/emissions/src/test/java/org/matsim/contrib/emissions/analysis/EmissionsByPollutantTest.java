@@ -25,8 +25,7 @@ public class EmissionsByPollutantTest {
 
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
-        Map<Pollutant,Double> map = new LinkedHashMap<>();
-        emissions.forEach( map::put ) ;
+		Map<Pollutant, Double> map = new LinkedHashMap<>(emissions);
 
         EmissionsByPollutant linkEmissions = new EmissionsByPollutant( map ) ;
 
@@ -47,7 +46,7 @@ public class EmissionsByPollutantTest {
         final double expectedValue = emissions.get(pollutant) + valueToAdd;
 
         Map<Pollutant,Double> map = new LinkedHashMap<>();
-        emissions.forEach( map::put ) ;
+		map.putAll(emissions);
 
         EmissionsByPollutant emissionsByPollutant = new EmissionsByPollutant(map);
 
@@ -80,12 +79,12 @@ public class EmissionsByPollutantTest {
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
         Map<Pollutant,Double> map = new LinkedHashMap<>();
-        emissions.forEach( map::put ) ;
+		map.putAll(emissions);
 
         EmissionsByPollutant linkEmissions = new EmissionsByPollutant(map);
 
         Map<Pollutant,Double> map2 = new LinkedHashMap<>();
-        emissions.forEach( map2::put ) ;
+		map2.putAll(emissions);
 
         linkEmissions.addEmissions(map2);
 
