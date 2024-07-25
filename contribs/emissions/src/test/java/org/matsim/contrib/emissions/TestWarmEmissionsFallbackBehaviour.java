@@ -60,12 +60,12 @@ public class TestWarmEmissionsFallbackBehaviour {
 	private final Vehicle vehicleFallbackToAverageTable = generateVehicleForFallbackToAverageTable();
 
 
-// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------	
+// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------
 	/**
 	 * vehicles information is complete
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should calculate value
 	 */
 	@Test
@@ -84,7 +84,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 *
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -100,9 +100,9 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -116,11 +116,11 @@ public class TestWarmEmissionsFallbackBehaviour {
 	}
 
 
-// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------	
+// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average
 	 * ---> should calculate value from detailed value
 	 */
@@ -139,7 +139,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average
 	 * ---> should calculate value from technology average
 	 */
@@ -157,9 +157,9 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -172,11 +172,11 @@ public class TestWarmEmissionsFallbackBehaviour {
 		});
 	}
 
-// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------	
+// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average or average table
 	 * ---> should calculate value from detailed value
 	 */
@@ -195,7 +195,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average; do NOT fall back to average table
 	 * ---> should calculate value from technology average
 	 */
@@ -213,9 +213,9 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: tryDetailedThenTechnologyAverageThenAverageTable
-	 *
+	 * <p>
 	 * -> do fall back to average table
 	 * ---> should calculate value from average table
 	 */
@@ -233,7 +233,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 
 
 
-// ---------- setup and helper methods -------------	
+// ---------- setup and helper methods -------------
 
 	/**
 	 * load and prepare the scenario, create the emissionsModule

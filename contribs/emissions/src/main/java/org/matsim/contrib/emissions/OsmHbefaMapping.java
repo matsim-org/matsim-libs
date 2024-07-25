@@ -31,13 +31,13 @@ import java.util.Map;
 
 /**
  * Created by molloyj on 01.12.2017.
- *
+ * <p>
  *
  * handled OSM road types:
  *    motorway,trunk,primary,secondary, tertiary, unclassified,residential,service
  *    motorway_link, trunk_link,primary_link, secondary_link
  *    tertiary_link, living_street, pedestrian,track,road
- *
+ * <p>
  * Hbefa categories and respective speeds
  *    URB/MW-Nat./80 - 130
  *    URB/MW-City/60 - 110
@@ -46,7 +46,7 @@ import java.util.Map;
  *    URB/Distr/50 - 80
  *    URB/Local/50 - 60
  *    URB/Access/30 - 50
- *
+ * <p>
  * Conversions from OSM to hbefa types
  *    motorway;MW
  *    primary;Trunk

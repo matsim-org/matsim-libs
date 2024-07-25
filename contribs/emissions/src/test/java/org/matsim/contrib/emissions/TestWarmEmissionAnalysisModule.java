@@ -47,7 +47,7 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
- *
+ * <p>
  * WarmEmissionAnalysisModule (weam)
  * public methods and corresponding tests:
  * weamParameter - testWarmEmissionAnalysisParameter
@@ -60,12 +60,12 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * get free flow km counter - testCounters*()
  * get top go km couter - testCounters*()
  * get warm emission event counter - testCounters*()
- *
+ * <p>
  * private methods and corresponding tests:
  * rescale warm emissions - rescaleWarmEmissionsTest()
  * calculate warm emissions - implicitly tested
  * convert string 2 tuple - implicitly tested
- *
+ * <p>
  * in all cases the needed tables are created manually by the setUp() method
  * see test methods for details on the particular test cases
  **/
