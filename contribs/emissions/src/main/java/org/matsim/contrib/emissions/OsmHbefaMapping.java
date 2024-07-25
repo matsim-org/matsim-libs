@@ -61,14 +61,14 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
     private final Map<String, Hbefa> hbfeaMap = new HashMap<>();
 
     static class Hbefa {
-        String name;
-        int min;
-        int max;
+        final String name;
+        final int min_speed;
+        final int max_speed;
 
-        Hbefa(String name, int min, int max) {
+        Hbefa(String name, int min_speed, int max) {
             this.name = name;
-            this.min = min;
-            this.max = max;
+            this.min_speed = min_speed;
+            this.max_speed = max;
         }
     }
 
@@ -137,8 +137,8 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
         if (!hbfeaMap.containsKey(type)) {
             throw new RuntimeException("'" + type + "' not in hbefa map");
         }
-        int min_speed = hbfeaMap.get(type).min;
-        int max_speed = hbfeaMap.get(type).max;
+        int min_speed = hbfeaMap.get(type).min_speed;
+        int max_speed = hbfeaMap.get(type).max_speed;
         int clamped_speed = (int) Math.min(Math.max(min_speed, freeVelocity_kmh), max_speed);
 
         return "URB/" + hbfeaMap.get(type).name + "/" + clamped_speed;
