@@ -33,11 +33,11 @@ public enum Pollutant{
         NMHC,   // non-methane hydro carbons
         NOx,    // nitrogen oxide
         NO2,    // provided as g/km, but based on %-values of NOx
-        PM,     // = PM10 --> particulate matterof size below 10μm, i.e. equivalent to PM10. unit = g/km
+        PM,     // = PM10 --> particulate matter of size below 10μm, i.e. equivalent to PM10. unit = g/km
         SO2,    //sulphur dioxide
         FC_MJ,  // fuel consumption in MJ/km
-        CO2_rep, // CO2(reported): = carbon dioxide “reported”, i.e. withoutthe biofuel share in the fuel -> input for CO2e calculation
-        CO2e,   // CO2 equivalents (WTW basis), CO2 equivalents contain CO2, CH4 and N2O, i.e. the relevant greenhouse gases from thetransport sector,multiplied with their respective 100-year Global Warming Potentials and summed up.
+        CO2_rep, // CO2(reported): = carbon dioxide “reported”, i.e. without the biofuel share in the fuel -> input for CO2e calculation
+        CO2e,   // CO2 equivalents (WTW basis), CO2 equivalents contain CO2, CH4 and N2O, i.e. the relevant greenhouse gases from the transport sector, multiplied with their respective 100-year Global Warming Potentials and summed up.
         PM2_5,  // particle mass for particles < 2.5 µm. unit = g/km
         PM2_5_non_exhaust, // tire wear!
         PM_non_exhaust, // PM10 from non-exhaust sources(e.g. road, tyre wear)
