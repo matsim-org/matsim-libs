@@ -77,11 +77,13 @@ public final class EmissionModule {
 		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
 	}
 
+	@SuppressWarnings("ClassEscapesDefinedScope")
 	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20
 		return this.warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
+	@SuppressWarnings("ClassEscapesDefinedScope")
 	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20
 		return this.coldEmissionHandler.getColdEmissionAnalysisModule();
