@@ -187,7 +187,6 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	// ===============
 	/**
 	 * @param hbefaTableConsistencyCheckingLevel -- {@value #HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL}
-	 * @noinspection JavadocReference
 	 */
 	@StringSetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
 	public void setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
