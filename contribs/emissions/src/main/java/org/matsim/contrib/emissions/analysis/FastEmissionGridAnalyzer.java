@@ -92,7 +92,7 @@ public abstract class FastEmissionGridAnalyzer {
 		logger.info("Start smoothing pollution.");
 		return linkEmissionsByPollutant.entrySet().stream()
 			.map(entry -> {
-				logger.info("Smoothing of: " + entry.getKey());
+				logger.info("Smoothing of: {}", entry.getKey());
 				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
 			})
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
@@ -116,7 +116,7 @@ public abstract class FastEmissionGridAnalyzer {
 
 		return linkEmissionsByPollutant.entrySet().stream()
 			.map(entry -> {
-				logger.info("Smoothing of: " + entry.getKey());
+				logger.info("Smoothing of: {}", entry.getKey());
 				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
 			})
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
@@ -192,7 +192,7 @@ public abstract class FastEmissionGridAnalyzer {
 
 	static Raster blur(Raster raster, int radius) {
 
-		logger.info("Creating Kernel with " + (radius * 2 + 1) + " taps");
+		logger.info("Creating Kernel with {} taps", radius * 2 + 1);
 		var kernel = createKernel(radius * 2 + 1);
 
 		var result = new Raster(raster.getBounds(), raster.getCellSize());

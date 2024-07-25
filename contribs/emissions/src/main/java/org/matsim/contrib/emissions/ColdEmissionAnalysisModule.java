@@ -130,7 +130,7 @@ final class ColdEmissionAnalysisModule {
 
 		final Map<Pollutant, Double> coldEmissionsOfEvent = new EnumMap<>( Pollutant.class );
 
-		logger.debug("VehId: " + vehicleId + " ; Tuple.first = " +vehicleInformationTuple.getFirst());
+		logger.debug("VehId: {} ; Tuple.first = {}", vehicleId, vehicleInformationTuple.getFirst());
 		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
 		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
 			for ( Pollutant coldPollutant : coldPollutants) {
@@ -218,8 +218,7 @@ final class ColdEmissionAnalysisModule {
 //		}
 		if (vehInfoWarnHDVCnt < maxWarnCnt) {
 			vehInfoWarnHDVCnt++;
-			logger.warn("Automagic changing of VehCategory is disabled. Please make sure that your table contains the " +
-					"necessary values for " + originVehCat.name());
+			logger.warn("Automagic changing of VehCategory is disabled. Please make sure that your table contains the necessary values for {}", originVehCat.name());
 			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 		}
 	}
@@ -241,7 +240,7 @@ final class ColdEmissionAnalysisModule {
 				}
 				if (this.detailedHbefaColdTable.get(efkey) != null) {
 					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if (detailedTransformToHbefa4Cnt <= 1) {
@@ -257,7 +256,7 @@ final class ColdEmissionAnalysisModule {
 					// ... and try to look up:
 					if (this.detailedHbefaColdTable.get(efkey2) != null) {
 						HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
-						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 				}
@@ -272,7 +271,7 @@ final class ColdEmissionAnalysisModule {
 				}
 				if (this.detailedHbefaColdTable.get(efkey) != null) {
 					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if (detailedTransformToHbefa4Cnt <= 1) {
@@ -288,7 +287,7 @@ final class ColdEmissionAnalysisModule {
 					// ... and try to look up:
 					if (this.detailedHbefaColdTable.get(efkey2) != null) {
 						HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
-						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 
@@ -297,8 +296,8 @@ final class ColdEmissionAnalysisModule {
 						attribs2.setHbefaSizeClass("average");
 						attribs2.setHbefaEmConcept("average");
 						if (detailedFallbackTechAverageWarnCnt <= 1) {
-							logger.warn("did not find emission factor for efkey=" + efkey);
-							logger.warn(" re-written to " + efkey2);
+							logger.warn("did not find emission factor for efkey={}", efkey);
+							logger.warn(" re-written to {}", efkey2);
 							logger.warn("will try it with '<technology>; average; average'");
 							logger.warn(Gbl.ONLYONCE);
 							logger.warn(Gbl.FUTURE_SUPPRESSED);
@@ -306,7 +305,7 @@ final class ColdEmissionAnalysisModule {
 						}
 						if (this.detailedHbefaColdTable.get(efkey2) != null) {
 							HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
-							logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
@@ -336,7 +335,7 @@ final class ColdEmissionAnalysisModule {
 				}
 				if (coldEmissionFactor != null) {
 					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if (detailedTransformToHbefa4Cnt <= 1) {
@@ -352,7 +351,7 @@ final class ColdEmissionAnalysisModule {
 					// ... and try to look up:
 					if (this.detailedHbefaColdTable.get(efkey2) != null) {
 						HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
-						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 
@@ -361,8 +360,8 @@ final class ColdEmissionAnalysisModule {
 						attribs2.setHbefaSizeClass("average");
 						attribs2.setHbefaEmConcept("average");
 						if (detailedFallbackTechAverageWarnCnt <= 1) {
-							logger.warn("did not find emission factor for efkey=" + efkey);
-							logger.warn(" re-written to " + efkey2);
+							logger.warn("did not find emission factor for efkey={}", efkey);
+							logger.warn(" re-written to {}", efkey2);
 							logger.warn("will try it with '<technology>; average; average'");
 							logger.warn(Gbl.ONLYONCE);
 							logger.warn(Gbl.FUTURE_SUPPRESSED);
@@ -370,7 +369,7 @@ final class ColdEmissionAnalysisModule {
 						}
 						if (this.detailedHbefaColdTable.get(efkey2) != null) {
 							HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
-							logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
@@ -387,7 +386,7 @@ final class ColdEmissionAnalysisModule {
 				efkey3.setVehicleAttributes(new HbefaVehicleAttributes());
 				if (this.avgHbefaColdTable.get(efkey3) != null) {
 					HbefaColdEmissionFactor ef = this.avgHbefaColdTable.get(efkey3);
-					logger.debug("Lookup result for " + efkey3 + " is " + ef.toString());
+					logger.debug("Lookup result for {} is {}", efkey3, ef.toString());
 					Gbl.assertNotNull(ef);
 					return ef;
 				}
@@ -402,11 +401,11 @@ final class ColdEmissionAnalysisModule {
 				efkey.setVehicleAttributes(new HbefaVehicleAttributes());
 				if (this.avgHbefaColdTable.get(efkey) != null) {
 					HbefaColdEmissionFactor ef = this.avgHbefaColdTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					Gbl.assertNotNull(ef);
 					return ef;
 				} else {
-					logger.warn("did not find average emission factor for efkey=" + efkey);
+					logger.warn("did not find average emission factor for efkey={}", efkey);
 					List<HbefaColdEmissionFactorKey> list = new ArrayList<>(this.avgHbefaColdTable.keySet());
 					list.sort(Comparator.comparing(HbefaColdEmissionFactorKey::toString));
 					for (HbefaColdEmissionFactorKey key : list) {

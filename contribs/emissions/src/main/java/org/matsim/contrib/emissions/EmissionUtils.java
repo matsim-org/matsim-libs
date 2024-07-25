@@ -225,7 +225,7 @@ public abstract class EmissionUtils {
 
 		EngineInformation engineInformation;
 		// get information from where it used to be in previous versions and move to where it should be now:
-		logger.debug("emissionsConfigGroup.getHbefaVehicleDescriptionSource=" + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
+		logger.debug("emissionsConfigGroup.getHbefaVehicleDescriptionSource={}", emissionsConfigGroup.getHbefaVehicleDescriptionSource());
 		switch( emissionsConfigGroup.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				// (v1, hbefa vehicle description is in vehicle type id.  Copy to where it is expected now)
@@ -320,7 +320,7 @@ public abstract class EmissionUtils {
 			try{
 				hbefaVehicleCategory = HbefaVehicleCategory.valueOf(string);
 			} catch (IllegalArgumentException e) {
-				logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
+				logger.warn("Could not map String {} to any HbefaVehicleCategory; please check syntax in hbefa input file.", string);
 				throw new RuntimeException();
 			}
 		}

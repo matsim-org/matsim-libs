@@ -113,14 +113,14 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		Collections.addAll( testCase4, "PASSENGER_CAR", "", "", "", averageAverageFactor );
 
 
-		logger.info("Running testcase: " + testCase4.indexOf( 0 ) + " " + testCase4);
+		logger.info("Running testcase: {} {}", testCase4.indexOf(0), testCase4);
 		Id<Link> linkId = Id.create( "linkId" + testCase4.indexOf( 0 ), Link.class );
 		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase4.indexOf( 0 ), Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase4.get( 0 ) + ";" + testCase4.get( 1 ) + ";" + testCase4.get( 2 ) + ";" + testCase4.get( 3 ), VehicleType.class );
 
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-		logger.info("VehicleId: " + vehicle.getId().toString());
-		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		logger.info("VehicleId: {}", vehicle.getId().toString());
+		logger.info("VehicleTypeId: {}", vehicle.getType().getId());
 
 		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();

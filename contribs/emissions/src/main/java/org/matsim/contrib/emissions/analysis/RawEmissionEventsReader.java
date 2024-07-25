@@ -103,7 +103,7 @@ class RawEmissionEventsReader extends MatsimXmlParser {
         // give some feedback about progress
         var currentCount = eventsCounter.incrementAndGet();
         if (currentCount % 500000 == 0) {
-            logger.info("Emission Event # " + numberFormat.format(currentCount));
+            logger.info("Emission Event # {}", numberFormat.format(currentCount));
         }
     }
 

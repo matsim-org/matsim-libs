@@ -105,8 +105,8 @@ public class TestColdEmissionAnalysisModuleCase2 {
 		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase2 , Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase2.get( 0 ) + ";" + testCase2.get( 1 ) + ";" + testCase2.get( 2 ) + ";" + testCase2.get( 3 ), VehicleType.class );
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-		logger.info("VehicleId: " + vehicle.getId().toString());
-		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		logger.info("VehicleId: {}", vehicle.getId().toString());
+		logger.info("VehicleTypeId: {}", vehicle.getType().getId());
 
 		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();

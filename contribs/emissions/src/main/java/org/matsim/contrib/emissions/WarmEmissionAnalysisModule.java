@@ -275,7 +275,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 		if ((averageSpeed_kmh - freeVelocity_ms * 3.6) > 1.0){
 			if (ecg.getHandleHighAverageSpeeds()) {
-				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
+				logger.warn("averageSpeed was capped from {} to{}", averageSpeed_kmh, freeVelocity_ms * 3.6);
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
 			} else {
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
@@ -307,7 +307,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions from stop-go fraction:
 					efkey.setTrafficSituation(STOPANDGO);
 					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-					logger.debug("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
+					logger.debug("pollutant={}; efStopGo={}", warmPollutant, efStopGo_gpkm);
 
 				}
 
@@ -316,7 +316,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions for free-flow fraction:
 					efkey.setTrafficSituation(FREEFLOW);
 					efFreeFlow_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-					logger.debug("pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm);
+					logger.debug("pollutant={}; efFreeFlow={}", warmPollutant, efFreeFlow_gpkm);
 				}
 
 				// sum them up:
@@ -379,7 +379,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if ( detailedTransformToHbefa4Cnt <= 1 ) {
@@ -395,7 +395,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 				}
@@ -410,7 +410,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if ( detailedTransformToHbefa4Cnt <= 1 ) {
@@ -426,7 +426,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 
@@ -435,8 +435,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						attribs2.setHbefaSizeClass( "average" );
 						attribs2.setHbefaEmConcept( "average" );
 						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
-							logger.warn( "did not find emission factor for efkey=" + efkey );
-							logger.warn( " re-written to " + efkey2 );
+							logger.warn("did not find emission factor for efkey={}", efkey);
+							logger.warn(" re-written to {}", efkey2);
 							logger.warn( "will try it with '<technology>; average; average'" );
 							logger.warn( Gbl.ONLYONCE );
 							logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -444,7 +444,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						}
 						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-							logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
@@ -462,7 +462,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if ( detailedTransformToHbefa4Cnt <= 1 ) {
@@ -478,7 +478,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 
@@ -487,8 +487,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						attribs2.setHbefaSizeClass( "average" );
 						attribs2.setHbefaEmConcept( "average" );
 						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
-							logger.warn( "did not find emission factor for efkey=" + efkey );
-							logger.warn( " re-written to " + efkey2 );
+							logger.warn("did not find emission factor for efkey={}", efkey);
+							logger.warn(" re-written to {}", efkey2);
 							logger.warn( "will try it with '<technology>; average; average'" );
 							logger.warn( Gbl.ONLYONCE );
 							logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -496,7 +496,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						}
 						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-							logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
@@ -513,7 +513,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				efkey3.setVehicleAttributes( new HbefaVehicleAttributes() );
 				if ( this.avgHbefaWarmTable.get( efkey3 ) != null ) {
 					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey3 );
-					logger.debug( "Lookup result for " + efkey3 + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey3, ef.toString());
 					Gbl.assertNotNull( ef );
 					return ef;
 				}
@@ -528,11 +528,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				efkey.setVehicleAttributes( new HbefaVehicleAttributes() );
 				if ( this.avgHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					Gbl.assertNotNull( ef );
 					return ef;
 				} else {
-					logger.warn( "did not find average emission factor for efkey=" + efkey );
+					logger.warn("did not find average emission factor for efkey={}", efkey);
 					List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
 					list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
 					for ( HbefaWarmEmissionFactorKey key : list ) {

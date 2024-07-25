@@ -106,7 +106,7 @@ public class EmissionGridAnalyzer {
         logger.info("Starting grid computation...");
 
         for (var bin : timeBinsWithEmissions.getTimeBins()) {
-            logger.info("creating grid for time bin with start time: " + bin.getStartTime());
+            logger.info("creating grid for time bin with start time: {}", bin.getStartTime());
             Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
             result.getTimeBin(bin.getStartTime()).setValue(grid);
         }
@@ -153,7 +153,7 @@ public class EmissionGridAnalyzer {
         if (!this.timeBins.hasNext()) throw new RuntimeException("processNextTimeBin() was called too many times");
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> nextBin = this.timeBins.next();
-        logger.info("creating grid for time bin with start time: " + nextBin.getStartTime());
+        logger.info("creating grid for time bin with start time: {}", nextBin.getStartTime());
 
         Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(nextBin.getValue());
 
@@ -224,7 +224,7 @@ public class EmissionGridAnalyzer {
                 .forEach(entry -> {
                     var count = counter.incrementAndGet();
                     if (count % 10000 == 0)
-                        logger.info("processing: " + count * 100 / linksWithEmissions.keySet().size() + "% done");
+                        logger.info("processing: {}% done", count * 100 / linksWithEmissions.keySet().size());
 
                     if (network.getLinks().containsKey(entry.getKey()) && isWithinBounds(network.getLinks().get(entry.getKey()))) {
                         processLink(network.getLinks().get(entry.getKey()), entry.getValue(), grid);

@@ -103,27 +103,19 @@ public final class EmissionModule {
 	}
 
 	public void writeEmissionInformation() {
-		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
-				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
+		logger.info("Warm emissions were not calculated for {} of {} link leave events (no corresponding link enter event).", warmEmissionHandler.getLinkLeaveWarnCnt(), warmEmissionHandler.getLinkLeaveCnt());
 		int noVehicleLeavesTrafficEmissions = warmEmissionHandler.getSameLinkTrafficLeaveWarnCnt() + warmEmissionHandler.getUnusualTrafficLeaveWarnCnt();
-		logger.info("Warm emissions were not calculated for " + noVehicleLeavesTrafficEmissions + " of " + warmEmissionHandler.getTrafficLeaveCnt() +
-				" vehicle leaves traffic events (no corresponding link enter event).");
+		logger.info("Warm emissions were not calculated for {} of {} vehicle leaves traffic events (no corresponding link enter event).", noVehicleLeavesTrafficEmissions, warmEmissionHandler.getTrafficLeaveCnt());
 		if ( warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() > 0 ) {
-			logger.info(warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() + " events occurred where the vehicle left traffic without entering ANY link " +
-					"(no warm emissions calculated). These events might need to be investigated."); }
+			logger.info("{} events occurred where the vehicle left traffic without entering ANY link (no warm emissions calculated). These events might need to be investigated.", warmEmissionHandler.getUnusualTrafficLeaveWarnCnt()); }
 
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 
-		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
+		logger.info("Emission calculation based on `Free flow only' occured for {} of {} warm emission events.", wam.getFreeFlowOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Emission calculation based on `Stop&Go only' occured for {} of {} warm emission events.", wam.getStopGoOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Emission calculation based on `Fractions' occured for {} of {} warm emission events.", wam.getFractionOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Free flow occured on {} km of total {} km, where emissions were calculated.", wam.getFreeFlowKmCounter(), wam.getKmCounter());
+		logger.info("Stop&Go occured on {} km of total {} km, where emissions were calculated.", wam.getStopGoKmCounter(), wam.getKmCounter());
 		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
 

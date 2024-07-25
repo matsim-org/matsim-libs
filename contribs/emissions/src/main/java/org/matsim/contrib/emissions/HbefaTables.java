@@ -125,7 +125,7 @@ public abstract class HbefaTables {
         else if (string.endsWith("St+Go")) return HbefaTrafficSituation.STOPANDGO;
         else if (string.endsWith("St+Go2")) return HbefaTrafficSituation.STOPANDGO_HEAVY;
         else {
-            logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in hbefa input file.");
+            logger.warn("Could not map String {} to any HbefaTrafficSituation; please check syntax in hbefa input file.", string);
             throw new RuntimeException();
         }
     }

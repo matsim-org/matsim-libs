@@ -83,7 +83,7 @@ public final class EmissionWriter {
 			}
 			//Close the output stream
 			out.close();
-			logger.info("Finished writing output to " + outFile);
+			logger.info("Finished writing output to {}", outFile);
 		} catch (Exception e){
 			throw new RuntimeException(e);
 		}

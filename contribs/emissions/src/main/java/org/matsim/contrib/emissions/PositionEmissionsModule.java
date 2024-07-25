@@ -290,7 +290,7 @@ public class PositionEmissionsModule extends AbstractModule {
 					eventsManager.processEvent(new PositionEmissionEvent(event, combinedEmissions, "combined"));
 
 				} else {
-					log.warn("speed was too fast: " + speed + "m/s Current time: " + event.getTime() + " prev time: " + previousPosition.getTime() + " current linkId: " + event.getLinkId() + " prev linkId: " + previousPosition.getLinkId() + " agentId: " + event.getPersonId());
+					log.warn("speed was too fast: {}m/s Current time: {} prev time: {} current linkId: {} prev linkId: {} agentId: {}", speed, event.getTime(), previousPosition.getTime(), event.getLinkId(), previousPosition.getLinkId(), event.getPersonId());
 				}
 			} else {
 				// if the vehicle hasn't moved, issue an event with 0 emissions. This way there is an event for every timestep

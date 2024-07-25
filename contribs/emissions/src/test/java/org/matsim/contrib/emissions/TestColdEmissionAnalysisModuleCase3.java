@@ -103,14 +103,14 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		// error when using the average entry.
 		Collections.addAll( testCase3, "PASSENGER_CAR", diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept, detailedDieselFactor );
 
-		logger.info("Running testcase: " + testCase3);
+		logger.info("Running testcase: {}", testCase3);
 		Id<Link> linkId = Id.create( "linkId" +  testCase3 , Link.class );
 		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase3, Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase3.get( 0 ) + ";" + testCase3.get( 1 ) + ";" + testCase3.get( 2 ) + ";" + testCase3.get( 3 ), VehicleType.class );
 
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-		logger.info("VehicleId: " + vehicle.getId().toString());
-		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		logger.info("VehicleId: {}", vehicle.getId().toString());
+		logger.info("VehicleTypeId: {}", vehicle.getType().getId());
 
 		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();

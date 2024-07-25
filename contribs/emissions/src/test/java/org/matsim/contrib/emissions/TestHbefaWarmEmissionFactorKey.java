@@ -121,8 +121,8 @@ public class TestHbefaWarmEmissionFactorKey{
 		noVehCat.setTrafficSituation(hbefaTrafficSituation);
 		noVehCat.setVehicleAttributes(hbefaVehicleAttributes);
 
-		log.warn("normal=" + normal);
-		log.warn("noVehCat=" + noVehCat);
+		log.warn("normal={}", normal);
+		log.warn("noVehCat={}", noVehCat);
 
 		var result = noVehCat.equals(normal);
 
