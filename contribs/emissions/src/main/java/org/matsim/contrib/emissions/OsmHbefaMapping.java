@@ -25,9 +25,9 @@ import com.google.inject.Provides;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Created by molloyj on 01.12.2017.
@@ -123,8 +123,7 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
 
         //sometimes link type is smth like 'motorway_link' or 'living_street' or 'primary|railway.tram'. We only care about the first part, here
-		int idx = Arrays.asList(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
-				.stream()
+		int idx = Stream.of(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
 				.filter(i -> i>= 0) //if chrc is not in String indexOf returns -1
 				.min(Integer::compare)
 				.orElse(type.length());
