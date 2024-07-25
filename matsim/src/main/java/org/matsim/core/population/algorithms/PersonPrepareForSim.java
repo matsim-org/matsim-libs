@@ -207,7 +207,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 		if(!linkModesConsistent){
 			String errorMessage = "Route inconsistent with link modes for: Person " + person.getId() + "; Leg '" + leg + "'";
-			log.error(errorMessage + "\n Consider cleaning inconsistent routes by using PopulationUtils.checkRouteModeAndReset().");
+			log.error(errorMessage + "\n Consider cleaning inconsistent routes by using PopulationUtils.checkRouteModeAndReset()." +
+				"\n If this is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
 			throw new RuntimeException(errorMessage);
 		}
 	}

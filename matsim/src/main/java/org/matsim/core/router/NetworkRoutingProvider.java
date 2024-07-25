@@ -149,7 +149,8 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 
 		if(changed) {
 			String errorMessage = "Network for mode '" + mode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.";
-			log.error(errorMessage + "\n If you restricted modes on some links, consider doing that with NetworkUtils.restrictModesAndCleanNetwork(). This makes sure, that the network is consistent for each mode.");
+			log.error(errorMessage + "\n If you restricted modes on some links, consider doing that with NetworkUtils.restrictModesAndCleanNetwork(). This makes sure, that the network is consistent for each mode." +
+				"\n If this network topology is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
 			throw new RuntimeException(errorMessage);
 		}
 	}
