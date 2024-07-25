@@ -60,14 +60,10 @@ public final class RunAverageEmissionToolOfflineExample{
 		emissionToolOfflineExampleV2.run();
 	}
 
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
-
 	public Config prepareConfig(String args){
 		throw new RuntimeException("execution path no longer exists");
 	}
+
 	public Config prepareConfig(String [] args) {
 		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
 		EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );

@@ -45,9 +45,6 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
 	@Test
 	final void testDetailed_vehTypeV2_FallbackToAverage() {
 		try {
-//			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
-
-//			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			var scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
 			var configUrl = IOUtils.extendUrl( scenarioUrl, "config_detailed.xml" );
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String [] { configUrl.toString() } );

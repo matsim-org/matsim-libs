@@ -74,8 +74,6 @@ public class EmissionUtilsTest {
 	private boolean nullPointerEx;
 
 	public static Map<Pollutant, Double> createUntypedEmissions() {
-//		return Arrays.asList("co2", CO, NOx, "NO", NO2, HC).stream()
-//			     .collect(Collectors.toMap(p -> p, p -> Math.random()));
 		return Stream.of(CO2_TOTAL, CO, NOx, NO2, HC)
 				.collect(Collectors.toMap(p -> p, p -> Math.random()));
 	}
@@ -793,10 +791,6 @@ public class EmissionUtilsTest {
 		return Arrays.stream( Pollutant.values() ).collect( Collectors.toMap( p -> p, p -> Math.random() ) ) ;
 	}
 
-//	public static Map<String, Double> createEmissionsWithFixedValue(double value) {
-//		return Arrays.asList("co2", CO, NOx, "NO", NO2, HC).stream()
-//				.collect(Collectors.toMap(p -> p, p -> value));
-//	}
 	public static Map<Pollutant,Double> createEmissionsWithFixedValue( double value ) {
 		return Arrays.stream( Pollutant.values() ).collect( Collectors.toMap( p -> p, p -> value ) ) ;
 	}

@@ -63,10 +63,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private int detailedFallbackAverageTableWarnCnt = 0;
 	private int averageReadingInfoCnt = 0;
 
-	// The following was tested to slow down significantly, therefore counters were commented out:
-//	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
-//	Set<Id> vehicleIdSet = Collections.synchronizedSet(new HashSet<Id>());
-
 	private int freeFlowCounter = 0;
 	private int saturatedCounter = 0;
 	private int heavyFlowCounter = 0;

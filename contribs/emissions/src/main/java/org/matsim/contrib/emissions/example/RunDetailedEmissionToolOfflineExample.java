@@ -60,11 +60,6 @@ public final class RunDetailedEmissionToolOfflineExample{
 		emissionToolOfflineExampleV2Vehv1.run();
 	}
 
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
-
 	public Config prepareConfig(String [] args) {
 		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
 		return config;
