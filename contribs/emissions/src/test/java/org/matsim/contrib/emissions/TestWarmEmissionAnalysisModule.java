@@ -182,8 +182,6 @@ public class TestWarmEmissionAnalysisModule {
 			excep = true;
 		}
 		Assertions.assertFalse(excep);
-
-		excep=false;
 	}
 
 	@ParameterizedTest
@@ -209,7 +207,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assertions.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep);
 	}
 
 	@ParameterizedTest
@@ -234,7 +232,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assertions.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep);
 	}
 
 	@ParameterizedTest
@@ -257,7 +255,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assertions.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep);
 
 	}
 
