@@ -279,7 +279,7 @@ public abstract class FastEmissionGridAnalyzer {
 	 * Rasterizes links into squares. Uses Bresenham's line drawing algorithm, which is supposed to be fast
 	 * Maybe the result is too chunky, but it'll do as a first try
 	 *
-	 * @param link Matsim network link
+	 * @param link MATSim network link
 	 * @return number of cells the link is rastered to
 	 */
 	private static int rasterizeLink(Link link, double value, Raster raster) {

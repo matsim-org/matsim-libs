@@ -113,11 +113,11 @@ public final class EmissionModule {
 
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 
-		logger.info("Emission calculation based on `Free flow only' occured for {} of {} warm emission events.", wam.getFreeFlowOccurences(), wam.getWarmEmissionEventCounter());
-		logger.info("Emission calculation based on `Stop&Go only' occured for {} of {} warm emission events.", wam.getStopGoOccurences(), wam.getWarmEmissionEventCounter());
-		logger.info("Emission calculation based on `Fractions' occured for {} of {} warm emission events.", wam.getFractionOccurences(), wam.getWarmEmissionEventCounter());
-		logger.info("Free flow occured on {} km of total {} km, where emissions were calculated.", wam.getFreeFlowKmCounter(), wam.getKmCounter());
-		logger.info("Stop&Go occured on {} km of total {} km, where emissions were calculated.", wam.getStopGoKmCounter(), wam.getKmCounter());
+		logger.info("Emission calculation based on `Free flow only' occurred for {} of {} warm emission events.", wam.getFreeFlowOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Emission calculation based on `Stop&Go only' occurred for {} of {} warm emission events.", wam.getStopGoOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Emission calculation based on `Fractions' occurred for {} of {} warm emission events.", wam.getFractionOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Free flow occurred on {} km of total {} km, where emissions were calculated.", wam.getFreeFlowKmCounter(), wam.getKmCounter());
+		logger.info("Stop&Go occurred on {} km of total {} km, where emissions were calculated.", wam.getStopGoKmCounter(), wam.getKmCounter());
 		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
 

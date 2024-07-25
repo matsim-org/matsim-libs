@@ -111,7 +111,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		}
 
 		private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
-			// the following block fixes the vehicle type's emission information whenusing an  old vehicle type format
+			// the following block fixes the vehicle type's emission information when using an  old vehicle type format
 			// the unit test I found uses an old format, so have it here.
 			{
 				String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription(vehicle.getType(), emissionsConfigGroup);
@@ -223,23 +223,23 @@ public class PositionEmissionsModule extends AbstractModule {
 
 		private Map<Pollutant, Double> computeColdEmissions(PositionEvent event, Vehicle vehicle, double distanceToLastPosition) {
 
-			// we remember the vehicles which are currently emmitting cold emissions if not stored here return nothing
+			// we remember the vehicles which are currently emitting cold emissions if not stored here return nothing
 			if (!vehiclesEmittingColdEmissions.contains(vehicle.getId()))
 				return emissionCalculator.getEmptyColdEmissions();
 
 			double distance = calculateTravelledDistance(event);
 
 			// this model assumes vehicles to emmit cold emissions for the first 2000m of a trip remove a vehicle from
-			// the list of emmiting vehicles if the current trajectory is longer than 2000m
+			// the list of emitting vehicles if the current trajectory is longer than 2000m
 			if (distance > 2000) {
 				vehiclesEmittingColdEmissions.remove(vehicle.getId());
 				return emissionCalculator.getEmptyColdEmissions();
 			}
 
-			// HBEFA assumes a constantly decreasing ammount of cold emissions depending on the distance travelled
+			// HBEFA assumes a constantly decreasing amount of cold emissions depending on the distance travelled
 			// the underlying emission module simplifies this into two steps. Between 0-1km and 1-2km. We use the same
 			// classes here because we don't want to rewrite all the stuff. The cold emission module computes emissions
-			// for 1000m. We take these as is and muliply with distanceToLastPosition / 1000. This way we have the fraction
+			// for 1000m. We take these as is and multiply with distanceToLastPosition / 1000. This way we have the fraction
 			// of cold emissions for the distance travelled during the last time step janek oct' 2021
 			int distanceClass = distance <= 1000 ? 1 : 2;
 

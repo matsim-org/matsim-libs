@@ -59,12 +59,12 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
  * weamParameter - testWarmEmissionAnalysisParameter
  * throw warm EmissionEvent - testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
- * get free flow occurences - testCounters*()
- * get fraction occurences - testCounters*()
- * get stop-go occurences - testCounters*()
+ * get free flow occurrences - testCounters*()
+ * get fraction occurrences - testCounters*()
+ * get stop-go occurrences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
- * get top go km couter - testCounters*()
+ * get top go km counter - testCounters*()
  * get warm emission event counter - testCounters*()
  *
  * private methods and corresponding tests:
@@ -241,9 +241,9 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 
 	/*
-	 * this test method creates a incoff mock link and incoff mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
-	 * for the computationMethod "Stop and Go" and "averageSpeed" the free flow occurences are tested
-	 * the counters (StopGoOccurences, KmCounter, WarmEmissionEventCounter) are tested
+	 * this test method creates an incoff mock link and incoff mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
+	 * for the computationMethod "Stop and Go" and "averageSpeed" the free flow occurrences are tested
+	 * the counters (StopGoOccurrences, KmCounter, WarmEmissionEventCounter) are tested
 	 * for the case average speed equals wrong free flow speed the counters are tested
 	 */
 
@@ -305,7 +305,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		// yyyyyy !!!!!!
 
 		/*
-		 * using the same case as above - case 1 and check the counters for all possible combinations of avg, stop go and free flow speed
+		 * using the same case as above - case 1 and check the counters for all possible combinations of avg, stop-go and free flow speed
 		 */
 
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
@@ -376,7 +376,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 		emissionsModule.reset();
 		emissionsModule.getEcg().setEmissionsComputationMethod(AverageSpeed );
-		//@KMT it seems to me that copying the counters from above and chaning the expected values??
+		//@KMT it seems to me that copying the counters from above and changing the expected values??
 		// yyyyyy !!!!!!
 
 	}

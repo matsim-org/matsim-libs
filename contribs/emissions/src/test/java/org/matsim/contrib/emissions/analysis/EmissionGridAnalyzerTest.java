@@ -386,9 +386,9 @@ public class EmissionGridAnalyzerTest {
         }
     }
 
-    private void assertCsvValuesAreSame(Path expected, Path acutal) throws IOException {
+    private void assertCsvValuesAreSame(Path expected, Path actual) throws IOException {
 
-        try (FileReader expectedReader = new FileReader(expected.toString()); var actualReader = new FileReader(acutal.toString())) {
+        try (FileReader expectedReader = new FileReader(expected.toString()); var actualReader = new FileReader(actual.toString())) {
 
             var actualIterator = CSVFormat.TDF.withFirstRecordAsHeader().parse(actualReader).iterator();
 

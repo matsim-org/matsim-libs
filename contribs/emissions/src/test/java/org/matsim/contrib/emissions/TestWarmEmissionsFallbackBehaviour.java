@@ -72,7 +72,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarmDetailedValueOnlyDetailed() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
@@ -92,7 +92,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		assertThrows(RuntimeException.class, () -> {
 			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 		});
 	}
@@ -110,7 +110,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		assertThrows(RuntimeException.class, () -> {
 			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 		});
 	}
@@ -128,7 +128,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
@@ -147,7 +147,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
@@ -167,7 +167,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		assertThrows(RuntimeException.class, () -> {
 			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 		});
 	}
@@ -184,7 +184,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
@@ -203,7 +203,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
@@ -223,7 +223,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 
 		double expectedValue = 31.1947174; // = 200m * 155.973587 g/km

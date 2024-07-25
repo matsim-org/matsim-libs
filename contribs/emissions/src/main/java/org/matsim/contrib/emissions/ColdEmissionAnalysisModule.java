@@ -206,7 +206,7 @@ final class ColdEmissionAnalysisModule {
 	 * @param originVehCat
 	 * @param targetvehCat
 	 */
-	//TODO Mabe make the behaviour settable by an enum? -> keep some kind of backwards capability or just return a 0.0 as it is for motorcycle?
+	//TODO Maybe make the behaviour settable by an enum? -> keep some kind of backwards capability or just return a 0.0 as it is for motorcycle?
 	private void changeVehCategory(HbefaColdEmissionFactorKey key, HbefaVehicleCategory originVehCat, HbefaVehicleCategory targetvehCat) {
 //		key.setVehicleCategory(targetvehCat);
 //		if (vehInfoWarnHDVCnt < maxWarnCnt) {

@@ -292,7 +292,7 @@ public class EmissionUtilsTest {
 
 		//put some content into the list
 		// no incorrect/incomplete input data here
-		// warm and cold emissions are already sumed up -> sumUpEmissionsPerId is tested seperatly
+		// warm and cold emissions are already summed up -> sumUpEmissionsPerId is tested separately
 
 		//person1
 		SortedMap<Pollutant, Double> allEmissionsP1 = new TreeMap<>();
@@ -442,7 +442,7 @@ public class EmissionUtilsTest {
 			}
 			//nothing else in the list
 			int numOfPolls = pollsFromEU.size();
-			Assertions.assertEquals(numOfPolls, finalMap.get(id).keySet().size(), "the number of pullutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls);
+			Assertions.assertEquals(numOfPolls, finalMap.get(id).keySet().size(), "the number of pollutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls);
 		}
 
 		//check: values for all emissions are correct -person 1
@@ -498,7 +498,7 @@ public class EmissionUtilsTest {
 		}
 		//nothing else in the list
 		int numOfPolls = pollsFromEU.size();
-		message = "the number of pullutants is " + finalMap.get(idp3).keySet().size() + " but should be" + numOfPolls;
+		message = "the number of pollutants is " + finalMap.get(idp3).keySet().size() + " but should be" + numOfPolls;
 		Assertions.assertEquals(numOfPolls, finalMap.get(idp3).keySet().size(), message);
 
 	}

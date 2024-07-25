@@ -36,7 +36,7 @@ public class RawEmissionEventsReaderTest {
 	@Test
 	void handleNonEmissionEvent() {
 
-        // read in events file wihtout emission events. Those events should be ignored
+        // read in events file without emission events. Those events should be ignored
         var eventsUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "output_events.xml.gz");
         new RawEmissionEventsReader((time, linkId, vehicleId, pollutant, value) -> {
             // this method should not be called

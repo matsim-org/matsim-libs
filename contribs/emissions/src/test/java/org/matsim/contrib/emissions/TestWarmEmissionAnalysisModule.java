@@ -103,7 +103,7 @@ public class TestWarmEmissionAnalysisModule {
 	private final Double noeFreeSpeed = AVG_PASSENGER_CAR_SPEED_FF_KMH;
 
 	// case 6 - data in detailed table, stop-go speed = free flow speed
-	private final String sgffRoadCatgory = "URB_case7";
+	private final String sgffRoadCategory = "URB_case7";
 	private final String sgffTechnology = "sg ff technology";
 	private final String sgffConcept = "sg ff concept";
 	private final String sgffSizeClass = "sg ff size class";
@@ -124,7 +124,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> sgffVehicleId = Id.create("vehicle sg equals ff", Vehicle.class);
 		double sgffLinklength = 4000.;
 		Link sgflink = createMockLink("link sgf", sgffLinklength, AVG_PASSENGER_CAR_SPEED_FF_KMH / 3.6);
-		EmissionUtils.setHbefaRoadType(sgflink, sgffRoadCatgory);
+		EmissionUtils.setHbefaRoadType(sgflink, sgffRoadCategory);
 
 		Id<VehicleType> sgffVehicleTypeId = Id.create( PASSENGER_CAR + ";" + sgffTechnology + ";"+ sgffSizeClass + ";"+sgffConcept, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -344,7 +344,7 @@ public class TestWarmEmissionAnalysisModule {
 			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
-				detWarmKey.setRoadCategory(sgffRoadCatgory);
+				detWarmKey.setRoadCategory(sgffRoadCategory);
 				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 				detWarmKey.setVehicleAttributes(vehAtt);
 				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
@@ -362,7 +362,7 @@ public class TestWarmEmissionAnalysisModule {
 			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
-				detWarmKey.setRoadCategory(sgffRoadCatgory);
+				detWarmKey.setRoadCategory(sgffRoadCategory);
 				detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 				detWarmKey.setVehicleAttributes(vehAtt);
 				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
@@ -374,7 +374,7 @@ public class TestWarmEmissionAnalysisModule {
 	static void fillAverageTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable ) {
 
 		// entries for first case "petrol" should not be used since there are entries in the detailed table
-		// there should only average vehicle attributes in the avgHebfWarmTable jm oct'18
+		// there should only average vehicle attributes in the avgHbefaWarmTable jm oct'18
 		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 
 

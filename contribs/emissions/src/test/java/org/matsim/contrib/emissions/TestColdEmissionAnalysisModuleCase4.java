@@ -89,7 +89,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 //	private static final String nullcase_emConcept = "nullCase";
 	// this testcase does not exist anymore.  kai, jul'18
 
-	// emission factors for tables - no dublicates!
+	// emission factors for tables - no duplicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
 	private static final Double averageAverageFactor = .1;

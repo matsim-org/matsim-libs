@@ -74,7 +74,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private static final String petrolConcept ="<1,4L";
 	private static final double[] detailedPetrolFactor = {10, 100, 1000, 10000, 100000};
 
-	// case 2 - free flow entry in both tables, stop go entry in average table -> use average
+	// case 2 - free flow entry in both tables, stop-go entry in average table -> use average
 	private static final String pcTechnology = "PC petrol <1,4L <ECE";
 	private static final String pcSizeClass = "petrol (4S)";
 	private static final String pcConcept = "<1,4L";
@@ -128,7 +128,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	}
 
-	//using the different computation methods, the NOx warm Emissions are calculated for the diffrent trafic Situations (FF;HEAVY;SAT;SG)
+	//using the different computation methods, the NOx warm Emissions are calculated for the different traffic situations (FF;HEAVY;SAT;SG)
 	@ParameterizedTest
 	@EnumSource(EmissionsConfigGroup.EmissionsComputationMethod.class)
 	public void testTrafficSituations(EmissionsComputationMethod emissionsComputationMethod) {

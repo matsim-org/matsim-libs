@@ -104,7 +104,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
 					// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
 					// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
-					// Eventually vehicle category and vehicle attribute should be alligned in order to make the allCombinations setting useful
+					// Eventually vehicle category and vehicle attribute should be aligned in order to make the allCombinations setting useful
 					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
 					Set<String> roadCategories = new HashSet<>();
 					Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
@@ -149,7 +149,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
 					// where some detailed values exist and others don't.  So the thing to check would be if for each existing
 					//   roadCategory x vehicleCategory x vehicleAttribute x pollutant
-					// there is a freeflow and a stopgo entry.  Maybe something like this here:
+					// there is a freeflow and a stop-go entry.  Maybe something like this here:
 					Set<String> freeflowSet = new HashSet<>();
 					Set<String> stopgoSet = new HashSet<>();
 					for (HbefaWarmEmissionFactorKey key : detailedHbefaWarmTable.keySet()) {
@@ -334,7 +334,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// update counters:
-		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20
+		// yy I don't know what this is good for; I would base downstream analysis rather on events.  kai, jan'20
 		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 			incrementCountersFractional( linkLength_m / 1000, fractionStopGo );
 		}
@@ -556,7 +556,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaRoadVehicleCategoryKey hbefaRoadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(efkey);
 		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(hbefaRoadVehicleCategoryKey);
 
-		//TODO: Hier die Berechunung einfügen, die die trafficSpeedTabelle entsprechend aus den Werten erstellt?
+		//TODO: Hier die Berechnung einfügen, die die trafficSpeedTabelle entsprechend aus den Werten erstellt?
 		//Frage Laufzeit: Einmal berechnen ha
 
 		if (trafficSpeeds == null || !trafficSpeeds.containsKey(FREEFLOW)) {
@@ -576,7 +576,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				trafficSituation = STOPANDGO;
 			}
 		}
-		/*FIXME The following lines should be added to account for the HBEFA 4.1's additiona traffic situation,
+		/*FIXME The following lines should be added to account for the HBEFA 4.1's additional traffic situation,
 		   but it currently causes a test failure (jwj, Nov'20) */
 //		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
 //			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
@@ -626,7 +626,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 	}
 
-	//------ These (occurrences) seem do be used only for logging statements and tests. KMT/GR Jul'20
+	//------ These (occurrences) seem to be used only for logging statements and tests. KMT/GR Jul'20
 	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}
