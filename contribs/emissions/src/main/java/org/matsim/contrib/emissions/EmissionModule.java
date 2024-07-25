@@ -205,24 +205,17 @@ public final class EmissionModule {
 	}
 
 	private boolean shouldCreateAverageTables() {
-		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
-			case tryDetailedThenTechnologyAverageThenAverageTable:
-			case directlyTryAverageTable:
-				return true;
-			default:
-				return false;
-		}
+		return switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+			case tryDetailedThenTechnologyAverageThenAverageTable, directlyTryAverageTable -> true;
+			default -> false;
+		};
 	}
 
 	private boolean shouldCreateDetailedTables() {
-		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
-			case onlyTryDetailedElseAbort:
-			case tryDetailedThenTechnologyAverageElseAbort:
-			case tryDetailedThenTechnologyAverageThenAverageTable:
-				return true;
-			default:
-				return false;
-		}
+		return switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+			case onlyTryDetailedElseAbort, tryDetailedThenTechnologyAverageElseAbort, tryDetailedThenTechnologyAverageThenAverageTable -> true;
+			default -> false;
+		};
 	}
 
 	private void createEmissionHandlers() {
