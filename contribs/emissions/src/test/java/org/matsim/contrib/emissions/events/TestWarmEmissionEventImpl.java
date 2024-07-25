@@ -111,9 +111,7 @@ public class TestWarmEmissionEventImpl {
 		valuesNotSet.put(NOx, null);
 		valuesNotSet.put(PM, null);
 
-		Map<Pollutant,Double> map = new LinkedHashMap<>();
-		valuesNotSet.forEach(map::put);
-		// (this could be made more direct)
+		Map<Pollutant, Double> map = new LinkedHashMap<>(valuesNotSet);
 
 		WarmEmissionEvent valuesNotSetEvent = new WarmEmissionEvent(44., linkId, vehicleId, map);
 

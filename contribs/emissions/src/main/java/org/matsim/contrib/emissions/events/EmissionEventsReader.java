@@ -67,9 +67,12 @@ public final class EmissionEventsReader implements MatsimReader {
 					case WarmEmissionEvent.ATTRIBUTE_LINK_ID -> linkId = Id.createLinkId(entry.getValue());
 					case WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID -> vehicleId = Id.createVehicleId(entry.getValue());
 					case null, default -> {
-						String pollutant = entry.getKey().equals("NOX") ?
-							"NOx" :
-							entry.getKey(); // the previous versions would write NOX instead of NOx
+						String pollutant = null; // the previous versions would write NOX instead of NOx
+						if (entry.getKey() != null) {
+							pollutant = entry.getKey().equals("NOX") ?
+								"NOx" :
+								entry.getKey();
+						}
 
 						Double value = Double.parseDouble(entry.getValue());
 						warmEmissions.put(Pollutant.valueOf(pollutant), value);
@@ -100,9 +103,12 @@ public final class EmissionEventsReader implements MatsimReader {
 					case ColdEmissionEvent.ATTRIBUTE_LINK_ID -> linkId = Id.createLinkId(entry.getValue());
 					case ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID -> vehicleId = Id.createVehicleId(entry.getValue());
 					case null, default -> {
-						String pollutant = entry.getKey().equals("NOX") ?
-							"NOx" :
-							entry.getKey(); // the previous versions would write NOX instead of NOx
+						String pollutant = null; // the previous versions would write NOX instead of NOx
+						if (entry.getKey() != null) {
+							pollutant = entry.getKey().equals("NOX") ?
+								"NOx" :
+								entry.getKey();
+						}
 
 						Double value = Double.parseDouble(entry.getValue());
 						coldEmissions.put(Pollutant.valueOf(pollutant), value);
