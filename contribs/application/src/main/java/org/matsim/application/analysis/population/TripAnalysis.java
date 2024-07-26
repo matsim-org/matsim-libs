@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.math3.analysis.interpolation.LoessInterpolator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
@@ -32,6 +33,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
@@ -41,6 +43,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 	produces = {
 		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
 		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv",
+		"mode_share_distance_distribution.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
 	}
@@ -107,6 +110,25 @@ public class TripAnalysis implements MATSimAppCommand {
 	private static int durationToSeconds(String d) {
 		String[] split = d.split(":");
 		return (Integer.parseInt(split[0]) * 60 * 60) + (Integer.parseInt(split[1]) * 60) + Integer.parseInt(split[2]);
+	}
+
+	private static double[] calcHistogram(double[] data, double[] bins) {
+
+		double[] hist = new double[bins.length - 1];
+
+		for (int i = 0; i < bins.length - 1; i++) {
+
+			double binStart = bins[i];
+			double binEnd = bins[i + 1];
+
+			// The last right bin edge is inclusive, which is consistent with the numpy implementation
+			if (i == bins.length - 2)
+				hist[i] = Arrays.stream(data).filter(d -> d >= binStart && d <= binEnd).count();
+			else
+				hist[i] = Arrays.stream(data).filter(d -> d >= binStart && d < binEnd).count();
+		}
+
+		return hist;
 	}
 
 	@Override
@@ -246,6 +268,8 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeTripStats(joined);
 
 		writeTripPurposes(joined);
+
+		writeTripDistribution(joined);
 
 		return 0;
 	}
@@ -465,6 +489,55 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		table.write().csv(output.getPath("trip_purposes_by_hour.csv").toFile());
 
+	}
+
+	private void writeTripDistribution(Table trips) throws IOException {
+
+		Map<String, double[]> dists = new LinkedHashMap<>();
+
+		// Note that the results of this interpolator are consistent with the one performed in matsim-python-tools
+		// This makes the results comparable with reference data, changes here will also require changes in the python package
+		LoessInterpolator inp = new LoessInterpolator(0.05, 0);
+
+		long max = distGroups.get(distGroups.size() - 3) + distGroups.get(distGroups.size() - 2);
+
+		double[] bins = IntStream.range(0, (int) (max / 100)).mapToDouble(i -> i * 100).toArray();
+		double[] x = Arrays.copyOf(bins, bins.length - 1);
+
+		for (String mode : modeOrder) {
+			double[] distances = trips.where(
+					trips.stringColumn("main_mode").equalsIgnoreCase(mode))
+				.numberColumn("traveled_distance").asDoubleArray();
+
+			double[] hist = calcHistogram(distances, bins);
+
+			double[] y = inp.smooth(x, hist);
+			dists.put(mode, y);
+		}
+
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("mode_share_distance_distribution.csv")), CSVFormat.DEFAULT)) {
+
+			printer.print("dist");
+			for (String s : modeOrder) {
+				printer.print(s);
+			}
+			printer.println();
+
+			for (int i = 0; i < x.length; i++) {
+
+				double sum = 0;
+				for (String s : modeOrder) {
+					sum += Math.max(0, dists.get(s)[i]);
+				}
+
+				printer.print(x[i]);
+				for (String s : modeOrder) {
+					double value = Math.max(0, dists.get(s)[i]) / sum;
+					printer.print(value);
+				}
+				printer.println();
+			}
+		}
 	}
 
 	/**
