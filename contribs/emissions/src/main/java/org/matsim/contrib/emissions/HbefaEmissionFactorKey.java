@@ -66,13 +66,11 @@ abstract class HbefaEmissionFactorKey {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof HbefaEmissionFactorKey)) return false;
+		if (!(o instanceof HbefaEmissionFactorKey efk)) return false;
 
-		var that = (HbefaEmissionFactorKey) o;
-
-		if (vehicleCategory != that.getVehicleCategory()) return false;
-		if (!Objects.equals(vehicleAttributes, that.vehicleAttributes)) return false;
-		return Objects.equals(component, that.component);
+		if (vehicleCategory != efk.getVehicleCategory()) return false;
+		if (!Objects.equals(vehicleAttributes, efk.vehicleAttributes)) return false;
+		return Objects.equals(component, efk.component);
 	}
 
 	@Override

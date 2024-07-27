@@ -21,10 +21,8 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -37,7 +35,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.matsim.contrib.emissions.Pollutant.NMHC;
 import static org.matsim.contrib.emissions.TestWarmEmissionAnalysisModule.fillAverageTable;
@@ -47,7 +44,7 @@ import static org.matsim.contrib.emissions.TestWarmEmissionAnalysisModule.fillAv
  * /
 
 /*
- *  Case 2 - free flow entry in both tables, stop go entry in average table -> use average
+ *  Case 2 - free flow entry in both tables, stop-go entry in average table -> use average
  * 	see (*) below.  kai, jan'20
  */
 
@@ -59,12 +56,12 @@ import static org.matsim.contrib.emissions.TestWarmEmissionAnalysisModule.fillAv
  * weamParameter - testWarmEmissionAnalysisParameter
  * throw warm EmissionEvent - testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
- * get free flow occurences - testCounters*()
- * get fraction occurences - testCounters*()
- * get stop go occurences - testCounters*()
+ * get free flow occurrences - testCounters*()
+ * get fraction occurrences - testCounters*()
+ * get stop-go occurrences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
- * get top go km couter - testCounters*()
+ * get top go km counter - testCounters*()
  * get warm emission event counter - testCounters*()
  *
  * private methods and corresponding tests:
@@ -98,7 +95,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 	// vehicle information for regular test cases
 
-	// case 2 - free flow entry in both tables, stop go entry in average table -> use average (now fail)
+	// case 2 - free flow entry in both tables, stop-go entry in average table -> use average (now fail)
 	private static final String PC_TECHNOLOGY = "PC petrol <1,4L <ECE";
 	private static final String PC_SIZE_CLASS = "petrol (4S)";
 	private static final String PC_CONCEPT = "<1,4L";
@@ -108,7 +105,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 	/*
 	 * this test method creates a mock link and mock vehicle with a complete vehicleTypId --> lookUpBehaviour: tryDetailedThenTechnologyAverageThenAverageTable
-	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions and emissions sum are computed using the two emissionsComputationMethods StopAndGoFraction & AverageSpeed
+	 * for two speed cases: avg speed = free flow speed & avg speed = stop-go speed the NMHC warm emissions and emissions sum are computed using the two emissionsComputationMethods StopAndGoFraction & AverageSpeed
 	 */
 
 	@ParameterizedTest
@@ -118,7 +115,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 		WarmEmissionAnalysisModule emissionsModule = setUp(emissionsComputationMethod);
 
-		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
+		// case 2 - free flow entry in both tables, stop-go entry in average table -> use average
 		// see (*) below.  kai, jan'20
 
 		// create a link:
@@ -131,7 +128,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle pcVehicle = vehFac.createVehicle(pcVehicleId, vehFac.createVehicleType(pcVehicleTypeId));
 
-		// sub case avg speed = free flow speed
+		// subcase avg speed = free flow speed
 		{
 			// compute warm emissions with travel time coming from free flow:
 			warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PC_FREE_VELOCITY_KMH * 3.6 );
@@ -140,8 +137,8 @@ public class TestWarmEmissionAnalysisModuleCase2{
 					// - DETAILED FreeFlow value is available in the table (1.0E-4 g/km);  StopAndGo value is NOT available in the table
 					// - AVERAGE  FreeFlow value is available in the table (1.0 g/km) ;    StopAndGo value is NOT available in the table ( 10.0 g/km)
 					// --> It seems like it was intended (or only implemented) in a way, that if one of the detailed values is missing (FreeFlow or StopGo) there is a fallback to average. So the result of this would be 1.0 g/km * 0.1 km = 0.1 g/km
-					// --> Now, after implementing the new fallback behaviour, it is looking up both values (FreeFlow or StopGo) ways independently from each other. Therefore the result comes from the detailed table (1.0E-4 g/km) * * 0.1 km = 1.0E-5 g/km
-					// -----> We need a decision here, if we want allow that inconsistent(?) lookup of FreeFlow and Detailed values with different grade of detail or not.
+					// --> Now, after implementing the new fallback behaviour, it is looking up both values (FreeFlow or StopGo) ways independently of each other. Therefore, the result comes from the detailed table (1.0E-4 g/km) * * 0.1 km = 1.0E-5 g/km
+					// -----> We need a decision here, if we want to allow that inconsistent(?) lookup of FreeFlow and Detailed values with different grade of detail or not.
 					// After discussion with Kai N. we decided to let it as it is for the time being. I will add a log.info in the consistency checker.  KMT Jul'20
 
 			//results should be equal here, because in both cases only the freeflow value is relevant (100% freeflow, 0% stop&go).
@@ -155,7 +152,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			warmEmissions.clear();
 		}
 
-		// sub case avg speed = stop go speed
+		// subcase avg speed = stop-go speed
 		{
 			warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PCSG_VELOCITY_KMH * 3.6 );
 			Assertions.assertEquals( AVG_PC_FACTOR_SG * pclinkLength / 1000., warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
@@ -169,7 +166,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 	/*
 	 * this test method creates a vehicle and mock link
-	 * for three cases:  "current speed equals free flow speed" & "current speed equals stop go speed" & "current speed equals stop go speed" the counters are  tested
+	 * for three cases:  "current speed equals free flow speed" & "current speed equals stop-go speed" & "current speed equals stop-go speed" the counters are  tested
 	 * average values are used
 	 */
 	@ParameterizedTest
@@ -178,7 +175,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 		WarmEmissionAnalysisModule emissionsModule = setUp(emissionsComputationMethod);
 
-		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
+		// case 2 - free flow entry in both tables, stop-go entry in average table -> use average
 		Id<Vehicle> pcVehicleId = Id.create("vehicle 2", Vehicle.class);
 		double pclinkLength= 20.*1000;
 		Id<VehicleType> pcVehicleTypeId = Id.create( PASSENGER_CAR + ";"+ PC_TECHNOLOGY + ";"+ PC_SIZE_CLASS +";"+ PC_CONCEPT, VehicleType.class );
@@ -186,7 +183,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		Vehicle pcVehicle = vehFac.createVehicle(pcVehicleId, vehFac.createVehicleType(pcVehicleTypeId));
 		Link pclink = TestWarmEmissionAnalysisModule.createMockLink("link 2", pclinkLength, PC_FREE_VELOCITY_KMH / 3.6 );
 
-		// sub case: current speed equals free flow speed
+		// subcase: current speed equals free flow speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle,pclink, pclinkLength/ PC_FREE_VELOCITY_KMH *3.6 );
 		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assertions.assertEquals(pclinkLength/1000, emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
@@ -197,7 +194,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		Assertions.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
 		emissionsModule.reset();
 
-		// sub case: current speed equals stop go speed
+		// subcase: current speed equals stop-go speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, pclink, pclinkLength/ PCSG_VELOCITY_KMH *3.6 );
 		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assertions.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );

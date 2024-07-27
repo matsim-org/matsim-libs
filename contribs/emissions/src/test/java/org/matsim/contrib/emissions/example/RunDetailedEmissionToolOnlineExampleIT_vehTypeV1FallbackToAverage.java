@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -65,7 +66,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1FallbackToAverage {
 			emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
 			emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent );
 
-			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
+            Scenario scenario = ScenarioUtils.loadScenario(config);
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
