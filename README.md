@@ -1,6 +1,6 @@
 [![GithubActionsCI_maven](https://github.com/matsim-vsp/logistics/actions/workflows/GithubActionsCI_maven.yml/badge.svg?branch=main)](https://github.com/matsim-vsp/logistics/actions/workflows/GithubActionsCI_maven.yml)
 
-# Logistics Service Provider (LSP)
+# Logistics Service Provider (LSP) 
 
 This code deals with creating logitics chains for good transport. 
 It is based on work in the dfg-freight project.

@@ -66,6 +66,7 @@ import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.vehicles.VehicleType;
@@ -133,6 +134,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                 final EventBasedCarrierScorer4MultipleChains carrierScorer =
                         new EventBasedCarrierScorer4MultipleChains();
                 carrierScorer.setToll(TOLL_VALUE);
+                carrierScorer.setTolledVehicleTypes( List.of("heavy40t"));
+                carrierScorer.setTolledLinks(ExampleConstants.TOLLED_LINK_LIST_BERLIN);
                 bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
                 bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
                 bind(CarrierStrategyManager.class)

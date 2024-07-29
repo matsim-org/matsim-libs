@@ -37,7 +37,6 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -47,21 +46,34 @@ import org.matsim.vehicles.VehicleUtils;
  */
 class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory {
 
+
+
   @Inject private Network network;
 
   @Inject private Scenario scenario;
 
   private double toll;
+  private List<String> tolledVehicleTypes = new ArrayList<>();
+  private List<String> tolledLinks = new ArrayList<>();
+
 
   public ScoringFunction createScoringFunction(Carrier carrier) {
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
-    sf.addScoringFunction(new LinkBasedTollScoring(toll, List.of("heavy40t")));
+    sf.addScoringFunction(new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks));
     return sf;
   }
 
   void setToll(double toll) {
     this.toll = toll;
+  }
+
+  void setTolledVehicleTypes(List<String> tolledVehicleTypes) {
+    this.tolledVehicleTypes = tolledVehicleTypes;
+  }
+
+  void setTolledLinks(List<String> tolledLinks) {
+    this.tolledLinks = tolledLinks;
   }
 
   /**
@@ -146,10 +158,12 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
     private final List<String> vehicleTypesToBeTolled;
     private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
     private double score;
+    private List<String> tolledLinkList = new ArrayList<>();
 
-    public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled) {
+    public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {
       super();
       this.vehicleTypesToBeTolled = vehicleTypeToBeTolled;
+      this.tolledLinkList = tolledLinkListBerlin;
       this.toll = toll;
     }
 
@@ -169,8 +183,6 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
     }
     
     private void handleEvent(LinkEnterEvent event) {
-      List<String> tolledLinkList = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
-
       final Id<VehicleType> vehicleTypeId =
           (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
 
