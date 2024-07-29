@@ -234,11 +234,11 @@ public class LSPModule extends AbstractModule {
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
       LSPs lsps = LSPUtils.getLSPs(scenario);
       for (LSP lsp : lsps.getLSPs().values()) {
-        log.warn("Dumping plan(s) of [LSP={}] ; [No of plans={}]", lsp.getId(), lsp.getPlans().size());
+        log.info("Dumping plan(s) of [LSP={}] ; [No of plans={}]", lsp.getId(), lsp.getPlans().size());
         for (LSPPlan plan : lsp.getPlans()) {
-          log.warn("[LSPPlan: {}]", plan.toString());
+          log.info("[LSPPlan: {}]", plan.toString());
         }
-        log.warn("Plan(s) of [LSP={}] dumped.", lsp.getId());
+        log.info("Plan(s) of [LSP={}] dumped.", lsp.getId());
       }
     }
   }
