@@ -23,7 +23,6 @@ package org.matsim.contrib.emissions.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.vehicles.Vehicle;
