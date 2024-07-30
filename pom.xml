@@ -35,9 +35,9 @@
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.17.1</jackson.version>
+        <jackson.version>2.17.2</jackson.version>
         <jogl.version>2.5.0</jogl.version>
-		<junit.version>5.10.2</junit.version>
+		<junit.version>5.10.3</junit.version>
     </properties>
 
     <scm>
@@ -296,7 +296,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.44.0</version>
+                <version>3.45.0</version>
             </dependency>
 
 			<dependency>
@@ -314,7 +314,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.26.0</version>
+                <version>3.26.3</version>
                 <scope>test</scope>
             </dependency>
 
@@ -358,7 +358,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.17</version>
+				<version>1.14.18</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -425,7 +425,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

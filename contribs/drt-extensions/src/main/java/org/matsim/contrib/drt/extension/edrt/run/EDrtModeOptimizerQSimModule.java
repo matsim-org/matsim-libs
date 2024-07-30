@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
@@ -143,7 +144,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(CostCalculationStrategy.class)
 				.to(defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated
 						?

@@ -73,14 +73,14 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	@Override
 	protected boolean isLastStep(double now) {
 		boolean dropoffsReady = updateDropoffRequests(now);
-		boolean pickupsReady = updatePickupRequests(now);
+		boolean pickupsReady = updatePickupRequests(now, false);
 		return pickupsReady && dropoffsReady && now >= endTime.get();
 	}
 
 	@Override
 	protected void beforeFirstStep(double now) {
 		initDropoffRequests(now);
-		updatePickupRequests(now);
+		updatePickupRequests(now, true);
 	}
 
 	private void initDropoffRequests(double now) {
@@ -112,7 +112,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		}
 	}
 
-	private boolean updatePickupRequests(double now) {
+	private boolean updatePickupRequests(double now, boolean isFirstStep) {
 		var pickupIterator = pickupRequests.values().iterator();
 
 		while (pickupIterator.hasNext()) {
@@ -125,7 +125,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 				if (passengerHandler.notifyWaitForPassengers(this, this.driver, request.getId())) {
 					// agent starts to enter
 					queuePickup(request, now);
-				} else if (now > request.getEarliestStartTime()) {
+				} else if (now > request.getEarliestStartTime() && !isFirstStep) {
 					if (abandonVoter.abandonRequest(now, vehicle, request)) {
 						prebookingManager.abandon(request.getId());
 					}

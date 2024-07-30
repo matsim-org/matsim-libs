@@ -16,7 +16,7 @@ public class OsmHbefaMappingTest {
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("primary", 70 / 3.6);
 
-        var hbefaType = mapping.determineHebfaType(link);
+        var hbefaType = mapping.determineHbefaType(link);
 
         assertEquals("URB/Trunk-City/70", hbefaType);
     }
@@ -27,7 +27,7 @@ public class OsmHbefaMappingTest {
 		var mapping = OsmHbefaMapping.build();
 		var link = getTestLink("primary|railway.tram", 70 / 3.6);
 
-		var hbefaType = mapping.determineHebfaType(link);
+		var hbefaType = mapping.determineHbefaType(link);
 
 		assertEquals("URB/Trunk-City/70", hbefaType);
 	}
@@ -39,7 +39,7 @@ public class OsmHbefaMappingTest {
 			var mapping = OsmHbefaMapping.build();
 			var link = getTestLink("unknown-tag", 100 / 3.6);
 
-			mapping.determineHebfaType(link);
+			mapping.determineHbefaType(link);
 
 			fail("Expected Runtime Exception.");
 		});
@@ -51,7 +51,7 @@ public class OsmHbefaMappingTest {
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("motorway", 100 / 3.6);
 
-        var hbefaType = mapping.determineHebfaType(link);
+        var hbefaType = mapping.determineHbefaType(link);
 
         assertEquals("URB/MW-Nat./100", hbefaType);
     }
@@ -62,11 +62,11 @@ public class OsmHbefaMappingTest {
 		var mapping = OsmHbefaMapping.build();
 
 		var link = getTestLink("motorway", 100.11 / 3.6);
-		var hbefaType = mapping.determineHebfaType(link);
+		var hbefaType = mapping.determineHbefaType(link);
 		assertEquals("URB/MW-Nat./100", hbefaType);
 
 		link = getTestLink("motorway", 86.11 / 3.6);
-		hbefaType = mapping.determineHebfaType(link);
+		hbefaType = mapping.determineHbefaType(link);
 		assertEquals("URB/MW-Nat./90", hbefaType);
 
 	}
@@ -77,7 +77,7 @@ public class OsmHbefaMappingTest {
 		var mapping = OsmHbefaMapping.build();
 		var link = getTestLink("motorway_link", 100 / 3.6);
 
-		var hbefaType = mapping.determineHebfaType(link);
+		var hbefaType = mapping.determineHbefaType(link);
 
 		assertEquals("URB/MW-Nat./100", hbefaType);
 	}
@@ -87,7 +87,7 @@ public class OsmHbefaMappingTest {
 		var mapping = OsmHbefaMapping.build();
 		var link = getTestLink("living_street", 50 / 3.6);
 
-		var hbefaType = mapping.determineHebfaType(link);
+		var hbefaType = mapping.determineHbefaType(link);
 
 		assertEquals("URB/Access/50", hbefaType);
 	}
@@ -98,7 +98,7 @@ public class OsmHbefaMappingTest {
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink("unclassified", 50 / 3.6);
 
-        var hbefaType = mapping.determineHebfaType(link);
+        var hbefaType = mapping.determineHbefaType(link);
 
         assertEquals("URB/Access/50", hbefaType);
     }
@@ -109,7 +109,7 @@ public class OsmHbefaMappingTest {
         var mapping = OsmHbefaMapping.build();
         var link = getTestLink(" ", 60 / 3.6);
 
-        var hbefaType = mapping.determineHebfaType(link);
+        var hbefaType = mapping.determineHbefaType(link);
 
         assertEquals("URB/Local/60", hbefaType);
     }
@@ -121,7 +121,7 @@ public class OsmHbefaMappingTest {
         var link = getTestLink("residential", 40 / 3.6);
         link.getAttributes().removeAttribute(NetworkUtils.ALLOWED_SPEED);
 
-        var hbefaType = mapping.determineHebfaType(link);
+        var hbefaType = mapping.determineHbefaType(link);
 
         assertEquals("URB/Access/40", hbefaType);
     }
