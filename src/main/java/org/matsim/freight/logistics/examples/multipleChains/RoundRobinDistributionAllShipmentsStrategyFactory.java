@@ -35,6 +35,13 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
+/**
+ *  This strategy removes **all** shipments from the logistic chains and reassigns them.
+ *  The reassignment is done in a round-robin fashion, so that in the hand all chains have the same number of shipments.
+ *  It does not seem to be a very useful strategy in terms of going forward towards a (local) optimum, as long as it is the only one.
+ *
+ *  @author nrichter (during his master thesis @VSP)
+ */
 /*package-private*/ class RoundRobinDistributionAllShipmentsStrategyFactory {
   //This is ok so as long as it is **non-public**.
   //Before making it public, it should be configurable either via config or Injection.
