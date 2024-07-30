@@ -69,7 +69,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
       CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
       carrier.getServices().put(carrierService.getId(), carrierService);
     }
-    carrier = CarrierSchedulerUtils.routeCarrier(carrier, resource.getNetwork());
+    carrier = CarrierSchedulerUtils.solveVrpWithJsprit(carrier, resource.getNetwork());
   }
 
   private CarrierService convertToCarrierService(LspShipmentWithTime tuple) {
