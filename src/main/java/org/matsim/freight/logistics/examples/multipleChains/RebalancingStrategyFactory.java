@@ -36,6 +36,12 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
+/**
+ *  This strategy removes **one** randomly selected shipment from logistic chain with the most shipments and reassign it to one of the chains with the lowest number of shipments.
+ *  This strategy allows to slowly change the plans and therefore follow the iterative learning process. But is moves towards a solution with all chains having the same number of shipments.
+ *  For me (KMT) the use case is not obvious, when used as only strategy, but it can have its use in a set of strategies.
+ *  @author nrichter (during his master thesis @VSP)
+ */
 class RebalancingStrategyFactory {
   //This is ok so as long as it is **non-public**.
   //Before making it public, it should be configurable either via config or Injection.

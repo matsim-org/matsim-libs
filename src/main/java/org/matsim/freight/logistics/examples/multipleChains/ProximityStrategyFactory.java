@@ -38,6 +38,13 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
+/**
+ *  This strategy removes **one** randomly selected shipment from logistic chain with the most shipments and reassign it to the chain with the closest chain.
+ *  The distance is measured as the Euclidean distance between the shipment's destination and the resource's start link.
+ *  This strategy allows to slowly change the plans and therefore follow the iterative learning process.
+ *
+ *  @author nrichter (during his master thesis @VSP)
+ */
 final class ProximityStrategyFactory {
   //This is ok so as long as it is **non-public**.
   //Before making it public, it should be configurable either via config or Injection.

@@ -38,6 +38,12 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
+/**
+ *  This strategy removes **one** randomly selected shipment from the logistic chain it was assigned to and reassign it to another chain.
+ *  This strategy allows to slowly change the plans and therefore follow the iterative learning process.
+ *  But it is i) slow, because it needs a lot of iterations and ii) has a high chance to get stuck in a local optimum.
+ *  @author nrichter (during his master thesis @VSP)
+ */
 class RandomShiftingStrategyFactory {
 
     private static Random random = null;
