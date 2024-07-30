@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.operations.eshifts.dispatcher;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
@@ -11,7 +11,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -96,8 +96,8 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 						final ElectricVehicle electricVehicle = eShiftVehicle.getElectricVehicle();
 						if (electricVehicle.getBattery().getCharge() / electricVehicle.getBattery().getCapacity() < drtShiftParams.chargeAtHubThreshold) {
 							final Task currentTask = eShiftVehicle.getSchedule().getCurrentTask();
-							if (currentTask instanceof EDrtWaitForShiftStayTask
-									&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
+							if (currentTask instanceof EDrtWaitForShiftTask
+									&& ((EDrtWaitForShiftTask) currentTask).getChargingTask() == null) {
 								Optional<Charger> selectedCharger = chargerIds
 										.stream()
 										.map(id -> chargingInfrastructure.getChargers().get(id))
@@ -122,7 +122,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 												.calcRemainingEnergyToCharge(electricVehicle);
 										final double endTime = timeStep + waitTime + chargingTime;
 										if (endTime < currentTask.getEndTime()) {
-											shiftTaskScheduler.chargeAtHub((WaitForShiftStayTask) currentTask, eShiftVehicle,
+											shiftTaskScheduler.chargeAtHub((WaitForShiftTask) currentTask, eShiftVehicle,
 													electricVehicle, selectedChargerImpl, timeStep, endTime, energy);
 										}
 									}

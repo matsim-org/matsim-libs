@@ -163,7 +163,7 @@ public class Tour {
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
 			Gbl.assertNotNull(leg);
-			tourElements.add(0,leg);
+			tourElements.addFirst(leg);
 			return this;
 		}
 
@@ -183,7 +183,7 @@ public class Tour {
 			}
 //			assertLastElementIsLeg();
 			Pickup pickup = createPickup(shipment);
-			tourElements.add(0, pickup);
+			tourElements.addFirst(pickup);
 //			previousElementIsActivity = true;
 			return this;
 		}
@@ -197,7 +197,7 @@ public class Tour {
 		 */
 		public void schedulePickup(CarrierShipment shipment) {
 			Gbl.assertNotNull(shipment);
-			logger.debug("Pickup to get scheduled: " + shipment);
+			logger.debug("Pickup to get scheduled: {}", shipment);
 			boolean wasNew = openPickups.add(shipment);
 			if (!wasNew) {
 				throw new IllegalStateException("Trying to deliver something which was already picked up.");
@@ -223,8 +223,8 @@ public class Tour {
 		 */
 		public void scheduleDelivery(CarrierShipment shipment) {
 			Gbl.assertNotNull(shipment);
-			logger.debug("Delivery to get scheduled: " + shipment);
-			logger.debug("OpenPickups: " + openPickups);
+			logger.debug("Delivery to get scheduled: {}", shipment);
+			logger.debug("OpenPickups: {}", openPickups);
 			boolean wasOpen = openPickups.remove(shipment);
 			if (!wasOpen) {
 				throw new IllegalStateException("Trying to deliver something which was not picked up.");

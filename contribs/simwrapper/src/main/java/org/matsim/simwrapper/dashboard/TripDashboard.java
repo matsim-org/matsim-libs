@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.analysis.population.TripAnalysis;
@@ -308,8 +309,9 @@ public class TripDashboard implements Dashboard {
 	private void createChoiceTab(Layout layout, String[] args) {
 
 		layout.row("choice-intro", "Mode Choice").el(TextBlock.class, (viz, data) -> {
-			viz.title = "Information";
+			viz.backgroundColor = "transparent";
 			viz.content = """
+				### **Information**
 				Note that these metrics are based on a single run and may have limited interpretability. For a more robust evaluation, consider running multiple simulations with different seeds and use metrics that consider probabilities as well.
 				(log-likelihood, Brier score, etc.)
 				For policy cases, these metrics do not have any meaning. They are solely for the base-case.
@@ -371,7 +373,14 @@ public class TripDashboard implements Dashboard {
 
 		for (String cat : Objects.requireNonNull(categories, "Categories not set")) {
 
-			layout.row("category_" + cat, "By Groups")
+			layout.row("category_header_" + cat, "By Groups")
+
+				.el(TextBlock.class, (viz, data) -> {
+					viz.content = "## **" + StringUtils.capitalize(cat) + "**";
+					viz.backgroundColor = "transparent";
+				});
+
+			layout.row("category_1_" + cat, "By Groups")
 				.el(Plotly.class, (viz, data) -> {
 
 					viz.title = "Mode share";
@@ -399,8 +408,7 @@ public class TripDashboard implements Dashboard {
 
 				});
 
-				/*
-				 TODO: This part needs some more work in simwrapper and is not yet ready
+			layout.row("category_2_" + cat, "By Groups")
 
 				.el(Plotly.class, (viz, data) -> {
 					viz.title = "Modal distance distribution";
@@ -433,7 +441,6 @@ public class TripDashboard implements Dashboard {
 						.build(), ds);
 
 				});
-				 */
 
 		}
 	}

@@ -13,59 +13,31 @@ public class GeneralParkingModule implements StartupListener, BeforeMobsimListen
 
 	private final Controler controler;
 	private ParkingScore parkingScoreManager;
-//	public final ParkingScore getParkingScoreManager() {
-//		return parkingScoreManager;
-//	}
-
-	public final void setParkingScoreManager(ParkingScore parkingScoreManager) {
-		this.parkingScoreManager = parkingScoreManager;
-	}
-
 	private ParkingInfrastructure parkingInfrastructureManager;
 	private ParkingChoiceSimulation parkingChoiceSimulation;
 
 	public GeneralParkingModule(Controler controler){
 		this.controler = controler ;
-		
 		controler.addControlerListener(this);
 	}
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
+
+	@Override public void notifyStartup(StartupEvent event) {
 		parkingChoiceSimulation = new ParkingChoiceSimulation(controler.getScenario(), parkingInfrastructureManager);
 		controler.getEvents().addHandler( parkingChoiceSimulation );
-//		controler.addControlerListener(parkingSimulation);
-		// was not doing anything there. kai, jul'15
 	}
 
-//	public final ParkingInfrastructure getParkingInfrastructure() {
-//		return parkingInfrastructureManager;
-//	}
+	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		parkingScoreManager.notifyBeforeMobsim();
+		parkingInfrastructureManager.notifyBeforeMobsim();
+		parkingChoiceSimulation.notifyBeforeMobsim();
+	}
+
+	public final void setParkingScoreManager(ParkingScore parkingScoreManager) {
+		this.parkingScoreManager = parkingScoreManager;
+	}
 
 	public final void setParkingInfrastructurManager(ParkingInfrastructure parkingInfrastructureManager) {
 		this.parkingInfrastructureManager = parkingInfrastructureManager;
 	}
-
-//	@Deprecated
-//	// lower level objects may keep back pointers to higher level objects if they have to, but we prefer that they do not provide them
-//	// as a service. kai, apr'15
-//	public final Controler getControler() {
-//		return controler;
-//	}
-
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		parkingScoreManager.prepareForNewIteration();
-		parkingInfrastructureManager.reset();
-		parkingChoiceSimulation.prepareForNewIteration();
-	}
-
-//	protected final ParkingInfrastructure getParkingInfrastructureManager() {
-//		return parkingInfrastructureManager;
-//	}
-//
-//	protected final ParkingChoiceSimulation getParkingSimulation() {
-//		return parkingSimulation;
-//	}
 
 }

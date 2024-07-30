@@ -40,7 +40,7 @@ public final class EmissionEventsReader implements MatsimReader {
 	// leave this public so that external code can generate "standard" emission events. MATSIM-893
 
 
-	private MatsimEventsReader delegate ;
+	private final MatsimEventsReader delegate ;
 
 	public EmissionEventsReader( EventsManager events ){
 		this.delegate = new MatsimEventsReader(events);
@@ -59,20 +59,24 @@ public final class EmissionEventsReader implements MatsimReader {
 			// the loop is necessary since we do now know which pollutants are in the event.
 			for (Map.Entry<String, String> entry : attributes.entrySet()) {
 
-				if( "time".equals( entry.getKey() ) ){
-					time = Double.parseDouble( entry.getValue() );
-				} else if( "type".equals( entry.getKey() ) ){
-					// I don't think that we are doing anything here. kai, jan'19
-				} else if( WarmEmissionEvent.ATTRIBUTE_LINK_ID.equals( entry.getKey() ) ){
-					linkId = Id.createLinkId( entry.getValue() );
-				} else if (WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID.equals(entry.getKey())) {
-					vehicleId = Id.createVehicleId(entry.getValue());
-				} else {
-					String pollutant = entry.getKey().equals("NOX") ?
-							"NOx" :
-							entry.getKey(); // the previous versions would write NOX instead of NOx
-					Double value = Double.parseDouble(entry.getValue());
-					warmEmissions.put(Pollutant.valueOf(pollutant), value);
+				switch (entry.getKey()) {
+					case "time" -> time = Double.parseDouble(entry.getValue());
+					case "type" -> {
+						// I don't think that we are doing anything here. kai, jan'19
+					}
+					case WarmEmissionEvent.ATTRIBUTE_LINK_ID -> linkId = Id.createLinkId(entry.getValue());
+					case WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID -> vehicleId = Id.createVehicleId(entry.getValue());
+					case null, default -> {
+						String pollutant = null; // the previous versions would write NOX instead of NOx
+						if (entry.getKey() != null) {
+							pollutant = entry.getKey().equals("NOX") ?
+								"NOx" :
+								entry.getKey();
+						}
+
+						Double value = Double.parseDouble(entry.getValue());
+						warmEmissions.put(Pollutant.valueOf(pollutant), value);
+					}
 				}
 			}
 
@@ -91,20 +95,24 @@ public final class EmissionEventsReader implements MatsimReader {
 			// the loop is necessary since we do now know which pollutants are in the event.
 			for (Map.Entry<String, String> entry : attributes.entrySet()) {
 
-				if( "time".equals( entry.getKey() ) ){
-					time = Double.parseDouble( entry.getValue() );
-				} else if( "type".equals( entry.getKey() ) ){
-					// do nothing
-				} else if( ColdEmissionEvent.ATTRIBUTE_LINK_ID.equals( entry.getKey() ) ){
-					linkId = Id.createLinkId( entry.getValue() );
-				} else if (ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID.equals(entry.getKey())) {
-					vehicleId = Id.createVehicleId(entry.getValue());
-				} else {
-					String pollutant = entry.getKey().equals("NOX") ?
-							"NOx" :
-							entry.getKey(); // the previous versions would write NOX instead of NOx
-					Double value = Double.parseDouble(entry.getValue());
-					coldEmissions.put(Pollutant.valueOf(pollutant), value);
+				switch (entry.getKey()) {
+					case "time" -> time = Double.parseDouble(entry.getValue());
+					case "type" -> {
+						// do nothing
+					}
+					case ColdEmissionEvent.ATTRIBUTE_LINK_ID -> linkId = Id.createLinkId(entry.getValue());
+					case ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID -> vehicleId = Id.createVehicleId(entry.getValue());
+					case null, default -> {
+						String pollutant = null; // the previous versions would write NOX instead of NOx
+						if (entry.getKey() != null) {
+							pollutant = entry.getKey().equals("NOX") ?
+								"NOx" :
+								entry.getKey();
+						}
+
+						Double value = Double.parseDouble(entry.getValue());
+						coldEmissions.put(Pollutant.valueOf(pollutant), value);
+					}
 				}
 			}
 			return new ColdEmissionEvent(time, linkId, vehicleId, coldEmissions);

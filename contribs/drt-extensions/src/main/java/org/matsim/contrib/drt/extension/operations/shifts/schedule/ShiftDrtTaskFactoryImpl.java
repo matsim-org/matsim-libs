@@ -58,9 +58,9 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 	}
 
 	@Override
-	public WaitForShiftStayTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime,
-														   Link link, OperationFacility facility) {
-		return new WaitForShiftStayTask(beginTime, endTime, link, facility);
+	public WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime,
+                                                       Link link, OperationFacility facility) {
+		return new WaitForShiftTask(beginTime, endTime, link, facility);
 	}
 
 	public DefaultStayTask createInitialTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
@@ -71,7 +71,7 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
-		WaitForShiftStayTask waitForShiftStayTask = createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+		WaitForShiftTask waitForShiftStayTask = createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 				vehicle.getStartLink(), operationFacility);
 		boolean success = operationFacility.register(vehicle.getId());
 		if (!success) {

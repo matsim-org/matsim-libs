@@ -142,14 +142,14 @@ import org.matsim.vehicles.VehicleUtils;
 		if (positionOfRelatedPickup == 0 && context.getRoute().getActivities().isEmpty()) {
 			context.getRoute().getStart().setLocation(context.getNewVehicle().getStartLocation());
 			context.getRoute().getEnd().setLocation(context.getNewVehicle().getEndLocation());
-			routeDistance = getDistance(context.getAssociatedActivities().get(0), context.getRoute().getEnd(),
+			routeDistance = getDistance(context.getAssociatedActivities().getFirst(), context.getRoute().getEnd(),
 					context.getNewVehicle(), context.getNewDepTime());
 			return routeDistance;
 		} else if (positionOfRelatedPickup == 0 && !context.getRoute().getActivities().isEmpty()) {
-			routeDistance = getDistance(context.getAssociatedActivities().get(0),
-					context.getRoute().getActivities().get(0), context.getNewVehicle(), context.getNewDepTime());
+			routeDistance = getDistance(context.getAssociatedActivities().getFirst(),
+					context.getRoute().getActivities().getFirst(), context.getNewVehicle(), context.getNewDepTime());
 		} else {
-			routeDistance = getDistance(context.getRoute().getStart(), context.getRoute().getActivities().get(0),
+			routeDistance = getDistance(context.getRoute().getStart(), context.getRoute().getActivities().getFirst(),
 					context.getNewVehicle(), context.getNewDepTime());
 		}
 		// adds distances between every tour activity and adds the associated pickup on
@@ -157,8 +157,8 @@ import org.matsim.vehicles.VehicleUtils;
 		while (context.getRoute().getTourActivities().getActivities().size() > (nextRouteActivity + 1)) {
 			if (positionOfRelatedPickup == (nextRouteActivity + 1) && positionOfRelatedPickup != 0) {
 				routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
-						context.getAssociatedActivities().get(0), context.getNewVehicle());
-				routeDistance = routeDistance + getDistance(context.getAssociatedActivities().get(0),
+						context.getAssociatedActivities().getFirst(), context.getNewVehicle());
+				routeDistance = routeDistance + getDistance(context.getAssociatedActivities().getFirst(),
 						context.getRoute().getActivities().get(nextRouteActivity), context.getNewVehicle());
 			} else {
 				routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
@@ -168,8 +168,8 @@ import org.matsim.vehicles.VehicleUtils;
 		}
 		if (positionOfRelatedPickup == context.getRoute().getActivities().size()) {
 			routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
-					context.getAssociatedActivities().get(0), context.getNewVehicle());
-			routeDistance = routeDistance + getDistance(context.getAssociatedActivities().get(0),
+					context.getAssociatedActivities().getFirst(), context.getNewVehicle());
+			routeDistance = routeDistance + getDistance(context.getAssociatedActivities().getFirst(),
 					context.getRoute().getEnd(), context.getNewVehicle());
 		} else
 			routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
@@ -189,7 +189,7 @@ import org.matsim.vehicles.VehicleUtils;
 			return realRouteDistance;
 		int n = 0;
 		realRouteDistance = getDistance(context.getRoute().getStart(),
-				context.getRoute().getTourActivities().getActivities().get(0), newVehicle);
+				context.getRoute().getTourActivities().getActivities().getFirst(), newVehicle);
 		while (context.getRoute().getTourActivities().getActivities().size() > (n + 1)) {
 			realRouteDistance = realRouteDistance
 					+ getDistance(context.getRoute().getTourActivities().getActivities().get(n),
@@ -258,9 +258,9 @@ import org.matsim.vehicles.VehicleUtils;
 			}
 			// checks the distance if the delivery is the last activity before the end of
 			// the tour
-			if (route.getTourActivities().getActivities().size() > 0) {
+			if (!route.getTourActivities().getActivities().isEmpty()) {
 				TourActivity activityLastDelivery = route.getTourActivities().getActivities()
-						.get(route.getTourActivities().getActivities().size() - 1);
+						.getLast();
 				TourActivity activityEnd = route.getEnd();
 				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle)
 						+ getDistance(assignedDelivery, activityEnd, newVehicle)

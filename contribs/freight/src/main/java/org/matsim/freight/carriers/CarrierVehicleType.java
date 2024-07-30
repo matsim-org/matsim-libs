@@ -50,7 +50,7 @@ public class CarrierVehicleType {
 	 *
 	 */
 	public static class Builder {
-		VehicleType delegate ;
+		final VehicleType delegate ;
 
 		/**
 		 * Returns a new instance of builder initialized with the typeId.
