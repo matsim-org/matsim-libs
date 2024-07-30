@@ -181,7 +181,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 //			System.out.println("utility egress: (sumExpVjkWalk) exponential of utility, sum over all opportunities near stop: : " + sumExpVjkWalk);
 
 			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() *
-				(utility_access + utilityDrtTime + utilityDrtDistance + utilityDrtConstant ))
+				(utility_access + utilityDrtTime + utilityDrtDistance + utilityDrtConstant))
 				* sumExpVjkWalk;
 		}
 		return expSum;
