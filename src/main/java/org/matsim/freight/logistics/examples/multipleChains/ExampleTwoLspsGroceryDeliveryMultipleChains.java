@@ -181,7 +181,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
       }
       ConfigUtils.applyCommandline(config, args);
     } else {
-      config.controller().setOutputDirectory("output/groceryDelivery_kmt9_1it");
+      config.controller().setOutputDirectory("output/groceryDelivery_kmt_10");
       config.controller().setLastIteration(1);
     }
 
