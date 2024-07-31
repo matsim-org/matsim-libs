@@ -60,6 +60,7 @@ final class ExampleGroceryDeliveryMultipleChains {
   private static final Id<Link> HUB_LINK_ID = Id.createLinkId("91085");
   private static final double TOLL_VALUE = 1000;
   static final double HUBCOSTS_FIX = 100;
+  private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
 
   private ExampleGroceryDeliveryMultipleChains() {}
 
@@ -88,7 +89,7 @@ final class ExampleGroceryDeliveryMultipleChains {
                 new EventBasedCarrierScorer4MultipleChains();
             carrierScorer.setToll(TOLL_VALUE);
             carrierScorer.setTolledVehicleTypes( List.of("heavy40t"));
-            carrierScorer.setTolledLinks(ExampleConstants.TOLLED_LINK_LIST_BERLIN);
+            carrierScorer.setTolledLinks(TOLLED_LINKS);
             bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
             bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
             bind(CarrierStrategyManager.class)

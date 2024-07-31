@@ -80,13 +80,22 @@ import org.matsim.vehicles.VehicleType;
 final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
   private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChains.class);
+
   private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
-  private static final double TOLL_VALUE = 1000;
   private static final double HUBCOSTS_FIX = 100;
+
+  private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
+  private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t");
+  private static final double TOLL_VALUE = 1000;
+
   private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
   private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
-  public static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
-  public static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
+  private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
+  private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
+
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10";
+
+
 
   private ExampleTwoLspsGroceryDeliveryMultipleChains() {}
 
@@ -134,8 +143,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                 final EventBasedCarrierScorer4MultipleChains carrierScorer =
                         new EventBasedCarrierScorer4MultipleChains();
                 carrierScorer.setToll(TOLL_VALUE);
-                carrierScorer.setTolledVehicleTypes( List.of("heavy40t"));
-                carrierScorer.setTolledLinks(ExampleConstants.TOLLED_LINK_LIST_BERLIN);
+                carrierScorer.setTolledVehicleTypes(TOLLED_VEHICLE_TYPES);
+                carrierScorer.setTolledLinks(TOLLED_LINKS);
                 bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
                 bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
                 bind(CarrierStrategyManager.class)
@@ -181,7 +190,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
       }
       ConfigUtils.applyCommandline(config, args);
     } else {
-      config.controller().setOutputDirectory("output/groceryDelivery_kmt_10");
+      config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
       config.controller().setLastIteration(1);
     }
 
