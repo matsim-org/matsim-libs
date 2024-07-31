@@ -21,14 +21,12 @@
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
-import java.net.URL;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,7 +40,6 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
@@ -52,14 +49,15 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * This bases on {@link ExampleGroceryDeliveryMultipleChains}.
- *  Now it will include two different LSPs
- *
+ * This bases on {@link ExampleTwoLspsGroceryDeliveryMultipleChains}.
+ * It is extended in a way that it will use the roadpricing contrib...
+ * This class is here only for development and will be merged into {@link ExampleTwoLspsGroceryDeliveryMultipleChains}
+ * once the result is satisfying.
+ * KMT, Jul'24
  */
 final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
@@ -108,7 +106,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
 
-    RoadPricingSchemeUsingTollFactor rpScheme = setUpRoadpricing(config, scenario);
+    RoadPricingSchemeUsingTollFactor rpScheme = setUpRoadpricing(scenario);
 
 
     log.info("Prepare controler");
@@ -172,51 +170,43 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
   }
 
   /*
-  *  Set up roadpricing --- this is a copy paste from KMT laecture in GVSim --> need some adaptions
-  * TODO Adapt settings
+   *  Set up roadpricing --- this is a copy paste from KMT lecture in GVSim --> need some adaptions
+   * TODO Adapt settings
    */
-  private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Config config, Scenario scenario) {
+  private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {
 
     //Create Rp Scheme from code.
-      RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+    RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 
-      /* Configure roadpricing scheme. */
-      RoadPricingUtils.setName(scheme, "MautFromcodeKMT");
-      RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
-      RoadPricingUtils.setDescription(scheme, "Mautdaten erstellt aus Link-Liste.");
+    /* Configure roadpricing scheme. */
+    RoadPricingUtils.setName(scheme, "MautFromCodeKMT");
+    RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+    RoadPricingUtils.setDescription(scheme, "Mautdaten erstellt aus Link-Liste.");
 
-      /* Add general toll. */
+    /* Add general toll. */
     for (String linkIdString : TOLLED_LINKS) {
       RoadPricingUtils.addLink(scheme, Id.createLinkId(linkIdString));
     }
 
-      RoadPricingUtils.createAndAddGeneralCost(scheme,
-              Time.parseTime("00:00:00"),
-              Time.parseTime("72:00:00"),
-              TOLL_VALUE);
+    RoadPricingUtils.createAndAddGeneralCost(scheme,
+            Time.parseTime("00:00:00"),
+            Time.parseTime("72:00:00"),
+            TOLL_VALUE);
     ///___ End creating from Code
-
-
-    // Roadpricing settings
-    RoadPricingConfigGroup roadPricingConfigGroup =
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
 
     // Wenn FzgTypId in Liste, erfolgt die Bemautung mit dem Kostensatz (Faktor = 1),
     // sonst mit 0 (Faktor = 0). ((MATSim seite)
     TollFactor tollFactor =
-            new TollFactor() {
-                @Override
-                public double getTollFactor(Id<Person> personId, Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-                    var vehTypeId = VehicleUtils.findVehicle(vehicleId, scenario).getType().getId();
-                    if (TOLLED_VEHICLE_TYPES.contains(vehTypeId.toString())) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
+            (personId, vehicleId, linkId, time) -> {
+              var vehTypeId = VehicleUtils.findVehicle(vehicleId, scenario).getType().getId();
+              if (TOLLED_VEHICLE_TYPES.contains(vehTypeId.toString())) {
+                return 1;
+              } else {
+                return 0;
+              }
             };
 
-      return new RoadPricingSchemeUsingTollFactor(scheme, tollFactor);
+    return new RoadPricingSchemeUsingTollFactor(scheme, tollFactor);
   }
 
 
@@ -410,11 +400,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
   private static LSP createLspWithDirectChain(Scenario scenario, String lspName, Collection<LSPShipment> lspShipments, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
 
-      LSPPlan lspPlan = LSPUtils.createLSPPlan()
+    LSPPlan lspPlan = LSPUtils.createLSPPlan()
             .addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
             .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 
-      LSP lsp =
+    LSP lsp =
             LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
                     .setInitialPlan(lspPlan)
                     .setLogisticChainScheduler(
