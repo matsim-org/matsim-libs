@@ -17,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- *                                                                         
+ *
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
@@ -134,8 +134,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
                                 + " Aborting..." );
             case ignore:
                 if ( noVehWarnCnt < 10 ){
-                    logger.warn(
-                            "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored." );
+                    logger.warn("No vehicle defined for id {}. The vehicle will be ignored.", vehicleId);
                     noVehWarnCnt++;
                     if ( noVehWarnCnt == 10 ) logger.warn( Gbl.FUTURE_SUPPRESSED );
                 }
@@ -201,7 +200,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
     private void warnIfZeroLinkLength(Id<Link> linkId, double linkLength) {
         if (linkLength == 0.) {
             if (zeroLinkLengthWarnCnt == 0) {
-                logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+                logger.warn("Length of the link {} is zero. No emissions will be estimated for this link. Make sure, this is intentional.", linkId);
                 logger.warn(Gbl.ONLYONCE);
                 zeroLinkLengthWarnCnt++;
             }
