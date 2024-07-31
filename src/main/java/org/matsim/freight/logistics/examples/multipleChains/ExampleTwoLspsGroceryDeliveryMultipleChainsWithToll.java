@@ -1,25 +1,4 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
- */
-
-/*
  *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
@@ -43,12 +22,12 @@
 package org.matsim.freight.logistics.examples.multipleChains;
 
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -61,6 +40,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
@@ -70,22 +50,23 @@ import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.vehicles.VehicleType;
-
+import org.matsim.vehicles.VehicleUtils;
 
 /**
- * This bases on {@link ExampleGroceryDeliveryMultipleChains}.
- *  Now it will include two different LSPs
- *
+ * This bases on {@link ExampleTwoLspsGroceryDeliveryMultipleChains}.
+ * It is extended in a way that it will use the roadpricing contrib...
+ * This class is here only for development and will be merged into {@link ExampleTwoLspsGroceryDeliveryMultipleChains}
+ * once the result is satisfying.
+ * KMT, Jul'24
  */
-final class ExampleTwoLspsGroceryDeliveryMultipleChains {
+final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
-  private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChains.class);
-
+  private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.class);
   private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
   private static final double HUBCOSTS_FIX = 100;
 
   private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
-  private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t");
+  private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
   private static final double TOLL_VALUE = 1000;
 
   private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
@@ -93,11 +74,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10";
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10_toll";
 
 
-
-  private ExampleTwoLspsGroceryDeliveryMultipleChains() {}
+  private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
 
   public static void main(String[] args) {
     log.info("Prepare config");
@@ -124,6 +104,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
+
+
+    RoadPricingSchemeUsingTollFactor rpScheme = setUpRoadpricing(scenario);
 
 
     log.info("Prepare controler");
@@ -168,6 +151,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 });
               }
             });
+    if (!rpScheme.getTolledLinkIds().isEmpty()) {
+      // RoadPricing.configure(controler);
+      controler.addOverridingModule( new RoadPricingModule(rpScheme) );
+    }
 
     log.info("Run MATSim");
 
@@ -181,6 +168,47 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("Done.");
   }
+
+  /*
+   *  Set up roadpricing --- this is a copy paste from KMT lecture in GVSim --> need some adaptions
+   * TODO Adapt settings
+   */
+  private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {
+
+    //Create Rp Scheme from code.
+    RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+
+    /* Configure roadpricing scheme. */
+    RoadPricingUtils.setName(scheme, "MautFromCodeKMT");
+    RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+    RoadPricingUtils.setDescription(scheme, "Mautdaten erstellt aus Link-Liste.");
+
+    /* Add general toll. */
+    for (String linkIdString : TOLLED_LINKS) {
+      RoadPricingUtils.addLink(scheme, Id.createLinkId(linkIdString));
+    }
+
+    RoadPricingUtils.createAndAddGeneralCost(scheme,
+            Time.parseTime("00:00:00"),
+            Time.parseTime("72:00:00"),
+            TOLL_VALUE);
+    ///___ End creating from Code
+
+    // Wenn FzgTypId in Liste, erfolgt die Bemautung mit dem Kostensatz (Faktor = 1),
+    // sonst mit 0 (Faktor = 0). ((MATSim seite)
+    TollFactor tollFactor =
+            (personId, vehicleId, linkId, time) -> {
+              var vehTypeId = VehicleUtils.findVehicle(vehicleId, scenario).getType().getId();
+              if (TOLLED_VEHICLE_TYPES.contains(vehTypeId.toString())) {
+                return 1;
+              } else {
+                return 0;
+              }
+            };
+
+    return new RoadPricingSchemeUsingTollFactor(scheme, tollFactor);
+  }
+
 
   private static Config prepareConfig(String[] args) {
     Config config = ConfigUtils.createConfig();
@@ -372,11 +400,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static LSP createLspWithDirectChain(Scenario scenario, String lspName, Collection<LSPShipment> lspShipments, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
 
-      LSPPlan lspPlan = LSPUtils.createLSPPlan()
+    LSPPlan lspPlan = LSPUtils.createLSPPlan()
             .addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
             .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 
-      LSP lsp =
+    LSP lsp =
             LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
                     .setInitialPlan(lspPlan)
                     .setLogisticChainScheduler(
