@@ -31,16 +31,16 @@ public class CarrierSchedulerUtils {
    * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
    * So, maybe this can be more simplify.
    * <p>
-   *  @Todo: include toll in the NetbasedCosts (if set), so it is also pat of the VRP
-   *  @Todo: Find a way to reuse the netbasedCosts over the iterations(?) to avoid re-setting this up???
-   *    <li> Pro: saves computation times,
-   *    <li> Con: There is now update of the costs if the network (load) changes.
-   *    <li> --> do it at least per Carrier or generally or stay as it is? --> Discuss with KN
-   *  @Todo: Make the number of jsprit-Iterations configurable
    *
-   * @param carrier  Carrier for which the problem should be solved
-   * @param network  the underlying network to create the network based transport costs
+   * @param carrier               Carrier for which the problem should be solved
+   * @param network               the underlying network to create the network based transport costs
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
+   * @Todo: include toll in the NetbasedCosts (if set), so it is also pat of the VRP
+   * @Todo: Find a way to reuse the netbasedCosts over the iterations(?) to avoid re-setting this up???
+   * <li> Pro: saves computation times,
+   * <li> Con: There is now update of the costs if the network (load) changes.
+   * <li> --> do it at least per Carrier or generally or stay as it is? --> Discuss with KN
+   * @Todo: Make the number of jsprit-Iterations configurable
    */
   public static Carrier solveVrpWithJsprit(Carrier carrier, Network network) {
     NetworkBasedTransportCosts netbasedTransportCosts =
