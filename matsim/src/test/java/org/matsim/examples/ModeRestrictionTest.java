@@ -29,11 +29,13 @@ import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -78,6 +80,7 @@ public class ModeRestrictionTest {
 			Map.of(Id.createPersonId("car"), List.of(linkId), Id.createPersonId("bike"), List.of(linkId)));
 		runController(scenario, firstLegRouteCheck);
 		firstLegRouteCheck.assertActualContainsExpected();
+		assertEventFilesSame();
 	}
 
 	/**
@@ -96,7 +99,7 @@ public class ModeRestrictionTest {
 
 		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck();
 		RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> runController(scenario, firstLegRouteCheck));
-		Assertions.assertTrue(exception instanceof ProvisionException);
+		Assertions.assertInstanceOf(ProvisionException.class, exception);
 		Assertions.assertTrue(((ProvisionException) exception).getErrorMessages().stream()
 															  .map(Message::getMessage)
 															  .anyMatch(m -> m.equals("java.lang.RuntimeException: Network for mode '" + restrictedMode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.")));
@@ -169,6 +172,7 @@ public class ModeRestrictionTest {
 		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId(restrictedMode), newRoute, Id.createPersonId(other), oldRoute));
 		runController(scenario, firstLegRouteCheck);
 		firstLegRouteCheck.assertActualEqualsExpected();
+		assertEventFilesSame();
 	}
 
 	/**
@@ -196,6 +200,7 @@ public class ModeRestrictionTest {
 		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId(restrictedMode), newRoute, Id.createPersonId(other), oldRoute));
 		runController(scenario, firstLegRouteCheck);
 		firstLegRouteCheck.assertActualEqualsExpected();
+		assertEventFilesSame();
 	}
 
 	/**
@@ -219,6 +224,7 @@ public class ModeRestrictionTest {
 		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId(restrictedMode), newRoute, Id.createPersonId(other), oldRoute));
 		runController(scenario, firstLegRouteCheck);
 		firstLegRouteCheck.assertActualEqualsExpected();
+		assertEventFilesSame();
 	}
 
 	/**
@@ -243,7 +249,7 @@ public class ModeRestrictionTest {
 	}
 
 	private Config prepareConfig(String plansFile, RoutingConfigGroup.NetworkRouteConsistencyCheck consistencyCheck) {
-		final Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
+		final Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml", MatsimTestUtils.TestMethodType.Parameterized);
 		config.routing().setNetworkRouteConsistencyCheck(consistencyCheck);
 		config.plans().setInputFile(plansFile);
 
@@ -366,5 +372,21 @@ public class ModeRestrictionTest {
 		@Override public double getLinkTravelTime( Link link, double time, Person person, Vehicle vehicle ){
 			return 1. ;
 		}
+	}
+
+	/**
+	 * Note that this method alone would be sufficient to check the simulation behaviour. But since I have already written the eventHandler, I will use it as well.
+	 * If at some point it is too nervig, to maintain both test methodologies here, the eventHandler can be removed.
+	 * But, I think it makes clearer what is the relevant thing to check. paul aug '24
+	 */
+	private void assertEventFilesSame() {
+		String fileName = "output_events.xml.gz";
+
+		String inputFile = utils.getInputDirectory() + utils.getParameterizedTestInputString() + "/" + fileName;
+		String outputFile = utils.getOutputDirectory() + "/" + fileName;
+
+		ComparisonResult comparisonResult = EventsUtils.compareEventsFiles(inputFile, outputFile);
+		if (comparisonResult != ComparisonResult.FILES_ARE_EQUAL)
+			Assertions.fail("Event files are not equal: " + comparisonResult);
 	}
 }
