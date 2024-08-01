@@ -23,6 +23,8 @@ package org.matsim.api.core.v01.population;
 import java.util.List;
 
 import org.matsim.api.core.v01.Customizable;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -34,23 +36,29 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * The only thing which is not "expected" in the same sense is the score.
  *
  */
-public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable {
+public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable, Identifiable<Plan> {
 	
-	public abstract List<PlanElement> getPlanElements();
+	List<PlanElement> getPlanElements();
 
-	public abstract void addLeg(final Leg leg);
+	void addLeg( final Leg leg );
 
-	public abstract void addActivity(final Activity act);
+	void addActivity( final Activity act );
 
+	void setType( final String type );
+	
+	void setPlanId( Id<Plan> planId );
+	
+	Id<Plan> getId();
+	
+	int getIterationCreated();
+	
+	void setIterationCreated( int iteration );
+	
+	String getPlanMutator();
+	
+	void setPlanMutator( String planMutator );
 
-	/**
-	 * Plan type, which may be used to ensure there is at least one plan of a certain type.
-	 */
-	public abstract String getType();
-
-	public abstract void setType(final String type);
-
-	public abstract Person getPerson();
+	Person getPerson();
 
 	/**
 	 * Sets the reference to the person.
@@ -58,6 +66,7 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 	 * sure that the bidirectional reference is set correctly if
 	 * you are using this method!.
 	 */
-	public abstract void setPerson(Person person);
+	void setPerson( Person person );
+	
 
 }

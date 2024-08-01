@@ -1,13 +1,16 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
+
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -17,12 +20,13 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.temperature.TemperatureService;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -38,9 +42,9 @@ public class RunEShiftDrtScenarioIT {
 	private static final double TEMPERATURE = 20;// oC
 
 	@Test
-	public void test() {
+	void test() {
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
 		String fleetFile =  "holzkirchenFleet.xml";
 		String plansFile =  "holzkirchenPlans.xml.gz";
@@ -50,20 +54,23 @@ public class RunEShiftDrtScenarioIT {
 		String chargersFile =  "holzkirchenChargers.xml";
 		String evsFile =  "holzkirchenElectricFleet.xml";
 
-		DrtWithOperationsConfigGroup drtWithShiftsConfigGroup = (DrtWithOperationsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.maxTravelTimeAlpha = 1.5;
-		drtConfigGroup.maxTravelTimeBeta = 10. * 60.;
+		DefaultDrtOptimizationConstraintsSet constraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		constraintsSet.maxTravelTimeAlpha = 1.5;
+        constraintsSet.maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
-		drtConfigGroup.maxWaitTime = 600.;
-		drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+        constraintsSet.maxWaitTime = 600.;
+        constraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.maxWalkDistance = 1000.;
+        constraintsSet.maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -78,26 +85,31 @@ public class RunEShiftDrtScenarioIT {
 
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
-		DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
-		drtZonalSystemParams.zonesGeneration = DrtZonalSystemParams.ZoneGeneration.GridFromNetwork;
-		drtZonalSystemParams.cellSize = 500.;
-		drtZonalSystemParams.targetLinkSelection = DrtZonalSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZonalSystemParams);
+		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
+		ConfigGroup parameterSet = drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		((SquareGridZoneSystemParams) parameterSet).cellSize = 500.;
+		drtZoneSystemParams.addParameterSet(parameterSet);
+		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
+		drtConfigGroup.addParameterSet(drtZoneSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
-				new DvrpConfigGroup());
+			dvrpConfigGroup);
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		PlanCalcScoreConfigGroup.ModeParams scoreParams = new PlanCalcScoreConfigGroup.ModeParams("drt");
-		config.planCalcScore().addModeParams(scoreParams);
-		PlanCalcScoreConfigGroup.ModeParams scoreParams2 = new PlanCalcScoreConfigGroup.ModeParams("walk");
-		config.planCalcScore().addModeParams(scoreParams2);
+		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
+		config.scoring().addModeParams(scoreParams);
+		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
+		config.scoring().addModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -106,33 +118,33 @@ public class RunEShiftDrtScenarioIT {
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
 
-		final PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		final ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
 		home.setTypicalDuration(8 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams other = new PlanCalcScoreConfigGroup.ActivityParams("other");
+		final ScoringConfigGroup.ActivityParams other = new ScoringConfigGroup.ActivityParams("other");
 		other.setTypicalDuration(4 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams education = new PlanCalcScoreConfigGroup.ActivityParams("education");
+		final ScoringConfigGroup.ActivityParams education = new ScoringConfigGroup.ActivityParams("education");
 		education.setTypicalDuration(6 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams shopping = new PlanCalcScoreConfigGroup.ActivityParams("shopping");
+		final ScoringConfigGroup.ActivityParams shopping = new ScoringConfigGroup.ActivityParams("shopping");
 		shopping.setTypicalDuration(2 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
-		config.planCalcScore().addActivityParams(home);
-		config.planCalcScore().addActivityParams(other);
-		config.planCalcScore().addActivityParams(education);
-		config.planCalcScore().addActivityParams(shopping);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(home);
+		config.scoring().addActivityParams(other);
+		config.scoring().addActivityParams(education);
+		config.scoring().addActivityParams(shopping);
+		config.scoring().addActivityParams(work);
 
-		final StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);
 		stratSets.setStrategyName("ChangeExpBeta");
-		config.strategy().addStrategySettings(stratSets);
+		config.replanning().addStrategySettings(stratSets);
 
-		config.controler().setLastIteration(1);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setLastIteration(1);
+		config.controller().setWriteEventsInterval(1);
 
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory("test/output/holzkirchen_eshifts");
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
 		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);

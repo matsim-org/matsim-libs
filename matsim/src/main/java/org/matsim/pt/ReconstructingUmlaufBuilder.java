@@ -31,8 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,7 +66,7 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	@Inject public ReconstructingUmlaufBuilder( Scenario scenario ) {
 		// (normal constructor used from TransitQSimEngine for testing :-(.  kai, mar'20) yy change
 
-		this.umlaufInterpolator = new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().planCalcScore());
+		this.umlaufInterpolator = new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().scoring());
 		this.transitLines = scenario.getTransitSchedule().getTransitLines().values();
 		this.vehicles = scenario.getTransitVehicles();
 		this.umlaufIdsByVehicleId = new HashMap<>();
@@ -103,11 +101,11 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 			printStatus(cnt);
 		}
 	}
-	
+
 	private Id<Umlauf> getUmlaufIdForVehicleId(Id<Vehicle> vehId){
 		return this.umlaufIdsByVehicleId.get(vehId);
 	}
-	
+
 	private Id<Umlauf> createUmlaufIdFromVehicle(Vehicle vehicle){
 		Id<Umlauf> id = Id.create(vehicle.getId().toString() + "_" + vehicle.getType().getId().toString(), Umlauf.class);
 		this.umlaufIdsByVehicleId.put(vehicle.getId(), id);
@@ -146,7 +144,7 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		log.info("... done generating UmlaufStuecke");
 		Collections.sort(this.umlaufStuecke, departureTimeComparator);
 	}
-	
+
 	private void printStatus(int cnt){
 		if ( cnt%100==0 ) {
 			System.out.print('.');

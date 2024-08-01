@@ -1,14 +1,14 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
 
 public class RasterTest {
 
-    @Test
-    public void test() {
+	@Test
+	void test() {
 
         var bounds = new Raster.Bounds(10, 10, 100, 100);
         var raster = new Raster(bounds, 10);
@@ -38,8 +38,8 @@ public class RasterTest {
         }
     }
 
-    @Test
-    public void testInsertion() {
+	@Test
+	void testInsertion() {
 
         var bounds = new Raster.Bounds(4, 5, 123, 244);
         var raster = new Raster(bounds, 10);
@@ -50,8 +50,8 @@ public class RasterTest {
         raster.forEachIndex((x, y, value) -> assertEquals(10, value, 0.000001));
     }
 
-    @Test
-    public void testIterationByIndex() {
+	@Test
+	void testIterationByIndex() {
 
         var bounds = new Raster.Bounds(4, 5, 123, 244);
         var raster = new Raster(bounds, 10);
@@ -68,8 +68,8 @@ public class RasterTest {
         });
     }
 
-    @Test
-    public void testIterationByCoord() {
+	@Test
+	void testIterationByCoord() {
 
         var bounds = new Raster.Bounds(4, 5, 123, 244);
         var raster = new Raster(bounds, 10);

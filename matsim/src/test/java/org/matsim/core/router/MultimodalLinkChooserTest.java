@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,8 +43,8 @@ import org.matsim.facilities.ActivityFacility;
 
 public class MultimodalLinkChooserTest {
 
-    @Test
-    public void testDecideOnLink() {
+	@Test
+	void testDecideOnLink() {
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -77,16 +77,16 @@ public class MultimodalLinkChooserTest {
 
         Link linkFromFacLinkId = linkChooser.decideOnLink(facilityLinkIdNotNull, network);
 
-        Assert.assertEquals(networkLink, linkFromFacLinkId);
+        Assertions.assertEquals(networkLink, linkFromFacLinkId);
 
         Link linkFromFacCoord = linkChooser.decideOnLink(facilityLinkIdNull, network);
 
-        Assert.assertEquals(networkLink, linkFromFacCoord);
+        Assertions.assertEquals(networkLink, linkFromFacCoord);
 
         //not sure whether the following makes sense as we basically are some functionality of NetworkUtils (which is used in the linkChooser)
         //testing this with the decideOnLink method would mean causing a RuntimeException -sm 0622
         Link linkNotInNetwork = NetworkUtils.getNearestLink(netWithoutLinks, facilityLinkIdNull.getCoord());
 
-        Assert.assertNull(linkNotInNetwork);
+        Assertions.assertNull(linkNotInNetwork);
     }
 }

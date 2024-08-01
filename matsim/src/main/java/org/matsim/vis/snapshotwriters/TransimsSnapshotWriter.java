@@ -34,8 +34,8 @@ import org.matsim.core.utils.io.IOUtils;
 public class TransimsSnapshotWriter implements SnapshotWriter {
 	private BufferedWriter out = null;
 	private double currentTime = -1;
-	
-	public static enum Labels { TIME, VEHICLE, EASTING, NORTHING, VELOCITY } ;
+
+	public static enum Labels { TIME, VEHICLE, EASTING, NORTHING, VELOCITY }
 
 	public TransimsSnapshotWriter(String filename) {
 		try {

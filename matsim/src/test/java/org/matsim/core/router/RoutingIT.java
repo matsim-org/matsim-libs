@@ -24,9 +24,9 @@ import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +39,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -55,14 +56,15 @@ import org.matsim.testcases.MatsimTestUtils;
 public class RoutingIT {
 	/*package*/ static final Logger log = LogManager.getLogger(RoutingIT.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private interface RouterProvider {
 		public String getName();
 		public LeastCostPathCalculatorFactory getFactory(Network network, TravelDisutility costCalc, TravelTime timeCalc);
 	}
+
 	@Test
-	public void testDijkstra() {
+	void testDijkstra() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -74,8 +76,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testSpeedyDijkstra() {
+	void testSpeedyDijkstra() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -87,8 +90,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testDijkstraPruneDeadEnds() {
+	void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -102,7 +106,7 @@ public class RoutingIT {
 	}
 
 	@Test
-	public void testAStarEuclidean() {
+	void testAStarEuclidean() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -114,8 +118,9 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testAStarLandmarks() {
+	void testAStarLandmarks() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -129,7 +134,7 @@ public class RoutingIT {
 	}
 
 	@Test
-	public void testSpeedyALT() {
+	void testSpeedyALT() {
 		doTest(new RouterProvider() {
 			@Override
 			public String getName() {
@@ -157,12 +162,12 @@ public class RoutingIT {
 		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
 		new PopulationReader(referenceScenario).readFile(inPlansName);
 
-		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
-		if ( !isEqual ) {
+		PopulationComparison.Result result = PopulationComparison.compare(referenceScenario.getPopulation(), scenario.getPopulation());
+		if (result == PopulationComparison.Result.notEqual) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
-		Assert.assertTrue("different plans files.", isEqual);
+		Assertions.assertEquals(PopulationComparison.Result.equal, result, "different plans files");
 	}
 
 	private static void calcRoute(
@@ -173,7 +178,7 @@ public class RoutingIT {
 
 		final FreespeedTravelTimeAndDisutility calculator =
 				new FreespeedTravelTimeAndDisutility(
-						scenario.getConfig().planCalcScore() );
+						scenario.getConfig().scoring() );
 		final LeastCostPathCalculatorFactory factory1 = provider.getFactory(
 				scenario.getNetwork(),
 				calculator,

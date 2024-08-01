@@ -20,9 +20,9 @@
  */
 package org.matsim.contrib.signals.data.conflicts;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
@@ -41,26 +41,26 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class UnprotectedLeftTurnLogicTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	@Test
-	public void testSingleIntersectionScenarioWithLeftTurns() {
+	void testSingleIntersectionScenarioWithLeftTurns() {
 		// run scenarios from files
 		AnalyzeSingleIntersectionLeftTurnDelays restrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS);
 		AnalyzeSingleIntersectionLeftTurnDelays unrestrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
 		AnalyzeSingleIntersectionLeftTurnDelays noLogic = runSimulation(IntersectionLogic.NONE);
-		
+
 		double leftTurnDelayWTurnRestriction = restrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWoTurnRestriction = unrestrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWithoutLogic = noLogic.getLeftTurnDelay();
 		System.out.println("delay wTurn: " + leftTurnDelayWTurnRestriction);
 		System.out.println("delay w/oTurn: " + leftTurnDelayWoTurnRestriction);
 		System.out.println("delay w/oLogic: " + leftTurnDelayWithoutLogic);
-		Assert.assertTrue("Delay without restriction should be less than with restricted left turns.", 2 * leftTurnDelayWoTurnRestriction < leftTurnDelayWTurnRestriction);
-		Assert.assertEquals("Delay without turn restriction should be equal to the case without conflicting data.", leftTurnDelayWoTurnRestriction, leftTurnDelayWithoutLogic, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Delay value for the case without turn restrictions is not as expected!", 21120, leftTurnDelayWoTurnRestriction, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Delay value for the case with turn restrictions is not as expected!", 80845, leftTurnDelayWTurnRestriction, MatsimTestUtils.EPSILON);
+		Assertions.assertTrue(2 * leftTurnDelayWoTurnRestriction < leftTurnDelayWTurnRestriction, "Delay without restriction should be less than with restricted left turns.");
+		Assertions.assertEquals(leftTurnDelayWoTurnRestriction, leftTurnDelayWithoutLogic, MatsimTestUtils.EPSILON, "Delay without turn restriction should be equal to the case without conflicting data.");
+		Assertions.assertEquals(21120, leftTurnDelayWoTurnRestriction, MatsimTestUtils.EPSILON, "Delay value for the case without turn restrictions is not as expected!");
+		Assertions.assertEquals(80845, leftTurnDelayWTurnRestriction, MatsimTestUtils.EPSILON, "Delay value for the case with turn restrictions is not as expected!");
 	}
 
 	private AnalyzeSingleIntersectionLeftTurnDelays runSimulation(IntersectionLogic intersectionLogic) {
@@ -69,30 +69,30 @@ public class UnprotectedLeftTurnLogicTest {
 				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfigGroup.setSignalControlFile("signalControlFixedTime.xml");
 		signalsConfigGroup.setIntersectionLogic(intersectionLogic);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + intersectionLogic + "/");
-		
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory() + intersectionLogic + "/");
+
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		
+
 		Controler controler = new Controler( scenario );
-        
+
 		// add the signals module
 //		controler.addOverridingModule(new SignalsModule());
 		Signals.configure(controler);
-				
+
 		// add analysis tools
 		AnalyzeSingleIntersectionLeftTurnDelays handler = new AnalyzeSingleIntersectionLeftTurnDelays();
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				this.addEventHandlerBinding().toInstance(handler);
 			}
 		});
-		
+
 		// run the simulation
 		controler.run();
-		
+
 		return handler;
 	}
-	
+
 }

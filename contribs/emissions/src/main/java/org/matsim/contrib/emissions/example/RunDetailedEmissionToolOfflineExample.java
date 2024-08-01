@@ -29,7 +29,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -38,7 +37,7 @@ import org.matsim.vehicles.MatsimVehicleWriter;
 
 /**
  *
- * Use the config file as created by the 
+ * Use the config file as created by the
  * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
  * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
  *
@@ -49,22 +48,17 @@ public final class RunDetailedEmissionToolOfflineExample{
 //	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 
 //	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+	// (remove dependency of one test/execution path from others. kai/ihab, nov'18)
 
 	//	private static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
 	private Config config;
 
-	// =======================================================================================================		
+	// =======================================================================================================
 
 	public static void main (String[] args){
 		RunDetailedEmissionToolOfflineExample emissionToolOfflineExampleV2Vehv1 = new RunDetailedEmissionToolOfflineExample();
 		emissionToolOfflineExampleV2Vehv1.run();
 	}
-
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
 
 	public Config prepareConfig(String [] args) {
 		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
@@ -90,13 +84,13 @@ public final class RunDetailedEmissionToolOfflineExample{
 				bind( EventsManager.class ).toInstance( eventsManager );
 				bind( EmissionModule.class ) ;
 			}
-		};;
+		};
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module );
 
 		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
-		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		final String outputDirectory = scenario.getConfig().controller().getOutputDirectory();
 		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + RunAverageEmissionToolOfflineExample.emissionEventsFilename ) ;
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 

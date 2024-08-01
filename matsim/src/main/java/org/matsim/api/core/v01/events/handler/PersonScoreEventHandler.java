@@ -18,7 +18,6 @@
 
 package org.matsim.api.core.v01.events.handler;
 
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.core.events.handler.EventHandler;
 

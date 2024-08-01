@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,7 +64,6 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -147,13 +147,13 @@ public final class EventsReaderJson {
 
 		// === material related to wait2link below here ===
 		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time, 
+			this.events.processEvent(new LinkLeaveEvent(time,
 					Id.create(o.get(LinkLeaveEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class),
 					Id.create(o.get(LinkLeaveEvent.ATTRIBUTE_LINK).asText(), Link.class)
 					// had driver id in previous version
 					));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time, 
+			this.events.processEvent(new LinkEnterEvent(time,
 					Id.create(o.get(LinkEnterEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class),
 					Id.create(o.get(LinkEnterEvent.ATTRIBUTE_LINK).asText(), Link.class)
 					// had driver id in previous version
@@ -161,7 +161,7 @@ public final class EventsReaderJson {
 		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType)) {
 			// (this is the new version, marked by the new events name)
 
-			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
+			this.events.processEvent(new VehicleEntersTrafficEvent(time,
 					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(VehicleEntersTrafficEvent.ATTRIBUTE_LINK).asText(), Link.class),
 					Id.create(o.get(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class),
@@ -189,7 +189,7 @@ public final class EventsReaderJson {
 					position
 					));
 		} else if (VehicleLeavesTrafficEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new VehicleLeavesTrafficEvent(time, 
+			this.events.processEvent(new VehicleLeavesTrafficEvent(time,
 					Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER).asText(), Person.class),
 					Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK).asText(), Link.class),
 					o.has(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) ? Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class) : null,
@@ -206,7 +206,7 @@ public final class EventsReaderJson {
 				coord = new Coord(xx, yy);
 			}
 			this.events.processEvent(new ActivityEndEvent(
-					time, 
+					time,
 					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class),
 					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
@@ -297,7 +297,7 @@ public final class EventsReaderJson {
 			this.events.processEvent(new PersonLeavesVehicleEvent(time, pId, vId));
 		} else if (TeleportationArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new TeleportationArrivalEvent(
-					time, 
+					time,
 					Id.create(o.get(TeleportationArrivalEvent.ATTRIBUTE_PERSON).asText(), Person.class),
 					o.get(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE).asDouble(),
 					o.path(TeleportationArrivalEvent.ATTRIBUTE_MODE).asText(null)));

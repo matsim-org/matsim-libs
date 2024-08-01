@@ -1,7 +1,7 @@
 package org.matsim.contrib.discrete_mode_choice.modules.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -21,11 +21,11 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ConfigTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReadWriteConfig() {
+	void testReadWriteConfig() {
 		// Create config
 		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
 		Config config = ConfigUtils.createConfig(dmcConfig);
@@ -46,7 +46,7 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void testReadWriteConfigMultipleTimes() throws IOException {
+	void testReadWriteConfigMultipleTimes() throws IOException {
 		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
 		Config config1 = ConfigUtils.createConfig(dmcConfig);
 
@@ -85,7 +85,7 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void testSetTripConstraints() {
+	void testSetTripConstraints() {
 		DiscreteModeChoiceConfigGroup dmcConfig1 = new DiscreteModeChoiceConfigGroup();
 		dmcConfig1.setTripConstraints(Arrays.asList("A", "B", "C"));
 

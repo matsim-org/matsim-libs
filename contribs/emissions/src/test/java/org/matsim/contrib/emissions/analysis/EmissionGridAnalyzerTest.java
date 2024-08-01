@@ -3,8 +3,8 @@ package org.matsim.contrib.emissions.analysis;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -32,13 +32,13 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class EmissionGridAnalyzerTest {
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
     private Geometry createRect(double maxX, double maxY) {
         return new GeometryFactory().createPolygon(new Coordinate[]{
@@ -49,25 +49,27 @@ public class EmissionGridAnalyzerTest {
                 new Coordinate(0, 0)});
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void initialize_invalidGridSizeToSmoothingRadiusRatio_exception() {
+	@Test
+	void initialize_invalidGridSizeToSmoothingRadiusRatio_exception() {
+		assertThrows(IllegalArgumentException.class, () -> {
 
-        new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
-                .withGridSize(1000)
-                .withNetwork(NetworkUtils.createNetwork())
-                .withTimeBinSize(1)
-                .build();
+			new EmissionGridAnalyzer.Builder()
+					.withSmoothingRadius(1)
+					.withGridSize(1000)
+					.withNetwork(NetworkUtils.createNetwork())
+					.withTimeBinSize(1)
+					.build();
 
-        fail("invalid grid size to smoothing radius ratio should cause exception");
-    }
+			fail("invalid grid size to smoothing radius ratio should cause exception");
+		});
+	}
 
-    @Test
-    public void process() {
+	@Test
+	void process() {
 
         final Pollutant pollutant = HC;
         final double pollutionPerEvent = 1;
-        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         Network network = TestUtils.createRandomNetwork(100, 1000, 1000);
         TestUtils.writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99);
 
@@ -87,13 +89,13 @@ public class EmissionGridAnalyzerTest {
         });
     }
 
-    @Test
-    public void process_singleLinkWithOneEvent() {
+	@Test
+	void process_singleLinkWithOneEvent() {
 
         final Pollutant pollutant = CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -126,13 +128,13 @@ public class EmissionGridAnalyzerTest {
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink));
     }
 
-    @Test
-    public void process_singleLinkWithTwoEvents() {
+	@Test
+	void process_singleLinkWithTwoEvents() {
 
         final Pollutant pollutant = CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -165,13 +167,13 @@ public class EmissionGridAnalyzerTest {
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink));
     }
 
-    @Test
-    public void process_twoLinksWithOneEventEach() {
+	@Test
+	void process_twoLinksWithOneEventEach() {
 
         final Pollutant pollutant = CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -207,13 +209,13 @@ public class EmissionGridAnalyzerTest {
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink + 0.1));
     }
 
-    @Test
-    public void process_twoLinksWithTwoEventsEach() {
+	@Test
+	void process_twoLinksWithTwoEventsEach() {
 
         final Pollutant pollutant = NOx;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -249,11 +251,11 @@ public class EmissionGridAnalyzerTest {
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink + 0.1));
     }
 
-    @Test
-    public void process_withBoundaries() {
+	@Test
+	void process_withBoundaries() {
 
         final double pollutionPerEvent = 1;
-        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         Network network = TestUtils.createRandomNetwork(100, 1000, 1000);
         TestUtils.writeWarmEventsToFile(eventsFile, network, NOx, pollutionPerEvent, 1, 99);
 
@@ -274,12 +276,12 @@ public class EmissionGridAnalyzerTest {
         assertEquals(25, bin.getValue().getCells().size());
     }
 
-    @Test
-    public void processToJson() {
+	@Test
+	void processToJson() {
 
         final double pollutionPerEvent = 1;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
         final Network network = TestUtils.createRandomNetwork(1, 1000, 1000);
         TestUtils.writeWarmEventsToFile(eventsFile, network, NO2, pollutionPerEvent, time, time + 3);
 
@@ -295,13 +297,13 @@ public class EmissionGridAnalyzerTest {
         assertNotNull(json);
     }
 
-    @Test
-    public void processToJsonFile() throws IOException {
+	@Test
+	void processToJsonFile() throws IOException {
 
         final double pollutionPerEvent = 1;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".json");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".xml");
+        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID() + ".json");
         final Network network = TestUtils.createRandomNetwork(1, 1000, 1000);
         TestUtils.writeWarmEventsToFile(eventsFile, network, NO2, pollutionPerEvent, time, time + 3);
 
@@ -319,8 +321,8 @@ public class EmissionGridAnalyzerTest {
         assertTrue(jsonFileData.length > 0);
     }
 
-    @Test
-    public void process_regression() throws IOException {
+	@Test
+	void process_regression() throws IOException {
 
         var scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" );
         var configUrl = IOUtils.extendUrl( scenarioUrl, "config_empty.xml" );
@@ -384,9 +386,9 @@ public class EmissionGridAnalyzerTest {
         }
     }
 
-    private void assertCsvValuesAreSame(Path expected, Path acutal) throws IOException {
+    private void assertCsvValuesAreSame(Path expected, Path actual) throws IOException {
 
-        try (FileReader expectedReader = new FileReader(expected.toString()); var actualReader = new FileReader(acutal.toString())) {
+        try (FileReader expectedReader = new FileReader(expected.toString()); var actualReader = new FileReader(actual.toString())) {
 
             var actualIterator = CSVFormat.TDF.withFirstRecordAsHeader().parse(actualReader).iterator();
 

@@ -19,13 +19,15 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Utility class holding static calculation methods related to state (updates).
  */
-final class RailsimCalc {
+public final class RailsimCalc {
 
 	private RailsimCalc() {
 	}
@@ -49,6 +51,7 @@ final class RailsimCalc {
 
 	/**
 	 * Calculate time needed to advance distance {@code dist}. Depending on acceleration and max speed.
+	 * If dist can never be reached, will return time needed to stop.
 	 */
 	static double calcRequiredTime(TrainState state, double dist) {
 
@@ -84,7 +87,7 @@ final class RailsimCalc {
 			} else if (dist <= max) {
 				return solveTraveledDist(state.speed, dist, state.acceleration);
 			} else
-				return Double.POSITIVE_INFINITY;
+				return decelTime;
 		}
 	}
 
@@ -98,6 +101,12 @@ final class RailsimCalc {
 		// Calculation is simplified if target is the same
 		if (FuzzyUtils.equals(allowedSpeed, finalSpeed)) {
 			return new SpeedTarget(finalSpeed, Double.POSITIVE_INFINITY);
+		}
+
+		// Distance could be zero, speeds must be already equal then
+		if (FuzzyUtils.equals(dist, 0)) {
+			assert FuzzyUtils.equals(currentSpeed, finalSpeed) : "Current speed must be equal to allowed speed";
+			return new SpeedTarget(finalSpeed, 0);
 		}
 
 		double timeDecel = (allowedSpeed - finalSpeed) / deceleration;
@@ -117,7 +126,7 @@ final class RailsimCalc {
 		}
 
 
-		assert FuzzyUtils.greaterEqualThan(allowedSpeed, currentSpeed) : "Current speed must be lower than allowed";
+//		assert FuzzyUtils.greaterEqualThan(allowedSpeed, currentSpeed) : "Current speed must be lower than allowed";
 		assert FuzzyUtils.greaterEqualThan(allowedSpeed, finalSpeed) : "Final speed must be smaller than target";
 
 		double timeAccel = (allowedSpeed - currentSpeed) / acceleration;
@@ -162,83 +171,92 @@ final class RailsimCalc {
 	}
 
 	/**
-	 * Calculate when the reservation function should be triggered.
-	 * Should return {@link Double#POSITIVE_INFINITY} if this distance is far in the future and can be checked at later point.
-	 *
-	 * @param state       current train state
-	 * @param currentLink the link where the train head is on
-	 * @return travel distance after which reservations should be updated.
+	 * Calculate the minimum distance that needs to be reserved for the train, such that it can stop safely.
 	 */
-	 static double nextLinkReservation(TrainState state, RailLink currentLink) {
-
-		// on way to pt stop, no need to reserve anymore
-		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
-			return Double.POSITIVE_INFINITY;
+	static double calcReservationDistance(TrainState state, RailLink currentLink) {
 
 		double assumedSpeed = calcPossibleMaxSpeed(state);
 
-		// time needed for full stop
-		double stopTime = assumedSpeed / state.train.deceleration();
+		// stop at end of link
+		if (state.isStop(currentLink.getLinkId()))
+			return currentLink.length - state.headPosition;
 
-		assert stopTime > 0 : "Stop time can not be negative";
+		double stopTime = assumedSpeed / state.train.deceleration();
 
 		// safety distance
 		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
 
+		double distToNextStop = currentLink.length - state.headPosition;
 		int idx = state.routeIdx;
-		double dist = currentLink.length - state.headPosition;
 
-		RailLink nextLink = null;
-		// need to check beyond safety distance
-		while (FuzzyUtils.lessEqualThan(dist, safety * 2) && idx < state.route.size()) {
-			nextLink = state.route.get(idx++);
+		while (idx < state.route.size()) {
+			RailLink nextLink = state.route.get(idx++);
+			distToNextStop += nextLink.length;
 
-			if (!nextLink.isBlockedBy(state.driver))
-				return dist - safety;
-
-			// No reservation beyond pt stop
 			if (state.isStop(nextLink.getLinkId()))
 				break;
-
-			dist += nextLink.length;
 		}
 
-		// No reservation needed after the end
-		if (idx == state.route.size() || (nextLink != null && state.isStop(nextLink.getLinkId())))
-			return Double.POSITIVE_INFINITY;
+		return Math.min(safety, distToNextStop);
+	}
 
-		return dist - safety;
+	/**
+	 * Calculate the projected driven distance, based on current position and state.
+	 */
+	public static double projectedDistance(double time,  TrainPosition position) {
+
+		if (!(position instanceof TrainState state))
+			throw new IllegalArgumentException("Position must be a TrainState.");
+
+		double elapsed = time - state.timestamp;
+
+		if (elapsed == 0)
+			return 0;
+
+		double accelTime = (state.targetSpeed - state.speed) / state.acceleration;
+
+		double dist;
+		if (state.acceleration == 0) {
+			dist = state.speed * elapsed;
+
+		} else if (accelTime < elapsed) {
+			// Travelled distance under constant acceleration
+			dist = RailsimCalc.calcTraveledDist(state.speed, accelTime, state.acceleration);
+
+			// Remaining time at constant speed
+			if (state.acceleration > 0)
+				dist += RailsimCalc.calcTraveledDist(state.targetSpeed, elapsed - accelTime, 0);
+
+		} else {
+			// Acceleration was constant the whole time
+			dist = RailsimCalc.calcTraveledDist(state.speed, elapsed, state.acceleration);
+		}
+
+		return dist;
 	}
 
 	/**
 	 * Links that need to be blocked or otherwise stop needs to be initiated.
+	 * This method is only valid for fixed block resources.
 	 */
-	static List<RailLink> calcLinksToBlock(TrainState state, RailLink currentLink) {
+	public static List<RailLink> calcLinksToBlock(TrainPosition position, RailLink currentLink, double reserveDist) {
 
 		List<RailLink> result = new ArrayList<>();
 
-		// Currently driving to pt stop
-		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
-			return result;
+		// Assume current distance left on link is already reserved (only for fixed block)
+		double dist = currentLink.length - position.getHeadPosition();
 
-		double assumedSpeed = calcPossibleMaxSpeed(state);
-		double stopTime = assumedSpeed / state.train.deceleration();
+		int idx = position.getRouteIndex();
 
-		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
-
-		int idx = state.routeIdx;
-
-		// dist to next
-		double dist = currentLink.length - state.headPosition;
-
-		while (FuzzyUtils.lessEqualThan(dist, safety) && idx < state.route.size()) {
-			RailLink nextLink = state.route.get(idx++);
-			result.add(nextLink);
+		// This function always needs to provide more reserve distance than requested (except when it will stop)
+		while (FuzzyUtils.lessEqualThan(dist, reserveDist) && idx < position.getRouteSize()) {
+			RailLink nextLink = position.getRoute(idx++);
 			dist += nextLink.length;
 
-			// Beyond pt stop links don't need to be reserved
-			if (state.isStop(nextLink.getLinkId()))
+			result.add(nextLink);
+
+			// Don't block beyond stop
+			if (position.isStop(nextLink.getLinkId()))
 				break;
 		}
 
@@ -246,18 +264,27 @@ final class RailsimCalc {
 	}
 
 	/**
-	 * Whether re-routing should be tried.
-	 *
-	 * @param upcoming the upcoming links the train tried to block.
+	 * Calculate distance to the next stop.
 	 */
-	static boolean considerReRouting(List<RailLink> upcoming, RailLink currentLink) {
-		return currentLink.isEntryLink() || upcoming.stream().anyMatch(RailLink::isEntryLink);
+	public static double calcDistToNextStop(TrainPosition position, RailLink currentLink) {
+		double dist = currentLink.length - position.getHeadPosition();
+
+		int idx = position.getRouteIndex();
+		while (idx < position.getRouteSize()) {
+			RailLink nextLink = position.getRoute(idx++);
+			dist += nextLink.length;
+
+			if (position.isStop(nextLink.getLinkId()))
+				break;
+		}
+
+		return dist;
 	}
 
 	/**
 	 * Maximum speed of the next upcoming links.
 	 */
-	private static double calcPossibleMaxSpeed(TrainState state) {
+	static double calcPossibleMaxSpeed(TrainState state) {
 
 		double safety = RailsimCalc.calcTraveledDist(state.train.maxVelocity(), state.train.maxVelocity() / state.train.deceleration(), -state.train.deceleration());
 		double maxSpeed = state.allowedMaxSpeed;

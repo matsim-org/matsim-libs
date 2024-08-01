@@ -18,8 +18,8 @@
  * *********************************************************************** */
 
 package org.matsim.core.population.routes;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,15 +32,13 @@ import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkR
 import org.matsim.core.population.routes.mediumcompressed.MediumCompressedNetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import org.junit.Assert;
-
 /**
  * @author mrieser / senozon
  */
 public class RouteFactoryImplTest {
 
 	@Test
-	public void testConstructor_DefaultNetworkRouteType() {
+	void testConstructor_DefaultNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		PopulationFactory pf = scenario.getPopulation().getFactory();
@@ -48,11 +46,11 @@ public class RouteFactoryImplTest {
 		Id<Link> linkId = Id.create(1, Link.class);
 		final Id<Link> startLinkId = linkId;
 		final Id<Link> endLinkId = linkId;
-		Assert.assertEquals(GenericRouteImpl.class, pf.getRouteFactories().createRoute(Route.class, startLinkId, endLinkId).getClass());
+		Assertions.assertEquals(GenericRouteImpl.class, pf.getRouteFactories().createRoute(Route.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
-	public void testConstructor_LinkNetworkRouteType() {
+	void testConstructor_LinkNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.LinkNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -61,11 +59,11 @@ public class RouteFactoryImplTest {
 		Id<Link> linkId = Id.create(1, Link.class);
 		final Id<Link> startLinkId = linkId;
 		final Id<Link> endLinkId = linkId;
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
+		Assertions.assertEquals(LinkNetworkRouteImpl.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
-	public void testConstructor_HeavyCompressedNetworkRouteType() {
+	void testConstructor_HeavyCompressedNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.HeavyCompressedNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -74,11 +72,11 @@ public class RouteFactoryImplTest {
 		Id<Link> linkId = Id.create(1, Link.class);
 		final Id<Link> startLinkId = linkId;
 		final Id<Link> endLinkId = linkId;
-		Assert.assertEquals(HeavyCompressedNetworkRoute.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
+		Assertions.assertEquals(HeavyCompressedNetworkRoute.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
-	public void testConstructor_MediumCompressedNetworkRouteType() {
+	void testConstructor_MediumCompressedNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.MediumCompressedNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -87,7 +85,7 @@ public class RouteFactoryImplTest {
 		Id<Link> linkId = Id.create(1, Link.class);
 		final Id<Link> startLinkId = linkId;
 		final Id<Link> endLinkId = linkId;
-		Assert.assertEquals(MediumCompressedNetworkRoute.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
+		Assertions.assertEquals(MediumCompressedNetworkRoute.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 }

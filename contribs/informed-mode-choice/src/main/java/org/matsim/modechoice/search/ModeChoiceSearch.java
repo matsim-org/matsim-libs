@@ -194,10 +194,8 @@ final class ModeChoiceSearch {
 
 			for (int i = 0; i < result.length; i++) {
 
-				byte[] path = Arrays.copyOf(entry.modes, entry.modes.length);
-
 				byte mode = -1;
-				byte originalMode = path[i];
+				byte originalMode = entry.modes[i];
 
 				// This mode had no options
 				if (originalMode == -1)
@@ -215,8 +213,9 @@ final class ModeChoiceSearch {
 					}
 				}
 
-				path[i] = mode;
 				if (mode != -1) {
+					byte[] path = Arrays.copyOf(entry.modes, entry.modes.length);
+					path[i] = mode;
 
 					// recompute the deviation from the maximum
 					// there might be a way to store and update this, without recomputing

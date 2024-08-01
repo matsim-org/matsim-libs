@@ -72,6 +72,30 @@ public final class OutputOptions {
 		return output;
 	}
 
+	/**
+	 * Get path for a specific output name and replace a placeholder (%s) in the name.
+	 */
+	public Path getPath(String name, String placeholder) {
+
+		if (!ArrayUtils.contains(spec.produces(), name))
+			throw new IllegalArgumentException(String.format("The output file '%s' is not defined in the @CommandSpec", name));
+		if (!name.contains("%s"))
+			throw new IllegalArgumentException(String.format("File %s does not contain placeholder %%s", name));
+
+		Path output = outputs.containsKey(name) ? outputs.get(name) : Path.of(name);
+		if (!output.toString().contains("%s"))
+			throw new IllegalArgumentException(String.format("Argument %s does not contain placeholder %%s", output));
+
+		Path outputReplaced = Path.of(String.format(output.toString(), placeholder));
+		try {
+			Files.createDirectories(outputReplaced.toAbsolutePath().getParent());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		return outputReplaced;
+	}
+
 	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
 	void setSpec(CommandLine.Model.CommandSpec command) {
 

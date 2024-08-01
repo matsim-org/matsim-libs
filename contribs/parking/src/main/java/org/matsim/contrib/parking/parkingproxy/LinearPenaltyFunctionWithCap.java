@@ -31,17 +31,15 @@ class LinearPenaltyFunctionWithCap implements PenaltyFunction {
 	
 	private final double penaltyPerCar;
 	private final double maxPenalty;
-	private final double areaFactor;
 	
-	public LinearPenaltyFunctionWithCap(double gridSize, double penaltyPerCar, double maxPenalty) {
+	public LinearPenaltyFunctionWithCap(double penaltyPerCar, double maxPenalty) {
 		this.penaltyPerCar = penaltyPerCar;
 		this.maxPenalty = maxPenalty;
-		this.areaFactor = gridSize * gridSize / 2500.;
 	}
 
 	@Override
 	public double calculatePenalty(int numberOfCars) {
-		return Math.max(Math.min(numberOfCars * penaltyPerCar / areaFactor, maxPenalty), 0);
+		return Math.max(Math.min(numberOfCars * penaltyPerCar, maxPenalty), 0);
 	}
 
 }

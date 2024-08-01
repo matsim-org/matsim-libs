@@ -5,10 +5,10 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,7 +31,7 @@ import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.testcases.MatsimTestUtils;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collection;
@@ -44,11 +44,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TopKMinMaxTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private TopKChoicesGenerator generator;
 	private Injector injector;
@@ -62,7 +62,7 @@ public class TopKMinMaxTest {
 	@Mock
 	private EventsManager em;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		TestModule testModule = new TestModule();
@@ -78,7 +78,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void minmax() {
+	void minmax() {
 
 		Person person = create();
 
@@ -115,7 +115,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void subset() {
+	void subset() {
 
 		Person person = create();
 
@@ -209,7 +209,7 @@ public class TopKMinMaxTest {
 					FacilitiesUtils.createActivityFacilities(),
 					TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes)));
 
-			MapBinder<String, ModeOptions<?>> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
+			MapBinder<String, ModeOptions> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
 			optionBinder.addBinding(TransportMode.car).toInstance(new ModeOptions.AlwaysAvailable());
 			optionBinder.addBinding(TransportMode.walk).toInstance(new ModeOptions.AlwaysAvailable());
 
@@ -217,26 +217,26 @@ public class TopKMinMaxTest {
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
 
-			MapBinder<String, FixedCostsEstimator<?>> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, FixedCostsEstimator> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			fcBinder.addBinding(TransportMode.car).toInstance((context, mode, option) -> -1);
 
-			MapBinder<String, LegEstimator<?>> legBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, LegEstimator> legBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			legBinder.addBinding(TransportMode.walk).toInstance((context, mode, leg, option) -> -0.5);
 
 
-			MapBinder<String, TripEstimator<?>> tripBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, TripEstimator> tripBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			tripBinder.addBinding(TransportMode.car).toInstance(new CarTripEstimator());
 
-			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters("person"), Map.of(), config.scenario());
+			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters("person"), Map.of(), config.scenario());
 
 			bind(ScoringParametersForPerson.class).toInstance(person -> scoring.build());
 			bind(InformedModeChoiceConfigGroup.class).toInstance(ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class));
@@ -251,7 +251,7 @@ public class TopKMinMaxTest {
 	}
 
 	// Provides fixed estimates for testing
-	private class CarTripEstimator implements TripEstimator<ModeAvailability> {
+	private class CarTripEstimator implements TripEstimator {
 
 		@Override
 		public MinMaxEstimate estimate(EstimatorContext context, String mode, PlanModel plan, List<Leg> trip, ModeAvailability option) {

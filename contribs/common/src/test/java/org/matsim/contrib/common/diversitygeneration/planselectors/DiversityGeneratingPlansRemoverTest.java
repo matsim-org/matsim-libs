@@ -4,8 +4,7 @@ import com.google.common.primitives.Doubles;
 import gnu.trove.map.TMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +36,7 @@ import java.util.TreeMap;
 
 public class DiversityGeneratingPlansRemoverTest {
 	private static final Logger log = LogManager.getLogger( DiversityGeneratingPlansRemoverTest.class ) ;
-	
+
 	private final Id<Node> node0 = Id.createNodeId( "node0" ) ;
 	private final Id<Node> node1 = Id.createNodeId( "node1" ) ;
 	private final Id<Node> node2 = Id.createNodeId( "node2" ) ;
@@ -45,12 +44,12 @@ public class DiversityGeneratingPlansRemoverTest {
 	private final Id<Link> link0_1 = Id.createLinkId( "dummy0-1" );
 	private final Id<Link> link1_2 = Id.createLinkId( "dummy1-2" );
 	private final Id<Link> link2_3 = Id.createLinkId( "dummyN" );
-	
+
 	@Test
-	public void calcWeights() {
+	void calcWeights() {
 		// yy This is not really a strong test.  Rather something I wrote for debugging.  Would be a good
 		// starting point for a fuller test.  kai, jul'18
-		
+
 		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
 		{
 			Network net = scenario.getNetwork();
@@ -130,11 +129,11 @@ public class DiversityGeneratingPlansRemoverTest {
 				plans.put("hwh_car_otherMode",plan) ;
 			}
 			pop.addPerson( person );
-			
+
 			DiversityGeneratingPlansRemover.Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
 			builder.setNetwork( scenario.getNetwork() ) ;
 			final DiversityGeneratingPlansRemover remover = builder.get();
-			
+
 			for ( Map.Entry<String,Plan> entry : plans.entrySet() ) {
 				log.info( "similarity " + entry.getKey() + " to self is " + remover.similarity( entry.getValue(), entry.getValue() ) );
 				log.info("") ;
@@ -145,7 +144,7 @@ public class DiversityGeneratingPlansRemoverTest {
 				}
 				log.info("") ;
 			}
-			
+
 //			{
 //				final double similarity = remover.similarity( person.getPlans().get( 0 ), person.getPlans().get( 1 ) );
 //				log.info( "similarity 0 to 1: " + similarity );
@@ -161,7 +160,7 @@ public class DiversityGeneratingPlansRemoverTest {
 //				log.info( "similarity 0 to 2: " + similarity );
 //				Assert.assertEquals( 12.0, similarity, 10.*Double.MIN_VALUE );
 //			}
-			
+
 			final Map<Plan, Double> retVal = remover.calcWeights( person.getPlans() );
 			log.info("") ;
 			for ( Map.Entry<Plan,Double> entry : retVal.entrySet() ) {
@@ -173,13 +172,13 @@ public class DiversityGeneratingPlansRemoverTest {
 			}
 
 			double[] expecteds = new double[]{1.0,0.0} ;
-			
+
 //			Assert.assertArrayEquals( expecteds, Doubles.toArray( retVal.values() ) , 10.*Double.MIN_VALUE );
 		}
-		
-		
+
+
 	}
-	
+
 	private Plan createHwhPlan( final PopulationFactory pf ) {
 		Plan plan = pf.createPlan() ;
 		{
@@ -221,8 +220,8 @@ public class DiversityGeneratingPlansRemoverTest {
 		plan.setScore(90.) ;
 		return plan;
 	}
-	
+
 	@Test
-	public void selectPlan() {
+	void selectPlan() {
 	}
 }

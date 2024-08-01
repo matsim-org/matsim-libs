@@ -40,7 +40,7 @@ import org.matsim.contrib.decongestion.data.LinkInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -103,7 +103,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 
 		log.info("decongestion settings: " + congestionInfo.getDecongestionConfigGroup().toString());
 
-		this.outputDirectory = this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory();
+		this.outputDirectory = this.congestionInfo.getScenario().getConfig().controller().getOutputDirectory();
 		if (!outputDirectory.endsWith("/")) {
 			log.info("Adjusting output directory.");
 			outputDirectory = outputDirectory + "/";
@@ -117,13 +117,13 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			computeDelays(event);
 		}
 
-		if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
+		if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controller().getFirstIteration()) {
 			// skip first iteration
 
 		} else if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval() == 0.) {
 
-			int totalNumberOfIterations = this.congestionInfo.getScenario().getConfig().controler().getLastIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
-			int iterationCounter = event.getIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
+			int totalNumberOfIterations = this.congestionInfo.getScenario().getConfig().controller().getLastIteration() - this.congestionInfo.getScenario().getConfig().controller().getFirstIteration();
+			int iterationCounter = event.getIteration() - this.congestionInfo.getScenario().getConfig().controller().getFirstIteration();
 
 			if (iterationCounter < this.congestionInfo.getDecongestionConfigGroup().getFractionOfIterationsToEndPriceAdjustment() * totalNumberOfIterations
 					&& iterationCounter > this.congestionInfo.getDecongestionConfigGroup().getFractionOfIterationsToStartPriceAdjustment() * totalNumberOfIterations) {
@@ -136,8 +136,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		}
 
 		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWriteOutputIteration() == 0.) {
-			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/", this.congestionInfo.getScenario().getConfig().controler().getRunId());
-			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/", this.congestionInfo.getScenario().getConfig().controler().getRunId());
+			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/", this.congestionInfo.getScenario().getConfig().controller().getRunId());
+			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/", this.congestionInfo.getScenario().getConfig().controller().getRunId());
 		}
 	}
 
@@ -197,7 +197,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				if ( person.getSelectedPlan().getScore()==null ) {
 					throw new RuntimeException( "score is null; don't know how to continue.") ;
 				}
-				monetizedUserBenefits += person.getSelectedPlan().getScore() / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
+				monetizedUserBenefits += person.getSelectedPlan().getScore() / this.congestionInfo.getScenario().getConfig().scoring().getMarginalUtilityOfMoney();
 			}
 			this.iteration2userBenefits.put(event.getIteration(), monetizedUserBenefits);
 
@@ -207,35 +207,35 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 					this.iteration2totalTravelTime,
 					this.iteration2userBenefits,
 					outputDirectory,
-					this.congestionInfo.getScenario().getConfig().controler().getRunId()
+					this.congestionInfo.getScenario().getConfig().controller().getRunId()
 					);
 
 			XYLineChart chart1 = new XYLineChart("Total travel time and total delay", "Iteration", "Hours");
 			double[] iterations1 = new double[event.getIteration() + 1];
 			double[] values1a = new double[event.getIteration() + 1];
 			double[] values1b = new double[event.getIteration() + 1];
-			for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
+			for (int i = this.congestionInfo.getScenario().getConfig().controller().getFirstIteration(); i <= event.getIteration(); i++) {
 				iterations1[i] = i;
 				values1a[i] = this.iteration2totalDelay.get(i) / 3600.;
 				values1b[i] = this.iteration2totalTravelTime.get(i) / 3600.;
 			}
 			chart1.addSeries("Total delay", iterations1, values1a);
 			chart1.addSeries("Total travel time", iterations1, values1b);
-			chart1.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".decongestion_travelTime_delay.png", 800, 600);
+			chart1.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controller().getRunId() + ".decongestion_travelTime_delay.png", 800, 600);
 
 			XYLineChart chart2 = new XYLineChart("user benefits and toll revenues", "Iteration", "Monetary units");
 			double[] iterations2 = new double[event.getIteration() + 1];
 			double[] values2b = new double[event.getIteration() + 1];
 			double[] values2c = new double[event.getIteration() + 1];
 
-			for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
+			for (int i = this.congestionInfo.getScenario().getConfig().controller().getFirstIteration(); i <= event.getIteration(); i++) {
 				iterations2[i] = i;
 				values2b[i] = this.iteration2userBenefits.get(i);
 				values2c[i] = this.iteration2totalTollPayments.get(i);
 			}
 			chart2.addSeries("User benefits", iterations2, values2b);
 			chart2.addSeries("Toll payments (decongestion tolls only)", iterations2, values2c);
-			chart2.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".decongestion_userBenefits_tolls.png", 800, 600);
+			chart2.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controller().getRunId() + ".decongestion_userBenefits_tolls.png", 800, 600);
 		}
 	}
 
@@ -243,9 +243,9 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
 		if (congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval() > 1) {
-			if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
+			if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controller().getFirstIteration()) {
 
-				this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval());
+				this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().replanning().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval());
 				log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
 
 				if (this.nextDisableInnovativeStrategiesIteration != 0) {
@@ -274,7 +274,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				} else if (event.getIteration() == this.nextEnableInnovativeStrategiesIteration) {
 					// set weight back to original value
 
-					if (event.getIteration() >= congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * (congestionInfo.getScenario().getConfig().controler().getLastIteration() - congestionInfo.getScenario().getConfig().controler().getFirstIteration())) {
+					if (event.getIteration() >= congestionInfo.getScenario().getConfig().replanning().getFractionOfIterationsToDisableInnovation() * (congestionInfo.getScenario().getConfig().controller().getLastIteration() - congestionInfo.getScenario().getConfig().controller().getFirstIteration())) {
 
 						log.info("Strategies are switched off by global settings. Do not set back the strategy parameters to original values...");
 
@@ -288,7 +288,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 							if (isInnovativeStrategy(strategy)) {
 
 								double originalValue = -1.0;
-								for (StrategySettings setting : event.getServices().getConfig().strategy().getStrategySettings()) {
+								for (StrategySettings setting : event.getServices().getConfig().replanning().getStrategySettings()) {
 									log.info("setting: " + setting.getStrategyName());
 									log.info("strategyName: " + strategyName);
 

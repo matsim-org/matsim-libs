@@ -2,11 +2,9 @@ package org.matsim.api.core.v01;
 
 import java.util.Objects;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.IdAnnotations.JsonLinkId;
-import org.matsim.api.core.v01.IdAnnotations.JsonNodeId;
-import org.matsim.api.core.v01.IdAnnotations.JsonPersonId;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.IdAnnotations.JsonId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -21,68 +19,80 @@ public class IdAnnotationsTest {
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
-	public void testRecordJsonIds() throws JsonProcessingException {
+	void testRecordJsonIds() throws JsonProcessingException {
+		Id<Person> personId = Id.createPersonId("person");
 		RecordWithIds recordWithIds1 = new RecordWithIds(
-				Id.createPersonId("person"),
+				personId,
 				Id.createLinkId("link"),
 				Id.createNodeId("node"));
 
 		String s = objectMapper.writeValueAsString(recordWithIds1);
 		RecordWithIds recordWithIds2 = objectMapper.readValue(s, RecordWithIds.class);
 
-		Assert.assertEquals(recordWithIds1, recordWithIds2);
+		Assertions.assertEquals(recordWithIds1, recordWithIds2);
+		Assertions.assertEquals(personId, recordWithIds2.personId);
+		Assertions.assertSame(personId, recordWithIds2.personId);
 	}
 
 	@Test
-	public void testRecordJsonIdsWithNull() throws JsonProcessingException {
-		RecordWithIds recordWithIds1 = new RecordWithIds(null, null, null);
+	void testRecordJsonIdsWithNull() throws JsonProcessingException {
+		Id<Person> personId = null;
+		RecordWithIds recordWithIds1 = new RecordWithIds(personId, null, null);
 
 		String s = objectMapper.writeValueAsString(recordWithIds1);
 		RecordWithIds recordWithIds2 = objectMapper.readValue(s, RecordWithIds.class);
 
-		Assert.assertEquals(recordWithIds1, recordWithIds2);
+		Assertions.assertEquals(recordWithIds1, recordWithIds2);
+		Assertions.assertEquals(personId, recordWithIds2.personId);
+		Assertions.assertSame(personId, recordWithIds2.personId);
 	}
 
 	@Test
-	public void testClassJsonIds() throws JsonProcessingException {
+	void testClassJsonIds() throws JsonProcessingException {
+		Id<Person> personId = Id.createPersonId("person");
 		ClassWithIds classWithIds1 = new ClassWithIds(
-				Id.createPersonId("person"),
+				personId,
 				Id.createLinkId("link"),
 				Id.createNodeId("node"));
 
 		String s = objectMapper.writeValueAsString(classWithIds1);
 		ClassWithIds classWithIds2 = objectMapper.readValue(s, ClassWithIds.class);
 
-		Assert.assertEquals(classWithIds1, classWithIds2);
+		Assertions.assertEquals(classWithIds1, classWithIds2);
+		Assertions.assertEquals(personId, classWithIds2.personId);
+		Assertions.assertSame(personId, classWithIds2.personId);
 	}
 
 	@Test
-	public void testClassJsonIdsWithNull() throws JsonProcessingException {
-		ClassWithIds classWithIds1 = new ClassWithIds(null, null, null);
+	void testClassJsonIdsWithNull() throws JsonProcessingException {
+		Id<Person> personId = null;
+		ClassWithIds classWithIds1 = new ClassWithIds(personId, null, null);
 
 		String s = objectMapper.writeValueAsString(classWithIds1);
 		ClassWithIds classWithIds2 = objectMapper.readValue(s, ClassWithIds.class);
 
-		Assert.assertEquals(classWithIds1, classWithIds2);
+		Assertions.assertEquals(classWithIds1, classWithIds2);
+		Assertions.assertEquals(personId, classWithIds2.personId);
+		Assertions.assertSame(personId, classWithIds2.personId);
 	}
 
 	@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 	private static record RecordWithIds(
-			@JsonPersonId Id<Person> personId,
-			@JsonLinkId Id<Link> linkId,
-			@JsonNodeId Id<Node> nodeId) {
-	};
+			@JsonId Id<Person> personId,
+			@JsonId Id<Link> linkId,
+			@JsonId Id<Node> nodeId) {
+	}
 
 	@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 	private static class ClassWithIds {
 
-		@JsonPersonId
+		@JsonId
 		Id<Person> personId;
 
-		@JsonLinkId
+		@JsonId
 		Id<Link> linkId;
 
-		@JsonNodeId
+		@JsonId
 		Id<Node> nodeId;
 
 		ClassWithIds() {
@@ -107,6 +117,6 @@ public class IdAnnotationsTest {
 			return false;
 		}
 
-	};
+	}
 
 }

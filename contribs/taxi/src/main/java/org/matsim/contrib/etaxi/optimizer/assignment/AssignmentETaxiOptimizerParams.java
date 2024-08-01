@@ -21,6 +21,7 @@ package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.core.config.ConfigGroup;
 
 import jakarta.validation.constraints.DecimalMax;
@@ -52,21 +53,14 @@ public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerP
 
 	public AssignmentETaxiOptimizerParams() {
 		super(SET_NAME, true, true);
+		initSingletonParameterSets();
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return type.equals(AssignmentTaxiOptimizerParams.SET_NAME) ?
-				new AssignmentTaxiOptimizerParams() :
-				super.createParameterSet(type);
-	}
-
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		if (set.getName().equals(AssignmentTaxiOptimizerParams.SET_NAME)) {
-			assignmentTaxiOptimizerParams = (AssignmentTaxiOptimizerParams)set;
-		}
-		super.addParameterSet(set);
+	private void initSingletonParameterSets() {
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(AssignmentTaxiOptimizerParams.SET_NAME, AssignmentTaxiOptimizerParams::new,
+			() -> assignmentTaxiOptimizerParams,
+			params -> assignmentTaxiOptimizerParams = (AssignmentTaxiOptimizerParams)params);
 	}
 
 	AssignmentTaxiOptimizerParams getAssignmentTaxiOptimizerParams() {

@@ -20,15 +20,17 @@
 
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,15 +48,16 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractLeastCostPathCalculatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	protected MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final Network network);
 
 	private static final String MODE_RESTRICTION_NOT_SUPPORTED = "Router algo does not support mode restrictions. ";
 
-	@Test public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
 		Config config = utils.loadConfig((String)null);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
@@ -65,8 +68,8 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600, null, null);
 
-		assertEquals("number of nodes wrong.", 4, path.nodes.size());
-		assertEquals("number of links wrong.", 3, path.links.size());
+		assertEquals(4, path.nodes.size(), "number of nodes wrong.");
+		assertEquals(3, path.links.size(), "number of links wrong.");
 		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(0));
 		assertEquals(network.getNodes().get(Id.create("13", Node.class)), path.nodes.get(1));
 		assertEquals(network.getNodes().get(Id.create("14", Node.class)), path.nodes.get(2));
@@ -76,7 +79,8 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 		assertEquals(network.getLinks().get(Id.create("22", Link.class)), path.links.get(2));
 	}
 
-	@Test public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
+	@Test
+	void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
@@ -85,9 +89,36 @@ public abstract class AbstractLeastCostPathCalculatorTest {
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600, null, null);
 
-		assertEquals("number of nodes wrong.", 1, path.nodes.size());
-		assertEquals("number of links wrong.", 0, path.links.size());
+		assertEquals(1, path.nodes.size(), "number of nodes wrong.");
+		assertEquals(0, path.links.size(), "number of links wrong.");
 		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(0));
+	}
+
+	@Test
+	void testCalcLeastCostPath_withOptions() throws SAXException, ParserConfigurationException, IOException {
+		Config config = utils.loadConfig((String)null);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+
+		//path from 1 to 13 has several options with the same travel time
+		Node node1 = network.getNodes().get(Id.create("1", Node.class));
+		Node node13 = network.getNodes().get(Id.create("13", Node.class));
+
+		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
+		Path path = routerAlgo.calcLeastCostPath(node1, node13, 8.0*3600, null, null);
+
+		assertEquals(5, path.nodes.size(), "number of nodes wrong.");
+		assertEquals(4, path.links.size(), "number of links wrong.");
+		assertEquals(network.getNodes().get(Id.create("1", Node.class)), path.nodes.get(0));
+		assertEquals(network.getNodes().get(Id.create("2", Node.class)), path.nodes.get(1));
+		assertEquals(network.getNodes().get(Id.create("3", Node.class)), path.nodes.get(2));
+		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(3));
+		assertEquals(network.getNodes().get(Id.create("13", Node.class)), path.nodes.get(4));
+		assertEquals(network.getLinks().get(Id.create("1", Link.class)), path.links.get(0));
+		assertEquals(network.getLinks().get(Id.create("2", Link.class)), path.links.get(1));
+		assertEquals(network.getLinks().get(Id.create("11", Link.class)), path.links.get(2));
+		assertEquals(network.getLinks().get(Id.create("20", Link.class)), path.links.get(3));
 	}
 
 }

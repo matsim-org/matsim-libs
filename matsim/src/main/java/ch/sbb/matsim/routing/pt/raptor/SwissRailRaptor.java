@@ -1,6 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2017.
- */
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package ch.sbb.matsim.routing.pt.raptor;
 
@@ -10,6 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -67,7 +85,7 @@ public class SwissRailRaptor implements TransitRouter {
     	final double departureTime = request.getDepartureTime();
     	final Person person = request.getPerson();
     	final Attributes routingAttributes = request.getAttributes();
-    	
+
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         if (parameters.getConfig().isUseRangeQuery()) {
             return this.performRangeQuery(fromFacility, toFacility, departureTime, person, routingAttributes, parameters);
@@ -79,50 +97,32 @@ public class SwissRailRaptor implements TransitRouter {
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, departureTime, person, parameters);
 
         /*
-		 * The pt trip is compared with a direct walk from trip origin to trip destination. This is useful for backwards
-		 * compatibility, but leads to many trips with only a single "transit_walk" leg which are then considered pt
-		 * trips by the main mode identifier even though they do not contain any pt leg and should rather be considered
-		 * "walk" trips.
-		 * 
-		 * That problem can be avoided by setting a very high direct walk factor in TransitRouterConfigGroup. However
-		 * this should be combined with enabling mode choice for pt and walk trips such that slow pt trips can be
-		 * replaced by (faster) walk trips by mode choice. Otherwise agents can be stuck with very slow pt trips.
-		 * 
-		 * Comparison is only made between a pt trip and a direct walk trip, other modes (e.g. intermodal access/egress
-		 * modes) are not considered. If they had been considered here, the router would effectively be a mode choice
-		 * module although it is supposed not to change mode choice but rather to simply return a route for a given
-		 * mode. Furthermore there is the problem that the generalized cost calculated by the router can be different
-		 * from the cost the agent will be exposed to in scoring, because the mode performed differently in mobsim than
-		 * anticipated by the router (e.g. the drt travel time turns out to be higher than expected, but the router will
-		 * always chose a direct drt trip over the pt trip, because the router might consistently underestimate drt
-		 * travel time). So it seems a bad idea to compare other modes than walk here. Walk is usually teleported at a
-		 * fixed speed, so it is usually completely deterministic whereas other modes are not.
-		 * 
-		 * Overall enabling mode choice and setting a very high direct walk factor (e.g. Double.POSITIVE_INFINITY which 
-		 * effectively excludes all direct walks) seems cleaner and better.
-		 * 
-		 * vsp-gleich sep'19 (after talking with KN)
-		 * 
-		 * 
 		 * foundRoute.parts.size() == 0 can happen if SwissRasilRaptorCore.createRaptorRoute() finds a trip made up of,
 		 * only 2 parts which consists only of an access and an egress leg without any pt leg inbetween.
 		 */
-        if (foundRoute == null || foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts)) {
+		if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
+			foundRoute = directWalk;
+		}
+		boolean forbidPurelyIntermodalRoutes = data.config.getIntermodalLegOnlyHandling().equals(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid) || data.config.getIntermodalLegOnlyHandling().equals(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.returnNull);
+		if (foundRoute == null || (foundRoute.parts.size() == 0 && forbidPurelyIntermodalRoutes)) {
         	if (person == null) {
             	log.debug("No route found for person null: trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + departureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
         	} else {
             	log.debug("No route found for person " + person.getId() + ": trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + departureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
         	}
-        	return null; 
+        	return null;
         }
-        if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
-            foundRoute = directWalk;
-        }
+		else if ((hasNoPtLeg(foundRoute.parts))){
+			if (forbidPurelyIntermodalRoutes){
+				return null;
+			}
+		}
+
 
 		List<? extends PlanElement> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         return legs;
     }
-    
+
 	private boolean hasNoPtLeg(List<RoutePart> parts) {
 		for (RoutePart part : parts) {
 			// if the route part has a TransitLine, it must be a real pt leg
@@ -142,10 +142,9 @@ public class SwissRailRaptor implements TransitRouter {
         double earliestDepartureTime = desiredDepartureTime - rangeSettings.getMaxEarlierDeparture();
         double latestDepartureTime = desiredDepartureTime + rangeSettings.getMaxLaterDeparture();
 
-        if (this.defaultRouteSelector instanceof ConfigurableRaptorRouteSelector) {
-            ConfigurableRaptorRouteSelector selector = (ConfigurableRaptorRouteSelector) this.defaultRouteSelector;
+        if (this.defaultRouteSelector instanceof ConfigurableRaptorRouteSelector selector) {
 
-            SwissRailRaptorConfigGroup.RouteSelectorParameterSet params = srrConfig.getRouteSelector(subpopulation);
+			SwissRailRaptorConfigGroup.RouteSelectorParameterSet params = srrConfig.getRouteSelector(subpopulation);
 
             selector.setBetaTransfer(params.getBetaTransfers());
             selector.setBetaTravelTime(params.getBetaTravelTime());
@@ -174,7 +173,7 @@ public class SwissRailRaptor implements TransitRouter {
         	} else {
             	log.debug("No route found for person " + person.getId() + ": trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + desiredDepartureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
         	}
-        	return null; 
+        	return null;
         }
         if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
@@ -232,17 +231,58 @@ public class SwissRailRaptor implements TransitRouter {
         for (TransitStopFacility stop : fromStops) {
             accessStops.add(new InitialStop(stop, 0, 0, 0, null));
         }
-        return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, person, null);
     }
 
     public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Facility fromFacility, double departureTime, Person person, Attributes routingAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         List<InitialStop> accessStops = findAccessStops(fromFacility, fromFacility, person, departureTime, routingAttributes, parameters);
-        return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, person, null);
     }
 
-    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, Person person) {
-        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, person);
+	/** Calculates a least-cost-tree for every actual departure time between <code>earliestDepartureTime</code>
+	 *  and <code>latestDepartureTime</code> at the provided stop-facility.
+	 *  This method returns nothing, instead users have to use the <code>observer</code> to collect
+	 *  relevant results.
+	 */
+		public void calcTreesObservable(TransitStopFacility stopFacility, double earliestDepartureTime, double latestStartTime, RaptorParameters parameters, Person person, RaptorObserver observer) {
+			if (this.data.config.getOptimization() != RaptorStaticConfig.RaptorOptimization.OneToAllRouting && !this.treeWarningShown) {
+				log.warn("SwissRailRaptorData was not initialized with full support for tree calculations and may result in unexpected results. Use `RaptorStaticConfig.setOptimization(RaptorOptimization.OneToAllRouting)` to fix this issue.");
+				this.treeWarningShown = true;
+			}
+			parameters.setExactDeparturesOnly(true);
+
+			List<InitialStop> accessStops = List.of(new InitialStop(stopFacility, 0, 0, 0, null));
+
+			int[] routeStopIndices = this.data.routeStopsPerStopFacility.get(stopFacility);
+
+			List<Double> departureTimes = new ArrayList<>();
+
+			for (int routeStopIndex : routeStopIndices) {
+				SwissRailRaptorData.RRouteStop routeStop = this.data.routeStops[routeStopIndex];
+				SwissRailRaptorData.RRoute route = this.data.routes[routeStop.transitRouteIndex];
+				int fromIndex = route.indexFirstDeparture;
+				int toIndex = fromIndex + route.countDepartures;
+				for (int depIndex = fromIndex; depIndex < toIndex; depIndex++) {
+					double departureTime = this.data.departures[depIndex] + routeStop.departureOffset;
+					if (departureTime >= earliestDepartureTime && departureTime <= latestStartTime) {
+						departureTimes.add(departureTime);
+					}
+				}
+			}
+			departureTimes.sort(Double::compare);
+			// we might have some departure times multiple times. helper variable to skip those
+			double lastDepTime = -1;
+			for (double departureTime : departureTimes) {
+				if (departureTime > lastDepTime) {
+					calcLeastCostTree(accessStops, departureTime, parameters, person, observer);
+					lastDepTime = departureTime;
+				}
+			}
+		}
+
+    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, Person person, RaptorObserver observer) {
+        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, person, observer);
     }
 
     public SwissRailRaptorData getUnderlyingData() {
@@ -311,6 +351,10 @@ public class SwissRailRaptor implements TransitRouter {
 			public SwissRailRaptor build() {
 				return new SwissRailRaptor(this.data, this.parametersForPerson, this.routeSelector, this.stopFinder, this.inVehicleCostCalculator, this.transferCostCalculator);
 			}
+		}
+
+		public interface RaptorObserver {
+			void arrivedAtStop(double departureTime, TransitStopFacility stopFacility, double arrivalTime, int transferCount, Supplier<RaptorRoute> route);
 		}
 
 }

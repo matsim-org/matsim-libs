@@ -143,7 +143,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		paramFields = getParamFields();
 		registeredParams = Sets.union(stringGetters.keySet(), paramFields.keySet());
 
-		checkModuleConsistency(setters.keySet().equals(stringGetters.keySet()), "setters and getters inconsistent");
+		// Each parameter which has a setter must have a getter. But there can be parameters which have a getter but no setter in order
+		// to provide backwards compatibility.
+		checkModuleConsistency(setters.keySet().containsAll(stringGetters.keySet()), "setters and getters inconsistent");
 		checkModuleConsistency(paramFields.keySet().stream().noneMatch(setters::containsKey),
 				"Use either StringGetter/Setter or Parameter annotations");
 	}
@@ -254,7 +256,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			var rawType = pType.getRawType();
 			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
 				var typeArgument = pType.getActualTypeArguments()[0];
-				return typeArgument.equals(String.class) || (typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum());
+				return typeArgument.equals(String.class) ||
+					typeArgument.equals(Double.class) ||
+					typeArgument.equals(Integer.class) ||
+					(typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum());
 			}
 
 			if (rawType.equals(Class.class))
@@ -283,14 +288,29 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return;
 		}
 
-		Preconditions.checkArgument(storeUnknownParameters, "Module %s of type %s doesn't accept unknown parameters."
-						+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), param_name,
-				setters.keySet());
+		this.handleAddUnknownParam(param_name, value);
+	}
+
+	/**
+	 * This method is designed to be overwritten if a config group wants to provide
+	 * custom handling for unknown parameters, e.g. for improved backwards compatibility.
+	 * For example: It allows to convert (old-named) parameter values to different units and
+	 * store them with the new name (old parameter could be km/h, new parameter could be m/s).
+	 *
+	 * The default implementation in {@link ReflectiveConfigGroup} will either store the
+	 * unknown parameter or throw an exception, depending on the value of {@link #storeUnknownParameters}.
+	 *
+	 * If the method is overwritten, it might make sense to also overwrite {@link #handleGetUnknownValue(String)}.
+	 */
+	public void handleAddUnknownParam(final String paramName, final String value) {
+		Preconditions.checkArgument(this.storeUnknownParameters, "Module %s of type %s doesn't accept unknown parameters."
+				+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), paramName,
+			this.setters.keySet());
 
 		log.warn(
-				"Unknown parameter {} for group {}. Here are the valid parameter names: {}. Only the string value will be remembered.",
-				param_name, getName(), registeredParams);
-		super.addParam(param_name, value);
+			"Unknown parameter {} for group {}. Here are the valid parameter names: {}. Only the string value will be remembered.",
+			paramName, getName(), this.registeredParams);
+		super.addParam(paramName, value);
 	}
 
 	private void invokeSetter(final Method setter, final String value) {
@@ -395,6 +415,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				List<? extends Enum<?>> enumConstants = getEnumConstants(paramField);
 				return stream.map(s -> stringToEnumValue(s, enumConstants)).collect(toImmutableSet());
 			}
+			if (paramField != null && isCollectionOfDoubleType(paramField))
+				return stream.map(Double::parseDouble).collect(toImmutableSet());
+			if (paramField != null && isCollectionOfIntegerType(paramField))
+				return stream.map(Integer::parseInt).collect(toImmutableSet());
+
 			return stream.collect(toImmutableSet());
 		} else if (type.equals(List.class)) {
 			if (value.isBlank()) {
@@ -405,6 +430,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				List<? extends Enum<?>> enumConstants = getEnumConstants(paramField);
 				return stream.map(s -> stringToEnumValue(s, enumConstants)).toList();
 			}
+			if (paramField != null && isCollectionOfDoubleType(paramField))
+				return stream.map(Double::parseDouble).toList();
+			if (paramField != null && isCollectionOfIntegerType(paramField))
+				return stream.map(Integer::parseInt).toList();
+
 			return stream.toList();
 		} else if (type.equals(Class.class)) {
 			try {
@@ -436,13 +466,22 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		if (field != null) {
 			return getParamField(field);
 		}
+		return this.handleGetUnknownValue(param_name);
+	}
 
-		Preconditions.checkArgument(storeUnknownParameters, "Module %s of type %s doesn't store unknown parameters."
-						+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), param_name,
-				registeredParams);
+	/**
+	 * This method is designed to be overwritten if a config group wants to provide
+	 * custom handling for unknown parameters, e.g. for improved backwards compatibility.
+	 *
+	 * Also see {@link #handleAddUnknownParam(String, String)}
+	 */
+	public String handleGetUnknownValue(final String paramName) {
+		Preconditions.checkArgument(this.storeUnknownParameters, "Module %s of type %s doesn't store unknown parameters."
+						+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), paramName,
+				this.registeredParams);
 
-		log.warn("no getter found for param {}: trying parent method", param_name);
-		return super.getValue(param_name);
+		log.warn("no getter found for param {}: trying parent method", paramName);
+		return super.getValue(paramName);
 	}
 
 	private String invokeGetter(Method getter) {
@@ -462,7 +501,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		boolean accessible = enforceAccessible(paramField);
 		try {
 			var result = paramField.get(this);
-			if (result != null && isCollectionOfEnumsWithUniqueStringValues(paramField)) {
+			if (result != null && (isCollectionOfEnumsWithUniqueStringValues(paramField) ||
+					isCollectionOfDoubleType(paramField) ||
+					isCollectionOfIntegerType(paramField))) {
 				result = ((Collection<Object>) result).stream()
 						.map(Object::toString) // map enum values to string
 						.collect(Collectors.toList());
@@ -643,6 +684,30 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 					// here, paramField *is* collection of Enums
 					return enumStringsAreUnique(((Class<?>) typeArgument));
 				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean isCollectionOfIntegerType(Field paramField) {
+		var type = paramField.getGenericType();
+		if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+                return typeArgument.equals(Integer.class) || typeArgument.equals(Integer.TYPE);
+			}
+		}
+		return false;
+	}
+
+	private static boolean isCollectionOfDoubleType(Field paramField) {
+		var type = paramField.getGenericType();
+		if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+				return typeArgument.equals(Double.class) || typeArgument.equals(Double.TYPE);
 			}
 		}
 		return false;

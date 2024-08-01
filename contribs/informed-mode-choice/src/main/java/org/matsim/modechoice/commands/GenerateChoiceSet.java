@@ -27,13 +27,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
-		name = "generate-choice-set",
-		description = "Generate a static mode-choice set for all agents in the population"
+	name = "generate-choice-set",
+	description = "Generate a static mode-choice set for all agents in the population"
 )
 public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
@@ -42,17 +43,20 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Mixin
 	private ScenarioOptions scenario;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
+	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter")
 	private String subpopulation;
 
-	@CommandLine.Option(names = "--top-k", description = "Use top k estimates", defaultValue = "5")
-	private int topK;
+	@CommandLine.Option(names = "--top-k", description = "Use top k estimates")
+	private Integer topK;
 
-	@CommandLine.Option(names = "--pruning", description = "Pruning parameter")
+	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", split = ",")
+	private Set<String> modes;
+
+	@CommandLine.Option(names = "--pruning", description = "Pruning to use. Disabled by default.")
 	private String pruning;
 
-	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", defaultValue = "car,walk,bike,pt,ride", split = ",")
-	private Set<String> modes;
+	@CommandLine.Option(names = "--keep-selected-plan", description = "Keep selected plan in choice set", defaultValue = "false")
+	private boolean keepSelectedPlan;
 
 	@CommandLine.Option(names = "--output", description = "Path for output population", required = true)
 	private Path output;
@@ -74,8 +78,8 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		Config config = scenario.getConfig();
 
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
@@ -83,8 +87,12 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		log.info("Using k={}, pruning={}", topK, pruning);
 
-		imc.setTopK(topK);
-		imc.setModes(modes);
+		if (topK != null)
+			imc.setTopK(topK);
+
+		if (modes != null)
+			imc.setModes(modes);
+
 		imc.setPruning(pruning);
 
 		Injector injector = controler.getInjector();
@@ -96,7 +104,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		// copy the original plan, so no modifications are made
 		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			String subpop = PopulationUtils.getSubpopulation(person);
-			if (subpopulation != null && !subpop.equals(subpopulation))
+			if (subpopulation != null && !Objects.equals(subpop, subpopulation))
 				continue;
 
 			Plan selected = person.getSelectedPlan();
@@ -155,10 +163,14 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		TopKChoicesGenerator generator = generatorCache.get();
 		Collection<PlanCandidate> candidates = generator.generate(model, null, null);
 
-		// remove all other plans
+		// remove all other plans, except source
 		Set<Plan> plans = new HashSet<>(person.getPlans());
 		plans.remove(plan);
 		plans.forEach(person::removePlan);
+
+		// This will result in a copy of the original plan created
+		if (keepSelectedPlan)
+			plan = null;
 
 		for (PlanCandidate c : candidates) {
 
@@ -177,10 +189,10 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			// the writer is synchronized
 			try {
 				distWriter.write(person.getId() + "\t" + candidates.size() + "\t" +
-						candidates.stream()
-								.map(PlanCandidate::getUtility).map(String::valueOf)
-								.collect(Collectors.joining(";")) +
-						"\n");
+					candidates.stream()
+						.map(PlanCandidate::getUtility).map(String::valueOf)
+						.collect(Collectors.joining(";")) +
+					"\n");
 
 			} catch (IOException e) {
 				throw new RuntimeException(e);

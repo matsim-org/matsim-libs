@@ -8,10 +8,10 @@ import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import java.awt.*;
 import java.util.Map;
 
-public class ChargerPowerTimeProfileView implements ProfileWriter.ProfileView {
+final class ChargerPowerTimeProfileView implements ProfileWriter.ProfileView {
 	private final ChargerPowerTimeProfileCalculator calculator;
 
-	public ChargerPowerTimeProfileView(ChargerPowerTimeProfileCalculator calculator) {
+	ChargerPowerTimeProfileView(ChargerPowerTimeProfileCalculator calculator) {
 		this.calculator = calculator;
 
 	}

@@ -20,9 +20,9 @@
 
 package org.matsim.core.replanning.selectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,7 +40,8 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testRemoveWorstPlans_nullType() {
+	@Test
+	void testRemoveWorstPlans_nullType() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
@@ -59,20 +60,20 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		person.addPlan(plan4);
 		person.addPlan(plan5);
 
-		assertEquals("test we have all plans we want", 5, person.getPlans().size());
+		assertEquals(5, person.getPlans().size(), "test we have all plans we want");
 
 		person.getPlans().remove(selector.selectPlan(person));
-		assertEquals("test that a plan was removed", 4, person.getPlans().size());
-		assertFalse("test that plan with undefined score was removed.", person.getPlans().contains(plan3));
+		assertEquals(4, person.getPlans().size(), "test that a plan was removed");
+		assertFalse(person.getPlans().contains(plan3), "test that plan with undefined score was removed.");
 
 		person.getPlans().remove(selector.selectPlan(person));
-		assertEquals("test that a plan was removed", 3, person.getPlans().size());
-		assertFalse("test that the plan with minimal score was removed", person.getPlans().contains(plan4));
+		assertEquals(3, person.getPlans().size(), "test that a plan was removed");
+		assertFalse(person.getPlans().contains(plan4), "test that the plan with minimal score was removed");
 
 		person.getPlans().remove(selector.selectPlan(person));
 		person.getPlans().remove(selector.selectPlan(person));
-		assertEquals("test that two plans were removed", 1, person.getPlans().size());
-		assertTrue("test that the plan left has highest score", person.getPlans().contains(plan2));
+		assertEquals(1, person.getPlans().size(), "test that two plans were removed");
+		assertTrue(person.getPlans().contains(plan2), "test that the plan left has highest score");
 	}
 
 	/**
@@ -80,7 +81,8 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test public void testRemoveWorstPlans_withTypes() {
+	@Test
+	void testRemoveWorstPlans_withTypes() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		/* The used plans, ordered by score:
 		 * plan2: b, 22.0
@@ -117,24 +119,24 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		person.addPlan(plan5);
 		person.addPlan(plan6);
 
-		assertEquals("test we have all plans we want", 6, person.getPlans().size());
+		assertEquals(6, person.getPlans().size(), "test we have all plans we want");
 
 		person.getPlans().remove(selector.selectPlan(person));
 		person.getPlans().remove(selector.selectPlan(person));
-		assertEquals("test that two plans were removed", 4, person.getPlans().size());
-		assertFalse("test that plan with undefined score was removed.", person.getPlans().contains(plan3));
-		assertFalse("test that plan with worst score was removed.", person.getPlans().contains(plan4));
+		assertEquals(4, person.getPlans().size(), "test that two plans were removed");
+		assertFalse(person.getPlans().contains(plan3), "test that plan with undefined score was removed.");
+		assertFalse(person.getPlans().contains(plan4), "test that plan with worst score was removed.");
 
 		person.getPlans().remove(selector.selectPlan(person));
 		person.getPlans().remove(selector.selectPlan(person));
-		assertEquals("test that two plans were removed", 2, person.getPlans().size());
-		assertFalse("test that the plan with worst score was removed", person.getPlans().contains(plan1));
-		assertTrue("test that the now only plan of type a was not removed", person.getPlans().contains(plan5));
-		assertFalse("test that the plan with the 2nd-worst score was removed", person.getPlans().contains(plan6));
+		assertEquals(2, person.getPlans().size(), "test that two plans were removed");
+		assertFalse(person.getPlans().contains(plan1), "test that the plan with worst score was removed");
+		assertTrue(person.getPlans().contains(plan5), "test that the now only plan of type a was not removed");
+		assertFalse(person.getPlans().contains(plan6), "test that the plan with the 2nd-worst score was removed");
 
 		person.getPlans().remove(selector.selectPlan(person));
-		assertEquals("test that one plan was removed", 1, person.getPlans().size());
-		assertTrue("test that the plan with highest score of type b was not removed", person.getPlans().contains(plan2));
+		assertEquals(1, person.getPlans().size(), "test that one plan was removed");
+		assertTrue(person.getPlans().contains(plan2), "test that the plan with highest score of type b was not removed");
 	}
 
 }

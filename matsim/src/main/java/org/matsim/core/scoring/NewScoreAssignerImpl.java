@@ -27,8 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 import jakarta.inject.Inject;
 import java.util.HashMap;
@@ -41,27 +41,38 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 	private Map<Plan,Integer> msaContributions = new HashMap<>() ;
 	private Integer scoreMSAstartsAtIteration;
 	private final double learningRate;
+	private final boolean explainScores;
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 
 	@Inject
-	NewScoreAssignerImpl(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ControlerConfigGroup controlerConfigGroup) {
-		if (planCalcScoreConfigGroup.getFractionOfIterationsToStartScoreMSA()!=null ) {
-			final int diff = controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration();
+	NewScoreAssignerImpl(ScoringConfigGroup scoringConfigGroup, ControllerConfigGroup controllerConfigGroup) {
+		if (scoringConfigGroup.getFractionOfIterationsToStartScoreMSA()!=null ) {
+			final int diff = controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration();
 			this.scoreMSAstartsAtIteration = (int) (diff
-					* planCalcScoreConfigGroup.getFractionOfIterationsToStartScoreMSA() + controlerConfigGroup.getFirstIteration());
+					* scoringConfigGroup.getFractionOfIterationsToStartScoreMSA() + controllerConfigGroup.getFirstIteration());
 		}
-		learningRate = planCalcScoreConfigGroup.getLearningRate();
+		learningRate = scoringConfigGroup.getLearningRate();
+		explainScores = scoringConfigGroup.isWriteScoreExplanations();
 	}
 
 	public void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population) {
 		log.info("it: " + iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
+
+		StringBuilder explanation = new StringBuilder();
 
 		for (Person person : population.getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
 			double score = sf.getScore();
 			Plan plan = person.getSelectedPlan();
 			Double oldScore = plan.getScore();
+
+			if (explainScores) {
+				explanation.setLength(0);
+				sf.explainScore(explanation);
+				plan.getAttributes().putAttribute(ScoringFunction.SCORE_EXPLANATION_ATTR, explanation.toString());
+			}
+
 			if (oldScore == null) {
 				plan.setScore(score);
 				if ( plan.getScore().isNaN() ) {

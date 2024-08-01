@@ -26,8 +26,8 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
 public class PopulationReaderMatsimV5Test {
 
 	@Test
-	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -107,36 +107,36 @@ public class PopulationReaderMatsimV5Test {
 
 		tester.endTag();
 
-		Assert.assertEquals("population size.", 2, population.getPersons().size());
+		Assertions.assertEquals(2, population.getPersons().size(), "population size.");
 		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
-		Assert.assertEquals("different startLink for first leg.", "1", route1a.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for first leg.", "20", route1a.getEndLinkId().toString());
+		Assertions.assertEquals("1", route1a.getStartLinkId().toString(), "different startLink for first leg.");
+		Assertions.assertEquals("20", route1a.getEndLinkId().toString(), "different endLink for first leg.");
 		Leg leg1b = (Leg) plan1.getPlanElements().get(3);
 		Route route1b = leg1b.getRoute();
-		Assert.assertEquals("different startLink for second leg.", "20", route1b.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for second leg.", "20", route1b.getEndLinkId().toString());
+		Assertions.assertEquals("20", route1b.getStartLinkId().toString(), "different startLink for second leg.");
+		Assertions.assertEquals("20", route1b.getEndLinkId().toString(), "different endLink for second leg.");
 		Leg leg1c = (Leg) plan1.getPlanElements().get(5);
 		Route route1c = leg1c.getRoute();
-		Assert.assertEquals("different startLink for third leg.", "20", route1c.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for third leg.", "1", route1c.getEndLinkId().toString());
+		Assertions.assertEquals("20", route1c.getStartLinkId().toString(), "different startLink for third leg.");
+		Assertions.assertEquals("1", route1c.getEndLinkId().toString(), "different endLink for third leg.");
 
 		Person person2 = population.getPersons().get(Id.create("2", Person.class));
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2a = (Leg) plan2.getPlanElements().get(1);
 		Route route2a = leg2a.getRoute();
-		Assert.assertEquals("different startLink for first leg.", "2", route2a.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for first leg.", "20", route2a.getEndLinkId().toString());
+		Assertions.assertEquals("2", route2a.getStartLinkId().toString(), "different startLink for first leg.");
+		Assertions.assertEquals("20", route2a.getEndLinkId().toString(), "different endLink for first leg.");
 		Leg leg2b = (Leg) plan2.getPlanElements().get(3);
 		Route route2b = leg2b.getRoute();
-		Assert.assertEquals("different startLink for third leg.", "20", route2b.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for third leg.", "1", route2b.getEndLinkId().toString());
+		Assertions.assertEquals("20", route2b.getStartLinkId().toString(), "different startLink for third leg.");
+		Assertions.assertEquals("1", route2b.getEndLinkId().toString(), "different endLink for third leg.");
 	}
 
 	@Test
-	public void testReadRoute_sameLinkRoute() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute_sameLinkRoute() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -164,15 +164,15 @@ public class PopulationReaderMatsimV5Test {
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
-		Assert.assertEquals("different startLink for first leg.", "1", route1a.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for first leg.", "1", route1a.getEndLinkId().toString());
-		Assert.assertTrue(route1a instanceof NetworkRoute);
+		Assertions.assertEquals("1", route1a.getStartLinkId().toString(), "different startLink for first leg.");
+		Assertions.assertEquals("1", route1a.getEndLinkId().toString(), "different endLink for first leg.");
+		Assertions.assertTrue(route1a instanceof NetworkRoute);
 		NetworkRoute nr = (NetworkRoute) route1a;
-		Assert.assertEquals(0, nr.getLinkIds().size());
+		Assertions.assertEquals(0, nr.getLinkIds().size());
 	}
 
 	@Test
-	public void testReadRoute_consequentLinks() throws SAXException, ParserConfigurationException, IOException {
+	void testReadRoute_consequentLinks() throws SAXException, ParserConfigurationException, IOException {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -200,11 +200,11 @@ public class PopulationReaderMatsimV5Test {
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
-		Assert.assertEquals("different startLink for first leg.", "1", route1a.getStartLinkId().toString());
-		Assert.assertEquals("different endLink for first leg.", "2", route1a.getEndLinkId().toString());
-		Assert.assertTrue(route1a instanceof NetworkRoute);
+		Assertions.assertEquals("1", route1a.getStartLinkId().toString(), "different startLink for first leg.");
+		Assertions.assertEquals("2", route1a.getEndLinkId().toString(), "different endLink for first leg.");
+		Assertions.assertTrue(route1a instanceof NetworkRoute);
 		NetworkRoute nr = (NetworkRoute) route1a;
-		Assert.assertEquals(0, nr.getLinkIds().size());
+		Assertions.assertEquals(0, nr.getLinkIds().size());
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class PopulationReaderMatsimV5Test {
 	 * @author mrieser
 	 */
 	@Test
-	public void testReadRouteWithoutActivityLinks() {
+	void testReadRouteWithoutActivityLinks() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -237,16 +237,16 @@ public class PopulationReaderMatsimV5Test {
 		parser.endTag("person", null, context);
 		parser.endTag("population", null, context);
 
-		Assert.assertEquals("population size.", 1, population.getPersons().size());
+		Assertions.assertEquals(1, population.getPersons().size(), "population size.");
 		Person person1 = population.getPersons().get(Id.create("981", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1 = (Leg) plan1.getPlanElements().get(1);
 		Route route1 = leg1.getRoute();
-		Assert.assertNotNull(route1);
+		Assertions.assertNotNull(route1);
 	}
 
 	@Test
-	public void testReadingOldRoutesWithoutType() {
+	void testReadingOldRoutesWithoutType() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -280,14 +280,14 @@ public class PopulationReaderMatsimV5Test {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
-		Assert.assertEquals(7, plan.getPlanElements().size());
-		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(5) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(6) instanceof Activity);
+		Assertions.assertEquals(7, plan.getPlanElements().size());
+		Assertions.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(5) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(6) instanceof Activity);
 		
 		Leg leg1 = (Leg) plan.getPlanElements().get(1);
 		Route route1 = leg1.getRoute();
@@ -296,17 +296,17 @@ public class PopulationReaderMatsimV5Test {
 		Leg leg3 = (Leg) plan.getPlanElements().get(5);
 		Route route3 = leg3.getRoute();
 		
-		Assert.assertTrue(route1 instanceof NetworkRoute);
+		Assertions.assertTrue(route1 instanceof NetworkRoute);
 //		Assert.assertTrue(route2 instanceof GenericRouteImpl);
-		Assert.assertTrue(route3 instanceof TransitPassengerRoute);
+		Assertions.assertTrue(route3 instanceof TransitPassengerRoute);
 	}
 
-	
+
 	/**
 	 * @author mrieser
 	 */
 	@Test
-	public void testReadActivity() {
+	void testReadActivity() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
@@ -325,15 +325,15 @@ public class PopulationReaderMatsimV5Test {
 		reader.endTag("person", "", context);
 		reader.endTag("population", "", context);
 
-		Assert.assertEquals(1, population.getPersons().size());
+		Assertions.assertEquals(1, population.getPersons().size());
 		Person person = population.getPersons().get(Id.create("2", Person.class));
 		Plan plan = person.getPlans().get(0);
-		Assert.assertEquals("3", ((Activity) plan.getPlanElements().get(0)).getLinkId().toString());
-		Assert.assertEquals("2", ((Activity) plan.getPlanElements().get(2)).getLinkId().toString());
+		Assertions.assertEquals("3", ((Activity) plan.getPlanElements().get(0)).getLinkId().toString());
+		Assertions.assertEquals("2", ((Activity) plan.getPlanElements().get(2)).getLinkId().toString());
 	}
 
 	@Test
-	public void testRepeatingLegs() {
+	void testRepeatingLegs() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -354,16 +354,16 @@ public class PopulationReaderMatsimV5Test {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
-		Assert.assertEquals(5, plan.getPlanElements().size());
-		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
+		Assertions.assertEquals(5, plan.getPlanElements().size());
+		Assertions.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(2) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
 	}
 
 	@Test
-	public void testRepeatingActs() {
+	void testRepeatingActs() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -383,15 +383,15 @@ public class PopulationReaderMatsimV5Test {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
-		Assert.assertEquals(4, plan.getPlanElements().size());
-		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Activity);
+		Assertions.assertEquals(4, plan.getPlanElements().size());
+		Assertions.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(3) instanceof Activity);
 	}
 
 	@Test
-	public void testVehicleIdInRoute() {
+	void testVehicleIdInRoute() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
 		final Population population = scenario.getPopulation();
@@ -412,13 +412,13 @@ public class PopulationReaderMatsimV5Test {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
-		Assert.assertEquals(3, plan.getPlanElements().size());
-		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertEquals(3, plan.getPlanElements().size());
+		Assertions.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
 		Leg leg = (Leg) plan.getPlanElements().get(1) ;
 		NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-		Assert.assertEquals(Id.create("123", Vehicle.class), route.getVehicleId() ) ;
-		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+		Assertions.assertEquals(Id.create("123", Vehicle.class), route.getVehicleId() ) ;
+		Assertions.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
 	}
 
 	private static class XmlParserTestHelper {

@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
-import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolTestRule;
+import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolExtension;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
@@ -47,8 +47,8 @@ import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
  * @author Michal Maciejewski (michalm)
  */
 public class SelectiveInsertionProviderTest {
-	@Rule
-	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
+	@RegisterExtension
+	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
 	private final BestInsertionFinder initialInsertionFinder = mock(BestInsertionFinder.class);
 

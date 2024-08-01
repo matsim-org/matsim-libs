@@ -26,9 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -39,7 +37,7 @@ import org.matsim.vehicles.MatsimVehicleWriter;
 
 /**
  *
- * Use the config file as created by the 
+ * Use the config file as created by the
  * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
  * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
  *
@@ -51,25 +49,21 @@ public final class RunAverageEmissionToolOfflineExample{
 
 	public static final String emissionEventsFilename = "emission.events.offline.xml.gz";
 
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+	// (remove dependency of one test/execution path from others. kai/ihab, nov'18)
 
 	private Config config;
 
-	// =======================================================================================================		
+	// =======================================================================================================
 
 	public static void main (String[] args){
 		RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
 		emissionToolOfflineExampleV2.run();
 	}
 
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
-
 	public Config prepareConfig(String args){
 		throw new RuntimeException("execution path no longer exists");
 	}
+
 	public Config prepareConfig(String [] args) {
 		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
 		EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
@@ -98,14 +92,14 @@ public final class RunAverageEmissionToolOfflineExample{
 				bind( EmissionModule.class ) ;
 //				bind( OutputDirectoryHierarchy.class );
 			}
-		};;
+		};
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module );
 
 		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 //		OutputDirectoryHierarchy outputDirectoryHierarchy = injector.getInstance( OutputDirectoryHierarchy.class );
 
-		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		final String outputDirectory = scenario.getConfig().controller().getOutputDirectory();
 		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventsFilename );
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 

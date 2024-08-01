@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 public class IdCollectorsTest {
 
 	@Test
-	public void testToIdMap() {
+	void testToIdMap() {
 		record Entry(Id<Vehicle> id, String value) {
 		}
 
@@ -53,7 +53,7 @@ public class IdCollectorsTest {
 	}
 
 	@Test
-	public void testToIdMap_streamWithDuplicateKeys() {
+	void testToIdMap_streamWithDuplicateKeys() {
 		record Entry(Id<Vehicle> id, String value) {
 		}
 
@@ -65,7 +65,7 @@ public class IdCollectorsTest {
 	}
 
 	@Test
-	public void testToIdMap_withMerge() {
+	void testToIdMap_withMerge() {
 		record Entry(Id<Vehicle> id, int value) {
 		}
 
@@ -82,7 +82,7 @@ public class IdCollectorsTest {
 	}
 
 	@Test
-	public void testToIdSet() {
+	void testToIdSet() {
 		var id1 = Id.createVehicleId("v1");
 		var id2 = Id.createVehicleId("v2");
 		var id3 = Id.createVehicleId("v3");

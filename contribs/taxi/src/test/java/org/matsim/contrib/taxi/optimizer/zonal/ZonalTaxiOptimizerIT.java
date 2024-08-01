@@ -22,24 +22,26 @@ package org.matsim.contrib.taxi.optimizer.zonal;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ZonalTaxiOptimizerIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testZonal_dse() {
+	void testZonal_dse() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
 		rbParams.nearestRequestsLimit = 99999;
 		rbParams.nearestVehiclesLimit = 99999;
-		rbParams.cellSize = 99999.;
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rbParams.getZoneSystemParams();
+		zoneParams.cellSize = 99999.;
 
 		ZonalSystemParams zsParams = new ZonalSystemParams();
 		zsParams.zonesShpFile = "zones/zones.shp";
@@ -54,12 +56,13 @@ public class ZonalTaxiOptimizerIT {
 	}
 
 	@Test
-	public void testZonal_minWaitTime() {
+	void testZonal_minWaitTime() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		rbParams.goal = Goal.MIN_WAIT_TIME;
 		rbParams.nearestRequestsLimit = 10;
 		rbParams.nearestVehiclesLimit = 10;
-		rbParams.cellSize = 1000.;
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rbParams.getZoneSystemParams();
+		zoneParams.cellSize = 1000.;
 
 		ZonalSystemParams zsParams = new ZonalSystemParams();
 		zsParams.zonesShpFile = "zones/zones.shp";

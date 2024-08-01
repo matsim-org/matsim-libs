@@ -18,47 +18,46 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author nagel
  *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
 	 */
 
-//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-	@Ignore //Ignore this test, because the thrown exception during events handling does not always leads to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
+//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback, it has to fail!
+	@Disabled //Ignore this test, because the thrown exception during events handling does not always lead to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
 	@Test
-	public final void testDetailed_vehTypeV2() {
+	final void testDetailed_vehTypeV2() {
 		boolean gotAnException = false ;
 		try {
-			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
-			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.controler().setLastIteration( 1 );
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			Scenario scenario = onlineExample.prepareScenario( config ) ;
-			onlineExample.run( scenario ) ;
+
+            Scenario scenario = ScenarioUtils.loadScenario(config);
+			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}
-		Assert.assertTrue( gotAnException );
+		Assertions.assertTrue( gotAnException );
 	}
 
 }

@@ -182,7 +182,8 @@ public interface Waypoint {
 		}
 
 		public int getOccupancyChange() {
-			return task.getPickupRequests().size() - task.getDropoffRequests().size();
+			return task.getPickupRequests().values().stream().mapToInt(AcceptedDrtRequest::getPassengerCount).sum() -
+					task.getDropoffRequests().values().stream().mapToInt(AcceptedDrtRequest::getPassengerCount).sum();
 		}
 
 		private double calcLatestArrivalTime() {

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -53,7 +53,8 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	@Inject Map<String, TravelTime> travelTimes;
 	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	@Inject SingleModeNetworksCache singleModeNetworksCache;
-	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	@Inject
+	RoutingConfigGroup routingConfigGroup;
 	@Inject Network network;
 	@Inject NetworkConfigGroup networkConfigGroup;
 	@Inject PopulationFactory populationFactory;
@@ -98,20 +99,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 						   + routingMode + ";\tmode=" + mode) ;
 
 		// the network refers to the (transport)mode:
-		Network filteredNetwork = null;
-
-		// Ensure this is not performed concurrently by multiple threads!
-		synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
-			filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
-			if (filteredNetwork == null) {
-				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-				Set<String> modes = new HashSet<>();
-				modes.add(mode);
-				filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
-				filter.filter(filteredNetwork, modes);
-				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
-			}
-		}
+		Network filteredNetwork = singleModeNetworksCache.getOrCreateSingleModeNetwork(mode);
 
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
@@ -129,7 +117,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 						travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if ( !plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if ( !routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			/*
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
 			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard

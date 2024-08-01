@@ -36,12 +36,12 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import jakarta.inject.Singleton;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * @author thibautd
@@ -50,16 +50,14 @@ import java.io.IOException;
 public class CourtesyHistogramListener  implements IterationEndsListener, IterationStartsListener {
 
 	private final CourtesyHistogram histogram;
-	private final boolean outputGraph;
 
 	private static final Logger log = LogManager.getLogger(CourtesyHistogramListener.class);
 	private final OutputDirectoryHierarchy controlerIO;
 
     @Inject
-    CourtesyHistogramListener(Config config, CourtesyHistogram histogram, OutputDirectoryHierarchy controlerIO) {
+    CourtesyHistogramListener(CourtesyHistogram histogram, OutputDirectoryHierarchy controlerIO) {
         this.controlerIO = controlerIO;
 		this.histogram = histogram;
-		this.outputGraph = config.controler().isCreateGraphs();
 	}
 
 	@Override
@@ -70,7 +68,10 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "courtesyHistogram.txt"));
-		if (this.outputGraph) {
+
+		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
+		if (createGraphs) {
 			for ( String type : histogram.getDataFrames().keySet() ) {
 				writeGraphic(
 						this.histogram,

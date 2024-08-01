@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Inject;
 
-public class ChargerOccupancyXYDataCollector implements MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
+public final class ChargerOccupancyXYDataCollector implements MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final MatsimServices matsimServices;
@@ -45,7 +45,7 @@ public class ChargerOccupancyXYDataCollector implements MobsimInitializedListene
 	private CompactCSVWriter writer;
 
 	@Inject
-	public ChargerOccupancyXYDataCollector(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
+	ChargerOccupancyXYDataCollector(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.matsimServices = matsimServices;
 	}

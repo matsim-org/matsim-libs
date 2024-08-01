@@ -20,12 +20,13 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-import com.google.common.base.MoreObjects;
+import java.util.List;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -37,6 +38,7 @@ public class AcceptedDrtRequest {
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestStartTime(request.getLatestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
+				.maxRideDuration(request.getMaxRideDuration())
 				.build();
 	}
 
@@ -45,12 +47,14 @@ public class AcceptedDrtRequest {
 	private final double earliestStartTime;
 	private final double latestStartTime;
 	private final double latestArrivalTime;
+	private final double maxRideDuration;
 
 	private AcceptedDrtRequest(Builder builder) {
 		request = builder.request;
 		earliestStartTime = builder.earliestStartTime;
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
+		maxRideDuration = builder.maxRideDuration;
 	}
 
 	public static Builder newBuilder() {
@@ -63,6 +67,7 @@ public class AcceptedDrtRequest {
 		builder.earliestStartTime = copy.getEarliestStartTime();
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
+		builder.maxRideDuration = copy.getMaxRideDuration();
 		return builder;
 	}
 
@@ -81,6 +86,9 @@ public class AcceptedDrtRequest {
 	public double getLatestArrivalTime() {
 		return latestArrivalTime;
 	}
+	public double getMaxRideDuration() {
+		return maxRideDuration;
+	}
 
 	public Id<Request> getId() {
 		return request.getId();
@@ -98,8 +106,12 @@ public class AcceptedDrtRequest {
 		return request.getToLink();
 	}
 
-	public Id<Person> getPassengerId() {
-		return request.getPassengerId();
+	public List<Id<Person>> getPassengerIds() {
+		return request.getPassengerIds();
+	}
+
+	public int getPassengerCount() {
+		return request.getPassengerCount();
 	}
 
 	public String getMode() {
@@ -121,6 +133,7 @@ public class AcceptedDrtRequest {
 		private double earliestStartTime;
 		private double latestStartTime;
 		private double latestArrivalTime;
+		private double maxRideDuration;
 
 		private Builder() {
 		}
@@ -142,6 +155,11 @@ public class AcceptedDrtRequest {
 
 		public Builder latestArrivalTime(double val) {
 			latestArrivalTime = val;
+			return this;
+		}
+
+		public Builder maxRideDuration(double val) {
+			this.maxRideDuration = val;
 			return this;
 		}
 

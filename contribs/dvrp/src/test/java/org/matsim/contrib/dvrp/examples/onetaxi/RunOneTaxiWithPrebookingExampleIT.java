@@ -32,9 +32,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.assertj.core.data.Offset;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,16 +47,14 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.api.core.v01.events.HasPersonId;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -68,19 +66,19 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 	private static final Logger log = LogManager.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testRun() {
+	void testRun() {
 		// load config
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"generic_dvrp_one_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		{
 			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config,
 					QSimComponentsConfigGroup.class);
@@ -96,9 +94,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			person.getSelectedPlan()
-					.getAttributes()
-					.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
+			PreplanningUtils.setPrebookingOffset_s( person.getSelectedPlan(), 900. );
 		}
 
 		//PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
@@ -142,7 +138,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 					if (event instanceof AgentWakeupEvent) {
 						wakeupEvents.put(((AgentWakeupEvent)event).getPersonId(), (AgentWakeupEvent)event);
 					} else if (event instanceof PassengerRequestScheduledEvent) {
-						requestScheduledEvents.put(((PassengerRequestScheduledEvent)event).getPersonId(),
+						requestScheduledEvents.put(((PassengerRequestScheduledEvent)event).getPersonIds().stream().findFirst().orElseThrow(),
 								(PassengerRequestScheduledEvent)event);
 					} else if (event instanceof ActivityEndEvent && ((ActivityEndEvent)event).getActType()
 							.equals("dummy")) {
@@ -157,6 +153,12 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				});
 			}
 		});
+
+		if ("true".equals(System.getProperty("runOTFVis"))) {
+			// This will start otfvis
+			controler.addOverridingModule(new OTFVisLiveModule() );
+			// !! does not work together with parameterized tests :-( !!
+		}
 
 		// run simulation
 		controler.run();
@@ -239,7 +241,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		PassengerRequestScheduledEvent event = events.get(Id.createPersonId(personId));
 		assertThat(event.getVehicleId().toString()).isEqualTo("taxi_one");
 		assertThat(event.getPickupTime()).isCloseTo(pickupTime, Offset.offset(0.01));
-		assertThat(event.getPersonId().toString()).isEqualTo(personId);
+		assertThat(event.getPersonIds().get(0).toString()).isEqualTo(personId);
 		assertThat(event.getRequestId().toString()).isEqualTo(requestId);
 	}
 

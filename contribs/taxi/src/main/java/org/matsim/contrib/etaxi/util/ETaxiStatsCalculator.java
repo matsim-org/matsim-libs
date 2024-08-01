@@ -19,7 +19,18 @@
 
 package org.matsim.contrib.etaxi.util;
 
-import static org.matsim.contrib.taxi.util.stats.DurationStats.stateDurationByTimeBinAndState;
+import com.google.common.collect.ImmutableList;
+import one.util.streamex.StreamEx;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector.ChargingSequence;
+import org.matsim.contrib.taxi.util.stats.DurationStats;
+import org.matsim.contrib.taxi.util.stats.DurationStats.State;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
+import org.matsim.contrib.taxi.util.stats.TimeBinSample;
+import org.matsim.contrib.taxi.util.stats.TimeBinSamples;
 
 import java.util.List;
 import java.util.Map;
@@ -27,20 +38,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
-import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector.ChargingSequence;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
-import org.matsim.contrib.taxi.util.stats.DurationStats;
-import org.matsim.contrib.taxi.util.stats.DurationStats.State;
-import org.matsim.contrib.taxi.util.stats.TimeBinSample;
-import org.matsim.contrib.taxi.util.stats.TimeBinSamples;
-
-import com.google.common.collect.ImmutableList;
-
-import one.util.streamex.StreamEx;
+import static org.matsim.contrib.taxi.util.stats.DurationStats.stateDurationByTimeBinAndState;
 
 public class ETaxiStatsCalculator {
 	private final SortedMap<Integer, ETaxiStats> hourlyEStats = new TreeMap<>();
@@ -49,7 +47,7 @@ public class ETaxiStatsCalculator {
 	public ETaxiStatsCalculator(List<ChargingSequence> chargingSequences, FleetSpecification fleetSpecification) {
 		for (ChargingSequence sequence : chargingSequences) {
 			//only calculate stats for EVs belonging to a given mode/fleet
-			var vehicleId = Id.create(sequence.getChargingStart().getVehicleId(), DvrpVehicle.class);
+			var vehicleId = Id.create(sequence.getChargingStart().orElseThrow().getVehicleId(), DvrpVehicle.class);
 			if (!fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {
 				continue;
 			}
@@ -76,8 +74,8 @@ public class ETaxiStatsCalculator {
 	}
 
 	private Stream<TimeBinSample<State<ETaxiState>>> getStateSampleStream(ChargingSequence seq, int binSize) {
-		var pluggedState = new State<>(ETaxiState.PLUGGED, seq.getChargingStart().getTime(),
-				seq.getChargingEnd().getTime());
+		var pluggedState = new State<>(ETaxiState.PLUGGED, seq.getChargingStart().orElseThrow().getTime(),
+				seq.getChargingEnd().orElseThrow().getTime());
 		var states = StreamEx.of(pluggedState);
 
 		//optionally (only if queueing occurred)

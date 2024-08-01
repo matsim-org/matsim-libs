@@ -23,9 +23,9 @@ package org.matsim.core.population.io;
 import java.util.List;
 import java.util.Stack;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -52,10 +52,10 @@ import org.xml.sax.Attributes;
  */
 public class PopulationWriterHandlerImplV5Test {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void test_writeNetworkRoute_sameStartEndLink() {
+	void test_writeNetworkRoute_sameStartEndLink() {
 		doTestWriteNetworkRoute("1", "", "1", "1");
 
 		// round trip
@@ -63,12 +63,12 @@ public class PopulationWriterHandlerImplV5Test {
 	}
 
 	@Test
-	public void test_writeNetworkRoute_consequentLinks() {
+	void test_writeNetworkRoute_consequentLinks() {
 		doTestWriteNetworkRoute("1", "", "2", "1 2");
 	}
 
 	@Test
-	public void test_writeNetworkRoute_regularCase() {
+	void test_writeNetworkRoute_regularCase() {
 		doTestWriteNetworkRoute("1", "2", "3", "1 2 3");
 		doTestWriteNetworkRoute("1", "2 3", "4", "1 2 3 4");
 	}
@@ -104,20 +104,20 @@ public class PopulationWriterHandlerImplV5Test {
 		Person person2 = pop2.getPersons().get(Id.create(1, Person.class));
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
-		Assert.assertEquals(expectedRouteSerialization, popReader.interceptedRouteContent.trim());
-		Assert.assertTrue("read route is of class " + route2.getClass().getCanonicalName(), route2 instanceof NetworkRoute);
+		Assertions.assertEquals(expectedRouteSerialization, popReader.interceptedRouteContent.trim());
+		Assertions.assertTrue(route2 instanceof NetworkRoute, "read route is of class " + route2.getClass().getCanonicalName());
 		NetworkRoute nr = (NetworkRoute) route2;
-		Assert.assertEquals("wrong start link", startLinkId, nr.getStartLinkId().toString());
-		Assert.assertEquals("wrong end link", endLinkId, nr.getEndLinkId().toString());
-		Assert.assertEquals("wrong number of links in route", routeLinkIds.size(), nr.getLinkIds().size());
+		Assertions.assertEquals(startLinkId, nr.getStartLinkId().toString(), "wrong start link");
+		Assertions.assertEquals(endLinkId, nr.getEndLinkId().toString(), "wrong end link");
+		Assertions.assertEquals(routeLinkIds.size(), nr.getLinkIds().size(), "wrong number of links in route");
 		for (int i = 0; i < routeLinkIds.size(); i++) {
-			Assert.assertEquals("wrong link in route at position " + i, routeLinkIds.get(i), nr.getLinkIds().get(i));
+			Assertions.assertEquals(routeLinkIds.get(i), nr.getLinkIds().get(i), "wrong link in route at position " + i);
 		}
 		return nr;
 	}
 
 	@Test
-	public void testWriteGenericRouteRoute() {
+	void testWriteGenericRouteRoute() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig((String) null));
 		String startLinkId = "1";
 		String endLinkId = "4";
@@ -152,10 +152,10 @@ public class PopulationWriterHandlerImplV5Test {
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
 //		Assert.assertTrue("read route is of class " + route2.getClass().getCanonicalName(), route2 instanceof GenericRouteImpl);
-		Assert.assertEquals("wrong start link", startLinkId, route2.getStartLinkId().toString());
-		Assert.assertEquals("wrong end link", endLinkId, route2.getEndLinkId().toString());
-		Assert.assertEquals("wrong travel time", travTime, route2.getTravelTime().seconds(), 1e-9);
-		Assert.assertEquals("wrong distance", dist, route2.getDistance(), 1e-9);
+		Assertions.assertEquals(startLinkId, route2.getStartLinkId().toString(), "wrong start link");
+		Assertions.assertEquals(endLinkId, route2.getEndLinkId().toString(), "wrong end link");
+		Assertions.assertEquals(travTime, route2.getTravelTime().seconds(), 1e-9, "wrong travel time");
+		Assertions.assertEquals(dist, route2.getDistance(), 1e-9, "wrong distance");
 	}
 
 	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements MatsimReader {

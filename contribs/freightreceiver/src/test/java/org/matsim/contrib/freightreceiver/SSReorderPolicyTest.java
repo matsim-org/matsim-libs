@@ -21,18 +21,18 @@
 package org.matsim.contrib.freightreceiver;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class SSReorderPolicyTest {
 
 	@Test
-	public void testCalculateOrderQuantity() {
+	void testCalculateOrderQuantity() {
 		ReorderPolicy policy = ReceiverUtils.createSSReorderPolicy(5.0, 10.0);
-		Assert.assertEquals("Wrong reorder quantity", 0.0, policy.calculateOrderQuantity(6.0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong reorder quantity", 5.0, policy.calculateOrderQuantity(5.0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong reorder quantity", 6.0, policy.calculateOrderQuantity(4.0), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.0, policy.calculateOrderQuantity(6.0), MatsimTestUtils.EPSILON, "Wrong reorder quantity");
+		Assertions.assertEquals(5.0, policy.calculateOrderQuantity(5.0), MatsimTestUtils.EPSILON, "Wrong reorder quantity");
+		Assertions.assertEquals(6.0, policy.calculateOrderQuantity(4.0), MatsimTestUtils.EPSILON, "Wrong reorder quantity");
 	}
 
 }

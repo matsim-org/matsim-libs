@@ -1,13 +1,13 @@
 package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 public class RunJointDemandCarExampleSkipIntervalIT {
 
 	@Test
-	public void main() throws IOException {
+	void main() throws IOException {
 		RunJointDemandCarToggleJspritExample.main(new String[0]);
 	}
 }

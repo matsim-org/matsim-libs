@@ -31,13 +31,13 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author nagel
  */
 public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
-	
+
 	@SuppressWarnings("unused")
 	private final static Logger log = LogManager.getLogger(VspExperimentalConfigGroup.class);
 
 	public static final String GROUP_NAME = "vspExperimental";
 
-	
+
 
 	// ---
 
@@ -57,7 +57,8 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
-	public static enum VspDefaultsCheckingLevel { ignore, info, warn, abort } ;
+	public static enum VspDefaultsCheckingLevel { ignore, info, warn, abort }
+
 	private VspDefaultsCheckingLevel vspDefaultsCheckingLevel = VspDefaultsCheckingLevel.ignore ;
 	@StringGetter(VSP_DEFAULTS_CHECKING_LEVEL)
 	public VspDefaultsCheckingLevel getVspDefaultsCheckingLevel() {
@@ -93,8 +94,8 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isGeneratingBoardingDeniedEvent = isGeneratingBoardingDeniedEvent;
 	}
 	// ---
-	private static final String ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS = "isAbleToOverwritePtInteractionParams" ; 
-	private boolean isAbleToOverwritePtInteractionParams = false ; // default is that this NOT allowed.  kai, nov'12 
+	private static final String ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS = "isAbleToOverwritePtInteractionParams" ;
+	private boolean isAbleToOverwritePtInteractionParams = false ; // default is that this NOT allowed.  kai, nov'12
 	@StringGetter(ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS)
 	public boolean isAbleToOverwritePtInteractionParams() {
 		return isAbleToOverwritePtInteractionParams;
@@ -105,7 +106,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isAbleToOverwritePtInteractionParams = isAbleToOverwritePtInteractionParams;
 	}
 	// ---
-	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE = "isUsingOpportunityCostOfTimeForLocationChoice" ; 
+	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE = "isUsingOpportunityCostOfTimeForLocationChoice" ;
 	private boolean isUsingOpportunityCostOfTimeForLocationChoice = true ;
 	@StringGetter(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE)
 	public boolean isUsingOpportunityCostOfTimeForLocationChoice() {
@@ -117,7 +118,8 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isUsingOpportunityCostOfTimeForLocationChoice = isUsingOpportunityCostOfTimeForLocationChoice;
 	}
 	// ---
-	public enum CheckingOfMarginalUtilityOfTravellng { allZero, none };
+	public enum CheckingOfMarginalUtilityOfTravellng { allZero, none }
+
 	private CheckingOfMarginalUtilityOfTravellng checkingOfMarginalUtilityOfTravellng = CheckingOfMarginalUtilityOfTravellng.allZero;
 	public CheckingOfMarginalUtilityOfTravellng getCheckingOfMarginalUtilityOfTravellng(){
 		return checkingOfMarginalUtilityOfTravellng;
@@ -146,7 +148,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		for ( VspDefaultsCheckingLevel option : VspDefaultsCheckingLevel.values() ) {
 			options.append(option + " | ") ;
 		}
-		map.put( VSP_DEFAULTS_CHECKING_LEVEL, 
+		map.put( VSP_DEFAULTS_CHECKING_LEVEL,
 				"Options: | " + options + ".  When violating VSP defaults, this results in " +
 		"nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
@@ -172,7 +174,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		testForLocked() ;
 		this.writingOutputEvents = writingOutputEvents;
 	}
-	
+
 	@Override
 	protected void checkConsistency(Config config) {
 	}

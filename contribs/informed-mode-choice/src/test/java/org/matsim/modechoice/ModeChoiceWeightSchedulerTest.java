@@ -1,7 +1,7 @@
 package org.matsim.modechoice;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -12,9 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModeChoiceWeightSchedulerTest extends ScenarioTest {
 
 	@Test
-	public void linear() {
+	void linear() {
 
-		controler.getConfig().controler().setLastIteration(100);
+		controler.getConfig().controller().setLastIteration(100);
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(controler.getConfig(), InformedModeChoiceConfigGroup.class);
 
 		imc.setInvBeta(1);
@@ -38,9 +38,9 @@ public class ModeChoiceWeightSchedulerTest extends ScenarioTest {
 	}
 
 	@Test
-	public void quadratic() {
+	void quadratic() {
 
-		controler.getConfig().controler().setLastIteration(101);
+		controler.getConfig().controller().setLastIteration(101);
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(controler.getConfig(), InformedModeChoiceConfigGroup.class);
 
 		imc.setInvBeta(1);

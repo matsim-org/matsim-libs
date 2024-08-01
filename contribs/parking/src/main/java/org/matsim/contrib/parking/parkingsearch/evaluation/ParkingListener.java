@@ -26,8 +26,12 @@ import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.io.IOUtils;
-
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -38,7 +42,7 @@ import java.util.List;
  *
  */
 
-public class ParkingListener implements IterationEndsListener {
+public class ParkingListener implements IterationEndsListener, MobsimBeforeSimStepListener, MobsimInitializedListener {
 
 	@Inject
 	ParkingSearchManager manager;
@@ -59,7 +63,7 @@ public class ParkingListener implements IterationEndsListener {
 		BufferedWriter bw = IOUtils.getBufferedWriter(output.getIterationFilename(iteration, "parkingStatsPerTimeSteps.csv"));
 		try {
 
-			String header = "time;rejectedReservations;foundParking;unpark";
+			String header = "time;rejectedParkingRequest;foundParking;unpark";
 			bw.write(header);
 			bw.newLine();
 			for (String s : produceBeneStatistics){
@@ -82,7 +86,7 @@ public class ParkingListener implements IterationEndsListener {
 		BufferedWriter bw = IOUtils.getBufferedWriter(output.getIterationFilename(iteration, "parkingStats.csv"));
 		try {
 
-			String header = "linkId;X;Y;parkingFacility;capacity;EndOccupation;reservationsRequests;numberOfParkedVehicles;rejectedReservations";
+			String header = "linkId;X;Y;parkingFacility;capacity;EndOccupation;reservationsRequests;numberOfParkedVehicles;rejectedParkingRequest;numberOfWaitingActivities;numberOfStaysFromGetOffUntilGetIn;numberOfParkingBeforeGetIn";
 			bw.write(header);
 			bw.newLine();
 			for (String s : produceStatistics){
@@ -99,4 +103,15 @@ public class ParkingListener implements IterationEndsListener {
 
 	}
 
+	@Override
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
+		((FacilityBasedParkingManager) manager).checkFreeCapacitiesForWaitingVehicles((QSim) event.getQueueSimulation(), event.getSimulationTime());
+	}
+
+	@Override
+	public void notifyMobsimInitialized(final MobsimInitializedEvent e) {
+		QSim qSim = (QSim) e.getQueueSimulation();
+		((FacilityBasedParkingManager) manager).setQSim(qSim);
+
+	}
 }

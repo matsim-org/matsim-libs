@@ -84,4 +84,14 @@ public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 				.add("super", super.toString())
 				.toString();
 	}
+	
+	@Override
+	public void removePickupRequest(Id<Request> requestId) {
+		pickupRequests.remove(requestId);
+	}
+	
+	@Override
+	public void removeDropoffRequest(Id<Request> requestId) {
+		dropoffRequests.remove(requestId);
+	}
 }

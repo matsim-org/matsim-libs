@@ -19,18 +19,23 @@
 
 package org.matsim.contrib.drt.run;
 
-import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
-
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -38,22 +43,21 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -86,42 +90,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public double stopDuration = Double.NaN;// seconds
 
 	@Parameter
-	@Comment("Max wait time for the bus to come (optimisation constraint).")
-	@PositiveOrZero
-	public double maxWaitTime = Double.NaN;// seconds
-
-	@Parameter
-	@Comment("Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-			+ "Alpha should not be smaller than 1.")
-	@DecimalMin("1.0")
-	public double maxTravelTimeAlpha = Double.NaN;// [-]
-
-	@Parameter
-	@Comment("Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-			+ "Beta should not be smaller than 0.")
-	@PositiveOrZero
-	public double maxTravelTimeBeta = Double.NaN;// [s]
-
-	@Parameter
-	@Comment(
-			"Defines the maximum allowed absolute detour in seconds of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-					+ "maxAbsoluteDetour should not be smaller than 0. and should be higher than the offset maxTravelTimeBeta.")
-	@PositiveOrZero
-	public double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
-
-	@Parameter
-	@Comment("If true, the max travel and wait times of a submitted request"
-			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
-			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
-			+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
-			+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-			+ " InsertionCostCalculator.PenaltyCalculator")
-	public boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-
-	@Parameter
 	@Comment("If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
 			+ "day at the link where it stopped operating the day before. False by default.")
 	public boolean changeStartLinkToLastLinkInSchedule = false;
@@ -147,14 +115,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default")
 	@NotNull
 	public OperationalScheme operationalScheme = OperationalScheme.door2door;
-
-	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
-	@Parameter
-	@Comment(
-			"Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt."
-					+ " If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).")
-	@PositiveOrZero // used only for stopbased DRT scheme
-	public double maxWalkDistance = Double.MAX_VALUE;// [m];
 
 	@Parameter
 	@Comment("An XML file specifying the vehicle fleet."
@@ -191,14 +151,23 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
-	@PositiveOrZero
-	public double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
+
+	public enum SimulationType {
+		fullSimulation, estimateAndTeleport
+	}
+
+	@Parameter
+	@Comment("Whether full simulation drt is employed")
+	public SimulationType simulationType = SimulationType.fullSimulation;
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
+	@NotNull
+	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
+
 	@Nullable
-	private DrtZonalSystemParams zonalSystemParams;
+	private DrtZoneSystemParams zonalSystemParams;
 
 	@Nullable
 	private RebalancingParams rebalancingParams;
@@ -210,21 +179,37 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtSpeedUpParams drtSpeedUpParams;
 
 	@Nullable
+	private PrebookingParams prebookingParams;
+
+	@Nullable
+	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+
+	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
-		super(GROUP_NAME);
-		initSingletonParameterSets();
+		this(DefaultDrtOptimizationConstraintsSet::new);
 	}
 
-	private void initSingletonParameterSets() {
+	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+		super(GROUP_NAME);
+		initSingletonParameterSets(constraintsSetSupplier);
+	}
+
+	private void initSingletonParameterSets(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+
+		//optimization constraints (mandatory)
+		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, () -> new DrtOptimizationConstraintsParams(constraintsSetSupplier),
+				() -> drtOptimizationConstraintsParams,
+				params -> drtOptimizationConstraintsParams = (DrtOptimizationConstraintsParams) params);
+
 		//rebalancing (optional)
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
 				params -> rebalancingParams = (RebalancingParams)params);
 
 		//zonal system (optional)
-		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
-				params -> zonalSystemParams = (DrtZonalSystemParams)params);
+		addDefinition(DrtZoneSystemParams.SET_NAME, DrtZoneSystemParams::new, () -> zonalSystemParams,
+				params -> zonalSystemParams = (DrtZoneSystemParams)params);
 
 		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
@@ -249,6 +234,37 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
 				() -> drtRequestInsertionRetryParams,
 				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
+
+		//prebooking (optional)
+		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
+				() -> prebookingParams,
+				params -> prebookingParams = (PrebookingParams)params);
+
+		// estimator (optional)
+		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
+			() -> drtEstimatorParams,
+			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+	}
+
+	/**
+	 * for backwards compatibility with old drt config groups
+	 */
+	public void handleAddUnknownParam(final String paramName, final String value) {
+		switch (paramName) {
+			case "maxWaitTime":
+			case "maxTravelTimeAlpha":
+			case "maxTravelTimeBeta":
+			case "maxAbsoluteDetour":
+			case "maxDetourAlpha":
+			case "maxDetourBeta":
+			case "maxAllowedPickupDelay":
+			case "rejectRequestIfMaxWaitOrTravelTimeViolated":
+			case "maxWalkDistance":
+				addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().addParam(paramName, value);
+            	break;
+            default:
+                super.handleAddUnknownParam(paramName, value);
+        }
 	}
 
 	@Override
@@ -265,7 +281,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		Verify.verify(maxWaitTime >= stopDuration, "maxWaitTime must not be smaller than stopDuration");
+		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
+		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
+			Verify.verify(constraintsSet.maxWaitTime >= stopDuration,
+					"maxWaitTime must not be smaller than stopDuration");
+		}
 
 		Verify.verify(operationalScheme != OperationalScheme.stopbased || transitStopFile != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
@@ -293,6 +313,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+
+		if (simulationType == SimulationType.estimateAndTeleport) {
+			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
+				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
+		}
 	}
 
 	@Override
@@ -300,11 +325,21 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return mode;
 	}
 
+
+
 	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
 		return drtInsertionSearchParams;
 	}
 
-	public Optional<DrtZonalSystemParams> getZonalSystemParams() {
+	public DrtOptimizationConstraintsParams addOrGetDrtOptimizationConstraintsParams() {
+		if (drtOptimizationConstraintsParams == null) {
+			DrtOptimizationConstraintsParams params = new DrtOptimizationConstraintsParams();
+			this.addParameterSet(params);
+		}
+		return drtOptimizationConstraintsParams;
+	}
+
+	public Optional<DrtZoneSystemParams> getZonalSystemParams() {
 		return Optional.ofNullable(zonalSystemParams);
 	}
 
@@ -324,10 +359,27 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
 	}
 
+	public Optional<PrebookingParams> getPrebookingParams() {
+		return Optional.ofNullable(prebookingParams);
+	}
+
+	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
+		return Optional.ofNullable(drtEstimatorParams);
+	}
+
 	/**
-	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
+	 *
+	 * @deprecated -- use {@link #setDrtInsertionSearchParams(DrtInsertionSearchParams) instead}
 	 */
+	@Deprecated
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		addParameterSet(pars);
+	}
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
+	 */
+	public final void setDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);
 	}
 }

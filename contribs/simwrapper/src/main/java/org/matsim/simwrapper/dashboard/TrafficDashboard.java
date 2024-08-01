@@ -2,13 +2,11 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
-import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.Links;
-import org.matsim.simwrapper.viz.Plotly;
-import org.matsim.simwrapper.viz.Table;
+import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
@@ -53,7 +51,7 @@ public class TrafficDashboard implements Dashboard {
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
 					.x("hour")
 					.y("congestion_index")
-					.name("road_type", Plotly.ColorScheme.Spectral)
+					.name("road_type", ColorScheme.Spectral)
 				);
 			})
 			.el(Table.class, ((viz, data) -> {
@@ -67,17 +65,42 @@ public class TrafficDashboard implements Dashboard {
 				viz.enableFilter = false;
 			}));
 
-		// TODO: not working ideally, should be converted to map viz
-		layout.row("map").el(Links.class, (viz, data) -> {
+		// TODO: Could be done per mode, by using the tab feature
 
-			viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
-			viz.datasets.csvBase = data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv", args);
+		layout.row("map").el(MapPlot.class, (viz, data) -> {
+
+			viz.title = "Traffic statistics";
 			viz.center = data.context().getCenter();
+			viz.zoom = data.context().mapZoomLevel;
 
-			viz.display.color.columnName = "avg_speed";
-			viz.display.width.columnName = "avg_speed";
+			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro"), "id");
+
+			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
+
+			viz.display.lineColor.dataset = "traffic";
+			viz.display.lineColor.columnName = "avg_speed";
+			viz.display.lineColor.join = "link_id";
+			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, false);
+
+			viz.display.lineWidth.dataset = "traffic";
+			viz.display.lineWidth.columnName = "simulated_traffic_volume";
+			viz.display.lineWidth.scaleFactor = 20000d;
+			viz.display.lineWidth.join = "link_id";
 
 			viz.height = 12d;
+		});
+
+
+		layout.row("info").el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### Notes
+				- The speed performance index is the ratio of average travel speed and the maximum permissible road speed.
+				A performance index of 0.5, means that the average speed is half of the maximum permissible speed. A road with a performance index below 0.5 is considered to be in a congested state.
+				- The congestion index is the ratio of time a road is in an uncongested state. 0.5 means that a road is congested half of the time. A road with 1.0 is always uncongested.
+
+				cf. *A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index* by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
+				""";
 		});
 
 	}

@@ -110,7 +110,7 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// change signal green split every INTERVAL iteration
-		if (event.getIteration() % INTERVAL == 0 && event.getIteration() != scenario.getConfig().controler().getFirstIteration()){
+		if (event.getIteration() % INTERVAL == 0 && event.getIteration() != scenario.getConfig().controller().getFirstIteration()){
 			computeDelays(event);
 			LOG.info("+++ Iteration " + event.getIteration() + ". Update signal green split...");
 			updateSignals();

@@ -18,14 +18,13 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -37,31 +36,13 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 /**
  * @author michalm
  */
 public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
-	private final double lookAhead;
-
-	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
-		if (drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated) {
-			lookAhead = drtCfg.maxWaitTime - drtCfg.stopDuration;
-			Preconditions.checkArgument(lookAhead >= 0,
-					"maxWaitTime must not be smaller than stopDuration");
-		} else {
-			// if no rejection due to max wait time, the look ahead is infinite
-			lookAhead = Double.POSITIVE_INFINITY;
-		}
-	}
-
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		if (isNotEligibleForRequestInsertion(vehicle, currentTime)) {
-			return null;
-		}
-
 		Schedule schedule = vehicle.getSchedule();
 		final LinkTimePair start;
 		final Task startTask;
@@ -89,9 +70,21 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		List<? extends Task> tasks = schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
+		
+		// find stop tasks and note down stay time before each task
+		double accumulatedStayTime = 0.0;
+		if (startTask != null && STAY.isBaseTypeOf(startTask)) {
+			accumulatedStayTime = Math.max(0.0, startTask.getEndTime() - currentTime);
+		}
+		
+		List<Double> precedingStayTimes = new ArrayList<>();
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (STOP.isBaseTypeOf(task)) {
+			if (STAY.isBaseTypeOf(task)) {
+				accumulatedStayTime += task.getEndTime() - task.getBeginTime();
+			} else if (STOP.isBaseTypeOf(task)) {
 				stopTasks.add((DrtStopTask)task);
+				precedingStayTimes.add(accumulatedStayTime); 
+				accumulatedStayTime = 0.0;
 			}
 		}
 
@@ -106,17 +99,13 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				? new Waypoint.Stop((DrtStopTask) startTask, 0)
 				: null;
 
-		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop);
+		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);
 
 		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
-				ImmutableList.copyOf(stops), slackTimes, currentTime);
+				ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, currentTime);
 	}
 
-	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
-		return currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime();
-	}
-
-	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start) {
+	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start, List<Double> precedingStayTimes) {
 		double[] slackTimes = new double[stops.length + 2];
 
 		//vehicle
@@ -128,6 +117,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			var stop = stops[i];
 			slackTime = Math.min(stop.latestArrivalTime - stop.task.getBeginTime(), slackTime);
 			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
+			slackTime += precedingStayTimes.get(i); // reset slack before prebooked request
 			slackTimes[i + 1] = slackTime;
 		}
 		

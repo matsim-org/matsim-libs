@@ -2,6 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -35,25 +36,25 @@ public class OverviewDashboard implements Dashboard {
 			viz.height = 7.5;
 			viz.width = 2.0;
 
-			viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties"), "id");
+			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
 			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
 
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";
 			viz.display.lineColor.join = "link_id";
-			viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, 5, true);
+			viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
 
 			viz.display.lineWidth.dataset = "traffic";
 			viz.display.lineWidth.columnName = "simulated_traffic_volume";
 			viz.display.lineWidth.scaleFactor = 20000d;
 			viz.display.lineWidth.join = "link_id";
 
+
 		});
 
+		// Info about the status of the run
 		layout.row("warnings").el(TextBlock.class, (viz, data) -> {
 			viz.file = data.compute(LogFileAnalysis.class, "status.md");
-			// Force minimal height
-			viz.height = 0.1d;
 		});
 
 		layout.row("config").el(XML.class, (viz, data) -> {
@@ -65,8 +66,8 @@ public class OverviewDashboard implements Dashboard {
 		}).el(PieChart.class, (viz, data) -> {
 			viz.title = "Mode Share";
 			viz.description = "at final Iteration";
-			viz.dataset = data.output("*.modestats.txt");
-			viz.ignoreColumns = List.of("Iteration");
+			viz.dataset = data.output("*.modestats.csv");
+			viz.ignoreColumns = List.of("iteration");
 			viz.useLastRow = true;
 		});
 
@@ -74,10 +75,10 @@ public class OverviewDashboard implements Dashboard {
 		layout.row("second").el(Line.class, (viz, data) -> {
 
 			viz.title = "Score";
-			viz.dataset = data.output("*.scorestats.txt");
+			viz.dataset = data.output("*.scorestats.csv");
 			viz.description = "per Iteration";
-			viz.x = "ITERATION";
-			viz.columns = List.of("avg. EXECUTED", "avg. WORST", "avg. BEST");
+			viz.x = "iteration";
+			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
 			viz.xAxisName = "Iteration";
 			viz.yAxisName = "Score";
 
@@ -87,8 +88,8 @@ public class OverviewDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Mode Share Progression";
 				viz.description = "per Iteration";
-				viz.dataset = data.output("*.modestats.txt");
-				viz.x = "Iteration";
+				viz.dataset = data.output("*.modestats.csv");
+				viz.x = "iteration";
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Share";
 				viz.width = 2d;

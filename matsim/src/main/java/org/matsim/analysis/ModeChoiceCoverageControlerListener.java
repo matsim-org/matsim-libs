@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -45,7 +45,7 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
     private final Population population;
     private final String modeFileName;
     private final boolean createPNG;
-    private final ControlerConfigGroup controlerConfigGroup;
+    private final ControllerConfigGroup controllerConfigGroup;
     private final MainModeIdentifier mainModeIdentifier;
 
     private int minIteration = 0;
@@ -64,10 +64,10 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
 
     @Inject
-    ModeChoiceCoverageControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-                                        PlanCalcScoreConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
+    ModeChoiceCoverageControlerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
+																				ScoringConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
 
-        this.controlerConfigGroup = controlerConfigGroup;
+        this.controllerConfigGroup = controllerConfigGroup;
         this.population = population1;
         this.modeFileName = controlerIO.getOutputFilename(FILENAME_MODESTATS);
         //		this.createPNG = controlerConfigGroup.isCreateGraphs();
@@ -81,7 +81,7 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
     @Override
     public void notifyStartup(final StartupEvent event) {
-        this.minIteration = controlerConfigGroup.getFirstIteration();
+        this.minIteration = controllerConfigGroup.getFirstIteration();
     }
 
     @Override
@@ -98,95 +98,102 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
         updateModesUsedPerPerson();
 
+		/*
+		 *	Looks through modesUsedPerPersonTrip at each person-trip. How many of those person trips have used each mode more than the
+		 *  predefined limits.
+		 */
+		int totalPersonTripCount = 0;
+		Map<Integer, Map<String, Double>> modeCountCurrentIteration = new TreeMap<>();
+		//Map<Limit, Map<Mode  , TotalTripCount >>
 
-        /*
-         *	Looks through modesUsedPerPersonTrip at each person-trip. How many of those person trips have used each mode more than the
-         *  predefined limits.
-         */
-        int totalPersonTripCount = 0;
-        Map<Integer, Map<String, Double>> modeCountCurrentIteration = new TreeMap<>();
-        //Map<Limit, Map<Mode  , TotalTripCount >>
-
-        for (Map<Integer, Map<String, Integer>> mapForPerson : modesUsedPerPersonTrip.values()) {
-            //Map<Trip # , Map<Mode  , Count  >>
-            for (Map<String, Integer> mapForPersonTrip : mapForPerson.values()) {
-                //Map<Mode  , Count >
-                totalPersonTripCount++;
-                for (String mode : mapForPersonTrip.keySet()) {
-                    Integer realCount = mapForPersonTrip.get(mode);
-                    for (Integer limit : limits) {
-                        Map<String, Double> modeCountMap = modeCountCurrentIteration.computeIfAbsent(limit, k -> new TreeMap<>());
-                        Double modeCount = modeCountMap.computeIfAbsent(mode, k -> 0.);
-                        if (realCount >= limit) {
-                            modeCount++;
-                        }
-                        modeCountMap.put(mode, modeCount);
-                        modeCountCurrentIteration.put(limit, modeCountMap);
-                    }
-                }
-            }
-        }
-        // Calculates mcc share for each mode in current iteration, and updates modeCCHistory accordingly
-        for (Integer limit : limits) {
-            Map<String, Double> modeCnt = modeCountCurrentIteration.get(limit);
-            this.modes.addAll(modeCnt.keySet()); // potentially adds new modes to setthat just showed up in current iter
-            Map<String, Map<Integer, Double>> modeIterationShareMap = modeCCHistory.computeIfAbsent(limit, k -> new HashMap<>());
-            for (String mode : modes) {
-                Double cnt = modeCnt.get(mode);
-                double share = 0.;
-                if (cnt != null) {
-                    share = cnt / totalPersonTripCount;
-                }
-
-                log.info("-- mode choice coverage (" + limit + "x) of mode " + mode + " = " + share);
-
-                Map<Integer, Double> iterationShareMap = modeIterationShareMap.get(mode);
-
-                // If this is the first iteration where the mode shows up, add zeros to all previous iterations in history
-                if (iterationShareMap == null) {
-                    iterationShareMap = new TreeMap<>();
-                    for (int iter = firstIteration; iter < event.getIteration(); iter++) {
-                        iterationShareMap.put(iter, 0.0);
-                    }
-                    modeIterationShareMap.put(mode, iterationShareMap);
-                }
-
-                iterationShareMap.put(event.getIteration(), share);
-            }
-        }
+		for (Map<Integer, Map<String, Integer>> mapForPerson : modesUsedPerPersonTrip.values()) {
+			//Map<Trip # , Map<Mode  , Count  >>
+			for (Map<String, Integer> mapForPersonTrip : mapForPerson.values()) {
+				//Map<Mode  , Count >
+				totalPersonTripCount++;
+				for (String mode : mapForPersonTrip.keySet()) {
+					Integer realCount = mapForPersonTrip.get(mode);
+					for (Integer limit : limits) {
+						Map<String, Double> modeCountMap = modeCountCurrentIteration.computeIfAbsent(limit, k -> new TreeMap<>());
+						Double modeCount = modeCountMap.computeIfAbsent(mode, k -> 0.);
+						if (realCount >= limit) {
+							modeCount++;
+						}
+						modeCountMap.put(mode, modeCount);
+						modeCountCurrentIteration.put(limit, modeCountMap);
+					}
+				}
+			}
+		}
 
 
-        // Print MCC Stats to output file
-        for (Integer limit : limits) {
-            Map<String, Map<Integer, Double>> modeIterationShareMap = modeCCHistory.get(limit);
+		//		for testing purposes: if there are any trips, do analysis. If not, it is probably a test or a faulty / empty population. -sme0524
+		if (!modeCountCurrentIteration.isEmpty()) {
+			// Calculates mcc share for each mode in current iteration, and updates modeCCHistory accordingly
+			for (Integer limit : limits) {
+				Map<String, Double> modeCnt = modeCountCurrentIteration.get(limit);
+				this.modes.addAll(modeCnt.keySet()); // potentially adds new modes to setthat just showed up in current iter
+				Map<String, Map<Integer, Double>> modeIterationShareMap = modeCCHistory.computeIfAbsent(limit, k -> new HashMap<>());
+				for (String mode : modes) {
+					Double cnt = modeCnt.get(mode);
+					double share = 0.;
+					if (cnt != null) {
+						share = cnt / totalPersonTripCount;
+					}
 
-            BufferedWriter modeOut = IOUtils.getBufferedWriter(this.modeFileName + limit + "x.txt");
-            try {
-                modeOut.write("Iteration");
-                for (String mode : modes) {
-                    modeOut.write("\t" + mode);
-                }
-                modeOut.write("\n");
-                for (int iter = firstIteration; iter <= event.getIteration(); iter++) {
-                    modeOut.write(String.valueOf(iter));
-                    for (String mode : modes) {
-                        modeOut.write("\t" + modeIterationShareMap.get(mode).get(iter));
-                    }
-                    modeOut.write("\n");
-                }
+					log.info("-- mode choice coverage (" + limit + "x) of mode " + mode + " = " + share);
 
-                modeOut.flush();
-                modeOut.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+					Map<Integer, Double> iterationShareMap = modeIterationShareMap.get(mode);
 
-        // Produce Graphs
-        if (this.createPNG && event.getIteration() > this.minIteration) {
-            produceGraphs();
-        }
+					// If this is the first iteration where the mode shows up, add zeros to all previous iterations in history
+					if (iterationShareMap == null) {
+						iterationShareMap = new TreeMap<>();
+						for (int iter = firstIteration; iter < event.getIteration(); iter++) {
+							iterationShareMap.put(iter, 0.0);
+						}
+						modeIterationShareMap.put(mode, iterationShareMap);
+					}
 
+					iterationShareMap.put(event.getIteration(), share);
+				}
+			}
+
+
+			// Print MCC Stats to output file
+			for (Integer limit : limits) {
+				Map<String, Map<Integer, Double>> modeIterationShareMap = modeCCHistory.get(limit);
+
+				BufferedWriter modeOut = IOUtils.getBufferedWriter(this.modeFileName + limit + "x.txt");
+				try {
+					modeOut.write("Iteration");
+					for (String mode : modes) {
+						modeOut.write("\t" + mode);
+					}
+					modeOut.write("\n");
+					for (int iter = firstIteration; iter <= event.getIteration(); iter++) {
+						modeOut.write(String.valueOf(iter));
+						for (String mode : modes) {
+							modeOut.write("\t" + modeIterationShareMap.get(mode).get(iter));
+						}
+						modeOut.write("\n");
+					}
+
+					modeOut.flush();
+					modeOut.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			// Produce Graphs
+			if (this.createPNG && event.getIteration() > this.minIteration) {
+				produceGraphs();
+			}
+
+		} else {
+			log.warn("There are no trips conducted by the analyzed population. This should only be the case for tests. If you are running a simulation run, " +
+				" this should not happen. Check your population.");
+		}
     }
 
     private void updateModesUsedPerPerson() {

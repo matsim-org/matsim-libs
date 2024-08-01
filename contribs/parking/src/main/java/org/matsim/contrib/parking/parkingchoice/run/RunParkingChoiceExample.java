@@ -33,8 +33,6 @@ import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScore;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructure;
 import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructureManager;
-import org.matsim.contrib.parking.parkingchoice.example.ParkingBetaExample;
-import org.matsim.contrib.parking.parkingchoice.example.ParkingCostCalculatorExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -44,10 +42,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author jbischoff
  * Sample main file for setting up an Matsim run with parking. Check the output events for Parking events and the scores.
- * 
- * 
+ *
+ *
  */
-public class RunParkingChoiceExample {
+class RunParkingChoiceExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("parkingchoice/config.xml");
@@ -58,27 +56,30 @@ public class RunParkingChoiceExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		// ---
 
 		// we need some settings to walk from parking to destination:
-		ParkingScore parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().plansCalcRoute()), scenario);
-		parkingScoreManager.setParkingScoreScalingFactor(1);
-		parkingScoreManager.setParkingBetas(new ParkingBetaExample());
-
+		ParkingScore parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().routing()), scenario);
+		{
+			parkingScoreManager.setParkingScoreScalingFactor( 1 );
+			parkingScoreManager.setParkingBetas( new ParkingBetaExample() );
+		}
 		// ---
 
 		ParkingInfrastructure parkingInfrastructureManager = new ParkingInfrastructureManager(parkingScoreManager, controler.getEvents());
 		{
-			LinkedList<PublicParking> publicParkings = new LinkedList<PublicParking>();
+			LinkedList<PublicParking> publicParkings = new LinkedList<>();
+
 			//parking 1: we place this near the workplace
-			publicParkings.add(new PublicParking(Id.create("workPark", PC2Parking.class), 98, new Coord((double) 10000, (double) 0),
+			publicParkings.add(new PublicParking(Id.create("workPark", PC2Parking.class), 98, new Coord( 10000, 0 ),
 					new ParkingCostCalculatorExample(1), "park"));
+
 			//parking 2: we place this at home
-			final double x = -25000;
-			publicParkings.add(new PublicParking(Id.create("homePark", PC2Parking.class), 98, new Coord(x, (double) 0),
+			publicParkings.add(new PublicParking(Id.create("homePark", PC2Parking.class), 98, new Coord( -25000, 0 ),
 					new ParkingCostCalculatorExample(0), "park"));
+
 			parkingInfrastructureManager.setPublicParkings(publicParkings);
 		}
 

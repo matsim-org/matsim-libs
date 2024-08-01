@@ -3,19 +3,22 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.net.URL;
 import java.util.*;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,7 +56,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class DrtPoolingParameterTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 
@@ -65,9 +68,9 @@ public class DrtPoolingParameterTest {
 	 * With a low maxWaitTime of 100s, no DRT vehicle should have time to any agents.
 	 */
 	@Test
-	public void testMaxWaitTimeNoVehicles() {
+	void testMaxWaitTimeNoVehicles() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(50, 10.0, 10000.);
-		Assert.assertEquals("There should be no vehicle used", 0, handler.getVehRequestCount().size());
+		Assertions.assertEquals(0, handler.getVehRequestCount().size(), "There should be no vehicle used");
 
 	}
 
@@ -77,20 +80,20 @@ public class DrtPoolingParameterTest {
 	 * too far away to reach those agents.
 	 */
 	@Test
-	public void testMaxWaitTimeTwoVehiclesForTwoAgents() {
+	void testMaxWaitTimeTwoVehiclesForTwoAgents() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(121, 10.0, 10000.);
 
-		Assert.assertEquals("There should two vehicle used", 2, handler.getVehRequestCount().size());
+		Assertions.assertEquals(2, handler.getVehRequestCount().size(), "There should two vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
 		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1,
-				handler.getVehRequestCount().get(drt_veh_1_1), 0);
-		Assert.assertTrue("drt_veh_1_2 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_2));
-		Assert.assertEquals("drt_veh_1_2 should be requested exactly once", 1,
-				handler.getVehRequestCount().get(drt_veh_1_2), 0);
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_1),
+				"drt_veh_1_1 should be requested in general");
+		Assertions.assertEquals(1,
+				handler.getVehRequestCount().get(drt_veh_1_1), 0, "drt_veh_1_1 should be requested exactly once");
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_2),
+				"drt_veh_1_2 should be requested in general");
+		Assertions.assertEquals(1,
+				handler.getVehRequestCount().get(drt_veh_1_2), 0, "drt_veh_1_2 should be requested exactly once");
 
 	}
 
@@ -98,20 +101,20 @@ public class DrtPoolingParameterTest {
 	 * With a maxWaitTime of 250s, both drt vehicles should have time to each pick up two passengers.
 	 */
 	@Test
-	public void testMaxWaitTimeTwoVehiclesForFourAgents() {
+	void testMaxWaitTimeTwoVehiclesForFourAgents() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(250, 10.0, 10000.);
 
-		Assert.assertEquals("There should two vehicle used", 2, handler.getVehRequestCount().size());
+		Assertions.assertEquals(2, handler.getVehRequestCount().size(), "There should two vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
 		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly twice", 2,
-				handler.getVehRequestCount().get(drt_veh_1_1), 0);
-		Assert.assertTrue("drt_veh_1_2 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_2));
-		Assert.assertEquals("drt_veh_1_2 should be requested exactly twice", 2,
-				handler.getVehRequestCount().get(drt_veh_1_2), 0);
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_1),
+				"drt_veh_1_1 should be requested in general");
+		Assertions.assertEquals(2,
+				handler.getVehRequestCount().get(drt_veh_1_1), 0, "drt_veh_1_1 should be requested exactly twice");
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_2),
+				"drt_veh_1_2 should be requested in general");
+		Assertions.assertEquals(2,
+				handler.getVehRequestCount().get(drt_veh_1_2), 0, "drt_veh_1_2 should be requested exactly twice");
 
 	}
 
@@ -119,32 +122,32 @@ public class DrtPoolingParameterTest {
 	 * With a high maxWaitTime of 500s, a single DRT vehicle should be able to pick up all four agents.
 	 */
 	@Test
-	public void testMaxWaitTimeOneVehicleForFourAgents() {
+	void testMaxWaitTimeOneVehicleForFourAgents() {
 
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(500, 10.0, 10000.);
 		System.out.println(handler.getVehRequestCount());
-		Assert.assertEquals("There should only be one vehicle used", 1, handler.getVehRequestCount().size());
+		Assertions.assertEquals(1, handler.getVehRequestCount().size(), "There should only be one vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly four times", 4,
-				handler.getVehRequestCount().get(drt_veh_1_1), 0);
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_1),
+				"drt_veh_1_1 should be requested in general");
+		Assertions.assertEquals(4,
+				handler.getVehRequestCount().get(drt_veh_1_1), 0, "drt_veh_1_1 should be requested exactly four times");
 
 	}
 
 	/*
-	  The following tests vary the maxTravelTimeBeta parameter. maxTravelTimeAlpha is fixed to 1.0, while maxWaitTime is
-	  fixed to a high value: 5000s.
+		e following tests vary the maxTravelTimeBeta parameter. maxTravelTimeAlpha is fixed to 1.0, while maxWaitTime is
+		ixed to a high value: 5000s.
 	 */
 
 	/**
 	 * With a low Beta of 0s, no DRT vehicles should be assigned to the agents.
 	 */
 	@Test
-	public void testBetaNoVehicles() {
+	void testBetaNoVehicles() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 0.);
 
-		Assert.assertEquals("There should only be zero vehicles used", 0, handler.getVehRequestCount().size());
+		Assertions.assertEquals(0, handler.getVehRequestCount().size(), "There should only be zero vehicles used");
 
 	}
 
@@ -153,20 +156,20 @@ public class DrtPoolingParameterTest {
 	 * the remaining two agents will be left stranded
 	 */
 	@Test
-	public void testBetaTwoVehiclesForTwoAgents() {
+	void testBetaTwoVehiclesForTwoAgents() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 150);
 
-		Assert.assertEquals("There should two vehicle used", 2, handler.getVehRequestCount().size());
+		Assertions.assertEquals(2, handler.getVehRequestCount().size(), "There should two vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
 		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1,
-				handler.getVehRequestCount().get(drt_veh_1_1), 0);
-		Assert.assertTrue("drt_veh_1_2 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_2));
-		Assert.assertEquals("drt_veh_1_2 should be requested exactly once", 1,
-				handler.getVehRequestCount().get(drt_veh_1_2), 0);
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_1),
+				"drt_veh_1_1 should be requested in general");
+		Assertions.assertEquals(1,
+				handler.getVehRequestCount().get(drt_veh_1_1), 0, "drt_veh_1_1 should be requested exactly once");
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_2),
+				"drt_veh_1_2 should be requested in general");
+		Assertions.assertEquals(1,
+				handler.getVehRequestCount().get(drt_veh_1_2), 0, "drt_veh_1_2 should be requested exactly once");
 
 	}
 
@@ -174,54 +177,62 @@ public class DrtPoolingParameterTest {
 	 * With a Beta value of 250s, two DRT vehicles should have enough time to pick up two passengers each.
 	 */
 	@Test
-	public void testBetaTwoVehiclesForFourAgents() {
+	void testBetaTwoVehiclesForFourAgents() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 250);
 
-		Assert.assertEquals("There should two vehicle used", 2, handler.getVehRequestCount().size());
+		Assertions.assertEquals(2, handler.getVehRequestCount().size(), "There should two vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
 		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly twice", 2,
-				handler.getVehRequestCount().get(drt_veh_1_1), 0);
-		Assert.assertTrue("drt_veh_1_2 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_2));
-		Assert.assertEquals("drt_veh_1_2 should be requested exactly twice", 2,
-				handler.getVehRequestCount().get(drt_veh_1_2), 0);
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_1),
+				"drt_veh_1_1 should be requested in general");
+		Assertions.assertEquals(2,
+				handler.getVehRequestCount().get(drt_veh_1_1), 0, "drt_veh_1_1 should be requested exactly twice");
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_2),
+				"drt_veh_1_2 should be requested in general");
+		Assertions.assertEquals(2,
+				handler.getVehRequestCount().get(drt_veh_1_2), 0, "drt_veh_1_2 should be requested exactly twice");
 	}
 
 	/**
 	 * With a high Beta of 400s, one DRT vehicle should be used to pick up all four agents
 	 */
 	@Test
-	public void testBetaOneVehicleForFourAgents() {
+	void testBetaOneVehicleForFourAgents() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 400);
 
-		Assert.assertEquals("There should only be one vehicle used", 1, handler.getVehRequestCount().size());
+		Assertions.assertEquals(1, handler.getVehRequestCount().size(), "There should only be one vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general",
-				handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly four times", 4,
-				handler.getVehRequestCount().get(drt_veh_1_1), 0);
+		Assertions.assertTrue(handler.getVehRequestCount().containsKey(drt_veh_1_1),
+				"drt_veh_1_1 should be requested in general");
+		Assertions.assertEquals(4,
+				handler.getVehRequestCount().get(drt_veh_1_1), 0, "drt_veh_1_1 should be requested exactly four times");
 
 	}
 
 	private PersonEnterDrtVehicleEventHandler setupAndRunScenario(double maxWaitTime, double maxTravelTimeAlpha,
 			double maxTravelTimeBeta) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+
+		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfig,
 				new OTFVisConfigGroup());
 
 		config.plans().setInputFile(null);
-		config.controler()
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		mm.getModalElements().forEach(x -> {
-			x.maxWaitTime = maxWaitTime;
-			x.maxTravelTimeAlpha = maxTravelTimeAlpha;
-			x.maxTravelTimeBeta = maxTravelTimeBeta;
+			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+					(DefaultDrtOptimizationConstraintsSet) x.addOrGetDrtOptimizationConstraintsParams()
+							.addOrGetDefaultDrtOptimizationConstraintsSet();
+			defaultConstraintsSet.maxWaitTime = maxWaitTime;
+			defaultConstraintsSet.maxTravelTimeAlpha = maxTravelTimeAlpha;
+			defaultConstraintsSet.maxTravelTimeBeta = maxTravelTimeBeta;
 			x.stopDuration = 1.;
 		});
 

@@ -21,6 +21,7 @@ package org.matsim.pt.transitSchedule;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -215,6 +215,13 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 					.ifDefined(offset -> attributes.add(createTimeTuple(Constants.ARRIVAL_OFFSET, offset)));
 			stop.getDepartureOffset().ifDefined(offset->
 					attributes.add(createTimeTuple(Constants.DEPARTURE_OFFSET, offset)));
+			// do not write out if it is true ==> the default value
+			if (!stop.isAllowBoarding()) {
+				attributes.add(createTuple(Constants.ALLOW_BOARDING, String.valueOf(stop.isAllowBoarding())));
+			}
+			if (!stop.isAllowAlighting()) {
+				attributes.add(createTuple(Constants.ALLOW_ALIGHTING, String.valueOf(stop.isAllowAlighting())));
+			}
 			attributes.add(createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
 			this.writeStartTag(Constants.STOP, attributes, true);
 		}

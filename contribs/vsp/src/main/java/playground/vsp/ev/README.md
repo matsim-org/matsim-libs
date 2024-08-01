@@ -19,6 +19,8 @@ and if there is a charger on the home link, it does not search for a suitable ac
 The final SoC at the end of the iteration is maintained and transferred as the initial SoC to the next iteration. 
 
 For this to work, vehicles that represent an EV need to be attached to a vehicle type that is tagged as EV by providing a specific attribute (see `MATSimVehicleWrappingEVSpecificationProvider.class`).
+By default, _all_ of these (electric) vehicles are planned by to potentially get charged according to the above described logic.
+However, one can prevent this on the vehicle level by `UrbanEVUtils.setChargingDuringActivities(vehicle, false)` when defining the input. 
 
 ## A few notes to the current state of this package (and it's issues and TODOs)
 

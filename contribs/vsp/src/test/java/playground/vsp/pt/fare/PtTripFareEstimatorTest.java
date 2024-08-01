@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.modechoice.*;
@@ -33,8 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PtTripFareEstimatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	protected InformedModeChoiceConfigGroup group;
 	protected Controler controler;
@@ -44,18 +44,18 @@ public class PtTripFareEstimatorTest {
 	@Inject
 	private ScoringParametersForPerson params;
 	@Inject
-	private Map<String, TripEstimator<?>> tripEstimator;
+	private Map<String, TripEstimator> tripEstimator;
 	private PtTripWithDistanceBasedFareEstimator estimator;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = config.planCalcScore().getScoringParameters("person").getModes();
+		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
 
-		PlanCalcScoreConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
-		PlanCalcScoreConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
+		ScoringConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
+		ScoringConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
 
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
@@ -110,7 +110,7 @@ public class PtTripFareEstimatorTest {
 	}
 
 	@Test
-	public void fare() {
+	void fare() {
 
 		List<MinMaxEstimate> est = estimateAgent(TestScenario.Agents.get(1));
 		System.out.println(est);
@@ -123,7 +123,7 @@ public class PtTripFareEstimatorTest {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 
 		for (Id<Person> agent : TestScenario.Agents) {
 			List<MinMaxEstimate> est = estimateAgent(agent);
@@ -135,7 +135,7 @@ public class PtTripFareEstimatorTest {
 	}
 
 	@Test
-	public void planEstimate() {
+	void planEstimate() {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(2));
 		Plan plan = person.getSelectedPlan();

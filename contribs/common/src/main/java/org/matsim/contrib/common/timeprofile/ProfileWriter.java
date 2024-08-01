@@ -87,7 +87,8 @@ public class ProfileWriter implements IterationEndsListener {
 			}
 		}
 
-		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
+		int createGraphsInterval = this.matsimServices.getConfig().controller().getCreateGraphsInterval();
+		if (createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0) {
 			DefaultTableXYDataset xyDataset = createXYDataset(times, profiles);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
@@ -103,7 +104,7 @@ public class ProfileWriter implements IterationEndsListener {
 		profiles.forEach((name, profile) -> {
 			XYSeries series = new XYSeries(name, true, false);
 			for (int i = 0; i < times.length; i++) {
-				series.add((double)times[i] / 3600, profile[i]);
+				series.add((double) times[i] / 3600, profile[i]);
 			}
 			seriesList.add(series);
 		});
@@ -115,7 +116,7 @@ public class ProfileWriter implements IterationEndsListener {
 
 	private void generateImage(DefaultTableXYDataset xyDataset, TimeProfileCharts.ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(xyDataset, chartType);
-		String runID = matsimServices.getConfig().controler().getRunId();
+		String runID = matsimServices.getConfig().controller().getRunId();
 		if (runID != null) {
 			chart.setTitle(runID + " " + chart.getTitle().getText());
 		}

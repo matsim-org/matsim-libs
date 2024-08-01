@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Id;
@@ -35,14 +36,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileWriter;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author droeder
- * 
+ *
  * writeResultsPlanCoords() added by gleich
  *
  */
@@ -65,7 +65,7 @@ public class ActivityToModeAnalysis extends AbstractAnalysisModule {
 	 * @param sc, the scenario (it has to contain facilities!!!)
 	 * @param personsOfInterest, might be null, than all persons are processed
 	 * @param slotSize, timeSlotSize in seconds
-	 * 
+	 *
 	 * output using Activity Coordinates from the plans instead of departure
 	 * and arrival links with writeResultsPlanCoords()
 	 */
@@ -100,24 +100,24 @@ public class ActivityToModeAnalysis extends AbstractAnalysisModule {
 				addAttribute("ActType", String.class).
 				addAttribute("Mode", String.class).
 				create();
-				
+
 		//create features for departure
 		this.departureSlotFeatures = new HashMap<Integer, Set<SimpleFeature>>();
 		for(ActivityToMode atm : this.handler.getDepartures()){
 			createFeatureAndAdd(atm, this.departureSlotFeatures, factory);
 		}
-		
+
 		this.departureSlotFeaturesPlanCoord = new HashMap<Integer, Set<SimpleFeature>>();
 		for(ActivityToMode atm : this.handlerPlanCoord.getDepartures()){
 			createFeatureAndAdd(atm, this.departureSlotFeaturesPlanCoord, factory);
 		}
-		
+
 		//create features for arrivals
 		this.arrivalSlotFeatures = new HashMap<Integer, Set<SimpleFeature>>();
 		for(ActivityToMode atm : this.handler.getArrivals()){
 			createFeatureAndAdd(atm, this.arrivalSlotFeatures, factory);
 		}
-		
+
 		this.arrivalSlotFeaturesPlanCoord = new HashMap<Integer, Set<SimpleFeature>>();
 		for(ActivityToMode atm : this.handlerPlanCoord.getArrivals()){
 			createFeatureAndAdd(atm, this.arrivalSlotFeaturesPlanCoord, factory);
@@ -128,9 +128,9 @@ public class ActivityToModeAnalysis extends AbstractAnalysisModule {
 	/**
 	 * @param atm
 	 * @param departureSlotFeatures2
-	 * @param featureType 
+	 * @param featureType
 	 */
-	private void createFeatureAndAdd(ActivityToMode atm, 
+	private void createFeatureAndAdd(ActivityToMode atm,
 			HashMap<Integer, Set<SimpleFeature>> slotFeatures, PointFeatureFactory factory) {
 		Integer slice = (int) (atm.getTime() / this.slotSize);
 		Set<SimpleFeature> temp = slotFeatures.get(slice);
@@ -149,22 +149,22 @@ public class ActivityToModeAnalysis extends AbstractAnalysisModule {
 	@Override
 	public void writeResults(String outputFolder) {
 		for(Entry<Integer, Set<SimpleFeature>> e: this.departureSlotFeatures.entrySet()){
-			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
+			GeoFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
 		}
 		for(Entry<Integer, Set<SimpleFeature>> e: this.departureSlotFeaturesPlanCoord.entrySet()){
-			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
+			GeoFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
 		}
 		for(Entry<Integer, Set<SimpleFeature>> e: this.arrivalSlotFeatures.entrySet()){
-			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "arrival_" + e.getKey().toString()  + ".shp");
+			GeoFileWriter.writeGeometries(e.getValue(), outputFolder + "arrival_" + e.getKey().toString()  + ".shp");
 		}
 	}
-	
+
 	public void writeResultsPlanCoords(String outputFolder) {
 		for(Entry<Integer, Set<SimpleFeature>> e: this.departureSlotFeaturesPlanCoord.entrySet()){
-			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
+			GeoFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
 		}
 		for(Entry<Integer, Set<SimpleFeature>> e: this.arrivalSlotFeaturesPlanCoord.entrySet()){
-			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "arrival_" + e.getKey().toString()  + ".shp");
+			GeoFileWriter.writeGeometries(e.getValue(), outputFolder + "arrival_" + e.getKey().toString()  + ".shp");
 		}
 	}
 }

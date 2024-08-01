@@ -29,12 +29,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * @author jbischoff
@@ -60,7 +62,7 @@ public final class AmberTimesReader10 extends AbstractSignalsReader {
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/amberTimes_v1.0.xsd")));
 			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
 		} catch (JAXBException | SAXException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException(e));
 		}
 
 		// convert from Jaxb types to MATSim-API conform types

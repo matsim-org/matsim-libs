@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.common.util.DistanceUtils;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -21,7 +22,7 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
     }
 
     @Override
-    public OperationFacility findFacilityOfType(Coord coord, OperationFacilityType type) {
+    public Optional<OperationFacility> findFacilityOfType(Coord coord, OperationFacilityType type) {
         Predicate<? super OperationFacility> filter;
         switch (type) {
             case hub:
@@ -37,15 +38,15 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
                 .filter(filter)
                 .filter(OperationFacility::hasCapacity)
                 .min(Comparator.comparing(
-                        f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord()))).orElse(null);
+                        f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord())));
     }
 
     @Override
-    public OperationFacility findFacility(Coord coord) {
+    public Optional<OperationFacility> findFacility(Coord coord) {
         return operationFacilities.getDrtOperationFacilities().values().stream()
                 .filter(OperationFacility::hasCapacity)
                 .min(Comparator.comparing(
-                        f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord()))).orElse(null);
+                        f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord())));
 
     }
 }

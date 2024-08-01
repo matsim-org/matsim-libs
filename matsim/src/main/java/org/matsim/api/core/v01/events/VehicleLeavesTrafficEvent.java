@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class VehicleLeavesTrafficEvent extends Event implements HasPersonId, HasLinkId {
+public class VehicleLeavesTrafficEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId {
 
 	public static final String EVENT_TYPE = "vehicle leaves traffic";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
@@ -53,30 +53,30 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId, Has
 		this.relativePositionOnLink = relativePositionOnLink;
 
 	}
-	
+
 	@Override
 	public Id<Person> getPersonId() {
 		return this.driverId;
-	}	
-	
+	}
+
 	@Override
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
-	
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	public String getNetworkMode() {
 		return networkMode;
 	}
-	
+
 	public double getRelativePositionOnLink() {
 		return relativePositionOnLink;
 	}
@@ -84,16 +84,11 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId, Has
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());
-		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
-		if (this.vehicleId != null) {
-			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		}
+		// personId, linkId, vehicleId handled by superclass
 		if (this.networkMode != null) {
 			attr.put(ATTRIBUTE_NETWORKMODE, networkMode);
 		}
 		attr.put(ATTRIBUTE_POSITION, Double.toString(this.relativePositionOnLink));
-
 		return attr;
 	}
 }
