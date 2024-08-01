@@ -66,6 +66,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.ParallelEventsManager;
@@ -1393,6 +1394,7 @@ public class QSimTest {
 	void testStartAndEndTime(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 
 		final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		// ---
@@ -1461,6 +1463,7 @@ public class QSimTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 		config.qsim().setNumberOfThreads(numberOfThreads);
 
@@ -1805,6 +1808,8 @@ public class QSimTest {
 
 			this.config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 			this.config.qsim().setNumberOfThreads(numberOfThreads);
+
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			/* build network */
 			this.network = this.scenario.getNetwork();

@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -68,6 +69,7 @@ public class TransitControlerIntegrationTest {
 	@Test
 	void testTransitRouteCopy() {
 		Config config = utils.loadConfig((String)null);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 

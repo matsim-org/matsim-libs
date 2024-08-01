@@ -111,7 +111,7 @@ public class PtAlongALine2Test {
 		// === ROUTER: ===
 
 		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
-
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
