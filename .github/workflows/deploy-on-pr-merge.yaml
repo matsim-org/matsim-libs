@@ -22,7 +22,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'zulu'
           cache: 'maven'
           server-id: 'matsim-releases'
@@ -46,7 +46,7 @@ jobs:
       - name: Submit Dependency Graph
         # Generate a complete dependency graph and submit the graph to the GitHub repository.
         # The goal is to improve security alerts from dependabot, because dependabot is not able to compute the complete dependency graph.
-        uses: advanced-security/maven-dependency-submission-action@v3
+        uses: advanced-security/maven-dependency-submission-action@v4
 
     env:
       MAVEN_OPTS: -Xmx2g

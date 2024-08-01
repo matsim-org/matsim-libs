@@ -32,6 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,8 +42,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Some helper methods for writing JUnit 5 tests in MATSim.
@@ -80,13 +79,6 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
-	private String testParameterSetIndex = null;
-
-	//captures the method name (group 1) and optionally the index of the parameter set (group 2; only if the test is parametrised)
-	//The matching may fail if the parameter set name does not start with {index} (at least one digit is required at the beginning)
-	private static final Pattern METHOD_PARAMETERS_WITH_INDEX_PATTERN = Pattern.compile(
-		"([\\S]*)(?:\\[(\\d+)[\\s\\S]*\\])?");
-
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
@@ -95,13 +87,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	@Override
 	public void beforeEach(ExtensionContext extensionContext) {
 		this.testClass = extensionContext.getTestClass().orElseThrow();
-
-		Matcher matcher = METHOD_PARAMETERS_WITH_INDEX_PATTERN.matcher(extensionContext.getTestMethod().orElseThrow().getName());
-		if (!matcher.matches()) {
-			throw new RuntimeException("The name of the test parameter set must start with {index}");
-		}
-		this.testMethodName = matcher.group(1);
-		this.testParameterSetIndex = matcher.group(2); // null for non-parametrised tests
+		this.testMethodName = extensionContext.getRequiredTestMethod().getName();
 	}
 
 	@Override
@@ -232,10 +218,12 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	 * @return path to the output directory for this test
 	 */
 	public String getOutputDirectory() {
+		return getOutputDirectory("");
+	}
+
+	public String getOutputDirectory(String subDir) {
 		if (this.outputDirectory == null) {
-			String subDirectoryForParametrisedTests = testParameterSetIndex == null ? "" : testParameterSetIndex + "/";
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/"
-					+ subDirectoryForParametrisedTests;
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/" + subDir;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -329,7 +317,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	}
 
   public static void assertEqualEventsFiles( String filename1, String filename2 ) {
-		Assertions.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
 	}
 
   public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {

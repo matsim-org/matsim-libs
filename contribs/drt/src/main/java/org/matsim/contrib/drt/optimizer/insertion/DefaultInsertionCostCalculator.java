@@ -19,19 +19,25 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 /**
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
+	private final DrtOptimizationConstraintsSet constraintsSet;
 
-	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
+	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
+										  DrtOptimizationConstraintsSet constraintsSet) {
 		this.costCalculationStrategy = costCalculationStrategy;
+		this.constraintsSet = constraintsSet;
 	}
 
 	/**
@@ -48,6 +54,12 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	 */
 	@Override
 	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
+		// check if the max riding time constraints is violated (with default config, the max ride duration
+		// is infinity)
+		if (violatesMaxRideDuration(drtRequest, detourTimeInfo)) {
+			return INFEASIBLE_SOLUTION_COST;
+		}
+
 		var vEntry = insertion.vehicleEntry;
 
 		// in case of prebooking, we may have intermediate stay times after pickup
@@ -55,12 +67,55 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		// dropoff insertion point
 		double effectiveDropoffTimeLoss = InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
 				insertion, detourTimeInfo.pickupDetourInfo) + detourTimeInfo.dropoffDetourInfo.dropoffTimeLoss;
-		
+
 		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
 				|| vEntry.getSlackTime(insertion.dropoff.index) < effectiveDropoffTimeLoss) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
+		if (vEntry.stops != null && !vEntry.stops.isEmpty() && constraintsSet.lateDiversionthreshold > 0) {
+			if(violatesLateDiversion(insertion, detourTimeInfo, vEntry, effectiveDropoffTimeLoss)) {
+				return INFEASIBLE_SOLUTION_COST;
+			}
+		}
+
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
+	}
+
+	private boolean violatesMaxRideDuration(DrtRequest drtRequest, InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
+		// Check if the max travel time constraint for the newly inserted request is violated
+		double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
+		return drtRequest.getMaxRideDuration() < rideDuration;
+	}
+
+	private boolean violatesLateDiversion(Insertion insertion, DetourTimeInfo detourTimeInfo,
+										  VehicleEntry vEntry, double effectiveDropoffTimeLoss) {
+        if (detourTimeInfo.pickupDetourInfo.pickupTimeLoss > 0) {
+			if (violatesLateDiversionBetweenStopIndices(vEntry, insertion.pickup.index, insertion.dropoff.index,
+					constraintsSet.lateDiversionthreshold)) {
+				return true;
+			}
+		}
+        if (effectiveDropoffTimeLoss > 0) {
+			if (violatesLateDiversionBetweenStopIndices(vEntry, insertion.dropoff.index, vEntry.stops.size(),
+					constraintsSet.lateDiversionthreshold)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean violatesLateDiversionBetweenStopIndices(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
+		for (int s = start; s < end; s++) {
+			Waypoint.Stop stop = vehicleEntry.stops.get(s);
+			if (!stop.task.getDropoffRequests().isEmpty()) {
+                double remainingRideDuration = stop.getArrivalTime() - vehicleEntry.start.getDepartureTime();
+				if (remainingRideDuration < lateDiversionThreshold) {
+					return true;
+				}
+				break;
+			}
+		}
+		return false;
 	}
 }

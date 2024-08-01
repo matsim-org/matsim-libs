@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -155,7 +156,7 @@ public class VisumNetworkReader {
 	}
 
 	public void read(final String filename) throws UncheckedIOException {
-		BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(filename), Charset.forName("ISO-8859-1"));
+		BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(filename), StandardCharsets.ISO_8859_1);
 
 		try {
 			String line = reader.readLine();

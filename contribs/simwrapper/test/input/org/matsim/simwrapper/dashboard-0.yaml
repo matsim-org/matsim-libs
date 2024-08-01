@@ -2,6 +2,7 @@ header:
   tab: Header Tab
   title: Simwrapper Test Dashboard
   description: Test All Simwrapper Plug-Ins Dashboard
+  triggerPattern: '*example.csv'
 layout:
   first:
   - type: area
@@ -72,9 +73,6 @@ layout:
     title: Hexagon
     file: drt_trips_drt.csv.gz
     projection: EPSG:31468
-    center:
-    - 0.0
-    - 0.0
     aggregations:
       O/D Summary:
       - title: Origins

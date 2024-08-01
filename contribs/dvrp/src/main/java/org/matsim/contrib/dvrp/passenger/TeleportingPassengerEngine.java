@@ -165,6 +165,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	private Route adaptLegRouteForTeleportation(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
 		Route teleportedRoute = teleportedRouteCalculator.calculateRoute(request);
 
+
 		for (MobsimPassengerAgent passenger : passengers) {
 			Leg leg = (Leg)WithinDayAgentUtils.getCurrentPlanElement(passenger);//side effect: makes the plan modifiable
 			Route originalRoute = leg.getRoute();

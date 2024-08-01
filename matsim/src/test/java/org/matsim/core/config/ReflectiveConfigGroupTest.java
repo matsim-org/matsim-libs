@@ -34,10 +34,10 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -71,6 +71,7 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.enumSetField = Set.of(MyEnum.VALUE2);
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
+		dumpedModule.ints = List.of(1, 2, 3);
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
 
@@ -167,6 +168,7 @@ public class ReflectiveConfigGroupTest {
 		expectedComments.put("enumListField", "list of enum");
 		expectedComments.put("enumSetField", "set of enum");
 		expectedComments.put("setField", "set");
+		expectedComments.put("ints", "list of ints");
 
 		assertThat(new MyModule().getComments()).isEqualTo(expectedComments);
 	}
@@ -325,7 +327,7 @@ public class ReflectiveConfigGroupTest {
 	void testFailUnsupportedType_NonStringList() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
 			@Parameter("field")
-			private List<Double> stuff;
+			private List<Person> stuff;
 		}).isInstanceOf(InconsistentModuleException.class);
 	}
 
@@ -409,7 +411,7 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	private enum MyEnum {
-		VALUE1, VALUE2;
+		VALUE1, VALUE2
 	}
 
 	/**
@@ -472,6 +474,10 @@ public class ReflectiveConfigGroupTest {
 		@Comment("set of enum")
 		@Parameter
 		private Set<MyEnum> enumSetField;
+
+		@Comment("list of ints")
+		@Parameter
+		private List<Integer> ints;
 
 		// Object fields:
 		// Id: string representation is toString

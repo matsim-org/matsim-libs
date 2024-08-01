@@ -54,13 +54,13 @@ public abstract class FastEmissionGridAnalyzer {
 	 * 2. The aggregated emissions for each link are rastered onto all the raster-cells covered by the link.
 	 * 3. In the smoothing step the emissions are blurred onto the surrounding raster-cells.
 	 * <p>
-	 * The blurring algorithm is a gaussian blur https://en.wikipedia.org/wiki/Gaussian_blur
+	 * The blurring algorithm is a gaussian blur <a href="https://en.wikipedia.org/wiki/Gaussian_blur">...</a>
 	 * <p>
 	 * If only a certain area of the scenario is of interest for the analysis. The supplied network must be filtered beforehand.
 	 * The resulting raster's size depends on the bounding box of the supplied network.
 	 * <p>
-	 * Note: The algorithm is not accurate at the edges of the raster. The kernel is cut of a the edges meaning that emissions
-	 * are underestimated at the edges of the raster. I didn't bother to implement this correctly. Otherwise the overall
+	 * Note: The algorithm is not accurate at the edges of the raster. The kernel is cut of the edges meaning that emissions
+	 * are underestimated at the edges of the raster. I didn't bother to implement this correctly. Otherwise, the overall
 	 * amount of emissions doesn't change.
 	 *
 	 * @param eventsFile The events file which contains the emission events
@@ -92,7 +92,7 @@ public abstract class FastEmissionGridAnalyzer {
 		logger.info("Start smoothing pollution.");
 		return linkEmissionsByPollutant.entrySet().stream()
 			.map(entry -> {
-				logger.info("Smoothing of: " + entry.getKey());
+				logger.info("Smoothing of: {}", entry.getKey());
 				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
 			})
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
@@ -116,7 +116,7 @@ public abstract class FastEmissionGridAnalyzer {
 
 		return linkEmissionsByPollutant.entrySet().stream()
 			.map(entry -> {
-				logger.info("Smoothing of: " + entry.getKey());
+				logger.info("Smoothing of: {}", entry.getKey());
 				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
 			})
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
@@ -192,7 +192,7 @@ public abstract class FastEmissionGridAnalyzer {
 
 	static Raster blur(Raster raster, int radius) {
 
-		logger.info("Creating Kernel with " + (radius * 2 + 1) + " taps");
+		logger.info("Creating Kernel with {} taps", radius * 2 + 1);
 		var kernel = createKernel(radius * 2 + 1);
 
 		var result = new Raster(raster.getBounds(), raster.getCellSize());
@@ -239,8 +239,11 @@ public abstract class FastEmissionGridAnalyzer {
 
 		emissions.forEachEntry((linkId, value) -> {
 			var link = network.getLinks().get(linkId);
-			var numberOfCells = rasterizeLink(link, 0, raster);
-			rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			// If the link does not exist in the network, we ignore it
+			if (link != null) {
+				var numberOfCells = rasterizeLink(link, 0, raster);
+				rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			}
 			return true;
 		});
 		return raster;
@@ -260,11 +263,14 @@ public abstract class FastEmissionGridAnalyzer {
 		for (var entry : emissions.entrySet()) {
 
 			var link = network.getLinks().get(entry.getKey());
-			var value = entry.getValue();
-			// first count number of cells
-			var numberOfCells = rasterizeLink(link, 0, raster);
-			// second pass for actually writing the emission values
-			rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			// If the link does not exist in the network, we ignore it
+			if (link != null) {
+				var value = entry.getValue();
+				// first count number of cells
+				var numberOfCells = rasterizeLink(link, 0, raster);
+				// second pass for actually writing the emission values
+				rasterizeLink(link, value / numberOfCells / cellArea, raster);
+			}
 		}
 		return raster;
 	}
@@ -273,7 +279,7 @@ public abstract class FastEmissionGridAnalyzer {
 	 * Rasterizes links into squares. Uses Bresenham's line drawing algorithm, which is supposed to be fast
 	 * Maybe the result is too chunky, but it'll do as a first try
 	 *
-	 * @param link Matsim network link
+	 * @param link MATSim network link
 	 * @return number of cells the link is rastered to
 	 */
 	private static int rasterizeLink(Link link, double value, Raster raster) {

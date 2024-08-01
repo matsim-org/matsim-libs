@@ -20,11 +20,8 @@
 package org.matsim.utils.objectattributes.attributeconverters;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.utils.objectattributes.AttributeConverter;
-
-import java.util.Locale;
 
 public class CoordArrayConverter implements AttributeConverter<Coord[]> {
 

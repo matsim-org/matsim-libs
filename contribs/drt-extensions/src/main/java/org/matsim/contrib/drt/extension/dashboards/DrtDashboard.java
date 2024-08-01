@@ -159,7 +159,7 @@ public class DrtDashboard implements Dashboard {
 				viz.description = "Number of rides (customers) is displayed in bars, wait statistics in lines";
 
 				Plotly.DataSet waitStats = viz.addDataset(data.output("*_waitStats_" + drtConfigGroup.mode + ".csv"));
-				Plotly.DataSet rejections = viz.addDataset(data.output("*drt_rejections_perTimeBin_" +  drtConfigGroup.mode + ".csv"));
+				Plotly.DataSet rejections = viz.addDataset(data.output("*drt_rejections_perTimeBin_" + drtConfigGroup.mode + ".csv"));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Time Bin").build())
@@ -244,7 +244,7 @@ public class DrtDashboard implements Dashboard {
 
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("Iteration").build())
-						.yAxis(Axis.builder().title("Wait Time [s]").build())
+						.yAxis(Axis.builder().title("Number of Rides").build())
 						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 						.build();
 
@@ -272,12 +272,12 @@ public class DrtDashboard implements Dashboard {
 					viz.description = "";
 					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
 					viz.x = "iteration";
-					viz.columns = List.of("wait_average","wait_median", "wait_p95");
+					viz.columns = List.of("wait_average", "wait_median", "wait_p95");
 					viz.legendName = List.of("Average", "Median", "95th Percentile");
 					viz.xAxisName = "Iteration";
 					viz.yAxisName = "Waiting Time [s]";
 				})
-				;
+			;
 
 			layout.row("Demand And Travel Time Statistics per iteration")
 				.el(Plotly.class, (viz, data) -> {
@@ -386,7 +386,7 @@ public class DrtDashboard implements Dashboard {
 				.el(Line.class, (viz, data) -> {
 					viz.title = "Relative Statistics per iteration";
 					viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
-					viz.description = "Pooling ratio (Pax distance / Vehicle mileage), Detour ratio, and Empty Ratio";
+					viz.description = "Occupancy rate (Pax distance / Vehicle mileage), Detour ratio, and Empty Ratio";
 					viz.x = "iteration";
 					viz.columns = List.of("d_p/d_t", "l_det", "emptyRatio");
 					viz.legendName = List.of("Pooling ratio", "Detour ratio", "Empty Ratio");

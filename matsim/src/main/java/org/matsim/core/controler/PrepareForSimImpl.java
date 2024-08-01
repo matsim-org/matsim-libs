@@ -291,7 +291,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			VehicleType type;
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
-					type = VehicleUtils.getDefaultVehicleType();
+					type = VehicleUtils.createDefaultVehicleType();
 					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId())){
 						scenario.getVehicles().addVehicleType( type );
 					}

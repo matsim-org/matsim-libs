@@ -33,11 +33,12 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -53,13 +54,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -68,8 +63,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -343,6 +337,67 @@ public class SwissRailRaptorTest {
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
         assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
+	@Test
+	void testLineChangeWithDifferentModeChangeUtils() {
+        Fixture f = new Fixture();
+        f.init();
+		f.blueLine.getRoutes().values().forEach(transitRoute -> transitRoute.setTransportMode(TransportMode.ship));
+		SwissRailRaptorConfigGroup swissRailRaptorConfigGroup = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty trainToShip = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty("train",TransportMode.ship,1000000.0);
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty shipToTrain = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty(TransportMode.ship,"train",1000000.0);
+		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(trainToShip);
+		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(shipToTrain);
+		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
+		Coord fromCoord = new Coord(3800, 5100);
+		Coord toCoord = new Coord(16100, 10050);
+		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null));
+		//changing from train to ship is so expensive that direct walk is cheaper
+		assertNull(legs);
+	}
+	
+	@Test
+	void testLineChangeWithDifferentTravelTimeUtils() {
+        Fixture f = new Fixture();
+        f.init();
+		f.blueLine.getRoutes().values().forEach(transitRoute -> transitRoute.setTransportMode("bus"));
+		SwissRailRaptorConfigGroup swissRailRaptorConfigGroup = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
+		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
+		RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.network, null);
+        TransitRouter router = new SwissRailRaptor.Builder(data, f.config).with(new RaptorParametersForPerson() {	
+			@Override
+			public RaptorParameters getRaptorParameters(Person person) {
+				return raptorParams;
+			}
+		}).build();
+        
+        // from C to G (see Fixture), competing between red line (express) and blue line (regular)
+		Coord fromCoord = new Coord(12000, 5000);
+		Coord toCoord = new Coord(28000, 5000);
+		
+		// default case
+		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600 - 60.0, null));
+		assertEquals(3, legs.size());
+		assertEquals("red", ((TransitPassengerRoute) ((Leg) legs.get(1)).getRoute()).getLineId().toString());
+		
+		// routing by transport mode, same costs, choose red (train) again
+		raptorParams.setUseTransportModeUtilities(true);
+		raptorParams.setMarginalUtilityOfTravelTime_utl_s("train", -1e-3);
+		raptorParams.setMarginalUtilityOfTravelTime_utl_s("bus", -1e-3);
+		legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600 - 60.0, null));
+		assertEquals(3, legs.size());
+		assertEquals("red", ((TransitPassengerRoute) ((Leg) legs.get(1)).getRoute()).getLineId().toString());
+
+		// routing by transport mode, train is quicker, but more costly now, so choose blue (bus)
+		raptorParams.setUseTransportModeUtilities(true);
+		raptorParams.setMarginalUtilityOfTravelTime_utl_s("train", -1e-2);
+		raptorParams.setMarginalUtilityOfTravelTime_utl_s("bus", -1e-3);
+		legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600 - 60.0, null));
+		assertEquals(3, legs.size());
+		assertEquals("blue", ((TransitPassengerRoute) ((Leg) legs.get(1)).getRoute()).getLineId().toString());
+	}
 
 	@Test
 	void testFasterAlternative() {
@@ -481,7 +536,7 @@ public class SwissRailRaptorTest {
         Fixture f = new Fixture();
         f.init();
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
-        double x = +42000;
+        double x = 42000;
         double x1 = -2000;
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(x1, 0)), new FakeFacility(new Coord(x, 0)), 5.5*3600, null)); // should map to stops A and I
         assertEquals(3, legs.size());
@@ -868,9 +923,8 @@ public class SwissRailRaptorTest {
         int[] transferCount = new int[] { 0 };
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        SwissRailRaptor router = new Builder(data, f.config).with(new RaptorTransferCostCalculator() {
-            @Override
-            public double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double now) {
+        SwissRailRaptor router = new Builder(data, f.config).with((RaptorTransferCostCalculator) (currentPE, transfer, staticConfig, raptorParams, totalTravelTime, totalTransferCount, existingTransferCosts, currentTime) -> {
+
                 transferCount[0]++;
                 Transfer t = transfer.get();
 
@@ -882,7 +936,7 @@ public class SwissRailRaptorTest {
                 assertEquals(Id.create("2to3", TransitRoute.class), t.getToTransitRoute().getId());
 
                 return 0.5;
-            }
+
         }).build();
 
         Coord fromCoord = f.fromFacility.getCoord();

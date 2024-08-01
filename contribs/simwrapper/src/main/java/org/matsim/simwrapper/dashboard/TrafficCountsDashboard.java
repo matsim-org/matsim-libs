@@ -1,21 +1,19 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.commons.lang.StringUtils;
 import org.matsim.application.analysis.traffic.CountComparisonAnalysis;
-import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -24,32 +22,35 @@ import java.util.stream.Collectors;
  */
 public class TrafficCountsDashboard implements Dashboard {
 
-	@Nullable
-	private final String countsPath;
 
-	@Nullable
-	private final Set<String> networkModes;
+	private final Map<String, Set<String>> networkModes = new LinkedHashMap<>();
+
 	private List<Double> limits = List.of(0.6, 0.8, 1.2, 1.4);
 	private List<String> labels = List.of("major under", "under", "ok", "over", "major over");
 
-	/**
-	 * Create counts with a given counts file and specific transport mode.
-	 *
-	 * @param countsPath   overwrite default counts file
-	 * @param networkModes overwrite default mode to analyze
-	 */
-	public TrafficCountsDashboard(@Nullable String countsPath, @Nullable Set<String> networkModes) {
-		this.countsPath = countsPath;
-		this.networkModes = networkModes;
-	}
+	private String countsPath = null;
 
 	/**
-	 * Constructor with default arguments.
+	 * Constructor with default arguments. Will analyze all modes
 	 */
 	public TrafficCountsDashboard() {
-		this(null, null);
 	}
 
+	/**
+	 * Registered modes to be compared separately. This will overwrite the default behaviour and result in one tab per node,
+	 */
+	public TrafficCountsDashboard withModes(String name, Set<String> modes) {
+		this.networkModes.put(name, modes);
+		return this;
+	}
+
+	/**
+	 * Overwrite the default counts file. Otherwise, output counts are used.
+	 */
+	public TrafficCountsDashboard withCountsPath(String countsPath) {
+		this.countsPath = countsPath;
+		return this;
+	}
 
 	/**
 	 * Set the quality thresholds and labels.
@@ -68,7 +69,7 @@ public class TrafficCountsDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Traffic Counts";
-		header.description = "Comparison of observed and simulated daily traffic volumes.\nError metrics: ";
+		header.description = "Comparison of observed and simulated daily traffic volumes. Reported volumes are scaled-up according to simulated sample size. \nError metrics based on relative error: ";
 
 		for (int i = 0; i < labels.size(); i++) {
 			if (i == 0)
@@ -87,13 +88,38 @@ public class TrafficCountsDashboard implements Dashboard {
 		if (countsPath != null)
 			argList.addAll(List.of("--counts", countsPath));
 
-		if (networkModes != null)
-			argList.addAll(List.of("--network-mode", String.join(",", networkModes)));
+
+		// Default analysis for cars
+		if (networkModes.isEmpty())
+			createTab(layout, argList, null, null);
+
+		else {
+
+			// One tab for each requested mode
+			for (Map.Entry<String, Set<String>> e : networkModes.entrySet()) {
+				createTab(layout, argList, e.getKey(), e.getValue());
+			}
+		}
+	}
+
+	private void createTab(Layout layout, List<String> argList, String tabName, Set<String> modes) {
+
+		// Copy list to avoid side effects
+		argList = new ArrayList<>(argList);
+
+		if (modes != null)
+			argList.addAll(List.of("--network-mode", String.join(",", modes)));
 
 		String[] args = argList.toArray(new String[0]);
 
-		layout.row("overview")
-			.el(Plotly.class, (viz, data) -> {
+		String suffix = tabName == null ? "" : ("_" + tabName.toLowerCase());
+		String context = tabName == null ? null : context() + tabName.toLowerCase();
+
+		// Name with capital letters
+		tabName = tabName == null ? null : StringUtils.capitalize(tabName);
+
+		layout.row("overview" + suffix, tabName)
+			.el(context, Plotly.class, (viz, data) -> {
 
 				viz.title = "Count estimation quality";
 				viz.description = "over all count stations";
@@ -111,9 +137,9 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(), ds.mapping()
 					.x("n")
 					.y("source")
-					.name("quality", Plotly.ColorScheme.RdYlBu)
+					.name("quality", ColorScheme.RdYlBu)
 				);
-			}).el(Plotly.class, (viz, data) -> {
+			}).el(context, Plotly.class, (viz, data) -> {
 
 				viz.title = "Count estimation quality";
 				viz.description = "by road type";
@@ -128,13 +154,13 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("road_type")
 					.y("share")
-					.name("quality", Plotly.ColorScheme.RdYlBu)
+					.name("quality", ColorScheme.RdYlBu)
 				);
 
 			});
 
-		layout.row("scatter")
-			.el(Plotly.class, (viz, data) -> {
+		layout.row("scatter" + suffix, tabName)
+			.el(context, Plotly.class, (viz, data) -> {
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
 
@@ -158,7 +184,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				);
 
 			})
-			.el(Plotly.class, (viz, data) -> {
+			.el(context, Plotly.class, (viz, data) -> {
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
@@ -181,26 +207,26 @@ public class TrafficCountsDashboard implements Dashboard {
 
 			});
 
-		layout.row("map")
-			.el(MapPlot.class, (viz, data) -> {
+		layout.row("map" + suffix, tabName)
+			.el(context, MapPlot.class, (viz, data) -> {
 				viz.title = "Relative traffic volumes";
 				viz.height = 8.0;
 
-				viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties"), "id");
+				viz.setShape(data.withDefaultContext().compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
 				viz.addDataset("counts", data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
-				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.center = data.withDefaultContext().context().getCenter();
+				viz.zoom = data.withDefaultContext().context().mapZoomLevel;
 
 				viz.display.lineColor.dataset = "counts";
 				viz.display.lineColor.columnName = "quality";
 				viz.display.lineColor.join = "link_id";
-				viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, labels.size(), false);
+				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, labels.size(), false);
 
 				// 8px
 				viz.display.lineWidth.dataset = "@8";
 			})
-			.el(Plotly.class, (viz, data) -> {
+			.el(context, Plotly.class, (viz, data) -> {
 
 				viz.title = "Avg. error / bias";
 
@@ -237,8 +263,8 @@ public class TrafficCountsDashboard implements Dashboard {
 
 			});
 
-		layout.row("details")
-			.el(Plotly.class, (viz, data) -> {
+		layout.row("details" + suffix, tabName)
+			.el(context, Plotly.class, (viz, data) -> {
 
 				viz.title = "Count stations";
 				viz.description = "hourly comparison";
@@ -259,5 +285,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				);
 
 			});
+
 	}
+
 }

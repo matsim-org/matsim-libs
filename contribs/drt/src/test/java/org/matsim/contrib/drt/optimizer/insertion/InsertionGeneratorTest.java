@@ -20,14 +20,9 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import com.google.common.collect.Sets;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +32,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
@@ -46,8 +42,12 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.testcases.fakes.FakeLink;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -378,7 +378,8 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
 		Waypoint.Stop stop0 = stop(200, fromLink, 1);
 		Waypoint.Stop stop1 = stop(400, link("stop"), 0);
-		VehicleEntry entry = entry(start, stop0, stop1);
+		List<Double> precedingStayTimes = Arrays.asList(100.0, 0.0);
+		VehicleEntry entry = entry(start, precedingStayTimes, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
 			new Insertion(drtRequest, entry, 0, 0),
 			new Insertion(drtRequest, entry, 0, 1),
@@ -444,6 +445,32 @@ public class InsertionGeneratorTest {
 				);
 	}
 
+	@Test
+	void testWaypointOccupancyChange() {
+		int occupancy = 0;
+		AcceptedDrtRequest acceptedReq5Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest5Pax);
+		AcceptedDrtRequest acceptedReq2Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest2Pax);
+
+		Waypoint.Stop stop2 = stop(0, link("stop2"), occupancy);
+		//dropoff 5 pax
+		stop2.task.addDropoffRequest(acceptedReq5Pax);
+		occupancy -= stop2.getOccupancyChange();
+		Assertions.assertEquals(5, occupancy);
+
+		Waypoint.Stop stop1 = stop(0, link("stop1"), occupancy);
+		//dropoff 2 pax, pickup 5
+		stop1.task.addDropoffRequest(acceptedReq2Pax);
+		stop1.task.addPickupRequest(acceptedReq5Pax);
+		occupancy -= stop1.getOccupancyChange();
+		Assertions.assertEquals(2, occupancy);
+
+
+		Waypoint.Stop stop0 = stop(0, link("stop0"), occupancy);
+		stop0.task.addPickupRequest(acceptedReq2Pax);
+		occupancy -= stop0.getOccupancyChange();
+		Assertions.assertEquals(0, occupancy);
+	}
+
 	private Link link(String id) {
 		return new FakeLink(Id.createLinkId(id));
 	}
@@ -498,9 +525,13 @@ public class InsertionGeneratorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return entry(start, precedingStayTimes, stops);
+	}
+	
+	private VehicleEntry entry(Waypoint.Start start, List<Double> precedingStayTimes, Waypoint.Stop... stops) {
 		var slackTimes = new double[stops.length + 2];
 		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
-		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
 	}
 }

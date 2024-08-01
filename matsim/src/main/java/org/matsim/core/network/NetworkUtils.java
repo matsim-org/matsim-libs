@@ -40,7 +40,6 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -1018,5 +1017,9 @@ public final class NetworkUtils {
 	public static boolean addDisallowedNextLinks(Link link, String mode, List<Id<Link>> linkIds) {
 		DisallowedNextLinks disallowedNextLinks = getOrCreateDisallowedNextLinks(link);
 		return disallowedNextLinks.addDisallowedLinkSequence(mode, linkIds);
+	}
+	
+	public static void removeDisallowedNextLinks(Link link) {
+		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
 	}
 }

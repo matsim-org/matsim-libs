@@ -1,44 +1,42 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.core.network.NetworkUtils;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DrtGridUtilsTest {
 
 	@Test
 	void test() {
 		Network network = createNetwork();
-		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
+		SquareGridZoneSystem squareGridZoneSystem = new SquareGridZoneSystem(network, 100, false, z -> true);
 
-		assertThat(grid).hasSize(100);
+		assertThat(squareGridZoneSystem.getZones()).hasSize(100);
 
-		int cell = 1;
 		for (int col = 0; col < 10; col++) {
 			for (int row = 0; row < 10; row++) {
-				Geometry geometry = grid.get(cell + "").getGeometry();
+				Optional<Zone> zoneForCoord = squareGridZoneSystem.getZoneForCoord(new Coord(col * 100, row * 100));
 
-				assertThat(geometry.getCoordinates()).containsExactly(//
+				assertThat(zoneForCoord).isPresent();
+				assertThat(zoneForCoord.get().getPreparedGeometry().getGeometry().getCoordinates()).containsExactly(//
 						new Coordinate(col * 100, row * 100),//
 						new Coordinate(col * 100 + 100, row * 100),//
 						new Coordinate(col * 100 + 100, row * 100 + 100),//
 						new Coordinate(col * 100, row * 100 + 100),//
 						new Coordinate(col * 100, row * 100));
-				assertThat(geometry.getCentroid().getCoordinate()).isEqualTo(
+				assertThat(zoneForCoord.get().getPreparedGeometry().getGeometry().getCentroid().getCoordinate()).isEqualTo(
 						new Coordinate(col * 100 + 50, row * 100 + 50));
-
-				cell++;
 			}
 		}
 	}

@@ -27,7 +27,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
-public class LinkEnterEvent extends Event implements HasLinkId, HasVehicleId{
+public class LinkEnterEvent extends Event implements HasLinkId, HasVehicleId {
 
 	public static final String EVENT_TYPE = "entered link";
 
@@ -49,29 +49,28 @@ public class LinkEnterEvent extends Event implements HasLinkId, HasVehicleId{
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	/**
-	 * Please use getVehicleId() instead. 
+	 * Please use getVehicleId() instead.
 	 * Vehicle-driver relations can be made by {@link VehicleEntersTrafficEvent} and {@link VehicleLeavesTrafficEvent}.
 	 */
 	@Deprecated
 	public Id<Person> getDriverId() {
 		throw new RuntimeException( LinkLeaveEvent.missingDriverIdMessage ) ;
-	}	
+	}
 	@Override
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		return attr;
+		Map<String, String> atts = super.getAttributes();
+		// linkId, vehicleId handled by superclass
+		return atts;
 	}
 }

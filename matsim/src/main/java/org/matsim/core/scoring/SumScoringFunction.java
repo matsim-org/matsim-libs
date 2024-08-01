@@ -22,6 +22,7 @@
  package org.matsim.core.scoring;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +36,12 @@ public final class SumScoringFunction implements ScoringFunction {
 	public interface BasicScoring {
 		void finish();
 		double getScore();
+
+		/**
+		 * @see ScoringFunction#explainScore(StringBuilder).
+		 */
+		default void explainScore(StringBuilder out) {
+		}
 	}
 
 	public interface ActivityScoring extends BasicScoring {
@@ -64,14 +71,14 @@ public final class SumScoringFunction implements ScoringFunction {
 	}
 
 	/**
-	 * NOTE: Despite its somewhat misleading name, only Events that at the same time implement HasPersonId are passed 
+	 * NOTE: Despite its somewhat misleading name, only Events that at the same time implement HasPersonId are passed
 	 * through this interface.  This excludes, in particular, LinkEnterEvent and LinkLeaveEvent.  This was done for performance reasons,
-	 * since passing those events to all handlers imposes a significant additional burden.  See comments in 
-	 * and implementation of the handleEvent 
+	 * since passing those events to all handlers imposes a significant additional burden.  See comments in
+	 * and implementation of the handleEvent
 	 * method in {@link EventsToScore}. (yyyyyy Those comments, and possibly also the events filtering, have gone
 	 * from EventsToScore in commit e718809884cac6a86bdc35ea2a03c10195d37c69 .  I don't know if the performance consequences
-	 * were tested.) 
-	 * 
+	 * were tested.)
+	 *
 	 * @author nagel
 	 */
 	public interface ArbitraryEventScoring extends BasicScoring {
@@ -80,14 +87,14 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	private static final  Logger log = LogManager.getLogger(SumScoringFunction.class);
 
-	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
-	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();
-	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
-	private ArrayList<ScoreScoring> scoreScoringFunctions = new ArrayList<>();
-	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<>();
-	private ArrayList<TripScoring> tripScoringFunctions = new ArrayList<>();
-	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
-	private ArrayList<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>() ;
+	private final List<BasicScoring> basicScoringFunctions = new ArrayList<>();
+	private final List<ActivityScoring> activityScoringFunctions = new ArrayList<>();
+	private final List<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
+	private final List<ScoreScoring> scoreScoringFunctions = new ArrayList<>();
+	private final List<LegScoring> legScoringFunctions = new ArrayList<>();
+	private final List<TripScoring> tripScoringFunctions = new ArrayList<>();
+	private final List<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
+	private final List<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>() ;
 
 	@Override
 	public final void handleActivity(Activity activity) {
@@ -177,6 +184,20 @@ public final class SumScoringFunction implements ScoringFunction {
 			score += contribution;
 		}
 		return score;
+	}
+
+
+	@Override
+	public void explainScore(StringBuilder out) {
+
+		for (BasicScoring s : basicScoringFunctions) {
+
+			// If something was already written, a delimiter needs to be placed
+			if (!out.isEmpty())
+				out.append(SCORE_DELIMITER);
+
+			s.explainScore(out);
+		}
 	}
 
 	public void addScoringFunction(BasicScoring scoringFunction) {

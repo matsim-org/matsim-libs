@@ -11,9 +11,8 @@ import java.util.Map;
 /**
  * @author nkuehnel / MOIA
  */
-public class DrtShiftBreakScheduledEvent extends Event {
+public class DrtShiftBreakScheduledEvent extends AbstractShiftEvent {
 
-    private final Id<DrtShift> shiftId;
     private final Id<DvrpVehicle> vehicleId;
     private final Id<Link> linkId;
     private final double latestArrival;
@@ -25,10 +24,9 @@ public class DrtShiftBreakScheduledEvent extends Event {
 
     public static final String EVENT_TYPE = "DRT shift break scheduled";
 
-    public DrtShiftBreakScheduledEvent(double timeOfDay, Id<DrtShift> id, Id<DvrpVehicle> id1, Id<Link> linkId, double latestArrival) {
-        super(timeOfDay);
-        shiftId = id;
-        vehicleId = id1;
+    public DrtShiftBreakScheduledEvent(double timeOfDay, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, Id<Link> linkId, double latestArrival) {
+        super(timeOfDay, mode, shiftId);
+        this.vehicleId = vehicleId;
         this.linkId = linkId;
         this.latestArrival = latestArrival;
     }
@@ -41,7 +39,6 @@ public class DrtShiftBreakScheduledEvent extends Event {
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> attr = super.getAttributes();
-        attr.put(ATTRIBUTE_SHIFT_ID, shiftId + "");
         attr.put(ATTRIBUTE_VEHICLE_ID, vehicleId + "");
         attr.put(ATTRIBUTE_LINK_ID, linkId + "");
         attr.put(ATTRIBUTE_LATEST_ARRIVAL, latestArrival + "");

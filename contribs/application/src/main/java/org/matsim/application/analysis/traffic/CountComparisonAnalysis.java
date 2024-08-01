@@ -76,6 +76,16 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return counts;
 	}
 
+	/**
+	 * Calculate the geh value for simulated and reference count
+	 */
+	private static double geh(double simulated, double observed) {
+		final double diff = simulated - observed;
+		final double sum = simulated + observed;
+
+		return Math.sqrt(2 * diff * diff / sum);
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -114,14 +124,16 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			StringColumn.create("road_type"),
 			IntColumn.create("hour"),
 			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+			DoubleColumn.create("simulated_traffic_volume"),
+			DoubleColumn.create("geh")
 		);
 
 		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
 			StringColumn.create("name"),
 			StringColumn.create("road_type"),
 			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+			DoubleColumn.create("simulated_traffic_volume"),
+			DoubleColumn.create("geh")
 		);
 
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> entry : counts.getMeasureLocations().entrySet()) {
@@ -170,6 +182,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setInt("hour", hour);
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
+					row.setDouble("geh", geh(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
 				}
 			} else {
 				// Get the daily values
@@ -183,6 +196,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setString("road_type", type);
 			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
+			row.setDouble("geh", geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
 		}
 
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")

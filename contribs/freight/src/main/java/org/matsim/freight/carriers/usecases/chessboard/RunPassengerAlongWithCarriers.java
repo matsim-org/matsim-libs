@@ -97,7 +97,7 @@ final class RunPassengerAlongWithCarriers {
 	}
 
 
-	public final Config prepareConfig() {
+	public Config prepareConfig() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(url, "config.xml"));
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		config.global().setRandomSeed(4177);
@@ -105,7 +105,7 @@ final class RunPassengerAlongWithCarriers {
 		return config;
 	}
 
-	public final Scenario prepareScenario(Config config) {
+	public Scenario prepareScenario(Config config) {
 		Gbl.assertNotNull( config );
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		CarriersUtils.addOrGetCarriers(scenario);

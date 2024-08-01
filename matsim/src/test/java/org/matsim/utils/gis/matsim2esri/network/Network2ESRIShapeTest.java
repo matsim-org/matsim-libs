@@ -22,6 +22,8 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import java.util.Collection;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,10 +33,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class Network2ESRIShapeTest   {
 
@@ -60,7 +60,7 @@ public class Network2ESRIShapeTest   {
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outputFileP);
 		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
@@ -83,7 +83,7 @@ public class Network2ESRIShapeTest   {
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outputFileP);
 		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
@@ -106,7 +106,7 @@ public class Network2ESRIShapeTest   {
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outputFileP);
 		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
@@ -129,7 +129,7 @@ public class Network2ESRIShapeTest   {
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileShp, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outputFileShp);
 		Assertions.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
@@ -145,7 +145,7 @@ public class Network2ESRIShapeTest   {
 
 		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
+		Collection<SimpleFeature> writtenFeatures = GeoFileReader.getAllFeatures(outputFileShp);
 		Assertions.assertEquals(network.getNodes().size(), writtenFeatures.size());
 	}
 }

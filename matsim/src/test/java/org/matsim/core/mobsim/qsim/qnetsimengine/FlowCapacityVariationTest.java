@@ -19,7 +19,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -69,7 +68,7 @@ public class FlowCapacityVariationTest {
 	void twoMotorbikesTravelTime(){
 		/* linkCapacity higher than 1PCU/sec*/
 		vehiclesLeavingSameTime("motorbike",3601);
-		
+
 		/*link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
 		vehiclesLeavingSameTime("motorbike",1800);
 	}
@@ -78,11 +77,11 @@ public class FlowCapacityVariationTest {
 	void twoBikesTravelTime(){
 		/* linkCapacity higher than 1PCU/sec */
 		vehiclesLeavingSameTime(TransportMode.bike,3601);
-				
+
 		/* link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
 		vehiclesLeavingSameTime(TransportMode.bike,1800);
 	}
-	
+
 	private void vehiclesLeavingSameTime(String travelMode, double linkCapacity){
 		PseudoInputs net = new PseudoInputs(travelMode);
 		net.createNetwork(linkCapacity);
@@ -102,16 +101,16 @@ public class FlowCapacityVariationTest {
 		Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 		Map<Id<Link>, double[]> times2 = vehicleLinkTravelTimes.get(Id.create("2", Vehicle.class));
 
-		int linkEnterTime1 = (int)times1.get(Id.create("2", Link.class))[0]; 
+		int linkEnterTime1 = (int)times1.get(Id.create("2", Link.class))[0];
 		int linkEnterTime2 = (int)times2.get(Id.create("2", Link.class))[0];
 
-		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1]; 
+		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1];
 		int linkLeaveTime2 = (int)times2.get(Id.create("2", Link.class))[1];
 
 		Assertions.assertEquals(0, linkEnterTime1-linkEnterTime2, travelMode+ " entered at different time");
 		Assertions.assertEquals(0, linkLeaveTime1-linkLeaveTime2, travelMode +" entered at same time but not leaving the link at the same time.");
 	}
-	
+
 	private static final class PseudoInputs{
 
 		final Config config;
@@ -126,7 +125,7 @@ public class FlowCapacityVariationTest {
 		public PseudoInputs(String travelMode){
 
 			this.travelMode = travelMode;
-			
+
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			config = scenario.getConfig();
 			config.qsim().setMainModes(Arrays.asList(travelMode));
@@ -157,10 +156,10 @@ public class FlowCapacityVariationTest {
 			link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), fromNode2, toNode2, 1000, 25, 7200, 1, null, "22");
 
 		}
-		
+
 		private void createPopulation(){
 
-			// Vehicles info			
+			// Vehicles info
 //			scenario.getConfig().qsim().setUseDefaultVehicles(false);
 			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.fromVehiclesData ) ;
 

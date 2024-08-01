@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.extension.insertion.distances.DistanceApproximator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -39,7 +40,9 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -58,8 +61,13 @@ public class DrtInsertionExtensionIT {
 	private Controler createController() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 				new OTFVisConfigGroup());
+
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		ConfigGroup zoneSystemParams = matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		matrixParams.addParameterSet(zoneSystemParams);
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -283,7 +291,7 @@ public class DrtInsertionExtensionIT {
 		}
 
 		assertEquals(1470, distanceCalculator.calculatedDistances);
-		assertEquals(5288, distanceApproximator.calculatedDistances);
+		assertEquals(5286, distanceApproximator.calculatedDistances);
 	}
 
 	@Test
@@ -319,7 +327,7 @@ public class DrtInsertionExtensionIT {
 		}
 
 		assertEquals(1470, distanceCalculator.calculatedDistances);
-		assertEquals(5288, distanceApproximator.calculatedDistances);
+		assertEquals(5286, distanceApproximator.calculatedDistances);
 	}
 
 	static class CustomDistanceCalculator extends CustomCalculator {
@@ -421,10 +429,10 @@ public class DrtInsertionExtensionIT {
 
 		controller.run();
 
-		assertEquals(16, handler.rejectedRequests);
-		assertEquals(2112862.0, handler.fleetDistance, 1e-3);
-		assertEquals(698710.0, handler.activeTime(), 1e-3);
-		assertEquals(280.19623, handler.meanWaitTime(), 1e-3);
+		assertEquals(18, handler.rejectedRequests);
+		assertEquals(2097060.0, handler.fleetDistance, 1e-3);
+		assertEquals(700441.0, handler.activeTime(), 1e-3);
+		assertEquals(278.5162162162162, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test
@@ -442,10 +450,10 @@ public class DrtInsertionExtensionIT {
 
 		controller.run();
 
-		assertEquals(16, handler.rejectedRequests);
-		assertEquals(2112862.0, handler.fleetDistance, 1e-3);
-		assertEquals(698710.0, handler.activeTime(), 1e-3);
-		assertEquals(280.19623, handler.meanWaitTime(), 1e-3);
+		assertEquals(18, handler.rejectedRequests);
+		assertEquals(2097060, handler.fleetDistance, 1e-3);
+		assertEquals(700441.0, handler.activeTime(), 1e-3);
+		assertEquals(278.5162162162162, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test
@@ -464,9 +472,9 @@ public class DrtInsertionExtensionIT {
 		controller.run();
 
 		assertEquals(22, handler.rejectedRequests);
-		assertEquals(2066658.0, handler.fleetDistance, 1e-3);
-		assertEquals(694149.0, handler.activeTime(), 1e-3);
-		assertEquals(280.61475, handler.meanWaitTime(), 1e-3);
+		assertEquals(2070663.0, handler.fleetDistance, 1e-3);
+		assertEquals(699076.0, handler.activeTime(), 1e-3);
+		assertEquals(279.37704, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test

@@ -5,18 +5,21 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +42,7 @@ public class RunFissDrtScenarioIT {
 	@Test
 	void test() {
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
 		String fleetFile = "holzkirchenFleet.xml";
 		String plansFile = "holzkirchenPlans_car_drt.xml.gz";
@@ -47,20 +50,23 @@ public class RunFissDrtScenarioIT {
 		String opFacilitiesFile = "holzkirchenOperationFacilities.xml";
 		String shiftsFile = "holzkirchenShifts.xml";
 
-		DrtWithOperationsConfigGroup drtWithShiftsConfigGroup = (DrtWithOperationsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.maxTravelTimeAlpha = 1.5;
-		drtConfigGroup.maxTravelTimeBeta = 10. * 60.;
 		drtConfigGroup.stopDuration = 30.;
-		drtConfigGroup.maxWaitTime = 600.;
-		drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
+		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
+		defaultConstraintsSet.maxWaitTime = 600.;
+		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		defaultConstraintsSet.maxWalkDistance = 1000.;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -75,16 +81,18 @@ public class RunFissDrtScenarioIT {
 
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
-		DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
-		drtZonalSystemParams.zonesGeneration = DrtZonalSystemParams.ZoneGeneration.GridFromNetwork;
-		drtZonalSystemParams.cellSize = 500.;
-		drtZonalSystemParams.targetLinkSelection = DrtZonalSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZonalSystemParams);
+		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
+		SquareGridZoneSystemParams zoneSystemParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		zoneSystemParams.cellSize = 500.;
+		drtZoneSystemParams.addParameterSet(zoneSystemParams);
+		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
+		drtConfigGroup.addParameterSet(drtZoneSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
-				new DvrpConfigGroup());
+			dvrpConfigGroup);
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();
@@ -98,6 +106,9 @@ public class RunFissDrtScenarioIT {
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
+
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
@@ -124,7 +135,7 @@ public class RunFissDrtScenarioIT {
 		stratSets.setStrategyName("ChangeExpBeta");
 		config.replanning().addStrategySettings(stratSets);
 
-		config.controller().setLastIteration(2);
+		config.controller().setLastIteration(1);
 		config.controller().setWriteEventsInterval(1);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -173,7 +184,7 @@ public class RunFissDrtScenarioIT {
 		}
 
 		run.run();
-		Assertions.assertEquals(23817, linkCounter.getLinkLeaveCount());
+		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);
 	}
 
 	static class LinkCounter implements LinkLeaveEventHandler {

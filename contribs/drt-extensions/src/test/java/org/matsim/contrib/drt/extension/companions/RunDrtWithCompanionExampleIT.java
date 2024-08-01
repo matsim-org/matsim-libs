@@ -20,28 +20,32 @@
 package org.matsim.contrib.drt.extension.companions;
 
 
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
-import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author Steffen Axer
@@ -53,14 +57,24 @@ public class RunDrtWithCompanionExampleIT {
 
 	@Test
 	void testRunDrtWithCompanions() {
+		MatsimRandom.reset();
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), dvrpConfigGroup);
 
 		// Add DrtCompanionParams with some default values into existing Drt configurations
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
 		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
-		drtWithExtensionsConfigGroup.addParameterSet(new DrtCompanionParams());
+
+		DrtCompanionParams crtCompanionParams = new DrtCompanionParams();
+		crtCompanionParams.setDrtCompanionSamplingWeights(List.of(0.5,0.2,0.1,0.1,0.1));
+
+		drtWithExtensionsConfigGroup.addParameterSet(crtCompanionParams);
+
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		ConfigGroup zoneSystemParams = matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		matrixParams.addParameterSet(zoneSystemParams);
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
@@ -68,11 +82,45 @@ public class RunDrtWithCompanionExampleIT {
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		int actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides).isEqualTo(471);
+		int[] actualRides = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRides[0]).isEqualTo(378);
+		Assertions.assertThat(actualRides[1]).isEqualTo(706);
 	}
 
-	private int getTotalNumberOfDrtRides() {
+	@Test
+	void testRunDrtWithCompanionsMultiThreaded() {
+		MatsimRandom.reset();
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), dvrpConfigGroup);
+
+		// Add DrtCompanionParams with some default values into existing Drt configurations
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
+		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
+
+		DrtCompanionParams crtCompanionParams = new DrtCompanionParams();
+		crtCompanionParams.setDrtCompanionSamplingWeights(List.of(0.5,0.2,0.1,0.1,0.1));
+
+		drtWithExtensionsConfigGroup.addParameterSet(crtCompanionParams);
+
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		ConfigGroup zoneSystemParams = matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		matrixParams.addParameterSet(zoneSystemParams);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.qsim().setNumberOfThreads(2);
+
+		Controler controler = DrtCompanionControlerCreator.createControler(config);
+		controler.run();
+
+		int[] actualRides = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRides[0]).isEqualTo(375);
+		Assertions.assertThat(actualRides[1]).isEqualTo(699);
+	}
+
+	private int[] getTotalNumberOfDrtRides() {
 		String filename = utils.getOutputDirectory() + "/drt_customer_stats_drt.csv";
 
 		final List<String> collect;
@@ -86,8 +134,12 @@ public class RunDrtWithCompanionExampleIT {
 		List<String> keys = List.of(collect.get(0).split(";"));
 		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
 
-		int index = keys.indexOf("rides");
-        String value = lastIterationValues.get(index);
-		return Integer.parseInt(value);
+		int ridesRequestIndex = keys.indexOf("rides");
+        int ridesRequest = Integer.parseInt(lastIterationValues.get(ridesRequestIndex));
+
+		int ridesPaxIndex = keys.indexOf("rides_pax");
+		int ridesPax = Integer.parseInt(lastIterationValues.get(ridesPaxIndex));
+
+		return new int[]{ridesRequest, ridesPax};
 	}
 }

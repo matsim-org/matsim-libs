@@ -19,6 +19,7 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +36,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
+import org.matsim.core.network.DisallowedNextLinks;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -91,6 +92,16 @@ public class TransportModeNetworkFilterTest {
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[3]));
 		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().size());
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().get(f.linkIds[7]));
+        Assertions.assertEquals(
+            new DisallowedNextLinks.Builder()
+                .withDisallowedLinkSequence(TransportMode.car, Arrays.asList(f.linkIds[14]))
+                .build(),
+            NetworkUtils.getDisallowedNextLinks(subNetwork.getLinks().get(f.linkIds[3])));
+        Assertions.assertEquals(
+            new DisallowedNextLinks.Builder()
+                .withDisallowedLinkSequence(TransportMode.car, Arrays.asList(f.linkIds[7]))
+                .build(),
+            NetworkUtils.getDisallowedNextLinks(subNetwork.getLinks().get(f.linkIds[6])));
 
 		subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.bike));
@@ -116,6 +127,11 @@ public class TransportModeNetworkFilterTest {
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
 		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[4]));
+        Assertions.assertEquals(
+            new DisallowedNextLinks.Builder()
+                .withDisallowedLinkSequence(TransportMode.bike, Arrays.asList(f.linkIds[7]))
+                .build(),
+            NetworkUtils.getDisallowedNextLinks(subNetwork.getLinks().get(f.linkIds[6])));
 
 		subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.walk));
@@ -138,7 +154,7 @@ public class TransportModeNetworkFilterTest {
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
 		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().size());
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getOutLinks().get(f.linkIds[14]));
-	}
+ 	}
 
 	@Test
 	void testFilter_MultipleModes() {
@@ -184,6 +200,17 @@ public class TransportModeNetworkFilterTest {
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[7]).getOutLinks().get(f.linkIds[7]));
 		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[10]).getInLinks().size());
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[10]).getInLinks().get(f.linkIds[9]));
+        Assertions.assertEquals(
+            new DisallowedNextLinks.Builder()
+                .withDisallowedLinkSequence(TransportMode.car, Arrays.asList(f.linkIds[14]))
+                .build(),
+            NetworkUtils.getDisallowedNextLinks(subNetwork.getLinks().get(f.linkIds[3])));
+        Assertions.assertEquals(
+            new DisallowedNextLinks.Builder()
+                .withDisallowedLinkSequence(TransportMode.car, Arrays.asList(f.linkIds[7]))
+                .withDisallowedLinkSequence(TransportMode.bike, Arrays.asList(f.linkIds[7]))
+                .build(),
+            NetworkUtils.getDisallowedNextLinks(subNetwork.getLinks().get(f.linkIds[6])));
 
 		subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.bike, TransportMode.walk));
@@ -219,6 +246,11 @@ public class TransportModeNetworkFilterTest {
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[4]).getInLinks().get(f.linkIds[13]));
 		Assertions.assertEquals(1, subNetwork.getNodes().get(f.nodeIds[10]).getOutLinks().size());
 		Assertions.assertNotNull(subNetwork.getNodes().get(f.nodeIds[10]).getOutLinks().get(f.linkIds[16]));
+        Assertions.assertEquals(
+            new DisallowedNextLinks.Builder()
+                .withDisallowedLinkSequence(TransportMode.bike, Arrays.asList(f.linkIds[7]))
+                .build(),
+            NetworkUtils.getDisallowedNextLinks(subNetwork.getLinks().get(f.linkIds[6])));
 	}
 
 	@Test
@@ -274,12 +306,12 @@ public class TransportModeNetworkFilterTest {
 	/**
 	 * Tests the algorithm for the case the network contains direct loops, i.e.
 	 * links with the same from and to node.
-	 * 
+	 *
 	 * <code>Issue #178</code> - http://sourceforge.net/apps/trac/matsim/ticket/178
-	 * 
-	 * The problem seems only to happen when the loop link is (accidentally / randomly) 
+	 *
+	 * The problem seems only to happen when the loop link is (accidentally / randomly)
 	 * chosen as start link for the algorithm, as otherwise the node already exists.
-	 * Thus cannot extend existing Fixture to test this, but have to create test 
+	 * Thus cannot extend existing Fixture to test this, but have to create test
 	 * scenario from scratch.
 	 */
 	@Test
@@ -293,9 +325,9 @@ public class TransportModeNetworkFilterTest {
 		Link link1 = factory.createLink(Id.create(1, Link.class), node1, node1);
 		link1.setAllowedModes(createHashSet(TransportMode.car));
 		network.addLink(link1);
-		
+
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		
+
 		Network subNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car));
 		Assertions.assertEquals(1, subNetwork.getNodes().size(), "wrong number of nodes.");
@@ -310,28 +342,28 @@ public class TransportModeNetworkFilterTest {
 	void testFilter_timeVariant() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
-		
+
 		Network sourceNetwork = NetworkUtils.createNetwork(config);
 		Node node1 = sourceNetwork.getFactory().createNode(Id.createNodeId("1"), new Coord(0.0, 0.0));
 		Node node2 = sourceNetwork.getFactory().createNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
 		sourceNetwork.addNode(node1);
 		sourceNetwork.addNode(node2);
-		
+
 		Link sourceLink = sourceNetwork.getFactory().createLink(Id.createLinkId("link"), node1, node2);
 		sourceLink.setFreespeed(50.0);
 		sourceLink.setAllowedModes(Collections.singleton("car"));
 		sourceNetwork.addLink(sourceLink);
-		
+
 		NetworkChangeEvent changeEvent = new NetworkChangeEvent(120.0);
 		changeEvent.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 2.0));
 		changeEvent.addLink(sourceLink);
 		((TimeDependentNetwork) sourceNetwork).addNetworkChangeEvent(changeEvent);
-		
+
 		Assertions.assertEquals(50.0, sourceLink.getFreespeed(), 1e-3);
 		Assertions.assertEquals(50.0, sourceLink.getFreespeed(0.0), 1e-3);
 		Assertions.assertEquals(100.0, sourceLink.getFreespeed(120.0), 1e-3);
-		
-		
+
+
 		Network targetNetwork = NetworkUtils.createNetwork(config);
 		new TransportModeNetworkFilter(sourceNetwork).filter(targetNetwork, Collections.singleton("car"));
 		Link targetLink = targetNetwork.getLinks().get(sourceLink.getId());
@@ -362,6 +394,10 @@ public class TransportModeNetworkFilterTest {
 	 *        c                         cb
 	 *
 	 * Legend: c = car, w = walk, b = bike
+     * 
+     * With turn restrictions:
+     * - for car: 3 -> 14 and 6 -> 7
+     * - for bike: 6 -> 7
 	 *
 	 * </pre>
 	 *
@@ -420,6 +456,14 @@ public class TransportModeNetworkFilterTest {
 			network.addLink(createLink(network, this.linkIds[14], this.nodeIds[ 4], this.nodeIds[ 7], this.modesCW));
 			network.addLink(createLink(network, this.linkIds[15], this.nodeIds[ 7], this.nodeIds[10], this.modesW));
 			network.addLink(createLink(network, this.linkIds[16], this.nodeIds[10], this.nodeIds[13], this.modesCBW));
+
+            // turn restrictions: create one link with only car turn restriction, one link with car and bike
+            Link link3 = network.getLinks().get(this.linkIds[3]);
+            NetworkUtils.addDisallowedNextLinks(link3, TransportMode.car, Arrays.asList(this.linkIds[14]));
+
+            Link link6 = network.getLinks().get(this.linkIds[6]);
+            NetworkUtils.addDisallowedNextLinks(link6, TransportMode.car, Arrays.asList(this.linkIds[7]));
+            NetworkUtils.addDisallowedNextLinks(link6, TransportMode.bike, Arrays.asList(this.linkIds[7]));
 		}
 
 	}

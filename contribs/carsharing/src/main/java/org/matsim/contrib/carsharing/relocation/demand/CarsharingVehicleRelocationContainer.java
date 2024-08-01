@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
@@ -28,7 +29,6 @@ import org.matsim.contrib.carsharing.relocation.utils.RelocationTimesReader;
 import org.matsim.contrib.carsharing.relocation.utils.RelocationZonesReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.opengis.feature.simple.SimpleFeature;
 
 public class CarsharingVehicleRelocationContainer {
 	private Scenario scenario;

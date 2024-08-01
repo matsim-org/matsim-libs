@@ -28,12 +28,39 @@ class OsmNetworkParser {
 	Map<Long, ProcessedOsmWay> ways;
 	Map<Long, ProcessedOsmNode> nodes;
 	Map<Long, List<ProcessedOsmWay>> nodeReferences;
+	private final String wayType;
 
+	/**
+	 * The default constructor for roads (OSM highway tag)
+	 * 
+	 * @param transformation
+	 * @param linkProperties
+	 * @param linkFilter
+	 * @param executor
+	 */
 	OsmNetworkParser(CoordinateTransformation transformation, Map<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
 		this.transformation = transformation;
 		this.linkProperties = linkProperties;
 		this.linkFilter = linkFilter;
 		this.executor = executor;
+		this.wayType = OsmTags.HIGHWAY;
+	}
+	
+	/**
+	 * A more flexible constructor which allows to pass a different way type, e.g. railway
+	 * 
+	 * @param transformation
+	 * @param linkProperties
+	 * @param linkFilter
+	 * @param executor
+	 * @param wayType
+	 */
+	OsmNetworkParser(CoordinateTransformation transformation, Map<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor, String wayType) {
+		this.transformation = transformation;
+		this.linkProperties = linkProperties;
+		this.linkFilter = linkFilter;
+		this.executor = executor;
+		this.wayType = wayType;
 	}
 
 	public Map<Long, ProcessedOsmWay> getWays() {
@@ -106,7 +133,7 @@ class OsmNetworkParser {
 		Map<String, String> tags = OsmModelUtil.getTagsAsMap(osmWay);
 
 		if (isStreetOfInterest(tags)) {
-			LinkProperties linkProperty = linkProperties.get(tags.get(OsmTags.HIGHWAY));
+			LinkProperties linkProperty = linkProperties.get(tags.get(wayType));
 			ProcessedOsmWay processedWay = ProcessedOsmWay.create(osmWay, tags, linkProperty);
 			ways.put(osmWay.getId(), processedWay);
 
@@ -125,7 +152,7 @@ class OsmNetworkParser {
 	}
 
 	private boolean isStreetOfInterest(Map<String, String> tags) {
-		return tags.containsKey(OsmTags.HIGHWAY) && linkProperties.containsKey(tags.get(OsmTags.HIGHWAY));
+		return tags.containsKey(wayType) && linkProperties.containsKey(tags.get(wayType));
 	}
 
 	private boolean isEndNodeOfReferencingLink(OsmNode node, ProcessedOsmWay processedOsmWay) {

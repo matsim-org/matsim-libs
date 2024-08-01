@@ -24,7 +24,6 @@ package org.matsim.contrib.emissions.analysis;
 
 import org.matsim.contrib.emissions.Pollutant;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

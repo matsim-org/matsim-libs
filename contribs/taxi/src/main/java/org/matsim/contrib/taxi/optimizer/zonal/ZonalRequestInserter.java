@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -40,10 +42,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.ZonalSystemParams;
-import org.matsim.contrib.zone.Zone;
-import org.matsim.contrib.zone.Zones;
-import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
-import org.matsim.contrib.zone.util.ZoneFinderImpl;
+import org.matsim.contrib.common.zones.util.ZoneFinderImpl;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -74,11 +73,11 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 				zonalRegisters);
 
 		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
-		zones = Zones.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
+		zones = ZoneSystemUtils.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
 				ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
 		// TODO No conversion of SRS is done
 
-		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
+		this.linkToZone = ZoneSystemUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
 
 		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
 		// the zones used in ZonalTaxiOptim (for dispatching)

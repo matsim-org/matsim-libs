@@ -215,6 +215,13 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 					.ifDefined(offset -> attributes.add(createTimeTuple(Constants.ARRIVAL_OFFSET, offset)));
 			stop.getDepartureOffset().ifDefined(offset->
 					attributes.add(createTimeTuple(Constants.DEPARTURE_OFFSET, offset)));
+			// do not write out if it is true ==> the default value
+			if (!stop.isAllowBoarding()) {
+				attributes.add(createTuple(Constants.ALLOW_BOARDING, String.valueOf(stop.isAllowBoarding())));
+			}
+			if (!stop.isAllowAlighting()) {
+				attributes.add(createTuple(Constants.ALLOW_ALIGHTING, String.valueOf(stop.isAllowAlighting())));
+			}
 			attributes.add(createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
 			this.writeStartTag(Constants.STOP, attributes, true);
 		}

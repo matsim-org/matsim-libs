@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -47,6 +46,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripStructureUtils;
@@ -292,7 +292,7 @@ public class ChooseRandomLegModeForSubtourTest {
 			Plan plan = createPlan(network, activityChainString, originalMode);
 			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, false);
 		}
@@ -308,7 +308,7 @@ public class ChooseRandomLegModeForSubtourTest {
 			Plan plan = createPlan(facilities, activityChainString, originalMode);
 			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, true);
 		}
@@ -323,9 +323,9 @@ public class ChooseRandomLegModeForSubtourTest {
 			Plan plan = createPlan(network, activityChainString, originalMode);
 			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 		}
 	}
 
@@ -338,9 +338,9 @@ public class ChooseRandomLegModeForSubtourTest {
 			Plan plan = createPlan(facilities, activityChainString, originalMode);
 			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 		}
 	}
 
@@ -354,7 +354,7 @@ public class ChooseRandomLegModeForSubtourTest {
 			Plan plan = createPlan(facilities, activityChainString, originalMode);
 			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, true);
 		}
@@ -370,7 +370,7 @@ public class ChooseRandomLegModeForSubtourTest {
 			Plan plan = createPlan(network, activityChainString, originalMode);
 			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
+			assertTrue(PopulationComparison.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, false);
 		}

@@ -3,19 +3,18 @@ package org.matsim.contrib.dvrp.passenger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-import java.util.function.Function;
+import java.util.Optional;
 
 /**
  * Provides a method to identify the passenger group id of an agent.
  * @author nkuehnel / MOIA
  */
-public interface PassengerGroupIdentifier extends Function<MobsimPassengerAgent, Id<PassengerGroupIdentifier.PassengerGroup>> {
+public interface PassengerGroupIdentifier {
 
 	class PassengerGroup {
 		private PassengerGroup(){}
 	}
 
-	@Override
-	Id<PassengerGroupIdentifier.PassengerGroup> apply(MobsimPassengerAgent agent);
+	Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent);
 
 }

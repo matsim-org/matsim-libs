@@ -20,21 +20,25 @@
 package org.matsim.contrib.drt.extension.companions;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.WeightedRandomSelection;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
- *
- * @author Steffen Axer
- *
+ * @author steffenaxer
  */
 public class DrtCompanionUtils {
 
 	public final static String ADDITIONAL_GROUP_SIZE_ATTRIBUTE = "additionalGroupSize";
 	public final static String ADDITIONAL_GROUP_PART_ATTRIBUTE = "additionalGroupPart";
 	public static final String COMPANION_TYPE_ATTRIBUTE = "companionType";
+	public static final String GROUP_IDENTIFIER_ATTRIBUTE = "groupIdentifier";
+	public static final String DRT_COMPANION_AGENT_PREFIX = "COMPANION";
 
 	private DrtCompanionUtils() {
 		throw new IllegalStateException("Utility class");
@@ -42,6 +46,10 @@ public class DrtCompanionUtils {
 
 	public static boolean isDrtCompanion(Person person) {
 		return getDRTCompanionType(person) != null;
+	}
+
+	public static boolean isDrtCompanion(Id<Person> personId) {
+		return personId.toString().startsWith(DRT_COMPANION_AGENT_PREFIX);
 	}
 
 	public static void setDRTCompanionType(Person person, String drtCompanionType) {
@@ -72,6 +80,15 @@ public class DrtCompanionUtils {
 		}
 	}
 
+	public static Optional<Id<PassengerGroupIdentifier.PassengerGroup>> getPassengerGroupIdentifier(Leg leg) {
+		if (leg.getAttributes().getAttribute(GROUP_IDENTIFIER_ATTRIBUTE) == null) {
+			return Optional.empty();
+		} else {
+			return Optional.of(Id.create(leg.getAttributes()
+				.getAttribute(GROUP_IDENTIFIER_ATTRIBUTE).toString(), PassengerGroupIdentifier.PassengerGroup.class));
+		}
+	}
+
 	public static Integer getAdditionalGroupPart(Person person) {
 		if (person.getAttributes().getAttribute(ADDITIONAL_GROUP_PART_ATTRIBUTE) == null) {
 			return null;
@@ -86,6 +103,15 @@ public class DrtCompanionUtils {
 
 	public static void setAdditionalGroupPart(Person person, int additionalgroupPart) {
 		person.getAttributes().putAttribute(ADDITIONAL_GROUP_PART_ATTRIBUTE, additionalgroupPart);
+	}
+
+	public static void setPassengerGroupIdentifier(Leg leg, Id<PassengerGroupIdentifier.PassengerGroup> passengerGroupIdentifierId ) {
+		leg.getAttributes().putAttribute(GROUP_IDENTIFIER_ATTRIBUTE, passengerGroupIdentifierId);
+	}
+
+	public static void removePassengerGroupIdentifier(Leg leg)
+	{
+		leg.getAttributes().removeAttribute(GROUP_IDENTIFIER_ATTRIBUTE);
 	}
 
 }
