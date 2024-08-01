@@ -205,11 +205,11 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 				if (link2pollutants.get(linkId).get(pollutant) != null) {
 					emissionValue = link2pollutants.get(linkId).get(pollutant);
 				}
-				absolute.print(nf.format(emissionValue));
+				absolute.print(nf.format(emissionValue * sample.getUpscaleFactor()));
 
 				Link link = network.getLinks().get(linkId);
 				double emissionPerM = emissionValue / link.getLength();
-				perMeter.print(nf.format(emissionPerM));
+				perMeter.print(nf.format(emissionPerM * sample.getUpscaleFactor()));
 			}
 
 			absolute.println();
@@ -246,7 +246,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 			total.printRecord("Pollutant", "kg");
 			for (Pollutant p : Pollutant.values()) {
-				double val = (sum.getDouble(p) / sample.getSample()) / 1000;
+				double val = (sum.getDouble(p) * sample.getUpscaleFactor()) / 1000;
 				total.printRecord(p, val < 100_000 && val > 100 ? simple.format(val) : scientific.format(val));
 			}
 
@@ -286,7 +286,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		for (int xi = 0; xi < xLength.get(0); xi++) {
 			for (int yi = 0; yi < yLength.get(0); yi++) {
 				Coord coord = raster.getCoordForIndex(xi, yi);
-				double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+				double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
 				if (xi == 0) yCoords.add((float) coord.getY());
 				if (yi == 0) xCoords.add((float) coord.getX());
 				valuesList.add((float) value);
@@ -349,7 +349,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 				for (int yi = 0; yi < yLength.get(0); yi++) {
 
 					Coord coord = raster.getCoordForIndex(xi, yi);
-					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
 
 					if (value == 0)
 						continue;
@@ -406,7 +406,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 					for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
 
 						Coord coord = raster.getCoordForIndex(xi, yi);
-						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
 
 						if (value == 0)
 							continue;
@@ -467,7 +467,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 					if (yi == 0 && isFirst)
 						xCoords.add((float) coord.getX());
 
-					valuesList.add((float) timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi));
+					double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+					valuesList.add((float) value);
 				}
 			}
 		}
