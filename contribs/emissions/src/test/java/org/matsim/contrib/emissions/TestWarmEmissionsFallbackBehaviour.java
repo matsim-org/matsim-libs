@@ -60,19 +60,19 @@ public class TestWarmEmissionsFallbackBehaviour {
 	private final Vehicle vehicleFallbackToAverageTable = generateVehicleForFallbackToAverageTable();
 
 
-// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------	
+// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------
 	/**
 	 * vehicles information is complete
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should calculate value
 	 */
 	@Test
 	void testWarmDetailedValueOnlyDetailed() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
@@ -84,7 +84,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 *
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -92,7 +92,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		assertThrows(RuntimeException.class, () -> {
 			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 		});
 	}
@@ -100,9 +100,9 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -110,17 +110,17 @@ public class TestWarmEmissionsFallbackBehaviour {
 		assertThrows(RuntimeException.class, () -> {
 			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 		});
 	}
 
 
-// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------	
+// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average
 	 * ---> should calculate value from detailed value
 	 */
@@ -128,7 +128,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
@@ -139,7 +139,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average
 	 * ---> should calculate value from technology average
 	 */
@@ -147,7 +147,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
@@ -157,9 +157,9 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -167,16 +167,16 @@ public class TestWarmEmissionsFallbackBehaviour {
 		assertThrows(RuntimeException.class, () -> {
 			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 		});
 	}
 
-// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------	
+// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average or average table
 	 * ---> should calculate value from detailed value
 	 */
@@ -184,7 +184,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
@@ -195,7 +195,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average; do NOT fall back to average table
 	 * ---> should calculate value from technology average
 	 */
@@ -203,7 +203,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
@@ -213,9 +213,9 @@ public class TestWarmEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: tryDetailedThenTechnologyAverageThenAverageTable
-	 *
+	 * <p>
 	 * -> do fall back to average table
 	 * ---> should calculate value from average table
 	 */
@@ -223,7 +223,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 
 		double expectedValue = 31.1947174; // = 200m * 155.973587 g/km
@@ -233,7 +233,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 
 
 
-// ---------- setup and helper methods -------------	
+// ---------- setup and helper methods -------------
 
 	/**
 	 * load and prepare the scenario, create the emissionsModule

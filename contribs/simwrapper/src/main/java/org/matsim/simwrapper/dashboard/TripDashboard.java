@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.analysis.population.TripAnalysis;
@@ -10,7 +11,9 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -39,6 +42,8 @@ public class TripDashboard implements Dashboard {
 	private String groupedRefCsv;
 	@Nullable
 	private String[] categories;
+	@Nullable
+	private String distanceRefCsv;
 
 	private String[] args;
 
@@ -80,6 +85,14 @@ public class TripDashboard implements Dashboard {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	/**
+	 * This enables detailed analysis of the distance distribution.
+	 */
+	public TripDashboard withDistanceDistribution(String modeShareDistRefCsv) {
+		this.distanceRefCsv = modeShareDistRefCsv;
+		return this;
 	}
 
 	/**
@@ -256,6 +269,7 @@ public class TripDashboard implements Dashboard {
 
 			});
 
+		createDistancePlot(layout, args, tab);
 
 		layout.row("departures", tab).el(Plotly.class, (viz, data) -> {
 
@@ -305,11 +319,63 @@ public class TripDashboard implements Dashboard {
 
 	}
 
+	private void createDistancePlot(Layout layout, String[] args, String tab) {
+
+		layout.row("dist-dist", tab).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Detailed distance distribution";
+			viz.description = "by mode.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Distance [m]").build())
+				.yAxis(Axis.builder().title("Share").build())
+				.showLegend(false)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+			viz.interactive = Plotly.Interactive.dropdown;
+
+			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_distance_distribution.csv", args))
+				.pivot(List.of("dist"), "main_mode", "share")
+				.constant("source", "Sim");
+
+			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE)
+					.build(),
+				ds.mapping()
+					.name("main_mode")
+					.x("dist")
+					.y("share")
+			);
+
+			if (distanceRefCsv != null) {
+				viz.description += " Dashed line represents the reference data.";
+
+				Plotly.DataSet ref = viz.addDataset(data.resource(distanceRefCsv))
+					.pivot(List.of("dist"), "main_mode", "share")
+					.constant("source", "Ref");
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.line(Line.builder().dash(Line.Dash.DASH).color("black").build())
+						.build(),
+					ref.mapping()
+						.name("main_mode")
+						.text("source")
+						.x("dist")
+						.y("share")
+				);
+			}
+
+		});
+
+	}
+
 	private void createChoiceTab(Layout layout, String[] args) {
 
 		layout.row("choice-intro", "Mode Choice").el(TextBlock.class, (viz, data) -> {
-			viz.title = "Information";
+			viz.backgroundColor = "transparent";
 			viz.content = """
+				### **Information**
 				Note that these metrics are based on a single run and may have limited interpretability. For a more robust evaluation, consider running multiple simulations with different seeds and use metrics that consider probabilities as well.
 				(log-likelihood, Brier score, etc.)
 				For policy cases, these metrics do not have any meaning. They are solely for the base-case.
@@ -371,7 +437,14 @@ public class TripDashboard implements Dashboard {
 
 		for (String cat : Objects.requireNonNull(categories, "Categories not set")) {
 
-			layout.row("category_" + cat, "By Groups")
+			layout.row("category_header_" + cat, "By Groups")
+
+				.el(TextBlock.class, (viz, data) -> {
+					viz.content = "## **" + StringUtils.capitalize(cat) + "**";
+					viz.backgroundColor = "transparent";
+				});
+
+			layout.row("category_1_" + cat, "By Groups")
 				.el(Plotly.class, (viz, data) -> {
 
 					viz.title = "Mode share";
@@ -399,8 +472,7 @@ public class TripDashboard implements Dashboard {
 
 				});
 
-				/*
-				 TODO: This part needs some more work in simwrapper and is not yet ready
+			layout.row("category_2_" + cat, "By Groups")
 
 				.el(Plotly.class, (viz, data) -> {
 					viz.title = "Modal distance distribution";
@@ -413,8 +485,6 @@ public class TripDashboard implements Dashboard {
 
 					viz.interactive = Plotly.Interactive.dropdown;
 
-					// TODO: modes are not separated into different traces
-					// probably dropdown config in plotly needs to be extended
 					Plotly.DataMapping ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_%s.csv", cat))
 						.pivot(List.of("main_mode", "dist_group", cat), "source", "share")
 						.normalize(List.of("dist_group", "source", cat), "share")
@@ -433,7 +503,6 @@ public class TripDashboard implements Dashboard {
 						.build(), ds);
 
 				});
-				 */
 
 		}
 	}

@@ -667,18 +667,25 @@ public final class DemandReaderFromCSV {
 					int demandForThisLink = calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, possibleLinksForService.size(),
 						sumOfPossibleLinkLength, link);
 					countOfLinks++;
-					double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit()
-							* demandForThisLink;
-					Id<CarrierService> idNewService = Id.create(
+					Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
+							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
+					int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);
+					for (int i = 0; i < numberOfJobsForDemand; i++) {
+						int singleDemandForThisLink = demandForThisLink / numberOfJobsForDemand;
+						if (i == numberOfJobsForDemand - 1)
+							singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
+						double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit()
+							* singleDemandForThisLink;
+						Id<CarrierService> idNewService = Id.create(
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
 							CarrierService.class);
-					if (demandToDistribute > 0 && demandForThisLink > 0) {
-						CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-								.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
+						if (demandToDistribute > 0 && singleDemandForThisLink > 0) {
+							CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
+								.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
 								.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 								.build();
-						CarriersUtils.getCarriers(scenario).getCarriers().values().iterator().next().getServices()
-								.put(thisService.getId(), thisService);
+							thisCarrier.getServices().put(thisService.getId(), thisService);
+						}
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
@@ -705,24 +712,31 @@ public final class DemandReaderFromCSV {
 							.skip(rand.nextInt(usedServiceLocations.size() - 1)).findFirst().get()));
 				}
 				int demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
+				Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
+					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
+				int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);
+				for (int j = 0; j < numberOfJobsForDemand; j++) {
+					int singleDemandForThisLink = demandForThisLink / numberOfJobsForDemand;
+					if (j == numberOfJobsForDemand - 1)
+						singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
+					double serviceTime;
+					if (singleDemandForThisLink == 0)
+						serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
+					else
+						serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
+					usedServiceLocations.add(link.getId().toString());
 
-				double serviceTime;
-				if (demandToDistribute == 0)
-					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
-				else
-					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
-				usedServiceLocations.add(link.getId().toString());
-
-				Id<CarrierService> idNewService = Id.create(
+					Id<CarrierService> idNewService = Id.create(
 						createJobId(scenario, newDemandInformationElement, link.getId(), null), CarrierService.class);
-				if ((demandToDistribute > 0 && demandForThisLink > 0) || demandToDistribute == 0) {
-					CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-							.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
+					if ((demandToDistribute > 0 && singleDemandForThisLink > 0) || demandToDistribute == 0) {
+						CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
+							.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
 							.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
-					CarriersUtils.getCarriers(scenario).getCarriers()
+						CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 							.put(thisService.getId(), thisService);
+					}
 				}
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
@@ -1007,29 +1021,56 @@ public final class DemandReaderFromCSV {
 	private static void createSingleShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
 											 Link linkPickup, Link linkDelivery, int demandForThisLink) {
 
-		Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
-			linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
+		Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
+			.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
+		int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);
 
 		TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
 		TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
 
-		double serviceTimePickup;
-		double serviceTimeDelivery;
-		if (demandForThisLink == 0) {
-			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
-			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
-		} else {
-			serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
-			serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * demandForThisLink;
+		for (int i = 0; i < numberOfJobsForDemand; i++) {
+			Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
+				linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
+			double serviceTimePickup;
+			double serviceTimeDelivery;
+			int singleDemandForThisLink = Math.round ((float) demandForThisLink / numberOfJobsForDemand);
+			if (i == numberOfJobsForDemand - 1)
+				singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
+			if (singleDemandForThisLink == 0) {
+				serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
+				serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
+			} else {
+				serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * singleDemandForThisLink;
+				serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * singleDemandForThisLink;
+			}
+			CarrierShipment thisShipment = CarrierShipment.Builder
+				.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), singleDemandForThisLink)
+				.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
+				.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
+				.build();
+			thisCarrier.getShipments().put(thisShipment.getId(), thisShipment);
 		}
-		CarrierShipment thisShipment = CarrierShipment.Builder
-			.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
-			.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-			.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
-			.build();
-		CarriersUtils.getCarriers(scenario).getCarriers()
-			.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
-			.put(thisShipment.getId(), thisShipment);
+	}
+
+	/**
+	 * Method calculates the number of jobs for a demand on one link based on the largest vehicle capacity of the carrier.
+	 *
+	 * @param thisCarrier       the carrier of a job
+	 * @param demandForThisLink Demand for this link
+	 * @return Number of jobs for this demand
+	 */
+	private static int calculateNumberOfJobsForDemand(Carrier thisCarrier, int demandForThisLink) {
+		double largestVehicleCapacity = 0;
+		for (CarrierVehicle vehicle : thisCarrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			if (vehicle.getType().getCapacity().getOther() > largestVehicleCapacity) {
+				largestVehicleCapacity = vehicle.getType().getCapacity().getOther();
+			}
+		}
+		if (demandForThisLink > largestVehicleCapacity) {
+			log.info("Demand {} is larger than the largest vehicle capacity ({}). Splitting demand into multiple jobs.", demandForThisLink, largestVehicleCapacity);
+			return (int) Math.ceil((double) demandForThisLink / largestVehicleCapacity);
+		}
+		return 1;
 	}
 
 	/**
@@ -1086,7 +1127,7 @@ public final class DemandReaderFromCSV {
 		} else {
 			roundingError = roundingError
 				+ ((double) demandForThisLink - ((double) demandToDistribute / (double) numberOfJobs));
-			if (roundingError > 1) {
+			if (roundingError >= 1) {
 				demandForThisLink = demandForThisLink - 1;
 				roundingError = roundingError - 1;
 			}
@@ -1113,7 +1154,7 @@ public final class DemandReaderFromCSV {
 				.ceil(link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute);
 			roundingError = roundingError + ((double) demandForThisLink
 				- (link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute));
-			if (roundingError > 1) {
+			if (roundingError >= 1) {
 				demandForThisLink = demandForThisLink - 1;
 				roundingError = roundingError - 1;
 			}
@@ -1265,7 +1306,7 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 				if (!possibleLinks.containsKey(newPossibleLink.getId()))
 					possibleLinks.put(newPossibleLink.getId(), newPossibleLink);
-				if (nearestLinkPerPerson.size() == possiblePersons.size())
+				if (!possiblePersons.isEmpty() && nearestLinkPerPerson.size() == possiblePersons.size())
 					break;
 			}
 		}

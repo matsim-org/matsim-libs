@@ -43,7 +43,7 @@ public class CarrierPlanXmlWriterV2Test {
 	private Carrier testCarrier;
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	public void setUp() {
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( this.testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
@@ -104,7 +104,7 @@ public class CarrierPlanXmlWriterV2Test {
 
 	@Test
 	void test_whenReadingPlans_nuOfToursIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		assertEquals(1, plans.get(0).getScheduledTours().size());
 		assertEquals(1, plans.get(1).getScheduledTours().size());
 		assertEquals(1, plans.get(2).getScheduledTours().size());
@@ -112,15 +112,15 @@ public class CarrierPlanXmlWriterV2Test {
 
 	@Test
 	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
-		CarrierPlan plan1 = plans.get(0);
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
+		CarrierPlan plan1 = plans.getFirst();
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		assertEquals(5,tour1.getTour().getTourElements().size());
 	}
 
 	@Test
 	void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		ScheduledTour tour1 = plan2.getScheduledTours().iterator().next();
 		assertEquals(9,tour1.getTour().getTourElements().size());
@@ -128,7 +128,7 @@ public class CarrierPlanXmlWriterV2Test {
 
 	@Test
 	void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
 		assertEquals(9,tour1.getTour().getTourElements().size());
@@ -136,7 +136,7 @@ public class CarrierPlanXmlWriterV2Test {
 
 
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
-		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
+		List<CarrierVehicle> vehicles = new ArrayList<>(carrierVehicles);
 		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
 		return vehicles.isEmpty();
 	}
@@ -151,10 +151,10 @@ public class CarrierPlanXmlWriterV2Test {
 	void test_ServicesAndShipmentsHaveAttributes(){
 		Object serviceCustomerAtt = testCarrier.getServices().get(Id.create("serv1",CarrierService.class)).getAttributes().getAttribute("customer");
 		assertNotNull(serviceCustomerAtt);
-		assertEquals("someRandomCustomer", (String) serviceCustomerAtt);
+		assertEquals("someRandomCustomer", serviceCustomerAtt);
 		Object shipmentCustomerAtt = testCarrier.getShipments().get(Id.create("s1",CarrierShipment.class)).getAttributes().getAttribute("customer");
 		assertNotNull(shipmentCustomerAtt);
-		assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
+		assertEquals("someRandomCustomer", shipmentCustomerAtt);
 	}
 
 }

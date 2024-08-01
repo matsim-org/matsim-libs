@@ -6,15 +6,15 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeoverTaskImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
@@ -52,12 +52,12 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 	public ShiftDrtModeModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtConfigGroup = drtCfg;
-		this.drtOperationsParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
+		this.drtOperationsParams = ((DrtWithExtensionsConfigGroup) drtCfg).getDrtOperationsParams().orElseThrow();
 	}
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing((Task.TaskType type) -> {
 		//we want the following order on the plot: STAY, RELOCATE, other
-		if (type.equals(WaitForShiftStayTask.TYPE)) {
+		if (type.equals(WaitForShiftTask.TYPE)) {
 			return "F";
 		} else if (type.equals(ShiftChangeoverTaskImpl.TYPE)) {
 			return "E";
@@ -73,7 +73,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 	}).reversed();
 
 	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(
-			WaitForShiftStayTask.TYPE, Color.WHITE,
+			WaitForShiftTask.TYPE, Color.WHITE,
 			ShiftChangeoverTaskImpl.TYPE, Color.GRAY,
 			ShiftBreakTaskImpl.TYPE, Color.DARK_GRAY,
 			DrtStayTask.TYPE, Color.LIGHT_GRAY);

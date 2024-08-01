@@ -13,8 +13,12 @@ import org.matsim.contrib.common.zones.Zone;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author nkuehnel / MOIA
@@ -39,41 +43,38 @@ public class H3ZoneSystem implements GridZoneSystem {
         this.resolution = resolution;
 		this.network = network;
 		this.filter = filter;
-		this.network.getLinks().values().forEach(l -> getZoneForCoord(l.getToNode().getCoord()));
+		init();
     }
 
-
-    @Override
-	public Optional<Zone> getZoneForCoord(Coord coord) {
-
-		long h3Address = getH3Cell(coord);
-		Id<Zone> zoneId = Id.create(h3Address, Zone.class);
-
-		if(zones.containsKey(zoneId)) {
-			return Optional.of(zones.get(zoneId));
-		} else {
-			Optional<Zone> zone = H3Utils.createZone(h3Address, fromLatLong);
-			if(zone.isPresent() && filter.test(zone.get())) {
-				initZone(zone.get(), h3Address);
-				return zone;
-			} else {
-				return Optional.empty();
-			}
+	private void init() {
+		Map<Long, List<Link>> linksToH3 =
+				this.network.getLinks().values()
+						.stream()
+						.collect(Collectors.groupingBy(link -> getH3Cell(link.getToNode().getCoord())));
+		for (Map.Entry<Long, List<Link>> linksH3 : linksToH3.entrySet()) {
+			Optional<Zone> maybeZone = createZone(linksH3.getKey());
+			maybeZone.ifPresent(z -> {
+                zones.put(z.getId(), z);
+				zoneToLinksMap.put(z.getId(), linksH3.getValue());
+            });
 		}
 	}
 
-	private void initZone(Zone zone, long h3Address) {
-		if(filter.test(zone)) {
-			zones.put(zone.getId(), zone);
-			for (Link link : network.getLinks().values()) {
-				long linkH3Address = getH3Cell(link.getToNode().getCoord());
-
-				if (linkH3Address == h3Address) {
-					List<Link> links = zoneToLinksMap.computeIfAbsent(zone.getId(), id -> new ArrayList<>());
-					links.add(link);
-				}
-			}
+	private Optional<Zone> createZone(Long h3) {
+		Optional<Zone> zone = H3Utils.createZone(h3, fromLatLong);
+		if(zone.isPresent() && filter.test(zone.get())) {
+			return zone;
 		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<Zone> getZoneForCoord(Coord coord) {
+		long h3Address = getH3Cell(coord);
+		Id<Zone> zoneId = Id.create(h3Address, Zone.class);
+		// create new zone if absent, should not be linked to existing links in the network,
+		// as all of them are covered in the init() phase.
+		return Optional.ofNullable(zones.computeIfAbsent(zoneId, id -> createZone(h3Address).orElse(null)));
 	}
 
 	private long getH3Cell(Coord coord) {

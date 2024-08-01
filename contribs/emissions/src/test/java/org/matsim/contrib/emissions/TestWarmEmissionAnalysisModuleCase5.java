@@ -22,9 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -37,7 +35,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.matsim.contrib.emissions.Pollutant.PM;
 
@@ -46,7 +43,7 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
  */
 
 /*
- * Case 5 - data in detailed table, stop go speed zero
+ * Case 5 - data in detailed table, stop-go speed zero
  */
 
 
@@ -60,12 +57,12 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
  * testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*,
  * testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
- * get free flow occurences - testCounters*()
- * get fraction occurences - testCounters*()
- * get stop go occurences - testCounters*()
+ * get free flow occurrences - testCounters*()
+ * get fraction occurrences - testCounters*()
+ * get stop-go occurrences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
- * get top go km couter - testCounters*()
+ * get top go km counter - testCounters*()
  * get warm emission event counter - testCounters*()
  *
  * private methods and corresponding tests:
@@ -93,7 +90,7 @@ public class TestWarmEmissionAnalysisModuleCase5 {
 	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 
 	// vehicle information for regular test cases
-	// case 5 - data in detailed table, stop go speed zero
+	// case 5 - data in detailed table, stop-go speed zero
 	private final String zeroRoadCategory = "URB_case6";
 	private final String zeroTechnology = "zero technology";
 	private final String zeroConcept = "zero concept";
