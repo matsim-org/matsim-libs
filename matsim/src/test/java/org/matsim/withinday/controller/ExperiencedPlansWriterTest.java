@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -82,6 +83,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		Config config = ConfigUtils.createConfig();
 
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		config.qsim().setEndTime(24 * 3600);
 

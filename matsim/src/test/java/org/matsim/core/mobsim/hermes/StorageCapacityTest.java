@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -68,6 +69,7 @@ public class StorageCapacityTest {
 	void testStorageCapacity() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());
@@ -120,6 +122,7 @@ public class StorageCapacityTest {
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		config.hermes().setFlowCapacityFactor(0.1);
 		config.hermes().setStorageCapacityFactor(0.1);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());
 
@@ -169,6 +172,7 @@ public class StorageCapacityTest {
 	void testStorageCapacityWithDifferentPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());

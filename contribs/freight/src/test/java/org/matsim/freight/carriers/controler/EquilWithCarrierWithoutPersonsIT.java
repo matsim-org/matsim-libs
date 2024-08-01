@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
@@ -50,6 +51,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 
 	public void setUp() {
 		Config config = EquilWithCarrierWithPersonsIT.commonConfig( testUtils );
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario( config, testUtils );
 		controler = new Controler(scenario);
 	}
