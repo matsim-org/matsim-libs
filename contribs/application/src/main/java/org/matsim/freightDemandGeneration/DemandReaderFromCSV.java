@@ -712,7 +712,6 @@ public final class DemandReaderFromCSV {
 							.skip(rand.nextInt(usedServiceLocations.size() - 1)).findFirst().get()));
 				}
 				int demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
-
 				Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 				int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);

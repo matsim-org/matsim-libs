@@ -83,7 +83,7 @@ import java.util.Collection;
 					vehicle = CarriersUtils.getVehicle( freightDriverPlan );
 				}
 
-				log.warn("inserting vehicleId={} into mobsim.", vehicle.getId());
+				log.debug("inserting vehicleId={} into mobsim.", vehicle.getId());
 				qsim.addParkedVehicle( new QVehicleImpl( vehicle ), agent.getCurrentLinkId() );
 				// yyyyyy should rather use QVehicleFactory.  kai, nov'18
 

@@ -651,7 +651,6 @@ public class SwissRailRaptorData {
   }
 
 	RTransfer[] calculateTransfers(RRouteStop fromRouteStop) {
-
 		// We tested this in a parallel set-up and things seem to work as they are
 		// implemented. The routing threads will access the cache as read-only an
 		// retrieve the cached stop connections. It can happen that two of them try to

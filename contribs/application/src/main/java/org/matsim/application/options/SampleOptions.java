@@ -124,6 +124,13 @@ public final class SampleOptions {
 		return sample;
 	}
 
+	/**
+	 * Return factor that is used to upscale the sample size.
+	 */
+	public double getUpscaleFactor() {
+		return 1.0 / sample;
+	}
+
 	private void setSize(double sample) {
 		this.set = true;
 		this.sample = sample;
