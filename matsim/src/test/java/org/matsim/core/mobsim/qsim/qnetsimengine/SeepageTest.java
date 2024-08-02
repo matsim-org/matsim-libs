@@ -40,6 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -170,6 +171,7 @@ public class SeepageTest {
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ);
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);

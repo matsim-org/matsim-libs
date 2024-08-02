@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -163,6 +164,7 @@ public class CombinedFlowAndStorageDelayTest {
 
 		public createPseudoInputs(){
 			config=ConfigUtils.createConfig();
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();

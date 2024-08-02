@@ -14,11 +14,8 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ChangeModeConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
-import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -134,6 +131,8 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 	private Config createConfig() {
 
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 		String[] modes = new String[]{TransportMode.car, TransportMode.bike};
 
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());

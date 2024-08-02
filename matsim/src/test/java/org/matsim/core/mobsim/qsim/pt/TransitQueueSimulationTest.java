@@ -63,6 +63,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -108,6 +109,7 @@ public class TransitQueueSimulationTest {
 	void testCreateAgents() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
 
@@ -310,6 +312,7 @@ public class TransitQueueSimulationTest {
 		assertThrows(TransitAgentTriesToTeleportException.class, () -> {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			config.transit().setUseTransit(true);
 
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
@@ -381,6 +384,7 @@ public class TransitQueueSimulationTest {
 	void testHandleStop() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
 
@@ -631,6 +635,7 @@ public class TransitQueueSimulationTest {
 	@Test
 	void testStartAndEndTime() {
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
@@ -728,6 +733,7 @@ public class TransitQueueSimulationTest {
 	@Test
 	void testEvents() {
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);

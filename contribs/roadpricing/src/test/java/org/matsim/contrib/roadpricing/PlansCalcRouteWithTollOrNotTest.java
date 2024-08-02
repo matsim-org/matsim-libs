@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
@@ -74,6 +75,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testBestAlternatives() {
 		Config config = matsimTestUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
@@ -180,6 +182,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testTolledActLink() {
 		Config config = matsimTestUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
@@ -206,6 +209,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testAllAlternativesTolled() {
 		Config config = matsimTestUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
@@ -245,6 +249,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testOutsideTollTime() {
 		Config config = matsimTestUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 

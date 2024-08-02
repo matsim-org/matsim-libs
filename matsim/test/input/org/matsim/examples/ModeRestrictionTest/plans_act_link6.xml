@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+	<person id="car">
+		<plan>
+			<activity type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="car">
+				<route type="links">1 6</route>
+			</leg>
+			<activity type="w" x="10000" y="0" link="6" max_dur="00:30" />
+			<leg mode="car">
+				<route type="links">6 15 20 21 22 23 1</route>
+			</leg>
+			<activity type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+	<person id="bike">
+		<plan>
+			<activity type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="bike">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">bike</attribute>
+				</attributes>
+				<route type="links">1 6</route>
+			</leg>
+			<activity type="w" x="10000" y="0" link="6" max_dur="00:30" />
+			<leg mode="bike">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">bike</attribute>
+				</attributes>
+				<route type="links">6 15 20 21 22 23 1</route>
+			</leg>
+			<activity type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+</population>

@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -184,6 +185,7 @@ public class VehicleHandlerTest {
 
 	private Scenario createScenario() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

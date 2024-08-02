@@ -136,6 +136,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testFlowAndStorageCongestion_3agents(){
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -181,6 +182,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testFlowAndStorageCongestion_3agents_V9() {
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -222,6 +224,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testFlowAndStorageCongestion_3agents_V8() {
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -264,6 +267,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testFlowAndStorageCongestion_3agents_V10() {
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -318,6 +322,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -454,6 +459,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testInsertingWaitingVehicles_01(){
 
 		Scenario sc = loadScenario4();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation4(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -513,6 +519,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testInsertingWaitingVehicles_02(){
 
 		Scenario sc = loadScenario5();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation5(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -574,6 +581,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	final void testInsertingWaitingVehicles_03(){
 
 		Scenario sc = loadScenario4();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation6(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();

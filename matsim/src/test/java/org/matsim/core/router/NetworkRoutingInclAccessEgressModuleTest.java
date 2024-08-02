@@ -181,6 +181,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 	void calcRoute_modeVehiclesFromVehiclesData_differentTypesTakeDifferentRoutes() {
 
         Config config = createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
         // set test specific things
         Collection<String> modes = Arrays.asList(SLOW_MODE, FAST_MODE);
@@ -234,6 +235,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 	void calcRoute_defaultVehicle_defaultVehicleIsAssigned() {
 
         Config config = createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
 
         Scenario scenario = createScenario(config);
@@ -266,7 +268,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink);
-        Scenario scenario = createScenario(config);
+        config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
         // add persons
@@ -285,6 +288,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 	void useAccessEgressTimeFromConstantAndWalkTime() {
 
         Config config = createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant);
         Scenario scenario = createScenario(config);
@@ -308,6 +312,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 	void routingModeInEvents() {
 
         Config config = createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant);
         Scenario scenario = createScenario(config);
@@ -352,6 +357,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
 			Config config = createConfig();
 			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink);
 			Scenario scenario = createScenario(config);
 			NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)), TransportMode.car, 75);
@@ -385,6 +391,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
@@ -410,6 +417,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(AccessEgressType.none);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);

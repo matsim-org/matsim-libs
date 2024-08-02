@@ -70,7 +70,7 @@ public class MarginalCongestionHandlerV3Test {
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
-
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
