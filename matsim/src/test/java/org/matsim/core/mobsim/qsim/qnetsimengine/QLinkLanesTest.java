@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -137,6 +138,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 
@@ -155,6 +157,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 1);
@@ -191,6 +194,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 2);
@@ -228,6 +232,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createThreeLanes(scenario);

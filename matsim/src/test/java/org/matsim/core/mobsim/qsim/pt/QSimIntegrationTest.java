@@ -44,6 +44,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -425,7 +426,8 @@ public class QSimIntegrationTest {
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
-			config.transit().setUseTransit(true);	
+			config.transit().setUseTransit(true);
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			config.qsim().setEndTime(8.0*3600);
 
 			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);

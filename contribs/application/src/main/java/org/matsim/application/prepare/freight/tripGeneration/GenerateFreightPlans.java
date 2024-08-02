@@ -35,7 +35,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/v2/germany-europe-network.xml.gz")
     private String networkPath;
 
-    @CommandLine.Option(names = "--nuts", description = "Path to desired network file", required = true)
+    @CommandLine.Option(names = "--nuts", description = "Path to NUTS file (available on SVN: )", required = true)
     // TODO Change this to URL pointing to SVN--> need to update the Location calculator
     private Path shpPath;
 
@@ -48,8 +48,8 @@ public class GenerateFreightPlans implements MATSimAppCommand {
     @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year")
     private int workingDays;
 
-    @CommandLine.Option(names = "--sample", defaultValue = "1", description = "Scaling factor of the freight traffic (0, 1)")
-    private double sample;
+    @CommandLine.Option(names = "--sample", defaultValue = "100", description = "Sample size of the freight plans (0, 100]")
+    private double pct;
 
     @CommandLine.Mixin
     private LanduseOptions landuse = new LanduseOptions();
@@ -60,7 +60,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
         log.info("Network successfully loaded!");
 
         log.info("preparing freight agent generator...");
-        FreightAgentGenerator freightAgentGenerator = new FreightAgentGenerator(network, shpPath, landuse, averageTruckLoad, workingDays, sample);
+        FreightAgentGenerator freightAgentGenerator = new FreightAgentGenerator(network, shpPath, landuse, averageTruckLoad, workingDays, pct / 100);
         log.info("Freight agent generator successfully created!");
 
         log.info("Reading trip relations...");
@@ -84,7 +84,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             Files.createDirectory(output);
         }
 
-        String outputPlansPath = output.toString() + "/german_freight.25pct.plans.xml.gz";
+        String outputPlansPath = output.toString() + "/german_freight." + pct + "pct.plans.xml.gz";
         PopulationWriter populationWriter = new PopulationWriter(outputPopulation);
         populationWriter.write(outputPlansPath);
 

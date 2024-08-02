@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -96,6 +97,7 @@ class IntermodalFixture {
     IntermodalFixture() {
         this.srrConfig = new SwissRailRaptorConfigGroup();
         this.config = ConfigUtils.createConfig(this.srrConfig);
+		this.config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         this.scenario = ScenarioUtils.createScenario(this.config);
 
         TransitSchedule schedule = this.scenario.getTransitSchedule();

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		RoadPricingTestUtils.createNetwork2((MutableScenario)scenario);
@@ -124,11 +126,12 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testDistanceTollRouter() {
 		Config config = utils.createConfig();
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( config ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -209,11 +212,12 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testLinkTollRouter() {
 		Config config = utils.createConfig();
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( config ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -304,11 +308,11 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	void testCordonTollRouter() {
 		Config config = utils.createConfig();
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
-		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( config ) );
 //		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
 		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));

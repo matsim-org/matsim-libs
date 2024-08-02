@@ -25,6 +25,7 @@ import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -140,6 +141,7 @@ public class DelayAnalysisToolTest {
 
 	private Scenario prepareTest(int numberOfPersons) {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		createNetwork(scenario);
 		createPopulation(scenario, numberOfPersons);
