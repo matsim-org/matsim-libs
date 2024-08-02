@@ -1,10 +1,12 @@
 package org.matsim.contrib.drt.estimator.impl;
 
+import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.distribution.DistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.distribution.LogNormalDistributionGenerator;
+import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
 import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
 import org.matsim.contrib.drt.estimator.impl.trip_estimation.RideDurationEstimator;
@@ -23,10 +25,11 @@ public final class DirectTripBasedDrtEstimator implements DrtEstimator {
 	private final DistributionGenerator rideTimeDistributionGenerator;
 
 	public static class Builder {
-		private RideDurationEstimator rideDurationEstimator;
-		private WaitingTimeEstimator waitingTimeEstimator;
-		private DistributionGenerator waitingTimeDistributionGenerator;
-		private DistributionGenerator rideTimeDistributionGenerator;
+		// Initialize with default estimation
+		private RideDurationEstimator rideDurationEstimator = new ConstantRideDurationEstimator(1.25, 300);
+		private WaitingTimeEstimator waitingTimeEstimator = new ConstantWaitingTimeEstimator(300);
+		private DistributionGenerator waitingTimeDistributionGenerator = new NoDistribution();
+		private DistributionGenerator rideTimeDistributionGenerator = new NoDistribution();
 
 		public Builder setRideDurationEstimator(RideDurationEstimator rideDurationEstimator) {
 			this.rideDurationEstimator = rideDurationEstimator;

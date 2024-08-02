@@ -6,5 +6,5 @@ public interface DistributionGenerator {
 	 */
 	double generateRandomValue();
 
-	enum DistributionType {NORMAL, LOG_NORMAL, POISSON, CUSTOM}
+	enum DistributionType {NO_DISTRIBUTION, NORMAL, LOG_NORMAL, CUSTOM}
 }
