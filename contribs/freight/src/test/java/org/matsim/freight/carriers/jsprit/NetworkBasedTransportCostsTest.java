@@ -30,9 +30,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.VehicleType;
@@ -47,6 +51,8 @@ import static org.mockito.Mockito.when;
 public class NetworkBasedTransportCostsTest {
 
 
+	private static final String TYPE_1 = "type1";
+	private static final String TYPE_2 = "type2";
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -60,21 +66,21 @@ public class NetworkBasedTransportCostsTest {
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
-		builder.addVehicleTypeSpecificCosts("type1", 10.0, 0.0, 2.0);
-		builder.addVehicleTypeSpecificCosts("type2", 20.0, 0.0, 4.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
 		NetworkBasedTransportCosts c = builder.build();
 
 		Vehicle vehicle1 = mock(Vehicle.class);
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type1.getMaxVelocity()).thenReturn(5.0);
-		when(type1.getTypeId()).thenReturn("type1");
+		when(type1.getTypeId()).thenReturn(TYPE_1);
 		when(vehicle1.getType()).thenReturn(type1);
 		when(vehicle1.getId()).thenReturn("vehicle1");
 
 		Vehicle vehicle2 = mock(Vehicle.class);
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type2.getMaxVelocity()).thenReturn(5.0);
-		when(type2.getTypeId()).thenReturn("type2");
+		when(type2.getTypeId()).thenReturn(TYPE_2);
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 
@@ -94,8 +100,8 @@ public class NetworkBasedTransportCostsTest {
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
-		builder.addVehicleTypeSpecificCosts("type1", 10.0, 0.0, 2.0);
-		builder.addVehicleTypeSpecificCosts("type2", 20.0, 0.0, 4.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
 		NetworkBasedTransportCosts c = builder.build();
 
 		Vehicle vehicle2 = mock(Vehicle.class);
@@ -120,14 +126,14 @@ public class NetworkBasedTransportCostsTest {
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 
-		VehicleType vehType1 = VehicleUtils.getFactory().createVehicleType(Id.create( "type1", VehicleType.class ));
+		VehicleType vehType1 = VehicleUtils.getFactory().createVehicleType(Id.create(TYPE_1, VehicleType.class ));
 
 		CostInformation costInformation1 = vehType1.getCostInformation() ;
 		costInformation1.setFixedCost( 0.0 );
 		costInformation1.setCostsPerMeter( 2.0 );
 		costInformation1.setCostsPerSecond( 0.0 );
 
-		VehicleType vehType2 = VehicleUtils.getFactory().createVehicleType(Id.create( "type2", VehicleType.class ));
+		VehicleType vehType2 = VehicleUtils.getFactory().createVehicleType(Id.create(TYPE_2, VehicleType.class ));
 
 		CostInformation costInformation = vehType2.getCostInformation() ;
 		costInformation.setFixedCost( 0.0 );
@@ -136,20 +142,20 @@ public class NetworkBasedTransportCostsTest {
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder =
-				NetworkBasedTransportCosts.Builder.newInstance(network,Arrays.asList(vehType1,vehType2));
+			NetworkBasedTransportCosts.Builder.newInstance(network,Arrays.asList(vehType1,vehType2));
 		NetworkBasedTransportCosts networkBasedTransportCosts = builder.build();
 
 		Vehicle vehicle1 = mock(Vehicle.class);
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type1.getMaxVelocity()).thenReturn(5.0);
-		when(type1.getTypeId()).thenReturn("type1");
+		when(type1.getTypeId()).thenReturn(TYPE_1);
 		when(vehicle1.getType()).thenReturn(type1);
 		when(vehicle1.getId()).thenReturn("vehicle1");
 
 		Vehicle vehicle2 = mock(Vehicle.class);
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type2.getMaxVelocity()).thenReturn(5.0);
-		when(type2.getTypeId()).thenReturn("type2");
+		when(type2.getTypeId()).thenReturn(TYPE_2);
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 
@@ -157,6 +163,152 @@ public class NetworkBasedTransportCostsTest {
 		Assertions.assertEquals(40000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
 		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
+	}
+
+	/**
+	 *  This test is a modified version of {@link #test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem}
+	 *  In addition, there is added a road pricing scheme.
+	 *  The scheme is only set for one vehicle type: type1.
+	 *  So, only the vehicle using that type (vehicle1) should be tolled, the other (vehicle2) not.
+	 *
+	 */
+	@Test
+	void test_whenAddingTwoDifferentVehicleTypes_tollOneType(){
+		Config config = new Config();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
+
+		//Create Rp Scheme from code.
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		/* Configure roadpricing scheme. */
+		RoadPricingUtils.setName(scheme, "DemoToll4Test");
+		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme, "Tolling scheme for test.");
+
+		/* Add general link based toll for one link */
+		RoadPricingUtils.addLink(scheme, Id.createLinkId("21"));
+		RoadPricingUtils.createAndAddGeneralCost(scheme, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 99.99);
+
+		/* Create the rpCalculator based on the scheme.
+		* Here, only for one type, the see the vehicleType dependent work of it
+		* */
+		VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
+		roadPricingCalculator.addPricingScheme(TYPE_1, scheme);
+		///___ End creating from Code
+
+		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
+		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
+		builder.setRoadPricingCalculator(roadPricingCalculator); //add the rpCalculator to activite the tolling.
+		NetworkBasedTransportCosts c = builder.build();
+
+		Vehicle vehicle1 = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+		when(type1.getMaxVelocity()).thenReturn(5.0);
+		when(type1.getTypeId()).thenReturn(TYPE_1);
+		when(vehicle1.getType()).thenReturn(type1);
+		when(vehicle1.getId()).thenReturn("vehicle1");
+
+		Vehicle vehicle2 = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+		when(type2.getMaxVelocity()).thenReturn(5.0);
+		when(type2.getTypeId()).thenReturn(TYPE_2);
+		when(vehicle2.getType()).thenReturn(type2);
+		when(vehicle2.getId()).thenReturn("vehicle2");
+
+		//vehicle1: includes toll
+		Assertions.assertEquals(20099.99, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
+
+		//vehicle 2: no toll
+		Assertions.assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
+	}
+
+	/**
+	 *  This test is a modified version of {@link #test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem}
+	 *  In addition, there is added a road pricing scheme.
+	 *  Two different schemes are created to toll the two different vehicle types differently.
+	 */
+	@Test
+	void test_whenAddingTwoDifferentVehicleTypes_tollBothTypesDifferently(){
+		Config config = new Config();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
+
+		//Create Rp Scheme from code.
+		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		/* Configure roadpricing scheme. */
+		RoadPricingUtils.setName(scheme1, "DemoToll4TestType1");
+		RoadPricingUtils.setType(scheme1, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme1, "Tolling scheme for test.");
+
+		/* Add general link based toll for one link */
+		RoadPricingUtils.addLink(scheme1, Id.createLinkId("21"));
+		RoadPricingUtils.createAndAddGeneralCost(scheme1, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 99.99);
+
+		//Create Rp Scheme from code.
+		//Fixme: The following does not work as one may expect: In the end, both schemes are the same object.
+		// --> It is just added a second entry to the costs, which is not taken into account anyways...
+		// Questions:
+		// 1.) How to build ab a second scheme, that is "independently" settable? Currently no new RoadPricingSchemeImpl() can be created without
+		// the addOrGet methods provided in {@link RoadPricingUtils}.
+		// 2.) Why does not both costs are summede up in the current behavior, so, the toll is 99.99 + 42.42 = 142.41?
+		// --> Which one is choose? The first? The higher one?...???
+		// One solution might be to use the "withTollFactor" approach. --> Todo write an additional test for it.
+		// Nevertheless, the current approach leads IMO (KMT) easily to unintentional mistakes.
+		//kmt, Aug'24
+		RoadPricingSchemeImpl scheme2 = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		/* Configure roadpricing scheme. */
+		RoadPricingUtils.setName(scheme2, "DemoToll4TestType1");
+		RoadPricingUtils.setType(scheme2, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme2, "Tolling scheme for test.");
+
+		/* Add general link based toll for one link */
+		RoadPricingUtils.addLink(scheme2, Id.createLinkId("21"));
+		RoadPricingUtils.createAndAddGeneralCost(scheme2, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 42.42);
+
+
+		/* Create the rpCalculator based on the scheme.
+		 * Each vehicle type gets affected by a different tolling scheme.
+		 * */
+		//FIXME: See above/below: schem1 and scheme2 are the same object....
+		VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
+		roadPricingCalculator.addPricingScheme(TYPE_1, scheme1);
+		roadPricingCalculator.addPricingScheme(TYPE_2, scheme2);
+
+		///___ End creating from Code
+
+		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
+		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
+		builder.setRoadPricingCalculator(roadPricingCalculator); //add the rpCalculator to activate the tolling.
+		NetworkBasedTransportCosts c = builder.build();
+
+		Vehicle vehicle1 = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+		when(type1.getMaxVelocity()).thenReturn(5.0);
+		when(type1.getTypeId()).thenReturn(TYPE_1);
+		when(vehicle1.getType()).thenReturn(type1);
+		when(vehicle1.getId()).thenReturn("vehicle1");
+
+		Vehicle vehicle2 = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+		when(type2.getMaxVelocity()).thenReturn(5.0);
+		when(type2.getTypeId()).thenReturn(TYPE_2);
+		when(vehicle2.getType()).thenReturn(type2);
+		when(vehicle2.getId()).thenReturn("vehicle2");
+
+		//vehicle1: includes toll of 99.99 for entering the final link
+		Assertions.assertEquals(20099.99, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
+
+		//vehicle 2: includes toll of 42.42 for entering the final link
+		//Fixme: This currently fails... see comments above.
+		Assertions.assertEquals(40042.42, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
 	}
 
 }
