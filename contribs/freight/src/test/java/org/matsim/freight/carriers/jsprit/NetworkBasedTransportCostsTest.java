@@ -25,6 +25,7 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -270,7 +271,6 @@ public class NetworkBasedTransportCostsTest {
 		RoadPricingUtils.addLink(scheme2, Id.createLinkId("21"));
 		RoadPricingUtils.createAndAddGeneralCost(scheme2, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 42.42);
 
-
 		/* Create the rpCalculator based on the scheme.
 		 * Each vehicle type gets affected by a different tolling scheme.
 		 * */
@@ -308,6 +308,70 @@ public class NetworkBasedTransportCostsTest {
 		//vehicle 2: includes toll of 42.42 for entering the final link
 		//Fixme: This currently fails... see comments above.
 		Assertions.assertEquals(40042.42, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
+	}
+
+	/**
+	 *  This test is a modified version of {@link #test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem}
+	 *  In addition, there is added a road pricing scheme.
+	 *  Two different schemes are created to toll the two different vehicle types differently.
+	 *  Here the approach using a factor is used to take into account the different types.
+	 *  //TODO: Write it completely
+	 */
+	@Test
+	@Disabled
+	void test_whenAddingTwoDifferentVehicleTypes_tollBothTypesDifferentlyWithFactor(){
+		Config config = new Config();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
+
+		//Create Rp Scheme from code.
+		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		/* Configure roadpricing scheme. */
+		RoadPricingUtils.setName(scheme1, "DemoToll4TestType1");
+		RoadPricingUtils.setType(scheme1, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme1, "Tolling scheme for test.");
+
+		/* Add general link based toll for one link */
+		RoadPricingUtils.addLink(scheme1, Id.createLinkId("21"));
+		RoadPricingUtils.createAndAddGeneralCost(scheme1, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 99.99);
+
+		//Use a factor to take into account the differnt types. type2 gehts tolled with 50% of the toll of type1
+		//TODO: Include factor
+
+		VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
+		roadPricingCalculator.addPricingScheme(TYPE_1, scheme1);
+
+		///___ End creating from Code
+
+		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
+		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
+		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
+		builder.setRoadPricingCalculator(roadPricingCalculator); //add the rpCalculator to activate the tolling.
+		NetworkBasedTransportCosts c = builder.build();
+
+		Vehicle vehicle1 = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+		when(type1.getMaxVelocity()).thenReturn(5.0);
+		when(type1.getTypeId()).thenReturn(TYPE_1);
+		when(vehicle1.getType()).thenReturn(type1);
+		when(vehicle1.getId()).thenReturn("vehicle1");
+
+		Vehicle vehicle2 = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+		when(type2.getMaxVelocity()).thenReturn(5.0);
+		when(type2.getTypeId()).thenReturn(TYPE_2);
+		when(vehicle2.getType()).thenReturn(type2);
+		when(vehicle2.getId()).thenReturn("vehicle2");
+
+		//vehicle1: includes toll of 99.99 for entering the final link
+		Assertions.assertEquals(20099.99, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
+
+		//vehicle 2: includes toll of 49.995 (50% of 99.99) for entering the final link
+		//Fixme: This currently fails... see comments above.
+		Assertions.assertEquals(40049.995, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
 	}
 
