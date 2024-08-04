@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -82,6 +84,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class NetworkBasedTransportCosts implements VRPTransportCosts {
+
+	private final RoadPricingScheme roadPricingScheme;
 
 	public interface InternalLeastCostPathCalculatorListener {
 
@@ -320,13 +324,13 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private final TravelDisutility baseTransportDisutility;
 
-		private final VehicleTypeDependentRoadPricingCalculator vehicleTypeDependentPricingCalculator;
+		private final RoadPricingScheme roadPricingScheme;
 
-		public VehicleTransportCostsIncludingToll(TravelDisutility baseTransportDisutility,
-				VehicleTypeDependentRoadPricingCalculator vehicleTypeDependentPricingCalculator) {
+		public VehicleTransportCostsIncludingToll( TravelDisutility baseTransportDisutility,
+							   RoadPricingScheme roadPricingScheme ) {
 			super();
 			this.baseTransportDisutility = baseTransportDisutility;
-			this.vehicleTypeDependentPricingCalculator = vehicleTypeDependentPricingCalculator;
+			this.roadPricingScheme = roadPricingScheme;
 //			System.out.println("huuuuuuuuuuuuuuuuuuuu - initialize transport costs with toll");
 		}
 
@@ -334,8 +338,10 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		public double getLinkTravelDisutility(Link link, double time, Person person,
 				org.matsim.vehicles.Vehicle vehicle) {
 			double costs = baseTransportDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-			Id<org.matsim.vehicles.VehicleType> typeId = vehicle.getType().getId();
-			double toll = vehicleTypeDependentPricingCalculator.getTollAmount(typeId, link, time);
+//			Id<org.matsim.vehicles.VehicleType> typeId = vehicle.getType().getId();
+//			double toll = roadPricingScheme.getTollAmount(typeId, link, time );
+			RoadPricingSchemeImpl.Cost costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, person.getId(), vehicle.getId() );
+			double toll = costInfo.amount;
 //			System.out.println("huuuuuuuuuuuuuuuuuuuu - paid toll");
 			return costs + toll;
 		}
@@ -377,7 +383,8 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = (network, travelCosts, travelTimes) -> new SpeedyALTFactory().createPathCalculator(network, travelCosts, travelTime);
 
-		private VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
+//		private VehicleTypeDependentRoadPricingCalculator roadPricingScheme = new VehicleTypeDependentRoadPricingCalculator();
+		private RoadPricingScheme roadPricingScheme;
 
 		private boolean withToll = false;
 
@@ -472,9 +479,9 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			return this;
 		}
 
-		public Builder setRoadPricingCalculator(VehicleTypeDependentRoadPricingCalculator calculator) {
+		public Builder setRoadPricingScheme( RoadPricingScheme roadPricingScheme) {
 			withToll = true;
-			this.roadPricingCalculator = calculator;
+			this.roadPricingScheme = roadPricingScheme;
 			return this;
 		}
 
@@ -501,7 +508,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 				baseDisutility = new BaseVehicleTransportCosts(typeSpecificCosts, travelTime);
 			}
 			if (withToll) {
-				finalDisutility = new VehicleTransportCostsIncludingToll(baseDisutility, roadPricingCalculator);
+				finalDisutility = new VehicleTransportCostsIncludingToll(baseDisutility, roadPricingScheme );
 			} else
 				finalDisutility = baseDisutility;
 			return new NetworkBasedTransportCosts(this);
@@ -551,8 +558,6 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	private final Map<String, org.matsim.vehicles.Vehicle> matsimVehicles = new HashMap<>();
 
-	private final VehicleTypeDependentRoadPricingCalculator roadPricingCalc;
-
 	/**
 	 * by default sets the {@link SpeedyALTFactory}
 	 */
@@ -568,7 +573,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		this.travelTime = builder.travelTime;
 		this.network = builder.network;
 		this.leastCostPathCalculatorFactory = builder.leastCostPathCalculatorFactory;
-		this.roadPricingCalc = builder.roadPricingCalculator;
+		this.roadPricingScheme = builder.roadPricingScheme;
 		this.timeSliceWidth = builder.timeSliceWidth;
 		this.defaultTypeId = builder.defaultTypeId;
 		this.ttMemorizedCounter = new Counter("#TransportCostValues cached ");
@@ -882,8 +887,8 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 *
 	 * @return {@link VehicleTypeDependentRoadPricingCalculator}
 	 */
-	public VehicleTypeDependentRoadPricingCalculator getRoadPricingCalculator() {
-		return roadPricingCalc;
-	}
+//	public VehicleTypeDependentRoadPricingCalculator getRoadPricingCalculator() {
+//		return roadPricingCalc;
+//	}
 
 }

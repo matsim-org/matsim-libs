@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -44,6 +44,9 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -194,14 +197,28 @@ public class NetworkBasedTransportCostsTest {
 		/* Create the rpCalculator based on the scheme.
 		* Here, only for one type, the see the vehicleType dependent work of it
 		* */
-		VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
-		roadPricingCalculator.addPricingScheme(TYPE_1, scheme);
+//		VehicleTypeDependentRoadPricingCalculator roadPricingScheme = new VehicleTypeDependentRoadPricingCalculator();
+//		roadPricingScheme.addPricingScheme(TYPE_1, scheme);
 		///___ End creating from Code
+
+		TollFactor tollFactor = new TollFactor(){
+			@Override public double getTollFactor( Id<Person> personId, Id<org.matsim.vehicles.Vehicle> vehicleId, Id<Link> linkId, double time ){
+				double tollFactor = 1.;
+				// find vehicle:
+				org.matsim.vehicles.Vehicle vehicle = scenario.getVehicles().getVehicles().get( vehicleId ); // das ist schlussendlich ziemlich dumm, aber so ist die Schnittstelle im Moment
+				VehicleType type = vehicle.getType();
+				if ( type......) {
+					tollFactor = 2.;
+				}
+				return tollFactor;
+			}
+		};
+		RoadPricingScheme schemeUsingTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
 		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
-		builder.setRoadPricingCalculator(roadPricingCalculator); //add the rpCalculator to activite the tolling.
+		builder.setRoadPricingScheme(schemeUsingTollFactor );
 		NetworkBasedTransportCosts c = builder.build();
 
 		Vehicle vehicle1 = mock(Vehicle.class);
@@ -284,7 +301,7 @@ public class NetworkBasedTransportCostsTest {
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
 		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
-		builder.setRoadPricingCalculator(roadPricingCalculator); //add the rpCalculator to activate the tolling.
+		builder.setRoadPricingScheme(roadPricingCalculator ); //add the rpCalculator to activate the tolling.
 		NetworkBasedTransportCosts c = builder.build();
 
 		Vehicle vehicle1 = mock(Vehicle.class);
@@ -348,7 +365,7 @@ public class NetworkBasedTransportCostsTest {
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
 		builder.addVehicleTypeSpecificCosts(TYPE_2, 20.0, 0.0, 4.0);
-		builder.setRoadPricingCalculator(roadPricingCalculator); //add the rpCalculator to activate the tolling.
+		builder.setRoadPricingScheme(roadPricingCalculator ); //add the rpCalculator to activate the tolling.
 		NetworkBasedTransportCosts c = builder.build();
 
 		Vehicle vehicle1 = mock(Vehicle.class);
