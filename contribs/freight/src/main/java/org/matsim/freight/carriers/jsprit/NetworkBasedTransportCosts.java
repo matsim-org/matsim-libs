@@ -340,7 +340,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			double costs = baseTransportDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 //			Id<org.matsim.vehicles.VehicleType> typeId = vehicle.getType().getId();
 //			double toll = roadPricingScheme.getTollAmount(typeId, link, time );
-			RoadPricingSchemeImpl.Cost costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, person.getId(), vehicle.getId() );
+			RoadPricingSchemeImpl.Cost costInfo;
+			if (person == null) {
+				costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, null, vehicle.getId() );
+			} else {
+				costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, person.getId(), vehicle.getId() );
+			}
 			double toll = costInfo.amount;
 //			System.out.println("huuuuuuuuuuuuuuuuuuuu - paid toll");
 			return costs + toll;
