@@ -320,7 +320,6 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 */
 	static class VehicleTransportCostsIncludingToll implements TravelDisutility {
 
-//		private static Logger logger = LogManager.getLogger(VehicleTransportCostsIncludingToll.class);
 
 		private final TravelDisutility baseTransportDisutility;
 
@@ -331,26 +330,24 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			super();
 			this.baseTransportDisutility = baseTransportDisutility;
 			this.roadPricingScheme = roadPricingScheme;
-//			System.out.println("huuuuuuuuuuuuuuuuuuuu - initialize transport costs with toll");
 		}
 
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person,
 				org.matsim.vehicles.Vehicle vehicle) {
 			double costs = baseTransportDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-//			Id<org.matsim.vehicles.VehicleType> typeId = vehicle.getType().getId();
-//			double toll = roadPricingScheme.getTollAmount(typeId, link, time );
+
 			RoadPricingSchemeImpl.Cost costInfo;
 			if (person == null) {
 				costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, null, vehicle.getId() );
 			} else {
 				costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, person.getId(), vehicle.getId() );
 			}
-			double toll=0.;
+
+			double toll = 0.;
 			if ( costInfo != null ){
 				toll = costInfo.amount;
 			}
-//			System.out.println("huuuuuuuuuuuuuuuuuuuu - paid toll");
 			return costs + toll;
 		}
 
@@ -408,7 +405,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * Creates the builder requiring {@link Network} and a collection of
 		 * {@link VehicleType}.
 		 *
-		 * @param network
+		 * @param network the MATSim network
 		 * @param vehicleTypes must be all vehicleTypes and their assigned
 		 *                     costInformation in the system.
 		 */
@@ -429,7 +426,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * Sets the travelTime. By default, travelTime is based on
 		 * <code>link.getFreespeed();</code>.
 		 *
-		 * @param travelTime
+		 * @param travelTime the travelTime to set
 		 * @return this builder
 		 */
 		public Builder setTravelTime(TravelTime travelTime) {
@@ -478,7 +475,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * <p>
 		 * By default, it use {@link SpeedyALTFactory}
 		 *
-		 * @param {@link {@link LeastCostPathCalculatorFactory}
+		 * @param  leastCostPathCalcFactory {@link LeastCostPathCalculatorFactory}
 		 * @return this builder
 		 */
 		public Builder setThreadSafeLeastCostPathCalculatorFactory(
@@ -526,10 +523,10 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * Adds type-specific costs. If typeId already exists, existing entry is
 		 * overwritten.
 		 *
-		 * @param typeId
-		 * @param fix
-		 * @param perSecond
-		 * @param perMeter
+		 * @param typeId the vehicleType-id as String
+		 * @param fix fix costs for the vehicle
+		 * @param perSecond variable costs per second
+		 * @param perMeter variable costs per meter
 		 */
 		public void addVehicleTypeSpecificCosts(String typeId, double fix, double perSecond, double perMeter) {
 			typeSpecificCosts.put(typeId, new VehicleTypeVarCosts(perMeter, perSecond));
@@ -598,7 +595,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * cached travel-time. If not, it computes and caches new values with the
 	 * leastCostPathCalc defined in here.
 	 *
-	 * @Throws {@link IllegalStateException} if vehicle is null
+	 * @exception  IllegalStateException if vehicle is null
 	 */
 	@Override
 	public double getTransportTime(Location fromId, Location toId, double departureTime, Driver driver,
@@ -679,7 +676,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * cached travel-cost value. If not, it computes and caches new values with the
 	 * leastCostPathCalc defined in here.
 	 *
-	 * @Throws {@link IllegalStateException} if vehicle is null
+	 * @exception  IllegalStateException if vehicle is null
 	 */
 	@Override
 	public double getTransportCost(Location fromId, Location toId, double departureTime, Driver driver,
@@ -747,7 +744,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * cached distance. If not, it computes and caches new values with the
 	 * leastCostPathCalc defined in here.
 	 *
-	 * @Throws {@link IllegalStateException} if vehicle is null
+	 * @exception  IllegalStateException if vehicle is null
 	 */
 	@Override
 	public double getDistance(Location fromId, Location toId, double departureTime, Vehicle vehicle) {
@@ -812,7 +809,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * This is a rather bad approximation. If you require this, you should implement
 	 * another {@link VehicleRoutingTransportCosts}
 	 *
-	 * @Throws {@link IllegalStateException} if vehicle is null
+	 * @exception  IllegalStateException if vehicle is null
 	 */
 	@Override
 	public double getBackwardTransportCost(Location fromId, Location toId, double arrivalTime, Driver driver,
@@ -828,7 +825,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * This is a rather bad approximation. If you require this, you should implement
 	 * another {@link VehicleRoutingTransportCosts}.
 	 *
-	 * @Throws {@link IllegalStateException} if vehicle is null
+	 * @exception  IllegalStateException if vehicle is null
 	 */
 	@Override
 	public double getBackwardTransportTime(Location fromId, Location toId, double arrivalTime, Driver driver,
@@ -875,7 +872,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	/**
 	 * Gets the network the calculation is based on.
 	 *
-	 * @return
+	 * @return the network
 	 */
 	public Network getNetwork() {
 		return network;
@@ -889,14 +886,5 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	public TravelTime getTravelTime() {
 		return travelTime;
 	}
-
-	/**
-	 * Gets the {@link VehicleTypeDependentRoadPricingCalculator}
-	 *
-	 * @return {@link VehicleTypeDependentRoadPricingCalculator}
-	 */
-//	public VehicleTypeDependentRoadPricingCalculator getRoadPricingCalculator() {
-//		return roadPricingCalc;
-//	}
 
 }
