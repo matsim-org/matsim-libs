@@ -30,9 +30,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -255,7 +253,7 @@ public class NetworkBasedTransportCostsTest {
 			}
 			return tollFactor1;
 		};
-		RoadPricingScheme schemeUsingTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
+		RoadPricingScheme rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 
 		/// End creating roadPricing scheme from Code
 
@@ -287,11 +285,11 @@ public class NetworkBasedTransportCostsTest {
 			vehicle2 = MatsimJspritFactory.createJspritVehicle(matsimVehicle2, new Coord());
 		}
 
-		//Build the NetbasedTransportCosts opbejct with the roadpricing scheme.
+		//Build the NetbasedTransportCosts object with the roadpricing scheme.
 		NetworkBasedTransportCosts c = NetworkBasedTransportCosts.Builder.newInstance(
 				scenario.getNetwork(),
 				scenario.getVehicles().getVehicleTypes().values() )
-			.setRoadPricingScheme(schemeUsingTollFactor)
+			.setRoadPricingScheme(rpSchemeWTollFactor)
 			.build() ;
 
 		//vehicle1: includes toll
@@ -319,33 +317,30 @@ public class NetworkBasedTransportCostsTest {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
 		//Create Rp Scheme from code.
-		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		/* Configure roadpricing scheme. */
-		RoadPricingUtils.setName(scheme1, "DemoToll4TestType1");
-		RoadPricingUtils.setType(scheme1, RoadPricingScheme.TOLL_TYPE_LINK);
-		RoadPricingUtils.setDescription(scheme1, "Tolling scheme for test.");
+		RoadPricingUtils.setName(scheme, "DemoToll4TestType1");
+		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme, "Tolling scheme for test.");
 
 		/* Add general link based toll for one link */
-		RoadPricingUtils.addLink(scheme1, Id.createLinkId("21"));
-		RoadPricingUtils.createAndAddGeneralCost(scheme1, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 99.99);
+		RoadPricingUtils.addLink(scheme, Id.createLinkId("21"));
+		RoadPricingUtils.createAndAddGeneralCost(scheme, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 99.99);
 
-		//Use a factor to take into account the differnt types. type2 gehts tolled with 50% of the toll of type1
-		TollFactor tollFactor = new TollFactor() {
-			@Override
-			public double getTollFactor(Id<Person> personId, Id<org.matsim.vehicles.Vehicle> vehicleId, Id<Link> linkId, double time) {
-				//No information about the vehicleType available anywhere, because is is nowhere registered centrally,
-				// -> Use the vehicleId to distinguish the types.
-				var vehTypeIdString = vehicleId.toString();
-				if (vehTypeIdString.equals("vehicle1")) {
-					return 1;
-				} else if (vehTypeIdString.equals("vehicle2")) {
-					return 0.5;
-				} else {
-					return 0;
-				}
+		//Use a factor to take into account the different types. type2 gehts tolled with 50% of the toll of type1
+		TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
+			//No information about the vehicleType available anywhere, because it is not registered centrally.
+			// -> Use the vehicleId to distinguish the types.
+			var vehTypeIdString = vehicleId.toString();
+			if (vehTypeIdString.equals("vehicle1")) {
+				return 1;
+			} else if (vehTypeIdString.equals("vehicle2")) {
+				return 0.5;
+			} else {
+				return 0;
 			}
 		};
-		RoadPricingSchemeUsingTollFactor rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme1 , tollFactor );
+		RoadPricingSchemeUsingTollFactor rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 
 		///___ End creating toll scheme from code
 
