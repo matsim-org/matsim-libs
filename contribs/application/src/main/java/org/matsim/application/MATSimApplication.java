@@ -413,6 +413,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		if (ApplicationUtils.isRunFromDesktop() && args.length == 0) {
 
+			System.setProperty("MATSIM_GUI_DESKTOP", "true");
+
 			if (defaultArgs.length > 0) {
 				String value = String.join(ARGS_DELIMITER, defaultArgs);
 				System.setProperty("MATSIM_GUI_ARGS", value);
