@@ -35,6 +35,7 @@ import java.util.*;
  * @author stefan schröder
  *
  */
+@Deprecated // use RoadPricingScheme
 public class VehicleTypeDependentRoadPricingCalculator {
 
 	interface TollCalculator {
