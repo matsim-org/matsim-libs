@@ -23,19 +23,19 @@ public class FreightDemandGenerationTest {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
 			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "DHL_vehicleTypes.xml");
-			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_CarrierCSV.csv");
-			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_DemandCSV.csv");
+			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_CarrierCSV_small.csv");
+			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_DemandCSV_small.csv");
 			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
-			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "lor_planungsraeume_2021.shp/lor_planungsraeume_2021.shp");
-			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "Liefergebiete_16_manuell/Liefergebiete_16_manuell.shp");
+			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "LOR_Liefergebiete/LOR_Liefergebiete.shp");
+			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "Liefergebiete_16_manuell/Liefergebiete_16_manuell.shp");
 			//String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-10pct.plans-initial.xml.gz";
+			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-1pct.plans-initial.xml.gz";
 			//String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			String network = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-network.xml.gz";
 			//String shapeCategory = "Ortsteil";
 			//String shapeCategory = "BEZIRK";
-			//String shapeCategory = "PLR_ID";
-			String shapeCategory = "Liefergebi";
+			String shapeCategory = "PLR_NAM";
+			//String shapeCategory = "Liefergebi";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
@@ -77,7 +77,7 @@ public class FreightDemandGenerationTest {
 					"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
 					"--inputDemandCSV", demandCSVLocation.toString(),
-					"--populationSample", "0.1",
+					"--populationSample", "0.01",
 					"--populationSamplingTo", "1.0",
 					"--defaultJspritIterations", "3"
 			);

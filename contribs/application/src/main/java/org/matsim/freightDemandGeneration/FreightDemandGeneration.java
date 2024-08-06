@@ -206,6 +206,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		// prepare the VRP and get a solution
 		Controler controler = prepareControler(scenario);
 		FreightDemandGenerationUtils.createDemandLocationsFile(controler);
+		FreightDemandGenerationUtils.createDemandDistributionFile(controler);
+		FreightDemandGenerationUtils.createAgeDistributionFile(controler);
 		solveSelectedSolution(selectedSolution, config, controler);
 
 		// TODO analyze results
