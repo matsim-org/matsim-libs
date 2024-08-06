@@ -346,7 +346,10 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			} else {
 				costInfo = roadPricingScheme.getLinkCostInfo( link.getId(), time, person.getId(), vehicle.getId() );
 			}
-			double toll = costInfo.amount;
+			double toll=0.;
+			if ( costInfo != null ){
+				toll = costInfo.amount;
+			}
 //			System.out.println("huuuuuuuuuuuuuuuuuuuu - paid toll");
 			return costs + toll;
 		}

@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,10 +39,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -279,19 +282,38 @@ public class NetworkBasedTransportCostsTest {
 		builder.setRoadPricingScheme(schemeUsingTollFactor );
 		NetworkBasedTransportCosts c = builder.build();
 
-		Vehicle vehicle1 = mock(Vehicle.class);
-		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
-		when(type1.getMaxVelocity()).thenReturn(5.0);
-		when(type1.getTypeId()).thenReturn(TYPE_1);
-		when(vehicle1.getType()).thenReturn(type1);
-		when(vehicle1.getId()).thenReturn("vehicle1");
+		VehiclesFactory vf = scenario.getVehicles().getFactory();
+		final Vehicle vehicle1;
+		{
+			VehicleType vehType1 = vf.createVehicleType( Id.create( TYPE_1, VehicleType.class ) );
+			scenario.getVehicles().addVehicleType( vehType1 );
+//		org.matsim.vehicles.Vehicle matsimVehicle1 = vf.createVehicle( Id.createVehicleId( "vehicle1" ), vehType1 );
+			CarrierVehicle matsimVehicle1 = CarrierVehicle.newInstance( Id.createVehicleId( "vehicle1" ), null, vehType1 );
+			scenario.getVehicles().addVehicle( matsimVehicle1 );
+			vehicle1 = MatsimJspritFactory.createJspritVehicle( matsimVehicle1, new Coord() );
+		}
+		VehicleType vehType2 = vf.createVehicleType( Id.create( TYPE_2, VehicleType.class ) );
+		scenario.getVehicles().addVehicleType( vehType2 );
+//		org.matsim.vehicles.Vehicle matsimVehicle2 = vf.createVehicle( Id.createVehicleId( "vehicle2" ), vehType2 );
+		CarrierVehicle matsimVehicle2 = CarrierVehicle.newInstance( Id.createVehicleId( "vehicle2" ), null, vehType2 );
+		scenario.getVehicles().addVehicle( matsimVehicle2 );
 
-		Vehicle vehicle2 = mock(Vehicle.class);
-		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
-		when(type2.getMaxVelocity()).thenReturn(5.0);
-		when(type2.getTypeId()).thenReturn(TYPE_2);
-		when(vehicle2.getType()).thenReturn(type2);
-		when(vehicle2.getId()).thenReturn("vehicle2");
+		Vehicle vehicle2 = MatsimJspritFactory.createJspritVehicle( matsimVehicle2, new Coord() );
+
+//		// for the following rather use the MatsimJspritFactory#createCarrierVehicle
+//		Vehicle vehicle1 = mock(Vehicle.class);
+//		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+//		when(type1.getMaxVelocity()).thenReturn(5.0);
+//		when(type1.getTypeId()).thenReturn(TYPE_1);
+//		when(vehicle1.getType()).thenReturn(type1);
+//		when(vehicle1.getId()).thenReturn("vehicle1");
+//
+//		Vehicle vehicle2 = mock(Vehicle.class);
+//		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
+//		when(type2.getMaxVelocity()).thenReturn(5.0);
+//		when(type2.getTypeId()).thenReturn(TYPE_2);
+//		when(vehicle2.getType()).thenReturn(type2);
+//		when(vehicle2.getId()).thenReturn("vehicle2");
 
 		//vehicle1: includes toll
 		Assertions.assertEquals(20099.99, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
