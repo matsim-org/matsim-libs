@@ -153,7 +153,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			config = loadConfig(Objects.requireNonNull( configPath, "No default scenario location given" ).getAbsoluteFile().toString() );
+			String path = Objects.requireNonNull( configPath, "No default scenario location given" ).getAbsoluteFile().toString();
+			List<ConfigGroup> customModules = getCustomModules();
+
+			final Config config1 = ConfigUtils.loadConfig(path, customModules.toArray(new ConfigGroup[0] ) );
+			Config prepared = prepareConfig( config1 );
+
+			config = prepared != null ? prepared : config1;
+			// (The above lines of code come from inlining so maybe it happened there: I cannot see how prepared could be null but config1 not except if user code returns null which I would consider a bug.  kai, aug'24)
 		} else {
 			Config tmp = prepareConfig(config);
 			config = tmp != null ? tmp : config;
@@ -306,15 +313,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		addRunOption(config, option, "");
 	}
 
-	private Config loadConfig(String path) {
-		List<ConfigGroup> customModules = getCustomModules();
-
-		final Config config = ConfigUtils.loadConfig(path, customModules.toArray(new ConfigGroup[0]));
-		Config prepared = prepareConfig(config);
-
-		return prepared != null ? prepared : config;
-	}
-
 	@Override
 	public String defaultValue(CommandLine.Model.ArgSpec argSpec) throws Exception {
 		Object obj = argSpec.userObject();
@@ -374,8 +372,39 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
-	 * Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
-	 * This method may also be used to predefine some default arguments.
+	 * <p>Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
+	 * This method may also be used to predefine some default arguments.</p>
+	 *
+	 * <p>With respect to args it looks like arguments are treated in the following sequence (programmed in the run method):
+	 * <ul>
+	 *         <li>ConfigUtils.loadConfig without args</li>
+	 *         <li>prepareConfig which is usually overwritten</li>
+	 *         <li>config options from some yaml file which can be provided as a command line option</li>
+	 *         <li>config options on command line </li>
+	 * </ul></p>
+	 *
+	 * <p>defaultArgs could be used to provide defaults when calling this method here; they would go in addition to what is coming in from "upstream" which is typically the command line.</p>
+	 *
+	 * <p>There are many execution paths that can be reached from this class, but a typical one for matsim-scenarios seems to be:<ul>
+	 * <li> This method runs MATSimApplication.run( TheScenarioClass.class , args ).</li>
+	 * <li> That run class will instantiate an instance of TheScenarioClass (*), then do some args consistenty checking, then call the piccoli execute method. </li>
+	 * <li> The piccoli execute method will essentially call the "call" method of MATSimApplication. </li>
+	 * <li> I think that in the described execution path, this.config in that call method will initially be null.  (The ctor of MATSimApplication was called via reflection at (*); I think that it was called there without a config argument.) </li>
+	 * <li> This call method then will do: <ul>
+	 * 		<li> getCustomModules() (which is empty by default but can be overriden) </li>
+	 * 		<li>ConfigUtils.loadConfig(...) _without_ passing on the args</li>
+	 * 		<li>prepareConfig(...) (which is empty by default but is typically overridden, in this case in OpenBerlinScenario).  In our case, this sets the typical scoring params and the typical replanning strategies.
+	 * 		<li>next one can override the config from some yaml file provided as a commandline option
+	 * 		<li> next args is parsed and set
+	 * 		<li>then some standard CL options are detected and set
+	 * 		<li>then createScenario(config) is called (which can be overwritten but is not)
+	 * 		<li>then prepareScenario(scenario) is called (which can be overwritten but is not)
+	 * 		<li>then a standard controler is created from scenario
+	 * 		<li>then prepareControler is called which can be overwritten
+	 * 	</ul>
+	 * 	</ul>
+	 * 	</p>
+	 *
 	 * @param clazz class of the scenario to run
 	 * @param args pass arguments from the main method
 	 * @param defaultArgs predefined default arguments that will always be present

@@ -16,7 +16,7 @@ public class VspHbefaRoadTypeMappingTest {
         var mapper = new VspHbefaRoadTypeMapping();
         var link = getTestLink("", 70 / 3.6);
 
-        var result = mapper.determineHebfaType(link);
+        var result = mapper.determineHbefaType(link);
 
         assertEquals("URB/MW-Nat./80", result);
     }

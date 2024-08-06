@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -142,6 +143,7 @@ public class JavaRoundingErrorInQsimTest {
 		public PseudoInputs(){
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
+			scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			population = scenario.getPopulation();
 		}
 

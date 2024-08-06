@@ -46,7 +46,7 @@ public class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
     }
 
     @Override
-    public String determineHebfaType(Link link) {
+    public String determineHbefaType(Link link) {
         String roadType = NetworkUtils.getType(link);
         return mapping.get(roadType);
     }

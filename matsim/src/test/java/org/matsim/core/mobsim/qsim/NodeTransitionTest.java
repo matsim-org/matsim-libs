@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.NodeTransition;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -292,6 +293,7 @@ public class NodeTransitionTest {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
+		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -374,6 +376,7 @@ public class NodeTransitionTest {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
+		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -457,6 +460,7 @@ public class NodeTransitionTest {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
+		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -548,6 +552,7 @@ public class NodeTransitionTest {
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setTimeStepSize(0.5);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
+		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -633,9 +638,11 @@ public class NodeTransitionTest {
 			config.controller().setLastIteration(0);
 			config.qsim().setStuckTime(24*3600);
 			config.qsim().setRemoveStuckVehicles(false);
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
 	        dummyAct.setTypicalDuration(12 * 3600);
 	        config.scoring().addActivityParams(dummyAct);
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 

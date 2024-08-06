@@ -33,11 +33,11 @@ public abstract class HbefaRoadTypeMapping {
 
         network.getLinks().values().parallelStream()
                 .forEach(link -> {
-                    String hbefaString = determineHebfaType(link);
+                    String hbefaString = determineHbefaType(link);
                     EmissionUtils.setHbefaRoadType(link, hbefaString);
                 });
     }
 
-    protected abstract String determineHebfaType(Link link);
+    protected abstract String determineHbefaType(Link link);
 
 }

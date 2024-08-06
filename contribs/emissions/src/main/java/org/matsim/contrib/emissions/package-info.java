@@ -14,7 +14,7 @@
  *
  * <h2>Export from HBEFA 3.x</h2>
  * Currently, data from the HBEFA 3.x Microsoft Access database needs to be exported manually.
- * 
+ * <p>
  * Consequently, the following steps within HBEFA 3.x need still be done manually:
  * <ul>
  *  <li> Install and open HBEFA 3.x</li>
@@ -29,11 +29,11 @@
  *    <li> HOT EMISSION FACTORS: Choose "Individual TrafficSituations" > "Construct your own list" > "SelectAll" > "Return"</li>
  *    <li> COLD START EXCESS EMISSION FACTORS: Tick this option and choose "Construct your own list" > select all "patterns" with average temperature, detailed parking time (0-1h .. >12h), and detailed distance (0-1km and 1-2km) > "Return"</li>
  *    <li> Leave everything else as default</li>
- *   </ul> 
+ *   </ul>
  *  <li> Enter "Name of parameter set" and press "Calculate"</li>
  *  <li> Save the two generated tables using "Results" > "Export" to the desired location</li>
  * </ul>
- * 
+ *
  *  All these emission factor files need to be converted into *.txt or *.csv with ";" as delimiter.
  *  Their column headers should automatically match the parser definition
  *  in the respective method of the {@link org.matsim.contrib.emissions.EmissionModule}.
@@ -44,9 +44,10 @@
  * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.x road types.
  * Update (June'2018) one can now directly add HBEFA road type to link attributes using {@link org.matsim.contrib.emissions.EmissionUtils#setHbefaRoadType(org.matsim.api.core.v01.network.Link, java.lang.String)}
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup} for a detailed description.
- * 
+ *
  * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
- * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.EmissionUtils.EmissionSpecificationMarker}. It is described as "definition of a vehicle
+ * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}.
+ * The following information is surrounded by {@link org.matsim.contrib.emissions.EmissionUtils.EmissionSpecificationMarker}. It is described as "definition of a vehicle
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
  *  <li> REQUIRED: Vehicle description must start with the respective HbefaVehicleCategory followed by ";"
@@ -61,7 +62,7 @@
  * <ul>
  *
  * <h2>Model description</h2>
- * 
+ *
  * <h3>Emissions</h3>
  * The main package contains classes and methods to handle the emission input data and create
  * maps to associate the emissions with corresponding vehicle types, speed, parking time, ... <br>
@@ -86,7 +87,7 @@
  * a distance, which is driven after parking and, again, vehicle attributes.
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
  * <br> <br>
- * 
+ *
  * @author benjamin, julia
  */
 

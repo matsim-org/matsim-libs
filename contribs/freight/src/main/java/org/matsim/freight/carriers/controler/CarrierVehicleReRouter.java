@@ -36,6 +36,7 @@ import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.router.util.TravelTime;
@@ -58,7 +59,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private final VehicleRoutingActivityCosts vehicleRoutingActivityCosts;
 
-	public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
+	public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, RoadPricingScheme roadPricing ) {
         this.network = network;
         vehicleRoutingTransportCosts = getNetworkBasedTransportCosts(network,vehicleTypes,travelTimes,roadPricing);
         vehicleRoutingActivityCosts = new VehicleRoutingActivityCosts() {
@@ -146,7 +147,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     }
 
-    private NetworkBasedTransportCosts getNetworkBasedTransportCosts(Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, VehicleTypeDependentRoadPricingCalculator roadPricing) {
+    private NetworkBasedTransportCosts getNetworkBasedTransportCosts(Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, RoadPricingScheme roadPricing ) {
         //******
         //Define transport-costs
         //******
@@ -157,7 +158,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //sets time-dependent travelTimes
         tpcostsBuilder.setTravelTime(travelTimes);
 
-        if(roadPricing != null) tpcostsBuilder.setRoadPricingCalculator(roadPricing);
+        if(roadPricing != null) tpcostsBuilder.setRoadPricingScheme(roadPricing );
 
         //sets time-slice to build time-dependent tpcosts and travelTime matrices
         tpcostsBuilder.setTimeSliceWidth(900);

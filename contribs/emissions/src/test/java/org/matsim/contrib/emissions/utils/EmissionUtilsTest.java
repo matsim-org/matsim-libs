@@ -52,8 +52,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * missing data is not tested here
  * negative emission values are allowed
  * 1 test constructor
- * 2 test sumUpEmissions 
- * 3 test sumUpEmissionPerId 
+ * 2 test sumUpEmissions
+ * 3 test sumUpEmissionPerId
  * 4 test getTotalEmissions
  * 5 test SetNonCalculatedEmissionsForPopulation
  * - correct input - population does not match map of emissions - empty map of emissions
@@ -74,8 +74,6 @@ public class EmissionUtilsTest {
 	private boolean nullPointerEx;
 
 	public static Map<Pollutant, Double> createUntypedEmissions() {
-//		return Arrays.asList("co2", CO, NOx, "NO", NO2, HC).stream()
-//			     .collect(Collectors.toMap(p -> p, p -> Math.random()));
 		return Stream.of(CO2_TOTAL, CO, NOx, NO2, HC)
 				.collect(Collectors.toMap(p -> p, p -> Math.random()));
 	}
@@ -292,7 +290,7 @@ public class EmissionUtilsTest {
 
 		//put some content into the list
 		// no incorrect/incomplete input data here
-		// warm and cold emissions are already sumed up -> sumUpEmissionsPerId is tested seperatly
+		// warm and cold emissions are already summed up -> sumUpEmissionsPerId is tested separately
 
 		//person1
 		SortedMap<Pollutant, Double> allEmissionsP1 = new TreeMap<>();
@@ -430,7 +428,7 @@ public class EmissionUtilsTest {
 		//check: all values for person 1 and 2 are not null or zero
 		// and of type double
 		for(Object id : finalMap.keySet()) {
-			Assertions.assertTrue(id instanceof Id);
+			Assertions.assertInstanceOf(Id.class, id);
 			for (Object pollutant : finalMap.get(id).values()) {
 				Assertions.assertSame(pollutant.getClass(), Double.class);
 				Assertions.assertNotSame(0.0, pollutant);
@@ -442,7 +440,7 @@ public class EmissionUtilsTest {
 			}
 			//nothing else in the list
 			int numOfPolls = pollsFromEU.size();
-			Assertions.assertEquals(numOfPolls, finalMap.get(id).keySet().size(), "the number of pullutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls);
+			Assertions.assertEquals(numOfPolls, finalMap.get(id).keySet().size(), "the number of pollutants is " + finalMap.get(id).keySet().size() + " but should be" + numOfPolls);
 		}
 
 		//check: values for all emissions are correct -person 1
@@ -486,11 +484,11 @@ public class EmissionUtilsTest {
 		message = "the calculated map should contain " + pop.getPersons().size() + " person(s) but contains " + finalMap.keySet().size() + "person(s).";
 		Assertions.assertEquals(pop.getPersons().keySet().size(), finalMap.keySet().size(), message);
 
-		//check: all values for the this person are zero and of type double
-		for (Object pollutant : finalMap.get(idp3).values()) {
-			Assertions.assertSame(pollutant.getClass(), Double.class);
-			Assertions.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON);
-			Assertions.assertNotNull(pollutant);
+		//check: all values for this person are zero and of type double
+		for (Double pollutantValues : finalMap.get(idp3).values()) {
+			Assertions.assertSame(pollutantValues.getClass(), Double.class);
+			Assertions.assertEquals(0.0, pollutantValues, MatsimTestUtils.EPSILON);
+			Assertions.assertNotNull(pollutantValues);
 		}
 		//check: all types of emissions appear
 		for (Pollutant emission : pollsFromEU) {
@@ -498,7 +496,7 @@ public class EmissionUtilsTest {
 		}
 		//nothing else in the list
 		int numOfPolls = pollsFromEU.size();
-		message = "the number of pullutants is " + finalMap.get(idp3).keySet().size() + " but should be" + numOfPolls;
+		message = "the number of pollutants is " + finalMap.get(idp3).keySet().size() + " but should be" + numOfPolls;
 		Assertions.assertEquals(numOfPolls, finalMap.get(idp3).keySet().size(), message);
 
 	}
@@ -553,7 +551,7 @@ public class EmissionUtilsTest {
 		//test setNonCalculatedEmissionsForPopulation with 'null'
 		// throw nullpointer exception
 		setUpForNonCaculatedEmissions();
-		
+
 		Id<Person> idp5 = Id.create("p5", Person.class);
 		Person p5 = populationFactory.createPerson(idp5);
 		pop.addPerson(p5);
@@ -576,7 +574,7 @@ public class EmissionUtilsTest {
 		// empty list should be returned
 		setUpForNonCaculatedEmissions();
 
-		//person 7 in totalEmissions but not in population		
+		//person 7 in totalEmissions but not in population
 		SortedMap<Pollutant, Double> p7Emissions = new TreeMap<>();
 		//complete list of all pollutants - missing data is not tested here
 		p7Emissions.put( CO, .0 );
@@ -625,9 +623,9 @@ public class EmissionUtilsTest {
 
 		//check: all values for all persons are zero and of type double
 		for (Id<Person> id : finalMap.keySet()) {
-			for (Object pollutant : finalMap.get(id).values()) {
+			for (Double pollutant : finalMap.get(id).values()) {
 				Assertions.assertSame(pollutant.getClass(), Double.class);
-				Assertions.assertEquals(0.0, (Double) pollutant, MatsimTestUtils.EPSILON, "map of pollutants was missing. Therefore all values should be set to zero.");
+				Assertions.assertEquals(0.0, pollutant, MatsimTestUtils.EPSILON, "map of pollutants was missing. Therefore all values should be set to zero.");
 				Assertions.assertNotNull(pollutant);
 			}
 			//check: alle types of emissions appear
@@ -793,10 +791,6 @@ public class EmissionUtilsTest {
 		return Arrays.stream( Pollutant.values() ).collect( Collectors.toMap( p -> p, p -> Math.random() ) ) ;
 	}
 
-//	public static Map<String, Double> createEmissionsWithFixedValue(double value) {
-//		return Arrays.asList("co2", CO, NOx, "NO", NO2, HC).stream()
-//				.collect(Collectors.toMap(p -> p, p -> value));
-//	}
 	public static Map<Pollutant,Double> createEmissionsWithFixedValue( double value ) {
 		return Arrays.stream( Pollutant.values() ).collect( Collectors.toMap( p -> p, p -> value ) ) ;
 	}
@@ -815,6 +809,6 @@ public class EmissionUtilsTest {
 		NetworkUtils.createAndAddLink(network, Id.create("link24", Link.class), node2, node4, 1000., 20., 3600, 2);
 		NetworkUtils.createAndAddLink(network, Id.create("link34", Link.class), node3, node4, 1000., 20., 3600, 2); //w/o orig id and type
 	}
-	
+
 }
-	
+

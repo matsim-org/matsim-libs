@@ -8,7 +8,7 @@
  */
 package org.matsim.contrib.drt.extension.operations.eshifts.dispatcher;
 
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftStartLogic;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -29,9 +29,9 @@ public class EDrtShiftStartLogic implements ShiftStartLogic {
 	public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry shiftEntry) {
 		Schedule schedule = shiftEntry.vehicle().getSchedule();
 		Task currentTask = schedule.getCurrentTask();
-		if (currentTask instanceof EDrtWaitForShiftStayTask) {
+		if (currentTask instanceof EDrtWaitForShiftTask) {
 			//check whether vehicle still needs to complete charging task
-			if(((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
+			if(((EDrtWaitForShiftTask) currentTask).getChargingTask() == null) {
 				return delegate.shiftStarts(shiftEntry);
 			}
 		}

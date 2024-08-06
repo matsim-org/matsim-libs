@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -53,6 +54,7 @@ public class CarrierModuleTest {
     @BeforeEach
     public void setUp(){
         Config config = ConfigUtils.createConfig() ;
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("w");
         workParams.setTypicalDuration(60 * 60 * 8);
         config.scoring().addActivityParams(workParams);

@@ -20,7 +20,7 @@ public class EmissionsDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Emissions";
-		header.description = "Shows the emissions footprint and spatial distribution.";
+		header.description = "Shows the emissions footprint and spatial distribution. Shown values are already upscaled from simulated sample size.";
 
 
 		layout.row("links")

@@ -39,6 +39,7 @@ import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
@@ -73,6 +74,7 @@ public class MultiModalTripRouterTest {
 		config.routing().addParam("teleportedModeSpeed_ride", "15.0");
 		config.routing().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
 		config.routing().addParam("teleportedModeSpeed_walk", "1.34");
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
 		final Scenario scenario = ScenarioUtils.createScenario(config);

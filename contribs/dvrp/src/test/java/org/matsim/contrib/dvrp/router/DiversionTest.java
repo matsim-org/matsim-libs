@@ -51,6 +51,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -124,7 +125,7 @@ public class DiversionTest {
 
 		{
 			/* Create some necessary configuration for the test */
-
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
 
@@ -454,6 +455,7 @@ public class DiversionTest {
 
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			config.qsim().setStartTime(0.0);
 			config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
