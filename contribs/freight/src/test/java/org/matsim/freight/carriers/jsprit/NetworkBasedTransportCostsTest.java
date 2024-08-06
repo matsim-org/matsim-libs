@@ -25,7 +25,6 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -40,7 +39,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.CarrierVehicle;
-import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.VehicleType;
@@ -48,9 +46,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -176,10 +171,7 @@ public class NetworkBasedTransportCostsTest {
 
 	/**
 	 *  This test is a modified version of {@link #test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem}
-	 *  In addition, there is added a road pricing scheme.
-	 *  The scheme is only set for one vehicle type: type1.
-	 *  So, only the vehicle using that type (vehicle1) should be tolled, the other (vehicle2) not.
-	 *
+	 *  In addition, there is added a road pricing scheme to toll all vehicles
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollAllTypes(){
@@ -227,12 +219,14 @@ public class NetworkBasedTransportCostsTest {
 		Assertions.assertEquals(40099.99, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 		Assertions.assertEquals(20000.0, c.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
 	}
+
 	/**
 	 *  This test is a modified version of {@link #test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem}
 	 *  In addition, there is added a road pricing scheme.
 	 *  The scheme is only set for one vehicle type: type1.
 	 *  So, only the vehicle using that type (vehicle1) should be tolled, the other (vehicle2) not.
-	 *
+	 *  This test is build, in a way, that it uses the MATSim infrastructure for filtering the vehicles in the toll factor.
+	 *  To see it just on jsprit setting, please refer to {@link #test_whenAddingTwoDifferentVehicleTypes_tollBasedOnVehicleId}
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollOneTypeTollFactor(){
@@ -255,7 +249,7 @@ public class NetworkBasedTransportCostsTest {
 		//Use toll factor to only toll vehicles of type1.
 		TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
 			double tollFactor1 = 0.;
-			var vehTypeIdString = VehicleUtils.findVehicle(vehicleId, scenario).getType().getId().toString();
+			var vehTypeIdString = VehicleUtils.findVehicle(vehicleId, scenario).getType().getId().toString(); //This needs, the vehicles registered in the scenario.
 			if (TYPE_1.equals(vehTypeIdString)) {
 				tollFactor1 = 1.;
 			}
@@ -266,7 +260,7 @@ public class NetworkBasedTransportCostsTest {
 		/// End creating roadPricing scheme from Code
 
 		//Build MATSim vehicles and convert them to jsprit Vehicles ... just to see, that this works across the whole chain and
-		//that we can filter/search by (MATSim) vehicle types in Toll Factor usage
+		//that we can filter/search by (MATSim) vehicle types in TollFactor usage
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		final Vehicle vehicle1;
 		{
@@ -294,7 +288,9 @@ public class NetworkBasedTransportCostsTest {
 		}
 
 		//Build the NetbasedTransportCosts opbejct with the roadpricing scheme.
-		NetworkBasedTransportCosts c = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), scenario.getVehicles().getVehicleTypes().values() )
+		NetworkBasedTransportCosts c = NetworkBasedTransportCosts.Builder.newInstance(
+				scenario.getNetwork(),
+				scenario.getVehicles().getVehicleTypes().values() )
 			.setRoadPricingScheme(schemeUsingTollFactor)
 			.build() ;
 
@@ -311,12 +307,12 @@ public class NetworkBasedTransportCostsTest {
 	/**
 	 *  This test is a modified version of {@link #test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem}
 	 *  In addition, there is added a road pricing scheme.
-	 *  Two different schemes are created to toll the two different vehicle types differently.
-	 *  Here the approach using a factor is used to take into account the different types.
-	 *  //TODO: Write it completely
+	 *  With using a toll factor, the tolling can be set differently for the two vehicles.
+	 *  This test is build, in a way, that it uses the JSPRIT vehicle directly.
+	 *  To see it with the MATSim settings, please refer to {@link #test_whenAddingTwoDifferentVehicleTypes_tollOneTypeTollFactor()}
 	 */
 	@Test
-	void test_whenAddingTwoDifferentVehicleTypes_tollBothTypesDifferentlyWithFactor(){
+	void test_whenAddingTwoDifferentVehicleTypes_tollBasedOnVehicleId(){
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -334,14 +330,19 @@ public class NetworkBasedTransportCostsTest {
 		RoadPricingUtils.createAndAddGeneralCost(scheme1, Time.parseTime("00:00:00"), Time.parseTime("72:00:00"), 99.99);
 
 		//Use a factor to take into account the differnt types. type2 gehts tolled with 50% of the toll of type1
-		TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
-			var vehTypeIdString = VehicleUtils.findVehicle(vehicleId, scenario).getType().getId().toString();
-			if (TYPE_1.equals(vehTypeIdString)) {
-				return 1;
-			} else if (TYPE_2.equals(vehTypeIdString)) {
-				return 0.5;
-			} else {
-				return 0;
+		TollFactor tollFactor = new TollFactor() {
+			@Override
+			public double getTollFactor(Id<Person> personId, Id<org.matsim.vehicles.Vehicle> vehicleId, Id<Link> linkId, double time) {
+				//No information about the vehicleType available anywhere, because is is nowhere registered centrally,
+				// -> Use the vehicleId to distinguish the types.
+				var vehTypeIdString = vehicleId.toString();
+				if (vehTypeIdString.equals("vehicle1")) {
+					return 1;
+				} else if (vehTypeIdString.equals("vehicle2")) {
+					return 0.5;
+				} else {
+					return 0;
+				}
 			}
 		};
 		RoadPricingSchemeUsingTollFactor rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme1 , tollFactor );
