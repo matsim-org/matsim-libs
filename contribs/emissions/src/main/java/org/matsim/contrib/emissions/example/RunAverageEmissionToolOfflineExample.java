@@ -49,7 +49,7 @@ public final class RunAverageEmissionToolOfflineExample{
 
 	public static final String emissionEventsFilename = "emission.events.offline.xml.gz";
 
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+	// (remove dependency of one test/execution path from others. kai/ihab, nov'18)
 
 	private Config config;
 
@@ -60,14 +60,10 @@ public final class RunAverageEmissionToolOfflineExample{
 		emissionToolOfflineExampleV2.run();
 	}
 
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
-
 	public Config prepareConfig(String args){
 		throw new RuntimeException("execution path no longer exists");
 	}
+
 	public Config prepareConfig(String [] args) {
 		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
 		EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
@@ -96,7 +92,7 @@ public final class RunAverageEmissionToolOfflineExample{
 				bind( EmissionModule.class ) ;
 //				bind( OutputDirectoryHierarchy.class );
 			}
-		};;
+		};
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module );
 

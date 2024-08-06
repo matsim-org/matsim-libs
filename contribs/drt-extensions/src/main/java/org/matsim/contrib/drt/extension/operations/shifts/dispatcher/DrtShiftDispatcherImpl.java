@@ -51,10 +51,10 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final String mode;
 
-    private Queue<DrtShift> unscheduledShifts;
-    private Queue<ShiftEntry> assignedShifts;
-    private Queue<ShiftEntry> activeShifts;
-    private Queue<ShiftEntry> endingShifts;
+    private SortedSet<DrtShift> unscheduledShifts;
+    private SortedSet<ShiftEntry> assignedShifts;
+    private SortedSet<ShiftEntry> activeShifts;
+    private SortedSet<ShiftEntry> endingShifts;
 
     private Map<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> idleVehiclesQueues;
 
@@ -63,8 +63,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final MobsimTimer timer;
 
-	private final OperationFacilities operationFacilities;
-	private final OperationFacilityFinder breakFacilityFinder;
+    private final OperationFacilities operationFacilities;
+    private final OperationFacilityFinder breakFacilityFinder;
     private final ShiftTaskScheduler shiftTaskScheduler;
 
     private final Network network;
@@ -73,8 +73,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final ShiftsParams drtShiftParams;
 
-	private final ShiftStartLogic shiftStartLogic;
-	private final AssignShiftToVehicleLogic assignShiftToVehicleLogic;
+    private final ShiftStartLogic shiftStartLogic;
+    private final AssignShiftToVehicleLogic assignShiftToVehicleLogic;
 
     public DrtShiftDispatcherImpl(String mode, DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
                                   OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
@@ -84,54 +84,56 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;
-		this.operationFacilities = operationFacilities;
-		this.breakFacilityFinder = breakFacilityFinder;
+        this.operationFacilities = operationFacilities;
+        this.breakFacilityFinder = breakFacilityFinder;
         this.shiftTaskScheduler = shiftTaskScheduler;
         this.network = network;
         this.eventsManager = eventsManager;
         this.drtShiftParams = drtShiftParams;
-		this.shiftStartLogic = shiftStartLogic;
-		this.assignShiftToVehicleLogic = assignShiftToVehicleLogic;
+        this.shiftStartLogic = shiftStartLogic;
+        this.assignShiftToVehicleLogic = assignShiftToVehicleLogic;
     }
 
-	@Override
-	public void initialize() {
+    @Override
+    public void initialize() {
 
-        unscheduledShifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
+        unscheduledShifts = new TreeSet<>(Comparator.comparingDouble(DrtShift::getStartTime));
         unscheduledShifts.addAll(shifts.getShifts().values());
 
-        assignedShifts = new PriorityQueue<>(Comparator.comparingDouble(v -> v.shift().getStartTime()));
+        assignedShifts = new TreeSet<>(Comparator.comparingDouble(v -> v.shift().getStartTime()));
 
         idleVehiclesQueues = new LinkedHashMap<>();
-		for(OperationFacility facility: operationFacilities.getDrtOperationFacilities().values()) {
-			PriorityQueue<ShiftDvrpVehicle> queue = new PriorityQueue<>((v1, v2) -> String.CASE_INSENSITIVE_ORDER.compare(v1.getId().toString(), v2.getId().toString()));
-			Set<Id<DvrpVehicle>> registeredVehicles = facility.getRegisteredVehicles();
-			for (Id<DvrpVehicle> registeredVehicle : registeredVehicles) {
-				queue.add((ShiftDvrpVehicle) fleet.getVehicles().get(registeredVehicle));
-			}
-			idleVehiclesQueues.put(
-					facility.getId(),
-					queue
-			);
-		}
-        activeShifts = new PriorityQueue<>(Comparator.comparingDouble(v -> v.shift().getEndTime()));
-        endingShifts = new PriorityQueue<>(Comparator.comparingDouble(v -> v.shift().getEndTime()));
+        for(OperationFacility facility: operationFacilities.getDrtOperationFacilities().values()) {
+            PriorityQueue<ShiftDvrpVehicle> queue = new PriorityQueue<>((v1, v2) -> String.CASE_INSENSITIVE_ORDER.compare(v1.getId().toString(), v2.getId().toString()));
+            Set<Id<DvrpVehicle>> registeredVehicles = facility.getRegisteredVehicles();
+            for (Id<DvrpVehicle> registeredVehicle : registeredVehicles) {
+                queue.add((ShiftDvrpVehicle) fleet.getVehicles().get(registeredVehicle));
+            }
+            idleVehiclesQueues.put(
+                    facility.getId(),
+                    queue
+            );
+        }
+        activeShifts = new TreeSet<>(Comparator.comparingDouble(v -> v.shift().getEndTime()));
+        endingShifts = new TreeSet<>(Comparator.comparingDouble(v -> v.shift().getEndTime()));
     }
 
-	@Override
+    @Override
     public void dispatch(double timeStep) {
-		if(timeStep % drtShiftParams.loggingInterval == 0) {
-			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
-					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
-			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
-				logger.info(String.format("Idle vehicles at facility %s: %d", queueEntry.getKey().toString(), queueEntry.getValue().size()));
-			}
-		}
+        if(timeStep % drtShiftParams.loggingInterval == 0) {
+            logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
+                    activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
+            StringJoiner print = new StringJoiner(" | ");
+            for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
+                print.add(String.format("Idle vehicles at facility %s: %d", queueEntry.getKey().toString(), queueEntry.getValue().size()));
+            }
+            logger.info(print.toString());
+        }
         endShifts(timeStep);
-		if (timeStep % (drtShiftParams.updateShiftEndInterval) == 0) {
-			updateShiftEnds(timeStep);
-		}
-		assignShifts(timeStep);
+        if (timeStep % (drtShiftParams.updateShiftEndInterval) == 0) {
+            updateShiftEnds(timeStep);
+        }
+        assignShifts(timeStep);
         startShifts(timeStep);
         checkBreaks();
     }
@@ -166,13 +168,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             final ShiftEntry assignedShiftEntry = iterator.next();
             if (assignedShiftEntry.shift().getStartTime() > timeStep) {
                 shiftTaskScheduler.planAssignedShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
-                break;
+                continue;
             } else if (assignedShiftEntry.shift().getEndTime() < timeStep) {
                 logger.warn("Too late to start shift " + assignedShiftEntry.shift().getId());
                 shiftTaskScheduler.cancelAssignedShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
                 assignedShiftEntry.vehicle().getShifts().remove(assignedShiftEntry.shift());
                 iterator.remove();
-				continue;
+                continue;
             }
 
             if (shiftStartLogic.shiftStarts(assignedShiftEntry)) {
@@ -193,17 +195,24 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private void assignShifts(double timeStep) {
         // Remove elapsed shifts
         unscheduledShifts.removeIf(shift -> {
-			if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
-				logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
+            if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
+                logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
                 return true;
-			}
-		    return false;
-		});
+            }
+            return false;
+        });
 
         // Assign shifts
         Set<DrtShift> assignableShifts = new LinkedHashSet<>();
-        while (!this.unscheduledShifts.isEmpty() && isSchedulable(this.unscheduledShifts.peek(), timeStep)) {
-            assignableShifts.add(this.unscheduledShifts.poll());
+        Iterator<DrtShift> unscheduledShiftsIterator = unscheduledShifts.iterator();
+        while(unscheduledShiftsIterator.hasNext()) {
+            DrtShift unscheduledShift = unscheduledShiftsIterator.next();
+            if(isSchedulable(unscheduledShift, timeStep)) {
+                assignableShifts.add(unscheduledShift);
+                unscheduledShiftsIterator.remove();
+            } else {
+                break;
+            }
         }
 
         for (DrtShift shift : assignableShifts) {
@@ -213,24 +222,24 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 if (active.shift().getEndTime() > shift.getStartTime()) {
                     break;
                 }
-				if(shift.getOperationFacilityId().isPresent()) {
-					//we have to check that the vehicle ends the previous shift at the same facility where
-					//the new shift is to start.
-					if(active.shift().getOperationFacilityId().isPresent()) {
-						if(!active.shift().getOperationFacilityId().get().equals(shift.getOperationFacilityId().get())) {
-							continue;
-						}
-					} else {
-						Optional<ShiftChangeOverTask> nextShiftChangeover = ShiftSchedules.getNextShiftChangeover(active.vehicle().getSchedule());
-						if(nextShiftChangeover.isPresent()) {
-							Verify.verify(nextShiftChangeover.get().getShift().equals(active.shift()));
-							if(!nextShiftChangeover.get().getFacility().getId().equals(shift.getOperationFacilityId().get())) {
-								// there is already a shift changeover scheduled elsewhere
-								continue;
-							}
-						}
-					}
-				}
+                if(shift.getOperationFacilityId().isPresent()) {
+                    //we have to check that the vehicle ends the previous shift at the same facility where
+                    //the new shift is to start.
+                    if(active.shift().getOperationFacilityId().isPresent()) {
+                        if(!active.shift().getOperationFacilityId().get().equals(shift.getOperationFacilityId().get())) {
+                            continue;
+                        }
+                    } else {
+                        Optional<ShiftChangeOverTask> nextShiftChangeover = ShiftSchedules.getNextShiftChangeover(active.vehicle().getSchedule());
+                        if(nextShiftChangeover.isPresent()) {
+                            Verify.verify(nextShiftChangeover.get().getShift().equals(active.shift()));
+                            if(!nextShiftChangeover.get().getFacility().getId().equals(shift.getOperationFacilityId().get())) {
+                                // there is already a shift changeover scheduled elsewhere
+                                continue;
+                            }
+                        }
+                    }
+                }
                 if (assignShiftToVehicleLogic.canAssignVehicleToShift(active.vehicle(), shift)) {
                     vehicle = active.vehicle();
                     break;
@@ -238,29 +247,29 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             }
 
             if (vehicle == null) {
-				final Iterator<ShiftDvrpVehicle> iterator;
+                final Iterator<ShiftDvrpVehicle> iterator;
 
-				if(shift.getOperationFacilityId().isPresent()) {
-					//shift has to start at specific hub/facility
-					iterator = idleVehiclesQueues.get(shift.getOperationFacilityId().get()).iterator();
-				} else {
-					//shift can start at random location
-					IteratorChain<ShiftDvrpVehicle> iteratorChain = new IteratorChain<>();
-					for (Queue<ShiftDvrpVehicle> value : idleVehiclesQueues.values()) {
-						iteratorChain.addIterator(value.iterator());
-					}
-					iterator = iteratorChain;
-				}
+                if(shift.getOperationFacilityId().isPresent()) {
+                    //shift has to start at specific hub/facility
+                    iterator = idleVehiclesQueues.get(shift.getOperationFacilityId().get()).iterator();
+                } else {
+                    //shift can start at random location
+                    IteratorChain<ShiftDvrpVehicle> iteratorChain = new IteratorChain<>();
+                    for (Queue<ShiftDvrpVehicle> value : idleVehiclesQueues.values()) {
+                        iteratorChain.addIterator(value.iterator());
+                    }
+                    iterator = iteratorChain;
+                }
 
-				while (iterator.hasNext()) {
-					final ShiftDvrpVehicle next = iterator.next();
-					if (assignShiftToVehicleLogic.canAssignVehicleToShift(next, shift)) {
-						vehicle = next;
-						iterator.remove();
-						break;
-					}
-				}
-			}
+                while (iterator.hasNext()) {
+                    final ShiftDvrpVehicle next = iterator.next();
+                    if (assignShiftToVehicleLogic.canAssignVehicleToShift(next, shift)) {
+                        vehicle = next;
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
 
             if (vehicle != null) {
                 logger.debug("Shift assigned");
@@ -297,37 +306,37 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 throw new IllegalStateException("Shifts don't match!");
             }
 
-			logger.debug("Scheduling shift end for shift " + next.shift().getId() + " of vehicle " + next.vehicle().getId());
-			scheduleShiftEnd(next);
-			endingShifts.add(next);
-			iterator.remove();
+            logger.debug("Scheduling shift end for shift " + next.shift().getId() + " of vehicle " + next.vehicle().getId());
+            scheduleShiftEnd(next);
+            endingShifts.add(next);
+            iterator.remove();
         }
-	}
+    }
 
-	private void updateShiftEnds(double timeStep) {
-		final Iterator<ShiftEntry> endingShiftsIterator = this.endingShifts.iterator();
-		while (endingShiftsIterator.hasNext()) {
-			final ShiftEntry next = endingShiftsIterator.next();
-			if (next.shift().isEnded()) {
-				endingShiftsIterator.remove();
-				continue;
-			}
-			if (timeStep + drtShiftParams.shiftEndRescheduleLookAhead > next.shift().getEndTime()) {
-				if (next.vehicle().getShifts().size() > 1) {
-					updateShiftEnd(next);
-				}
-			} else {
-				break;
-			}
-		}
-	}
+    private void updateShiftEnds(double timeStep) {
+        final Iterator<ShiftEntry> endingShiftsIterator = this.endingShifts.iterator();
+        while (endingShiftsIterator.hasNext()) {
+            final ShiftEntry next = endingShiftsIterator.next();
+            if (next.shift().isEnded()) {
+                endingShiftsIterator.remove();
+                continue;
+            }
+            if (timeStep + drtShiftParams.shiftEndRescheduleLookAhead > next.shift().getEndTime()) {
+                if (next.vehicle().getShifts().size() > 1) {
+                    updateShiftEnd(next);
+                }
+            } else {
+                break;
+            }
+        }
+    }
 
-	private void updateShiftEnd(ShiftEntry next) {
+    private void updateShiftEnd(ShiftEntry next) {
 
-		if(next.shift().getOperationFacilityId().isPresent()) {
-			//start and end facility are fixed
-			return;
-		}
+        if(next.shift().getOperationFacilityId().isPresent()) {
+            //start and end facility are fixed
+            return;
+        }
 
         final List<? extends Task> tasks = next.vehicle().getSchedule().getTasks();
 
@@ -415,31 +424,31 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
         final Coord coord = lastLink.getCoord();
 
-		OperationFacility shiftChangeoverFacility = null;
+        OperationFacility shiftChangeoverFacility = null;
 
-		//check whether current shift has to end at specific facility
-		if(endingShift.shift().getOperationFacilityId().isPresent()) {
-			shiftChangeoverFacility = operationFacilities
-					.getDrtOperationFacilities()
-					.get(endingShift.shift().getOperationFacilityId().get());
-		} else {
-			//check whether next shift has to start at specific facility
-			for (DrtShift shift : endingShift.vehicle().getShifts()) {
-				if (shift != endingShift.shift()) {
-					if (shift.getOperationFacilityId().isPresent()) {
-						shiftChangeoverFacility = operationFacilities
-								.getDrtOperationFacilities()
-								.get(shift.getOperationFacilityId().get());
-					}
-					break;
-				}
-			}
-		}
+        //check whether current shift has to end at specific facility
+        if(endingShift.shift().getOperationFacilityId().isPresent()) {
+            shiftChangeoverFacility = operationFacilities
+                    .getDrtOperationFacilities()
+                    .get(endingShift.shift().getOperationFacilityId().get());
+        } else {
+            //check whether next shift has to start at specific facility
+            for (DrtShift shift : endingShift.vehicle().getShifts()) {
+                if (shift != endingShift.shift()) {
+                    if (shift.getOperationFacilityId().isPresent()) {
+                        shiftChangeoverFacility = operationFacilities
+                                .getDrtOperationFacilities()
+                                .get(shift.getOperationFacilityId().get());
+                    }
+                    break;
+                }
+            }
+        }
 
-		if(shiftChangeoverFacility == null) {
-			shiftChangeoverFacility = breakFacilityFinder.findFacilityOfType(coord,
-					OperationFacilityType.hub).orElseThrow(() -> new RuntimeException("Could not find shift end location!"));
-		}
+        if(shiftChangeoverFacility == null) {
+            shiftChangeoverFacility = breakFacilityFinder.findFacilityOfType(coord,
+                    OperationFacilityType.hub).orElseThrow(() -> new RuntimeException("Could not find shift end location!"));
+        }
 
         Verify.verify(shiftChangeoverFacility.register(endingShift.vehicle().getId()), "Could not register vehicle at facility.");
 
@@ -488,14 +497,14 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 new VehicleLeftShiftFacilityEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
         eventsManager.processEvent(
                 new DrtShiftBreakEndedEvent(timer.getTimeOfDay(), mode, vehicle.getShifts().peek().getId(),
-                vehicle.getId(), previousTask.getFacility().getLinkId())
+                        vehicle.getId(), previousTask.getFacility().getLinkId())
         );
     }
 
     public void startBreak(ShiftDvrpVehicle vehicle, Id<Link> linkId) {
         eventsManager.processEvent(
                 new DrtShiftBreakStartedEvent(timer.getTimeOfDay(), mode,
-                vehicle.getShifts().peek().getId(), vehicle.getId(), linkId)
+                        vehicle.getShifts().peek().getId(), vehicle.getId(), linkId)
         );
     }
 

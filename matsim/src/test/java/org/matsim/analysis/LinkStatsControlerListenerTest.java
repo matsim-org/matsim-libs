@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
@@ -352,6 +353,7 @@ public class LinkStatsControlerListenerTest {
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(7);
 		config.controller().setWritePlansInterval(0);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 
 		lsConfig.setWriteLinkStatsInterval(3);

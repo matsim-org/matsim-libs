@@ -69,7 +69,7 @@ public class TrafficCountsDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Traffic Counts";
-		header.description = "Comparison of observed and simulated daily traffic volumes.\nError metrics: ";
+		header.description = "Comparison of observed and simulated daily traffic volumes. Reported volumes are scaled-up according to simulated sample size. \nError metrics based on relative error: ";
 
 		for (int i = 0; i < labels.size(); i++) {
 			if (i == 0)

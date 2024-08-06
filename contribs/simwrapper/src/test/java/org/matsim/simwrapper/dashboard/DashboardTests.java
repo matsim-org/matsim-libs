@@ -79,6 +79,7 @@ public class DashboardTests {
 
 		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv")
 			.withGroupedRefData("mode_share_per_group_dist_ref.csv")
+			.withDistanceDistribution("mode_share_distance_distribution.csv")
 			.withChoiceEvaluation(true);
 
 		run(dashboard);

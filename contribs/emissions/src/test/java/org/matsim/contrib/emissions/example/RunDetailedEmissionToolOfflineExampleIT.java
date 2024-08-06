@@ -42,7 +42,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	 *
 	 * */
 
-	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	// Expecting RuntimeException, because requested values are only in average file. Without fallback, it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
 	final void testDetailed_vehTypeV1() {
@@ -67,7 +67,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		Assertions.assertTrue( gotAnException );
 	}
 
-	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	// Expecting RuntimeException, because requested values are only in average file. Without fallback, it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
 	final void testDetailed_vehTypeV2() {
@@ -91,7 +91,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		Assertions.assertTrue( gotAnException );
 	}
 
-	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	// Expecting RuntimeException, because requested values are only in average file. Without fallback, it has to fail!
 //	@Test(expected=RuntimeException.class)
 	@Test
 	final void testDetailed_vehTypeV2_HBEFA4() {

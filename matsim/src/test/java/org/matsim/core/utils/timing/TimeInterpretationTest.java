@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.controler.Controler;
@@ -55,6 +56,7 @@ public class TimeInterpretationTest {
 	@Test
 	void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
 		Controler controller = prepareController(config);
@@ -76,6 +78,7 @@ public class TimeInterpretationTest {
 	@Test
 	void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 
 		Controler controller = prepareController(config);
