@@ -72,7 +72,6 @@ import org.matsim.vehicles.VehicleType;
         CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
     CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-    capabilitiesBuilder.addType(collectionType);
     capabilitiesBuilder.addVehicle(carrierVehicle);
     capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
     CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -142,7 +141,6 @@ import org.matsim.vehicles.VehicleType;
 
     CarrierCapabilities mainRunCapabilities =
         CarrierCapabilities.Builder.newInstance()
-            .addType(mainRunType)
             .addVehicle(mainRunCarrierVehicle)
             .setFleetSize(FleetSize.INFINITE)
             .build();
@@ -210,7 +208,6 @@ import org.matsim.vehicles.VehicleType;
 
     CarrierCapabilities.Builder distributionCapabilitiesBuilder =
         CarrierCapabilities.Builder.newInstance();
-    distributionCapabilitiesBuilder.addType(distributionType);
     distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
     distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
     CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
