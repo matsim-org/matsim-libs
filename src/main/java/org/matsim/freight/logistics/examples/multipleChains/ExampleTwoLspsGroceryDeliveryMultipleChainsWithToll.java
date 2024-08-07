@@ -74,7 +74,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
   private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10_toll";
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10_tollb_1000newTollScoring";
 
 
   private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
@@ -97,6 +97,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     Carrier carrierEdeka = carriers.getCarriers().get(Id.create(EDEKA_SUPERMARKT_TROCKEN, CarrierImpl.class));
     Carrier carrierKaufland = carriers.getCarriers().get(Id.create(KAUFLAND_VERBRAUCHERMARKT_TROCKEN, CarrierImpl.class));
 
+    RoadPricingScheme rpScheme = setUpRoadpricing(scenario);
+
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
     lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
@@ -106,7 +108,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
 
-    RoadPricingSchemeUsingTollFactor rpScheme = setUpRoadpricing(scenario);
 
 
     log.info("Prepare controler");
@@ -367,7 +368,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             distributionCarrier, scenario.getNetwork())
                     .setDistributionScheduler(
-                            ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
+//                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                     .build();
 
     LogisticChainElement distributionCarrierElement =
@@ -439,7 +441,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             directCarrier, scenario.getNetwork())
                     .setDistributionScheduler(
-                            ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
+//                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                     .build();
 
     LogisticChainElement singleCarrierElement =
