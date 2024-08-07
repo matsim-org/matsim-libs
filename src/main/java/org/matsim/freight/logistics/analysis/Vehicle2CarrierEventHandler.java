@@ -24,9 +24,6 @@ package org.matsim.freight.logistics.analysis;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
@@ -34,6 +31,16 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandle
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * Basic event handler that collects the relation between vehicles and carrier.
+ * Necessary since there is no event having all this information together.
+ * <p>
+ * This is a modified implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
+ * <p>
+ * In a first step only used internally. When needed more often, I have nothing against putting it more central. -> matsim-libs
+ *
+ * @author kturner
+ */
 public class Vehicle2CarrierEventHandler implements CarrierTourStartEventHandler, CarrierTourEndEventHandler {
 
   private final Map<Id<Vehicle>, Id<Carrier>> vehicle2carrier = new ConcurrentHashMap<>();
