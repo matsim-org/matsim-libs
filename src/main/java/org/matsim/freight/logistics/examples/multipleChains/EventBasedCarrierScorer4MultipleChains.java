@@ -46,16 +46,12 @@ import org.matsim.vehicles.VehicleUtils;
  */
 class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory {
 
-
-
   @Inject private Network network;
-
   @Inject private Scenario scenario;
 
   private double toll;
   private List<String> tolledVehicleTypes = new ArrayList<>();
   private List<String> tolledLinks = new ArrayList<>();
-
 
   public ScoringFunction createScoringFunction(Carrier carrier) {
     SumScoringFunction sf = new SumScoringFunction();
@@ -119,7 +115,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
       tourStartTime.put(event.getTourId(), event.getTime());
     }
 
-    // Fix costs for vehicle usage
+    // scores fix costs for vehicle usage and variable costs per time
     private void handleEvent(CarrierTourEndEvent event) {
       // Fix costs for vehicle usage
       final VehicleType vehicleType =
@@ -134,6 +130,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
       score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
     }
 
+    // scores variable costs per distance
     private void handleEvent(LinkEnterEvent event) {
       final double distance = network.getLinks().get(event.getLinkId()).getLength();
       final double costPerMeter =
