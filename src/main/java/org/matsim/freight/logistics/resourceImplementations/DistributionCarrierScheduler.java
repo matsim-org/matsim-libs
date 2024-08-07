@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Leg;
@@ -52,9 +53,22 @@ import org.matsim.vehicles.VehicleType;
   private DistributionCarrierResource resource;
   private ArrayList<LSPCarrierPair> pairs;
   private int carrierCnt = 1;
+  private RoadPricingScheme rpscheme = null;
 
   DistributionCarrierScheduler() {
     this.pairs = new ArrayList<>();
+  }
+
+  /**
+   * Constructor for the DistributionCarrierScheduler.
+   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
+   * @deprecated This is only a dirty workaround. KMT'Aug'24
+   * @param rpscheme the road pricing scheme
+   */
+  @Deprecated
+  DistributionCarrierScheduler(RoadPricingScheme rpscheme) {
+    this.pairs = new ArrayList<>();
+    this.rpscheme = rpscheme;
   }
 
   @Override
@@ -91,7 +105,7 @@ import org.matsim.vehicles.VehicleType;
             CarrierSchedulerUtils.solveVrpWithJspritWithToll(
                 createAuxiliaryCarrier(
                     shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-                resource.getNetwork(), null);
+                resource.getNetwork(), rpscheme);
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         carrier.getServices().putAll(auxiliaryCarrier.getServices());
         cumulatedLoadingTime = 0;
@@ -108,7 +122,7 @@ import org.matsim.vehicles.VehicleType;
           CarrierSchedulerUtils.solveVrpWithJspritWithToll(
               createAuxiliaryCarrier(
                   shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-              resource.getNetwork(), null);
+              resource.getNetwork(), rpscheme);
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
       carrier.getServices().putAll(auxiliaryCarrier.getServices());
       shipmentsInCurrentTour.clear();

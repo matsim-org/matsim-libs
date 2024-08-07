@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
@@ -219,6 +220,26 @@ public class ResourceImplementationUtils {
 
   public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
     return new CollectionCarrierScheduler();
+  }
+
+  /**
+   * Utils method to create a  DistributionCarrierScheduler with Roadpricing.
+   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
+   * @deprecated This is only a dirty workaround. KMT'Aug'24
+   * @param roadPricingScheme the road pricing scheme
+   */
+  public static DistributionCarrierScheduler createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingScheme roadPricingScheme) {
+    return new DistributionCarrierScheduler(roadPricingScheme);
+  }
+
+  /**
+   * Utils method to create a  Collection CarrierScheduler with Roadpricing.
+   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
+   * @deprecated This is only a dirty workaround. KMT'Aug'24
+   * @param roadPricingScheme the road pricing scheme
+   */
+  public static CollectionCarrierScheduler createDefaultCollectionCarrierSchedulerWithRoadPricing(RoadPricingScheme roadPricingScheme) {
+    return new CollectionCarrierScheduler(roadPricingScheme);
   }
 
   public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler() {
