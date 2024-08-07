@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.noise;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -8,6 +10,7 @@ import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.application.options.SampleOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
@@ -38,6 +41,8 @@ import java.util.Set;
 )
 public class NoiseAnalysis implements MATSimAppCommand {
 
+	private static final Logger log = LogManager.getLogger(NoiseAnalysis.class);
+
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(NoiseAnalysis.class);
 	@CommandLine.Mixin
@@ -45,6 +50,9 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
+
+	@CommandLine.Mixin
+	private final SampleOptions sampleOptions = new SampleOptions();
 
 	@CommandLine.Option(names = "--consider-activities", split = ",", description = "Considered activities for noise calculation." +
 		" Use asterisk ('*') for acttype prefixes, if all such acts shall be considered.", defaultValue = "h,w,home*,work*")
@@ -89,6 +97,16 @@ public class NoiseAnalysis implements MATSimAppCommand {
 			noiseParameters.setNoiseBarriersFilePath(noiseBarrierFile);
 		}
 
+		if(! sampleOptions.isSet() && noiseParameters.getScaleFactor() == 1d){
+			log.warn("You didn't provide the simulation sample size via command line option --sample-size! This means, noise damages are not scaled!!!");
+		} else if (noiseParameters.getScaleFactor() == 1d){
+			if (sampleOptions.getSample() == 1d){
+				log.warn("Be aware that the noise output is not scaled. This might be unintended. If so, assure to provide the sample size via command line option --sample-size, in the SimWrapperConfigGroup," +
+					"or provide the scaleFactor (the inverse of the sample size) in the NoiseConfigGroup!!!");
+			}
+			noiseParameters.setScaleFactor(sampleOptions.getUpscaleFactor());
+		}
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		String outputFilePath = output.getPath().getParent() == null ? "." : output.getPath().getParent().toString();
@@ -120,6 +138,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		config.facilities().setInputFile(null);
 		config.eventsManager().setNumberOfThreads(null);
 		config.eventsManager().setEstimatedNumberOfEvents(null);
+		//ts, aug '24: not sure if and why we need to set 1 thread
 		config.global().setNumberOfThreads(1);
 
 		return config;
