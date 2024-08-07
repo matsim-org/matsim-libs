@@ -116,6 +116,7 @@ import org.matsim.vehicles.VehicleType;
 
     CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledPlans));
     plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
+    plan.setJspritScore(CarrierSchedulerUtils.sumUpJspritScore(scheduledPlans));
     carrier.setSelectedPlan(plan);
   }
 

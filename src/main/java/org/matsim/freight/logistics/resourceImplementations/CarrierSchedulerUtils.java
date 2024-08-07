@@ -117,4 +117,19 @@ public class CarrierSchedulerUtils {
     }
     return score;
   }
+
+  /**
+   * Sum up the jsprit score of the given list of CarrierPlans.
+   * As a consequence this is not from the one and only jsprit run, but from all jsprit runs af the different auxiliary carriers.
+   * @param scheduledPlans
+   * @return the summ of the scores coming from jsprit
+   */
+  public static Double sumUpJspritScore(List<CarrierPlan> scheduledPlans) {
+    double jspritScore = 0;
+    for (CarrierPlan scheduledPlan : scheduledPlans) {
+      if (scheduledPlan.getJspritScore() != null) {
+        jspritScore = jspritScore + scheduledPlan.getJspritScore();      }
+    }
+    return jspritScore;
+  }
 }
