@@ -88,10 +88,10 @@ import org.matsim.vehicles.VehicleType;
           > vehicleType.getCapacity().getOther().intValue()) {
         load = 0;
         Carrier auxiliaryCarrier =
-            CarrierSchedulerUtils.solveVrpWithJsprit(
+            CarrierSchedulerUtils.solveVrpWithJspritWithToll(
                 createAuxiliaryCarrier(
                     shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-                resource.getNetwork());
+                resource.getNetwork(), null);
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         carrier.getServices().putAll(auxiliaryCarrier.getServices());
         cumulatedLoadingTime = 0;
@@ -105,10 +105,10 @@ import org.matsim.vehicles.VehicleType;
 
     if (!shipmentsInCurrentTour.isEmpty()) {
       Carrier auxiliaryCarrier =
-          CarrierSchedulerUtils.solveVrpWithJsprit(
+          CarrierSchedulerUtils.solveVrpWithJspritWithToll(
               createAuxiliaryCarrier(
                   shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-              resource.getNetwork());
+              resource.getNetwork(), null);
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
       carrier.getServices().putAll(auxiliaryCarrier.getServices());
       shipmentsInCurrentTour.clear();

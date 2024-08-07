@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
-import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
 
 /**
  * This class contains some code fragments, that are used in the different *CarrierScheduler
@@ -31,16 +31,16 @@ public class CarrierSchedulerUtils {
    * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
    * So, maybe this can be more simplify.
    * <p>
-   *  @Todo: include toll in the NetbasedCosts (if set), so it is also pat of the VRP
-   *  @Todo: Find a way to reuse the netbasedCosts over the iterations(?) to avoid re-setting this up???
-   *    <li> Pro: saves computation times,
-   *    <li> Con: There is now update of the costs if the network (load) changes.
-   *    <li> --> do it at least per Carrier or generally or stay as it is? --> Discuss with KN
-   *  @Todo: Make the number of jsprit-Iterations configurable
    *
-   * @param carrier  Carrier for which the problem should be solved
-   * @param network  the underlying network to create the network based transport costs
+   * @param carrier               Carrier for which the problem should be solved
+   * @param network               the underlying network to create the network based transport costs
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
+   * @Todo: include toll in the NetbasedCosts (if set), so it is also pat of the VRP
+   * @Todo: Find a way to reuse the netbasedCosts over the iterations(?) to avoid re-setting this up???
+   * <li> Pro: saves computation times,
+   * <li> Con: There is now update of the costs if the network (load) changes.
+   * <li> --> do it at least per Carrier or generally or stay as it is? --> Discuss with KN
+   * @Todo: Make the number of jsprit-Iterations configurable
    */
   public static Carrier solveVrpWithJsprit(Carrier carrier, Network network) {
     NetworkBasedTransportCosts netbasedTransportCosts =
@@ -70,17 +70,18 @@ public class CarrierSchedulerUtils {
   /**
    * First try with tolls.
    * Rest is the same as {@link #solveVrpWithJsprit(Carrier, Network)}.
-   * @param carrier  Carrier for which the problem should be solved
-   * @param network  the underlying network to create the network based transport costs
-   * @param roadPricingCalculator the road pricing calculator to calculate the tolls
+   * //TODO: Combine this method with the untolled version {@link #solveVrpWithJsprit(Carrier, Network)}.
+   * @param carrier           Carrier for which the problem should be solved
+   * @param network           the underlying network to create the network based transport costs
+   * @param roadPricingScheme (MATSim's) road pricing scheme from the roadpricing contrib
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
    */
-  public static Carrier solveVrpWithJspritWithToll(Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricingCalculator) {
-    if (roadPricingCalculator != null) {
+  public static Carrier solveVrpWithJspritWithToll(Carrier carrier, Network network, RoadPricingScheme roadPricingScheme) {
+    if (roadPricingScheme != null) {
       NetworkBasedTransportCosts netbasedTransportCosts =
           NetworkBasedTransportCosts.Builder.newInstance(
                   network, ResourceImplementationUtils.getVehicleTypeCollection(carrier))
-              .setRoadPricingCalculator(roadPricingCalculator)
+              .setRoadPricingScheme(roadPricingScheme)
               .build();
 
       VehicleRoutingProblem vrp =
@@ -89,6 +90,7 @@ public class CarrierSchedulerUtils {
                   .build();
 
       //Setting jspritIterations to use central infrastructure -> should go more up in the code
+      //TODO: If not set, setze es auf 1.
       CarriersUtils.setJspritIterations(carrier, 1);
 
       VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);

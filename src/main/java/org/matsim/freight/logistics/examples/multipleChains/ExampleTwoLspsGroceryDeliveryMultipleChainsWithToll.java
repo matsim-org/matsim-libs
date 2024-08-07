@@ -352,6 +352,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             CarriersUtils.createCarrier(Id.create(lspName +"_distributionCarrier", Carrier.class));
     distributionCarrier
             .getCarrierCapabilities()
+            //.setNumberOfJspritIterations // TODO Das mal hier einbauen. --> Ist aktuell in CarrierUtils.
             .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
     CarriersUtils.addCarrierVehicle(
