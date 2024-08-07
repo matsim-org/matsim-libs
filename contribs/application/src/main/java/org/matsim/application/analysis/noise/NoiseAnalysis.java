@@ -46,7 +46,8 @@ public class NoiseAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 
-	@CommandLine.Option(names = "--consider-activities", split = ",", description = "Considered activities for noise calculation", defaultValue = "h,w,home,work")
+	@CommandLine.Option(names = "--consider-activities", split = ",", description = "Considered activities for noise calculation." +
+		" Use asterisk ('*') for acttype prefixes, if all such acts shall be considered.", defaultValue = "h,w,home*,work*")
 	private Set<String> considerActivities;
 
 	@CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
