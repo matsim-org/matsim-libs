@@ -89,6 +89,7 @@ public class CarrierSchedulerUtils {
                   .build();
 
       //Setting jspritIterations to use central infrastructure -> should go more up in the code
+      //TODO: If not set, setze es auf 1.
       CarriersUtils.setJspritIterations(carrier, 1);
 
       VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);
