@@ -55,7 +55,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 	private final SampleOptions sampleOptions = new SampleOptions();
 
 	@CommandLine.Option(names = "--consider-activities", split = ",", description = "Considered activities for noise calculation." +
-		" Use asterisk ('*') for acttype prefixes, if all such acts shall be considered.", defaultValue = "h,w,home*,work*")
+		" Use asterisk ('*') for acttype prefixes, if all such acts shall be considered.", defaultValue = "home*,work*,educ*,leisure*")
 	private Set<String> considerActivities;
 
 	@CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
@@ -71,31 +71,54 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 		config.controller().setOutputDirectory(input.getRunDirectory().toString());
 
-		// adjust the default noise parameters
+		//trying to set noise parameters more explicitly, here...
+		//if NoiseConfigGroup was added before. do not override (most) parameters
+		boolean overrideParameters = ! ConfigUtils.hasModule(config, NoiseConfigGroup.class);
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
-		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(considerActivities.toArray(String[]::new));
-		noiseParameters.setConsideredActivitiesForDamageCalculationArray(considerActivities.toArray(String[]::new));
-		if (shp.getShapeFile() != null) {
-			CoordinateTransformation ct = shp.createInverseTransformation(config.global().getCoordinateSystem());
 
-			Envelope bbox = shp.getGeometry().getEnvelopeInternal();
+		if(overrideParameters){
+			log.warn("no NoiseConfigGroup was configured before. Will set som estandards. You should check the next lines in the log file!");
+			noiseParameters.setConsideredActivitiesForReceiverPointGridArray(considerActivities.toArray(String[]::new));
+			noiseParameters.setConsideredActivitiesForDamageCalculationArray(considerActivities.toArray(String[]::new));
 
-			Coord minCoord = ct.transform(new Coord(bbox.getMinX(), bbox.getMinY()));
-			Coord maxCoord = ct.transform(new Coord(bbox.getMaxX(), bbox.getMaxY()));
+			//use actual speed and not freespeed
+			noiseParameters.setUseActualSpeedLevel(true);
+			//use the valid speed range (recommended by IK)
+			noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 
-			noiseParameters.setReceiverPointsGridMinX(minCoord.getX());
-			noiseParameters.setReceiverPointsGridMinY(minCoord.getY());
-			noiseParameters.setReceiverPointsGridMaxX(maxCoord.getX());
-			noiseParameters.setReceiverPointsGridMaxY(maxCoord.getY());
+			if (shp.getShapeFile() != null) {
+				CoordinateTransformation ct = shp.createInverseTransformation(config.global().getCoordinateSystem());
+
+				Envelope bbox = shp.getGeometry().getEnvelopeInternal();
+
+				Coord minCoord = ct.transform(new Coord(bbox.getMinX(), bbox.getMinY()));
+				Coord maxCoord = ct.transform(new Coord(bbox.getMaxX(), bbox.getMaxY()));
+
+				noiseParameters.setReceiverPointsGridMinX(minCoord.getX());
+				noiseParameters.setReceiverPointsGridMinY(minCoord.getY());
+				noiseParameters.setReceiverPointsGridMaxX(maxCoord.getX());
+				noiseParameters.setReceiverPointsGridMaxY(maxCoord.getY());
+			}
+
+			noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
+
+			if (!Objects.equals(noiseBarrierFile, "")) {
+				noiseParameters.setNoiseBarriersSourceCRS(config.global().getCoordinateSystem());
+				noiseParameters.setConsiderNoiseBarriers(true);
+				noiseParameters.setNoiseBarriersFilePath(noiseBarrierFile);
+			}
+		} else {
+			log.warn("will override a few settings in NoiseConfigGroup, as we are now doing postprocessing and do not want any internalization etc." +
+				" You should check the next lines in the log file!");
 		}
 
-		noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
-
-		if (!Objects.equals(noiseBarrierFile, "")) {
-			noiseParameters.setNoiseBarriersSourceCRS(config.global().getCoordinateSystem());
-			noiseParameters.setConsiderNoiseBarriers(true);
-			noiseParameters.setNoiseBarriersFilePath(noiseBarrierFile);
-		}
+		// we only mean to do postprocessing here, thus no internalization etc
+		noiseParameters.setInternalizeNoiseDamages(false);
+		noiseParameters.setComputeCausingAgents(false);
+		//we don't need events (for Dashboard) - spare disk space.
+		noiseParameters.setThrowNoiseEventsAffected(false);
+		noiseParameters.setThrowNoiseEventsCaused(false);
+		noiseParameters.setComputeNoiseDamages(true);
 
 		if(! sampleOptions.isSet() && noiseParameters.getScaleFactor() == 1d){
 			log.warn("You didn't provide the simulation sample size via command line option --sample-size! This means, noise damages are not scaled!!!");
@@ -111,6 +134,9 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 		String outputFilePath = output.getPath().getParent() == null ? "." : output.getPath().getParent().toString();
 
+		log.info("starting " + NoiseOfflineCalculation.class + " with the following parameters:\n"
+			+ noiseParameters);
+
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputFilePath);
 		outputFilePath += "/noise-analysis";
 		noiseCalculation.run();
@@ -122,12 +148,11 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		MergeNoiseOutput mergeNoiseOutput = new MergeNoiseOutput(paths, Path.of(outputFilePath), config.global().getCoordinateSystem());
 		mergeNoiseOutput.run();
 
-
 		return 0;
 	}
 
 	private Config prepareConfig() {
-		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString(), new NoiseConfigGroup());
+		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
 
 		//it is important to match "output_vehicles.xml.gz" specifically, because otherwise dvrpVehicle files might be matched and the code crashes later
 		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());

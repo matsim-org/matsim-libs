@@ -35,7 +35,7 @@ public class NoiseDashboard implements Dashboard {
 		layout.row("aggregate noise")
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Noise Immissions (Grid)";
-				viz.description = "Aggregate Noise Immissions per day";
+				viz.description = "Total Noise Immissions per day";
 				viz.height = 12.0;
 				viz.cellSize = 250;
 				viz.opacity = 0.2;
@@ -47,7 +47,7 @@ public class NoiseDashboard implements Dashboard {
 			})
 			.el(MapPlot.class, (viz, data) -> {
 				viz.title = "Noise Emissions (Link)";
-				viz.description = "Aggregate Noise Emissions per day";
+				viz.description = "Maximum Noise Level per day [dB]";
 				viz.height = 12.0;
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;

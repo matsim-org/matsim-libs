@@ -118,6 +118,7 @@ final class MergeNoiseOutput {
 	 * @param output
 	 */
 	private void writeAvro(XYTData xytData, File output) {
+		log.info(String.format("Start writing avro file to %s", output.toString() ));
 		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
 		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
 			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
@@ -143,9 +144,8 @@ final class MergeNoiseOutput {
 				.separator(';').build());
 
 			for (Row row : table) {
-				// index for Noise Emission xx:xx:xx -> 7
 				String linkId = row.getString("Link Id");
-				double value = row.getDouble(7);
+				double value = row.getDouble(row.columnCount() - 1);
 				mergedData.mergeDouble(linkId, value, Double::max);
 
 			}
@@ -188,7 +188,10 @@ final class MergeNoiseOutput {
 
 			// Read the file
 			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
-				.columnTypesPartial(Map.of("x", ColumnType.FLOAT, "y", ColumnType.FLOAT, "Receiver Point Id", ColumnType.INTEGER, "t", ColumnType.DOUBLE))
+				.columnTypesPartial(Map.of("x", ColumnType.FLOAT,
+					"y", ColumnType.FLOAT,
+					"Receiver Point Id", ColumnType.INTEGER,
+					"t", ColumnType.DOUBLE))
 				.sample(false)
 				.separator(';').build());
 
@@ -278,7 +281,10 @@ final class MergeNoiseOutput {
 
 			// Read the file
 			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
-				.columnTypesPartial(Map.of("x", ColumnType.DOUBLE, "y", ColumnType.DOUBLE, "Receiver Point Id", ColumnType.INTEGER, "t", ColumnType.DOUBLE))
+				.columnTypesPartial(Map.of("x", ColumnType.DOUBLE,
+					"y", ColumnType.DOUBLE,
+					"Receiver Point Id", ColumnType.INTEGER,
+					"t", ColumnType.DOUBLE))
 				.sample(false)
 				.separator(';').build());
 
