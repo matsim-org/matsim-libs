@@ -27,9 +27,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.Carrier;
@@ -37,6 +37,8 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
+import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
+import org.matsim.freight.logistics.analysis.Vehicle2CarrierEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -46,16 +48,13 @@ import org.matsim.vehicles.VehicleUtils;
  */
 class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory {
 
-
-
   @Inject private Network network;
-
   @Inject private Scenario scenario;
+
 
   private double toll;
   private List<String> tolledVehicleTypes = new ArrayList<>();
   private List<String> tolledLinks = new ArrayList<>();
-
 
   public ScoringFunction createScoringFunction(Carrier carrier) {
     SumScoringFunction sf = new SumScoringFunction();
@@ -84,9 +83,6 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
   private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
 
     final Logger log = LogManager.getLogger(EventBasedScoring.class);
-    private final double MAX_SHIFT_DURATION = 8 * 3600;
-    private final Map<VehicleType, Double> vehicleType2TourDuration = new LinkedHashMap<>();
-    private final Map<VehicleType, Integer> vehicleType2ScoredFixCosts = new LinkedHashMap<>();
     private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
     private double score;
 
@@ -105,13 +101,12 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
     @Override
     public void handleEvent(Event event) {
       log.debug(event.toString());
-        switch (event) {
-            case CarrierTourStartEvent freightTourStartEvent -> handleEvent(freightTourStartEvent);
-            case CarrierTourEndEvent freightTourEndEvent -> handleEvent(freightTourEndEvent);
-            case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
-            default -> {
-            }
-        }
+      switch (event) {
+        case CarrierTourStartEvent carrierTourStartEvent -> handleEvent(carrierTourStartEvent);
+        case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
+        case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+        default -> {}
+      }
     }
 
     private void handleEvent(CarrierTourStartEvent event) {
@@ -119,7 +114,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
       tourStartTime.put(event.getTourId(), event.getTime());
     }
 
-    // Fix costs for vehicle usage
+    // scores fix costs for vehicle usage and variable costs per time
     private void handleEvent(CarrierTourEndEvent event) {
       // Fix costs for vehicle usage
       final VehicleType vehicleType =
@@ -134,6 +129,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
       score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
     }
 
+    // scores variable costs per distance
     private void handleEvent(LinkEnterEvent event) {
       final double distance = network.getLinks().get(event.getLinkId()).getLength();
       final double costPerMeter =
@@ -187,7 +183,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
           (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
 
       // toll a vehicle only once.
-      if (!tolledVehicles.contains(event.getVehicleId()))
+      if (!tolledVehicles.contains(event.getVehicleId())) {
         if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
           if (tolledLinkList.contains(event.getLinkId().toString())) {
             log.info("Tolling caused by event: {}", event);
@@ -195,6 +191,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
             score = score - toll;
           }
         }
+      }
     }
   }
 }
