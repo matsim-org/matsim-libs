@@ -1,22 +1,22 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
+ *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       :  (C) 2024 by the members listed in the COPYING,       *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * ***********************************************************************
  */
 
 package org.matsim.freight.logistics.examples.multipleChains;
@@ -28,13 +28,17 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
+import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
@@ -56,8 +60,11 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
     this.carrierId = carrier.getId();
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
+    sf.addScoringFunction(new FindOtherEventsForDebuggingOnly_NO_Scoring());
+    sf.addScoringFunction(new TollMoneyScoringForDebuggingOnly_NO_Scoring());
     return sf;
   }
+
 
   /**
    * Calculate the carrier's score based on Events. Currently, it includes: - fixed costs (using
@@ -65,7 +72,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
    * distance-dependent costs (using LinkEnterEvent)
    * tolls (using PersonMoneyEvent)
    */
-  private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
+  private class EventBasedScoring implements ArbitraryEventScoring {
 
     final Logger log = LogManager.getLogger(EventBasedScoring.class);
     private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
@@ -92,7 +99,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
         case CarrierTourStartEvent carrierTourStartEvent -> handleEvent(carrierTourStartEvent);
         case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
         case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
-        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
+        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);     //FIXME: Aus irgendwelchen Gründen kommen hier keine PersonMoneyEvents an...
         case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> d2v.handleEvent(vehicleEntersTrafficEvent);
         case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> d2v.handleEvent(vehicleLeavesTrafficEvent);
         default -> {}
@@ -110,7 +117,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
       v2c.handleEvent(event);
       // Fix costs for vehicle usage
       final VehicleType vehicleType =
-          (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
+              (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
       double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 
@@ -125,10 +132,10 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
     private void handleEvent(LinkEnterEvent event) {
       final double distance = network.getLinks().get(event.getLinkId()).getLength();
       final double costPerMeter =
-          (VehicleUtils.findVehicle(event.getVehicleId(), scenario))
-              .getType()
-              .getCostInformation()
-              .getCostsPerMeter();
+              (VehicleUtils.findVehicle(event.getVehicleId(), scenario))
+                      .getType()
+                      .getCostInformation()
+                      .getCostsPerMeter();
       // variable costs per distance
       score = score - (distance * costPerMeter);
     }
@@ -142,13 +149,82 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
       if (event.getPurpose().equals("toll")) {
         if (carrierId.equals(v2c.getCarrierOfVehicle(d2v.getVehicleOfDriver(event.getPersonId())))) {
 //           toll a person only once.
-//          if (!tolledPersons.contains(event.getPersonId())) {
-//            tolledPersons.add(event.getPersonId());
+          if (!tolledPersons.contains(event.getPersonId())) {
+            log.info("Tolling caused by event: {}", event);
+            tolledPersons.add(event.getPersonId());
             tollValue = event.getAmount();
-//          }
+          }
         }
       }
       score = score - tollValue;
+    }
+  }
+
+  /**
+   * Versuche nur mit dem Debugger die PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
+   */
+  private class FindOtherEventsForDebuggingOnly_NO_Scoring implements ArbitraryEventScoring {
+
+    final Logger log = LogManager.getLogger(FindOtherEventsForDebuggingOnly_NO_Scoring.class);
+
+
+    public FindOtherEventsForDebuggingOnly_NO_Scoring() {
+      super();
+    }
+
+    @Override
+    public void finish() {}
+
+    @Override
+    public double getScore() {
+      return Double.MIN_VALUE;
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+      log.debug(event.toString());
+
+      switch (event) {
+        case CarrierTourStartEvent carrierTourStartEvent -> {}
+//        case CarrierTourEndEvent carrierTourEndEvent -> {}
+        case CarrierServiceStartEvent carrierServiceStartEvent -> {}
+        case CarrierServiceEndEvent carrierServiceEndEvent -> {}
+        case LinkEnterEvent linkEnterEvent ->{}
+        case LinkLeaveEvent linkLeaveEvent ->{}
+//        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
+        default -> {handleOtherEvent(event);}
+      }
+    }
+
+    private void handleOtherEvent(Event event) {
+      log.info("Found another event: {}", event.toString());
+    }
+
+  }
+
+
+  /**
+   * Versuche nur mit dem Debugger die Einträge aus den PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
+   */
+  private static class TollMoneyScoringForDebuggingOnly_NO_Scoring implements SumScoringFunction.MoneyScoring, PersonMoneyEventHandler {
+
+    private double score = 0.0;
+    @Override
+    public void addMoney(double amount) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void finish() {    }
+
+    @Override
+    public double getScore() {
+      return this.score;
+    }
+
+    @Override
+    public void handleEvent(PersonMoneyEvent event) {
+    // Todo: implement
     }
   }
 
