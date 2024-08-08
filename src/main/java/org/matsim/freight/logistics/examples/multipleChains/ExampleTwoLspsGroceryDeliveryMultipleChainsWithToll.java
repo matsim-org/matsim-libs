@@ -124,12 +124,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             new AbstractModule() {
               @Override
               public void install() {
-                final EventBasedCarrierScorer4MultipleChains carrierScorer =
-                        new EventBasedCarrierScorer4MultipleChains();
-                carrierScorer.setToll(TOLL_VALUE);
-                carrierScorer.setTolledVehicleTypes(TOLLED_VEHICLE_TYPES);
-                carrierScorer.setTolledLinks(TOLLED_LINKS);
-                bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+                bind(CarrierScoringFunctionFactory.class).toInstance(new EventBasedCarrierScorer4MultipleChainsInclToll());
                 bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
                 bind(CarrierStrategyManager.class)
                         .toProvider(
