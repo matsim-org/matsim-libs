@@ -40,6 +40,13 @@ class ShowGUI implements Callable<Integer> {
 
         Gui gui = f.get();
 
+		// Set the current working directory to be used in the gui, when run from the command line
+		// If the gui is run from desktop, the working directory is not overwritten
+
+		// Assumption is that starting something from command line, the user expects that the working directory remains the same
+		if (!System.getProperty("MATSIM_GUI_DESKTOP", "false").equals("true"))
+			gui.setWorkingDirectory(new File(""));
+
         while (gui.isShowing())
             Thread.sleep(250);
 
