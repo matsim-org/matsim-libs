@@ -24,6 +24,7 @@ package org.matsim.freight.logistics.examples.multipleChains;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.analysis.personMoney.PersonMoneyEventsAnalysisModule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -364,8 +365,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             distributionCarrier, scenario.getNetwork())
                     .setDistributionScheduler(
-                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
-//                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+//                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
+                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                     .build();
 
     LogisticChainElement distributionCarrierElement =
@@ -437,8 +438,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             directCarrier, scenario.getNetwork())
                     .setDistributionScheduler(
-                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
-//                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+//                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
+                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
                     .build();
 
     LogisticChainElement singleCarrierElement =
