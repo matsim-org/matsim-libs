@@ -74,7 +74,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
   private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10_tollb_1000newTollScoring";
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10_tollb_1000newTollScoringONCE";
 
 
   private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
@@ -117,6 +117,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
               @Override
               public void install() {
                 install(new LSPModule());
+                install(new PersonMoneyEventsAnalysisModule());
               }
             });
 
