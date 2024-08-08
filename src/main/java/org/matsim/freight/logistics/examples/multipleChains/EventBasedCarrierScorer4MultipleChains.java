@@ -55,10 +55,8 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
   private double toll;
   private List<String> tolledVehicleTypes = new ArrayList<>();
   private List<String> tolledLinks = new ArrayList<>();
-  private Id<Carrier> carrierId;
 
   public ScoringFunction createScoringFunction(Carrier carrier) {
-    this.carrierId = carrier.getId();
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
     sf.addScoringFunction(new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks));
