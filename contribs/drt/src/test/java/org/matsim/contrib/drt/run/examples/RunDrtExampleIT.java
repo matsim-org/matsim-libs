@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -37,6 +35,10 @@ import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemP
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
+import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -53,6 +55,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
@@ -60,6 +63,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -392,6 +396,39 @@ public class RunDrtExampleIT {
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
 
+
+	@Test
+	void testRunDrtOfferRejectionExample() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_stop_based_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {
+			@Override
+			protected void configureQSim() {
+				bindModal(DrtOfferAcceptor.class).toProvider(modalProvider(getter -> new ProbabilisticOfferAcceptor()));
+			}
+		});
+		controller.run();
+
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.46)
+				.rejections(174.0)
+				.waitAverage(222.66)
+				.inVehicleTravelTimeMean(369.74)
+				.totalTravelTimeMean(592.4)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
 	/**
 	 * Early warning system: if customer stats vary more than the defined percentage above or below the expected values
 	 * then the following unit tests will fail. This is meant to serve as a red flag.
@@ -534,6 +571,22 @@ public class RunDrtExampleIT {
 					addEventHandlerBinding().toInstance(thisTracker);
 				}
 			});
+		}
+	}
+
+	private static class ProbabilisticOfferAcceptor implements DrtOfferAcceptor {
+
+		private final DefaultOfferAcceptor delegate = new DefaultOfferAcceptor();
+
+		private final Random random = new Random(123);
+
+		@Override
+		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime) {
+			if (random.nextBoolean()) {
+				return Optional.empty();
+			} else {
+				return delegate.acceptDrtOffer(request, departureTime, arrivalTime);
+			}
 		}
 	}
 }
