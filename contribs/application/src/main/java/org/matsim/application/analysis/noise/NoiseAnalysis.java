@@ -144,8 +144,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "/immissions/", outputFilePath + "/receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 
-		final String[] paths = {outputFilePath + "/immissions/", outputFilePath + "/emissions/"};
-		MergeNoiseOutput mergeNoiseOutput = new MergeNoiseOutput(paths, Path.of(outputFilePath), config.global().getCoordinateSystem());
+		MergeNoiseOutput mergeNoiseOutput = new MergeNoiseOutput(Path.of(outputFilePath), config.global().getCoordinateSystem());
 		mergeNoiseOutput.run();
 
 		return 0;

@@ -13,11 +13,14 @@ import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.avro.XYTData;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import tech.tablesaw.api.*;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
@@ -29,7 +32,8 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static org.geotools.gml3.v3_2.GML.coordinateSystem;
 
 /**
  * Merges noise data from multiple files into one file.
@@ -44,17 +48,14 @@ final class MergeNoiseOutput {
 	 */
 	private static final boolean CREATE_CSV_FILES = false;
 
-	private final String[] inputPath;
 	private final Path outputDirectory;
 	private final String crs;
-	private final String[] labels = {"immission", "emission"};
 	private final int minTime = 3600;
 	private int maxTime = 24 * 3600;
 
-	MergeNoiseOutput(String[] inputPath, Path outputDirectory, String crs) {
-		this.inputPath = inputPath;
-		this.outputDirectory = outputDirectory;
-		this.crs = crs;
+	MergeNoiseOutput(Path path, String coordinateSystem ) {
+		this.outputDirectory = path;
+		this.crs = coordinateSystem;
 	}
 
 	/**
@@ -90,25 +91,9 @@ final class MergeNoiseOutput {
 	 * Merges noise data from multiple files into one file.
 	 */
 	public void run() {
-
-		// Loop over all paths
-		for (int i = 0; i < labels.length; i++) {
-
-			// Select the correct method based on the label
-			switch (labels[i]) {
-				case "immission" -> {
-					if (CREATE_CSV_FILES) {
-						mergeImmissionsCSV(inputPath[i], labels[i]);
-					} else {
-						mergeImissions(inputPath[i], labels[i]);
-					}
-
-				}
-				case "emission" -> mergeEmissions(inputPath[i], labels[i]);
-				default -> log.warn("Unknown path: " + inputPath[i]);
-			}
-
-		}
+		mergeReceiverPointData(outputDirectory + "/immissions/", "immission");
+		mergeReceiverPointData(outputDirectory + "/damages_receiverPoint/", "damages_receiverPoint");
+		mergeLinkData(outputDirectory.toString() + "/emissions/", "emission");
 	}
 
 	/**
@@ -129,7 +114,7 @@ final class MergeNoiseOutput {
 		}
 	}
 
-	private void mergeEmissions(String pathParameter, String label) {
+	private void mergeLinkData(String pathParameter, String label) {
 		log.info("Merging emissions data for label {}", label);
 		Object2DoubleMap<String> mergedData = new Object2DoubleOpenHashMap<>();
 		Table csvOutputMerged = Table.create(TextColumn.create("Link Id"), DoubleColumn.create("value"));
@@ -165,41 +150,48 @@ final class MergeNoiseOutput {
 	}
 
 	/**
-	 * Merges the immissions data
+	 * Merges receiverPoint data (written by {@link org.matsim.contrib.noise.NoiseWriter}
 	 *
-	 * @param pathParameter path to the immissions data
-	 * @param label         label for the immissions data
+	 * @param outputDir path to the receiverPoint data
+	 * @param label         label for the receiverPoint data (which kind of data)
 	 */
-	private void mergeImissions(String pathParameter, String label) {
+	private void mergeReceiverPointData(String outputDir, String label) {
 
 		// data per time step, maps coord to value
 		Int2ObjectMap<Object2FloatMap<FloatFloatPair>> data = new Int2ObjectOpenHashMap<>();
 
 		// Loop over all files
+		//TODO could be adjusted to time bin size from noise config group
 		for (int time = minTime; time <= maxTime; time += 3600) {
 
-			String path = pathParameter + label + "_" + round(time, 1) + ".csv";
+			String timeDataFile = outputDir + label + "_" + round(time, 1) + ".csv";
+
 			Object2FloatOpenHashMap<FloatFloatPair> values = new Object2FloatOpenHashMap<>();
 
-			if (!Files.exists(Path.of(path))) {
-				log.warn("File {} does not exist", path);
+			if (!Files.exists(Path.of(timeDataFile))) {
+				log.warn("File {} does not exist", timeDataFile);
 				continue;
 			}
 
-			// Read the file
-			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
+			//we need "damages_receiverPoint" -> "Damages 01:00:00" and "immission" -> "Immision 01:00:00"
+			String substrToCapitalize = label.contains("_") ? label.substring(0, label.lastIndexOf("_")) : label;
+			String valueHeader = StringUtils.capitalize(substrToCapitalize) + " " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS);
+
+			// Read the data file
+			Table dataTable = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(timeDataFile))
 				.columnTypesPartial(Map.of("x", ColumnType.FLOAT,
 					"y", ColumnType.FLOAT,
 					"Receiver Point Id", ColumnType.INTEGER,
-					"t", ColumnType.DOUBLE))
+					"t", ColumnType.DOUBLE,
+					valueHeader, ColumnType.DOUBLE))
 				.sample(false)
 				.separator(';').build());
 
-			// Loop over all rows in the file
-			for (Row row : table) {
+			// Loop over all rows in the data file
+			for (Row row : dataTable) {
 				float x = row.getFloat("x");
 				float y = row.getFloat("y");
-				float value = (float) row.getDouble(1); // 1
+				float value = (float) row.getDouble(valueHeader);
 				FloatFloatPair coord = FloatFloatPair.of(x, y);
 				values.put(coord, value);
 			}
@@ -235,7 +227,7 @@ final class MergeNoiseOutput {
 			}
 		}
 
-		xytHourData.setData(Map.of("imissions", raw));
+		xytHourData.setData(Map.of(label, raw));
 		xytHourData.setCrs(crs);
 
 		File out = outputDirectory.getParent().resolve(label + "_per_hour.avro").toFile();
@@ -257,7 +249,7 @@ final class MergeNoiseOutput {
 		xytDayData.setTimestamps(List.of(0));
 		xytDayData.setXCoords(xCoords);
 		xytDayData.setYCoords(yCoords);
-		xytDayData.setData(Map.of("imissions", raw));
+		xytDayData.setData(Map.of(label, raw));
 		xytDayData.setCrs(crs);
 
 		File outDay = outputDirectory.getParent().resolve(label + "_per_day.avro").toFile();
