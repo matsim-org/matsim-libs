@@ -65,7 +65,7 @@ public class FreightDemandGenerationUtils {
 	 * @param samplingOption 			The sampling option to be used for the population
 	 */
 	static void preparePopulation(Population population, double sampleSizeInputPopulation, double sampleTo,
-			String samplingOption) {
+								  String samplingOption) {
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		population.getAttributes().putAttribute("sampleSize", sampleSizeInputPopulation);
 		population.getAttributes().putAttribute("samplingTo", sampleTo);
@@ -73,7 +73,7 @@ public class FreightDemandGenerationUtils {
 
 		for (Person person : population.getPersons().values()) {
 			if (person.getAttributes().getAsMap().containsKey("subpopulation")
-					&& !person.getAttributes().getAttribute("subpopulation").toString().equals("person")) {
+				&& !person.getAttributes().getAttribute("subpopulation").toString().equals("person")) {
 				personsToRemove.add(person.getId());
 				continue;
 			}
@@ -131,29 +131,29 @@ public class FreightDemandGenerationUtils {
 			for (Carrier thisCarrier : CarriersUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));
 					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" + coord.getX()
-							+ "	" + coord.getY() + "	" + "Service" + "	"
-							+ thisService.getLocationLinkId().toString() + "		" +"	"+ "\n");
+						+ "	" + coord.getY() + "	" + "Service" + "	"
+						+ thisService.getLocationLinkId().toString() + "		" +"	"+ "\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
 					Coord coordFrom = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getFrom()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getFrom()));
 					Coord coordTo = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getTo()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getTo()));
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
-							+ coordFrom.getX() + "	" + coordFrom.getY() + "	" +
-							"Pickup" + "		"+
-							thisShipment.getFrom().toString() + "	" +
-							thisShipment.getTo().toString() + "	"+
-							0 + "\n");
+						+ coordFrom.getX() + "	" + coordFrom.getY() + "	" +
+						"Pickup" + "		"+
+						thisShipment.getFrom().toString() + "	" +
+						thisShipment.getTo().toString() + "	"+
+						0 + "\n");
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
-							+ coordTo.getX() + "	" + coordTo.getY() + "	"
-							+ "Delivery" + "		"
-							+ thisShipment.getFrom() + "	" +
-							thisShipment.getTo() + "	"+
-							thisShipment.getSize() + "\n");
+						+ coordTo.getX() + "	" + coordTo.getY() + "	"
+						+ "Delivery" + "		"
+						+ thisShipment.getFrom() + "	" +
+						thisShipment.getTo() + "	"+
+						thisShipment.getSize() + "\n");
 				}
 			}
 			writer.flush();
@@ -209,12 +209,12 @@ public class FreightDemandGenerationUtils {
 
 				// Write the age group data to the file
 				writer.write(ageGroup + "	" +
-						ageGroupData.get("lower") + "	" +
-						ageGroupData.get("upper") + "	" +
-						ageGroupData.get("share") + "	"+
-						ageGroupData.get("totalDemand") + "	"+
-						ageGroupData.get("personsWithDemandInThisAgeGroup")+ "	"+
-						ageGroupData.get("personsWithDemandInThisAgeGroup_counter")+ "\n");
+					ageGroupData.get("lower") + "	" +
+					ageGroupData.get("upper") + "	" +
+					ageGroupData.get("share") + "	"+
+					ageGroupData.get("totalDemand") + "	"+
+					ageGroupData.get("personsWithDemandInThisAgeGroup")+ "	"+
+					ageGroupData.get("personsWithDemandInThisAgeGroup_counter")+ "\n");
 			}
 
 			// Flush the writer to ensure all data is written to the file
@@ -237,11 +237,11 @@ public class FreightDemandGenerationUtils {
 
 				// Write the age group data to the file
 				writer.write(ageGroup + "	" +
-						ageGroupData.get("lower") + "	" +
-						ageGroupData.get("upper") + "	" +
-						ageGroupData.get("share") + "	"+
-						ageGroupData.get("total") + "	"+
-						ageGroupData.get("possiblePersonsInThisAge")+ "\n");
+					ageGroupData.get("lower") + "	" +
+					ageGroupData.get("upper") + "	" +
+					ageGroupData.get("share") + "	"+
+					ageGroupData.get("total") + "	"+
+					ageGroupData.get("possiblePersonsInThisAge")+ "\n");
 			}
 
 			// Flush the writer to ensure all data is written to the file
@@ -270,9 +270,9 @@ public class FreightDemandGenerationUtils {
 		for (Person person : population.getPersons().values()) {
 
 			if (!person.getAttributes().getAsMap().containsKey("homeX")
-					|| !person.getAttributes().getAsMap().containsKey("homeY"))
+				|| !person.getAttributes().getAsMap().containsKey("homeY"))
 				throw new RuntimeException(
-						"The coordinates of the home facility are not part of the attributes a person. Please check!");
+					"The coordinates of the home facility are not part of the attributes a person. Please check!");
 
 			double x = (double) person.getAttributes().getAttribute("homeX");
 			double y = (double) person.getAttributes().getAttribute("homeY");

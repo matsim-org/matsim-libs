@@ -57,9 +57,9 @@ import java.util.concurrent.ExecutionException;
  * @author: Ricardo Ewert
  */
 @CommandLine.Command(name = "generate-freight-demand", description = "The class generates a freight demand based on the "
-		+ " *          selected input options and the read input files. The format and "
-		+ " *          column titles of the input csv should not be changed. The format of"
-		+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
+	+ " *          selected input options and the read input files. The format and "
+	+ " *          column titles of the input csv should not be changed. The format of"
+	+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
 public class FreightDemandGeneration implements MATSimAppCommand {
 
 	private enum CarrierInputOptions {
@@ -166,7 +166,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		// create and prepare MATSim config
 		outputLocation = outputLocation
-				.resolve(java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay());
+			.resolve(java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay());
 		int lastMATSimIteration = 0;
 
 		Config config = prepareConfig(lastMATSimIteration, networkCRS);
@@ -194,14 +194,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		}
 		log.info("Start creating carriers. Selected option: {}", selectedCarrierInputOption);
 		createCarrier(scenario, selectedCarrierInputOption, csvCarrierPath, indexShape,
-				defaultJspritIterations, crsTransformationFromNetworkToShape);
+			defaultJspritIterations, crsTransformationFromNetworkToShape);
 
 		// create the demand
 		log.info("Start creating the demand. Selected option: {}", selectedCarrierInputOption);
 		//fixed ERROR log.info(Boolean.getBoolean(combineSimilarJobs));
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
-				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.valueOf(combineSimilarJobs),
-				crsTransformationFromNetworkToShape);
+			selectedPopulationSamplingOption, selectedPopulationOption, Boolean.valueOf(combineSimilarJobs),
+			crsTransformationFromNetworkToShape);
 
 		// prepare the VRP and get a solution
 		Controler controler = prepareControler(scenario);
@@ -229,7 +229,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		config.controller().setOutputDirectory(outputLocation.toString());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
-				config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
+			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);
@@ -252,7 +252,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws RuntimeException 				if the networkPathOfOtherNetwork is empty
 	 */
 	private static void setNetworkAndNetworkChangeEvents(Config config, String networkPathOfOtherNetwork,
-			String networkChangeEventsFileLocation) throws RuntimeException {
+														 String networkChangeEventsFileLocation) throws RuntimeException {
 
 		if (networkPathOfOtherNetwork.isEmpty())
 			throw new RuntimeException("no correct network path network");
@@ -298,11 +298,11 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws IOException 						if the carrier file is not found
 	 */
 	private void createCarrier(Scenario scenario, CarrierInputOptions selectedCarrierInputOption,
-			Path csvLocationCarrier, ShpOptions.Index indexShape,
-			int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+							   Path csvLocationCarrier, ShpOptions.Index indexShape,
+							   int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				FreightCarriersConfigGroup.class);
+			FreightCarriersConfigGroup.class);
 		switch (selectedCarrierInputOption) {
 			case addCSVDataToExistingCarrierFileData -> {
 				// reads an existing carrier file and adds the information based on the read csv
@@ -327,8 +327,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			}
 			case createCarriersFromCSV ->
 				// creates all carriers based on the given information in the read carrier csv
-					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
-						indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
+				CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
+					indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 			default -> throw new RuntimeException("no method to create or read carrier selected.");
 		}
 	}
@@ -355,8 +355,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		switch (selectedDemandGenerationOption) {
 			case createDemandFromCSV ->
 				// creates the demand by using the information given in the read csv file
-					DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape, combineSimilarJobs,
-							crsTransformationNetworkAndShape, null, shapeCategory);
+				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape, combineSimilarJobs,
+					crsTransformationNetworkAndShape, null, shapeCategory);
 			case createDemandFromCSVAndUsePopulation -> {
 				/*
 				 * Option creates the demand by using the information given in the read csv file
@@ -375,22 +375,22 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 * locations are created related to the given share of persons in the population
 						 * with this demand.
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-									upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
 					case increaseDemandOnLocation ->
 						/*
 						 * If the demand sample is higher than the population sample, the demand per
 						 * person will be increased.
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-									upSamplePopulationTo, "changeDemandOnLocation");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeDemandOnLocation");
 					case noPopulationSampling ->
 						/*
 						 * If the demand sample is equal to the population sample, the demand is created
 						 * based on the given population and the set input population sampleSize
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-								sampleSizeInputPopulation, "noPopulationSampling");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							sampleSizeInputPopulation, "noPopulationSampling");
 					default -> throw new RuntimeException("No valid sampling option selected!");
 				}
 				switch (selectedPopulationOption) {
@@ -402,14 +402,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						if(population != null && shapeCategory != null )
 							log.warn("Population isn't reduced to shapefile even though shapefile is defined. This might lead to errors when no areas or locations for pickup or delivery are defined.");
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
+							combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
 						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
-								shp.createIndex(populationCRS, "_"));
+							shp.createIndex(populationCRS, "_"));
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
+							combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
 					default:
 						throw new RuntimeException("No valid population option selected!");
@@ -445,7 +445,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			@Override
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
-		}});
+			}});
 
 		return controler;
 	}
@@ -460,7 +460,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws InterruptedException 	if the execution of the jsprit is interrupted
 	 */
 	private static void solveSelectedSolution(OptionsOfVRPSolutions selectedSolution, Config config,
-			Controler controler) throws ExecutionException, InterruptedException {
+											  Controler controler) throws ExecutionException, InterruptedException {
 		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
 			.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 		if (Objects.requireNonNull(selectedSolution) == OptionsOfVRPSolutions.createNoSolutionAndOnlyWriteCarrierFile) {
@@ -481,7 +481,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			controler.run();
 		else
 			log.warn(
-					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
+				"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
 		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
 			.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 	}
@@ -495,12 +495,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws InterruptedException 	if the execution of the jsprit is interrupted
 	 */
 	private static void runJsprit(Controler controler, boolean usingRangeRestriction)
-			throws ExecutionException, InterruptedException {
+		throws ExecutionException, InterruptedException {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(),
-				FreightCarriersConfigGroup.class);
+			FreightCarriersConfigGroup.class);
 		if (usingRangeRestriction)
 			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(
-					FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+				FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
 		CarriersUtils.runJsprit(controler.getScenario());
 	}
 }
