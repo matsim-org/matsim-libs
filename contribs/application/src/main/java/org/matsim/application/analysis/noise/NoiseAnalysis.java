@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.noise;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
@@ -19,9 +21,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,7 +44,10 @@ import java.util.Set;
 	produces = {
 		"emission_per_day.csv",
 		"immission_per_day.%s",
-		"immission_per_hour.%s"
+		"immission_per_hour.%s",
+		"damages_receiverPoint_per_hour.%s",
+		"damages_receiverPoint_per_day.%s",
+		"noise_stats.csv"
 	}
 )
 public class NoiseAnalysis implements MATSimAppCommand {
@@ -77,7 +88,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
 		if(overrideParameters){
-			log.warn("no NoiseConfigGroup was configured before. Will set som estandards. You should check the next lines in the log file!");
+			log.warn("no NoiseConfigGroup was configured before. Will set some standards. You should check the next lines in the log file!");
 			noiseParameters.setConsideredActivitiesForReceiverPointGridArray(considerActivities.toArray(String[]::new));
 			noiseParameters.setConsideredActivitiesForDamageCalculationArray(considerActivities.toArray(String[]::new));
 
@@ -146,6 +157,17 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 		MergeNoiseOutput mergeNoiseOutput = new MergeNoiseOutput(Path.of(outputFilePath), config.global().getCoordinateSystem());
 		mergeNoiseOutput.run();
+
+		// Total stats
+		DecimalFormat df = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.US));
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("noise_stats.csv").toString()), CSVFormat.DEFAULT)) {
+			printer.printRecord("Annual cost rate per pop. unit [€]:", df.format(noiseParameters.getAnnualCostRate()));
+			for (Map.Entry<String, Float> labelValueEntry : mergeNoiseOutput.getTotalReceiverPointValues().entrySet()) {
+				printer.printRecord("Total " + labelValueEntry.getKey() + " at receiver points", df.format(labelValueEntry.getValue()));
+			}
+		} catch (IOException ex) {
+			log.error(ex);
+		}
 
 		return 0;
 	}

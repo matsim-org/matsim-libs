@@ -53,6 +53,8 @@ final class MergeNoiseOutput {
 	private final int minTime = 3600;
 	private int maxTime = 24 * 3600;
 
+	private final Map<String,Float> totalReceiverPointValues = new HashMap<>();
+
 	MergeNoiseOutput(Path path, String coordinateSystem ) {
 		this.outputDirectory = path;
 		this.crs = coordinateSystem;
@@ -162,6 +164,7 @@ final class MergeNoiseOutput {
 
 		// Loop over all files
 		//TODO could be adjusted to time bin size from noise config group
+		String substrToCapitalize = null;
 		for (int time = minTime; time <= maxTime; time += 3600) {
 
 			String timeDataFile = outputDir + label + "_" + round(time, 1) + ".csv";
@@ -174,7 +177,7 @@ final class MergeNoiseOutput {
 			}
 
 			//we need "damages_receiverPoint" -> "Damages 01:00:00" and "immission" -> "Immision 01:00:00"
-			String substrToCapitalize = label.contains("_") ? label.substring(0, label.lastIndexOf("_")) : label;
+			substrToCapitalize = label.contains("_") ? label.substring(0, label.lastIndexOf("_")) : label;
 			String valueHeader = StringUtils.capitalize(substrToCapitalize) + " " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS);
 
 			// Read the data file
@@ -255,9 +258,12 @@ final class MergeNoiseOutput {
 		File outDay = outputDirectory.getParent().resolve(label + "_per_day.avro").toFile();
 
 		writeAvro(xytDayData, outDay);
+		//cache the overall sum
+		this.totalReceiverPointValues.put(substrToCapitalize, raw.stream().reduce(0f, Float::sum));
 	}
 
 	// Merges the immissions data
+
 	@Deprecated
 	private void mergeImmissionsCSV(String pathParameter, String label) {
 		log.info("Merging immissions data for label {}", label);
@@ -316,5 +322,8 @@ final class MergeNoiseOutput {
 		csvOutputMerged.write().csv(outPerDay);
 		log.info("Merged noise data written to {} ", outPerDay);
 
+	}
+	public Map<String, Float> getTotalReceiverPointValues() {
+		return totalReceiverPointValues;
 	}
 }
