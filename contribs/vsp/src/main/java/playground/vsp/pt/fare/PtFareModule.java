@@ -11,12 +11,15 @@ public class PtFareModule extends AbstractModule {
         getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
         getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
         PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);
+		DistanceBasedPtFareParams distanceBasedPtFareParams = ConfigUtils.addOrGetModule(this.getConfig(), DistanceBasedPtFareParams.class);
+
         if (ptFareConfigGroup.getPtFareCalculation() == PtFareConfigGroup.PtFareCalculationModels.distanceBased) {
-            DistanceBasedPtFareParams distanceBasedPtFareParams = ConfigUtils.addOrGetModule(this.getConfig(), DistanceBasedPtFareParams.class);
-            addEventHandlerBinding().toInstance(new DistanceBasedPtFareHandler(distanceBasedPtFareParams));
-        } else {
+			addEventHandlerBinding().toInstance(new DistanceBasedPtFareHandler(distanceBasedPtFareParams));
+		} else if (ptFareConfigGroup.getPtFareCalculation() == PtFareConfigGroup.PtFareCalculationModels.fareZoneBased) {
+			addEventHandlerBinding().toInstance(new FareZoneBasedPtFareHandler(distanceBasedPtFareParams));
+		} else {
             throw new RuntimeException("Please choose from the following fare Calculation method: [" +
-                    PtFareConfigGroup.PtFareCalculationModels.distanceBased + "]");
+                    PtFareConfigGroup.PtFareCalculationModels.distanceBased + ", " + PtFareConfigGroup.PtFareCalculationModels.fareZoneBased + "]");
         }
 
         if (ptFareConfigGroup.getApplyUpperBound()) {

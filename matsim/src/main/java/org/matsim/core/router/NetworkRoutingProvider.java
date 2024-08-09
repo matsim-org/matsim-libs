@@ -46,6 +46,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
 
 	private final String routingMode;
+	private boolean alreadyCheckedConsistency = false;
 
 	@Inject Map<String, TravelTime> travelTimes;
 	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
@@ -142,6 +143,12 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			return;
 		}
 
+		if(alreadyCheckedConsistency){
+			return;
+		}
+
+		log.info("Checking network for mode '{}' for consistency...", mode);
+
 		int nLinks = filteredNetwork.getLinks().size();
 		int nNodes = filteredNetwork.getNodes().size();
 		new NetworkCleaner().run(filteredNetwork);
@@ -153,5 +160,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 				"\n If this network topology is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
 			throw new RuntimeException(errorMessage);
 		}
+
+		alreadyCheckedConsistency = true;
 	}
 }
