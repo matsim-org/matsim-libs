@@ -392,6 +392,7 @@ public final class MergeNoiseCSVFile {
 		}
 	}
 
+	//TODO this should be updated to use CSVReader or something as robust
 	private void readValues() {
 		for (int ll = 0; ll < this.labels.length; ll++) {
 
