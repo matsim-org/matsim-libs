@@ -57,6 +57,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PersonRouteCheck;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -1295,4 +1296,16 @@ public final class PopulationUtils {
 		VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
 	}
 
+	/**
+	 * Checks if each link of a route has the mode of the respective leg. This may be the case, if network links were
+	 * If the route is not a {@link NetworkRoute}, nothing is changed. If there are inconsistencies, the route is reset.
+	 * @param population
+	 * @param network
+	 */
+	public static void checkRouteModeAndReset(Population population, Network network) {
+		PersonRouteCheck personRouteChecker = new PersonRouteCheck(network);
+		population.getPersons().values().forEach(
+			personRouteChecker::run
+		);
+	}
 }

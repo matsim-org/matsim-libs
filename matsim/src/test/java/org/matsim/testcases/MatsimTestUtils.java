@@ -51,6 +51,10 @@ import java.util.Objects;
 public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallback {
 	private static final Logger log = LogManager.getLogger(MatsimTestUtils.class);
 
+	public enum TestMethodType {
+		Normal, Parameterized
+	}
+
 	/**
 	 * A constant for the exactness when comparing doubles.
 	 */
@@ -79,6 +83,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
+	private String testDisplayName = null;
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
@@ -88,6 +93,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	public void beforeEach(ExtensionContext extensionContext) {
 		this.testClass = extensionContext.getTestClass().orElseThrow();
 		this.testMethodName = extensionContext.getRequiredTestMethod().getName();
+		this.testDisplayName = extensionContext.getDisplayName();
 	}
 
 	@Override
@@ -163,35 +169,60 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 		return config;
 	}
 
-
 	/**
-	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).
+	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>)
+	 * and sets the output directory to {classPath}/{methodName}/. For parameterized tests, the output directory is {classPath}/{methodName}/{parameters}/.
 	 *
 	 * @param configfile The path/filename of a configuration file, or null to load the default configuration.
 	 * @return The loaded configuration.
 	 */
-	public Config loadConfig(final String configfile, final ConfigGroup... customGroups) {
+	public Config loadConfig(final String configfile, TestMethodType testMethodType, final ConfigGroup... customGroups) {
 		Config config;
 		if (configfile != null) {
 			config = ConfigUtils.loadConfig(configfile, customGroups);
 		} else {
 			config = ConfigUtils.createConfig( customGroups );
 		}
-		this.outputDirectory = getOutputDirectory();
+		return setOutputDirectory(config, testMethodType);
+	}
+
+	public Config loadConfig(final String configfile, final ConfigGroup... customGroups) {
+		return loadConfig(configfile, TestMethodType.Normal, customGroups);
+	}
+
+	public Config loadConfig(final URL configfile, TestMethodType testMethodType, final ConfigGroup... customGroups) {
+		Config config;
+		if (configfile != null) {
+			config = ConfigUtils.loadConfig(configfile, customGroups);
+		} else {
+			config = ConfigUtils.createConfig( customGroups );
+		}
+		return setOutputDirectory(config, testMethodType);
+	}
+
+	public Config loadConfig(final URL configfile, final ConfigGroup... customGroups) {
+		return loadConfig(configfile, TestMethodType.Normal, customGroups);
+	}
+
+	/**
+	 * Sets the output directory to {classPath}/{methodName}/{subDir}. For normal tests, there is no {subDir}.
+	 * For parameterized tests, {subDir} is a slightly adapted test input parameter string (aka display name of JUnit 5).
+	 * E.g.: "[1] car, 6" will be transformed to "car_6".
+	 */
+	private Config setOutputDirectory(Config config, TestMethodType testMethodType) {
+		String subDirectory = switch (testMethodType) {
+			case Normal -> "";
+			case Parameterized -> getParameterizedTestInputString();
+		};
+		this.outputDirectory = getOutputDirectory(subDirectory);
 		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
-	public Config loadConfig(final URL configfile, final ConfigGroup... customGroups) {
-		Config config;
-		if (configfile != null) {
-			config = ConfigUtils.loadConfig(configfile, customGroups);
-		} else {
-			config = ConfigUtils.createConfig( customGroups );
-		}
-		this.outputDirectory = getOutputDirectory();
-		config.controller().setOutputDirectory(this.outputDirectory);
-		return config;
+	public String getParameterizedTestInputString() {
+		String parameters = this.testDisplayName.replaceFirst("^.*?\\]", "").trim();
+		parameters = parameters.replaceAll(" ", "").replaceAll("[^a-zA-Z0-9]", "_");
+		return parameters;
 	}
 
 	public Config createConfig(final ConfigGroup... customGroups) {

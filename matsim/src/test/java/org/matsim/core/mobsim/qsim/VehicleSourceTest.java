@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -94,6 +95,7 @@ public class VehicleSourceTest {
 		createPlans(vehiclesSource, providingVehiclesInPerson);
 
 		Config config = scenario.getConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setFlowCapFactor(1.0);
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(Arrays.asList(transportModes));

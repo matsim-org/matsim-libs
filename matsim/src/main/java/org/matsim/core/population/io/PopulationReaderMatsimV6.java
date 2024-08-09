@@ -461,6 +461,7 @@ import com.google.inject.Inject;
 			if ("pt".equals(legMode)) {
 				routeType = "experimentalPt1";
 			} else if ("car".equals(legMode)) {
+				//yyyy couldn't we check against all network modes of config here? paul, jul '24
 				routeType = "links";
 			} else {
 				routeType = "generic";

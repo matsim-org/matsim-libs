@@ -48,6 +48,7 @@ import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
@@ -210,6 +211,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -238,6 +240,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -270,6 +273,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -303,6 +307,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWithThreeLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
