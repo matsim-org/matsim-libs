@@ -26,10 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -422,11 +419,11 @@ public class RunDrtExampleIT {
 
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.1)
-				.rejections(190)
-				.waitAverage(217.01)
-				.inVehicleTravelTimeMean(362.57)
-				.totalTravelTimeMean(579.58)
+				.rejectionRate(0.46)
+				.rejections(174.0)
+				.waitAverage(222.66)
+				.inVehicleTravelTimeMean(369.74)
+				.totalTravelTimeMean(592.4)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -581,9 +578,11 @@ public class RunDrtExampleIT {
 
 		private final DefaultOfferAcceptor delegate = new DefaultOfferAcceptor();
 
+		private final Random random = new Random(123);
+
 		@Override
 		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime) {
-			if (MatsimRandom.getLocalInstance().nextBoolean()) {
+			if (random.nextBoolean()) {
 				return Optional.empty();
 			} else {
 				return delegate.acceptDrtOffer(request, departureTime, arrivalTime);
