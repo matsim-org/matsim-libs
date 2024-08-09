@@ -56,7 +56,8 @@ public final class DemandReaderFromCSV {
 	private static final Random rand = new Random(4711);
 	private static double roundingError;
 
-	protected static HashMap<Id<Person>, HashMap<Integer, Integer>> demandForEachPerson = new HashMap<>();
+	// NEW
+	protected static HashMap<Id<Person>, HashMap<Integer, Integer>> demandForEachPerson;
 
 	protected static final HashMap demandDistributionPerAgeGroup = new HashMap<>(Map.of(
 			(int) 0,new HashMap<>(Map.of("lower",0,"upper",13,"share", 0.0)),
@@ -82,9 +83,9 @@ public final class DemandReaderFromCSV {
 	//private static final String demandDistributionOption = "byPopulation";
 	//private static final String demandDistributionOption = "toRandomLinks";
 	//private static final String demandDistributionOption = "";
-	//private static final String totalDemandGenerationOption = "";
 	private static final String totalDemandGenerationOption = "DemandPerPerson";
 	//private static final String totalDemandGenerationOption = "DemandForShape";
+	//private static final String totalDemandGenerationOption = "";
 	private static final double PACKAGES_PER_PERSON = 0.16;
 	public static final double PACKAGES_PER_STOP = 1.5;
 
@@ -811,13 +812,17 @@ public final class DemandReaderFromCSV {
 			double sampleTo = (double) population.getAttributes().getAttribute("samplingTo");
 			String samplingOption = String.valueOf(population.getAttributes().getAttribute("samplingOption"));
 
-			//ERROR2: index shape, da sonst Endlosschleife, wenn keine area angegeben
+			//Pickup
+			// ERROR2: index shape, da sonst Endlosschleife, wenn keine Area angegeben
 			if (areasForPickupLocations != null || indexShape != null)
 				possiblePersonsPickup = findPossiblePersons(population, areasForPickupLocations, indexShape,
 						crsTransformationNetworkAndShape);
 			else
 				possiblePersonsPickup.putAll(population.getPersons());
 
+			//Delivery
+			//NEW / MODIFICATIONS
+			//AGENTS ARE DELETED IN THE POPULATION: PROBLEM FOR OTHER USECASES?
 			if (areasForDeliveryLocations != null || indexShape != null) {
 				log.info("Population is reduced to selected delivery areas...");
 				//possiblePersonsDelivery = findPossiblePersons(population, areasForDeliveryLocations, indexShape,
@@ -825,11 +830,11 @@ public final class DemandReaderFromCSV {
 				population = findPopulationWithPossiblePersons(population, areasForDeliveryLocations, indexShape,
 						crsTransformationNetworkAndShape);
 				sizeOfPopulationFilteredByArea = population.getPersons().size();
-				log.info("Population size decreased from "+ sizeOfWholePopulation+" to "+sizeOfPopulationFilteredByArea+ " due to selected area(s).");
+				log.info("Population size decreased from "+ sizeOfWholePopulation+" to "+sizeOfPopulationFilteredByArea+ " due to defined area(s).");
 			}
 			else{
 				sizeOfPopulationFilteredByArea = population.getPersons().size();
-				log.info("Population size not decreased due to areas.");
+				log.info("Population size not decreased due to defined areas.");
 			}
 			if (demandDistributionOption == "byPopulationAndAge") {
 				population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
@@ -838,7 +843,7 @@ public final class DemandReaderFromCSV {
 
 			possiblePersonsDelivery.putAll(population.getPersons());
 
-			//demand to distribute
+			//NEW: generation of demand to distribute
 			if (demandDistributionOption == "toRandomLinks" || demandDistributionOption == "byPopulationAndAge" || demandDistributionOption == "byPopulation") {
 				if (totalDemandGenerationOption == "DemandPerPerson") {
 					demandToDistribute =
@@ -916,13 +921,11 @@ public final class DemandReaderFromCSV {
 
 		}
 
-		//byPopulationAndAge
+		//NEW: get demand per age group and add it to "demandDistributionPerAgeGroup"
+		//NEW: or delete population bcs "toRandomLinks" was selected
 		if (demandDistributionOption == "byPopulationAndAge") {
-			getDemandAndPersonsPerAgeGroup(demandToDistribute,population);
-			//log.info(demandDistributionPerAgeGroup);
-			//log.info(ageGroupDemandShare);
-		}
-		else if(demandDistributionOption == "toRandomLinks"){
+			getDemandAndPersonsPerAgeGroup(demandToDistribute, population);
+		} else if (demandDistributionOption == "toRandomLinks") {
 			log.warn("Because the option toRandomLinks was selected, population is deleted.");
 			log.warn("Number of jobs is set to 0.");
 			numberOfDeliveryLocations = null;
@@ -935,7 +938,7 @@ public final class DemandReaderFromCSV {
 		HashMap<Id<Link>, Link> possibleLinksDelivery = null;
 		HashMap<Id<Link>, Link> possibleLinksPickup = null;
 
-
+		//NEW: Not links but possible persons are matched to link -> saves time
 		if (demandDistributionOption == "byPopulationAndAge"||demandDistributionOption=="byPopulation") {
 			//pickup
 			possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
@@ -1022,7 +1025,7 @@ public final class DemandReaderFromCSV {
 						usedPickupLocations.add(linkPickup.getId().toString());
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
-
+					//NEW: package creation to use other parameters
 					if(demandDistributionOption =="") {
 						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
 								demandForThisLink);
@@ -1112,7 +1115,7 @@ public final class DemandReaderFromCSV {
 		{
 			log.info("Number of jobs: "+numberOfJobs);
 
-			//ERROR: Verschoben vor die Schleife
+			//ERROR: Verschoben vor die for-Schleife
 			if (demandToDistribute != 0 && demandToDistribute < numberOfJobs && demandDistributionOption != "byPopulationAndAge") {
 				numberOfJobs = demandToDistribute;
 				log.warn(
@@ -1146,22 +1149,23 @@ public final class DemandReaderFromCSV {
 				//NEW: demand not random but by age group
 				int demandForThisLink = 0;
 				if (demandDistributionOption == "byPopulationAndAge") {
-					if (distributedDemand != demandToDistribute){
+					if (distributedDemand != demandToDistribute) {
 						demandForThisLink = calculateDemandBasedOnAge(person, population);
 					}
-					//add demand for the age of person
+					//add demand for the person
 					int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-					demandForEachPerson.put(person,new HashMap<>());
-					demandForEachPerson.get(person).put(age,demandForThisLink);
-				}
-					else {
+					demandForEachPerson.put(person, new HashMap<>());
+					demandForEachPerson.get(person).put(age, demandForThisLink);
+				} else {
 					demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
 				}
+
 				if (!usedPickupLocations.contains(linkPickup.getId().toString()))
 					usedPickupLocations.add(linkPickup.getId().toString());
 				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 					usedDeliveryLocations.add(linkDelivery.getId().toString());
 
+				//NEW: create Package
 				if(demandDistributionOption !="") {
 					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
 							demandForThisLink);
@@ -1176,7 +1180,7 @@ public final class DemandReaderFromCSV {
 			}
 		}
 
-		//if more possible persons than demand
+		//NEW: if more possible persons than demand -> add to demandForEachPerson
 		if (possiblePersonsDelivery.size() != 0) {
 			for (Id<Person> person : possiblePersonsDelivery.keySet()) {
 				demandForEachPerson.put(person, new HashMap<>());
@@ -1226,7 +1230,7 @@ public final class DemandReaderFromCSV {
 	}
 
 
-	/** Creates a single shipment for packages.
+	/** Creates a single shipment for packages. //NEW METHOD
 	 * @param scenario                    Scenario
 	 * @param newDemandInformationElement single DemandInformationElement
 	 * @param linkPickup                  Link for the pickup
@@ -1234,6 +1238,7 @@ public final class DemandReaderFromCSV {
 	 * @param demandForThisLink           Demand for this link
 	 * @param sampleSize                  SampleSize
 	 */
+
 	private static void createSinglePackageShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
 											 Link linkPickup, Link linkDelivery, int demandForThisLink, double sampleSize) {
 
@@ -1263,10 +1268,6 @@ public final class DemandReaderFromCSV {
 
 		}
 	}
-
-
-
-
 
 	/**
 	 * Creates a job Id for a new job.
@@ -1357,7 +1358,7 @@ public final class DemandReaderFromCSV {
 		return demandForThisLink;
 	}
 
-	/**
+	/** Calculates the demand for selected person based on the age //NEW METHOD
 	 * @param person				selected person
 	 * @param population 		    population
 	 * @return						Demand for this link
@@ -1391,20 +1392,6 @@ public final class DemandReaderFromCSV {
 						}
 
 					}
-					//TODO: Error needed?
-					//error += demandForThisPersonDouble - demandForThisLink;
-/*					error += demandForThisLink - demandForThisPersonDouble;
-					log.info(error);
-
-					if (error <= -1) {
-						demandForThisLink += 1;
-						error += 1;
-					} else if (error >= 1) {
-						demandForThisLink -= 1;
-						error -= 1;
-					}
-
-					log.info(error);*/
 
 					temp.put("demand", restOfDemandForThisAge - demandForThisLink);
 					temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
@@ -1641,7 +1628,7 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Finds all persons that are possible for the demand.
+	 * Finds population with all persons that are possible for the demand. //NEW METHOD
 	 *
 	 * @param population 						Population
 	 * @param areasForJobElementLocations 		Areas for the locations
@@ -1793,7 +1780,7 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Modifies the population according to the age distribution
+	 * Modifies the population according to the age distribution //NEW METHOD
 	 *
 	 * @param population						Population (possibly reduced to shape)
 	 * @param areasForDeliveryLocations			String of Areas for Delivery Location
@@ -1804,13 +1791,16 @@ public final class DemandReaderFromCSV {
 
 	private static Population modifyPopulation(Population population,String[] areasForDeliveryLocations, ShpOptions.Index indexShape,
 											   CoordinateTransformation crsTransformationNetworkAndShape){
+
 		log.info("Population is modified by age...");
-		//getting the age distribution of the given population and the number of persons available for delivery
+
+		//getting the age distribution of the given population (ageGroupDemandShare) and the number of available persons for delivery
 		int totalNumberOfPersonsWithDemand = getAgeDistribution(population, areasForDeliveryLocations, indexShape,
 				crsTransformationNetworkAndShape);
-		log.info("Population will be decreased from "+ population.getPersons().size()+" to "+totalNumberOfPersonsWithDemand+" due to age distribution");
 
-		//create duplicate of population to decrease population
+		log.info("Population will be decreased from "+ population.getPersons().size()+" to "+totalNumberOfPersonsWithDemand+" due to age distribution ...");
+
+		//create list of population to decrease population
 		Set<Id<Person>> allPersons = new HashSet<>();
 		for (Id<Person> person : population.getPersons().keySet()) {
 			allPersons.add(person);
@@ -1823,35 +1813,35 @@ public final class DemandReaderFromCSV {
 			if (totalNumberOfPersonsWithDemand == 0) {
 				//set demand = 0 for the age of this person
 				int agePerson = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-				demandForEachPerson.put(person,new HashMap<>());
-				demandForEachPerson.get(person).put(agePerson,0);
+				demandForEachPerson.put(person, new HashMap<>());
+				demandForEachPerson.get(person).put(agePerson, 0);
 				//remove person
 				population.removePerson(person);
 				allPersons.remove(person);
-				} else {
-
+			} else {
 				//int agePerson = (int) population.getPersons().get(person).getCustomAttributes().get("age");
 				int agePerson = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-
-				for (Object ageRange : ageGroupDemandShare.keySet()) {
-					HashMap tempHashMap = (HashMap) ageGroupDemandShare.get(ageRange);
+				//determine age group of the person
+				for (Object ageGroup : ageGroupDemandShare.keySet()) {
+					HashMap tempHashMap = (HashMap) ageGroupDemandShare.get(ageGroup);
 					int lower = (int) tempHashMap.get("lower");
 					int upper = (int) tempHashMap.get("upper");
 					int personsWithDemand = (int) tempHashMap.get("possiblePersonsInThisAge_counter");
 
 					if (agePerson <= upper && agePerson >= lower) {
 						if (personsWithDemand == 0) {
-							population.removePerson(person);
 							//set demand = 0 for the age of this person
-							demandForEachPerson.put(person,new HashMap<>());
-							demandForEachPerson.get(person).put(agePerson,0);
+							demandForEachPerson.put(person, new HashMap<>());
+							demandForEachPerson.get(person).put(agePerson, 0);
+							//remove person
+							population.removePerson(person);
 						} else {
 							personsWithDemand -= 1;
 							totalNumberOfPersonsWithDemand -= 1;
 						}
 
 						tempHashMap.put("possiblePersonsInThisAge_counter", personsWithDemand);
-						ageGroupDemandShare.put(ageRange, tempHashMap);
+						ageGroupDemandShare.put(ageGroup, tempHashMap);
 						allPersons.remove(person);
 					}
 				}
@@ -1862,7 +1852,7 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Determination of the age distribution
+	 * Determination of the age distribution of given population \\ new method
 	 *
 	 * @param population						Population (possibly reduced to shape)
 	 * @param areasForDeliveryLocations			String of Areas for Delivery Location
@@ -1878,45 +1868,28 @@ public final class DemandReaderFromCSV {
 		int totalNumberOfPersonsWithDemand = 0;
 		HashSet<Id<Person>> personsToBeRemoved = new HashSet<>();
 
-		//each person's age is evaluated
+		//each person's age is evaluated to determine the number of persons in each age group
 		for (Id<Person> personId : population.getPersons().keySet()) {
 
-			boolean removedPerson = false;
 			//int agePerson = (int) population.getPersons().get(personId).getCustomAttributes().get("age");
 			int agePerson = (int) population.getPersons().get(personId).getAttributes().getAttribute("age");
 
-			//check location and remove person if location is outside of shape/areas
-			/*if (areasForDeliveryLocations != null || indexShape != null){
-				Person person = population.getPersons().get(personId);
-				Coord coord = getHomeCoord(person);
-
-				if (crsTransformationNetworkAndShape != null)
-					coord = crsTransformationNetworkAndShape.transform(coord);
-				if (!FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape,
-						areasForDeliveryLocations, crsTransformationNetworkAndShape)) {
-					personsToBeRemoved.add(personId);
-					removedPerson = true;
-				}
-
-			}*/
-
-			//add person to age distribution
-			if (removedPerson != true) {
-				for (Object ageRange: ageGroupDemandShare.keySet()) {
-					ageSplit = (HashMap) ageGroupDemandShare.get(ageRange);
-					int lower = (int) ageSplit.get("lower");
-					int upper = (int) ageSplit.get("upper");
-					int counter = (int) ageSplit.get("total"); // total number of people in this age group
-					if (agePerson <= upper && agePerson >= lower){
+			//add person to age group
+			for (Object ageRange : ageGroupDemandShare.keySet()) {
+				ageSplit = (HashMap) ageGroupDemandShare.get(ageRange);
+				int lower = (int) ageSplit.get("lower");
+				int upper = (int) ageSplit.get("upper");
+				int counter = (int) ageSplit.get("total"); // total number of people in this age group
+				if (agePerson <= upper && agePerson >= lower) {
 					counter += 1;
-					}
-					ageSplit.put("total",counter);
-					ageGroupDemandShare.put(ageRange,ageSplit);
 				}
+				ageSplit.put("total", counter);
+				ageGroupDemandShare.put(ageRange, ageSplit);
 			}
+
 		}
 
-		// multiply persons in the age group with share of people within each age group who have a demand
+		// determine persons in the age group with share of people within each age group who have a demand
 		for (Object ageRange: ageGroupDemandShare.keySet()) {
 			ageSplit = (HashMap) ageGroupDemandShare.get(ageRange);
 			int personsWithDemandInThisAgeGroup = (int) Math.round(
@@ -1927,23 +1900,21 @@ public final class DemandReaderFromCSV {
 			totalNumberOfPersonsWithDemand += personsWithDemandInThisAgeGroup;
 		}
 
-		/*//reducing population to the people in shapefile or area(s)
-		if (personsToBeRemoved.size() !=0){
-			log.info(
-					"Population is reduced to the shapefile or the selected delivery area(s) by " +
-							personsToBeRemoved.size());
-			for ( Id<Person> Id : personsToBeRemoved) {
-				population.removePerson(Id);
-			}
-		}*/
-
 		return totalNumberOfPersonsWithDemand;
 	}
 
-	public static int getDemandAndPersonsPerAgeGroup(int demandToDistribute, Population population) {
 
-		log.info("Getting the demand per age group...");
-		//modifying the demand hash map and add share of demand
+	/**
+	 * Determination of the age distribution of given population \\NEW METHOD
+	 *
+	 * @param population						Population (possibly reduced to shape)
+	 * @param demandToDistribute				Total number of demand
+	 */
+	public static void getDemandAndPersonsPerAgeGroup(int demandToDistribute, Population population) {
+
+		log.info("Splitting the demand per age group...");
+
+		//the demand volume is divided between the individual age groups and added to "demandDistributionPerAgeGroup"
 		double error = 0;
 		for (Object ageGroup : demandDistributionPerAgeGroup.keySet()) {
 
@@ -1955,10 +1926,10 @@ public final class DemandReaderFromCSV {
 
 			if (error >= 1) {
 				demandForAgeGroupAsInt += 1;
-				error += -1;
+				error -= 1;
 			}
 			else if (error<=-1) {
-				demandForAgeGroupAsInt += -1;
+				demandForAgeGroupAsInt -= 1;
 				error += 1;
 			}
 
@@ -1987,9 +1958,9 @@ public final class DemandReaderFromCSV {
 			}
 		}
 		log.info("Finished with the demand per age group...");
-		return demandToDistribute;
 	}
 
+	//NEW METHOD
 	public static Link findLinkForSelectedPerson(Scenario scenario, ShpOptions.Index indexShape, Integer selectedNumberOfLocations, String[] areasForLocations,
 												 String[] selectedLocations, ArrayList<String> usedLocations, HashMap<Id<Person>, Person> possiblePersonsDel,
 												 Id<Person> person, HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, CoordinateTransformation crsTransformationNetworkAndShape, int i) {

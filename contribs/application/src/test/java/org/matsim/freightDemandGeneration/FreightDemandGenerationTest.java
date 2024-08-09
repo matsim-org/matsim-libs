@@ -29,7 +29,8 @@ public class FreightDemandGenerationTest {
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "LOR_Liefergebiete/LOR_Liefergebiete.shp");
 			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "Liefergebiete_16_manuell/Liefergebiete_16_manuell.shp");
 			//String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-1pct.plans-initial.xml.gz";
+			//String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-only-v6.3-100pct.plans_NOT-fully-calibrated.xml.gz";
+			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-1pct.plans.xml.gz";
 			//String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			String network = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-network.xml.gz";
 			//String shapeCategory = "Ortsteil";
@@ -77,7 +78,7 @@ public class FreightDemandGenerationTest {
 					"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
 					"--inputDemandCSV", demandCSVLocation.toString(),
-					"--populationSample", "0.01",
+					"--populationSample", "1.0",
 					"--populationSamplingTo", "1.0",
 					"--defaultJspritIterations", "3"
 			);
