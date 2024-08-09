@@ -44,7 +44,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -365,7 +366,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		try (var bw = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv")) {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
-				bw.write("runId;iteration");
+				bw.write("runId" + delimiter + "iteration");
 				for (int i = 0; i <= maxcap; i++) {
 					bw.write(delimiter + i + " pax distance_m");
 				}
@@ -664,15 +665,18 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					distances);
 			ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
 
-			DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+			DrtOptimizationConstraintsSet constraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+			Pair<Double, Double> lineCoeffs = null;
+			if(constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultConstraintsSet) {
+                lineCoeffs = Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
+                        defaultConstraintsSet.maxTravelTimeBeta);
+            }
 			final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]", "unshared ride time [s]", travelTimes,
-					Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
-							defaultConstraintsSet.maxTravelTimeBeta));
+					lineCoeffs);
 			ChartSaveUtils.saveAsPNG(chart2, fileName + "_travelTimePlot", 1500, 1500);
 
 			final JFreeChart chart3 = DensityScatterPlots.createPlot("Ride Times", "ride time [s]", "unshared ride time [s]", rideTimes,
-					Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
-							defaultConstraintsSet.maxTravelTimeBeta));
+					lineCoeffs);
 			ChartSaveUtils.saveAsPNG(chart3, fileName + "_rideTimePlot", 1500, 1500);
 		}
 	}

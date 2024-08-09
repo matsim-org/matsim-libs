@@ -108,7 +108,7 @@ public final class CommandRunner {
 		MATSimAppCommand command = clazz.getDeclaredConstructor().newInstance();
 		String[] args = this.args.get(clazz);
 		args = ArrayUtils.addAll(args, createArgs(clazz, args, input));
-		log.info("Running {} with arguments: {}", clazz, Arrays.toString(args));
+		log.info("Running {} with arguments: {}", clazz, String.join(" ", args));
 
 		command.execute(args);
 	}

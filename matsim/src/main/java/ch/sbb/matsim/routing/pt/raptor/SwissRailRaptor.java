@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -229,17 +231,58 @@ public class SwissRailRaptor implements TransitRouter {
         for (TransitStopFacility stop : fromStops) {
             accessStops.add(new InitialStop(stop, 0, 0, 0, null));
         }
-        return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, person, null);
     }
 
     public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Facility fromFacility, double departureTime, Person person, Attributes routingAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         List<InitialStop> accessStops = findAccessStops(fromFacility, fromFacility, person, departureTime, routingAttributes, parameters);
-        return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, person, null);
     }
 
-    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, Person person) {
-        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, person);
+	/** Calculates a least-cost-tree for every actual departure time between <code>earliestDepartureTime</code>
+	 *  and <code>latestDepartureTime</code> at the provided stop-facility.
+	 *  This method returns nothing, instead users have to use the <code>observer</code> to collect
+	 *  relevant results.
+	 */
+		public void calcTreesObservable(TransitStopFacility stopFacility, double earliestDepartureTime, double latestStartTime, RaptorParameters parameters, Person person, RaptorObserver observer) {
+			if (this.data.config.getOptimization() != RaptorStaticConfig.RaptorOptimization.OneToAllRouting && !this.treeWarningShown) {
+				log.warn("SwissRailRaptorData was not initialized with full support for tree calculations and may result in unexpected results. Use `RaptorStaticConfig.setOptimization(RaptorOptimization.OneToAllRouting)` to fix this issue.");
+				this.treeWarningShown = true;
+			}
+			parameters.setExactDeparturesOnly(true);
+
+			List<InitialStop> accessStops = List.of(new InitialStop(stopFacility, 0, 0, 0, null));
+
+			int[] routeStopIndices = this.data.routeStopsPerStopFacility.get(stopFacility);
+
+			List<Double> departureTimes = new ArrayList<>();
+
+			for (int routeStopIndex : routeStopIndices) {
+				SwissRailRaptorData.RRouteStop routeStop = this.data.routeStops[routeStopIndex];
+				SwissRailRaptorData.RRoute route = this.data.routes[routeStop.transitRouteIndex];
+				int fromIndex = route.indexFirstDeparture;
+				int toIndex = fromIndex + route.countDepartures;
+				for (int depIndex = fromIndex; depIndex < toIndex; depIndex++) {
+					double departureTime = this.data.departures[depIndex] + routeStop.departureOffset;
+					if (departureTime >= earliestDepartureTime && departureTime <= latestStartTime) {
+						departureTimes.add(departureTime);
+					}
+				}
+			}
+			departureTimes.sort(Double::compare);
+			// we might have some departure times multiple times. helper variable to skip those
+			double lastDepTime = -1;
+			for (double departureTime : departureTimes) {
+				if (departureTime > lastDepTime) {
+					calcLeastCostTree(accessStops, departureTime, parameters, person, observer);
+					lastDepTime = departureTime;
+				}
+			}
+		}
+
+    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, Person person, RaptorObserver observer) {
+        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, person, observer);
     }
 
     public SwissRailRaptorData getUnderlyingData() {
@@ -308,6 +351,10 @@ public class SwissRailRaptor implements TransitRouter {
 			public SwissRailRaptor build() {
 				return new SwissRailRaptor(this.data, this.parametersForPerson, this.routeSelector, this.stopFinder, this.inVehicleCostCalculator, this.transferCostCalculator);
 			}
+		}
+
+		public interface RaptorObserver {
+			void arrivedAtStop(double departureTime, TransitStopFacility stopFacility, double arrivalTime, int transferCount, Supplier<RaptorRoute> route);
 		}
 
 }

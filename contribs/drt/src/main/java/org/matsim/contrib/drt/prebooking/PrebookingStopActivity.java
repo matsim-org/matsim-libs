@@ -3,6 +3,8 @@ package org.matsim.contrib.drt.prebooking;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -38,7 +40,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests;
 
 	private final IdMap<Request, Double> enterTimes = new IdMap<>(Request.class);
-	private final IdMap<Request, Double> leaveTimes = new IdMap<>(Request.class);
+	private final Queue<QueuedRequest> leaveTimes = new PriorityQueue<>();
 	private final Set<Id<Request>> enteredRequests = new HashSet<>();
 
 	private final PrebookingManager prebookingManager;
@@ -71,43 +73,46 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	@Override
 	protected boolean isLastStep(double now) {
 		boolean dropoffsReady = updateDropoffRequests(now);
-		boolean pickupsReady = updatePickupRequests(now);
+		boolean pickupsReady = updatePickupRequests(now, false);
 		return pickupsReady && dropoffsReady && now >= endTime.get();
 	}
 
 	@Override
 	protected void beforeFirstStep(double now) {
 		initDropoffRequests(now);
-		updatePickupRequests(now);
+		updatePickupRequests(now, true);
 	}
 
 	private void initDropoffRequests(double now) {
 		for (var request : dropoffRequests.values()) {
 			double leaveTime = now + stopDurationProvider.calcDropoffDuration(vehicle, request.getRequest());
-			leaveTimes.put(request.getId(), leaveTime);
+			leaveTimes.add(new QueuedRequest(request.getId(), leaveTime));
 		}
 
 		updateDropoffRequests(now);
 	}
 
 	private boolean updateDropoffRequests(double now) {
-		var iterator = leaveTimes.entrySet().iterator();
 
-		while (iterator.hasNext()) {
-			var entry = iterator.next();
-
-			if (entry.getValue() <= now) { // Request should leave now
-				passengerHandler.dropOffPassengers(driver, entry.getKey(), now);
-				prebookingManager.notifyDropoff(entry.getKey());
-				onboard -= dropoffRequests.get(entry.getKey()).getPassengerCount();
-				iterator.remove();
-			}
+		while (!leaveTimes.isEmpty() && leaveTimes.peek().time <= now) {
+			Id<Request> requestId = leaveTimes.poll().id;
+			passengerHandler.dropOffPassengers(driver, requestId, now);
+			prebookingManager.notifyDropoff(requestId);
+			onboard -= dropoffRequests.get(requestId).getPassengerCount();
 		}
 
-		return leaveTimes.size() == 0;
+		return leaveTimes.isEmpty();
 	}
 
-	private boolean updatePickupRequests(double now) {
+	private record QueuedRequest(Id<Request> id, double time) implements Comparable<QueuedRequest> {
+
+		@Override
+		public int compareTo(QueuedRequest o) {
+			return Double.compare(this.time, o.time);
+		}
+	}
+
+	private boolean updatePickupRequests(double now, boolean isFirstStep) {
 		var pickupIterator = pickupRequests.values().iterator();
 
 		while (pickupIterator.hasNext()) {
@@ -120,7 +125,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 				if (passengerHandler.notifyWaitForPassengers(this, this.driver, request.getId())) {
 					// agent starts to enter
 					queuePickup(request, now);
-				} else if (now > request.getEarliestStartTime()) {
+				} else if (now > request.getEarliestStartTime() && !isFirstStep) {
 					if (abandonVoter.abandonRequest(now, vehicle, request)) {
 						prebookingManager.abandon(request.getId());
 					}
@@ -131,19 +136,19 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		var enterIterator = enterTimes.entrySet().iterator();
 
 		while (enterIterator.hasNext()) {
-			if (onboard >= vehicle.getCapacity()) {
-				// only let people enter if there is currently free capacity
-				break;
-			}
-
 			var entry = enterIterator.next();
+			int availableCapacity = vehicle.getCapacity() - onboard;
 
 			if (entry.getValue() <= now) {
-				// let agent enter now
-				Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
-				enteredRequests.add(entry.getKey());
-				onboard += pickupRequests.get(entry.getKey()).getPassengerCount();
-				enterIterator.remove();
+				int requiredCapacity = pickupRequests.get(entry.getKey()).getPassengerCount();
+				
+				if (requiredCapacity <= availableCapacity) {
+					// let agent enter now
+					Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
+					enteredRequests.add(entry.getKey());
+					onboard += requiredCapacity;
+					enterIterator.remove();
+				}
 			}
 		}
 

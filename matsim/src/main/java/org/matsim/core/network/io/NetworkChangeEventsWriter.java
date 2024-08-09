@@ -71,6 +71,7 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 	private static final String XSD_LOCATION = "http://www.matsim.org/files/dtd/networkChangeEvents.xsd";
 
 	public void write(String file, Collection<NetworkChangeEvent> events) {
+		log.info("Writing network change events to file: " + file  + "...");
 		try {
 			openFile(file);
 			super.writeXmlHead();
@@ -119,6 +120,7 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 		} catch (IOException e) {
 			log.fatal("Error during writing network change events!", e);
 		}
+		log.info("done.");
 	}
 	
 	private void writeEvent(NetworkChangeEvent event) throws IOException {

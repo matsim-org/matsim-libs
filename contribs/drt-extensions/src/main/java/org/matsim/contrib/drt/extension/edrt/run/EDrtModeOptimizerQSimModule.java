@@ -29,6 +29,8 @@ import org.matsim.contrib.drt.extension.edrt.schedule.EDrtStayTaskEndTimeCalcula
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.drt.optimizer.*;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
@@ -134,7 +136,8 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(PassengerStopDurationProvider.class)))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
+						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet())));
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 

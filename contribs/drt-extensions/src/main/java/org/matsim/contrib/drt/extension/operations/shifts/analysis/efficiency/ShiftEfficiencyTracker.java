@@ -37,6 +37,7 @@ import static java.util.stream.Collectors.*;
 public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
         PassengerDroppedOffEventHandler, DrtShiftStartedEventHandler, DrtShiftEndedEventHandler {
 
+    private final String mode;
     private Map<Id<DrtShift>, Double> revenueByShift;
     private Map<Id<Request>, Id<DrtShift>> shiftByRequest;
 
@@ -45,7 +46,7 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
 
 	private Record currentRecord;
 
-	public static record Record(Map<Id<DrtShift>, Double> revenueByShift,
+	public record Record(Map<Id<DrtShift>, Double> revenueByShift,
 								Map<Id<Request>, Id<DrtShift>> shiftByRequest,
 								Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts){
 		public Map<Id<DrtShift>, Double> getRevenueByShift() {
@@ -63,8 +64,9 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
 		}
 	}
 
-	public ShiftEfficiencyTracker() {
-		this.revenueByShift = new HashMap<>();
+	public ShiftEfficiencyTracker(String mode) {
+        this.mode = mode;
+        this.revenueByShift = new HashMap<>();
 		this.shiftByRequest = new HashMap<>();
 		this.finishedShifts = new HashMap<>();
 		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts);
@@ -72,35 +74,43 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
 
     @Override
     public void handleEvent(PersonMoneyEvent personMoneyEvent) {
-        if (DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE.equals(personMoneyEvent.getPurpose())) {
-            Id<DrtShift> key = shiftByRequest.get(Id.create(personMoneyEvent.getReference(), DrtRequest.class));
-            if(key != null) {
-                revenueByShift.merge(key, -personMoneyEvent.getAmount(), Double::sum);
+        if(personMoneyEvent.getTransactionPartner().equals(mode)) {
+            if (DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE.equals(personMoneyEvent.getPurpose())) {
+                Id<DrtShift> key = shiftByRequest.get(Id.create(personMoneyEvent.getReference(), DrtRequest.class));
+                if (key != null) {
+                    revenueByShift.merge(key, -personMoneyEvent.getAmount(), Double::sum);
+                }
             }
         }
     }
 
     @Override
     public void handleEvent(PassengerDroppedOffEvent event) {
-        Id<DvrpVehicle> vehicleId = event.getVehicleId();
-        Gbl.assertIf(activeShifts.containsKey(vehicleId));
-        Id<DrtShift> drtShiftId = activeShifts.get(vehicleId);
-        shiftByRequest.put(event.getRequestId(), drtShiftId);
+        if(event.getMode().equals(mode)) {
+            Id<DvrpVehicle> vehicleId = event.getVehicleId();
+            Gbl.assertIf(activeShifts.containsKey(vehicleId));
+            Id<DrtShift> drtShiftId = activeShifts.get(vehicleId);
+            shiftByRequest.put(event.getRequestId(), drtShiftId);
+        }
     }
 
     @Override
     public void handleEvent(DrtShiftStartedEvent event) {
-        revenueByShift.put(event.getShiftId(), 0.);
-        if(activeShifts.containsKey(event.getVehicleId())) {
-            throw new RuntimeException("Vehicle is already registered for another shift");
+        if(event.getMode().equals(mode)) {
+            revenueByShift.put(event.getShiftId(), 0.);
+            if (activeShifts.containsKey(event.getVehicleId())) {
+                throw new RuntimeException("Vehicle is already registered for another shift");
+            }
+            activeShifts.put(event.getVehicleId(), event.getShiftId());
         }
-        activeShifts.put(event.getVehicleId(), event.getShiftId());
     }
 
     @Override
     public void handleEvent(DrtShiftEndedEvent event) {
-        activeShifts.remove(event.getVehicleId());
-        finishedShifts.put(event.getShiftId(), event.getVehicleId());
+        if(event.getMode().equals(mode)) {
+            activeShifts.remove(event.getVehicleId());
+            finishedShifts.put(event.getShiftId(), event.getVehicleId());
+        }
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.matsim.application.prepare.network.params.NetworkModel;
  */
 public final class GermanyNetworkParams implements NetworkModel {
 	@Override
-	public FeatureRegressor capacity(String junctionType) {
+	public FeatureRegressor capacity(String junctionType, String highwayType) {
 		return switch (junctionType) {
 			case "traffic_light" -> GermanyNetworkParams_capacity_traffic_light.INSTANCE;
 			case "right_before_left" -> GermanyNetworkParams_capacity_right_before_left.INSTANCE;
@@ -19,7 +19,7 @@ public final class GermanyNetworkParams implements NetworkModel {
 	}
 
 	@Override
-	public FeatureRegressor speedFactor(String junctionType) {
+	public FeatureRegressor speedFactor(String junctionType, String highwayType) {
 		return switch (junctionType) {
 			case "traffic_light" -> GermanyNetworkParams_speedRelative_traffic_light.INSTANCE;
 			case "right_before_left" -> GermanyNetworkParams_speedRelative_right_before_left.INSTANCE;

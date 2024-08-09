@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -111,8 +111,9 @@ public class PtAlongALineTest {
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.mode = "drt_A";
 			drtConfig.stopDuration = 60.;
-			DrtOptimizationConstraintsSet defaultConstraintsSet =
-					drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+                    (DefaultDrtOptimizationConstraintsSet) drtConfig.addOrGetDrtOptimizationConstraintsParams()
+							.addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxWaitTime = 900.;
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
@@ -251,7 +252,9 @@ public class PtAlongALineTest {
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.stopDuration = 60.;
-			DrtOptimizationConstraintsSet defaultConstraintsSet = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+					(DefaultDrtOptimizationConstraintsSet) drtConfig.addOrGetDrtOptimizationConstraintsParams()
+							.addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 			defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;

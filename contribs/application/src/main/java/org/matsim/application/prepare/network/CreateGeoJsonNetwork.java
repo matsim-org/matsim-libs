@@ -29,6 +29,9 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 
+/**
+ * Note that {@link CreateAvroNetwork} offers a more efficient way to store network data, which also loads much faster in the browser.
+ */
 @CommandLine.Command(name = "network-geojson", description = "Create geojson representation of a network.")
 @CommandSpec(requireNetwork = true, produces = "network.geojson")
 public class CreateGeoJsonNetwork implements MATSimAppCommand {

@@ -178,10 +178,10 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 				nofAvgScores++;
 			}
 		}
-		log.info("-- avg. score of the executed plan of each agent: " + (sumExecutedScores / nofExecutedScores));
-		log.info("-- avg. score of the worst plan of each agent: " + (sumScoreWorst / nofScoreWorst));
-		log.info("-- avg. of the avg. plan score per agent: " + (sumAvgScores / nofAvgScores));
-		log.info("-- avg. score of the best plan of each agent: " + (sumScoreBest / nofScoreBest));
+		log.info("-- avg. score of the executed plan of each agent: {}", sumExecutedScores / nofExecutedScores);
+		log.info("-- avg. score of the worst plan of each agent: {}", sumScoreWorst / nofScoreWorst);
+		log.info("-- avg. of the avg. plan score per agent: {}", sumAvgScores / nofAvgScores);
+		log.info("-- avg. score of the best plan of each agent: {}", sumScoreBest / nofScoreBest);
 
 		try {
 			this.out.write(event.getIteration() + "\t" + (sumExecutedScores / nofExecutedScores) + "\t" +

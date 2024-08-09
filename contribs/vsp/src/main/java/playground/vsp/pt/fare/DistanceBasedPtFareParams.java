@@ -22,6 +22,7 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
     public static final String LONG_DISTANCE_TRIP_THRESHOLD = "longDistanceTripThreshold";
     public static final String LONG_DISTANCE_TRIP_SLOPE = "longDistanceTripSlope";
     public static final String LONG_DISTANCE_TRIP_INTERCEPT = "longDistanceTripIntercept";
+    public static final String FARE_ZONE_SHP = "fareZoneShp";
 
     @PositiveOrZero
     private double minFare = 2.0;
@@ -35,6 +36,7 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
     private double longDistanceTripIntercept = 30.0;
     @PositiveOrZero
     private double longDistanceTripSlope = 0.00025;
+	private String fareZoneShp;
 
     public DistanceBasedPtFareParams() {
         super(SET_NAME);
@@ -52,6 +54,7 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
         map.put(LONG_DISTANCE_TRIP_THRESHOLD, "Threshold of the long trips in meters. Below this value, " +
                 "the trips are considered as normal trips. Above this value, the trips are considered as " +
                 "inter-city trips");
+		map.put(FARE_ZONE_SHP, "Shp file with fare zone(s). This parameter is only used for PtFareCalculationModel 'fareZoneBased'.");
         return map;
     }
 
@@ -114,4 +117,14 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
     public void setLongDistanceTripThreshold(double longDistanceTripThreshold) {
         this.longDistanceTripThreshold = longDistanceTripThreshold;
     }
+
+	@StringGetter(FARE_ZONE_SHP)
+	public String getFareZoneShp() {
+		return fareZoneShp;
+	}
+
+	@StringSetter(FARE_ZONE_SHP)
+	public void setFareZoneShp(String fareZoneShp) {
+		this.fareZoneShp = fareZoneShp;
+	}
 }

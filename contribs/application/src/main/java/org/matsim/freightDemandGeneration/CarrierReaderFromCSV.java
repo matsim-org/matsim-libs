@@ -305,11 +305,11 @@ public final class CarrierReaderFromCSV {
 	/**
 	 * Checks if the read carrier information is consistent.
 	 *
-	 *  @param allNewCarrierInformation   Set of CarrierInformationElements
-	 * 	 * @param freightCarriersConfigGroup FreightCarriersConfigGroup
-	 * 	 * @param scenario                   Scenario
-	 * 	 * @param indexShape                 ShpOptions.Index for the shape file
-	 * 	 * @param shapeCategory              Column name in the shape file for the data connection in the csv files
+	 * @param allNewCarrierInformation   Set of CarrierInformationElements
+	 * @param freightCarriersConfigGroup FreightCarriersConfigGroup
+	 * @param scenario                   Scenario
+	 * @param indexShape                 ShpOptions.Index for the shape file
+	 * @param shapeCategory              Column name in the shape file for the data connection in the csv files
 	 */
 	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
 								FreightCarriersConfigGroup freightCarriersConfigGroup, Scenario scenario, ShpOptions.Index indexShape, String shapeCategory) {
@@ -347,9 +347,9 @@ public final class CarrierReaderFromCSV {
 						"If a vehicle type is selected in the input file, numberOfDepots or selectedVehicleDepots should be set. Please check carrier "
 								+ carrierElement.getName());
 			if ((carrierElement.getVehicleDepots() != null
-					&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
-					&& carrierElement.getAreaOfAdditionalDepots() == null) || (carrierElement.getVehicleDepots() == null && (carrierElement.getNumberOfDepotsPerType() > 0)
-					&& carrierElement.getAreaOfAdditionalDepots() == null))
+				&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
+				&& carrierElement.getAreaOfAdditionalDepots() == null) || (carrierElement.getVehicleDepots() == null && (carrierElement.getNumberOfDepotsPerType() > 0)
+				&& carrierElement.getAreaOfAdditionalDepots() == null))
 				log.warn("No possible area for additional depot given. Random choice in the hole network of a possible position");
 			if (carrierElement.getAreaOfAdditionalDepots() != null) {
 				if (indexShape == null)

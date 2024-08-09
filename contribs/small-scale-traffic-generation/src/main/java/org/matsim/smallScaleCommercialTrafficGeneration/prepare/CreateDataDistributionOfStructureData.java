@@ -29,7 +29,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateDataDistributionOfStructureData.class);
 
-	private static LanduseDataConnectionCreator landuseDataConnectionCreator;
+	private final LanduseDataConnectionCreator landuseDataConnectionCreator;
 
 	private enum LanduseConfiguration {
 		useOnlyOSMLanduse, useOSMBuildingsAndLanduse
@@ -78,16 +78,16 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	private final Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 	public CreateDataDistributionOfStructureData(LanduseDataConnectionCreator landuseDataConnectionCreator) {
-		CreateDataDistributionOfStructureData.landuseDataConnectionCreator = landuseDataConnectionCreator;
+		this.landuseDataConnectionCreator = landuseDataConnectionCreator;
 		log.info("Using LanduseDataConnectionCreator {} to connect the types of the landuse data to the categories of the small scale commercial traffic generation", landuseDataConnectionCreator.getClass().getSimpleName());
 	}
 	public CreateDataDistributionOfStructureData() {
-		landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
+		this.landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
 		log.info("Using default LanduseDataConnectionCreatorForOSM_Data to connect the types of the landuse data to the categories of the small scale commercial traffic generation");
 	}
 
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new CreateDataDistributionOfStructureData(landuseDataConnectionCreator)).execute(args));
+		System.exit(new CommandLine(new CreateDataDistributionOfStructureData()).execute(args));
 	}
 
 	@Override

@@ -179,7 +179,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		setNetworkAndNetworkChangeEvents(config, networkPathOfOtherNetwork, networkChangeEventsFilePath);
 
 		// load or create carrierVehicle
-		log.info("Start creating carriers. Selected option: " + selectedCarrierInputOption);
+		log.info("Start creating carriers. Selected option: {}", selectedCarrierInputOption);
 		prepareVehicles(config, vehicleTypesFileLocation);
 
 		// load or create carrier
@@ -197,8 +197,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				defaultJspritIterations, crsTransformationFromNetworkToShape);
 
 		// create the demand
-		log.info("Start creating carriers. Selected option: {}", selectedCarrierInputOption);
-		//ERROR log.info(Boolean.getBoolean(combineSimilarJobs));
+		log.info("Start creating the demand. Selected option: {}", selectedCarrierInputOption);
+		//fixed ERROR log.info(Boolean.getBoolean(combineSimilarJobs));
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
 				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.valueOf(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
@@ -384,6 +384,13 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 */
 							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
 									upSamplePopulationTo, "changeDemandOnLocation");
+					case noPopulationSampling ->
+						/*
+						 * If the demand sample is equal to the population sample, the demand is created
+						 * based on the given population and the set input population sampleSize
+						 */
+							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+								sampleSizeInputPopulation, "noPopulationSampling");
 					default -> throw new RuntimeException("No valid sampling option selected!");
 				}
 				switch (selectedPopulationOption) {
@@ -455,10 +462,10 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private static void solveSelectedSolution(OptionsOfVRPSolutions selectedSolution, Config config,
 			Controler controler) throws ExecutionException, InterruptedException {
 		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-				.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
+			.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 		if (Objects.requireNonNull(selectedSolution) == OptionsOfVRPSolutions.createNoSolutionAndOnlyWriteCarrierFile) {
 			log.warn(
-					"##Finished without solution of the VRP. If you also want to run jsprit and/or MATSim, please change case of optionsOfVRPSolutions");
+				"##Finished without solution of the VRP. If you also want to run jsprit and/or MATSim, please change case of optionsOfVRPSolutions");
 			System.exit(0);
 		}
 		boolean runMatSim = false;
@@ -476,7 +483,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			log.warn(
 					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
 		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-				.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
+			.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 	}
 
 	/**
