@@ -7,6 +7,8 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
@@ -24,6 +26,7 @@ import org.matsim.freight.carriers.jsprit.NetworkRouter;
  * @author Kai Martins-Turner (kturner)
  */
 public class CarrierSchedulerUtils {
+  private static final Logger log = LogManager.getLogger(CarrierSchedulerUtils.class);
 
   /**
    * Creates a VehicleRoutingProblem from a carrier and a network and solves it with Jsprit.
@@ -36,11 +39,9 @@ public class CarrierSchedulerUtils {
    * @param network               the underlying network to create the network based transport costs
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
    * @Todo: include toll in the NetbasedCosts (if set), so it is also pat of the VRP
-   * @Todo: Find a way to reuse the netbasedCosts over the iterations(?) to avoid re-setting this up???
    * <li> Pro: saves computation times,
    * <li> Con: There is now update of the costs if the network (load) changes.
    * <li> --> do it at least per Carrier or generally or stay as it is? --> Discuss with KN
-   * @Todo: Make the number of jsprit-Iterations configurable
    */
   public static Carrier solveVrpWithJsprit(Carrier carrier, Network network) {
     NetworkBasedTransportCosts netbasedTransportCosts =
@@ -53,11 +54,17 @@ public class CarrierSchedulerUtils {
                     .setRoutingCost(netbasedTransportCosts)
                     .build();
 
-    //Setting jspritIterations to use central infrastructure -> should go more up in the code
-    CarriersUtils.setJspritIterations(carrier, 1);
+    //If jspritIterations are not set (get.... returns a negativ value), set it to 1
+    int jspritIterations;
+    if (CarriersUtils.getJspritIterations(carrier) >= 1) {
+      jspritIterations = CarriersUtils.getJspritIterations(carrier);
+    } else  {
+      log.info("Jsprit iterations are not set (properly) for carrier {}. Set to 1.", carrier.getId());
+      jspritIterations = 1;
+    }
 
     VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
-    algorithm.setMaxIterations(CarriersUtils.getJspritIterations(carrier));
+    algorithm.setMaxIterations(jspritIterations);
 
     VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 
@@ -89,12 +96,17 @@ public class CarrierSchedulerUtils {
                   .setRoutingCost(netbasedTransportCosts)
                   .build();
 
-      //Setting jspritIterations to use central infrastructure -> should go more up in the code
-      //TODO: If not set, setze es auf 1.
-      CarriersUtils.setJspritIterations(carrier, 1);
+      //If jspritIterations are not set (get.... returns a negativ value), set it to 1
+      int jspritIterations;
+      if (CarriersUtils.getJspritIterations(carrier) >= 1) {
+        jspritIterations = CarriersUtils.getJspritIterations(carrier);
+      } else  {
+        log.info("Jsprit iterations are not set (properly) for carrier {}. Set to 1.", carrier.getId());
+        jspritIterations = 1;
+      }
 
       VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);
-      vra.setMaxIterations(CarriersUtils.getJspritIterations(carrier));
+      vra.setMaxIterations(jspritIterations);
       VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
 
       CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
