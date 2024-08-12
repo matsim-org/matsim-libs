@@ -67,26 +67,26 @@ class RandomShiftingStrategyFactory {
             @Override
             public void handlePlan(LSPPlan lspPlan) {
 
-                // Shifting shipments only makes sense for multiple chains
+                // Shifting lspShipments only makes sense for multiple chains
                 if (lspPlan.getLogisticChains().size() < 2) return;
 
                 LSP lsp = lspPlan.getLSP();
 
-                // Make a new list of shipments and pick a random shipment from it
-                List<LSPShipment> shipments = new ArrayList<>(lsp.getShipments());
-                int shipmentIndex = random.nextInt(lsp.getShipments().size());
-                LSPShipment shipment = shipments.get(shipmentIndex);
+                // Make a new list of lspShipments and pick a random lspShipment from it
+                List<LSPShipment> lspShipments = new ArrayList<>(lsp.getLspShipments());
+                int shipmentIndex = random.nextInt(lsp.getLspShipments().size());
+                LSPShipment lspShipment = lspShipments.get(shipmentIndex);
 
-                // Find and remove the random shipment from its current logistic chain
+                // Find and remove the random lspShipment from its current logistic chain
                 LogisticChain sourceLogisticChain = null;
                 for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
-                    if (logisticChain.getShipmentIds().remove(shipment.getId())) {
+                    if (logisticChain.getLspShipmentIds().remove(lspShipment.getId())) {
                         sourceLogisticChain = logisticChain;
                         break;
                     }
                 }
 
-                // Find a new logistic chain for the shipment
+                // Find a new logistic chain for the lspShipment
                 // Ensure that the chain selected is not the same as the one it was removed from
                 int chainIndex;
                 LogisticChain targetLogisticChain = null;
@@ -101,9 +101,9 @@ class RandomShiftingStrategyFactory {
                     }
                 } while (targetLogisticChain == sourceLogisticChain);
 
-                // Add the shipment to the new logistic chain
+                // Add the lspShipment to the new logistic chain
                 assert targetLogisticChain != null;
-                targetLogisticChain.addShipmentToChain(shipment);
+                targetLogisticChain.addShipmentToChain(lspShipment);
             }
 
             @Override

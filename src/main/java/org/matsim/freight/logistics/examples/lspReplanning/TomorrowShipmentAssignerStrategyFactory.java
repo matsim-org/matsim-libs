@@ -55,27 +55,27 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
           @Override
           public void handlePlan(LSPPlan plan) {
-            plan.getLogisticChains().iterator().next().getShipmentIds().clear();
+            plan.getLogisticChains().iterator().next().getLspShipmentIds().clear();
             plan.setInitialShipmentAssigner(assigner);
             //				LSP lsp = assigner.getLSP();
             LSP lsp = plan.getLSP();
-            Collection<LSPShipment> shipments = lsp.getShipments();
-            for (LSPShipment shipment : shipments) {
-              assigner.assignToPlan(plan, shipment);
+            Collection<LSPShipment> lspShipments = lsp.getLspShipments();
+            for (LSPShipment lspShipment : lspShipments) {
+              assigner.assignToPlan(plan, lspShipment);
             }
 
             for (LogisticChain solution : plan.getLogisticChains()) {
-              solution.getShipmentIds().clear();
+              solution.getLspShipmentIds().clear();
               for (LogisticChainElement element : solution.getLogisticChainElements()) {
                 element.getIncomingShipments().clear();
                 element.getOutgoingShipments().clear();
               }
             }
 
-            for (LSPShipment shipment : plan.getLSP().getShipments()) {
-              ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).clear();
-              shipment.getShipmentLog().clear();
-              plan.getInitialShipmentAssigner().assignToPlan(plan, shipment);
+            for (LSPShipment lspShipment : plan.getLSP().getLspShipments()) {
+              ShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).clear();
+              lspShipment.getShipmentLog().clear();
+              plan.getInitialShipmentAssigner().assignToPlan(plan, lspShipment);
             }
           }
 

@@ -45,7 +45,7 @@ class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner
   RoundRobinLogisticChainShipmentAssigner() {}
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
     Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     // prepare the map if empty for the first time with each number of assigned shipments being zero
     if (shipmentCountByChain.isEmpty()) {
@@ -58,7 +58,7 @@ class RoundRobinLogisticChainShipmentAssigner implements InitialShipmentAssigner
     // its value by one
     LogisticChain minChain =
         Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
-    minChain.addShipmentToChain(shipment);
+    minChain.addShipmentToChain(lspShipment);
     shipmentCountByChain.merge(minChain, 1, Integer::sum);
   }
 }

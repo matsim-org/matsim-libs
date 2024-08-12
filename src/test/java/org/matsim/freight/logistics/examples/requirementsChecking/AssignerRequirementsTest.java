@@ -201,11 +201,11 @@ public class AssignerRequirementsTest {
 
 	@Test
 	public void testAssignerRequirements() {
-		for (Id<LSPShipment> shipmentId : blueChain.getShipmentIds()) {
+		for (Id<LSPShipment> shipmentId : blueChain.getLspShipmentIds()) {
 			LSPShipment shipment = LSPUtils.findLspShipment(blueChain.getLSP(), shipmentId);
 			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
 		}
-		for (Id<LSPShipment> shipmentId : redChain.getShipmentIds()) {
+		for (Id<LSPShipment> shipmentId : redChain.getLspShipmentIds()) {
 			LSPShipment shipment = LSPUtils.findLspShipment(redChain.getLSP(), shipmentId);
 			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
 		}

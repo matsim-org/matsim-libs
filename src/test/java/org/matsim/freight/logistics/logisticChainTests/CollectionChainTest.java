@@ -101,8 +101,8 @@ public class CollectionChainTest {
 		assertNotNull(logisticChain.getAttributes());
 		assertTrue(logisticChain.getAttributes().isEmpty());
 		assertNull(logisticChain.getLSP());
-		assertNotNull(logisticChain.getShipmentIds());
-		assertTrue(logisticChain.getShipmentIds().isEmpty());
+		assertNotNull(logisticChain.getLspShipmentIds());
+		assertTrue(logisticChain.getLspShipmentIds().isEmpty());
 		assertEquals(1, logisticChain.getLogisticChainElements().size());
 		ArrayList<LogisticChainElement> elements = new ArrayList<>(logisticChain.getLogisticChainElements());
 		for (LogisticChainElement element : elements) {

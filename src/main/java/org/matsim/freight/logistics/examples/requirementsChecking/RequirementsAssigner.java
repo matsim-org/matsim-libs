@@ -59,12 +59,12 @@ class RequirementsAssigner implements InitialShipmentAssigner {
   }
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
     feasibleLogisticChains.clear();
 
     label:
     for (LogisticChain solution : lspPlan.getLogisticChains()) {
-      for (LSPShipmentRequirement requirement : shipment.getRequirements()) {
+      for (LSPShipmentRequirement requirement : lspShipment.getRequirements()) {
         if (!requirement.checkRequirement(solution)) {
 
           continue label;
@@ -73,7 +73,7 @@ class RequirementsAssigner implements InitialShipmentAssigner {
       feasibleLogisticChains.add(solution);
     }
     LogisticChain chosenSolution = feasibleLogisticChains.iterator().next();
-    chosenSolution.addShipmentToChain(shipment);
+    chosenSolution.addShipmentToChain(lspShipment);
   }
 
 }

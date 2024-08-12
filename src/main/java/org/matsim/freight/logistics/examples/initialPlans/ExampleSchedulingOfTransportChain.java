@@ -341,25 +341,25 @@ import org.matsim.vehicles.VehicleType;
 
     // Create LSP and shipments
     LSP lsp = createInitialLSP(scenario);
-    Collection<LSPShipment> shipments = createInitialLSPShipments(scenario.getNetwork());
+    Collection<LSPShipment> lspShipments = createInitialLSPShipments(scenario.getNetwork());
 
     // assign the shipments to the LSP
-    for (LSPShipment shipment : shipments) {
-      lsp.assignShipmentToLSP(shipment);
+    for (LSPShipment lspShipment : lspShipments) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
     // schedule the LSP with the shipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
     // print the schedules for the assigned LSPShipments
-    for (LSPShipment shipment : lsp.getShipments()) {
+    for (LSPShipment lspShipment : lsp.getLspShipments()) {
       ArrayList<ShipmentPlanElement> elementList =
           new ArrayList<>(
-              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
                   .getPlanElements()
                   .values());
       elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-      System.out.println("Shipment: " + shipment.getId());
+      System.out.println("Shipment: " + lspShipment.getId());
       for (ShipmentPlanElement element : elementList) {
         System.out.println(
             element.getLogisticChainElement().getId()

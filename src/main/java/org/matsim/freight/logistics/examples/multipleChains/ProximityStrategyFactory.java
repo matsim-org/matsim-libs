@@ -76,26 +76,26 @@ final class ProximityStrategyFactory {
             LSPResource minDistanceResource = null;
 
             // get all shipments assigned to the LSP
-            Map<Id<LSPShipment>, LSPShipment> shipmentById = new HashMap<>();
-            for (LSPShipment lspShipment : lsp.getShipments()) {
-              shipmentById.put(lspShipment.getId(), lspShipment);
+            Map<Id<LSPShipment>, LSPShipment> lspShipmentById = new HashMap<>();
+            for (LSPShipment lspShipment : lsp.getLspShipments()) {
+              lspShipmentById.put(lspShipment.getId(), lspShipment);
             }
 
             // Retrieve all shipments in the logistic chains of the plan
             // These should be all shipments of the lsp, but not necessarily if shipments got lost
             ArrayList<LSPShipment> shipments = new ArrayList<>();
             for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-              for (Id<LSPShipment> id : logisticChain.getShipmentIds()) {
-                LSPShipment shipment = shipmentById.get(id);
-                if (shipment != null) {
-                  shipments.add(shipment);
+              for (Id<LSPShipment> id : logisticChain.getLspShipmentIds()) {
+                LSPShipment lspShipment = lspShipmentById.get(id);
+                if (lspShipment != null) {
+                  shipments.add(lspShipment);
                 }
               }
             }
 
-            // pick a random shipment from the shipments contained in the plan
+            // pick a random lspShipment from the shipments contained in the plan
             int shipmentIndex = MatsimRandom.getRandom().nextInt(shipments.size());
-            LSPShipment shipment = shipments.get(shipmentIndex);
+            LSPShipment lspShipment = shipments.get(shipmentIndex);
 
             // Collect all resources of the logistic chains of the LSP plan
             ArrayList<LSPResource> resources = new ArrayList<>();
@@ -106,9 +106,9 @@ final class ProximityStrategyFactory {
               }
             }
 
-            // get the resource with the smallest distance to the shipment
+            // get the resource with the smallest distance to the lspShipment
             for (LSPResource resource : resources) {
-              Link shipmentLink = network.getLinks().get(shipment.getTo());
+              Link shipmentLink = network.getLinks().get(lspShipment.getTo());
               Link resourceLink = network.getLinks().get(resource.getStartLinkId());
               double distance =
                   NetworkUtils.getEuclideanDistance(
@@ -119,21 +119,21 @@ final class ProximityStrategyFactory {
               }
             }
 
-            // add randomly picked shipment to chain with resource of the smallest distance
+            // add randomly picked lspShipment to chain with resource of the smallest distance
             for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
               for (LogisticChainElement logisticChainElement :
                   logisticChain.getLogisticChainElements()) {
                 if (logisticChainElement.getResource().equals(minDistanceResource)) {
-                  logisticChain.getShipmentIds().add(shipment.getId());
+                  logisticChain.getLspShipmentIds().add(lspShipment.getId());
                 }
               }
             }
 
-            // remove the shipment from the previous logistic chain, can be the same as the new
+            // remove the lspShipment from the previous logistic chain, can be the same as the new
             // logistic chain
             for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-              if (logisticChain.getShipmentIds().contains(shipment.getId())) {
-                logisticChain.getShipmentIds().remove(shipment.getId());
+              if (logisticChain.getLspShipmentIds().contains(lspShipment.getId())) {
+                logisticChain.getLspShipmentIds().remove(lspShipment.getId());
                 break;
               }
             }

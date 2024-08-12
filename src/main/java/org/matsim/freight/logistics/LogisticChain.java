@@ -42,7 +42,7 @@ public interface LogisticChain
 
   Collection<LogisticChainElement> getLogisticChainElements();
 
-  Collection<Id<LSPShipment>> getShipmentIds();
+  Collection<Id<LSPShipment>> getLspShipmentIds();
 
-  void addShipmentToChain(LSPShipment shipment);
+  void addShipmentToChain(LSPShipment lspShipment);
 }

@@ -56,15 +56,15 @@ public class FirstHubElementTest {
 	@Test
 	public void testDistributionElement() {
 		assertNotNull(reloadingElement.getIncomingShipments());
-		assertNotNull(reloadingElement.getIncomingShipments().getShipments());
-		assertTrue(reloadingElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(reloadingElement.getIncomingShipments().getLspShipmentsWTime());
+		assertTrue(reloadingElement.getIncomingShipments().getSortedLspShipments().isEmpty());
 		assertNotNull(reloadingElement.getAttributes());
 		assertTrue(reloadingElement.getAttributes().isEmpty());
 //		assertNull(reloadingElement.getEmbeddingContainer() );
 		assertNull(reloadingElement.getNextElement());
 		assertNotNull(reloadingElement.getOutgoingShipments());
-		assertNotNull(reloadingElement.getOutgoingShipments().getShipments());
-		assertTrue(reloadingElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNotNull(reloadingElement.getOutgoingShipments().getLspShipmentsWTime());
+		assertTrue(reloadingElement.getOutgoingShipments().getSortedLspShipments().isEmpty());
 		assertNull(reloadingElement.getPreviousElement());
 		assertSame(reloadingElement.getResource(), point);
 		assertSame(reloadingElement.getResource().getClientElements().iterator().next(), reloadingElement);

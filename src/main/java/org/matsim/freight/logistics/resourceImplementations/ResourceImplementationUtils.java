@@ -84,8 +84,8 @@ public class ResourceImplementationUtils {
       final String str0 = "LSP: " + lsp.getId();
       System.out.println(str0);
       writer.write(str0 + "\n");
-      for (LSPShipment shipment : lsp.getShipments()) {
-        final String str1 = "Shipment: " + shipment;
+      for (LSPShipment lspShipment : lsp.getLspShipments()) {
+        final String str1 = "Shipment: " + lspShipment;
         System.out.println(str1);
         writer.write(str1 + "\n");
       }
@@ -101,7 +101,7 @@ public class ResourceImplementationUtils {
       final String str0 = "LSP: " + lsp.getId();
       System.out.println(str0);
       writer.write(str0 + "\n");
-      for (LSPShipment shipment : lsp.getShipments()) {
+      for (LSPShipment shipment : lsp.getLspShipments()) {
         ArrayList<ShipmentPlanElement> elementList =
             new ArrayList<>(
                 ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
@@ -116,9 +116,9 @@ public class ResourceImplementationUtils {
   }
 
   private static void writeShipmentWithPlanElements(
-      BufferedWriter writer, LSPShipment shipment, ArrayList<ShipmentPlanElement> elementList)
+      BufferedWriter writer, LSPShipment lspShipment, ArrayList<ShipmentPlanElement> elementList)
       throws IOException {
-    final String str1 = "Shipment: " + shipment;
+    final String str1 = "Shipment: " + lspShipment;
     System.out.println(str1);
     writer.write(str1 + "\n");
     for (ShipmentPlanElement element : elementList) {
@@ -153,11 +153,11 @@ public class ResourceImplementationUtils {
       final String str0 = "LSP: " + lsp.getId();
       System.out.println(str0);
       writer.write(str0 + "\n");
-      for (LSPShipment shipment : lsp.getShipments()) {
+      for (LSPShipment lspShipment : lsp.getLspShipments()) {
         ArrayList<ShipmentPlanElement> elementList =
-            new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
+            new ArrayList<>(lspShipment.getShipmentLog().getPlanElements().values());
         elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-        writeShipmentWithPlanElements(writer, shipment, elementList);
+        writeShipmentWithPlanElements(writer, lspShipment, elementList);
       }
     } catch (IOException e) {
       e.printStackTrace();

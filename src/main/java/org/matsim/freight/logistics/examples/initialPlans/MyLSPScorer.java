@@ -86,9 +86,9 @@ import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubReso
     LSPPlan lspPlan = lsp.getSelectedPlan();
     int lspPlanShipmentCount =
         lspPlan.getLogisticChains().stream()
-            .mapToInt(logisticChain -> logisticChain.getShipmentIds().size())
+            .mapToInt(logisticChain -> logisticChain.getLspShipmentIds().size())
             .sum();
-    if (lspPlanShipmentCount != lsp.getShipments().size()) {
+    if (lspPlanShipmentCount != lsp.getLspShipments().size()) {
       logger.error(
           "LspPlan doesn't contain the same number of shipments as LSP, "
               + "shipments probably lost during replanning.");

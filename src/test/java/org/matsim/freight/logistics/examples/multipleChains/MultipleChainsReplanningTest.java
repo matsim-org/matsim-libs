@@ -256,7 +256,7 @@ public class MultipleChainsReplanningTest {
 		updatedPlanCount = lsp.getPlans().size();
 		innovatedPlanShipmentPlanCount = lsp.getPlans().get(1).getShipmentPlans().size();
 
-		innovatedPlanFirstLogisticChainShipmentCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
+		innovatedPlanFirstLogisticChainShipmentCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getLspShipmentIds().size();
 		for (ShipmentPlan shipmentPlan : lsp.getPlans().get(1).getShipmentPlans()) {
 			if (shipmentPlan.getPlanElements().isEmpty()) {
 				innovatedPlanHasEmptyShipmentPlanElements = true;

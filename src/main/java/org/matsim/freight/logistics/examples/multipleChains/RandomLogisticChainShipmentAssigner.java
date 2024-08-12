@@ -46,11 +46,11 @@ class RandomLogisticChainShipmentAssigner implements InitialShipmentAssigner {
   }
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
     Gbl.assertIf(!lspPlan.getLogisticChains().isEmpty());
     List<LogisticChain> logisticChains = new ArrayList<>(lspPlan.getLogisticChains());
     int index = random.nextInt(logisticChains.size());
     LogisticChain logisticChain = logisticChains.get(index);
-    logisticChain.addShipmentToChain(shipment);
+    logisticChain.addShipmentToChain(lspShipment);
   }
 }

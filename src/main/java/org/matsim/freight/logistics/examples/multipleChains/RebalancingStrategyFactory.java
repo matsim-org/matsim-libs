@@ -72,7 +72,7 @@ class RebalancingStrategyFactory {
 
             // fill the shipmentCountByChain map with each chain's shipment count
             for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
-              shipmentCountByChain.put(chain, chain.getShipmentIds().size());
+              shipmentCountByChain.put(chain, chain.getLspShipmentIds().size());
             }
 
             // find the chains with the minimum and maximum shipment counts
@@ -87,15 +87,15 @@ class RebalancingStrategyFactory {
             if (minChain.equals(maxChain)) return;
 
             // get the first shipment ID from the chain with the maximum shipment count
-            Id<LSPShipment> shipmentIdForReplanning = maxChain.getShipmentIds().iterator().next();
+            Id<LSPShipment> shipmentIdForReplanning = maxChain.getLspShipmentIds().iterator().next();
 
             // iterate through the chains and move the shipment from the max chain to the min chain
             for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
               if (logisticChain.equals(maxChain)) {
-                logisticChain.getShipmentIds().remove(shipmentIdForReplanning);
+                logisticChain.getLspShipmentIds().remove(shipmentIdForReplanning);
               }
               if (logisticChain.equals(minChain)) {
-                logisticChain.getShipmentIds().add(shipmentIdForReplanning);
+                logisticChain.getLspShipmentIds().add(shipmentIdForReplanning);
               }
             }
           }

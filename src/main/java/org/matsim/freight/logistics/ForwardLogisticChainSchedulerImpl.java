@@ -131,7 +131,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
       LogisticChainElement firstElement = getFirstElement(solution);
       assert firstElement != null;
-      for (Id<LSPShipment> lspShipmentId : solution.getShipmentIds()) {
+      for (Id<LSPShipment> lspShipmentId : solution.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
         assert shipment != null;
         firstElement

@@ -32,7 +32,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   private static final Logger log = LogManager.getLogger(LogisticChainImpl.class);
 
   private final Collection<LogisticChainElement> logisticChainElements;
-  private final Collection<Id<LSPShipment>> shipmentIds;
+  private final Collection<Id<LSPShipment>> lspShipmentIds;
   private LSP lsp;
 
   LogisticChainImpl(LSPUtils.LogisticChainBuilder builder) {
@@ -41,7 +41,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     for (LogisticChainElement element : this.logisticChainElements) {
       element.setEmbeddingContainer(this);
     }
-    this.shipmentIds = new ArrayList<>();
+    this.lspShipmentIds = new ArrayList<>();
   }
 
   @Override
@@ -60,13 +60,13 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public Collection<Id<LSPShipment>> getShipmentIds() {
-    return shipmentIds;
+  public Collection<Id<LSPShipment>> getLspShipmentIds() {
+    return lspShipmentIds;
   }
 
   @Override
-  public void addShipmentToChain(LSPShipment shipment) {
-    shipmentIds.add(shipment.getId());
+  public void addShipmentToChain(LSPShipment lspShipment) {
+    lspShipmentIds.add(lspShipment.getId());
   }
 
   @Override
@@ -83,10 +83,10 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
       }
       strb.append("}");
     }
-    strb.append("[No of Shipments=").append(shipmentIds.size()).append("] \n");
-    if (!shipmentIds.isEmpty()) {
+    strb.append("[No of Shipments=").append(lspShipmentIds.size()).append("] \n");
+    if (!lspShipmentIds.isEmpty()) {
       strb.append("{ShipmentIds=");
-      for (Id<LSPShipment> lspShipmentId : shipmentIds) {
+      for (Id<LSPShipment> lspShipmentId : lspShipmentIds) {
         strb.append("[").append(lspShipmentId.toString()).append("]");
       }
       strb.append("}");

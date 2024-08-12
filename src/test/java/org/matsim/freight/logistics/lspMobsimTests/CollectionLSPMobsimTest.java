@@ -205,7 +205,7 @@ public class CollectionLSPMobsimTest {
 
 	@Test
 	public void testCollectionLSPMobsim() {
-		for (LSPShipment shipment : collectionLSP.getShipments()) {
+		for (LSPShipment shipment : collectionLSP.getLspShipments()) {
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
 
 			log.warn("");

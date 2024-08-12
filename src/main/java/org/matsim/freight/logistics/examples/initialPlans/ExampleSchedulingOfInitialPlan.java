@@ -160,33 +160,33 @@ import org.matsim.vehicles.VehicleType;
         .readFile("scenarios/2regions/2regions-network.xml");
     Network network = scenario.getNetwork();
 
-    // Create LSP and shipments
+    // Create LSP and lspShipments
     LSP lsp = createInitialLSP(network);
-    Collection<LSPShipment> shipments = createInitialLSPShipments(network);
+    Collection<LSPShipment> lspShipments = createInitialLSPShipments(network);
 
-    // assign the shipments to the LSP
-    for (LSPShipment shipment : shipments) {
-      lsp.assignShipmentToLSP(shipment);
+    // assign the lspShipments to the LSP
+    for (LSPShipment lspShipment : lspShipments) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
-    // schedule the LSP with the shipments and according to the scheduler of the Resource
+    // schedule the LSP with the lspShipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
     // print the schedules for the assigned LSPShipments
-    for (LSPShipment shipment : shipments) {
-      System.out.println("Shipment: " + shipment.getId());
+    for (LSPShipment lspShipment : lspShipments) {
+      System.out.println("Shipment: " + lspShipment.getId());
       ArrayList<ShipmentPlanElement> scheduleElements =
           new ArrayList<>(
-              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
                   .getPlanElements()
                   .values());
       scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
       ArrayList<ShipmentPlanElement> logElements =
-          new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
+          new ArrayList<>(lspShipment.getShipmentLog().getPlanElements().values());
       logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
       for (ShipmentPlanElement element :
-          ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+          ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
               .getPlanElements()
               .values()) {
         System.out.println(

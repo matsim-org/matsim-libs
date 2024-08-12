@@ -291,7 +291,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 	@Test
 	public void testCompletedLSPScheduling() {
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			System.out.println();
@@ -304,7 +304,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
 		ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			assertEquals(11, ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
@@ -438,7 +438,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		while (iter.hasNext()) {
 			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
 			CarrierService service = entry.getKey();
-			LSPShipment shipment = entry.getValue().shipment;
+			LSPShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().element;
 			assertSame(service.getLocationLinkId(), shipment.getFrom());
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
@@ -452,8 +452,8 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 			}
 			assertTrue(handledByTranshipmentHub);
 
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
+			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 
 		assertEquals(1, secondTranshipmentHubResource.getSimulationTrackers().size());
@@ -465,7 +465,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		while (iter.hasNext()) {
 			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
 			CarrierService service = entry.getKey();
-			LSPShipment shipment = entry.getValue().shipment;
+			LSPShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().element;
 			assertSame(service.getLocationLinkId(), toLinkId);
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
@@ -479,11 +479,11 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 			}
 			assertTrue(handledByTranshipmentHub);
 
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
+			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			assertEquals(6, shipment.getSimulationTrackers().size());
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
@@ -598,11 +598,11 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
-				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 				if (element.getNextElement() != null) {
-					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());
+					assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				} else {
-					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+					assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				}
 			}
 		}

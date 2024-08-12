@@ -317,7 +317,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		int numberOfIterations = 1 + MatsimRandom.getRandom().nextInt(10);
 		for (int i = 0; i < numberOfIterations; i++) {
 			initialize();
-			for (LSPShipment shipment : completeLSP.getShipments()) {
+			for (LSPShipment shipment : completeLSP.getLspShipments()) {
 				assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
 				ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 				scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

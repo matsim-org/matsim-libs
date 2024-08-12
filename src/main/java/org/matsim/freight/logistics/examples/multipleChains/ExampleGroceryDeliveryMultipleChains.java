@@ -320,8 +320,8 @@ final class ExampleGroceryDeliveryMultipleChains {
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment shipment : createLSPShipmentsFromCarrierShipments(carrier)) {
-      lsp.assignShipmentToLSP(shipment);
+    for (LSPShipment lspShipment : createLSPShipmentsFromCarrierShipments(carrier)) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");

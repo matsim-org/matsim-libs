@@ -237,7 +237,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		}*/
 
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			assertEquals(7, ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
@@ -324,7 +324,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 
 		for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
-			LSPShipment shipment = entry.getValue().shipment;
+			LSPShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().element;
 			assertSame(service.getLocationLinkId(), shipment.getFrom());
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
@@ -338,11 +338,11 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			}
 			assertTrue(handledByTranshipmentHub);
 
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
+			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			assertEquals(4, shipment.getSimulationTrackers().size());
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
@@ -422,11 +422,11 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 
 		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
-				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 				if (element.getNextElement() != null) {
-					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());
+					assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				} else {
-					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+					assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				}
 			}
 		}

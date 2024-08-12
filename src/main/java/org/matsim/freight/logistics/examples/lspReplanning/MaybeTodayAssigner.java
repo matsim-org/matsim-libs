@@ -45,11 +45,11 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
     boolean assignToday = random.nextBoolean();
     if (assignToday) {
       Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
-      lspPlan.getLogisticChains().iterator().next().addShipmentToChain(shipment);
+      lspPlan.getLogisticChains().iterator().next().addShipmentToChain(lspShipment);
     }
   }
 

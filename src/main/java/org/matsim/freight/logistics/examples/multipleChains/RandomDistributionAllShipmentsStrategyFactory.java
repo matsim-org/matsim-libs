@@ -67,16 +67,16 @@ final class RandomDistributionAllShipmentsStrategyFactory {
                         if (lspPlan.getLogisticChains().size() < 2) return;
 
                         for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-                            logisticChain.getShipmentIds().clear();
+                            logisticChain.getLspShipmentIds().clear();
                         }
 
                         LSP lsp = lspPlan.getLSP();
                         List<LogisticChain> logisticChains =
                                 new ArrayList<>(lsp.getSelectedPlan().getLogisticChains());
 
-                        for (LSPShipment shipment : lsp.getShipments()) {
+                        for (LSPShipment lspShipment : lsp.getLspShipments()) {
                             int index = MatsimRandom.getRandom().nextInt(logisticChains.size());
-                            logisticChains.get(index).addShipmentToChain(shipment);
+                            logisticChains.get(index).addShipmentToChain(lspShipment);
                         }
                     }
 

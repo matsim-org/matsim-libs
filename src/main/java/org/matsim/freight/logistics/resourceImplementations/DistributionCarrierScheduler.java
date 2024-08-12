@@ -98,7 +98,7 @@ import org.matsim.vehicles.VehicleType;
       // gibt???
       VehicleType vehicleType =
           ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
-      if ((load + tuple.getShipment().getSize())
+      if ((load + tuple.getLspShipment().getSize())
           > vehicleType.getCapacity().getOther().intValue()) {
         load = 0;
         Carrier auxiliaryCarrier =
@@ -112,8 +112,8 @@ import org.matsim.vehicles.VehicleType;
         shipmentsInCurrentTour.clear();
       }
       shipmentsInCurrentTour.add(tuple);
-      load = load + tuple.getShipment().getSize();
-      cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
+      load = load + tuple.getLspShipment().getSize();
+      cumulatedLoadingTime = cumulatedLoadingTime + tuple.getLspShipment().getDeliveryServiceTime();
       availabilityTimeOfLastShipment = tuple.getTime();
     }
 
@@ -176,11 +176,11 @@ import org.matsim.vehicles.VehicleType;
 
   private CarrierService convertToCarrierService(LspShipmentWithTime tuple) {
     Id<CarrierService> serviceId =
-        Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
+        Id.create(tuple.getLspShipment().getId().toString(), CarrierService.class);
     CarrierService.Builder builder =
-        CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getTo());
-    builder.setCapacityDemand(tuple.getShipment().getSize());
-    builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime());
+        CarrierService.Builder.newInstance(serviceId, tuple.getLspShipment().getTo());
+    builder.setCapacityDemand(tuple.getLspShipment().getSize());
+    builder.setServiceDuration(tuple.getLspShipment().getDeliveryServiceTime());
     CarrierService service = builder.build();
     pairs.add(new LSPCarrierPair(tuple, service));
     return service;
@@ -216,7 +216,7 @@ import org.matsim.vehicles.VehicleType;
         ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
     builder.setResourceId(resource.getId());
     for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
         builder.setLogisticChainElement(element);
       }
     }
@@ -237,7 +237,7 @@ import org.matsim.vehicles.VehicleType;
     String idString =
         load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
     Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId())
+    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
         .addPlanElement(id, load);
   }
 
@@ -247,7 +247,7 @@ import org.matsim.vehicles.VehicleType;
         ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
     builder.setResourceId(resource.getId());
     for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
         builder.setLogisticChainElement(element);
       }
     }
@@ -279,7 +279,7 @@ import org.matsim.vehicles.VehicleType;
             + transport.getLogisticChainElement().getId()
             + transport.getElementType();
     Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId())
+    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
         .addPlanElement(id, transport);
   }
 
@@ -289,7 +289,7 @@ import org.matsim.vehicles.VehicleType;
         ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
     builder.setResourceId(resource.getId());
     for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
         builder.setLogisticsChainElement(element);
       }
     }
@@ -311,7 +311,7 @@ import org.matsim.vehicles.VehicleType;
             + String.valueOf(unload.getLogisticChainElement().getId())
             + unload.getElementType();
     Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId())
+    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
         .addPlanElement(id, unload);
   }
 
@@ -343,11 +343,11 @@ import org.matsim.vehicles.VehicleType;
   private void addDistributionServiceEventHandler(
       CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource) {
     for (LogisticChainElement element : this.resource.getClientElements()) {
-      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
         DistributionServiceStartEventHandler handler =
             new DistributionServiceStartEventHandler(
-                carrierService, tuple.getShipment(), element, resource);
-        tuple.getShipment().addSimulationTracker(handler);
+                carrierService, tuple.getLspShipment(), element, resource);
+        tuple.getLspShipment().addSimulationTracker(handler);
         break;
       }
     }
@@ -359,11 +359,11 @@ import org.matsim.vehicles.VehicleType;
       LSPCarrierResource resource,
       Tour tour) {
     for (LogisticChainElement element : this.resource.getClientElements()) {
-      if (element.getIncomingShipments().getShipments().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
         LSPTourStartEventHandler handler =
             new LSPTourStartEventHandler(
-                tuple.getShipment(), carrierService, element, resource, tour);
-        tuple.getShipment().addSimulationTracker(handler);
+                tuple.getLspShipment(), carrierService, element, resource, tour);
+        tuple.getLspShipment().addSimulationTracker(handler);
         break;
       }
     }

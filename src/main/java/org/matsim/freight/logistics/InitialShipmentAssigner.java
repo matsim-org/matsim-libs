@@ -39,5 +39,5 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  */
 public interface InitialShipmentAssigner {
 
-  void assignToPlan(LSPPlan lspPlan, LSPShipment shipment);
+  void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment);
 }

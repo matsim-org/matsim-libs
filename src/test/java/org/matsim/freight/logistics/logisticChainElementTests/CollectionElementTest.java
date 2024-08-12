@@ -87,15 +87,15 @@ public class CollectionElementTest {
 	@Test
 	public void testCollectionElement() {
 		assertNotNull(collectionElement.getIncomingShipments());
-		assertNotNull(collectionElement.getIncomingShipments().getShipments());
-		assertTrue(collectionElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(collectionElement.getIncomingShipments().getLspShipmentsWTime());
+		assertTrue(collectionElement.getIncomingShipments().getSortedLspShipments().isEmpty());
 		assertNotNull(collectionElement.getAttributes());
 		assertTrue(collectionElement.getAttributes().isEmpty());
 //		assertNull(collectionElement.getEmbeddingContainer() );
 		assertNull(collectionElement.getNextElement());
 		assertNotNull(collectionElement.getOutgoingShipments());
-		assertNotNull(collectionElement.getOutgoingShipments().getShipments());
-		assertTrue(collectionElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNotNull(collectionElement.getOutgoingShipments().getLspShipmentsWTime());
+		assertTrue(collectionElement.getOutgoingShipments().getSortedLspShipments().isEmpty());
 		assertNull(collectionElement.getPreviousElement());
 		assertSame(collectionElement.getResource(), carrierResource);
 		assertSame(collectionElement.getResource().getClientElements().iterator().next(), collectionElement);

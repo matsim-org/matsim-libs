@@ -29,16 +29,16 @@ public class LspShipmentWithTime {
   // means (delivery time?  current time?).  kai,
   // jun'22
 
-  private final LSPShipment shipment;
+  private final LSPShipment lspShipment;
   private final double time;
 
-  public LspShipmentWithTime(double time, LSPShipment shipment) {
-    this.shipment = shipment;
+  public LspShipmentWithTime(double time, LSPShipment lspShipment) {
+    this.lspShipment = lspShipment;
     this.time = time;
   }
 
-  public LSPShipment getShipment() {
-    return shipment;
+  public LSPShipment getLspShipment() {
+    return lspShipment;
   }
 
   public double getTime() {

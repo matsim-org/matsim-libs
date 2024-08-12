@@ -152,7 +152,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 	@Test
 	public void testCollectionLSPScheduling() {
 
-		for (LSPShipment shipment : collectionLSP.getShipments()) {
+		for (LSPShipment shipment : collectionLSP.getLspShipments()) {
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
@@ -163,7 +163,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			System.out.println();
 		}
 
-		for (LSPShipment shipment : collectionLSP.getShipments()) {
+		for (LSPShipment shipment : collectionLSP.getLspShipments()) {
 			assertEquals(3, ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			assertEquals("UNLOAD", planElements.get(2).getElementType());
@@ -223,11 +223,11 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 
 		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
-				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 				if (element.getNextElement() != null) {
-					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());
+					assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				} else {
-					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+					assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				}
 			}
 		}

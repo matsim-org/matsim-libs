@@ -93,15 +93,15 @@ public class DistributionElementTest {
 	@Test
 	public void testDistributionElement() {
 		assertNotNull(distributionElement.getIncomingShipments());
-		assertNotNull(distributionElement.getIncomingShipments().getShipments());
-		assertTrue(distributionElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(distributionElement.getIncomingShipments().getLspShipmentsWTime());
+		assertTrue(distributionElement.getIncomingShipments().getSortedLspShipments().isEmpty());
 		assertNotNull(distributionElement.getAttributes());
 		assertTrue(distributionElement.getAttributes().isEmpty());
 //		assertNull(distributionElement.getEmbeddingContainer() );
 		assertNull(distributionElement.getNextElement());
 		assertNotNull(distributionElement.getOutgoingShipments());
-		assertNotNull(distributionElement.getOutgoingShipments().getShipments());
-		assertTrue(distributionElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNotNull(distributionElement.getOutgoingShipments().getLspShipmentsWTime());
+		assertTrue(distributionElement.getOutgoingShipments().getSortedLspShipments().isEmpty());
 		assertNull(distributionElement.getPreviousElement());
 		assertSame(distributionElement.getResource(), adapter);
 		assertSame(distributionElement.getResource().getClientElements().iterator().next(), distributionElement);

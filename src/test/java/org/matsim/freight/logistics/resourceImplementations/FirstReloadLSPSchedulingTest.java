@@ -190,7 +190,7 @@ public class FirstReloadLSPSchedulingTest {
 	@Test
 	public void testFirstReloadLSPScheduling() {
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
@@ -202,7 +202,7 @@ public class FirstReloadLSPSchedulingTest {
 		}
 
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			assertEquals(4, ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
@@ -257,7 +257,7 @@ public class FirstReloadLSPSchedulingTest {
 
 		for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
-			LSPShipment shipment = entry.getValue().shipment;
+			LSPShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().element;
 			assertSame(service.getLocationLinkId(), shipment.getFrom());
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
@@ -271,12 +271,12 @@ public class FirstReloadLSPSchedulingTest {
 			}
 			assertTrue(handledByTranshipmentHub);
 			//This asserts that the shipments waiting for handling have been handled and the queues have been cleared
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
+			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 
 
-		for (LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getLspShipments()) {
 			assertEquals(2, shipment.getSimulationTrackers().size());
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
@@ -307,13 +307,13 @@ public class FirstReloadLSPSchedulingTest {
 		}
 
 		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-			assertEquals(1, solution.getShipmentIds().size());
+			assertEquals(1, solution.getLspShipmentIds().size());
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
-				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 				if (element.getNextElement() != null) {
-					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());
+					assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				} else {
-					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+					assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 				}
 			}
 		}

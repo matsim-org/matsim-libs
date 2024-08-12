@@ -165,8 +165,8 @@ public class CollectionLSPScoringTest {
 	@Test
 	public void testCollectionLSPScoring() {
 		System.out.println(collectionLSP.getSelectedPlan().getScore());
-		assertEquals(numberOfShipments, collectionLSP.getShipments().size());
-		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipmentIds()
+		assertEquals(numberOfShipments, collectionLSP.getLspShipments().size());
+		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLspShipmentIds()
 				.size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));

@@ -64,17 +64,17 @@ public class AssignmentStrategyFactory {
           public void handlePlan(LSPPlan lspPlan) {
 
             for (LogisticChain solution : lspPlan.getLogisticChains()) {
-              solution.getShipmentIds().clear();
+              solution.getLspShipmentIds().clear();
               for (LogisticChainElement element : solution.getLogisticChainElements()) {
                 element.getIncomingShipments().clear();
                 element.getOutgoingShipments().clear();
               }
             }
 
-            for (LSPShipment shipment : lspPlan.getLSP().getShipments()) {
-              ShipmentUtils.getOrCreateShipmentPlan(lspPlan, shipment.getId()).clear();
-              shipment.getShipmentLog().clear();
-              lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, shipment);
+            for (LSPShipment lspShipment : lspPlan.getLSP().getLspShipments()) {
+              ShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipment.getId()).clear();
+              lspShipment.getShipmentLog().clear();
+              lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, lspShipment);
             }
           }
 

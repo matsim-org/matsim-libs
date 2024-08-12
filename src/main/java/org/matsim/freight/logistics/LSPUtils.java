@@ -120,7 +120,7 @@ public final class LSPUtils {
    * @return the lspShipment object or null, if it is not found.
    */
   public static LSPShipment findLspShipment(LSP lsp, Id<LSPShipment> shipmentId) {
-    for (LSPShipment lspShipment : lsp.getShipments()) {
+    for (LSPShipment lspShipment : lsp.getLspShipments()) {
       if (lspShipment.getId().equals(shipmentId)) {
         return lspShipment;
       }

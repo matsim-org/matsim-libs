@@ -134,8 +134,8 @@ class LSPControlerListener
       }
 
       // simulation trackers of shipments:
-      for (LSPShipment shipment : lsp.getShipments()) {
-        registerSimulationTrackers(shipment);
+      for (LSPShipment lspShipment : lsp.getLspShipments()) {
+        registerSimulationTrackers(lspShipment);
       }
 
       // simulation trackers of solutions:

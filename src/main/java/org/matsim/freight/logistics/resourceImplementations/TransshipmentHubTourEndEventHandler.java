@@ -96,9 +96,9 @@ import org.matsim.freight.logistics.shipment.*;
   }
 
   public void addShipment(
-      LSPShipment shipment, LogisticChainElement logisticChainElement, ShipmentPlan shipmentPlan) {
+      LSPShipment lspShipment, LogisticChainElement logisticChainElement, ShipmentPlan shipmentPlan) {
     TransshipmentHubEventHandlerPair pair =
-        new TransshipmentHubEventHandlerPair(shipment, logisticChainElement);
+        new TransshipmentHubEventHandlerPair(lspShipment, logisticChainElement);
 
     for (ShipmentPlanElement planElement : shipmentPlan.getPlanElements().values()) {
       if (planElement instanceof ShipmentLeg transport) {
@@ -133,7 +133,7 @@ import org.matsim.freight.logistics.shipment.*;
                   && (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
 
                 final CarrierService carrierService = serviceActivity.getService();
-                final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
+                final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).lspShipment;
                 // NOTE: Do NOT add time vor unloading all goods, because they are included for the
                 // main run (Service activity at end of tour)
                 final double expHandlingDuration =
@@ -156,7 +156,7 @@ import org.matsim.freight.logistics.shipment.*;
             if (tour.getEndLinkId() == transshipmentHubResource.getStartLinkId()) {
 
               final CarrierService carrierService = serviceActivity.getService();
-              final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
+              final LSPShipment lspShipment = servicesWaitedFor.get(carrierService).lspShipment;
 
               // TODO: Adding this here to be more in line with the schedule and have the shipment
               // log fitting to it.
@@ -204,7 +204,7 @@ import org.matsim.freight.logistics.shipment.*;
   private void logHandlingInHub(
           CarrierService carrierService, double startTime, double endTime) {
 
-    LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
+    LSPShipment lspShipment = servicesWaitedFor.get(carrierService).lspShipment;
 
     { // Old logging approach - will be removed at some point in time
       ShipmentPlanElement handle =
@@ -267,11 +267,11 @@ import org.matsim.freight.logistics.shipment.*;
   }
 
   public static class TransshipmentHubEventHandlerPair {
-    public final LSPShipment shipment;
+    public final LSPShipment lspShipment;
     public final LogisticChainElement element;
 
-    public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticChainElement element) {
-      this.shipment = shipment;
+    public TransshipmentHubEventHandlerPair(LSPShipment lspShipment, LogisticChainElement element) {
+      this.lspShipment = lspShipment;
       this.element = element;
     }
   }

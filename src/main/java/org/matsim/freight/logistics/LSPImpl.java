@@ -30,8 +30,8 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 /* package-private */ class LSPImpl extends LSPDataObject<LSP> implements LSP {
   private static final Logger log = LogManager.getLogger(LSPImpl.class);
 
-  private final Collection<LSPShipment> shipments;
-  private final ArrayList<LSPPlan> plans;
+  private final Collection<LSPShipment> lspShipments;
+  private final ArrayList<LSPPlan> lspPlans;
   private final LogisticChainScheduler logisticChainScheduler;
   private final Collection<LSPResource> resources;
   private LSPPlan selectedPlan;
@@ -41,13 +41,13 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 
   LSPImpl(LSPUtils.LSPBuilder builder) {
     super(builder.id);
-    this.shipments = new ArrayList<>();
-    this.plans = new ArrayList<>();
+    this.lspShipments = new ArrayList<>();
+    this.lspPlans = new ArrayList<>();
     this.logisticChainScheduler = builder.logisticChainScheduler;
     this.logisticChainScheduler.setEmbeddingContainer(this);
     this.selectedPlan = builder.initialPlan;
     this.selectedPlan.setLSP(this);
-    this.plans.add(builder.initialPlan);
+    this.lspPlans.add(builder.initialPlan);
     this.resources = builder.resources;
   }
 
@@ -57,7 +57,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
       LogisticChain newPlanChain =
           LSPUtils.LogisticChainBuilder.newInstance(initialPlanChain.getId()).build();
       newPlanChain.getLogisticChainElements().addAll(initialPlanChain.getLogisticChainElements());
-      newPlanChain.getShipmentIds().addAll(initialPlanChain.getShipmentIds());
+      newPlanChain.getLspShipmentIds().addAll(initialPlanChain.getLspShipmentIds());
       newPlanChains.add(newPlanChain);
     }
 
@@ -95,7 +95,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
       }
     }
     plan.setLSP(this);
-    return plans.add(plan);
+    return lspPlans.add(plan);
   }
 
   @Override
@@ -107,7 +107,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 
   @Override
   public ArrayList<LSPPlan> getPlans() {
-    return plans;
+    return lspPlans;
   }
 
   @Override
@@ -117,16 +117,16 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 
   @Override
   public void setSelectedPlan(LSPPlan selectedPlan) {
-    if (!plans.contains(selectedPlan)) {
-      plans.add(selectedPlan);
+    if (!lspPlans.contains(selectedPlan)) {
+      lspPlans.add(selectedPlan);
     }
     this.selectedPlan = selectedPlan;
   }
 
   @Override
-  public boolean removePlan(LSPPlan plan) {
-    if (plans.contains(plan)) {
-      plans.remove(plan);
+  public boolean removePlan(LSPPlan lspPlan) {
+    if (lspPlans.contains(lspPlan)) {
+      lspPlans.remove(lspPlan);
       return true;
     } else {
       return false;
@@ -147,17 +147,17 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public void assignShipmentToLSP(LSPShipment shipment) {
+  public void assignShipmentToLSP(LSPShipment lspShipment) {
     //		shipment.setLspId(this.getId()); // und rückweg dann auch darüber und dann
     // lsp.getselectedPlan.getShipment...
-    shipments.add(shipment);
-    for (LSPPlan lspPlan : plans) {
-      lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, shipment);
+    lspShipments.add(lspShipment);
+    for (LSPPlan lspPlan : lspPlans) {
+      lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, lspShipment);
     }
   }
 
   @Override
-  public Collection<LSPShipment> getShipments() {
-    return this.shipments;
+  public Collection<LSPShipment> getLspShipments() {
+    return this.lspShipments;
   }
 }

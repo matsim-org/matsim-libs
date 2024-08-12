@@ -67,13 +67,13 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
             if (lspPlan.getLogisticChains().size() < 2) return;
 
             for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-              logisticChain.getShipmentIds().clear();
+              logisticChain.getLspShipmentIds().clear();
             }
 
             LSP lsp = lspPlan.getLSP();
             Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
-            for (LSPShipment shipment : lsp.getShipments()) {
+            for (LSPShipment lspShipment : lsp.getLspShipments()) {
               if (shipmentCountByChain.isEmpty()) {
                 for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
                   shipmentCountByChain.put(chain, 0);
@@ -82,7 +82,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
               LogisticChain minChain =
                   Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue())
                       .getKey();
-              minChain.addShipmentToChain(shipment);
+              minChain.addShipmentToChain(lspShipment);
               shipmentCountByChain.merge(minChain, 1, Integer::sum);
             }
           }

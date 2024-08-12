@@ -81,7 +81,7 @@ public abstract class LSPResourceScheduler {
   private void presortIncomingShipments() {
     this.lspShipmentsWithTime = new ArrayList<>();
     for (LogisticChainElement element : resource.getClientElements()) {
-      lspShipmentsWithTime.addAll(element.getIncomingShipments().getShipments());
+      lspShipmentsWithTime.addAll(element.getIncomingShipments().getLspShipmentsWTime());
     }
     lspShipmentsWithTime.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
   }
@@ -89,17 +89,17 @@ public abstract class LSPResourceScheduler {
   private void switchHandledShipments(int bufferTime) {
     for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
       var shipmentPlan =
-          ShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getShipment().getId());
+          ShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getLspShipment().getId());
       double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
       LspShipmentWithTime outgoingTuple =
-          new LspShipmentWithTime(endOfTransportTime, lspShipmentWithTime.getShipment());
+          new LspShipmentWithTime(endOfTransportTime, lspShipmentWithTime.getLspShipment());
       for (LogisticChainElement element : resource.getClientElements()) {
-        if (element.getIncomingShipments().getShipments().contains(lspShipmentWithTime)) {
-          element.getOutgoingShipments().getShipments().add(outgoingTuple);
-          element.getIncomingShipments().getShipments().remove(lspShipmentWithTime);
+        if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipmentWithTime)) {
+          element.getOutgoingShipments().getLspShipmentsWTime().add(outgoingTuple);
+          element.getIncomingShipments().getLspShipmentsWTime().remove(lspShipmentWithTime);
           if (element.getNextElement() != null) {
-            element.getNextElement().getIncomingShipments().getShipments().add(outgoingTuple);
-            element.getOutgoingShipments().getShipments().remove(outgoingTuple);
+            element.getNextElement().getIncomingShipments().getLspShipmentsWTime().add(outgoingTuple);
+            element.getOutgoingShipments().getLspShipmentsWTime().remove(outgoingTuple);
           }
         }
       }

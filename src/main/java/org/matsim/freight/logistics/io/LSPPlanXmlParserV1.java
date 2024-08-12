@@ -216,7 +216,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
           shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
 
         currentShipment = shipmentBuilder.build();
-        currentLsp.getShipments().add(currentShipment);
+        currentLsp.getLspShipments().add(currentShipment);
       }
       case LSP_PLAN -> {
         currentLspPlan = LSPUtils.createLSPPlan();
@@ -405,19 +405,19 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
       }
 
       case SHIPMENT_PLAN -> {
-        for (LSPShipment shipment : currentLsp.getShipments()) {
-          if (shipment.getId().toString().equals(shipmentPlanId)) {
+        for (LSPShipment lspShipment : currentLsp.getLspShipments()) {
+          if (lspShipment.getId().toString().equals(shipmentPlanId)) {
             for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-              ShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, shipment.getId())
+              ShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, lspShipment.getId())
                   .addPlanElement(
                       Id.create(planElement.getKey(), ShipmentPlanElement.class),
                       planElement.getValue());
             }
           }
-          for (LogisticChain chain : currentLspPlan.getLogisticChains()) {
-            if (chain.getId().toString().equals(shipmentChainId)
-                && shipment.getId().toString().equals(shipmentPlanId)) {
-              chain.addShipmentToChain(shipment);
+          for (LogisticChain logisticChain : currentLspPlan.getLogisticChains()) {
+            if (logisticChain.getId().toString().equals(shipmentChainId)
+                && lspShipment.getId().toString().equals(shipmentPlanId)) {
+              logisticChain.addShipmentToChain(lspShipment);
             }
           }
         }

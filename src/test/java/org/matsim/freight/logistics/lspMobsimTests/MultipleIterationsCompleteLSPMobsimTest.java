@@ -334,7 +334,7 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 
 	@Test
 	public void testCompleteLSPMobsim() {
-		for (LSPShipment shipment : completeLSP.getShipments()) {
+		for (LSPShipment shipment : completeLSP.getLspShipments()) {
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

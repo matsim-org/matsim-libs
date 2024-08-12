@@ -41,11 +41,11 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  */
 public interface WaitingShipments {
 
-  void addShipment(double time, LSPShipment shipment);
+  void addShipment(double time, LSPShipment lspShipment);
 
-  Collection<LspShipmentWithTime> getSortedShipments();
+  Collection<LspShipmentWithTime> getSortedLspShipments();
 
-  Collection<LspShipmentWithTime> getShipments();
+  Collection<LspShipmentWithTime> getLspShipmentsWTime();
 
   void clear();
 }

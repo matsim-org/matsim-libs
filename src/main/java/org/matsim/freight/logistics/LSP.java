@@ -34,7 +34,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<LSP> {
 
   /** yyyy does this have to be exposed? */
-  Collection<LSPShipment> getShipments();
+  Collection<LSPShipment> getLspShipments();
 
   /** ok (behavioral method) */
   void scheduleLogisticChains();
@@ -46,8 +46,8 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
   void scoreSelectedPlan();
 
   /**
-   * @param shipment ok (LSP needs to be told that it is responsible for shipment)
+   * @param lspShipment ok (LSP needs to be told that it is responsible for lspShipment)
    */
-  void assignShipmentToLSP(LSPShipment shipment);
+  void assignShipmentToLSP(LSPShipment lspShipment);
 
 }

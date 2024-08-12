@@ -174,16 +174,16 @@ import org.matsim.vehicles.VehicleType;
         .readFile("scenarios/2regions/2regions-network.xml");
     Network network = scenario.getNetwork();
 
-    // Create LSP and shipments
+    // Create LSP and lspShipments
     LSP lsp = createLSPWithTracker(scenario);
-    Collection<LSPShipment> shipments = createInitialLSPShipments(network);
+    Collection<LSPShipment> lspShipments = createInitialLSPShipments(network);
 
-    // assign the shipments to the LSP
-    for (LSPShipment shipment : shipments) {
-      lsp.assignShipmentToLSP(shipment);
+    // assign the lspShipments to the LSP
+    for (LSPShipment lspShipment : lspShipments) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
-    // schedule the LSP with the shipments and according to the scheduler of the Resource
+    // schedule the LSP with the lspShipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
     // Prepare LSPModule and add the LSP

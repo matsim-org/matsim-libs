@@ -35,14 +35,14 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public void addShipment(double time, LSPShipment shipment) {
-    LspShipmentWithTime tuple = new LspShipmentWithTime(time, shipment);
+  public void addShipment(double time, LSPShipment lspShipment) {
+    LspShipmentWithTime tuple = new LspShipmentWithTime(time, lspShipment);
     this.shipments.add(tuple);
     shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
   }
 
   @Override
-  public Collection<LspShipmentWithTime> getSortedShipments() {
+  public Collection<LspShipmentWithTime> getSortedLspShipments() {
     shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
     return shipments;
   }
@@ -52,7 +52,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public Collection<LspShipmentWithTime> getShipments() {
+  public Collection<LspShipmentWithTime> getLspShipmentsWTime() {
     return shipments;
   }
 
@@ -62,8 +62,8 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     strb.append("WaitingShipmentsImpl{").append("No of Shipments= ").append(shipments.size());
     if (!shipments.isEmpty()) {
       strb.append("; ShipmentIds=");
-      for (LspShipmentWithTime shipment : getSortedShipments()) {
-        strb.append("[").append(shipment.getShipment().getId()).append("]");
+      for (LspShipmentWithTime shipment : getSortedLspShipments()) {
+        strb.append("[").append(shipment.getLspShipment().getId()).append("]");
       }
     }
     strb.append('}');

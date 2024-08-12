@@ -92,15 +92,15 @@ public class MainRunElementTest {
 	@Test
 	public void testDistributionElement() {
 		assertNotNull(mainRunElement.getIncomingShipments());
-		assertNotNull(mainRunElement.getIncomingShipments().getShipments());
-		assertTrue(mainRunElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(mainRunElement.getIncomingShipments().getLspShipmentsWTime());
+		assertTrue(mainRunElement.getIncomingShipments().getSortedLspShipments().isEmpty());
 		assertNotNull(mainRunElement.getAttributes());
 		assertTrue(mainRunElement.getAttributes().isEmpty());
 //		assertNull(mainRunElement.getEmbeddingContainer() );
 		assertNull(mainRunElement.getNextElement());
 		assertNotNull(mainRunElement.getOutgoingShipments());
-		assertNotNull(mainRunElement.getOutgoingShipments().getShipments());
-		assertTrue(mainRunElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNotNull(mainRunElement.getOutgoingShipments().getLspShipmentsWTime());
+		assertTrue(mainRunElement.getOutgoingShipments().getSortedLspShipments().isEmpty());
 		assertNull(mainRunElement.getPreviousElement());
 		assertSame(mainRunElement.getResource(), mainRunResource);
 		assertSame(mainRunElement.getResource().getClientElements().iterator().next(), mainRunElement);

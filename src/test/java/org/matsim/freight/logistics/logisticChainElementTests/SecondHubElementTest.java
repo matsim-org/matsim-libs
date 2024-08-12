@@ -57,15 +57,15 @@ public class SecondHubElementTest {
 	@Test
 	public void testDistributionElement() {
 		assertNotNull(hubElement.getIncomingShipments());
-		assertNotNull(hubElement.getIncomingShipments().getShipments());
-		assertTrue(hubElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(hubElement.getIncomingShipments().getLspShipmentsWTime());
+		assertTrue(hubElement.getIncomingShipments().getSortedLspShipments().isEmpty());
 		assertNotNull(hubElement.getAttributes());
 		assertTrue(hubElement.getAttributes().isEmpty());
 //		assertNull(hubElement.getEmbeddingContainer() );
 		assertNull(hubElement.getNextElement());
 		assertNotNull(hubElement.getOutgoingShipments());
-		assertNotNull(hubElement.getOutgoingShipments().getShipments());
-		assertTrue(hubElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNotNull(hubElement.getOutgoingShipments().getLspShipmentsWTime());
+		assertTrue(hubElement.getOutgoingShipments().getSortedLspShipments().isEmpty());
 		assertNull(hubElement.getPreviousElement());
 		assertSame(hubElement.getResource(), point);
 		assertSame(hubElement.getResource().getClientElements().iterator().next(), hubElement);

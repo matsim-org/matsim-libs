@@ -226,33 +226,33 @@ class ExampleCheckRequirementsOfAssigner {
         .readFile("scenarios/2regions/2regions-network.xml");
     Network network = scenario.getNetwork();
 
-    // Create LSP and shipments
+    // Create LSP and lspShipments
     LSP lsp = createLSPWithProperties(network);
-    Collection<LSPShipment> shipments = createShipmentsWithRequirements(network);
+    Collection<LSPShipment> lspShipments = createShipmentsWithRequirements(network);
 
-    // assign the shipments to the LSP
-    for (LSPShipment shipment : shipments) {
-      lsp.assignShipmentToLSP(shipment);
+    // assign the lspShipments to the LSP
+    for (LSPShipment lspShipment : lspShipments) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
-    for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-      if (solution.getId().toString().equals("RedSolution")) {
-        for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
-          LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-            if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
+    for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+      if (logisticChain.getId().toString().equals("RedSolution")) {
+        for (Id<LSPShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
+          LSPShipment lspShipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
+            if (lspShipment != null && !(lspShipment.getRequirements().iterator().next() instanceof RedRequirement)) {
                 break;
             }
         }
-        System.out.println("All shipments in " + solution.getId() + " are red");
+        System.out.println("All lspShipments in " + logisticChain.getId() + " are red");
       }
-      if (solution.getId().toString().equals("BlueSolution")) {
-        for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
-          LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
+      if (logisticChain.getId().toString().equals("BlueSolution")) {
+        for (Id<LSPShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
+          LSPShipment shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
             if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
                 break;
             }
         }
-        System.out.println("All shipments in " + solution.getId() + " are blue");
+        System.out.println("All lspShipments in " + logisticChain.getId() + " are blue");
       }
     }
   }

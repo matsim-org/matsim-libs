@@ -305,8 +305,8 @@ final class ExampleMultipleOneEchelonChains {
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment shipment : createInitialLSPShipments()) {
-      lsp.assignShipmentToLSP(shipment);
+    for (LSPShipment lspShipment : createInitialLSPShipments()) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
@@ -316,7 +316,7 @@ final class ExampleMultipleOneEchelonChains {
   }
 
   private static Collection<LSPShipment> createInitialLSPShipments() {
-    List<LSPShipment> shipmentList = new ArrayList<>();
+    List<LSPShipment> lspShipmentList = new ArrayList<>();
     int capacityDemand;
 
     switch (demandSetting) {
@@ -339,7 +339,7 @@ final class ExampleMultipleOneEchelonChains {
         builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
         builder.setDeliveryServiceTime(capacityDemand * 60);
 
-        shipmentList.add(builder.build());
+        lspShipmentList.add(builder.build());
       } else {
         Id<LSPShipment> id = Id.create("ShipmentRight_" + i, LSPShipment.class);
         ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
@@ -353,10 +353,10 @@ final class ExampleMultipleOneEchelonChains {
         builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
         builder.setDeliveryServiceTime(capacityDemand * 60);
 
-        shipmentList.add(builder.build());
+        lspShipmentList.add(builder.build());
       }
     }
-    return shipmentList;
+    return lspShipmentList;
   }
 
   private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {

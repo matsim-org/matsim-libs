@@ -334,16 +334,16 @@ import org.matsim.vehicles.VehicleType;
     new MatsimNetworkReader(scenario.getNetwork())
         .readFile("scenarios/2regions/2regions-network.xml");
 
-    // Create LSP and shipments
+    // Create LSP and lspShipments
     LSP lsp = createInitialLSP(scenario);
-    Collection<LSPShipment> shipments = createInitialLSPShipments(scenario.getNetwork());
+    Collection<LSPShipment> lspShipments = createInitialLSPShipments(scenario.getNetwork());
 
-    // assign the shipments to the LSP
-    for (LSPShipment shipment : shipments) {
-      lsp.assignShipmentToLSP(shipment);
+    // assign the lspShipments to the LSP
+    for (LSPShipment lspShipment : lspShipments) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
-    // schedule the LSP with the shipments and according to the scheduler of the Resource
+    // schedule the LSP with the lspShipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
     // set up simulation controler and LSPModule
@@ -374,21 +374,21 @@ import org.matsim.vehicles.VehicleType;
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controler.run();
 
-    for (LSPShipment shipment : lsp.getShipments()) {
-      System.out.println("Shipment: " + shipment.getId());
+    for (LSPShipment lspShipment : lsp.getLspShipments()) {
+      System.out.println("Shipment: " + lspShipment.getId());
       ArrayList<ShipmentPlanElement> scheduleElements =
           new ArrayList<>(
-              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
                   .getPlanElements()
                   .values());
       scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
       ArrayList<ShipmentPlanElement> logElements =
-          new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
+          new ArrayList<>(lspShipment.getShipmentLog().getPlanElements().values());
       logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
       for (int i = 0;
           i
-              < ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+              < ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
                   .getPlanElements()
                   .size();
           i++) {
@@ -405,7 +405,7 @@ import org.matsim.vehicles.VehicleType;
                 + scheduleElements.get(i).getEndTime());
       }
       System.out.println();
-      for (int i = 0; i < shipment.getShipmentLog().getPlanElements().size(); i++) {
+      for (int i = 0; i < lspShipment.getShipmentLog().getPlanElements().size(); i++) {
         System.out.println(
             "Logged: "
                 + logElements.get(i).getLogisticChainElement().getId()

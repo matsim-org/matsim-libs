@@ -275,15 +275,15 @@ public class CompleteLSPShipmentAssignerTest {
 
 		for (LogisticChain solution : solutions) {
 			if (solutions.indexOf(solution) == 0) {
-				assertEquals(10, solution.getShipmentIds().size());
+				assertEquals(10, solution.getLspShipmentIds().size());
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if (element.getPreviousElement() == null) {
-						assertTrue(element.getIncomingShipments().getShipments().isEmpty());
-						assertTrue(element.getOutgoingShipments().getShipments().isEmpty());
+						assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
+						assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 					}
 				}
 			} else {
-				assertTrue(solution.getShipmentIds().isEmpty());
+				assertTrue(solution.getLspShipmentIds().isEmpty());
 			}
 		}
 

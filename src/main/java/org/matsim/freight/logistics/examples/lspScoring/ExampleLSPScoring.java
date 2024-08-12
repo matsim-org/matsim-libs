@@ -197,16 +197,16 @@ import org.matsim.vehicles.VehicleType;
   static Scenario prepareScenario(Config config) {
     Scenario scenario = ScenarioUtils.loadScenario(config);
 
-    // Create LSP and shipments
+    // Create LSP and lspShipments
     LSP lsp = createLSPWithScorer(scenario.getNetwork());
-    Collection<LSPShipment> shipments = createInitialLSPShipments(scenario.getNetwork());
+    Collection<LSPShipment> lspShipments = createInitialLSPShipments(scenario.getNetwork());
 
-    // assign the shipments to the LSP
-    for (LSPShipment shipment : shipments) {
-      lsp.assignShipmentToLSP(shipment);
+    // assign the lspShipments to the LSP
+    for (LSPShipment lspShipment : lspShipments) {
+      lsp.assignShipmentToLSP(lspShipment);
     }
 
-    // schedule the LSP with the shipments and according to the scheduler of the Resource
+    // schedule the LSP with the lspShipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
     // Prepare LSPModule and add the LSP
